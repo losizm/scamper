@@ -1,6 +1,7 @@
 package scamper
 
 import java.net.URI
+import scala.util.Try
 
 /**
  * A representation of an HTTP message.
@@ -35,6 +36,10 @@ trait HttpMessage {
 
   /** The message body */
   def body: Option[Entity]
+
+  /** Parses the message body. */
+  def parse[T]()(implicit bodyParser: BodyParser[T]): Try[T] =
+    bodyParser(this)
 
   /**
    * Creates a copy of this message with the additional header.
