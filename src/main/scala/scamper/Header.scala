@@ -10,7 +10,7 @@ case class Header(key: String, value: String) {
 object Header {
   private val HeaderRegex = """([\w-]+):\s*(.*)\s*""".r
 
-  /** Parses header line. */
+  /** Parses the header line. */
   def apply(line: String): Header =
     line match {
       case HeaderRegex(key, value) =>

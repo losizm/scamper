@@ -15,8 +15,10 @@ trait Entity {
 
   /**
    * Provides access to this entity's input stream with automatic resource
-   * management. The input stream is passed to the supplied function, and the
-   * stream is closed upon function's return.
+   * management.
+   *
+   * The input stream is passed to the supplied function, and the stream is
+   * closed upon function's return.
    *
    * @return the value returned from supplied function
    */

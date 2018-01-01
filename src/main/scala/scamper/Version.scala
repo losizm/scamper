@@ -12,7 +12,7 @@ case class Version(major: Int, minor: Int) {
 object Version {
   private val VersionRegex = """(\d+)\.(\d+)""".r
 
-  /** Parses version value. */
+  /** Parses the version value. */
   def apply(value: String): Version =
     value match {
       case VersionRegex(major, minor) =>
