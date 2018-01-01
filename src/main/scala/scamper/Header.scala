@@ -10,13 +10,13 @@ case class Header(key: String, value: String) {
 object Header {
   private val HeaderRegex = """([\w-]+):\s*(.*)\s*""".r
 
-  /** Parses the header line. */
-  def apply(line: String): Header =
-    line match {
+  /** Parses the header. */
+  def apply(header: String): Header =
+    header match {
       case HeaderRegex(key, value) =>
         Header(key, value)
       case _ =>
-        throw new IllegalArgumentException(s"Invalid header line: $line")
+        throw new IllegalArgumentException(s"Invalid header: $header")
     }
 }
 

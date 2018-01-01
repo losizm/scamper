@@ -1,13 +1,7 @@
 package scamper
 
 /** Provides the status code and reason phrase of an HTTP response. */
-case class Status(code: Int, reason: String) {
-  /**
-   * Returns a canonically formatted status code and reason phrase as it would
-   * appear in an HTTP status line.
-   */
-  override def toString(): String = s"$code $reason"
-}
+case class Status(code: Int, reason: String)
 
 /** Status factory */
 object Status {

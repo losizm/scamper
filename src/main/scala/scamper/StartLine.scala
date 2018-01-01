@@ -18,7 +18,7 @@ case class RequestLine(method: String, uri: URI, version: Version) extends Start
 
 /** RequestLine factory */
 object RequestLine {
-  private val LineRegex = """(\w+)\h+(\p{Graph}+)\h+HTTP/(\w+\.\w+)\h*""".r
+  private val LineRegex = """(\w+)\h+(\p{Graph}+)\h+HTTP/(\d+\.\d+)\h*""".r
 
   /** Parses the request line. */
   def apply(line: String): RequestLine =
@@ -35,12 +35,12 @@ object RequestLine {
 /** Provides the attributes of an HTTP status line. */
 case class StatusLine(version: Version, status: Status) extends StartLine {
   /** Returns a canonically formatted HTTP status line. */
-  override def toString(): String = s"HTTP/$version $status"
+  override def toString(): String = s"HTTP/$version ${status.code} ${status.reason}"
 }
 
 /** StatusLine factory */
 object StatusLine {
-  private val LineRegex = """HTTP/(\w+\.\w+)\h+(\d+)\h+(\p{Print}+)\h*""".r
+  private val LineRegex = """HTTP/(\d+\.\d+)\h+(\d+)\h+(\p{Print}+)\h*""".r
 
   /** Parses the status line. */
   def apply(line: String): StatusLine =
