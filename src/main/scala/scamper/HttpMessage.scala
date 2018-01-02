@@ -58,12 +58,20 @@ trait HttpMessage {
     getHeaderValue("Content-Length").map(_.toLong)
 
   /**
-   * Gets the transfer encoding.
+   * Gets the content encoding.
    *
-   * The value is retrieved from the Transfer-Encoding header.
+   * The value is retrieved from the Content-Encoding header.
    */
-  def transferEncoding: Option[String] =
-    getHeaderValue("Transfer-Encoding")
+  def contentEncoding: Option[String] =
+    getHeaderValue("Content-Encoding")
+
+  /**
+   * Tests whether the message body is chunked.
+   *
+   * This is determined by inspecting the Transfer-Encoding header.
+   */
+  def isChunked: Boolean =
+    getHeaderValue("Transfer-Encoding").map(_ == "chunked").getOrElse(false)
 
   /**
    * Creates a copy of this message with the additional header.

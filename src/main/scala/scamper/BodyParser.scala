@@ -28,7 +28,7 @@ private object StringBodyParser extends BodyParser[String] {
     Try {
       message.body.map { entity =>
         entity.withInputStream { in =>
-          message.getHeaderValue("Content-Encoding").getOrElse("identity") match {
+          message.contentEncoding.getOrElse("identity") match {
             case "gzip" =>
               val gzipIn = new GZIPInputStream(in)
               try toString(gzipIn)
