@@ -42,6 +42,30 @@ trait HttpMessage {
     bodyParser(this)
 
   /**
+   * Gets the content type.
+   *
+   * The value is retrieved from the Content-Type header.
+   */
+  def contentType: Option[ContentType] =
+    getHeaderValue("Content-Type").map(ContentType.apply)
+
+  /**
+   * Gets the content length.
+   *
+   * The value is retrieved from the Content-Length header.
+   */
+  def contentLength: Option[Long] =
+    getHeaderValue("Content-Length").map(_.toLong)
+
+  /**
+   * Gets the transfer encoding.
+   *
+   * The value is retrieved from the Transfer-Encoding header.
+   */
+  def transferEncoding: Option[String] =
+    getHeaderValue("Transfer-Encoding")
+
+  /**
    * Creates a copy of this message with the additional header.
    *
    * @return the new message
@@ -85,6 +109,14 @@ trait HttpRequest extends HttpMessage {
 
   lazy val startLine: RequestLine =
     RequestLine(method, uri, version)
+
+  /**
+   * Gets the requested host.
+   *
+   * The value is retrieved from the Host header.
+   */
+  def host: Option[String] =
+    getHeaderValue("Host")
 
   /**
    * Creates a copy of this request with a new method.
