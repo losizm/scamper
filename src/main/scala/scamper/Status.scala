@@ -19,6 +19,8 @@ object Status {
   val ResetContent            = Status(205, "Reset Content")
   /** 301 Moved Permanently */
   val MovedPermanently        = Status(301, "Moved Permanently")
+  /** 302 Found */
+  val Found                   = Status(302, "Found")
   /** 303 See Other */
   val SeeOther                = Status(303, "See Other")
   /** 304 Not Modified */

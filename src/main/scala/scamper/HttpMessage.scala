@@ -38,8 +38,8 @@ trait HttpMessage {
   def body: Option[Entity]
 
   /** Parses the message body. */
-  def parse[T]()(implicit bodyParser: BodyParser[T]): Try[T] =
-    bodyParser(this)
+  def parse[T](implicit bodyParser: BodyParser[T]): Try[T] =
+    Try(bodyParser(this))
 
   /**
    * Gets the content type.
@@ -74,25 +74,18 @@ trait HttpMessage {
     getHeaderValue("Transfer-Encoding").map(_ == "chunked").getOrElse(false)
 
   /**
-   * Creates a copy of this message with the additional header.
-   *
-   * @return the new message
-   */
-  def addHeader(header: Header): MessageType
-
-  /**
    * Creates a copy of this message with the additional headers.
    *
    * @return the new message
    */
-  def addHeaders(headers: Seq[Header]): MessageType
+  def addHeaders(headers: Header*): MessageType
 
   /**
-   * Creates a copy of this message with a new sequence of headers.
+   * Creates a copy of this message with a new set of headers.
    *
    * @return the new message
    */
-  def withHeaders(headers: Seq[Header]): MessageType
+  def withHeaders(headers: Header*): MessageType
 
   /**
    * Creates a copy of this message with a new body.
@@ -153,16 +146,17 @@ object HttpRequest {
   /** Creates an HttpRequest using the supplied attributes. */
   def apply(method: String, uri: URI, headers: Seq[Header] = Nil, body: Option[Entity] = None, version: Version = Version(1, 1)): HttpRequest =
     SimpleHttpRequest(method, uri, headers, body, version)
+
+  /** Creates an HttpRequest using the supplied attributes. */
+  def apply(requestLine: RequestLine, headers: Seq[Header], body: Option[Entity]): HttpRequest =
+    SimpleHttpRequest(requestLine.method, requestLine.uri, headers, body, requestLine.version)
 }
 
 private case class SimpleHttpRequest(method: String, uri: URI, headers: Seq[Header], body: Option[Entity], version: Version) extends HttpRequest {
-  def addHeader(header: Header): MessageType =
-    copy(headers = headers :+ header)
-
-  def addHeaders(moreHeaders: Seq[Header]): MessageType =
+  def addHeaders(moreHeaders: Header*): MessageType =
     copy(headers = headers ++ moreHeaders)
 
-  def withHeaders(newHeaders: Seq[Header]): MessageType =
+  def withHeaders(newHeaders: Header*): MessageType =
     copy(headers = newHeaders)
 
   def withBody(newBody: Option[Entity]): MessageType =
@@ -211,16 +205,17 @@ object HttpResponse {
   /** Creates an HttpResponse using the supplied attributes. */
   def apply(status: Status, headers: Seq[Header] = Nil, body: Option[Entity] = None, version: Version = Version(1, 1)): HttpResponse =
     SimpleHttpResponse(status, headers, body, version)
+
+  /** Creates an HttpResponse using the supplied attributes. */
+  def apply(statusLine: StatusLine, headers: Seq[Header], body: Option[Entity]): HttpResponse =
+    SimpleHttpResponse(statusLine.status, headers, body, statusLine.version)
 }
 
 private case class SimpleHttpResponse(status: Status, headers: Seq[Header], body: Option[Entity], version: Version) extends HttpResponse {
-  def addHeader(header: Header): MessageType =
-    copy(headers = headers :+ header)
-
-  def addHeaders(moreHeaders: Seq[Header]): MessageType =
+  def addHeaders(moreHeaders: Header*): MessageType =
     copy(headers = headers ++ moreHeaders)
 
-  def withHeaders(newHeaders: Seq[Header]): MessageType =
+  def withHeaders(newHeaders: Header*): MessageType =
     copy(headers = newHeaders)
 
   def withBody(newBody: Option[Entity]): MessageType =

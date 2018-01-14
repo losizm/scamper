@@ -11,7 +11,7 @@ trait Entity {
   def size: Option[Long]
 
   /** Gets an input stream to this entity. */
-  def getInputStream(): InputStream
+  def getInputStream: InputStream
 
   /**
    * Provides access to this entity's input stream with automatic resource
@@ -23,7 +23,7 @@ trait Entity {
    * @return the value returned from supplied function
    */
   def withInputStream[T](f: InputStream => T): T = {
-    val in = getInputStream()
+    val in = getInputStream
     try f(in)
     finally Try(in.close())
   }
@@ -45,6 +45,10 @@ object Entity {
     ByteArrayEntity(copy)
   }
 
+  /** Creates an entity from the supplied input stream provider. */
+  def apply(provider: () => InputStream): Entity =
+    InputStreamEntity(provider)
+
   /** Creates an entity whose content is the data in file at supplied path. */
   def apply(path: Path): Entity =
     FileEntity(path.toFile)
@@ -62,13 +66,18 @@ object Entity {
     ByteArrayEntity(string.getBytes(charset))
 }
 
+private case class InputStreamEntity(provider: () => InputStream) extends Entity {
+  def size = None
+  def getInputStream = provider()
+}
+
 private case class ByteArrayEntity(bytes: Array[Byte]) extends Entity {
   def size = Some(bytes.length)
-  def getInputStream() = new ByteArrayInputStream(bytes)
+  def getInputStream = new ByteArrayInputStream(bytes)
 }
 
 private case class FileEntity(file: File) extends Entity {
   def size = Some(file.length)
-  def getInputStream() = new FileInputStream(file)
+  def getInputStream = new FileInputStream(file)
 }
 
