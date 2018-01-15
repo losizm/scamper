@@ -55,7 +55,7 @@ object Implicits {
      *
      * @return the value returned from supplied handler
      */
-    def request[T](method: String, body: Option[Entity] = None, headers: Seq[Header] = Nil)(f: HttpResponse => T): Try[T] =
+    def request[T](method: String, headers: Seq[Header] = Nil, body: Option[Entity] = None)(f: HttpResponse => T): Try[T] =
       withConnection { conn =>
         conn.setRequestMethod(method)
         headers.foreach(header => conn.addRequestProperty(header.key, header.value))
@@ -80,7 +80,7 @@ object Implicits {
      * @return the value returned from supplied handler
      */
     def get[T](headers: Header*)(f: HttpResponse => T): Try[T] =
-      request("GET", None, headers)(f)
+      request("GET", headers)(f)
 
     /**
      * Sends a POST request and passes the response to the supplied handler.
@@ -92,7 +92,7 @@ object Implicits {
      * @return the value returned from supplied handler
      */
     def post[T](body: Entity, headers: Header*)(f: HttpResponse => T): Try[T] =
-      request("POST", Option(body), headers)(f)
+      request("POST", headers, Option(body))(f)
 
     /**
      * Sends a PUT request and passes the response to the supplied handler.
@@ -104,7 +104,7 @@ object Implicits {
      * @return the value returned from supplied handler
      */
     def put[T](body: Entity, headers: Header*)(f: HttpResponse => T): Try[T] =
-      request("PUT", Option(body), headers)(f)
+      request("PUT", headers, Option(body))(f)
 
     /**
      * Sends a DELETE request and passes the response to the supplied handler.
@@ -115,7 +115,7 @@ object Implicits {
      * @return the value returned from supplied handler
      */
     def delete[T](headers: Header*)(f: HttpResponse => T): Try[T] =
-      request("DELETE", None, headers)(f)
+      request("DELETE", headers)(f)
 
     /**
      * Sends a HEAD request and passes the response to the supplied handler.
@@ -126,7 +126,7 @@ object Implicits {
      * @return the value returned from supplied handler
      */
     def head[T](headers: Header*)(f: HttpResponse => T): Try[T] =
-      request("HEAD", None, headers)(f)
+      request("HEAD", headers)(f)
 
     /**
      * Sends a TRACE request and passes the response to the supplied handler.
@@ -137,7 +137,7 @@ object Implicits {
      * @return the value returned from supplied handler
      */
     def trace[T](headers: Header*)(f: HttpResponse => T): Try[T] =
-      request("TRACE", None, headers)(f)
+      request("TRACE", headers)(f)
 
     /**
      * Sends an OPTIONS request and passes the response to the supplied handler.
@@ -148,7 +148,7 @@ object Implicits {
      * @return the value returned from supplied handler
      */
     def options[T](headers: Header*)(f: HttpResponse => T): Try[T] =
-      request("OPTIONS", None, headers)(f)
+      request("OPTIONS", headers)(f)
 
     private def writeBody(conn: HttpURLConnection, body: Entity): Unit = {
       body.size match {
