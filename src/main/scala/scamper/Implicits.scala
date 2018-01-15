@@ -46,6 +46,32 @@ object Implicits {
       }
 
     /**
+     * Sends the HTTP request and passes the response to the supplied handler.
+     *
+     * @param method request method
+     * @param headers request headers
+     * @param body request entity body
+     * @param f response handler
+     *
+     * @return the value returned from supplied handler
+     */
+    def request[T](method: String, body: Option[Entity] = None, headers: Seq[Header] = Nil)(f: HttpResponse => T): Try[T] =
+      withConnection { conn =>
+        conn.setRequestMethod(method)
+        headers.foreach(header => conn.addRequestProperty(header.key, header.value))
+
+        body.foreach { entity =>
+          conn.setDoOutput(true)
+          writeBody(conn, entity)
+        }
+
+        val statusLine = StatusLine(conn.getHeaderField(0))
+        val response = HttpResponse(statusLine, getHeaders(conn), getBody(conn))
+
+        f(response)
+      }
+
+    /**
      * Sends a GET request and passes the response to the supplied handler.
      *
      * @param headers request headers
@@ -54,63 +80,31 @@ object Implicits {
      * @return the value returned from supplied handler
      */
     def get[T](headers: Header*)(f: HttpResponse => T): Try[T] =
-      withConnection { conn =>
-        conn.setRequestMethod("GET")
-        headers.foreach(header => conn.addRequestProperty(header.key, header.value))
-
-        val statusLine = StatusLine(conn.getHeaderField(0))
-        val response = HttpResponse(statusLine, getHeaders(conn), getBody(conn))
-
-        f(response)
-      }
+      request("GET", None, headers)(f)
 
     /**
      * Sends a POST request and passes the response to the supplied handler.
      *
-     * @param headers request headers
      * @param body request entity body
+     * @param headers request headers
      * @param f response handler
      *
      * @return the value returned from supplied handler
      */
     def post[T](body: Entity, headers: Header*)(f: HttpResponse => T): Try[T] =
-      withConnection { conn =>
-        conn.setRequestMethod("POST")
-        headers.foreach(header => conn.addRequestProperty(header.key, header.value))
-        conn.setRequestProperty("X-Scamper-Chunked-Managed", "true")
-
-        conn.setDoOutput(true)
-        writeBody(conn, body)
-
-        val statusLine = StatusLine(conn.getHeaderField(0))
-        val response = HttpResponse(statusLine, getHeaders(conn), getBody(conn))
-
-        f(response)
-      }
+      request("POST", Option(body), headers)(f)
 
     /**
      * Sends a PUT request and passes the response to the supplied handler.
      *
-     * @param headers request headers
      * @param body request entity body
+     * @param headers request headers
      * @param f response handler
      *
      * @return the value returned from supplied handler
      */
     def put[T](body: Entity, headers: Header*)(f: HttpResponse => T): Try[T] =
-      withConnection { conn =>
-        conn.setRequestMethod("PUT")
-        headers.foreach(header => conn.addRequestProperty(header.key, header.value))
-        conn.setRequestProperty("X-Scamper-Chunked-Managed", "true")
-
-        conn.setDoOutput(true)
-        writeBody(conn, body)
-
-        val statusLine = StatusLine(conn.getHeaderField(0))
-        val response = HttpResponse(statusLine, getHeaders(conn), getBody(conn))
-
-        f(response)
-      }
+      request("PUT", Option(body), headers)(f)
 
     /**
      * Sends a DELETE request and passes the response to the supplied handler.
@@ -121,16 +115,40 @@ object Implicits {
      * @return the value returned from supplied handler
      */
     def delete[T](headers: Header*)(f: HttpResponse => T): Try[T] =
-      withConnection { conn =>
-        conn.setRequestMethod("DELETE")
-        headers.foreach(header => conn.addRequestProperty(header.key, header.value))
-        conn.setRequestProperty("X-Scamper-Chunked-Managed", "true")
+      request("DELETE", None, headers)(f)
 
-        val statusLine = StatusLine(conn.getHeaderField(0))
-        val response = HttpResponse(statusLine, getHeaders(conn), getBody(conn))
+    /**
+     * Sends a HEAD request and passes the response to the supplied handler.
+     *
+     * @param headers request headers
+     * @param f response handler
+     *
+     * @return the value returned from supplied handler
+     */
+    def head[T](headers: Header*)(f: HttpResponse => T): Try[T] =
+      request("HEAD", None, headers)(f)
 
-        f(response)
-      }
+    /**
+     * Sends a TRACE request and passes the response to the supplied handler.
+     *
+     * @param headers request headers
+     * @param f response handler
+     *
+     * @return the value returned from supplied handler
+     */
+    def trace[T](headers: Header*)(f: HttpResponse => T): Try[T] =
+      request("TRACE", None, headers)(f)
+
+    /**
+     * Sends an OPTIONS request and passes the response to the supplied handler.
+     *
+     * @param headers request headers
+     * @param f response handler
+     *
+     * @return the value returned from supplied handler
+     */
+    def options[T](headers: Header*)(f: HttpResponse => T): Try[T] =
+      request("OPTIONS", None, headers)(f)
 
     private def writeBody(conn: HttpURLConnection, body: Entity): Unit = {
       body.size match {
