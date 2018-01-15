@@ -45,9 +45,9 @@ object Entity {
     ByteArrayEntity(copy)
   }
 
-  /** Creates an entity from the supplied input stream provider. */
-  def apply(provider: () => InputStream): Entity =
-    InputStreamEntity(provider)
+  /** Creates an entity from the input stream returned from supplied function. */
+  def apply(f: () => InputStream): Entity =
+    InputStreamEntity(f)
 
   /** Creates an entity whose content is the data in file at supplied path. */
   def apply(path: Path): Entity =
@@ -66,9 +66,9 @@ object Entity {
     ByteArrayEntity(string.getBytes(charset))
 }
 
-private case class InputStreamEntity(provider: () => InputStream) extends Entity {
+private case class InputStreamEntity(f: () => InputStream) extends Entity {
   def size = None
-  def getInputStream = provider()
+  def getInputStream = f()
 }
 
 private case class ByteArrayEntity(bytes: Array[Byte]) extends Entity {

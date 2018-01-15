@@ -11,6 +11,9 @@ object Implicits {
   /** Converts a string to a [[Header]]. */
   implicit val stringToHeader = (header: String) => Header(header)
 
+  /** Converts a tuple to a [[Header]]. */
+  implicit val tupleToHeader = (header: (String, String)) => Header(header._1, header._2)
+
   /** Converts a string to a [[Version]]. */
   implicit val stringToVersion = (version: String) => Version(version)
 
@@ -19,9 +22,6 @@ object Implicits {
 
   /** Converts a string to a <code>java.net.URL</code>. */
   implicit val stringToURL = (url: String) => new URL(url)
-
-  /** Converts a tuple to a [[Header]]. */
-  implicit val tupleToHeader = (header: (String, String)) => Header(header._1, header._2)
 
   /**
    * A type class of <code>java.net.URL</code> which adds methods for sending
@@ -56,7 +56,7 @@ object Implicits {
     def get[T](headers: Header*)(f: HttpResponse => T): Try[T] =
       withConnection { conn =>
         conn.setRequestMethod("GET")
-        headers.foreach(header => conn.setRequestProperty(header.key, header.value))
+        headers.foreach(header => conn.addRequestProperty(header.key, header.value))
 
         val statusLine = StatusLine(conn.getHeaderField(0))
         val response = HttpResponse(statusLine, getHeaders(conn), getBody(conn))
@@ -76,9 +76,10 @@ object Implicits {
     def post[T](body: Entity, headers: Header*)(f: HttpResponse => T): Try[T] =
       withConnection { conn =>
         conn.setRequestMethod("POST")
-        conn.setDoOutput(true)
-        headers.foreach(header => conn.setRequestProperty(header.key, header.value))
+        headers.foreach(header => conn.addRequestProperty(header.key, header.value))
+        conn.setRequestProperty("X-Scamper-Chunked-Managed", "true")
 
+        conn.setDoOutput(true)
         writeBody(conn, body)
 
         val statusLine = StatusLine(conn.getHeaderField(0))
@@ -99,9 +100,10 @@ object Implicits {
     def put[T](body: Entity, headers: Header*)(f: HttpResponse => T): Try[T] =
       withConnection { conn =>
         conn.setRequestMethod("PUT")
-        conn.setDoOutput(true)
-        headers.foreach(header => conn.setRequestProperty(header.key, header.value))
+        headers.foreach(header => conn.addRequestProperty(header.key, header.value))
+        conn.setRequestProperty("X-Scamper-Chunked-Managed", "true")
 
+        conn.setDoOutput(true)
         writeBody(conn, body)
 
         val statusLine = StatusLine(conn.getHeaderField(0))
@@ -121,7 +123,8 @@ object Implicits {
     def delete[T](headers: Header*)(f: HttpResponse => T): Try[T] =
       withConnection { conn =>
         conn.setRequestMethod("DELETE")
-        headers.foreach(header => conn.setRequestProperty(header.key, header.value))
+        headers.foreach(header => conn.addRequestProperty(header.key, header.value))
+        conn.setRequestProperty("X-Scamper-Chunked-Managed", "true")
 
         val statusLine = StatusLine(conn.getHeaderField(0))
         val response = HttpResponse(statusLine, getHeaders(conn), getBody(conn))
@@ -144,14 +147,27 @@ object Implicits {
     }
 
     @tailrec
-    private def getHeaders(conn: HttpURLConnection, keyIndex: Int = 1, headers: Seq[Header] = Nil): Seq[Header] =
+    private def getHeaders(conn: HttpURLConnection, keyIndex: Int, headers: Seq[Header]): Seq[Header] =
       conn.getHeaderFieldKey(keyIndex) match {
         case null => headers
         case key  => getHeaders(conn, keyIndex + 1, headers :+ Header(key, conn.getHeaderField(keyIndex)))
       }
 
+    private def getHeaders(conn: HttpURLConnection): Seq[Header] = {
+      val headers = getHeaders(conn, 1, Nil)
+
+      if ("chunked".equalsIgnoreCase(conn.getHeaderField("Transfer-Encoding")))
+        headers :+ Header("X-Scamper-Chunked-Managed: true")
+      else headers
+    }
+
     private def getBody(conn: HttpURLConnection): Option[Entity] =
-      Some(Entity(() => conn.getInputStream))
+      Some(
+        Entity(() =>
+          if (conn.getResponseCode >= 400) conn.getErrorStream
+          else conn.getInputStream
+        )
+      )
   }
 }
 

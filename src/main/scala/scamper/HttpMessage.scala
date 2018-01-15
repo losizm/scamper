@@ -25,13 +25,13 @@ trait HttpMessage {
    */
   def getHeaderValue(key: String): Option[String] =
     headers.collectFirst {
-      case Header(k, value) if k.toLowerCase == key.toLowerCase => value
+      case Header(k, value) if k.equalsIgnoreCase(key) => value
     }
 
   /** Gets all header values for specified key. */
   def getHeaderValues(key: String): List[String] =
     headers.collect {
-      case Header(k, value) if k.toLowerCase == key.toLowerCase => value
+      case Header(k, value) if k.equalsIgnoreCase(key) => value
     }.toList
 
   /** The message body */
@@ -71,7 +71,7 @@ trait HttpMessage {
    * This is determined by inspecting the Transfer-Encoding header.
    */
   def isChunked: Boolean =
-    getHeaderValue("Transfer-Encoding").map(_ == "chunked").getOrElse(false)
+    getHeaderValue("Transfer-Encoding").map("chunked".equalsIgnoreCase).getOrElse(false)
 
   /**
    * Creates a copy of this message with the additional headers.
