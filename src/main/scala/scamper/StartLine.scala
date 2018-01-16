@@ -7,7 +7,10 @@ import scala.util.Try
  *
  * @see [[RequestLine]], [[StatusLine]]
  */
-sealed trait StartLine
+sealed trait StartLine {
+  /** HTTP version */
+  def version: Version
+}
 
 /** Provides the attributes of an HTTP request line. */
 case class RequestLine(method: String, uri: String, version: Version) extends StartLine {
