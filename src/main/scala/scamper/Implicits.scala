@@ -175,7 +175,7 @@ object Implicits {
       val headers = getHeaders(conn, 1, Nil)
 
       if ("chunked".equalsIgnoreCase(conn.getHeaderField("Transfer-Encoding")))
-        headers :+ Header("X-Scamper-Chunked-Managed: true")
+        headers :+ Header("X-Scamper-Encoding: unchunked")
       else headers
     }
 

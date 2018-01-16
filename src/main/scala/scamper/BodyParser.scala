@@ -26,17 +26,12 @@ private object ByteArrayBodyParser extends BodyParser[Array[Byte]] {
   import bantam.nx.io._
   import java.util.zip.{ GZIPInputStream, InflaterInputStream }
 
-  implicit class HttpMessageType(message: HttpMessage) {
-    def isChunkedManaged: Boolean =
-      message.getHeaderValue("X-Scamper-Chunked-Managed").map(_.toBoolean).getOrElse(false)
-  }
-
   def apply(message: HttpMessage): Array[Byte] =
     message.body.map { entity =>
       entity.withInputStream { in =>
         message.contentEncoding.getOrElse("identity") match {
           case "gzip" =>
-            val gzipIn = if (message.isChunked && !message.isChunkedManaged)
+            val gzipIn = if (isChunked(message))
                 new GZIPInputStream(new SequenceInputStream(new ChunkEnumeration(in)))
               else new GZIPInputStream(in)
 
@@ -44,7 +39,7 @@ private object ByteArrayBodyParser extends BodyParser[Array[Byte]] {
             finally gzipIn.close()
 
           case "deflate" =>
-            val deflateIn = if (message.isChunked && !message.isChunkedManaged)
+            val deflateIn = if (isChunked(message))
                 new InflaterInputStream(new SequenceInputStream(new ChunkEnumeration(in)))
               else new InflaterInputStream(in)
 
@@ -52,7 +47,7 @@ private object ByteArrayBodyParser extends BodyParser[Array[Byte]] {
             finally deflateIn.close()
 
           case "identity" =>
-            if (message.isChunked && !message.isChunkedManaged)
+            if (isChunked(message))
               toByteArray(new SequenceInputStream(new ChunkEnumeration(in)))
             else toByteArray(in)
 
@@ -61,6 +56,9 @@ private object ByteArrayBodyParser extends BodyParser[Array[Byte]] {
         }
       }
     } getOrElse Array.empty
+
+  private def isChunked(message: HttpMessage): Boolean =
+    message.isChunked && !message.getHeaderValue("X-Scamper-Encoding").map(_.contains("unchunked")).getOrElse(false)
 
   private def toByteArray(in: InputStream): Array[Byte] = {
     val out = new ByteArrayOutputStream(1024)
@@ -78,7 +76,7 @@ private object StringBodyParser extends BodyParser[String] {
 }
 
 private class ChunkEnumeration(in: InputStream) extends java.util.Enumeration[InputStream] {
-  private var chunkSize = readChunkSize
+  private var chunkSize = nextChunkSize
 
   def hasMoreElements(): Boolean =
     chunkSize > 0
@@ -96,20 +94,18 @@ private class ChunkEnumeration(in: InputStream) extends java.util.Enumeration[In
       }
 
     // discard CRLF
-    if (readLine.length != 0) throw new HttpException("Invalid chunked encoding")
+    if (nextLine.length != 0) throw new HttpException("Invalid chunked encoding")
 
-    chunkSize = readChunkSize
+    chunkSize = nextChunkSize
 
     new ByteArrayInputStream(buffer)
   }
 
-  private def readChunkSize: Int =
-    readLine.split("\\s+", 2) match {
-      case Array(size, _*) => Integer.parseInt(size, 16)
-    }
+  private def nextChunkSize: Int =
+    Integer.parseInt(nextLine.split("\\s+", 2).head)
 
-  private def readLine: String = {
-    def read: Int =
+  private def nextLine: String = {
+    def nextByte: Int =
       in.read() match {
         case '\r' =>
           if (in.read() != '\n') throw new HttpException("Invalid chunked encoding")
@@ -122,7 +118,7 @@ private class ChunkEnumeration(in: InputStream) extends java.util.Enumeration[In
     val buffer = new scala.collection.mutable.ArrayBuffer[Byte](8)
     var byte = 0
 
-    while ({ byte = read; byte != -1 })
+    while ({ byte = nextByte; byte != -1 })
       buffer += byte.toByte
 
     new String(buffer.toArray, "ASCII")
