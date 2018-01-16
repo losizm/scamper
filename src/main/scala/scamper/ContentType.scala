@@ -1,7 +1,5 @@
 package scamper
 
-import scala.util.Try
-
 /**
  * Provides the primary type, subtype, and parameters of a content type (i.e.,
  * MIME type).

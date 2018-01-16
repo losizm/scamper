@@ -1,6 +1,5 @@
 package scamper
 
-import java.net.URI
 import scala.util.Try
 
 /**
@@ -11,7 +10,7 @@ import scala.util.Try
 sealed trait StartLine
 
 /** Provides the attributes of an HTTP request line. */
-case class RequestLine(method: String, uri: URI, version: Version) extends StartLine {
+case class RequestLine(method: String, uri: String, version: Version) extends StartLine {
   /** Returns a canonically formatted HTTP request line. */
   override def toString(): String = s"$method $uri HTTP/$version"
 }
@@ -24,7 +23,7 @@ object RequestLine {
   def apply(line: String): RequestLine =
     line match {
       case LineRegex(method, uri, version) =>
-        Try(RequestLine(method, new URI(uri), Version(version))).getOrElse {
+        Try(RequestLine(method, uri, Version(version))).getOrElse {
           throw new IllegalArgumentException(s"Invalid request line: $line")
         }
       case _ =>

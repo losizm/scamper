@@ -1,6 +1,5 @@
 package scamper
 
-import java.net.URI
 import scala.util.Try
 
 /**
@@ -103,7 +102,7 @@ trait HttpRequest extends HttpMessage {
   def method: String
 
   /** The request URI */
-  def uri: URI
+  def uri: String
 
   /** HTTP version of request message */
   def version: Version
@@ -131,7 +130,7 @@ trait HttpRequest extends HttpMessage {
    *
    * @return the new request
    */
-  def withURI(uri: URI): MessageType
+  def withURI(uri: String): MessageType
 
   /**
    * Creates a copy of this request with a new version.
@@ -144,7 +143,7 @@ trait HttpRequest extends HttpMessage {
 /** HttpRequest factory */
 object HttpRequest {
   /** Creates an HttpRequest using the supplied attributes. */
-  def apply(method: String, uri: URI, headers: Seq[Header] = Nil, body: Option[Entity] = None, version: Version = Version(1, 1)): HttpRequest =
+  def apply(method: String, uri: String, headers: Seq[Header] = Nil, body: Option[Entity] = None, version: Version = Version(1, 1)): HttpRequest =
     SimpleHttpRequest(method, uri, headers, body, version)
 
   /** Creates an HttpRequest using the supplied attributes. */
@@ -152,7 +151,7 @@ object HttpRequest {
     SimpleHttpRequest(requestLine.method, requestLine.uri, headers, body, requestLine.version)
 }
 
-private case class SimpleHttpRequest(method: String, uri: URI, headers: Seq[Header], body: Option[Entity], version: Version) extends HttpRequest {
+private case class SimpleHttpRequest(method: String, uri: String, headers: Seq[Header], body: Option[Entity], version: Version) extends HttpRequest {
   def addHeaders(moreHeaders: Header*): MessageType =
     copy(headers = headers ++ moreHeaders)
 
@@ -165,7 +164,7 @@ private case class SimpleHttpRequest(method: String, uri: URI, headers: Seq[Head
   def withMethod(newMethod: String): MessageType =
     copy(method = newMethod)
 
-  def withURI(newURI: URI): MessageType =
+  def withURI(newURI: String): MessageType =
     copy(uri = newURI)
 
   def withVersion(newVersion: Version): MessageType =

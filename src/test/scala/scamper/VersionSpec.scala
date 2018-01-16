@@ -1,6 +1,5 @@
 package scamper
 
-import java.net.URI
 import org.scalatest.FlatSpec
 
 class VersionSpec extends FlatSpec {

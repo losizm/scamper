@@ -1,7 +1,7 @@
 package scamper
 
 import bantam.nx.io._
-import java.net.{ HttpURLConnection, URI, URL }
+import java.net.{ HttpURLConnection, URL }
 import scala.annotation.tailrec
 import scala.util.Try
 import scamper._
@@ -16,12 +16,6 @@ object Implicits {
 
   /** Converts a string to a [[Version]]. */
   implicit val stringToVersion = (version: String) => Version(version)
-
-  /** Converts a string to a <code>java.net.URI</code>. */
-  implicit val stringToURI = (uri: String) => new URI(uri)
-
-  /** Converts a string to a <code>java.net.URL</code>. */
-  implicit val stringToURL = (url: String) => new URL(url)
 
   /**
    * A type class of <code>java.net.URL</code> which adds methods for sending
