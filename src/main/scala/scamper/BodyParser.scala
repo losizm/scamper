@@ -27,38 +27,28 @@ private object ByteArrayBodyParser extends BodyParser[Array[Byte]] {
   import java.util.zip.{ GZIPInputStream, InflaterInputStream }
 
   def apply(message: HttpMessage): Array[Byte] =
-    message.body.map { entity =>
-      entity.withInputStream { in =>
-        message.contentEncoding.getOrElse("identity") match {
-          case "gzip" =>
-            val gzipIn = if (isChunked(message))
-                new GZIPInputStream(new SequenceInputStream(new ChunkEnumeration(in)))
-              else new GZIPInputStream(in)
+    message.body.withInputStream { in =>
+      val dechunked = if (isChunked(message)) new SequenceInputStream(new ChunkEnumeration(in)) else in
 
-            try toByteArray(gzipIn)
-            finally gzipIn.close()
+      message.contentEncoding.getOrElse("identity") match {
+        case "gzip" =>
+          val gzipIn = new GZIPInputStream(dechunked)
+          try toByteArray(gzipIn)
+          finally gzipIn.close()
 
-          case "deflate" =>
-            val deflateIn = if (isChunked(message))
-                new InflaterInputStream(new SequenceInputStream(new ChunkEnumeration(in)))
-              else new InflaterInputStream(in)
+        case "deflate" =>
+          val deflateIn =  new InflaterInputStream(dechunked)
+          try toByteArray(deflateIn)
+          finally deflateIn.close()
 
-            try toByteArray(deflateIn)
-            finally deflateIn.close()
+        case "identity" => toByteArray(dechunked)
 
-          case "identity" =>
-            if (isChunked(message))
-              toByteArray(new SequenceInputStream(new ChunkEnumeration(in)))
-            else toByteArray(in)
-
-          case encoding =>
-            throw new HttpException(s"Unsupported content encoding: $encoding")
-        }
+        case encoding => throw new HttpException(s"Unsupported content encoding: $encoding")
       }
-    } getOrElse Array.empty
+    }
 
   private def isChunked(message: HttpMessage): Boolean =
-    message.isChunked && !message.getHeaderValue("X-Scamper-Encoding").exists(_.contains("unchunked"))
+    message.isChunked && !message.getHeaderValue("X-Scamper-Decoding").exists(_.contains("chunked"))
 
   private def toByteArray(in: InputStream): Array[Byte] = {
     val out = new ByteArrayOutputStream(1024)

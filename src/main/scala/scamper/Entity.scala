@@ -10,6 +10,10 @@ trait Entity {
   /** The size in bytes, if known. */
   def size: Option[Long]
 
+  /** Tests whether this entity is known to be empty. */
+  def isKnownEmpty: Boolean =
+    size.exists(_ == 0)
+
   /** Gets an input stream to this entity. */
   def getInputStream: InputStream
 
@@ -64,6 +68,9 @@ object Entity {
   /** Creates an entity whose content is the encoded bytes from supplied string. */
   def apply(string: String, charset: Charset): Entity =
     ByteArrayEntity(string.getBytes(charset))
+
+  /** Creates an empty entity. */
+  def empty: Entity = ByteArrayEntity(Array.empty)
 }
 
 private case class InputStreamEntity(f: () => InputStream) extends Entity {

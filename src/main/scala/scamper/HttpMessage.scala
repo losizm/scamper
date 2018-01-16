@@ -34,7 +34,7 @@ trait HttpMessage {
     }.toList
 
   /** The message body */
-  def body: Option[Entity]
+  def body: Entity
 
   /** Parses the message body. */
   def parse[T](implicit bodyParser: BodyParser[T]): Try[T] =
@@ -91,7 +91,7 @@ trait HttpMessage {
    *
    * @return the new message
    */
-  def withBody(body: Option[Entity]): MessageType
+  def withBody(body: Entity): MessageType
 }
 
 /** A representation of an HTTP request. */
@@ -143,22 +143,22 @@ trait HttpRequest extends HttpMessage {
 /** HttpRequest factory */
 object HttpRequest {
   /** Creates an HttpRequest using the supplied attributes. */
-  def apply(method: String, uri: String, headers: Seq[Header] = Nil, body: Option[Entity] = None, version: Version = Version(1, 1)): HttpRequest =
+  def apply(method: String, uri: String, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpRequest =
     SimpleHttpRequest(method, uri, headers, body, version)
 
   /** Creates an HttpRequest using the supplied attributes. */
-  def apply(requestLine: RequestLine, headers: Seq[Header], body: Option[Entity]): HttpRequest =
+  def apply(requestLine: RequestLine, headers: Seq[Header], body: Entity): HttpRequest =
     SimpleHttpRequest(requestLine.method, requestLine.uri, headers, body, requestLine.version)
 }
 
-private case class SimpleHttpRequest(method: String, uri: String, headers: Seq[Header], body: Option[Entity], version: Version) extends HttpRequest {
+private case class SimpleHttpRequest(method: String, uri: String, headers: Seq[Header], body: Entity, version: Version) extends HttpRequest {
   def addHeaders(moreHeaders: Header*): MessageType =
     copy(headers = headers ++ moreHeaders)
 
   def withHeaders(newHeaders: Header*): MessageType =
     copy(headers = newHeaders)
 
-  def withBody(newBody: Option[Entity]): MessageType =
+  def withBody(newBody: Entity): MessageType =
     copy(body = newBody)
 
   def withMethod(newMethod: String): MessageType =
@@ -202,22 +202,22 @@ trait HttpResponse extends HttpMessage {
 /** HttpResponse factory */
 object HttpResponse {
   /** Creates an HttpResponse using the supplied attributes. */
-  def apply(status: Status, headers: Seq[Header] = Nil, body: Option[Entity] = None, version: Version = Version(1, 1)): HttpResponse =
+  def apply(status: Status, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpResponse =
     SimpleHttpResponse(status, headers, body, version)
 
   /** Creates an HttpResponse using the supplied attributes. */
-  def apply(statusLine: StatusLine, headers: Seq[Header], body: Option[Entity]): HttpResponse =
+  def apply(statusLine: StatusLine, headers: Seq[Header], body: Entity): HttpResponse =
     SimpleHttpResponse(statusLine.status, headers, body, statusLine.version)
 }
 
-private case class SimpleHttpResponse(status: Status, headers: Seq[Header], body: Option[Entity], version: Version) extends HttpResponse {
+private case class SimpleHttpResponse(status: Status, headers: Seq[Header], body: Entity, version: Version) extends HttpResponse {
   def addHeaders(moreHeaders: Header*): MessageType =
     copy(headers = headers ++ moreHeaders)
 
   def withHeaders(newHeaders: Header*): MessageType =
     copy(headers = newHeaders)
 
-  def withBody(newBody: Option[Entity]): MessageType =
+  def withBody(newBody: Entity): MessageType =
     copy(body = newBody)
 
   def withStatus(newStatus: Status): MessageType =

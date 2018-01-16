@@ -169,16 +169,14 @@ object Implicits {
       val headers = getHeaders(conn, 1, Nil)
 
       if ("chunked".equalsIgnoreCase(conn.getHeaderField("Transfer-Encoding")))
-        headers :+ Header("X-Scamper-Encoding: unchunked")
+        headers :+ Header("X-Scamper-Decoding: chunked")
       else headers
     }
 
-    private def getBody(conn: HttpURLConnection): Option[Entity] =
-      Some(
-        Entity(() =>
-          if (conn.getResponseCode >= 400) conn.getErrorStream
-          else conn.getInputStream
-        )
+    private def getBody(conn: HttpURLConnection): Entity =
+      Entity(() =>
+        if (conn.getResponseCode >= 400) conn.getErrorStream
+        else conn.getInputStream
       )
   }
 }
