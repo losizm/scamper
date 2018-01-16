@@ -70,7 +70,7 @@ trait HttpMessage {
    * This is determined by inspecting the Transfer-Encoding header.
    */
   def isChunked: Boolean =
-    getHeaderValue("Transfer-Encoding").map("chunked".equalsIgnoreCase).getOrElse(false)
+    getHeaderValue("Transfer-Encoding").exists("chunked".equalsIgnoreCase)
 
   /**
    * Creates a copy of this message with the additional headers.

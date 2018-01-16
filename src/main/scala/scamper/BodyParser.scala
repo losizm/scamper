@@ -58,7 +58,7 @@ private object ByteArrayBodyParser extends BodyParser[Array[Byte]] {
     } getOrElse Array.empty
 
   private def isChunked(message: HttpMessage): Boolean =
-    message.isChunked && !message.getHeaderValue("X-Scamper-Encoding").map(_.contains("unchunked")).getOrElse(false)
+    message.isChunked && !message.getHeaderValue("X-Scamper-Encoding").exists(_.contains("unchunked"))
 
   private def toByteArray(in: InputStream): Array[Byte] = {
     val out = new ByteArrayOutputStream(1024)

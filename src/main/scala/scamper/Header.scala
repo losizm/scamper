@@ -13,10 +13,8 @@ object Header {
   /** Parses the header. */
   def apply(header: String): Header =
     header match {
-      case HeaderRegex(key, value) =>
-        Header(key, value)
-      case _ =>
-        throw new IllegalArgumentException(s"Invalid header: $header")
+      case HeaderRegex(key, value) => Header(key, value)
+      case _ => throw new IllegalArgumentException(s"Invalid header: $header")
     }
 }
 
