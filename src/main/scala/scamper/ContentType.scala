@@ -6,8 +6,7 @@ package scamper
  */
 case class ContentType private (primaryType: String, subtype: String, parameters: Map[String, String]) {
   /** Returns a canonically formatted MIME type. */
-  override def toString(): String =
-    s"${primaryType}/$subtype$paramsToString"
+  override val toString: String = s"${primaryType}/$subtype$paramsToString"
 
   /** Tests whether primary type is text. */
   def isText: Boolean = primaryType == "text"

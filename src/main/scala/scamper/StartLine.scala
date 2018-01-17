@@ -15,7 +15,7 @@ sealed trait StartLine {
 /** Provides the attributes of an HTTP request line. */
 case class RequestLine(method: String, uri: String, version: Version) extends StartLine {
   /** Returns a canonically formatted HTTP request line. */
-  override def toString(): String = s"$method $uri HTTP/$version"
+  override val toString: String = s"$method $uri HTTP/$version"
 }
 
 /** RequestLine factory */
@@ -37,7 +37,7 @@ object RequestLine {
 /** Provides the attributes of an HTTP status line. */
 case class StatusLine(version: Version, status: Status) extends StartLine {
   /** Returns a canonically formatted HTTP status line. */
-  override def toString(): String = s"HTTP/$version ${status.code} ${status.reason}"
+  override val toString: String = s"HTTP/$version ${status.code} ${status.reason}"
 }
 
 /** StatusLine factory */

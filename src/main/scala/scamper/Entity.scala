@@ -12,7 +12,7 @@ trait Entity {
 
   /** Tests whether this entity is known to be empty. */
   def isKnownEmpty: Boolean =
-    size.exists(_ == 0)
+    size.contains(0)
 
   /** Gets an input stream to this entity. */
   def getInputStream: InputStream
@@ -74,12 +74,12 @@ object Entity {
 }
 
 private case class InputStreamEntity(f: () => InputStream) extends Entity {
-  def size = None
+  val size = None
   def getInputStream = f()
 }
 
 private case class ByteArrayEntity(bytes: Array[Byte]) extends Entity {
-  def size = Some(bytes.length)
+  val size = Some(bytes.length)
   def getInputStream = new ByteArrayInputStream(bytes)
 }
 

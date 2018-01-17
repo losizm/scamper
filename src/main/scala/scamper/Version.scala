@@ -5,7 +5,7 @@ import scala.util.Try
 /** Provides the major and minor numbers of an HTTP version. */
 case class Version(major: Int, minor: Int) {
   /** Returns the formatted version. */
-  override def toString(): String = s"$major.$minor"
+  override val toString: String = s"$major.$minor"
 }
 
 /** Version factory */

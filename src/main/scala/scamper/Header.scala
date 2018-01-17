@@ -3,7 +3,7 @@ package scamper
 /** Provides the key-value pair of an HTTP header. */
 case class Header(key: String, value: String) {
   /** Returns a canonically formatted HTTP header. */
-  override def toString(): String = s"$key: $value"
+  override val toString: String = s"$key: $value"
 }
 
 /** Header factory */
