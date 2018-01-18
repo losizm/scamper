@@ -185,6 +185,14 @@ trait HttpResponse extends HttpMessage {
     StatusLine(version, status)
 
   /**
+   * Gets the location.
+   *
+   * The value is retrieved from the Location header.
+   */
+  def location: Option[String] =
+    getHeaderValue("Location")
+
+  /**
    * Creates a copy of this response with a new status.
    *
    * @return the new response
