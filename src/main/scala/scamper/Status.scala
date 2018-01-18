@@ -1,7 +1,27 @@
 package scamper
 
 /** Provides the status code and reason phrase of an HTTP response. */
-case class Status(code: Int, reason: String)
+case class Status(code: Int, reason: String) {
+  /** Tests whether this is an informational status. */
+  def isInformational: Boolean =
+    code >= 100 && code <= 199
+
+  /** Tests whether this is a successful status. */
+  def isSuccessful: Boolean =
+    code >= 200 && code <= 299
+
+  /** Tests whether this is a redirection status. */
+  def isRedirection: Boolean =
+    code >= 300 && code <= 399
+
+  /** Tests whether this is a client error status. */
+  def isClientError: Boolean =
+    code >= 400 && code <= 499
+
+  /** Tests whether this is a server error status. */
+  def isServerError: Boolean =
+    code >= 500 && code <= 599
+}
 
 /** Status factory */
 object Status {
