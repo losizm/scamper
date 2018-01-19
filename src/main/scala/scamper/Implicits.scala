@@ -158,13 +158,6 @@ object Implicits {
       body.withInputStream(conn.getOutputStream << _)
     }
 
-    @tailrec
-    private def getHeaders(conn: HttpURLConnection, keyIndex: Int, headers: Seq[Header]): Seq[Header] =
-      conn.getHeaderFieldKey(keyIndex) match {
-        case null => headers
-        case key  => getHeaders(conn, keyIndex + 1, headers :+ Header(key, conn.getHeaderField(keyIndex)))
-      }
-
     private def getHeaders(conn: HttpURLConnection): Seq[Header] = {
       val headers = getHeaders(conn, 1, Nil)
 
@@ -172,6 +165,13 @@ object Implicits {
         headers :+ Header("X-Scamper-Decoding: chunked")
       else headers
     }
+
+    @tailrec
+    private def getHeaders(conn: HttpURLConnection, keyIndex: Int, headers: Seq[Header]): Seq[Header] =
+      conn.getHeaderFieldKey(keyIndex) match {
+        case null => headers
+        case key  => getHeaders(conn, keyIndex + 1, headers :+ Header(key, conn.getHeaderField(keyIndex)))
+      }
 
     private def getBody(conn: HttpURLConnection): Entity =
       Entity(() =>

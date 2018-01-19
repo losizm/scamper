@@ -34,7 +34,7 @@ object Status {
   val SwitchingProtocols = newStatus(101, "Switching Protocols")
 
   /** 200 OK */
-  val OK = newStatus(200, "OK")
+  val Ok = newStatus(200, "OK")
 
   /** 201 Created */
   val Created = newStatus(201, "Created")
