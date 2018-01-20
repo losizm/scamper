@@ -1,11 +1,10 @@
 package scamper
 
 /**
- * Provides the primary type, subtype, and parameters of a content type (i.e.,
- * MIME type).
+ * Provides the primary type, subtype, and parameters of an HTTP content type.
  */
 case class ContentType private (primaryType: String, subtype: String, parameters: Map[String, String]) {
-  /** Returns a canonically formatted MIME type. */
+  /** Returns the formatted content type. */
   override val toString: String = s"${primaryType}/$subtype$paramsToString"
 
   /** Tests whether primary type is text. */
@@ -55,7 +54,7 @@ object ContentType {
     new ContentType(primaryType, subtype, parameters)
   }
 
-  /** Parses the content type. */
+  /** Parses the formatted content type. */
   def apply(contentType: String): ContentType =
     contentType match {
       case ContentTypeRegex(primaryType, subtype, params, _*) =>

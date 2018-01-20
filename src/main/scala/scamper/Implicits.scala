@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 import scala.util.Try
 import scamper._
 
-/** A collection of implicits. */
+/** Provides implicit conversion functions and type classes. */
 object Implicits {
   /** Converts a string to a [[Header]]. */
   implicit val stringToHeader = (header: String) => Header(header)
@@ -21,7 +21,7 @@ object Implicits {
   implicit val intToStatus = (status: Int) => Status(status)
 
   /**
-   * A type class for [[Status]] that adds methods for creating an
+   * A type class of [[Status]] that adds methods for creating an
    * [[HttpResponse]].
    */
   implicit class StatusType(status: Status) {

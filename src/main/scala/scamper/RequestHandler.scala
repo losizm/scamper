@@ -14,7 +14,7 @@ trait RequestHandler {
 
 /** Represents a chain of request handlers. */
 class RequestHandlerChain private (handler: RequestHandler, next: RequestHandlerChain) {
-  /** Forwards the request through the chain of request handlers. */
+  /** Forwards the request through the request handler chain. */
   def apply(request: HttpRequest): HttpResponse =
     handler(request, next)
 }
@@ -23,7 +23,7 @@ class RequestHandlerChain private (handler: RequestHandler, next: RequestHandler
 object RequestHandlerChain {
   private val notFound = new RequestHandlerChain((_, _) => HttpResponse(Status.NotFound), null)
 
-  /** Creates a chain with supplied handlers. */
+  /** Creates a request handler chain with supplied handlers. */
   def apply(handlers: RequestHandler*): RequestHandlerChain =
     handlers.foldRight(notFound) { (handler, next) => new RequestHandlerChain(handler, next) }
 }

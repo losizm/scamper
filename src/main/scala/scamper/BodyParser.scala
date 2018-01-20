@@ -6,9 +6,6 @@ import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, InputStream, Seque
 trait BodyParser[T] {
   /**
    * Parses the body of supplied HTTP message as an instance of defined type.
-   *
-   * @return the result of parsing computation -- i.e., <code>Success(T)</code>
-   * or <code>Failure(Throwable)</code>
    */
   def apply(message: HttpMessage): T
 }

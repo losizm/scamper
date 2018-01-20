@@ -14,7 +14,7 @@ sealed trait StartLine {
 
 /** Provides the attributes of an HTTP request line. */
 case class RequestLine(method: String, uri: String, version: Version) extends StartLine {
-  /** Returns a canonically formatted HTTP request line. */
+  /** Returns the formatted HTTP request line. */
   override val toString: String = s"$method $uri HTTP/$version"
 }
 
@@ -22,7 +22,7 @@ case class RequestLine(method: String, uri: String, version: Version) extends St
 object RequestLine {
   private val LineRegex = """(\w+)\h+(\p{Graph}+)\h+HTTP/(\d+\.\d+)\h*""".r
 
-  /** Parses the request line. */
+  /** Parses the formatted request line. */
   def apply(line: String): RequestLine =
     line match {
       case LineRegex(method, uri, version) =>
@@ -36,7 +36,7 @@ object RequestLine {
 
 /** Provides the attributes of an HTTP status line. */
 case class StatusLine(version: Version, status: Status) extends StartLine {
-  /** Returns a canonically formatted HTTP status line. */
+  /** Returns the formatted HTTP status line. */
   override val toString: String = s"HTTP/$version ${status.code} ${status.reason}"
 }
 
@@ -44,7 +44,7 @@ case class StatusLine(version: Version, status: Status) extends StartLine {
 object StatusLine {
   private val LineRegex = """HTTP/(\d+\.\d+)\h+(\d+)\h+(\p{Print}+)\h*""".r
 
-  /** Parses the status line. */
+  /** Parses the formatted status line. */
   def apply(line: String): StatusLine =
     line match {
       case LineRegex(version, code, reason) =>

@@ -33,7 +33,7 @@ trait Entity {
   }
 }
 
-/** An Entity factory for various content types. */
+/** Entity factory */
 object Entity {
   /** Creates an entity whose content is the supplied bytes. */
   def apply(bytes: Array[Byte]): Entity =

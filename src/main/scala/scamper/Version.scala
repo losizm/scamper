@@ -2,7 +2,7 @@ package scamper
 
 import scala.util.Try
 
-/** Provides the major and minor numbers of an HTTP version. */
+/** HTTP version */
 case class Version(major: Int, minor: Int) {
   /** Returns the formatted version. */
   override val toString: String = s"$major.$minor"
@@ -12,7 +12,7 @@ case class Version(major: Int, minor: Int) {
 object Version {
   private val VersionRegex = """(\d+)\.(\d+)""".r
 
-  /** Parses the version. */
+  /** Parses the formatted version. */
   def apply(version: String): Version =
     version match {
       case VersionRegex(major, minor) =>
