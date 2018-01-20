@@ -17,8 +17,29 @@ object Implicits {
   /** Converts a string to a [[Version]]. */
   implicit val stringToVersion = (version: String) => Version(version)
 
+  /** Converts an integer to a [[Status]]. */
+  implicit val intToStatus = (status: Int) => Status(status)
+
   /**
-   * A type class of <code>java.net.URL</code> which adds methods for sending
+   * A type class for [[Status]] that adds methods for creating an
+   * [[HttpResponse]].
+   */
+  implicit class StatusType(status: Status) {
+    /** Creates a response with status and supplied headers. */
+    def withHeaders(headers: Header*): HttpResponse =
+      HttpResponse(status, headers)
+
+    /** Creates a response with status and supplied body. */
+    def withBody(body: Entity): HttpResponse =
+      HttpResponse(status, body = body)
+
+    /** Creates a response with status and supplied version. */
+    def withVersion(version: Version): HttpResponse =
+      HttpResponse(status, version = version)
+  }
+
+  /**
+   * A type class of <code>java.net.URL</code> that adds methods for sending
    * HTTP requests and handling the response.
    */
   implicit class URLType(url: URL) {
