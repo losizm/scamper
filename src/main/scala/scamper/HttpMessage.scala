@@ -74,6 +74,13 @@ trait HttpMessage {
     getHeaderValue("Transfer-Encoding").exists("chunked".equalsIgnoreCase)
 
   /**
+   * Creates a copy of this message replacing the start line.
+   *
+   * @return the new message
+   */
+  def withStartLine(line: LineType): MessageType
+
+  /**
    * Creates a copy of this message replacing the supplied header.
    *
    * All previous headers having the same key as supplied header are removed and
@@ -160,22 +167,19 @@ trait HttpRequest extends HttpMessage {
   type LineType = RequestLine
 
   /** The request method (i.e., GET, POST, etc.) */
-  def method: String
+  def method: String = startLine.method
 
   /** The request URI */
-  def uri: String
+  def uri: String = startLine.uri
 
   /** HTTP version of request message */
-  def version: Version
+  def version: Version = startLine.version
 
   /** The path component of URI */
   def path: String
 
   /** The query component of URI */
   def query: Option[String]
-
-  lazy val startLine: RequestLine =
-    RequestLine(method, uri, version)
 
   /**
    * Gets the requested host.
@@ -218,37 +222,40 @@ trait HttpRequest extends HttpMessage {
 /** Provides HttpRequest factory methods. */
 object HttpRequest {
   /** Creates an HttpRequest using the supplied attributes. */
-  def apply(method: String, uri: String, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpRequest =
-    SimpleHttpRequest(method, uri, headers, body, version)
+  def apply(requestLine: RequestLine, headers: Seq[Header], body: Entity): HttpRequest =
+    SimpleHttpRequest(requestLine, headers, body)
 
   /** Creates an HttpRequest using the supplied attributes. */
-  def apply(requestLine: RequestLine, headers: Seq[Header], body: Entity): HttpRequest =
-    SimpleHttpRequest(requestLine.method, requestLine.uri, headers, body, requestLine.version)
+  def apply(method: String, uri: String, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpRequest =
+    SimpleHttpRequest(RequestLine(method, uri, version), headers, body)
 }
 
-private case class SimpleHttpRequest(method: String, uri: String, headers: Seq[Header], body: Entity, version: Version) extends HttpRequest {
+private case class SimpleHttpRequest(startLine: RequestLine, headers: Seq[Header], body: Entity) extends HttpRequest {
   private lazy val uriObject = new java.net.URI(uri)
 
   lazy val path = uriObject.getPath
   lazy val query = Option(uriObject.getQuery)
 
-  def addHeaders(moreHeaders: Header*): MessageType =
+  def addHeaders(moreHeaders: Header*): HttpRequest =
     copy(headers = headers ++ moreHeaders)
 
-  def withHeaders(newHeaders: Header*): MessageType =
+  def withHeaders(newHeaders: Header*): HttpRequest =
     copy(headers = newHeaders)
 
-  def withBody(newBody: Entity): MessageType =
+  def withBody(newBody: Entity): HttpRequest =
     copy(body = newBody)
 
-  def withMethod(newMethod: String): MessageType =
-    copy(method = newMethod)
+  def withStartLine(line: RequestLine): HttpRequest =
+    copy(startLine = line)
 
-  def withURI(newURI: String): MessageType =
-    copy(uri = newURI)
+  def withMethod(newMethod: String): HttpRequest =
+    copy(startLine = startLine.copy(method = newMethod))
 
-  def withVersion(newVersion: Version): MessageType =
-    copy(version = newVersion)
+  def withURI(newURI: String): HttpRequest =
+    copy(startLine = startLine.copy(uri = newURI))
+
+  def withVersion(newVersion: Version): HttpRequest =
+    copy(startLine = startLine.copy(version = newVersion))
 }
 
 /** A representation of an HTTP response. */
@@ -257,13 +264,10 @@ trait HttpResponse extends HttpMessage {
   type LineType = StatusLine
 
   /** The response status */
-  def status: Status
+  def status: Status = startLine.status
 
   /** HTTP version of response message */
-  def version: Version
-
-  lazy val startLine: StatusLine =
-    StatusLine(version, status)
+  def version: Version = startLine.version
 
   /**
    * Gets the location.
@@ -299,28 +303,31 @@ trait HttpResponse extends HttpMessage {
 /** Provides HttpResponse factory methods. */
 object HttpResponse {
   /** Creates an HttpResponse using the supplied attributes. */
-  def apply(status: Status, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpResponse =
-    SimpleHttpResponse(status, headers, body, version)
+  def apply(statusLine: StatusLine, headers: Seq[Header], body: Entity): HttpResponse =
+    SimpleHttpResponse(statusLine, headers, body)
 
   /** Creates an HttpResponse using the supplied attributes. */
-  def apply(statusLine: StatusLine, headers: Seq[Header], body: Entity): HttpResponse =
-    SimpleHttpResponse(statusLine.status, headers, body, statusLine.version)
+  def apply(status: Status, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpResponse =
+    SimpleHttpResponse(StatusLine(version, status), headers, body)
 }
 
-private case class SimpleHttpResponse(status: Status, headers: Seq[Header], body: Entity, version: Version) extends HttpResponse {
-  def addHeaders(moreHeaders: Header*): MessageType =
+private case class SimpleHttpResponse(startLine: StatusLine, headers: Seq[Header], body: Entity) extends HttpResponse {
+  def addHeaders(moreHeaders: Header*): HttpResponse =
     copy(headers = headers ++ moreHeaders)
 
-  def withHeaders(newHeaders: Header*): MessageType =
+  def withHeaders(newHeaders: Header*): HttpResponse =
     copy(headers = newHeaders)
 
-  def withBody(newBody: Entity): MessageType =
+  def withBody(newBody: Entity): HttpResponse =
     copy(body = newBody)
 
-  def withStatus(newStatus: Status): MessageType =
-    copy(status = newStatus)
+  def withStartLine(line: StatusLine) =
+    copy(startLine = line)
 
-  def withVersion(newVersion: Version): MessageType =
-    copy(version = newVersion)
+  def withStatus(newStatus: Status): HttpResponse =
+    copy(startLine = startLine.copy(status = newStatus))
+
+  def withVersion(newVersion: Version): HttpResponse =
+    copy(startLine = startLine.copy(version = newVersion))
 }
 
