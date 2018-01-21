@@ -12,7 +12,7 @@ class BodyParserSpec extends FlatSpec {
     assert(response.contentType.contains(ContentType("text/plain")))
     assert(response.parse.get == "Hello, world!")
 
-    response = response.withChunked.withBody("7\r\nHello, \r\n6\r\nworld!\r\n0\r\n")
+    response = response.withChunked(true).withBody("7\r\nHello, \r\n6\r\nworld!\r\n0\r\n")
     assert(response.parse.get == "Hello, world!")
   }
 }

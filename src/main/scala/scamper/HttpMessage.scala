@@ -155,10 +155,14 @@ trait HttpMessage {
   /**
    * Creates a copy of this message replacing the transfer encoding.
    *
+   * If chunked is true, then the Transfer-Encoding header is set to chunked;
+   * otherwise, the header is removed.
+   *
    * @return the new message
    */
-  def withChunked: MessageType =
-    withHeader(Header("Transfer-Encoding", "chunked"))
+  def withChunked(chunked: Boolean): MessageType =
+    if (chunked) withHeader(Header("Transfer-Encoding", "chunked"))
+    else withoutHeader("Transfer-Encoding")
 }
 
 /** A representation of an HTTP request. */
