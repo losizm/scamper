@@ -12,14 +12,14 @@ trait BodyParser[T] {
 
 /** Provides default implementation of various body parsers. */
 object BodyParser {
-  /** Provides a byte array body parser. */
-  def bytes: BodyParser[Array[Byte]] = ByteArrayBodyParser
+  /** Provides a body parser of binary data. */
+  def binary: BodyParser[Array[Byte]] = BinaryBodyParser
 
-  /** Provides a string body parser. */
-  def string: BodyParser[String] = StringBodyParser
+  /** Provides a text body parser. */
+  def text: BodyParser[String] = TextBodyParser
 }
 
-private object ByteArrayBodyParser extends BodyParser[Array[Byte]] {
+private object BinaryBodyParser extends BodyParser[Array[Byte]] {
   import bantam.nx.io._
   import java.util.zip.{ GZIPInputStream, InflaterInputStream }
 
@@ -54,12 +54,12 @@ private object ByteArrayBodyParser extends BodyParser[Array[Byte]] {
   }
 }
 
-private object StringBodyParser extends BodyParser[String] {
+private object TextBodyParser extends BodyParser[String] {
   def apply(message: HttpMessage): String =
     message.contentType
       .flatMap(_.parameters.get("charset"))
       .orElse(Some("UTF-8"))
-      .map(new String(ByteArrayBodyParser(message), _)).get
+      .map(new String(BinaryBodyParser(message), _)).get
 }
 
 private class ChunkEnumeration(in: InputStream) extends java.util.Enumeration[InputStream] {

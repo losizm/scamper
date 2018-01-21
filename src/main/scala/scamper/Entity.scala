@@ -61,13 +61,13 @@ object Entity {
   def apply(file: File): Entity =
     FileEntity(file)
 
-  /** Creates an entity whose content is the encoded bytes from supplied string. */
-  def apply(string: String, charset: String): Entity =
-    ByteArrayEntity(string.getBytes(charset))
+  /** Creates an entity whose content is the encoded bytes of supplied text. */
+  def apply(text: String, charset: String): Entity =
+    ByteArrayEntity(text.getBytes(charset))
 
-  /** Creates an entity whose content is the encoded bytes from supplied string. */
-  def apply(string: String, charset: Charset): Entity =
-    ByteArrayEntity(string.getBytes(charset))
+  /** Creates an entity whose content is the encoded bytes of supplied text. */
+  def apply(text: String, charset: Charset): Entity =
+    ByteArrayEntity(text.getBytes(charset))
 
   /** Creates an empty entity. */
   def empty: Entity = ByteArrayEntity(Array.empty)
