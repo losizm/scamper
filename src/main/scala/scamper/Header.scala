@@ -6,7 +6,7 @@ case class Header(key: String, value: String) {
   override val toString: String = s"$key: $value"
 }
 
-/** Header factory */
+/** Provides Header factory methods. */
 object Header {
   private val HeaderRegex = """([\w-]+):\s*(.*)\s*""".r
 

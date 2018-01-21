@@ -140,7 +140,7 @@ trait HttpRequest extends HttpMessage {
   def withVersion(version: Version): MessageType
 }
 
-/** HttpRequest factory */
+/** Provides HttpRequest factory methods. */
 object HttpRequest {
   /** Creates an HttpRequest using the supplied attributes. */
   def apply(method: String, uri: String, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpRequest =
@@ -207,7 +207,7 @@ trait HttpResponse extends HttpMessage {
   def withVersion(version: Version): MessageType
 }
 
-/** HttpResponse factory */
+/** Provides HttpResponse factory methods. */
 object HttpResponse {
   /** Creates an HttpResponse using the supplied attributes. */
   def apply(status: Status, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpResponse =

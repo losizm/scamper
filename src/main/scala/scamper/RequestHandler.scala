@@ -19,9 +19,9 @@ class RequestHandlerChain private (handler: RequestHandler, next: RequestHandler
     handler(request, next)
 }
 
-/** RequestHandlerChain factory */
+/** Provides RequestHandlerChain factory methods. */
 object RequestHandlerChain {
-  private val notFound = new RequestHandlerChain((_, _) => HttpResponse(Status.NotFound), null)
+  private val notFound = new RequestHandlerChain((_, _) => HttpResponses.NotFound, null)
 
   /** Creates a request handler chain with supplied handlers. */
   def apply(handlers: RequestHandler*): RequestHandlerChain =

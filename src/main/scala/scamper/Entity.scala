@@ -10,15 +10,15 @@ trait Entity {
   /** The size in bytes, if known. */
   def size: Option[Long]
 
-  /** Tests whether this entity is known to be empty. */
+  /** Tests whether the entity is known to be empty. */
   def isKnownEmpty: Boolean =
     size.contains(0)
 
-  /** Gets an input stream to this entity. */
+  /** Gets an input stream to the entity. */
   def getInputStream: InputStream
 
   /**
-   * Provides access to this entity's input stream with automatic resource
+   * Provides access to the entity's input stream with automatic resource
    * management.
    *
    * The input stream is passed to the supplied function, and the stream is
@@ -33,7 +33,7 @@ trait Entity {
   }
 }
 
-/** Entity factory */
+/** Provides Entity factory methods. */
 object Entity {
   /** Creates an entity whose content is the supplied bytes. */
   def apply(bytes: Array[Byte]): Entity =

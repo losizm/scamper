@@ -10,9 +10,9 @@ trait BodyParser[T] {
   def apply(message: HttpMessage): T
 }
 
-/** Provides default implementation of various body parsers. */
+/** Provides body parser implementations. */
 object BodyParser {
-  /** Provides a body parser of binary data. */
+  /** Provides a body parser for binary data. */
   def binary: BodyParser[Array[Byte]] = BinaryBodyParser
 
   /** Provides a text body parser. */

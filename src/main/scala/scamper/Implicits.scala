@@ -12,7 +12,10 @@ object Implicits {
   /** Converts a string to a [[Header]]. */
   implicit val stringToHeader = (header: String) => Header(header)
 
-  /** Converts a tuple to a [[Header]]. */
+  /**
+   * Converts a tuple to a [[Header]] where the first element is the key and the
+   * second is the value.
+   */
   implicit val tupleToHeader = (header: (String, String)) => Header(header._1, header._2)
 
   /** Converts a string to a [[Version]]. */
@@ -37,24 +40,6 @@ object Implicits {
 
   /** Converts a file to an [[Entity]]. */
   implicit val fileToEntity = (entity: File) => Entity(entity)
-
-  /**
-   * A type class of [[Status]] that adds methods for creating an
-   * [[HttpResponse]].
-   */
-  implicit class StatusType(status: Status) {
-    /** Creates a response with status and supplied headers. */
-    def withHeaders(headers: Header*): HttpResponse =
-      HttpResponse(status, headers)
-
-    /** Creates a response with status and supplied body. */
-    def withBody(body: Entity): HttpResponse =
-      HttpResponse(status, body = body)
-
-    /** Creates a response with status and supplied version. */
-    def withVersion(version: Version): HttpResponse =
-      HttpResponse(status, version = version)
-  }
 
   /**
    * A type class of <code>java.net.URL</code> that adds methods for sending

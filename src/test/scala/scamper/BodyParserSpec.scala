@@ -1,13 +1,14 @@
 package scamper
 
 import org.scalatest.FlatSpec
-import scamper.Implicits._
+import HttpResponses._
+import Implicits._
 
 class BodyParserSpec extends FlatSpec {
   "A BodyParser" should "parse an HTTP message" in {
     implicit val bodyParser = BodyParser.text
-    var response = HttpResponse(200).withBody("Hello, world!")
-    assert(response.status == Status.Ok)
+    var response = Ok.withBody("Hello, world!")
+    assert(response.status == Ok.status)
     assert(response.parse.get == "Hello, world!")
 
     response = response.withHeaders("Transfer-Encoding: chunked")

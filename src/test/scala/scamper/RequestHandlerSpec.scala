@@ -1,7 +1,8 @@
 package scamper
 
 import org.scalatest.FlatSpec
-import scamper.Implicits._
+import HttpResponses._
+import Implicits._
 
 class RequestHandlerSpec extends FlatSpec {
   "A RequestHandlerChain" should "be traversed" in {
@@ -12,13 +13,13 @@ class RequestHandlerSpec extends FlatSpec {
         val user = req.getHeaderValue("user").get
         val access = req.getHeaderValue("access").get
 
-        Status.Ok.withBody(Entity(s"Hello, $user. You have $access access.", "utf8"))
+        Ok.withBody(Entity(s"Hello, $user. You have $access access.", "utf8"))
       }
     )
 
     val resp = chain(HttpRequest("GET", "/"))
 
-    assert(resp.status == Status.Ok)
+    assert(resp.status == Ok.status)
     assert(resp.parse(BodyParser.text).get == "Hello, guest. You have read access.")
   }
 }

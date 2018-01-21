@@ -32,7 +32,7 @@ case class ContentType private (primaryType: String, subtype: String, parameters
     if (ContentType.isToken(value)) value else '"' + value + '"'
 }
 
-/** ContentType factory */
+/** Provides ContentType factory methods. */
 object ContentType {
   import bantam.nx.lang.DefaultType
 

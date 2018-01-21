@@ -13,7 +13,7 @@ trait ResponseFilter {
     if (apply(response)) Some(response) else None
 }
 
-/** Provides a set of filters that are based on status type. */
+/** Provides filters that are based on status type. */
 object ResponseFilter {
   /**
    * Filters informational responses.

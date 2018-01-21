@@ -18,7 +18,7 @@ case class RequestLine(method: String, uri: String, version: Version) extends St
   override val toString: String = s"$method $uri HTTP/$version"
 }
 
-/** RequestLine factory */
+/** Provides RequestLine factory methods. */
 object RequestLine {
   private val LineRegex = """(\w+)\h+(\p{Graph}+)\h+HTTP/(\d+\.\d+)\h*""".r
 
@@ -40,7 +40,7 @@ case class StatusLine(version: Version, status: Status) extends StartLine {
   override val toString: String = s"HTTP/$version ${status.code} ${status.reason}"
 }
 
-/** StatusLine factory */
+/** Provides StatusLine factory methods. */
 object StatusLine {
   private val LineRegex = """HTTP/(\d+\.\d+)\h+(\d+)\h+(\p{Print}+)\h*""".r
 
