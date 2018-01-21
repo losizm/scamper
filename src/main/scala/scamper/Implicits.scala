@@ -18,6 +18,9 @@ object Implicits {
    */
   implicit val tupleToHeader = (header: (String, String)) => Header(header._1, header._2)
 
+  /** Converts a string to a [[ContentType]]. */
+  implicit val stringToContentType = (contentType: String) => ContentType(contentType)
+
   /** Converts a string to a [[Version]]. */
   implicit val stringToVersion = (version: String) => Version(version)
 

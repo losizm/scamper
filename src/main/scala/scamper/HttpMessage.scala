@@ -92,6 +92,38 @@ trait HttpMessage {
    * @return the new message
    */
   def withBody(body: Entity): MessageType
+
+  /**
+   * Creates a copy of this message with the supplied content type.
+   *
+   * @return the new message
+   */
+  def withContentType(contentType: ContentType): MessageType =
+    addHeaders(Header("Content-Type", contentType.toString))
+
+  /**
+   * Creates a copy of this message with the supplied content length.
+   *
+   * @return the new message
+   */
+  def withContentLength(length: Long): MessageType =
+    addHeaders(Header("Content-Length", length.toString))
+
+  /**
+   * Creates a copy of this message with the supplied content encoding.
+   *
+   * @return the new message
+   */
+  def withContentEncoding(encoding: String): MessageType =
+    addHeaders(Header("Content-Encoding", encoding))
+
+  /**
+   * Creates a copy of this message with chunked transfer encoding.
+   *
+   * @return the new message
+   */
+  def withChunked: MessageType =
+    addHeaders(Header("Transfer-Encoding", "chunked"))
 }
 
 /** A representation of an HTTP request. */
@@ -106,6 +138,12 @@ trait HttpRequest extends HttpMessage {
 
   /** HTTP version of request message */
   def version: Version
+
+  /** The path component of URI */
+  def path: String
+
+  /** The query component of URI */
+  def query: Option[String]
 
   lazy val startLine: RequestLine =
     RequestLine(method, uri, version)
@@ -152,6 +190,11 @@ object HttpRequest {
 }
 
 private case class SimpleHttpRequest(method: String, uri: String, headers: Seq[Header], body: Entity, version: Version) extends HttpRequest {
+  private lazy val uriObject = new java.net.URI(uri)
+
+  lazy val path = uriObject.getPath
+  lazy val query = Option(uriObject.getQuery)
+
   def addHeaders(moreHeaders: Header*): MessageType =
     copy(headers = headers ++ moreHeaders)
 
