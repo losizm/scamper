@@ -9,9 +9,10 @@ import scala.util.Try
  */
 trait HttpMessage {
   type MessageType <: HttpMessage
+  type LineType <: StartLine
 
   /** The message start line */
-  def startLine: StartLine
+  def startLine: LineType
 
   /** The sequence of message headers */
   def headers: Seq[Header]
@@ -73,62 +74,90 @@ trait HttpMessage {
     getHeaderValue("Transfer-Encoding").exists("chunked".equalsIgnoreCase)
 
   /**
-   * Creates a copy of this message with the additional headers.
+   * Creates a copy of this message replacing the supplied header.
+   *
+   * All previous headers having the same key as supplied header are removed and
+   * replaced with the single header instance.
+   *
+   * @return the new message
+   */
+  def withHeader(header: Header): MessageType =
+    withHeaders {
+      headers.filterNot(_.key.equalsIgnoreCase(header.key)) :+ header : _*
+    }
+
+  /**
+   * Creates a copy of this message removing all headers having the supplied
+   * key.
+   *
+   * @return the new message
+   */
+  def withoutHeader(key: String): MessageType =
+    withHeaders {
+      headers.filterNot(_.key.equalsIgnoreCase(key)) : _*
+    }
+
+  /**
+   * Creates a copy of this message including additional headers.
    *
    * @return the new message
    */
   def addHeaders(headers: Header*): MessageType
 
   /**
-   * Creates a copy of this message with a new set of headers.
+   * Creates a copy of this message replacing the headers.
+   *
+   * All previous headers are removed, and the new message contains only the
+   * supplied headers.
    *
    * @return the new message
    */
   def withHeaders(headers: Header*): MessageType
 
   /**
-   * Creates a copy of this message with a new body.
+   * Creates a copy of this message replacing the body.
    *
    * @return the new message
    */
   def withBody(body: Entity): MessageType
 
   /**
-   * Creates a copy of this message with the supplied content type.
+   * Creates a copy of this message replacing the content type.
    *
    * @return the new message
    */
   def withContentType(contentType: ContentType): MessageType =
-    addHeaders(Header("Content-Type", contentType.toString))
+    withHeader(Header("Content-Type", contentType.toString))
 
   /**
-   * Creates a copy of this message with the supplied content length.
+   * Creates a copy of this message replacing the content length.
    *
    * @return the new message
    */
   def withContentLength(length: Long): MessageType =
-    addHeaders(Header("Content-Length", length.toString))
+    withHeader(Header("Content-Length", length.toString))
 
   /**
-   * Creates a copy of this message with the supplied content encoding.
+   * Creates a copy of this message replacing the content encoding.
    *
    * @return the new message
    */
   def withContentEncoding(encoding: String): MessageType =
-    addHeaders(Header("Content-Encoding", encoding))
+    withHeader(Header("Content-Encoding", encoding))
 
   /**
-   * Creates a copy of this message with chunked transfer encoding.
+   * Creates a copy of this message replacing the transfer encoding.
    *
    * @return the new message
    */
   def withChunked: MessageType =
-    addHeaders(Header("Transfer-Encoding", "chunked"))
+    withHeader(Header("Transfer-Encoding", "chunked"))
 }
 
 /** A representation of an HTTP request. */
 trait HttpRequest extends HttpMessage {
   type MessageType = HttpRequest
+  type LineType = RequestLine
 
   /** The request method (i.e., GET, POST, etc.) */
   def method: String
@@ -157,25 +186,33 @@ trait HttpRequest extends HttpMessage {
     getHeaderValue("Host")
 
   /**
-   * Creates a copy of this request with a new method.
+   * Creates a copy of this request replacing the request method.
    *
    * @return the new request
    */
   def withMethod(method: String): MessageType
 
   /**
-   * Creates a copy of this request with a new URI.
+   * Creates a copy of this request replacing the request URI.
    *
    * @return the new request
    */
   def withURI(uri: String): MessageType
 
   /**
-   * Creates a copy of this request with a new version.
+   * Creates a copy of this request replacing the HTTP version.
    *
    * @return the new request
    */
   def withVersion(version: Version): MessageType
+
+  /**
+   * Creates a copy of this message replacing the host.
+   *
+   * @return the new message
+   */
+  def withHost(host: String): MessageType =
+    withHeader(Header("Host", host))
 }
 
 /** Provides HttpRequest factory methods. */
@@ -217,6 +254,7 @@ private case class SimpleHttpRequest(method: String, uri: String, headers: Seq[H
 /** A representation of an HTTP response. */
 trait HttpResponse extends HttpMessage {
   type MessageType = HttpResponse
+  type LineType = StatusLine
 
   /** The response status */
   def status: Status
@@ -236,18 +274,26 @@ trait HttpResponse extends HttpMessage {
     getHeaderValue("Location")
 
   /**
-   * Creates a copy of this response with a new status.
+   * Creates a copy of this response replacing the response status.
    *
    * @return the new response
    */
   def withStatus(status: Status): MessageType
 
   /**
-   * Creates a copy of this response with a new version.
+   * Creates a copy of this response replacing the HTTP version.
    *
    * @return the new response
    */
   def withVersion(version: Version): MessageType
+
+  /**
+   * Creates a copy of this message replacing the location.
+   *
+   * @return the new message
+   */
+  def withLocation(location: String): MessageType =
+    withHeader(Header("Location", location))
 }
 
 /** Provides HttpResponse factory methods. */
