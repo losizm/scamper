@@ -1,6 +1,7 @@
 package scamper
 
 import bantam.nx.io._
+import java.io.File
 import java.net.{ HttpURLConnection, URL }
 import scala.annotation.tailrec
 import scala.util.Try
@@ -19,6 +20,23 @@ object Implicits {
 
   /** Converts an integer to a [[Status]]. */
   implicit val intToStatus = (status: Int) => Status(status)
+
+  /** Converts a byte array to an [[Entity]]. */
+  implicit val bytesToEntity = (entity: Array[Byte]) => Entity(entity)
+
+  /**
+   * Converts a string to an [[Entity]] where the text is to be UTF-8 encoded.
+   */
+  implicit val stringToEntity = (entity: String) => Entity(entity, "UTF-8")
+
+  /**
+   * Converts a tuple to an [[Entity]] where the first element is the text and
+   * the second is the character encoding.
+   */
+  implicit val tupleToEntity = (entity: (String, String)) => Entity(entity._1, entity._2)
+
+  /** Converts a file to an [[Entity]]. */
+  implicit val fileToEntity = (entity: File) => Entity(entity)
 
   /**
    * A type class of [[Status]] that adds methods for creating an
