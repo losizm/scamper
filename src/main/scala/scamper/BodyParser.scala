@@ -17,6 +17,9 @@ object BodyParser {
 
   /** Provides a text body parser. */
   def text: BodyParser[String] = TextBodyParser
+
+  /** Provides a form body parser. */
+  def form: BodyParser[Map[String, List[String]]] = FormBodyParser
 }
 
 private object BinaryBodyParser extends BodyParser[Array[Byte]] {
@@ -60,6 +63,15 @@ private object TextBodyParser extends BodyParser[String] {
       .flatMap(_.parameters.get("charset"))
       .orElse(Some("UTF-8"))
       .map(new String(BinaryBodyParser(message), _)).get
+}
+
+private object FormBodyParser extends BodyParser[Map[String, List[String]]] {
+  def apply(message: HttpMessage): Map[String, List[String]] =
+    message.contentType
+      .flatMap(_.parameters.get("charset"))
+      .orElse(Some("UTF-8"))
+      .map(new String(BinaryBodyParser(message), _))
+      .map(QueryParser.parse).get
 }
 
 private class ChunkEnumeration(in: InputStream) extends java.util.Enumeration[InputStream] {

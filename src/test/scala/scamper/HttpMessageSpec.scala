@@ -1,9 +1,11 @@
 package scamper
 
 import org.scalatest.FlatSpec
-import scamper.Implicits._
 
-class HttpRequestSpec extends FlatSpec {
+class HttpMessageSpec extends FlatSpec {
+  import HttpResponses._
+  import Implicits._
+
   "An HttpRequest" should "be created" in {
     val request = HttpRequest("GET", "/find").withQuery("user=root").withHeaders("Host: localhost:8080")
     assert(request.method == "GET")
@@ -12,6 +14,13 @@ class HttpRequestSpec extends FlatSpec {
     assert(request.query.contains("user=root"))
     assert(request.getQueryParameterValue("user").contains("root"))
     assert(request.host.contains("localhost:8080"))
+  }
+
+  "An HttpResponse" should "be created" in {
+    val response = SeeOther.withLocation("/find").withChunked(true)
+    assert(response.status == SeeOther.status)
+    assert(response.location.contains("/find"))
+    assert(response.isChunked)
   }
 }
 

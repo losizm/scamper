@@ -253,6 +253,13 @@ trait HttpRequest extends HttpMessage {
   def withQueryParameters(params: Map[String, List[String]]): HttpRequest
 
   /**
+   * Creates a copy of this request replacing the request query parameters.
+   *
+   * @return the new request
+   */
+  def withQueryParameters(params: (String, String)*): HttpRequest
+
+  /**
    * Creates a copy of this message replacing the host.
    *
    * @return the new message
@@ -307,6 +314,13 @@ private case class SimpleHttpRequest(startLine: RequestLine, headers: Seq[Header
 
   def withQueryParameters(params: Map[String, List[String]]): HttpRequest = {
     val query = QueryParser.format(params)
+
+    if (query.isEmpty) withQuery(null)
+    else withQuery(query)
+  }
+
+  def withQueryParameters(params: (String, String)*): HttpRequest = {
+    val query = QueryParser.format(params : _*)
 
     if (query.isEmpty) withQuery(null)
     else withQuery(query)
@@ -417,8 +431,12 @@ private object QueryParser {
 
   def format(params: Map[String, List[String]]): String =
     params.toSeq.map {
-      case (name, values) =>
-        values.map(value => s"${name.toURLEncoded}=${value.toURLEncoded}").mkString("&")
+      case (name, values) => format(values.map(name -> _) : _*)
+    }.mkString("&")
+
+  def format(params: (String, String)*): String =
+    params.map {
+      case (name, value) => s"${name.toURLEncoded}=${value.toURLEncoded}"
     }.mkString("&")
 }
 
