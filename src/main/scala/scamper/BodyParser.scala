@@ -1,6 +1,7 @@
 package scamper
 
 import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, InputStream, SequenceInputStream }
+import scala.util.Try
 
 /** Provides a utility for parsing the body of an HTTP message. */
 trait BodyParser[T] {
@@ -67,11 +68,7 @@ private object TextBodyParser extends BodyParser[String] {
 
 private object FormBodyParser extends BodyParser[Map[String, List[String]]] {
   def apply(message: HttpMessage): Map[String, List[String]] =
-    message.contentType
-      .flatMap(_.parameters.get("charset"))
-      .orElse(Some("UTF-8"))
-      .map(new String(BinaryBodyParser(message), _))
-      .map(QueryParser.parse).get
+    QueryParser.parse(TextBodyParser(message))
 }
 
 private class ChunkEnumeration(in: InputStream) extends java.util.Enumeration[InputStream] {
@@ -100,8 +97,13 @@ private class ChunkEnumeration(in: InputStream) extends java.util.Enumeration[In
     new ByteArrayInputStream(buffer)
   }
 
-  private def nextChunkSize: Int =
-    Integer.parseInt(nextLine.split("\\s+", 2).head)
+  private def nextChunkSize: Int = {
+    val line = nextLine
+
+    Try(Integer.parseInt(line)).getOrElse {
+      throw new HttpException(s"Invalid chunk size: $line")
+    }
+  }
 
   private def nextLine: String = {
     def nextByte: Int =

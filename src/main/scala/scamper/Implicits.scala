@@ -58,13 +58,12 @@ object Implicits {
      *
      * @return the value returned from supplied handler
      */
-    def withConnection[T](f: HttpURLConnection => T): Try[T] =
-      Try {
-        val conn = url.openConnection()
+    def withConnection[T](f: HttpURLConnection => T): T = {
+      val conn = url.openConnection()
 
-        try f(conn.asInstanceOf[HttpURLConnection])
-        finally Try(conn.asInstanceOf[HttpURLConnection].disconnect())
-      }
+      try f(conn.asInstanceOf[HttpURLConnection])
+      finally Try(conn.asInstanceOf[HttpURLConnection].disconnect())
+    }
 
     /**
      * Sends the HTTP request and passes the response to the supplied handler.
@@ -76,7 +75,7 @@ object Implicits {
      *
      * @return the value returned from supplied handler
      */
-    def request[T](method: String, headers: Seq[Header] = Nil, body: Option[Entity] = None)(f: HttpResponse => T): Try[T] =
+    def request[T](method: String, headers: Seq[Header] = Nil, body: Option[Entity] = None)(f: HttpResponse => T): T =
       withConnection { conn =>
         conn.setRequestMethod(method)
         headers.foreach(header => conn.addRequestProperty(header.key, header.value))
@@ -100,7 +99,7 @@ object Implicits {
      *
      * @return the value returned from supplied handler
      */
-    def get[T](headers: Header*)(f: HttpResponse => T): Try[T] =
+    def get[T](headers: Header*)(f: HttpResponse => T): T =
       request("GET", headers)(f)
 
     /**
@@ -112,7 +111,7 @@ object Implicits {
      *
      * @return the value returned from supplied handler
      */
-    def post[T](body: Entity, headers: Header*)(f: HttpResponse => T): Try[T] =
+    def post[T](body: Entity, headers: Header*)(f: HttpResponse => T): T =
       request("POST", headers, Option(body))(f)
 
     /**
@@ -124,7 +123,7 @@ object Implicits {
      *
      * @return the value returned from supplied handler
      */
-    def put[T](body: Entity, headers: Header*)(f: HttpResponse => T): Try[T] =
+    def put[T](body: Entity, headers: Header*)(f: HttpResponse => T): T =
       request("PUT", headers, Option(body))(f)
 
     /**
@@ -135,7 +134,7 @@ object Implicits {
      *
      * @return the value returned from supplied handler
      */
-    def delete[T](headers: Header*)(f: HttpResponse => T): Try[T] =
+    def delete[T](headers: Header*)(f: HttpResponse => T): T =
       request("DELETE", headers)(f)
 
     /**
@@ -146,7 +145,7 @@ object Implicits {
      *
      * @return the value returned from supplied handler
      */
-    def head[T](headers: Header*)(f: HttpResponse => T): Try[T] =
+    def head[T](headers: Header*)(f: HttpResponse => T): T =
       request("HEAD", headers)(f)
 
     /**
@@ -157,7 +156,7 @@ object Implicits {
      *
      * @return the value returned from supplied handler
      */
-    def trace[T](headers: Header*)(f: HttpResponse => T): Try[T] =
+    def trace[T](headers: Header*)(f: HttpResponse => T): T =
       request("TRACE", headers)(f)
 
     /**
@@ -168,7 +167,7 @@ object Implicits {
      *
      * @return the value returned from supplied handler
      */
-    def options[T](headers: Header*)(f: HttpResponse => T): Try[T] =
+    def options[T](headers: Header*)(f: HttpResponse => T): T =
       request("OPTIONS", headers)(f)
 
     private def writeBody(conn: HttpURLConnection, body: Entity): Unit = {
@@ -202,8 +201,8 @@ object Implicits {
 
     private def getBody(conn: HttpURLConnection): Entity =
       Entity(() =>
-        if (conn.getResponseCode >= 400) conn.getErrorStream
-        else conn.getInputStream
+        if (conn.getResponseCode < 400) conn.getInputStream
+        else conn.getErrorStream
       )
   }
 }
