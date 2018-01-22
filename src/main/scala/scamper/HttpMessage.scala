@@ -11,17 +11,17 @@ trait HttpMessage {
   type MessageType <: HttpMessage
   type LineType <: StartLine
 
-  /** The message start line */
+  /** Message start line */
   def startLine: LineType
 
-  /** The sequence of message headers */
+  /** Sequence of message headers */
   def headers: Seq[Header]
 
   /**
    * Gets header value for specified key.
    *
-   * If there are multiple headers for key, then the value of first header
-   * occurrence is retreived.
+   * If there are multiple headers for key, then the value of first occurrence
+   * is retrieved.
    */
   def getHeaderValue(key: String): Option[String] =
     headers.collectFirst {
@@ -34,7 +34,7 @@ trait HttpMessage {
       case Header(k, value) if k.equalsIgnoreCase(key) => value
     }.toList
 
-  /** The message body */
+  /** Message body */
   def body: Entity
 
   /** Parses the message body. */
@@ -170,20 +170,37 @@ trait HttpRequest extends HttpMessage {
   type MessageType = HttpRequest
   type LineType = RequestLine
 
-  /** The request method (i.e., GET, POST, etc.) */
+  /** Request method (i.e., GET, POST, etc.) */
   def method: String = startLine.method
 
-  /** The request URI */
+  /** Request URI */
   def uri: String = startLine.uri
 
   /** HTTP version of request message */
   def version: Version = startLine.version
 
-  /** The path component of URI */
+  /** Path component of URI */
   def path: String
 
-  /** The query component of URI */
+  /** Query component of URI */
   def query: Option[String]
+
+  /** Query parameters from URI */
+  lazy val queryParameters: Map[String, List[String]] =
+    query.map(QueryParser.parse).getOrElse(Map.empty)
+
+  /**
+   * Gets value for named query parameter.
+   *
+   * If there are multiple parameters with given name, then the value of first
+   * occurrence is retrieved.
+   */
+  def getQueryParameterValue(name: String): Option[String] =
+    queryParameters.get(name).flatMap(_.headOption)
+
+  /** Gets all values for named query parameter. */
+  def getQueryParameterValues(name: String): List[String] =
+    queryParameters.get(name).getOrElse(Nil)
 
   /**
    * Gets the requested host.
@@ -215,6 +232,27 @@ trait HttpRequest extends HttpMessage {
   def withVersion(version: Version): MessageType
 
   /**
+   * Creates a copy of this request replacing the request path.
+   *
+   * @return the new request
+   */
+  def withPath(path: String): HttpRequest
+
+  /**
+   * Creates a copy of this request replacing the request query.
+   *
+   * @return the new request
+   */
+  def withQuery(query: String): HttpRequest
+
+  /**
+   * Creates a copy of this request replacing the request query parameters.
+   *
+   * @return the new request
+   */
+  def withQueryParameters(params: Map[String, List[String]]): HttpRequest
+
+  /**
    * Creates a copy of this message replacing the host.
    *
    * @return the new message
@@ -238,7 +276,7 @@ private case class SimpleHttpRequest(startLine: RequestLine, headers: Seq[Header
   private lazy val uriObject = new java.net.URI(uri)
 
   lazy val path = uriObject.getPath
-  lazy val query = Option(uriObject.getQuery)
+  lazy val query = Option(uriObject.getRawQuery)
 
   def addHeaders(moreHeaders: Header*): HttpRequest =
     copy(headers = headers ++ moreHeaders)
@@ -260,6 +298,37 @@ private case class SimpleHttpRequest(startLine: RequestLine, headers: Seq[Header
 
   def withVersion(newVersion: Version): HttpRequest =
     copy(startLine = startLine.copy(version = newVersion))
+
+  def withPath(newPath: String): HttpRequest =
+    withURI(buildURI(newPath, query))
+
+  def withQuery(newQuery: String): HttpRequest =
+    withURI(buildURI(path, Option(newQuery)))
+
+  def withQueryParameters(params: Map[String, List[String]]): HttpRequest = {
+    val query = QueryParser.format(params)
+
+    if (query.isEmpty) withQuery(null)
+    else withQuery(query)
+  }
+
+  private def buildURI(path: String, query: Option[String]): String = {
+    val uri = new StringBuilder()
+
+    val scheme = uriObject.getScheme
+    if (scheme != null) uri.append(scheme).append("://")
+
+    val authority = uriObject.getRawAuthority
+    if (authority != null) uri.append(authority).append('/')
+
+    uri.append(path)
+    query.foreach(uri.append('?').append(_))
+
+    val fragment = uriObject.getRawFragment
+    if (fragment != null) uri.append('#').append(fragment)
+
+    uri.toString
+  }
 }
 
 /** A representation of an HTTP response. */
@@ -267,7 +336,7 @@ trait HttpResponse extends HttpMessage {
   type MessageType = HttpResponse
   type LineType = StatusLine
 
-  /** The response status */
+  /** Response status */
   def status: Status = startLine.status
 
   /** HTTP version of response message */
@@ -333,5 +402,23 @@ private case class SimpleHttpResponse(startLine: StatusLine, headers: Seq[Header
 
   def withVersion(newVersion: Version): HttpResponse =
     copy(startLine = startLine.copy(version = newVersion))
+}
+
+private object QueryParser {
+  import bantam.nx.lang.StringType
+
+  def parse(query: String): Map[String, List[String]] =
+    query.split("&").map(_.split("=")).collect {
+      case Array(name, value) if !name.isEmpty => name.toURLDecoded -> value.toURLDecoded
+      case Array(name)        if !name.isEmpty => name.toURLDecoded -> ""
+    }.groupBy(_._1).map {
+      case (name, value) => name -> value.map(_._2).toList
+    }
+
+  def format(params: Map[String, List[String]]): String =
+    params.toSeq.map {
+      case (name, values) =>
+        values.map(value => s"${name.toURLEncoded}=${value.toURLEncoded}").mkString("&")
+    }.mkString("&")
 }
 
