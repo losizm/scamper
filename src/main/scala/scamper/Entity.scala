@@ -7,12 +7,12 @@ import scala.util.Try
 
 /** A representation of an HTTP entity. */
 trait Entity {
-  /** The size in bytes, if known. */
-  def size: Option[Long]
+  /** The length in bytes, if known. */
+  def length: Option[Long]
 
   /** Tests whether the entity is known to be empty. */
   def isKnownEmpty: Boolean =
-    size.contains(0)
+    length.contains(0)
 
   /** Gets an input stream to the entity. */
   def getInputStream: InputStream
@@ -74,17 +74,17 @@ object Entity {
 }
 
 private case class InputStreamEntity(f: () => InputStream) extends Entity {
-  val size = None
+  val length = None
   def getInputStream = f()
 }
 
 private case class ByteArrayEntity(bytes: Array[Byte]) extends Entity {
-  val size = Some(bytes.length)
+  val length = Some(bytes.length)
   def getInputStream = new ByteArrayInputStream(bytes)
 }
 
 private case class FileEntity(file: File) extends Entity {
-  def size = Some(file.length)
+  def length = Some(file.length)
   def getInputStream = new FileInputStream(file)
 }
 

@@ -171,7 +171,7 @@ object Implicits {
       request("OPTIONS", headers)(f)
 
     private def writeBody(conn: HttpURLConnection, body: Entity): Unit = {
-      body.size match {
+      body.length match {
         case Some(length) =>
           conn.setRequestProperty("Content-Length", length.toString)
           conn.setFixedLengthStreamingMode(length)
