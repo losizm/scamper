@@ -9,7 +9,7 @@ package scamper
  * @param cause underlying cause
  */
 class HttpException(message: String, cause: Throwable) extends RuntimeException(message, cause) {
-  /** Constructs a new HttpException with no detail message. */
+  /** Constructs a new HttpException. */
   def this() = this(null, null)
 
   /**

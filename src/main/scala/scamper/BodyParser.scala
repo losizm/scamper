@@ -6,14 +6,15 @@ import scala.util.Try
 /** Provides a utility for parsing the body of an HTTP message. */
 trait BodyParser[T] {
   /**
-   * Parses the body of supplied HTTP message as an instance of defined type.
+   * Parses the body of supplied HTTP message returning an instance of defined
+   * type.
    */
   def apply(message: HttpMessage): T
 }
 
 /** Provides body parser implementations. */
 object BodyParser {
-  /** Provides a body parser for binary data. */
+  /** Provides a body parser of binary data. */
   def binary: BodyParser[Array[Byte]] = BinaryBodyParser
 
   /** Provides a text body parser. */

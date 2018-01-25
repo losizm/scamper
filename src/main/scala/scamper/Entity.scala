@@ -53,13 +53,13 @@ object Entity {
   def apply(f: () => InputStream): Entity =
     InputStreamEntity(f)
 
-  /** Creates an entity whose content is the data in file at supplied path. */
-  def apply(path: Path): Entity =
-    FileEntity(path.toFile)
-
   /** Creates an entity whose content is the data in supplied file. */
   def apply(file: File): Entity =
     FileEntity(file)
+
+  /** Creates an entity whose content is the data in file at supplied path. */
+  def apply(path: Path): Entity =
+    FileEntity(path.toFile)
 
   /** Creates an entity whose content is the encoded bytes of supplied text. */
   def apply(text: String, charset: String): Entity =
