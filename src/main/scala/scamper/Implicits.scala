@@ -9,39 +9,39 @@ import scamper._
 
 /** Provides implicit conversion functions and type classes. */
 object Implicits {
-  /** Converts a string to a [[Header]]. */
+  /** Converts a string to [[Header]]. */
   implicit val stringToHeader = (header: String) => Header(header)
 
   /**
-   * Converts a tuple to a [[Header]] where the first element is the key and the
-   * second is the value.
+   * Converts a tuple to [[Header]] where the first element is the header key
+   * and the second is the value.
    */
   implicit val tupleToHeader = (header: (String, String)) => Header(header._1, header._2)
 
-  /** Converts a string to a [[ContentType]]. */
+  /** Converts a string to [[ContentType]]. */
   implicit val stringToContentType = (contentType: String) => ContentType(contentType)
 
-  /** Converts a string to a [[Version]]. */
+  /** Converts a string to [[Version]]. */
   implicit val stringToVersion = (version: String) => Version(version)
 
-  /** Converts an integer to a [[Status]]. */
+  /** Converts an integer to [[Status]]. */
   implicit val intToStatus = (status: Int) => Status(status)
 
-  /** Converts a byte array to an [[Entity]]. */
+  /** Converts a byte array to [[Entity]]. */
   implicit val bytesToEntity = (entity: Array[Byte]) => Entity(entity)
 
   /**
-   * Converts a string to an [[Entity]] where the text is to be UTF-8 encoded.
+   * Converts a string to [[Entity]] where the text is to be UTF-8 encoded.
    */
   implicit val stringToEntity = (entity: String) => Entity(entity, "UTF-8")
 
   /**
-   * Converts a tuple to an [[Entity]] where the first element is the text and
-   * the second is the character encoding.
+   * Converts a tuple to [[Entity]] where the first element is text and the
+   * second is the character encoding.
    */
   implicit val tupleToEntity = (entity: (String, String)) => Entity(entity._1, entity._2)
 
-  /** Converts a file to an [[Entity]]. */
+  /** Converts a file to [[Entity]]. */
   implicit val fileToEntity = (entity: File) => Entity(entity)
 
   /**
@@ -50,7 +50,7 @@ object Implicits {
    */
   implicit class URLType(url: URL) {
     /**
-     * Opens an HTTP connection and passes it to the supplied handler.
+     * Opens HTTP connection and passes it to supplied handler.
      *
      * The connection is disconnected upon handler's return.
      *
@@ -66,7 +66,7 @@ object Implicits {
     }
 
     /**
-     * Sends the HTTP request and passes the response to the supplied handler.
+     * Sends HTTP request and passes response to supplied handler.
      *
      * @param method request method
      * @param headers request headers
@@ -92,7 +92,7 @@ object Implicits {
       }
 
     /**
-     * Sends a GET request and passes the response to the supplied handler.
+     * Sends GET request and passes response to supplied handler.
      *
      * @param headers request headers
      * @param f response handler
@@ -103,7 +103,7 @@ object Implicits {
       request("GET", headers)(f)
 
     /**
-     * Sends a POST request and passes the response to the supplied handler.
+     * Sends POST request and passes response to supplied handler.
      *
      * @param body request entity body
      * @param headers request headers
@@ -115,7 +115,7 @@ object Implicits {
       request("POST", headers, Option(body))(f)
 
     /**
-     * Sends a PUT request and passes the response to the supplied handler.
+     * Sends PUT request and passes response to supplied handler.
      *
      * @param body request entity body
      * @param headers request headers
@@ -127,7 +127,7 @@ object Implicits {
       request("PUT", headers, Option(body))(f)
 
     /**
-     * Sends a DELETE request and passes the response to the supplied handler.
+     * Sends DELETE request and passes response to supplied handler.
      *
      * @param headers request headers
      * @param f response handler
@@ -138,7 +138,7 @@ object Implicits {
       request("DELETE", headers)(f)
 
     /**
-     * Sends a HEAD request and passes the response to the supplied handler.
+     * Sends HEAD request and passes response to supplied handler.
      *
      * @param headers request headers
      * @param f response handler
@@ -149,7 +149,7 @@ object Implicits {
       request("HEAD", headers)(f)
 
     /**
-     * Sends a TRACE request and passes the response to the supplied handler.
+     * Sends TRACE request and passes response to supplied handler.
      *
      * @param headers request headers
      * @param f response handler
@@ -160,7 +160,7 @@ object Implicits {
       request("TRACE", headers)(f)
 
     /**
-     * Sends an OPTIONS request and passes the response to the supplied handler.
+     * Sends OPTIONS request and passes response to supplied handler.
      *
      * @param headers request headers
      * @param f response handler

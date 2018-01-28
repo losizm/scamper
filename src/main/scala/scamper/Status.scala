@@ -1,6 +1,6 @@
 package scamper
 
-/** Provides the status code and reason phrase of an HTTP response. */
+/** Provides status code and reason phrase of HTTP response. */
 case class Status(code: Int, reason: String) {
   /** Tests whether this is an informational status. */
   def isInformational: Boolean =

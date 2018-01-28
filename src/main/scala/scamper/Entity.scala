@@ -5,24 +5,24 @@ import java.nio.file.Path
 import java.nio.charset.Charset
 import scala.util.Try
 
-/** A representation of an HTTP entity. */
+/** Representation of HTTP entity. */
 trait Entity {
   /** The length in bytes, if known. */
   def length: Option[Long]
 
-  /** Tests whether the entity is known to be empty. */
+  /** Tests whether entity is known to be empty. */
   def isKnownEmpty: Boolean =
     length.contains(0)
 
-  /** Gets an input stream to the entity. */
+  /** Gets input stream to entity. */
   def getInputStream: InputStream
 
   /**
-   * Provides access to the entity's input stream with automatic resource
+   * Provides access to entity's input stream with automatic resource
    * management.
    *
-   * The input stream is passed to the supplied function, and the stream is
-   * closed upon function's return.
+   * The input stream is passed to supplied function, and the stream is closed
+   * upon function's return.
    *
    * @return the value returned from supplied function
    */

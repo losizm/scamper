@@ -1,10 +1,10 @@
 package scamper
 
 /**
- * Provides the primary type, subtype, and parameters of an HTTP content type.
+ * Provides primary type, subtype, and parameters of HTTP content type.
  */
 case class ContentType private (primaryType: String, subtype: String, parameters: Map[String, String]) {
-  /** Returns the formatted content type. */
+  /** Returns formatted content type. */
   override val toString: String = s"${primaryType}/$subtype$paramsToString"
 
   /** Tests whether primary type is text. */
@@ -41,11 +41,11 @@ object ContentType {
   private val param = s"""\\s*;\\s*(${Token.regex})=($value)\\s*"""
   private val ContentTypeRegex = s"""\\s*(${Token.regex})/(${Token.regex})(($param)*)\\s*""".r
 
-  /** Creates a ContentType using the given attributes. */
+  /** Creates a ContentType using the supplied attributes. */
   def apply(primaryType: String, subtype: String, parameters: (String, String)*): ContentType =
     new ContentType(primaryType, subtype, parameters.toMap)
 
-  /** Creates a ContentType using the given attributes. */
+  /** Creates a ContentType using the supplied attributes. */
   def apply(primaryType: String, subtype: String, parameters: Map[String, String]): ContentType = {
     require(Token(primaryType), s"Invalid primary type: $primaryType")
     require(Token(subtype), s"Invalid subtype: $subtype")
@@ -54,7 +54,7 @@ object ContentType {
     new ContentType(primaryType, subtype, parameters)
   }
 
-  /** Parses the formatted content type. */
+  /** Parses formatted content type. */
   def apply(contentType: String): ContentType =
     contentType match {
       case ContentTypeRegex(primaryType, subtype, params, _*) =>

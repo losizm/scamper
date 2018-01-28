@@ -1,6 +1,6 @@
 package scamper
 
-/** Provides the standard responses. */
+/** Provides standard HTTP responses. */
 object HttpResponses {
   /** 100 Continue */
   val Continue = HttpResponse(Status(100, "Continue"))

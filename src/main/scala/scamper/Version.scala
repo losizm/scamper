@@ -4,7 +4,7 @@ import scala.util.Try
 
 /** HTTP version */
 case class Version(major: Int, minor: Int) {
-  /** Returns the formatted version. */
+  /** Returns formatted version. */
   override val toString: String = s"$major.$minor"
 }
 
@@ -12,7 +12,7 @@ case class Version(major: Int, minor: Int) {
 object Version {
   private val VersionRegex = """(\d+)\.(\d+)""".r
 
-  /** Parses the formatted version. */
+  /** Parses formatted version. */
   def apply(version: String): Version =
     version match {
       case VersionRegex(major, minor) =>

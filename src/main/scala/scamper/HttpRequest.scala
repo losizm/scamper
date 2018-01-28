@@ -1,6 +1,6 @@
 package scamper
 
-/** A representation of an HTTP request. */
+/** Representation of HTTP request. */
 trait HttpRequest extends HttpMessage {
   type MessageType = HttpRequest
   type LineType = RequestLine
@@ -38,7 +38,7 @@ trait HttpRequest extends HttpMessage {
     queryParameters.get(name).getOrElse(Nil)
 
   /**
-   * Gets the requested host.
+   * Gets requested host.
    *
    * The value is retrieved from the Host header.
    */
@@ -105,11 +105,11 @@ trait HttpRequest extends HttpMessage {
 
 /** Provides HttpRequest factory methods. */
 object HttpRequest {
-  /** Creates an HttpRequest using the supplied attributes. */
+  /** Creates an HttpRequest using supplied attributes. */
   def apply(requestLine: RequestLine, headers: Seq[Header], body: Entity): HttpRequest =
     SimpleHttpRequest(requestLine, headers, body)
 
-  /** Creates an HttpRequest using the supplied attributes. */
+  /** Creates an HttpRequest using supplied attributes. */
   def apply(method: String, uri: String, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpRequest =
     SimpleHttpRequest(RequestLine(method, uri, version), headers, body)
 }

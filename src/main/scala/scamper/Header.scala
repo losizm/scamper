@@ -1,8 +1,8 @@
 package scamper
 
-/** Provides the key-value pair of an HTTP header. */
+/** Provides key-value pair of HTTP header. */
 case class Header private(key: String, value: String) {
-  /** Returns the formatted HTTP header. */
+  /** Returns formatted HTTP header. */
   override val toString: String = s"$key: $value"
 }
 
@@ -18,7 +18,7 @@ object Header {
     new Header(key, value)
   }
 
-  /** Parses the formatted header. */
+  /** Parses formatted header. */
   def apply(header: String): Header =
     header match {
       case HeaderRegex(key, value) => new Header(key, value)

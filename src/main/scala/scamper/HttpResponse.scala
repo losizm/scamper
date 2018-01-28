@@ -1,6 +1,6 @@
 package scamper
 
-/** A representation of an HTTP response. */
+/** Representation of HTTP response. */
 trait HttpResponse extends HttpMessage {
   type MessageType = HttpResponse
   type LineType = StatusLine
@@ -12,7 +12,7 @@ trait HttpResponse extends HttpMessage {
   def version: Version = startLine.version
 
   /**
-   * Gets the location.
+   * Gets location.
    *
    * The value is retrieved from the Location header.
    */
@@ -44,11 +44,11 @@ trait HttpResponse extends HttpMessage {
 
 /** Provides HttpResponse factory methods. */
 object HttpResponse {
-  /** Creates an HttpResponse using the supplied attributes. */
+  /** Creates an HttpResponse using supplied attributes. */
   def apply(statusLine: StatusLine, headers: Seq[Header], body: Entity): HttpResponse =
     SimpleHttpResponse(statusLine, headers, body)
 
-  /** Creates an HttpResponse using the supplied attributes. */
+  /** Creates an HttpResponse using supplied attributes. */
   def apply(status: Status, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpResponse =
     SimpleHttpResponse(StatusLine(version, status), headers, body)
 }

@@ -3,7 +3,7 @@ package scamper
 import scala.util.Try
 
 /**
- * A representation of an HTTP message.
+ * Representation of HTTP message.
  *
  * @see [[HttpRequest]], [[HttpResponse]]
  */
@@ -37,12 +37,12 @@ trait HttpMessage {
   /** Message body */
   def body: Entity
 
-  /** Parses the message body. */
+  /** Parses message body. */
   def parse[T](implicit bodyParser: BodyParser[T]): Try[T] =
     Try(bodyParser(this))
 
   /**
-   * Gets the content type.
+   * Gets content type.
    *
    * The value is retrieved from the Content-Type header.
    */
@@ -50,7 +50,7 @@ trait HttpMessage {
     getHeaderValue("Content-Type").map(ContentType.apply)
 
   /**
-   * Gets the content length.
+   * Gets content length.
    *
    * The value is retrieved from the Content-Length header.
    */
@@ -58,7 +58,7 @@ trait HttpMessage {
     getHeaderValue("Content-Length").map(_.toLong)
 
   /**
-   * Gets the content encoding.
+   * Gets content encoding.
    *
    * The value is retrieved from the Content-Encoding header.
    */
@@ -66,7 +66,7 @@ trait HttpMessage {
     getHeaderValue("Content-Encoding")
 
   /**
-   * Tests whether the message body is chunked.
+   * Tests whether message body is chunked.
    *
    * This is determined by inspecting the Transfer-Encoding header.
    */
