@@ -27,10 +27,10 @@ object RequestLine {
     line match {
       case LineRegex(method, uri, version) =>
         Try(RequestLine(method, uri, Version(version))).getOrElse {
-          throw new IllegalArgumentException(s"Invalid request line: $line")
+          throw new IllegalArgumentException(s"Malformed request line: $line")
         }
       case _ =>
-        throw new IllegalArgumentException(s"Invalid request line: $line")
+        throw new IllegalArgumentException(s"Malformed request line: $line")
     }
 }
 
@@ -49,10 +49,10 @@ object StatusLine {
     line match {
       case LineRegex(version, code, reason) =>
         Try(StatusLine(Version(version), Status(code.toInt, reason))).getOrElse {
-          throw new IllegalArgumentException(s"Invalid response line: $line")
+          throw new IllegalArgumentException(s"Malformed status line: $line")
         }
       case _ =>
-        throw new IllegalArgumentException(s"Invalid response line: $line")
+        throw new IllegalArgumentException(s"Malformed status line: $line")
     }
 }
 

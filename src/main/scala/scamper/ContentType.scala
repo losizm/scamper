@@ -29,17 +29,17 @@ case class ContentType private (primaryType: String, subtype: String, parameters
     parameters.map(param => s"; ${param._1}=${quote(param._2)}").mkString
 
   private def quote(value: String): String =
-    if (ContentType.isToken(value)) value else '"' + value + '"'
+    if (Token(value)) value
+    else '"' + value + '"'
 }
 
 /** Provides ContentType factory methods. */
 object ContentType {
   import bantam.nx.lang.DefaultType
 
-  private val token = """[\w!#$%&'*+.^`{}|~-]+"""
-  private val value = s"""(?:$token|"([^"]+)")"""
-  private val param = s"""\\s*;\\s*($token)=($value)\\s*"""
-  private val ContentTypeRegex = s"""\\s*($token)/($token)(($param)*)\\s*""".r
+  private val value = s"""(?:${Token.regex}|"([^"]+)")"""
+  private val param = s"""\\s*;\\s*(${Token.regex})=($value)\\s*"""
+  private val ContentTypeRegex = s"""\\s*(${Token.regex})/(${Token.regex})(($param)*)\\s*""".r
 
   /** Creates a ContentType using the given attributes. */
   def apply(primaryType: String, subtype: String, parameters: (String, String)*): ContentType =
@@ -47,9 +47,9 @@ object ContentType {
 
   /** Creates a ContentType using the given attributes. */
   def apply(primaryType: String, subtype: String, parameters: Map[String, String]): ContentType = {
-    require(isToken(primaryType), s"Invalid primary type: $primaryType")
-    require(isToken(subtype), s"Invalid subtype: $subtype")
-    require(parameters.forall { case (name, value) => isToken(name) && isValue(value) }, s"Invalid parameters: $parameters")
+    require(Token(primaryType), s"Invalid primary type: $primaryType")
+    require(Token(subtype), s"Invalid subtype: $subtype")
+    require(parameters.forall { case (name, value) => Token(name) && isValue(value) }, s"Invalid parameters: $parameters")
 
     new ContentType(primaryType, subtype, parameters)
   }
@@ -58,13 +58,14 @@ object ContentType {
   def apply(contentType: String): ContentType =
     contentType match {
       case ContentTypeRegex(primaryType, subtype, params, _*) =>
-        ContentType(primaryType, subtype, parseParams(params))
+        new ContentType(primaryType, subtype, parseParams(params))
       case _ =>
-        throw new IllegalArgumentException(s"Invalid content type: $contentType")
+        throw new IllegalArgumentException(s"Malformed content type: $contentType")
     }
 
-  private def isToken(s: String) = s.matches(token)
-  private def isValue(s: String) = s.matches("[^\"]+")
+  private def isValue(s: String) =
+    if (s == null) false
+    else s.matches("[^\"]+")
 
   private def parseParams(params: String): Map[String, String] =
     param.r.findAllMatchIn(params)
