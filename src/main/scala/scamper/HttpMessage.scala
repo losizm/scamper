@@ -18,21 +18,30 @@ trait HttpMessage {
   def headers: Seq[Header]
 
   /**
+   * Gets header for specified key.
+   *
+   * If there are multiple headers for key, then the first occurrence is
+   * retrieved.
+   */
+  def getHeader(key: String): Option[Header] =
+    headers.find(_.key.equalsIgnoreCase(key))
+
+  /** Gets all header for specified key. */
+  def getHeaders(key: String): Seq[Header] =
+    headers.filter(_.key.equalsIgnoreCase(key))
+
+  /**
    * Gets header value for specified key.
    *
    * If there are multiple headers for key, then the value of first occurrence
    * is retrieved.
    */
   def getHeaderValue(key: String): Option[String] =
-    headers.collectFirst {
-      case Header(k, value) if k.equalsIgnoreCase(key) => value
-    }
+    getHeader(key).map(_.value)
 
   /** Gets all header values for specified key. */
   def getHeaderValues(key: String): List[String] =
-    headers.collect {
-      case Header(k, value) if k.equalsIgnoreCase(key) => value
-    }.toList
+    getHeaders(key).map(_.value).toList
 
   /** Message body */
   def body: Entity
@@ -55,7 +64,7 @@ trait HttpMessage {
    * The value is retrieved from the Content-Length header.
    */
   def contentLength: Option[Long] =
-    getHeaderValue("Content-Length").map(_.toLong)
+    getHeader("Content-Length").map(_.longValue)
 
   /**
    * Gets content encoding.
@@ -142,7 +151,7 @@ trait HttpMessage {
    * @return the new message
    */
   def withContentLength(length: Long): MessageType =
-    withHeader(Header("Content-Length", length.toString))
+    withHeader(Header("Content-Length", length))
 
   /**
    * Creates a copy of this message replacing the content encoding.

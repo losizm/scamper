@@ -1,5 +1,7 @@
 package scamper
 
+import java.time.OffsetDateTime
+
 /** Representation of HTTP response. */
 trait HttpResponse extends HttpMessage {
   type MessageType = HttpResponse
@@ -10,6 +12,22 @@ trait HttpResponse extends HttpMessage {
 
   /** HTTP version of response message */
   def version: Version = startLine.version
+
+  /**
+   * Gets response date.
+   *
+   * The value is retrieved from the Date header.
+   */
+  def date: Option[OffsetDateTime] =
+    getHeader("Date").map(_.dateValue)
+
+  /**
+   * Gets entity tag.
+   *
+   * The value is retrieved from the ETag header.
+   */
+  def entityTag: Option[String] =
+   getHeaderValue("ETag")
 
   /**
    * Gets location.
@@ -34,9 +52,25 @@ trait HttpResponse extends HttpMessage {
   def withVersion(version: Version): MessageType
 
   /**
+   * Creates a copy of this response replacing the response date.
+   *
+   * @return the new response
+   */
+  def withDate(date: OffsetDateTime): MessageType =
+    withHeader(Header("Date", date))
+
+  /**
+   * Creates a copy of this message replacing the entity tag.
+   *
+   * @return the new response
+   */
+  def withEntityTag(tag: String): MessageType =
+    withHeader(Header("ETag", tag))
+
+  /**
    * Creates a copy of this message replacing the location.
    *
-   * @return the new message
+   * @return the new response
    */
   def withLocation(location: String): MessageType =
     withHeader(Header("Location", location))
