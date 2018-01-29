@@ -46,6 +46,26 @@ trait HttpRequest extends HttpMessage {
     getHeaderValue("Host")
 
   /**
+   * Get accepted media types.
+   *
+   * This value is retrieved from the Accept header.
+   */
+  def accept: Seq[ContentType] =
+    getHeaderValue("Accept").map { value =>
+      value.split("\\s*,\\s*").map(ContentType.apply).toSeq
+    }.getOrElse(Nil)
+
+  /**
+   * Get accepted encodings.
+   *
+   * This value is retrieved from the Accept-Encoding header.
+   */
+  def acceptEncoding: Seq[String] =
+    getHeaderValue("Accept-Encoding").map { value =>
+      value.split("\\s*,\\s*").toSeq
+    }.getOrElse(Nil)
+
+  /**
    * Creates a copy of this request replacing the request method.
    *
    * @return the new request
@@ -101,6 +121,22 @@ trait HttpRequest extends HttpMessage {
    */
   def withHost(host: String): MessageType =
     withHeader(Header("Host", host))
+
+  /**
+   * Creates a copy of this message replacing the accepted media types.
+   *
+   * @return the new message
+   */
+  def withAccept(types: ContentType*): MessageType =
+    withHeader(Header("Accept", types.mkString(", ")))
+
+  /**
+   * Creates a copy of this message replacing the accepted encodings.
+   *
+   * @return the new message
+   */
+  def withAcceptEncoding(encodings: String*): MessageType =
+    withHeader(Header("Accept-Encoding", encodings.mkString(", ")))
 }
 
 /** Provides HttpRequest factory methods. */
@@ -150,9 +186,9 @@ private case class SimpleHttpRequest(startLine: RequestLine, headers: Seq[Header
     withURI(uriObject.withQuery(newQuery).toString)
 
   def withQueryParameters(params: Map[String, List[String]]): HttpRequest =
-    withURI(uriObject.withQuery(params).toString)
+    withURI(uriObject.withQueryParameters(params).toString)
 
   def withQueryParameters(params: (String, String)*): HttpRequest =
-    withURI(uriObject.withQuery(params : _*).toString)
+    withURI(uriObject.withQueryParameters(params : _*).toString)
 }
 
