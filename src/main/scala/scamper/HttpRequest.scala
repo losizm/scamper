@@ -115,6 +115,8 @@ object HttpRequest {
 }
 
 private case class SimpleHttpRequest(startLine: RequestLine, headers: Seq[Header], body: Entity) extends HttpRequest {
+  import Implicits.URIType
+
   private lazy val uriObject = new java.net.URI(uri)
 
   lazy val path = uriObject.getPath
@@ -142,41 +144,15 @@ private case class SimpleHttpRequest(startLine: RequestLine, headers: Seq[Header
     copy(startLine = startLine.copy(version = newVersion))
 
   def withPath(newPath: String): HttpRequest =
-    withURI(buildURI(newPath, query))
+    withURI(uriObject.withPath(newPath).toString)
 
   def withQuery(newQuery: String): HttpRequest =
-    withURI(buildURI(path, Option(newQuery)))
+    withURI(uriObject.withQuery(newQuery).toString)
 
-  def withQueryParameters(params: Map[String, List[String]]): HttpRequest = {
-    val query = QueryParser.format(params)
+  def withQueryParameters(params: Map[String, List[String]]): HttpRequest =
+    withURI(uriObject.withQuery(params).toString)
 
-    if (query.isEmpty) withQuery(null)
-    else withQuery(query)
-  }
-
-  def withQueryParameters(params: (String, String)*): HttpRequest = {
-    val query = QueryParser.format(params : _*)
-
-    if (query.isEmpty) withQuery(null)
-    else withQuery(query)
-  }
-
-  private def buildURI(path: String, query: Option[String]): String = {
-    val uri = new StringBuilder()
-
-    val scheme = uriObject.getScheme
-    if (scheme != null) uri.append(scheme).append("://")
-
-    val authority = uriObject.getRawAuthority
-    if (authority != null) uri.append(authority).append('/')
-
-    uri.append(path)
-    query.foreach(uri.append('?').append(_))
-
-    val fragment = uriObject.getRawFragment
-    if (fragment != null) uri.append('#').append(fragment)
-
-    uri.toString
-  }
+  def withQueryParameters(params: (String, String)*): HttpRequest =
+    withURI(uriObject.withQuery(params : _*).toString)
 }
 

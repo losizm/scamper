@@ -2,7 +2,7 @@ package scamper
 
 import bantam.nx.io._
 import java.io.File
-import java.net.{ HttpURLConnection, URL }
+import java.net.{ HttpURLConnection, URI, URL }
 import scala.annotation.tailrec
 import scala.util.Try
 import scamper._
@@ -45,10 +45,67 @@ object Implicits {
   implicit val fileToEntity = (entity: File) => Entity(entity)
 
   /**
-   * A type class of <code>java.net.URL</code> that adds methods for sending
-   * HTTP requests and handling the response.
+   * A type class of <code>java.net.URI</code> that adds methods for building
+   * new URIs.
+   */
+  implicit class URIType(uri: URI) {
+    /** Creates a new URI replacing the path. */
+    def withPath(path: String): URI =
+      buildURI(path, Option(uri.getQuery))
+
+    /** Creates a new URI replacing the query. */
+    def withQuery(query: String): URI =
+      buildURI(uri.getPath, Option(query))
+
+    /** Creates a new URI replacing the query with supplied parameters. */
+    def withQuery(params: Map[String, List[String]]): URI =
+      withQuery(QueryParser.format(params))
+
+    /** Creates a new URI replacing the query with supplied parameters. */
+    def withQuery(params: (String, String)*): URI =
+      withQuery(QueryParser.format(params : _*))
+
+    private def buildURI(path: String, query: Option[String]): URI = {
+      val uriBuilder = new StringBuilder()
+
+      val scheme = uri.getScheme
+      if (scheme != null) uriBuilder.append(scheme).append("://")
+
+      val authority = uri.getRawAuthority
+      if (authority != null)
+        uriBuilder.append(authority).append('/').append(path.dropWhile(_ == '/'))
+      else uriBuilder.append(path)
+
+      query.filterNot(_.matches("\\s+")).foreach(uriBuilder.append('?').append(_))
+
+      val fragment = uri.getRawFragment
+      if (fragment != null) uriBuilder.append('#').append(fragment)
+
+      new URI(uriBuilder.toString)
+    }
+  }
+
+  /**
+   * A type class of <code>java.net.URL</code> that adds methods for building
+   * new URLs and sending HTTP requests.
    */
   implicit class URLType(url: URL) {
+    /** Creates a new URL replacing the path. */
+    def withPath(path: String): URL =
+      buildURL(path, Option(url.getQuery))
+
+    /** Creates a new URL replacing the query. */
+    def withQuery(query: String): URL =
+      buildURL(url.getPath, Option(query))
+
+    /** Creates a new URL replacing the query with supplied parameters. */
+    def withQuery(params: Map[String, List[String]]): URL =
+      buildURL(url.getPath, Option(QueryParser.format(params)))
+
+    /** Creates a new URL replacing the query with supplied parameters. */
+    def withQuery(params: (String, String)*): URL =
+      buildURL(url.getPath, Option(QueryParser.format(params : _*)))
+
     /**
      * Opens HTTP connection and passes it to supplied handler.
      *
@@ -169,6 +226,20 @@ object Implicits {
      */
     def options[T](headers: Header*)(f: HttpResponse => T): T =
       request("OPTIONS", headers)(f)
+
+    private def buildURL(path: String, query: Option[String]): URL = {
+      val urlBuilder = new StringBuilder()
+
+      urlBuilder.append(url.getProtocol).append("://")
+      urlBuilder.append(url.getAuthority).append('/')
+      urlBuilder.append(path.dropWhile(_ == '/'))
+      query.foreach(urlBuilder.append('?').append(_))
+
+      val ref = url.getRef
+      if (ref != null) urlBuilder.append('#').append(ref)
+
+      new URL(urlBuilder.toString)
+    }
 
     private def writeBody(conn: HttpURLConnection, body: Entity): Unit = {
       body.length match {
