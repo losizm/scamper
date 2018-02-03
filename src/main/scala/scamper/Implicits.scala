@@ -46,6 +46,27 @@ object Implicits {
   implicit val fileToEntity = (entity: File) => Entity(entity)
 
   /**
+   * A type class of [[HttpRequest]] that adds a method for sending request and
+   * receiving [[HttpResponse]].
+   */
+  implicit class HttpRequestType(request: HttpRequest) {
+    /**
+     * Sends request and passes response to supplied handler.
+     *
+     * @param secure specifies whether to use HTTPS protocol
+     * @param f response handler
+     *
+     * @return the value returned from supplied handler
+     */
+    def send[T](secure: Boolean = false)(f: HttpResponse => T): T = {
+      val host = request.host.getOrElse(throw new HttpException("Missing Host header"))
+      val url = request.uri.toURI.toURL(if (secure) "https" else "http", host)
+
+      url.request(request.method, request.headers, Some(request.body))(f)
+    }
+  }
+
+  /**
    * A type class of <code>java.net.URI</code> that adds methods for building
    * new URIs.
    */
@@ -160,7 +181,7 @@ object Implicits {
         conn.setRequestMethod(method)
         headers.foreach(header => conn.addRequestProperty(header.key, header.value))
 
-        body.foreach { entity =>
+        body.filterNot(_.isKnownEmpty).foreach { entity =>
           conn.setDoOutput(true)
           writeBody(conn, entity)
         }
