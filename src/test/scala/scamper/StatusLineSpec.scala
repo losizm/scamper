@@ -3,7 +3,7 @@ package scamper
 import org.scalatest.FlatSpec
 
 class StatusLineSpec extends FlatSpec {
-  "A StatusLine" should "be created" in {
+  "StatusLine" should "be created" in {
     var response = StatusLine("HTTP/1.1 200 OK")
     assert(response.version == Version("1.1"))
     assert(response.status == Status(200, "OK"))

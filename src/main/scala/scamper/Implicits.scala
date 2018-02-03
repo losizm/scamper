@@ -1,6 +1,7 @@
 package scamper
 
 import bantam.nx.io._
+import bantam.nx.lang._
 import java.io.File
 import java.net.{ HttpURLConnection, URI, URL }
 import scala.annotation.tailrec
@@ -66,13 +67,17 @@ object Implicits {
     def getQueryParameterValues(name: String): List[String] =
       getQueryParameters.get(name).getOrElse(Nil)
 
+    /** Converts URI to URL using supplied scheme and authority. */
+    def toURL(scheme: String, authority: String): URL =
+      buildURI(scheme, authority, uri.getPath, uri.getQuery, uri.getFragment).toURL
+
     /** Creates a new URI replacing the path. */
     def withPath(path: String): URI =
-      buildURI(path, Option(uri.getQuery))
+      createURI(path, uri.getQuery)
 
     /** Creates a new URI replacing the query. */
     def withQuery(query: String): URI =
-      buildURI(uri.getPath, Option(query))
+      createURI(uri.getPath, query)
 
     /** Creates a new URI replacing the query parameters. */
     def withQueryParameters(params: Map[String, List[String]]): URI =
@@ -82,24 +87,8 @@ object Implicits {
     def withQueryParameters(params: (String, String)*): URI =
       withQuery(QueryParser.format(params : _*))
 
-    private def buildURI(path: String, query: Option[String]): URI = {
-      val uriBuilder = new StringBuilder()
-
-      val scheme = uri.getScheme
-      if (scheme != null) uriBuilder.append(scheme).append("://")
-
-      val authority = uri.getRawAuthority
-      if (authority != null)
-        uriBuilder.append(authority).append('/').append(path.dropWhile(_ == '/'))
-      else uriBuilder.append(path)
-
-      query.filterNot(_.matches("\\s+")).foreach(uriBuilder.append('?').append(_))
-
-      val fragment = uri.getRawFragment
-      if (fragment != null) uriBuilder.append('#').append(fragment)
-
-      new URI(uriBuilder.toString)
-    }
+    private def createURI(path: String, query: String): URI =
+      buildURI(uri.getScheme, uri.getRawAuthority, path, query, uri.getRawFragment).toURI
   }
 
   /**
@@ -126,19 +115,19 @@ object Implicits {
 
     /** Creates a new URL replacing the path. */
     def withPath(path: String): URL =
-      buildURL(path, Option(url.getQuery))
+      createURL(path, url.getQuery)
 
     /** Creates a new URL replacing the query. */
     def withQuery(query: String): URL =
-      buildURL(url.getPath, Option(query))
+      createURL(url.getPath, query)
 
     /** Creates a new URL replacing the query parameters. */
     def withQueryParameters(params: Map[String, List[String]]): URL =
-      buildURL(url.getPath, Option(QueryParser.format(params)))
+      createURL(url.getPath, QueryParser.format(params))
 
     /** Creates a new URL replacing the query parameters. */
     def withQueryParameters(params: (String, String)*): URL =
-      buildURL(url.getPath, Option(QueryParser.format(params : _*)))
+      createURL(url.getPath, QueryParser.format(params : _*))
 
     /**
      * Opens HTTP connection and passes it to supplied handler.
@@ -261,19 +250,8 @@ object Implicits {
     def options[T](headers: Header*)(f: HttpResponse => T): T =
       request("OPTIONS", headers)(f)
 
-    private def buildURL(path: String, query: Option[String]): URL = {
-      val urlBuilder = new StringBuilder()
-
-      urlBuilder.append(url.getProtocol).append("://")
-      urlBuilder.append(url.getAuthority).append('/')
-      urlBuilder.append(path.dropWhile(_ == '/'))
-      query.foreach(urlBuilder.append('?').append(_))
-
-      val ref = url.getRef
-      if (ref != null) urlBuilder.append('#').append(ref)
-
-      new URL(urlBuilder.toString)
-    }
+    private def createURL(path: String, query: String): URL =
+      buildURI(url.getProtocol, url.getAuthority, path, query, url.getRef).toURL
 
     private def writeBody(conn: HttpURLConnection, body: Entity): Unit = {
       body.length match {
@@ -309,6 +287,20 @@ object Implicits {
         if (conn.getResponseCode < 400) conn.getInputStream
         else conn.getErrorStream
       )
+  }
+
+  private def buildURI(scheme: String, authority: String, path: String, query: String, fragment: String): String = {
+    val uriBuilder = new StringBuilder()
+
+    if (scheme != null) uriBuilder.append(scheme).append(":")
+    if (authority != null) uriBuilder.append("//").append(authority)
+
+    uriBuilder.append('/').append(path.dropWhile(_ == '/'))
+
+    if (query != null && !query.isEmpty) uriBuilder.append('?').append(query)
+    if (fragment != null) uriBuilder.append('#').append(fragment)
+
+    uriBuilder.toString
   }
 }
 

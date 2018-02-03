@@ -3,7 +3,7 @@ package scamper
 import org.scalatest.FlatSpec
 
 class VersionSpec extends FlatSpec {
-  "A Version" should "be created" in {
+  "Version" should "be created" in {
     assert(Version("1.2") == Version(1, 2))
   }
 

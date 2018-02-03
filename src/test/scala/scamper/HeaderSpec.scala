@@ -4,7 +4,7 @@ import bantam.nx.lang._
 import org.scalatest.FlatSpec
 
 class HeaderSpec extends FlatSpec {
-  "A Header" should "be created using a formatted value" in {
+  "Header" should "be created using formatted value" in {
     val header = Header("Content-Type: text/plain")
 
     assert(header.key == "Content-Type")
@@ -12,7 +12,7 @@ class HeaderSpec extends FlatSpec {
     assert(header == Header(header.toString))
   }
 
-  it should "be created using a long value" in {
+  it should "be created using long value" in {
     val header = Header("Content-Length", 80)
 
     assert(header.key == "Content-Length")
@@ -21,7 +21,7 @@ class HeaderSpec extends FlatSpec {
     assert(header == Header(header.toString))
   }
 
-  it should "be created using a date value" in {
+  it should "be created using date value" in {
     val formatter = java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
     val date = "2016-11-08T09:00:00+04:00".toOffsetDateTime
     val header = Header("If-Modified-Since", date)

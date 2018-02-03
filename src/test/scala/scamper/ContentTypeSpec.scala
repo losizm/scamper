@@ -3,14 +3,16 @@ package scamper
 import org.scalatest.FlatSpec
 
 class ContentTypeSpec extends FlatSpec {
-  "A ContentType" should "be created" in {
-    var contentType = ContentType("text/html")
+  "ContentType" should "be created without parameters" in {
+    val contentType = ContentType("text/html")
     assert(contentType.primaryType == "text")
     assert(contentType.subtype == "html")
     assert(contentType.isText)
     assert(contentType == ContentType(contentType.toString))
+  }
 
-    contentType = ContentType("text/html; charset=iso-8859-1")
+  it should "be created with parameters" in {
+    var contentType = ContentType("text/html; charset=iso-8859-1")
     assert(contentType.primaryType == "text")
     assert(contentType.subtype == "html")
     assert(contentType.parameters("charset") == "iso-8859-1")

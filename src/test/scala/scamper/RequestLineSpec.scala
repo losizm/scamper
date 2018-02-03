@@ -3,7 +3,7 @@ package scamper
 import org.scalatest.FlatSpec
 
 class RequestLineSpec extends FlatSpec {
-  "A RequestLine" should "be created" in {
+  "RequestLine" should "be created" in {
     var request = RequestLine("GET / HTTP/1.1")
     assert(request.method == "GET")
     assert(request.uri == "/")

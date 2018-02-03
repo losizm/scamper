@@ -5,7 +5,7 @@ import HttpResponses._
 import Implicits._
 
 class RequestHandlerSpec extends FlatSpec {
-  "A RequestHandlerChain" should "be traversed" in {
+  "RequestHandlerChain" should "be traversed" in {
     val chain = RequestHandlerChain(
       (req, next) => next(req.addHeaders("user: guest")),
       (req, next) => next(req.addHeaders("access: read")),

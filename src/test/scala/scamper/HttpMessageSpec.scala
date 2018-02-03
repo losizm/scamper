@@ -6,7 +6,7 @@ class HttpMessageSpec extends FlatSpec {
   import HttpResponses._
   import Implicits._
 
-  "An HttpRequest" should "be created" in {
+  "HttpRequest" should "be created" in {
     val request = HttpRequest("GET", "/find").withQuery("user=root").withHeaders("Host: localhost:8080")
     assert(request.method == "GET")
     assert(request.uri == "/find?user=root")
@@ -16,7 +16,7 @@ class HttpMessageSpec extends FlatSpec {
     assert(request.host.contains("localhost:8080"))
   }
 
-  "An HttpResponse" should "be created" in {
+  "HttpResponse" should "be created" in {
     val response = SeeOther.withLocation("/find").withChunked(true)
     assert(response.status == SeeOther.status)
     assert(response.location.contains("/find"))
