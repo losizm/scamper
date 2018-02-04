@@ -21,6 +21,33 @@ trait HttpMessage {
    * Gets header for specified key.
    *
    * If there are multiple headers for key, then first occurrence is retrieved.
+   *
+   * @throws HeaderNotFound if no header with specified key is present
+   *
+   * @see [[getHeader]]
+   */
+  def header(key: String): Header =
+    getHeader(key).getOrElse(throw HeaderNotFound(key))
+
+  /**
+   * Gets header value for specified key.
+   *
+   * If there are multiple headers for key, then value of first occurrence is
+   * retrieved.
+   *
+   * @throws HeaderNotFound if no header with specified key is present
+   *
+   * @see [[getHeaderValue]]
+   */
+  def headerValue(key: String): String =
+    getHeaderValue(key).getOrElse(throw HeaderNotFound(key))
+
+  /**
+   * Gets header for specified key.
+   *
+   * If there are multiple headers for key, then first occurrence is retrieved.
+   *
+   * @see [[header]]
    */
   def getHeader(key: String): Option[Header] =
     headers.find(_.key.equalsIgnoreCase(key))
@@ -34,6 +61,8 @@ trait HttpMessage {
    *
    * If there are multiple headers for key, then value of first occurrence is
    * retrieved.
+   *
+   * @see [[headerValue]]
    */
   def getHeaderValue(key: String): Option[String] =
     getHeader(key).map(_.value)

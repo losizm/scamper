@@ -3,7 +3,7 @@ package scamper
 import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, InputStream, SequenceInputStream }
 import scala.util.Try
 
-/** Provides utility for parsing body of HTTP message. */
+/** Provides utility for parsing HTTP message body. */
 trait BodyParser[T] {
   /**
    * Parses body of supplied HTTP message returning instance of defined type.

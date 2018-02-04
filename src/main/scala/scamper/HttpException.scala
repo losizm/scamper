@@ -27,3 +27,5 @@ class HttpException(message: String, cause: Throwable) extends RuntimeException(
   def this(cause: Throwable) = this(null, cause)
 }
 
+/** Indicates absence of specified header. */
+case class HeaderNotFound(key: String) extends HttpException(key)

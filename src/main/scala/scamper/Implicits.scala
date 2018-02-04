@@ -13,10 +13,7 @@ object Implicits {
   /** Converts string to [[Header]]. */
   implicit val stringToHeader = (header: String) => Header(header)
 
-  /**
-   * Converts tuple to [[Header]] where first element is header key and second
-   * is value.
-   */
+  /** Converts tuple to [[Header]] where tuple is key-value pair. */
   implicit val tupleToHeader = (header: (String, String)) => Header(header._1, header._2)
 
   /** Converts string to [[ContentType]]. */
@@ -35,8 +32,7 @@ object Implicits {
   implicit val stringToEntity = (entity: String) => Entity(entity, "UTF-8")
 
   /**
-   * Converts tuple to [[Entity]] where first element is text and second is
-   * character encoding.
+   * Converts tuple to [[Entity]] where tuple is text and character encoding.
    */
   implicit val tupleToEntity = (entity: (String, String)) => Entity(entity._1, entity._2)
 
@@ -44,7 +40,7 @@ object Implicits {
   implicit val fileToEntity = (entity: File) => Entity(entity)
 
   /**
-   * A type class of [[HttpRequest]] that adds method for sending request and
+   * Type class of [[HttpRequest]] that adds method for sending request and
    * receiving [[HttpResponse]].
    */
   implicit class HttpRequestType(request: HttpRequest) {
@@ -57,7 +53,7 @@ object Implicits {
      * @return value returned from supplied handler
      */
     def send[T](secure: Boolean = false)(f: HttpResponse => T): T = {
-      val host = request.host.getOrElse(throw new HttpException("Missing Host header"))
+      val host = request.headerValue("host")
       val url = request.uri.toURI.toURL(if (secure) "https" else "http", host)
 
       url.request(request.method, request.headers, Some(request.body))(f)
@@ -65,8 +61,8 @@ object Implicits {
   }
 
   /**
-   * A type class of <code>java.net.URI</code> that adds methods for building
-   * new URIs.
+   * Type class of <code>java.net.URI</code> that adds methods for building new
+   * URI.
    */
   implicit class URIType(uri: URI) {
     /** Gets query parameters. */
@@ -111,8 +107,8 @@ object Implicits {
   }
 
   /**
-   * A type class of <code>java.net.URL</code> that adds methods for building
-   * new URLs and sending HTTP requests.
+   * Type class of <code>java.net.URL</code> that adds methods for building new
+   * URL and sending HTTP request.
    */
   implicit class URLType(url: URL) {
     /** Gets the query parameters. */

@@ -7,7 +7,7 @@ class HttpMessageSpec extends FlatSpec {
   import Implicits._
 
   "HttpRequest" should "be created" in {
-    val request = HttpRequest("GET", "/find").withQuery("user=root").withHeaders("Host: localhost:8080")
+    val request = HttpRequest("GET", "/find").withQuery("user=root").withHeader("Host: localhost:8080")
     assert(request.method == "GET")
     assert(request.uri == "/find?user=root")
     assert(request.path == "/find")
@@ -21,6 +21,11 @@ class HttpMessageSpec extends FlatSpec {
     assert(response.status == SeeOther.status)
     assert(response.location.contains("/find"))
     assert(response.isChunked)
+  }
+
+  "HeaderNotFound" should "be thrown" in {
+    val request = HttpRequest("GET", "/")
+    assertThrows[HeaderNotFound](request.header("host"))
   }
 }
 
