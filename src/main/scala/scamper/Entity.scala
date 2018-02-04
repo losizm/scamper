@@ -18,13 +18,12 @@ trait Entity {
   def getInputStream: InputStream
 
   /**
-   * Provides access to entity's input stream with automatic resource
-   * management.
+   * Provides access to input stream with automatic resource management.
    *
    * The input stream is passed to supplied function, and the stream is closed
    * upon function's return.
    *
-   * @return the value returned from supplied function
+   * @return value returned from supplied function
    */
   def withInputStream[T](f: InputStream => T): T = {
     val in = getInputStream
@@ -35,11 +34,11 @@ trait Entity {
 
 /** Provides Entity factory methods. */
 object Entity {
-  /** Creates an entity whose content is the supplied bytes. */
+  /** Creates an entity whose content is supplied bytes. */
   def apply(bytes: Array[Byte]): Entity =
     apply(bytes, 0, bytes.length)
 
-  /** Creates an entity whose content is the supplied bytes. */
+  /** Creates an entity whose content is supplied bytes. */
   def apply(bytes: Array[Byte], start: Int, length: Int): Entity = {
     require(start >= 0, "Start must be nonnegative")
     require(start + length <= bytes.length, "Applied start and length must not exceed data length")
@@ -49,7 +48,7 @@ object Entity {
     ByteArrayEntity(copy)
   }
 
-  /** Creates an entity from the input stream returned from supplied function. */
+  /** Creates an entity from input stream returned from supplied function. */
   def apply(f: () => InputStream): Entity =
     InputStreamEntity(f)
 

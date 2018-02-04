@@ -16,7 +16,7 @@ trait HttpResponse extends HttpMessage {
   /**
    * Gets response date.
    *
-   * The value is retrieved from the Date header.
+   * Value retrieved from Date header.
    */
   def date: Option[OffsetDateTime] =
     getHeader("Date").map(_.dateValue)
@@ -24,7 +24,7 @@ trait HttpResponse extends HttpMessage {
   /**
    * Gets entity tag.
    *
-   * The value is retrieved from the ETag header.
+   * Value retrieved from ETag header.
    */
   def entityTag: Option[String] =
    getHeaderValue("ETag")
@@ -32,45 +32,45 @@ trait HttpResponse extends HttpMessage {
   /**
    * Gets location.
    *
-   * The value is retrieved from the Location header.
+   * Value retrieved from Location header.
    */
   def location: Option[String] =
     getHeaderValue("Location")
 
   /**
-   * Creates a copy of this response replacing the response status.
+   * Creates new response replacing status.
    *
-   * @return the new response
+   * @return new response
    */
   def withStatus(status: Status): MessageType
 
   /**
-   * Creates a copy of this response replacing the HTTP version.
+   * Creates new response replacing version.
    *
-   * @return the new response
+   * @return new response
    */
   def withVersion(version: Version): MessageType
 
   /**
-   * Creates a copy of this response replacing the response date.
+   * Creates new response replacing date.
    *
-   * @return the new response
+   * @return new response
    */
   def withDate(date: OffsetDateTime): MessageType =
     withHeader(Header("Date", date))
 
   /**
-   * Creates a copy of this message replacing the entity tag.
+   * Creates new message replacing entity tag.
    *
-   * @return the new response
+   * @return new response
    */
   def withEntityTag(tag: String): MessageType =
     withHeader(Header("ETag", tag))
 
   /**
-   * Creates a copy of this message replacing the location.
+   * Creates new message replacing location.
    *
-   * @return the new response
+   * @return new response
    */
   def withLocation(location: String): MessageType =
     withHeader(Header("Location", location))
@@ -78,11 +78,11 @@ trait HttpResponse extends HttpMessage {
 
 /** Provides HttpResponse factory methods. */
 object HttpResponse {
-  /** Creates an HttpResponse using supplied attributes. */
+  /** Creates HttpResponse using supplied attributes. */
   def apply(statusLine: StatusLine, headers: Seq[Header], body: Entity): HttpResponse =
     SimpleHttpResponse(statusLine, headers, body)
 
-  /** Creates an HttpResponse using supplied attributes. */
+  /** Creates HttpResponse using supplied attributes. */
   def apply(status: Status, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpResponse =
     SimpleHttpResponse(StatusLine(version, status), headers, body)
 }

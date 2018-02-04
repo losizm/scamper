@@ -1,9 +1,9 @@
 package scamper
 
 /**
- * Thrown when an error occurs during HTTP processing.
+ * Thrown when error occurs during HTTP processing.
  *
- * @constructor Constructs a new HttpException with the specified detail message and cause.
+ * @constructor Constructs HttpException with supplied detail message and cause.
  * 
  * @param message detail message
  * @param cause underlying cause
@@ -13,14 +13,14 @@ class HttpException(message: String, cause: Throwable) extends RuntimeException(
   def this() = this(null, null)
 
   /**
-   * Constructs a new HttpException with the specified detail message.
+   * Constructs HttpException with supplied detail message.
    * 
    * @param message detail message
    */
   def this(message: String) = this(message, null)
 
   /**
-   * Constructs a new HttpException with the specified cause.
+   * Constructs HttpException with supplied cause.
    * 
    * @param cause underlying cause
    */

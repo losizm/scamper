@@ -10,43 +10,41 @@ import scamper._
 
 /** Provides implicit conversion functions and type classes. */
 object Implicits {
-  /** Converts a string to [[Header]]. */
+  /** Converts string to [[Header]]. */
   implicit val stringToHeader = (header: String) => Header(header)
 
   /**
-   * Converts a tuple to [[Header]] where the first element is the header key
-   * and the second is the value.
+   * Converts tuple to [[Header]] where first element is header key and second
+   * is value.
    */
   implicit val tupleToHeader = (header: (String, String)) => Header(header._1, header._2)
 
-  /** Converts a string to [[ContentType]]. */
+  /** Converts string to [[ContentType]]. */
   implicit val stringToContentType = (contentType: String) => ContentType(contentType)
 
-  /** Converts a string to [[Version]]. */
+  /** Converts string to [[Version]]. */
   implicit val stringToVersion = (version: String) => Version(version)
 
-  /** Converts an integer to [[Status]]. */
+  /** Converts integer to [[Status]]. */
   implicit val intToStatus = (status: Int) => Status(status)
 
-  /** Converts a byte array to [[Entity]]. */
+  /** Converts byte array to [[Entity]]. */
   implicit val bytesToEntity = (entity: Array[Byte]) => Entity(entity)
 
-  /**
-   * Converts a string to [[Entity]] where the text is to be UTF-8 encoded.
-   */
+  /** Converts string to [[Entity]] where text is UTF-8 encoded. */
   implicit val stringToEntity = (entity: String) => Entity(entity, "UTF-8")
 
   /**
-   * Converts a tuple to [[Entity]] where the first element is text and the
-   * second is the character encoding.
+   * Converts tuple to [[Entity]] where first element is text and second is
+   * character encoding.
    */
   implicit val tupleToEntity = (entity: (String, String)) => Entity(entity._1, entity._2)
 
-  /** Converts a file to [[Entity]]. */
+  /** Converts file to [[Entity]]. */
   implicit val fileToEntity = (entity: File) => Entity(entity)
 
   /**
-   * A type class of [[HttpRequest]] that adds a method for sending request and
+   * A type class of [[HttpRequest]] that adds method for sending request and
    * receiving [[HttpResponse]].
    */
   implicit class HttpRequestType(request: HttpRequest) {
@@ -56,7 +54,7 @@ object Implicits {
      * @param secure specifies whether to use HTTPS protocol
      * @param f response handler
      *
-     * @return the value returned from supplied handler
+     * @return value returned from supplied handler
      */
     def send[T](secure: Boolean = false)(f: HttpResponse => T): T = {
       val host = request.host.getOrElse(throw new HttpException("Missing Host header"))
@@ -78,7 +76,7 @@ object Implicits {
     /**
      * Gets value for named query parameter.
      *
-     * If there are multiple parameters with given name, then the value of first
+     * If there are multiple parameters with given name, then value of first
      * occurrence is retrieved.
      */
     def getQueryParameterValue(name: String): Option[String] =
@@ -92,19 +90,19 @@ object Implicits {
     def toURL(scheme: String, authority: String): URL =
       buildURI(scheme, authority, uri.getPath, uri.getQuery, uri.getFragment).toURL
 
-    /** Creates a new URI replacing the path. */
+    /** Creates new URI replacing path. */
     def withPath(path: String): URI =
       createURI(path, uri.getQuery)
 
-    /** Creates a new URI replacing the query. */
+    /** Creates new URI replacing query. */
     def withQuery(query: String): URI =
       createURI(uri.getPath, query)
 
-    /** Creates a new URI replacing the query parameters. */
+    /** Creates new URI replacing query parameters. */
     def withQueryParameters(params: Map[String, List[String]]): URI =
       withQuery(QueryParser.format(params))
 
-    /** Creates a new URI replacing the query parameters. */
+    /** Creates new URI replacing query parameters. */
     def withQueryParameters(params: (String, String)*): URI =
       withQuery(QueryParser.format(params : _*))
 
@@ -124,7 +122,7 @@ object Implicits {
     /**
      * Gets value for named query parameter.
      *
-     * If there are multiple parameters with given name, then the value of first
+     * If there are multiple parameters with given name, then value of first
      * occurrence is retrieved.
      */
     def getQueryParameterValue(name: String): Option[String] =
@@ -134,19 +132,19 @@ object Implicits {
     def getQueryParameterValues(name: String): List[String] =
       getQueryParameters.get(name).getOrElse(Nil)
 
-    /** Creates a new URL replacing the path. */
+    /** Creates new URL replacing path. */
     def withPath(path: String): URL =
       createURL(path, url.getQuery)
 
-    /** Creates a new URL replacing the query. */
+    /** Creates new URL replacing query. */
     def withQuery(query: String): URL =
       createURL(url.getPath, query)
 
-    /** Creates a new URL replacing the query parameters. */
+    /** Creates new URL replacing query parameters. */
     def withQueryParameters(params: Map[String, List[String]]): URL =
       createURL(url.getPath, QueryParser.format(params))
 
-    /** Creates a new URL replacing the query parameters. */
+    /** Creates new URL replacing query parameters. */
     def withQueryParameters(params: (String, String)*): URL =
       createURL(url.getPath, QueryParser.format(params : _*))
 
@@ -157,7 +155,7 @@ object Implicits {
      *
      * @param f connection handler
      *
-     * @return the value returned from supplied handler
+     * @return value returned from supplied handler
      */
     def withConnection[T](f: HttpURLConnection => T): T = {
       val conn = url.openConnection()
@@ -174,7 +172,7 @@ object Implicits {
      * @param body request entity body
      * @param f response handler
      *
-     * @return the value returned from supplied handler
+     * @return value returned from supplied handler
      */
     def request[T](method: String, headers: Seq[Header] = Nil, body: Option[Entity] = None)(f: HttpResponse => T): T =
       withConnection { conn =>
@@ -198,7 +196,7 @@ object Implicits {
      * @param headers request headers
      * @param f response handler
      *
-     * @return the value returned from supplied handler
+     * @return value returned from supplied handler
      */
     def get[T](headers: Header*)(f: HttpResponse => T): T =
       request("GET", headers)(f)
@@ -210,7 +208,7 @@ object Implicits {
      * @param headers request headers
      * @param f response handler
      *
-     * @return the value returned from supplied handler
+     * @return value returned from supplied handler
      */
     def post[T](body: Entity, headers: Header*)(f: HttpResponse => T): T =
       request("POST", headers, Option(body))(f)
@@ -222,7 +220,7 @@ object Implicits {
      * @param headers request headers
      * @param f response handler
      *
-     * @return the value returned from supplied handler
+     * @return value returned from supplied handler
      */
     def put[T](body: Entity, headers: Header*)(f: HttpResponse => T): T =
       request("PUT", headers, Option(body))(f)
@@ -233,7 +231,7 @@ object Implicits {
      * @param headers request headers
      * @param f response handler
      *
-     * @return the value returned from supplied handler
+     * @return value returned from supplied handler
      */
     def delete[T](headers: Header*)(f: HttpResponse => T): T =
       request("DELETE", headers)(f)
@@ -244,7 +242,7 @@ object Implicits {
      * @param headers request headers
      * @param f response handler
      *
-     * @return the value returned from supplied handler
+     * @return value returned from supplied handler
      */
     def head[T](headers: Header*)(f: HttpResponse => T): T =
       request("HEAD", headers)(f)
@@ -255,7 +253,7 @@ object Implicits {
      * @param headers request headers
      * @param f response handler
      *
-     * @return the value returned from supplied handler
+     * @return value returned from supplied handler
      */
     def trace[T](headers: Header*)(f: HttpResponse => T): T =
       request("TRACE", headers)(f)
@@ -266,7 +264,7 @@ object Implicits {
      * @param headers request headers
      * @param f response handler
      *
-     * @return the value returned from supplied handler
+     * @return value returned from supplied handler
      */
     def options[T](headers: Header*)(f: HttpResponse => T): T =
       request("OPTIONS", headers)(f)

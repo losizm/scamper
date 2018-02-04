@@ -3,24 +3,23 @@ package scamper
 import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, InputStream, SequenceInputStream }
 import scala.util.Try
 
-/** Provides a utility for parsing the body of an HTTP message. */
+/** Provides utility for parsing body of HTTP message. */
 trait BodyParser[T] {
   /**
-   * Parses the body of supplied HTTP message returning an instance of defined
-   * type.
+   * Parses body of supplied HTTP message returning instance of defined type.
    */
   def apply(message: HttpMessage): T
 }
 
 /** Provides body parser implementations. */
 object BodyParser {
-  /** Provides a body parser of binary data. */
+  /** Provides binary data body parser. */
   def binary: BodyParser[Array[Byte]] = BinaryBodyParser
 
-  /** Provides a text body parser. */
+  /** Provides text body parser. */
   def text: BodyParser[String] = TextBodyParser
 
-  /** Provides a form body parser. */
+  /** Provides form body parser. */
   def form: BodyParser[Map[String, List[String]]] = FormBodyParser
 }
 

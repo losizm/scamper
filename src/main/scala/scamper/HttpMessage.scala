@@ -20,8 +20,7 @@ trait HttpMessage {
   /**
    * Gets header for specified key.
    *
-   * If there are multiple headers for key, then the first occurrence is
-   * retrieved.
+   * If there are multiple headers for key, then first occurrence is retrieved.
    */
   def getHeader(key: String): Option[Header] =
     headers.find(_.key.equalsIgnoreCase(key))
@@ -33,8 +32,8 @@ trait HttpMessage {
   /**
    * Gets header value for specified key.
    *
-   * If there are multiple headers for key, then the value of first occurrence
-   * is retrieved.
+   * If there are multiple headers for key, then value of first occurrence is
+   * retrieved.
    */
   def getHeaderValue(key: String): Option[String] =
     getHeader(key).map(_.value)
@@ -53,7 +52,7 @@ trait HttpMessage {
   /**
    * Gets content type.
    *
-   * The value is retrieved from the Content-Type header.
+   * Value retrieved from Content-Type header.
    */
   def contentType: Option[ContentType] =
     getHeaderValue("Content-Type").map(ContentType.apply)
@@ -61,7 +60,7 @@ trait HttpMessage {
   /**
    * Gets content length.
    *
-   * The value is retrieved from the Content-Length header.
+   * Value retrieved from Content-Length header.
    */
   def contentLength: Option[Long] =
     getHeader("Content-Length").map(_.longValue)
@@ -69,7 +68,7 @@ trait HttpMessage {
   /**
    * Gets content encoding.
    *
-   * The value is retrieved from the Content-Encoding header.
+   * Value retrieved from Content-Encoding header.
    */
   def contentEncoding: Option[String] =
     getHeaderValue("Content-Encoding")
@@ -77,25 +76,25 @@ trait HttpMessage {
   /**
    * Tests whether message body is chunked.
    *
-   * This is determined by inspecting the Transfer-Encoding header.
+   * Value determined by inspecting Transfer-Encoding header.
    */
   def isChunked: Boolean =
     getHeaderValue("Transfer-Encoding").exists("chunked".equalsIgnoreCase)
 
   /**
-   * Creates a copy of this message replacing the start line.
+   * Creates new message replacing start line.
    *
-   * @return the new message
+   * @return new message
    */
   def withStartLine(line: LineType): MessageType
 
   /**
-   * Creates a copy of this message replacing the supplied header.
+   * Creates new message replacing supplied header.
    *
-   * All previous headers having the same key as supplied header are removed and
-   * replaced with the single header instance.
+   * All previous headers having same key as supplied header are removed and
+   * replaced with single header instance.
    *
-   * @return the new message
+   * @return new message
    */
   def withHeader(header: Header): MessageType =
     withHeaders {
@@ -103,10 +102,9 @@ trait HttpMessage {
     }
 
   /**
-   * Creates a copy of this message removing all headers having the supplied
-   * key.
+   * Creates new message removing all headers having supplied key.
    *
-   * @return the new message
+   * @return new message
    */
   def withoutHeader(key: String): MessageType =
     withHeaders {
@@ -114,60 +112,60 @@ trait HttpMessage {
     }
 
   /**
-   * Creates a copy of this message including additional headers.
+   * Creates new message including additional headers.
    *
-   * @return the new message
+   * @return new message
    */
   def addHeaders(headers: Header*): MessageType
 
   /**
-   * Creates a copy of this message replacing the headers.
+   * Creates new message replacing headers.
    *
-   * All previous headers are removed, and the new message contains only the
-   * supplied headers.
+   * All previous headers are removed, and new message contains only supplied
+   * headers.
    *
-   * @return the new message
+   * @return new message
    */
   def withHeaders(headers: Header*): MessageType
 
   /**
-   * Creates a copy of this message replacing the body.
+   * Creates new message replacing body.
    *
-   * @return the new message
+   * @return new message
    */
   def withBody(body: Entity): MessageType
 
   /**
-   * Creates a copy of this message replacing the content type.
+   * Creates new message replacing content type.
    *
-   * @return the new message
+   * @return new message
    */
   def withContentType(contentType: ContentType): MessageType =
     withHeader(Header("Content-Type", contentType.toString))
 
   /**
-   * Creates a copy of this message replacing the content length.
+   * Creates new message replacing content length.
    *
-   * @return the new message
+   * @return new message
    */
   def withContentLength(length: Long): MessageType =
     withHeader(Header("Content-Length", length))
 
   /**
-   * Creates a copy of this message replacing the content encoding.
+   * Creates new message replacing content encoding.
    *
-   * @return the new message
+   * @return new message
    */
   def withContentEncoding(encoding: String): MessageType =
     withHeader(Header("Content-Encoding", encoding))
 
   /**
-   * Creates a copy of this message replacing the transfer encoding.
+   * Creates new message replacing transfer encoding.
    *
-   * If chunked is true, then the Transfer-Encoding header is set to chunked;
-   * otherwise, the header is removed.
+   * If chunked is true, then Transfer-Encoding header is set to chunked;
+   * otherwise, header is removed.
    *
-   * @return the new message
+   * @return new message
    */
   def withChunked(chunked: Boolean): MessageType =
     if (chunked) withHeader(Header("Transfer-Encoding", "chunked"))

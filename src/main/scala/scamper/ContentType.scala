@@ -41,11 +41,11 @@ object ContentType {
   private val param = s"""\\s*;\\s*(${Token.regex})=($value)\\s*"""
   private val ContentTypeRegex = s"""\\s*(${Token.regex})/(${Token.regex})(($param)*)\\s*""".r
 
-  /** Creates a ContentType using the supplied attributes. */
+  /** Creates ContentType using supplied attributes. */
   def apply(primaryType: String, subtype: String, parameters: (String, String)*): ContentType =
     new ContentType(primaryType, subtype, parameters.toMap)
 
-  /** Creates a ContentType using the supplied attributes. */
+  /** Creates ContentType using supplied attributes. */
   def apply(primaryType: String, subtype: String, parameters: Map[String, String]): ContentType = {
     require(Token(primaryType), s"Invalid primary type: $primaryType")
     require(Token(subtype), s"Invalid subtype: $subtype")

@@ -20,7 +20,7 @@ case class Header private(key: String, value: String) {
 object Header {
   private val HeaderRegex = s"(${Token.regex}):\\s*(.*)\\s*".r
 
-  /** Creates a Header using supplied key and value. */
+  /** Creates Header using supplied key and value. */
   def apply(key: String, value: String): Header = {
     if (!Token(key))
       throw new IllegalArgumentException(s"Invalid header key: $key")
@@ -28,7 +28,7 @@ object Header {
     new Header(key, value)
   }
 
-  /** Creates a Header using supplied key and value. */
+  /** Creates Header using supplied key and value. */
   def apply(key: String, value: Long): Header = {
     if (!Token(key))
       throw new IllegalArgumentException(s"Invalid header key: $key")
@@ -36,7 +36,7 @@ object Header {
     new Header(key, value.toString)
   }
 
-  /** Creates a Header using supplied key and value. */
+  /** Creates Header using supplied key and value. */
   def apply(key: String, value: OffsetDateTime): Header = {
     if (!Token(key))
       throw new IllegalArgumentException(s"Invalid header key: $key")

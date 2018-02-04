@@ -5,9 +5,8 @@ trait RequestHandler {
   /**
    * Handles incoming request.
    *
-   * If the handler fulfills request, then a response is returned. Otherwise,
-   * the handler passes request, as is or with modifications, to next handler in
-   * chain.
+   * If handler fulfills request, then response is returned. Otherwise, handler
+   * passes request, as is or with modifications, to next handler in chain.
    */
   def apply(request: HttpRequest, next: RequestHandlerChain): HttpResponse
 }

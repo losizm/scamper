@@ -27,7 +27,7 @@ trait HttpRequest extends HttpMessage {
   /**
    * Gets value for named query parameter.
    *
-   * If there are multiple parameters with given name, then the value of first
+   * If there are multiple parameters with given name, then value of first
    * occurrence is retrieved.
    */
   def getQueryParameterValue(name: String): Option[String] =
@@ -40,15 +40,15 @@ trait HttpRequest extends HttpMessage {
   /**
    * Gets requested host.
    *
-   * The value is retrieved from the Host header.
+   * Value retrieved from Host header.
    */
   def host: Option[String] =
     getHeaderValue("Host")
 
   /**
-   * Get accepted media types.
+   * Get accepted content types.
    *
-   * This value is retrieved from the Accept header.
+   * Value retrieved from Accept header.
    */
   def accept: Seq[ContentType] =
     getHeaderValue("Accept").map { value =>
@@ -58,7 +58,7 @@ trait HttpRequest extends HttpMessage {
   /**
    * Get accepted encodings.
    *
-   * This value is retrieved from the Accept-Encoding header.
+   * Value retrieved from Accept-Encoding header.
    */
   def acceptEncoding: Seq[String] =
     getHeaderValue("Accept-Encoding").map { value =>
@@ -66,74 +66,74 @@ trait HttpRequest extends HttpMessage {
     }.getOrElse(Nil)
 
   /**
-   * Creates a copy of this request replacing the request method.
+   * Creates new request replacing method.
    *
-   * @return the new request
+   * @return new request
    */
   def withMethod(method: String): MessageType
 
   /**
-   * Creates a copy of this request replacing the request URI.
+   * Creates new request replacing URI.
    *
-   * @return the new request
+   * @return new request
    */
   def withURI(uri: String): MessageType
 
   /**
-   * Creates a copy of this request replacing the HTTP version.
+   * Creates new request replacing version.
    *
-   * @return the new request
+   * @return new request
    */
   def withVersion(version: Version): MessageType
 
   /**
-   * Creates a copy of this request replacing the path component of URI.
+   * Creates new request replacing path component of URI.
    *
-   * @return the new request
+   * @return new request
    */
   def withPath(path: String): HttpRequest
 
   /**
-   * Creates a copy of this request replacing the query component of URI.
+   * Creates new request replacing query component of URI.
    *
-   * @return the new request
+   * @return new request
    */
   def withQuery(query: String): HttpRequest
 
   /**
-   * Creates a copy of this request replacing the query parameters.
+   * Creates new request replacing query parameters.
    *
-   * @return the new request
+   * @return new request
    */
   def withQueryParameters(params: Map[String, List[String]]): HttpRequest
 
   /**
-   * Creates a copy of this request replacing the query parameters.
+   * Creates new request replacing query parameters.
    *
-   * @return the new request
+   * @return new request
    */
   def withQueryParameters(params: (String, String)*): HttpRequest
 
   /**
-   * Creates a copy of this message replacing the host.
+   * Creates new message replacing host.
    *
-   * @return the new message
+   * @return new message
    */
   def withHost(host: String): MessageType =
     withHeader(Header("Host", host))
 
   /**
-   * Creates a copy of this message replacing the accepted media types.
+   * Creates new message replacing accepted content types.
    *
-   * @return the new message
+   * @return new message
    */
   def withAccept(types: ContentType*): MessageType =
     withHeader(Header("Accept", types.mkString(", ")))
 
   /**
-   * Creates a copy of this message replacing the accepted encodings.
+   * Creates new message replacing accepted encodings.
    *
-   * @return the new message
+   * @return new message
    */
   def withAcceptEncoding(encodings: String*): MessageType =
     withHeader(Header("Accept-Encoding", encodings.mkString(", ")))
@@ -141,11 +141,11 @@ trait HttpRequest extends HttpMessage {
 
 /** Provides HttpRequest factory methods. */
 object HttpRequest {
-  /** Creates an HttpRequest using supplied attributes. */
+  /** Creates HttpRequest using supplied attributes. */
   def apply(requestLine: RequestLine, headers: Seq[Header], body: Entity): HttpRequest =
     SimpleHttpRequest(requestLine, headers, body)
 
-  /** Creates an HttpRequest using supplied attributes. */
+  /** Creates HttpRequest using supplied attributes. */
   def apply(method: String, uri: String, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpRequest =
     SimpleHttpRequest(RequestLine(method, uri, version), headers, body)
 }
