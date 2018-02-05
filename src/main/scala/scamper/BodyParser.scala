@@ -14,22 +14,27 @@ trait BodyParser[T] {
 /** Provides body parser implementations. */
 object BodyParser {
   /** Provides binary data body parser. */
-  def binary: BodyParser[Array[Byte]] = BinaryBodyParser
+  def binary(maxLength: Option[Int] = None): BodyParser[Array[Byte]] =
+    new BinaryBodyParser(maxLength)
 
   /** Provides text body parser. */
-  def text: BodyParser[String] = TextBodyParser
+  def text(maxLength: Option[Int] = None): BodyParser[String] =
+    new TextBodyParser(maxLength)
 
   /** Provides form body parser. */
-  def form: BodyParser[Map[String, Seq[String]]] = FormBodyParser
+  def form(maxLength: Option[Int] = None): BodyParser[Map[String, Seq[String]]] =
+    new FormBodyParser(maxLength)
 }
 
-private object BinaryBodyParser extends BodyParser[Array[Byte]] {
+private class BinaryBodyParser(maxLength: Option[Int]) extends BodyParser[Array[Byte]] {
   import bantam.nx.io._
   import java.util.zip.{ GZIPInputStream, InflaterInputStream }
 
+  private val limit = maxLength.getOrElse(Int.MaxValue)
+
   def apply(message: HttpMessage): Array[Byte] =
     message.body.withInputStream { in =>
-      val dechunked = if (isChunked(message)) new SequenceInputStream(new ChunkEnumeration(in)) else in
+      val dechunked = if (isChunked(message)) new SequenceInputStream(new ChunkEnumeration(in, limit, limit)) else in
 
       message.contentEncoding.getOrElse("identity") match {
         case "gzip" =>
@@ -52,33 +57,71 @@ private object BinaryBodyParser extends BodyParser[Array[Byte]] {
     message.isChunked && !message.getHeaderValue("X-Scamper-Decoding").exists(_.contains("chunked"))
 
   private def toByteArray(in: InputStream): Array[Byte] = {
-    val out = new ByteArrayOutputStream(1024)
-    out << in
-    out.toByteArray
+    val out = new scala.collection.mutable.ArrayBuffer[Byte](limit.min(1024))
+    val buffer = new Array[Byte](limit.min(1024))
+    var length = 0
+
+    while ({ length = in.read(buffer); length != -1 })
+      if (out.length + length > limit) throw new HttpException(s"Entity too large: ${out.length + length} > $limit")
+      else out ++= buffer.take(length)
+
+    out.toArray
   }
 }
 
-private object TextBodyParser extends BodyParser[String] {
+private class TextBodyParser(maxLength: Option[Int]) extends BodyParser[String] {
+  private val limit = maxLength.getOrElse(Int.MaxValue)
+  private val bodyParser = new BinaryBodyParser(Some(limit))
+
   def apply(message: HttpMessage): String =
     message.contentType
       .flatMap(_.parameters.get("charset"))
       .orElse(Some("UTF-8"))
-      .map(new String(BinaryBodyParser(message), _)).get
+      .map(new String(bodyParser(message), _)).get
 }
 
-private object FormBodyParser extends BodyParser[Map[String, Seq[String]]] {
+private class FormBodyParser(maxLength: Option[Int]) extends BodyParser[Map[String, Seq[String]]] {
+  private val limit = maxLength.getOrElse(Int.MaxValue)
+  private val bodyParser = new TextBodyParser(Some(limit))
+
   def apply(message: HttpMessage): Map[String, Seq[String]] =
-    QueryParser.parse(TextBodyParser(message))
+    QueryParser.parse(bodyParser(message))
 }
 
-private class ChunkEnumeration(in: InputStream) extends java.util.Enumeration[InputStream] {
+private class BoundInputStream(in: InputStream, limit: Long) extends java.io.FilterInputStream(in) {
+  private var position = 0L
+
+  override def read(): Int =
+    if (position >= limit) -1
+    else
+      in.read() match {
+        case -1   => -1
+        case byte => position += 1; byte
+      }
+
+  override def read(buffer: Array[Byte], offset: Int, length: Int): Int =
+    if (position >= limit) -1
+    else
+      in.read(buffer, offset, length.min(remaining)) match {
+        case -1   => -1
+        case byte => position += 1; byte
+      }
+
+  private def remaining: Int =
+    (limit - position).min(Int.MaxValue).toInt
+}
+
+private class ChunkEnumeration(in: InputStream, maxChunkSize: Int, maxTotalLength: Long) extends java.util.Enumeration[InputStream] {
   private var chunkSize = nextChunkSize
+  private var totalLength = chunkSize
 
   def hasMoreElements(): Boolean =
     chunkSize > 0
 
   def nextElement(): InputStream = {
     if (!hasMoreElements) throw new NoSuchElementException("No more chunks")
+    if (chunkSize > maxChunkSize) throw new HttpException(s"Chunk too large: $chunkSize > $maxChunkSize")
+    if (totalLength > maxTotalLength) throw new HttpException(s"Entity too large: $totalLength > $maxTotalLength")
 
     val buffer = new Array[Byte](chunkSize)
     var length = 0
@@ -90,9 +133,10 @@ private class ChunkEnumeration(in: InputStream) extends java.util.Enumeration[In
       }
 
     // discard CRLF
-    if (nextLine.length != 0) throw new HttpException("Invalid chunked encoding")
+    if (nextLine.length != 0) throw new HttpException("Invalid chunked")
 
     chunkSize = nextChunkSize
+    totalLength += chunkSize
 
     new ByteArrayInputStream(buffer)
   }

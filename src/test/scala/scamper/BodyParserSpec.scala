@@ -6,7 +6,7 @@ import Implicits._
 
 class BodyParserSpec extends FlatSpec {
   "BodyParser" should "parse response with text body" in {
-    implicit val bodyParser = BodyParser.text
+    implicit val bodyParser = BodyParser.text()
     val message = Ok.withContentType("text/plain").withBody("Hello, world!")
 
     assert(message.status == Ok.status)
@@ -15,7 +15,7 @@ class BodyParserSpec extends FlatSpec {
   }
 
   it should "parse response with chunked text body" in {
-    implicit val bodyParser = BodyParser.text
+    implicit val bodyParser = BodyParser.text()
     val message = Ok.withContentType("text/plain; charset=utf8")
       .withChunked(true)
       .withBody("7\r\nHello, \r\n6\r\nworld!\r\n0\r\n")
@@ -24,7 +24,7 @@ class BodyParserSpec extends FlatSpec {
   }
 
   it should "parse request with form body" in {
-    implicit val bodyParser = BodyParser.form
+    implicit val bodyParser = BodyParser.form()
     val request = HttpRequest("POST", "users").withBody("id=0&name=root")
     val form = request.parse.get
 

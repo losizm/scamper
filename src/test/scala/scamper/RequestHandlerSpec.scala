@@ -20,7 +20,7 @@ class RequestHandlerSpec extends FlatSpec {
     val resp = chain(HttpRequest("GET", "/"))
 
     assert(resp.status == Ok.status)
-    assert(resp.parse(BodyParser.text).get == "Hello, guest. You have read access.")
+    assert(resp.parse(BodyParser.text()).get == "Hello, guest. You have read access.")
   }
 }
 
