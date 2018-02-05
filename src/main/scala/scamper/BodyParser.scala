@@ -20,7 +20,7 @@ object BodyParser {
   def text: BodyParser[String] = TextBodyParser
 
   /** Provides form body parser. */
-  def form: BodyParser[Map[String, List[String]]] = FormBodyParser
+  def form: BodyParser[Map[String, Seq[String]]] = FormBodyParser
 }
 
 private object BinaryBodyParser extends BodyParser[Array[Byte]] {
@@ -66,8 +66,8 @@ private object TextBodyParser extends BodyParser[String] {
       .map(new String(BinaryBodyParser(message), _)).get
 }
 
-private object FormBodyParser extends BodyParser[Map[String, List[String]]] {
-  def apply(message: HttpMessage): Map[String, List[String]] =
+private object FormBodyParser extends BodyParser[Map[String, Seq[String]]] {
+  def apply(message: HttpMessage): Map[String, Seq[String]] =
     QueryParser.parse(TextBodyParser(message))
 }
 

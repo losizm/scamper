@@ -1,6 +1,6 @@
 package scamper
 
-/** Filters responses conditionally. */
+/** Filters response conditionally. */
 trait ResponseFilter {
   /** Tests whether response matches filter condition. */
   def apply(response: HttpResponse): Boolean

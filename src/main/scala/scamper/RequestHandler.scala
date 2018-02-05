@@ -1,6 +1,6 @@
 package scamper
 
-/** Handles HTTP requests. */
+/** Handles HTTP request. */
 trait RequestHandler {
   /**
    * Handles incoming request.

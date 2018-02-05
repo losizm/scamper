@@ -21,7 +21,7 @@ trait HttpRequest extends HttpMessage {
   def query: Option[String]
 
   /** Query parameters */
-  lazy val queryParameters: Map[String, List[String]] =
+  lazy val queryParameters: Map[String, Seq[String]] =
     query.map(QueryParser.parse).getOrElse(Map.empty)
 
   /**
@@ -34,7 +34,7 @@ trait HttpRequest extends HttpMessage {
     queryParameters.get(name).flatMap(_.headOption)
 
   /** Gets all values for named query parameter. */
-  def getQueryParameterValues(name: String): List[String] =
+  def getQueryParameterValues(name: String): Seq[String] =
     queryParameters.get(name).getOrElse(Nil)
 
   /**
@@ -105,7 +105,7 @@ trait HttpRequest extends HttpMessage {
    *
    * @return new request
    */
-  def withQueryParameters(params: Map[String, List[String]]): HttpRequest
+  def withQueryParameters(params: Map[String, Seq[String]]): HttpRequest
 
   /**
    * Creates new request replacing query parameters.
@@ -185,7 +185,7 @@ private case class SimpleHttpRequest(startLine: RequestLine, headers: Seq[Header
   def withQuery(newQuery: String): HttpRequest =
     withURI(uriObject.withQuery(newQuery).toString)
 
-  def withQueryParameters(params: Map[String, List[String]]): HttpRequest =
+  def withQueryParameters(params: Map[String, Seq[String]]): HttpRequest =
     withURI(uriObject.withQueryParameters(params).toString)
 
   def withQueryParameters(params: (String, String)*): HttpRequest =

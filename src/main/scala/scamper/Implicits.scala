@@ -66,7 +66,7 @@ object Implicits {
    */
   implicit class URIType(uri: URI) {
     /** Gets query parameters. */
-    def getQueryParameters(): Map[String, List[String]] =
+    def getQueryParameters(): Map[String, Seq[String]] =
       QueryParser.parse(uri.getQuery)
 
     /**
@@ -79,7 +79,7 @@ object Implicits {
       getQueryParameters.get(name).flatMap(_.headOption)
 
     /** Gets all values for named query parameter. */
-    def getQueryParameterValues(name: String): List[String] =
+    def getQueryParameterValues(name: String): Seq[String] =
       getQueryParameters.get(name).getOrElse(Nil)
 
     /** Converts URI to URL using supplied scheme and authority. */
@@ -95,7 +95,7 @@ object Implicits {
       createURI(uri.getPath, query)
 
     /** Creates new URI replacing query parameters. */
-    def withQueryParameters(params: Map[String, List[String]]): URI =
+    def withQueryParameters(params: Map[String, Seq[String]]): URI =
       withQuery(QueryParser.format(params))
 
     /** Creates new URI replacing query parameters. */
@@ -112,7 +112,7 @@ object Implicits {
    */
   implicit class URLType(url: URL) {
     /** Gets the query parameters. */
-    def getQueryParameters(): Map[String, List[String]] =
+    def getQueryParameters(): Map[String, Seq[String]] =
       QueryParser.parse(url.getQuery)
 
     /**
@@ -125,7 +125,7 @@ object Implicits {
       getQueryParameters.get(name).flatMap(_.headOption)
 
     /** Gets all values for named query parameter. */
-    def getQueryParameterValues(name: String): List[String] =
+    def getQueryParameterValues(name: String): Seq[String] =
       getQueryParameters.get(name).getOrElse(Nil)
 
     /** Creates new URL replacing path. */
@@ -137,7 +137,7 @@ object Implicits {
       createURL(url.getPath, query)
 
     /** Creates new URL replacing query parameters. */
-    def withQueryParameters(params: Map[String, List[String]]): URL =
+    def withQueryParameters(params: Map[String, Seq[String]]): URL =
       createURL(url.getPath, QueryParser.format(params))
 
     /** Creates new URL replacing query parameters. */

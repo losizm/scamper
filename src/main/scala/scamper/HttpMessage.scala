@@ -68,8 +68,8 @@ trait HttpMessage {
     getHeader(key).map(_.value)
 
   /** Gets all header values for specified key. */
-  def getHeaderValues(key: String): List[String] =
-    getHeaders(key).map(_.value).toList
+  def getHeaderValues(key: String): Seq[String] =
+    getHeaders(key).map(_.value)
 
   /** Message body */
   def body: Entity

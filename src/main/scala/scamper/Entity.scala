@@ -20,8 +20,8 @@ trait Entity {
   /**
    * Provides access to input stream with automatic resource management.
    *
-   * The input stream is passed to supplied function, and the stream is closed
-   * upon function's return.
+   * The input stream is passed to supplied function, and stream is closed upon
+   * function's return.
    *
    * @return value returned from supplied function
    */
@@ -34,11 +34,11 @@ trait Entity {
 
 /** Provides Entity factory methods. */
 object Entity {
-  /** Creates an entity whose content is supplied bytes. */
+  /** Creates entity whose content is supplied bytes. */
   def apply(bytes: Array[Byte]): Entity =
     apply(bytes, 0, bytes.length)
 
-  /** Creates an entity whose content is supplied bytes. */
+  /** Creates entity whose content is supplied bytes. */
   def apply(bytes: Array[Byte], start: Int, length: Int): Entity = {
     require(start >= 0, "Start must be nonnegative")
     require(start + length <= bytes.length, "Applied start and length must not exceed data length")
@@ -48,27 +48,35 @@ object Entity {
     ByteArrayEntity(copy)
   }
 
-  /** Creates an entity from input stream returned from supplied function. */
+  /** Creates entity from input stream returned from supplied function. */
   def apply(f: () => InputStream): Entity =
     InputStreamEntity(f)
 
-  /** Creates an entity whose content is data in supplied file. */
+  /** Creates entity whose content is data in supplied file. */
   def apply(file: File): Entity =
     FileEntity(file)
 
-  /** Creates an entity whose content is data in file at supplied path. */
+  /** Creates entity whose content is data in file at supplied path. */
   def apply(path: Path): Entity =
     FileEntity(path.toFile)
 
-  /** Creates an entity whose content is encoded bytes of supplied text. */
+  /** Creates entity whose content is UTF-8 encoded bytes of supplied text. */
+  def apply(text: String): Entity =
+    ByteArrayEntity(text.getBytes("UTF-8"))
+
+  /** Creates entity whose content is encoded bytes of supplied text. */
   def apply(text: String, charset: String): Entity =
     ByteArrayEntity(text.getBytes(charset))
 
-  /** Creates an entity whose content is encoded bytes of supplied text. */
+  /** Creates entity whose content is encoded bytes of supplied text. */
   def apply(text: String, charset: Charset): Entity =
     ByteArrayEntity(text.getBytes(charset))
 
-  /** Creates an empty entity. */
+  /** Creates entity whose content is supplied form data. */
+  def apply(form: Map[String, Seq[String]]): Entity =
+    Entity(QueryParser.format(form))
+
+  /** Creates empty entity. */
   def empty: Entity = ByteArrayEntity(Array.empty)
 }
 
