@@ -23,36 +23,36 @@ object BodyParser {
   private val maxBufferSize = Math.min(config.getBytes("scamper.parser.maxBufferSize"), Int.MaxValue).toInt
   private val maxFileSize = config.getBytes("scamper.parser.maxFileSize")
 
-  /** Provides bytes data body parser. */
+  /** Gets body parser to collect raw bytes of message body. */
   def bytes: BodyParser[Array[Byte]] =
     bytes(maxBufferSize)
 
   /**
-   * Provides bytes data body parser.
+   * Gets body parser to collect raw bytes of message body.
    *
    * @param maxLength maximum length in bytes allowed
    */
   def bytes(maxLength: Int): BodyParser[Array[Byte]] =
     new ByteArrayBodyParser(maxLength)
 
-  /** Provides text body parser. */
+  /** Gets body parser to collect text content. */
   def text: BodyParser[String] =
     text(maxBufferSize)
 
   /**
-   * Provides text body parser.
+   * Gets body parser to collect text content.
    *
    * @param maxLength maximum length in bytes allowed
    */
   def text(maxLength: Int): BodyParser[String] =
     new TextBodyParser(maxLength)
 
-  /** Provides form body parser. */
+  /** Gets body parser to collect form data. */
   def form: BodyParser[Map[String, Seq[String]]] =
     form(maxBufferSize)
 
   /**
-   * Provides form body parser.
+   * Gets body parser to collect form data.
    *
    * @param maxLength maximum length in bytes allowed
    */
@@ -60,17 +60,17 @@ object BodyParser {
     new FormBodyParser(maxLength)
 
   /**
-   * Provides body parser that stores parsed content to supplied file.
+   * Gets body parser to store message body to file.
    *
-   * @param dest destination file to which content is stored
+   * @param dest destination file to which message body is stored
    */
   def file(dest: File): BodyParser[File] =
     file(dest, maxFileSize)
 
   /**
-   * Provides body parser that stores parsed content to supplied file.
+   * Gets body parser to store message body to file.
    *
-   * @param dest destination file to which content is stored
+   * @param dest destination file to which message body is stored
    * @param maxLength maximum length in bytes allowed
    */
   def file(dest: File, maxLength: Long): BodyParser[File] =
