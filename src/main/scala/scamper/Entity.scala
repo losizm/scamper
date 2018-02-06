@@ -76,6 +76,10 @@ object Entity {
   def apply(form: Map[String, Seq[String]]): Entity =
     Entity(QueryParser.format(form))
 
+  /** Creates entity whose content is supplied form data. */
+  def apply(form: (String, String)*): Entity =
+    Entity(QueryParser.format(form : _*))
+
   /** Creates empty entity. */
   def empty: Entity = ByteArrayEntity(Array.empty)
 }

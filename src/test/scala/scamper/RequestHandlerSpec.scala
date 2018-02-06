@@ -12,15 +12,16 @@ class RequestHandlerSpec extends FlatSpec {
       (req, next) => {
         val user = req.getHeaderValue("user").get
         val access = req.getHeaderValue("access").get
+        val body = Entity(s"Hello, $user. You have $access access.", "utf8")
 
-        Ok.withBody(Entity(s"Hello, $user. You have $access access.", "utf8"))
+        Ok.withBody(body).withContentLength(body.length.get)
       }
     )
 
     val resp = chain(HttpRequest("GET", "/"))
 
     assert(resp.status == Ok.status)
-    assert(resp.parse(BodyParser.text()).get == "Hello, guest. You have read access.")
+    assert(resp.parse(BodyParser.text).get == "Hello, guest. You have read access.")
   }
 }
 

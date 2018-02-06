@@ -1,77 +1,145 @@
 package scamper
 
-import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, InputStream, SequenceInputStream }
-import scala.util.Try
+import bantam.nx.io._
+
+import com.typesafe.config.ConfigFactory
+
+import java.io.{ File, InputStream, SequenceInputStream }
+import java.util.zip.{ GZIPInputStream, InflaterInputStream }
+
+import scala.collection.mutable.ArrayBuffer
 
 /** Provides utility for parsing HTTP message body. */
 trait BodyParser[T] {
   /**
-   * Parses body of supplied HTTP message returning instance of defined type.
+   * Parses body of supplied HTTP message and returns instance of defined type.
    */
   def apply(message: HttpMessage): T
 }
 
 /** Provides body parser implementations. */
 object BodyParser {
-  private val config = com.typesafe.config.ConfigFactory.load()
+  private val config = ConfigFactory.load()
   private val maxBufferSize = Math.min(config.getBytes("scamper.parser.maxBufferSize"), Int.MaxValue).toInt
+  private val maxFileSize = config.getBytes("scamper.parser.maxFileSize")
 
-  /** Provides binary data body parser. */
-  def binary(maxLength: Option[Int] = None): BodyParser[Array[Byte]] =
-    new BinaryBodyParser(maxLength.getOrElse(maxBufferSize))
+  /** Provides bytes data body parser. */
+  def bytes: BodyParser[Array[Byte]] =
+    bytes(maxBufferSize)
+
+  /**
+   * Provides bytes data body parser.
+   *
+   * @param maxLength maximum length in bytes allowed
+   */
+  def bytes(maxLength: Int): BodyParser[Array[Byte]] =
+    new ByteArrayBodyParser(maxLength)
 
   /** Provides text body parser. */
-  def text(maxLength: Option[Int] = None): BodyParser[String] =
-    new TextBodyParser(maxLength.getOrElse(maxBufferSize))
+  def text: BodyParser[String] =
+    text(maxBufferSize)
+
+  /**
+   * Provides text body parser.
+   *
+   * @param maxLength maximum length in bytes allowed
+   */
+  def text(maxLength: Int): BodyParser[String] =
+    new TextBodyParser(maxLength)
 
   /** Provides form body parser. */
-  def form(maxLength: Option[Int] = None): BodyParser[Map[String, Seq[String]]] =
-    new FormBodyParser(maxLength.getOrElse(maxBufferSize))
+  def form: BodyParser[Map[String, Seq[String]]] =
+    form(maxBufferSize)
+
+  /**
+   * Provides form body parser.
+   *
+   * @param maxLength maximum length in bytes allowed
+   */
+  def form(maxLength: Int): BodyParser[Map[String, Seq[String]]] =
+    new FormBodyParser(maxLength)
+
+  /**
+   * Provides body parser that stores parsed content to supplied file.
+   *
+   * @param dest destination file to which content is stored
+   */
+  def file(dest: File): BodyParser[File] =
+    file(dest, maxFileSize)
+
+  /**
+   * Provides body parser that stores parsed content to supplied file.
+   *
+   * @param dest destination file to which content is stored
+   * @param maxLength maximum length in bytes allowed
+   */
+  def file(dest: File, maxLength: Long): BodyParser[File] =
+    new FileBodyParser(dest, maxLength, maxBufferSize)
 }
 
-private class BinaryBodyParser(maxLength: Int) extends BodyParser[Array[Byte]] {
-  import bantam.nx.io._
-  import java.util.zip.{ GZIPInputStream, InflaterInputStream }
+/** A mixin that provides access to decoded message body. */
+trait BodyParsing {
+  /** Maximum body length allowed */
+  def maxLength: Long
 
-  def apply(message: HttpMessage): Array[Byte] =
+  /** Maximum buffer size allowed */
+  def maxBufferSize: Int
+
+  /**
+   * Provides decoded input stream to message body. That is, the input stream
+   * passed to handler is uncompressed and dechunked.
+   *
+   * @param message HTTP message
+   * @param f input stream handler
+   *
+   * @return value returned from handler
+   */
+  def withInputStream[T](message: HttpMessage)(f: InputStream => T): T =
     message.body.withInputStream { in =>
-      val dechunked = if (isChunked(message)) new SequenceInputStream(new ChunkEnumeration(in, maxLength, maxLength)) else in
+      val dechunked =
+        if (isChunked(message)) chunkInputStream(in)
+        else new BoundInputStream(in, message.headerValue("Content-Length").toLong)
 
       message.contentEncoding.getOrElse("identity") match {
-        case "gzip" =>
-          val gzipIn = new GZIPInputStream(dechunked)
-          try toByteArray(gzipIn)
-          finally gzipIn.close()
-
-        case "deflate" =>
-          val deflateIn =  new InflaterInputStream(dechunked)
-          try toByteArray(deflateIn)
-          finally deflateIn.close()
-
-        case "identity" => toByteArray(dechunked)
-
-        case encoding => throw new HttpException(s"Unsupported content encoding: $encoding")
+        case "gzip"     => f(new GZIPInputStream(dechunked))
+        case "deflate"  => f(new InflaterInputStream(dechunked))
+        case "identity" => f(dechunked)
+        case encoding   => throw new HttpException(s"Unsupported content encoding: $encoding")
       }
     }
 
+  private def chunkInputStream(in: InputStream) =
+    new SequenceInputStream(new ChunkEnumeration(in, maxBufferSize, maxLength))
+
   private def isChunked(message: HttpMessage): Boolean =
     message.isChunked && !message.getHeaderValue("X-Scamper-Decoding").exists(_.contains("chunked"))
+}
+
+private class ByteArrayBodyParser(val maxLength: Long) extends BodyParser[Array[Byte]] with BodyParsing {
+  val maxBufferSize = maxLength.toInt
+  private val bufferSize = maxBufferSize.min(8192)
+
+  def apply(message: HttpMessage): Array[Byte] =
+    withInputStream(message)(toByteArray)
 
   private def toByteArray(in: InputStream): Array[Byte] = {
-    val out = new scala.collection.mutable.ArrayBuffer[Byte](maxLength.min(1024))
-    val buffer = new Array[Byte](maxLength.min(1024))
+    val out = new ArrayBuffer[Byte](bufferSize)
+    val buffer = new Array[Byte](bufferSize)
     var length = 0
 
-    while ({ length = in.read(buffer); length != -1 })
-      if (out.length + length > maxLength) throw new HttpException(s"Entity too large: ${out.length + length} > $maxLength")
-      else out ++= buffer.take(length)
+    while ({ length = in.read(buffer); length != -1 }) {
+      val totalLength = out.length + length
+      if (totalLength > maxLength)
+        throw new EntityException(s"Entity too large: $totalLength > $maxLength")
+      out ++= buffer.take(length)
+    }
 
     out.toArray
   }
 }
 
 private class TextBodyParser(maxLength: Int) extends BodyParser[String] {
-  private val bodyParser = new BinaryBodyParser(maxLength)
+  private val bodyParser = new ByteArrayBodyParser(maxLength)
 
   def apply(message: HttpMessage): String =
     message.contentType
@@ -87,85 +155,11 @@ private class FormBodyParser(maxLength: Int) extends BodyParser[Map[String, Seq[
     QueryParser.parse(bodyParser(message))
 }
 
-private class BoundInputStream(in: InputStream, limit: Long) extends java.io.FilterInputStream(in) {
-  private var position = 0L
-
-  override def read(): Int =
-    if (position >= limit) -1
-    else
-      in.read() match {
-        case -1   => -1
-        case byte => position += 1; byte
-      }
-
-  override def read(buffer: Array[Byte], offset: Int, length: Int): Int =
-    if (position >= limit) -1
-    else
-      in.read(buffer, offset, length.min(remaining)) match {
-        case -1   => -1
-        case byte => position += 1; byte
-      }
-
-  private def remaining: Int =
-    (limit - position).min(Int.MaxValue).toInt
-}
-
-private class ChunkEnumeration(in: InputStream, maxChunkSize: Int, maxTotalLength: Long) extends java.util.Enumeration[InputStream] {
-  private var chunkSize = nextChunkSize
-  private var totalLength = chunkSize
-
-  def hasMoreElements(): Boolean =
-    chunkSize > 0
-
-  def nextElement(): InputStream = {
-    if (!hasMoreElements) throw new NoSuchElementException("No more chunks")
-    if (chunkSize > maxChunkSize) throw new HttpException(s"Chunk too large: $chunkSize > $maxChunkSize")
-    if (totalLength > maxTotalLength) throw new HttpException(s"Entity too large: $totalLength > $maxTotalLength")
-
-    val buffer = new Array[Byte](chunkSize)
-    var length = 0
-
-    while (length < chunkSize)
-      in.read(buffer, length, chunkSize - length) match {
-        case -1    => throw new HttpException("Unexpected end of entity body")
-        case count => length += count
-      }
-
-    // discard CRLF
-    if (nextLine.length != 0) throw new HttpException("Invalid chunked")
-
-    chunkSize = nextChunkSize
-    totalLength += chunkSize
-
-    new ByteArrayInputStream(buffer)
-  }
-
-  private def nextChunkSize: Int = {
-    val line = nextLine
-
-    Try(Integer.parseInt(line)).getOrElse {
-      throw new HttpException(s"Invalid chunk size: $line")
+private class FileBodyParser(dest: File, val maxLength: Long, val maxBufferSize: Int) extends BodyParser[File] with BodyParsing {
+  def apply(message: HttpMessage): File =
+    withInputStream(message) { in =>
+      dest.withOutputStream(out => out << in)
+      dest
     }
-  }
-
-  private def nextLine: String = {
-    def nextByte: Int =
-      in.read() match {
-        case '\r' =>
-          if (in.read() != '\n') throw new HttpException("Invalid chunked encoding")
-          else -1
-
-        case '\n' => -1
-        case byte => byte
-      }
-
-    val buffer = new scala.collection.mutable.ArrayBuffer[Byte](8)
-    var byte = 0
-
-    while ({ byte = nextByte; byte != -1 })
-      buffer += byte.toByte
-
-    new String(buffer.toArray, "ASCII")
-  }
 }
 
