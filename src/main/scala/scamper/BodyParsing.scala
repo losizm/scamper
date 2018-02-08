@@ -23,18 +23,18 @@ trait BodyParsing {
   def withInputStream[T](message: HttpMessage)(f: InputStream => T): T =
     message.body.withInputStream { in =>
       val dechunked =
-        if (isChunked(message)) chunkInputStream(in)
+        if (isChunked(message)) dechunkInputStream(in)
         else new BoundInputStream(in, message.headerValue("Content-Length").toLong)
 
       message.contentEncoding.getOrElse("identity") match {
-        case "gzip"     => f(new GZIPInputStream(dechunked))
-        case "deflate"  => f(new InflaterInputStream(dechunked))
-        case "identity" => f(dechunked)
-        case encoding   => throw new HttpException(s"Unsupported content encoding: $encoding")
+        case "gzip" | "x-gzip" => f(new GZIPInputStream(dechunked))
+        case "deflate"         => f(new InflaterInputStream(dechunked))
+        case "identity"        => f(dechunked)
+        case encoding          => throw new HttpException(s"Unsupported content encoding: $encoding")
       }
     }
 
-  private def chunkInputStream(in: InputStream) =
+  private def dechunkInputStream(in: InputStream) =
     new SequenceInputStream(new ChunkEnumeration(in, maxBufferSize, maxLength))
 
   private def isChunked(message: HttpMessage): Boolean =

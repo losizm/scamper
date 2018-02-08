@@ -53,10 +53,29 @@ object Implicits {
      * @return value returned from supplied handler
      */
     def send[T](secure: Boolean = false)(f: HttpResponse => T): T = {
-      val host = request.headerValue("host")
-      val url = request.uri.toURI.toURL(if (secure) "https" else "http", host)
+      val scheme = if (secure) "https" else "http"
+      val uri = request.uri.toURI
 
-      url.request(request.method, request.headers, Some(request.body))(f)
+      if (uri.isAbsolute) {
+        val host = uri.getAuthority
+        val url = uri.toURL(scheme, host)
+        val headers = Header("Host", host) +: request.headers.filterNot(_.key.equalsIgnoreCase("Host"))
+
+        url.request(request.method, headers, Some(request.body))(f)
+      } else {
+        val host = getHost(uri)
+        val url = uri.toURL(scheme, host)
+        val headers = Header("Host", host) +: request.headers.filterNot(_.key.equalsIgnoreCase("Host"))
+
+        url.request(request.method, headers, Some(request.body))(f)
+      }
+    }
+
+    private def getHost(uri: URI): String = {
+      val authority = uri.getAuthority
+
+      if (authority != null) authority
+      else request.headerValue("host")
     }
   }
 
