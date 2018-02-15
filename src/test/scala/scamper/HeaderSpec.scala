@@ -33,7 +33,6 @@ class HeaderSpec extends FlatSpec {
   }
 
   it should "not be created" in {
-    assertThrows[IllegalArgumentException](Header("Content-Type"))
     assertThrows[IllegalArgumentException](Header("text/plain"))
   }
 }

@@ -3,6 +3,10 @@ package scamper
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => dateFormatter }
 
+import scala.util.Try
+
+import Grammar._
+
 /** Provides key-value pair of HTTP header. */
 case class Header private(key: String, value: String) {
   /** Returns formatted HTTP header. */
@@ -18,36 +22,24 @@ case class Header private(key: String, value: String) {
 
 /** Provides Header factory methods. */
 object Header {
-  private val HeaderRegex = s"(${Token.regex}):\\s*(.*)\\s*".r
+  /** Creates Header using supplied key and value. */
+  def apply(key: String, value: String): Header =
+    Token.unapply(key).map(key => new Header(key, value)).getOrElse {
+      throw new IllegalArgumentException(s"Invalid header key: $key")
+    }
 
   /** Creates Header using supplied key and value. */
-  def apply(key: String, value: String): Header = {
-    if (!Token(key))
-      throw new IllegalArgumentException(s"Invalid header key: $key")
-
-    new Header(key, value)
-  }
+  def apply(key: String, value: Long): Header =
+    apply(key, value.toString)
 
   /** Creates Header using supplied key and value. */
-  def apply(key: String, value: Long): Header = {
-    if (!Token(key))
-      throw new IllegalArgumentException(s"Invalid header key: $key")
-
-    new Header(key, value.toString)
-  }
-
-  /** Creates Header using supplied key and value. */
-  def apply(key: String, value: OffsetDateTime): Header = {
-    if (!Token(key))
-      throw new IllegalArgumentException(s"Invalid header key: $key")
-
-    new Header(key, dateFormatter.format(value))
-  }
+  def apply(key: String, value: OffsetDateTime): Header =
+    apply(key, dateFormatter.format(value))
 
   /** Parses formatted header. */
   def apply(header: String): Header =
-    header match {
-      case HeaderRegex(key, value) => new Header(key, value)
+    header.split(":", 2) match {
+      case Array(key, value) => apply(key.trim, value.trim)
       case _ => throw new IllegalArgumentException(s"Malformed header: $header")
     }
 }
