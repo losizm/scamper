@@ -1,9 +1,10 @@
 package scamper
 
-/** Representation of HTTP request. */
+/** HTTP request */
 trait HttpRequest extends HttpMessage {
   type MessageType = HttpRequest
   type LineType = RequestLine
+  type CookieType = PlainCookie
 
   /** Request method */
   def method: String = startLine.method
@@ -38,11 +39,22 @@ trait HttpRequest extends HttpMessage {
     queryParameters.get(name).getOrElse(Nil)
 
   /**
+   * Gets all request cookies.
+   *
+   * Values retrieved from Cookie header.
+   */
+  lazy val cookies: Seq[PlainCookie] =
+    getHeaderValue("Cookie")
+      .map(_.split("\\s*;\\s*"))
+      .map(_.map(PlainCookie.apply).toSeq)
+      .getOrElse(Nil)
+
+  /**
    * Gets requested host.
    *
    * Value retrieved from Host header.
    */
-  def host: Option[String] =
+  lazy val host: Option[String] =
     getHeaderValue("Host")
 
   /**
@@ -50,20 +62,21 @@ trait HttpRequest extends HttpMessage {
    *
    * Value retrieved from Accept header.
    */
-  def accept: Seq[ContentType] =
-    getHeaderValue("Accept").map { value =>
-      value.split("\\s*,\\s*").map(ContentType.apply).toSeq
-    }.getOrElse(Nil)
+  lazy val accept: Seq[ContentType] =
+    getHeaderValue("Accept")
+      .map(_.split("\\s*,\\s*")
+      .map(ContentType.apply).toSeq)
+      .getOrElse(Nil)
 
   /**
    * Get accepted encodings.
    *
    * Value retrieved from Accept-Encoding header.
    */
-  def acceptEncoding: Seq[String] =
-    getHeaderValue("Accept-Encoding").map { value =>
-      value.split("\\s*,\\s*").toSeq
-    }.getOrElse(Nil)
+  lazy val acceptEncoding: Seq[String] =
+    getHeaderValue("Accept-Encoding")
+      .map(_.split("\\s*,\\s*").toSeq)
+      .getOrElse(Nil)
 
   /**
    * Creates new request replacing method.
@@ -139,7 +152,7 @@ trait HttpRequest extends HttpMessage {
     withHeader(Header("Accept-Encoding", encodings.mkString(", ")))
 }
 
-/** Provides HttpRequest factory methods. */
+/** HttpRequest factory */
 object HttpRequest {
   /** Creates HttpRequest using supplied attributes. */
   def apply(requestLine: RequestLine, headers: Seq[Header], body: Entity): HttpRequest =
@@ -158,11 +171,14 @@ private case class SimpleHttpRequest(startLine: RequestLine, headers: Seq[Header
   lazy val path = uriObject.getPath
   lazy val query = Option(uriObject.getRawQuery)
 
-  def addHeaders(moreHeaders: Header*): HttpRequest =
-    copy(headers = headers ++ moreHeaders)
+  def addHeaders(newHeaders: Header*): HttpRequest =
+    copy(headers = headers ++ newHeaders)
 
   def withHeaders(newHeaders: Header*): HttpRequest =
     copy(headers = newHeaders)
+
+  def withCookies(newCookies: PlainCookie*): HttpRequest =
+    copy(headers = headers.filterNot(_.key.equalsIgnoreCase("Cookie")) :+ Header("Cookie", newCookies.mkString("; ")))
 
   def withBody(newBody: Entity): HttpRequest =
     copy(body = newBody)

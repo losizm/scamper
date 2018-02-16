@@ -8,7 +8,7 @@ case class Version(major: Int, minor: Int) {
   override val toString: String = s"$major.$minor"
 }
 
-/** Provides Version factory methods. */
+/** Version factory */
 object Version {
   private val VersionRegex = """(\d+)\.(\d+)""".r
 

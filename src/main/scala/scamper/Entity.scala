@@ -5,7 +5,7 @@ import java.nio.file.Path
 import java.nio.charset.Charset
 import scala.util.Try
 
-/** Representation of HTTP entity. */
+/** HTTP entity */
 trait Entity {
   /** The length in bytes, if known. */
   def length: Option[Long]
@@ -32,7 +32,7 @@ trait Entity {
   }
 }
 
-/** Provides Entity factory methods. */
+/** Entity factory */
 object Entity {
   /** Creates entity whose content is supplied bytes. */
   def apply(bytes: Array[Byte]): Entity =

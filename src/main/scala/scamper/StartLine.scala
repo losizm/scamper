@@ -3,7 +3,7 @@ package scamper
 import scala.util.Try
 
 /**
- * Start line of HTTP message.
+ * The start line of HTTP message
  *
  * @see [[RequestLine]], [[StatusLine]]
  */
@@ -12,13 +12,13 @@ sealed trait StartLine {
   def version: Version
 }
 
-/** Provides HTTP request line attributes. */
+/** HTTP request line */
 case class RequestLine(method: String, uri: String, version: Version) extends StartLine {
   /** Returns formatted HTTP request line. */
   override val toString: String = s"$method $uri HTTP/$version"
 }
 
-/** Provides RequestLine factory methods. */
+/** RequestLine factory */
 object RequestLine {
   private val LineRegex = """(\w+)\h+(\p{Graph}+)\h+HTTP/(\d+\.\d+)\h*""".r
 
@@ -34,13 +34,13 @@ object RequestLine {
     }
 }
 
-/** Provides HTTP status line attributes. */
+/** HTTP status line */
 case class StatusLine(version: Version, status: Status) extends StartLine {
   /** Returns formatted HTTP status line. */
   override val toString: String = s"HTTP/$version ${status.code} ${status.reason}"
 }
 
-/** Provides StatusLine factory methods. */
+/** StatusLine factory */
 object StatusLine {
   private val LineRegex = """HTTP/(\d+\.\d+)\h+(\d+)\h+(\p{Print}+)\h*""".r
 

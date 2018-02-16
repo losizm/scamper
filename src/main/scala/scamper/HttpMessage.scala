@@ -3,19 +3,23 @@ package scamper
 import scala.util.Try
 
 /**
- * Representation of HTTP message.
+ * HTTP message
  *
  * @see [[HttpRequest]], [[HttpResponse]]
  */
 trait HttpMessage {
   type MessageType <: HttpMessage
   type LineType <: StartLine
+  type CookieType <: Cookie
 
   /** Message start line */
   def startLine: LineType
 
-  /** Sequence of message headers */
+  /** Message headers */
   def headers: Seq[Header]
+
+  /** Message cookies */
+  def cookies: Seq[CookieType]
 
   /**
    * Gets header for specified key.
@@ -52,10 +56,6 @@ trait HttpMessage {
   def getHeader(key: String): Option[Header] =
     headers.find(_.key.equalsIgnoreCase(key))
 
-  /** Gets all header for specified key. */
-  def getHeaders(key: String): Seq[Header] =
-    headers.filter(_.key.equalsIgnoreCase(key))
-
   /**
    * Gets header value for specified key.
    *
@@ -67,9 +67,21 @@ trait HttpMessage {
   def getHeaderValue(key: String): Option[String] =
     getHeader(key).map(_.value)
 
+  /** Gets all headers for specified key. */
+  def getHeaders(key: String): Seq[Header] =
+    headers.filter(_.key.equalsIgnoreCase(key))
+
   /** Gets all header values for specified key. */
   def getHeaderValues(key: String): Seq[String] =
     getHeaders(key).map(_.value)
+
+  /** Gets cookie for specified name. */
+  def getCookie(name: String): Option[CookieType] =
+    cookies.find(_.name == name)
+
+  /** Gets cookie value for specified name. */
+  def getCookieValue(name: String): Option[String] =
+    getCookie(name).map(_.value)
 
   /** Message body */
   def body: Entity
@@ -156,6 +168,16 @@ trait HttpMessage {
    * @return new message
    */
   def withHeaders(headers: Header*): MessageType
+
+  /**
+   * Creates new message replacing cookies.
+   *
+   * All previous cookies are removed, and new message contains only supplied
+   * cookies.
+   *
+   * @return new message
+   */
+  def withCookies(cookies: CookieType*): MessageType
 
   /**
    * Creates new message replacing body.

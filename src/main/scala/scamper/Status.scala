@@ -1,6 +1,6 @@
 package scamper
 
-/** Provides status code and reason phrase of HTTP response. */
+/** HTTP response status */
 case class Status(code: Int, reason: String) {
   /** Tests for informational status code. */
   def isInformational: Boolean =
@@ -23,7 +23,7 @@ case class Status(code: Int, reason: String) {
     code >= 500 && code <= 599
 }
 
-/** Provides Status factory methods. */
+/** Status factory */
 object Status {
   private val statuses = new scala.collection.mutable.TreeMap[Int, Status]
 

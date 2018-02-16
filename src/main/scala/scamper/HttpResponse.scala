@@ -2,16 +2,25 @@ package scamper
 
 import java.time.OffsetDateTime
 
-/** Representation of HTTP response. */
+/** HTTP response */
 trait HttpResponse extends HttpMessage {
   type MessageType = HttpResponse
   type LineType = StatusLine
+  type CookieType = SetCookie
 
   /** Response status */
   def status: Status = startLine.status
 
   /** HTTP version of response message */
   def version: Version = startLine.version
+
+  /**
+   * Gets all response cookies.
+   *
+   * Values retrieved from Set-Cookie headers.
+   */
+  lazy val cookies: Seq[SetCookie] =
+    getHeaderValues("Set-Cookie").map(SetCookie.apply)
 
   /**
    * Gets response date.
@@ -76,7 +85,7 @@ trait HttpResponse extends HttpMessage {
     withHeader(Header("Location", location))
 }
 
-/** Provides HttpResponse factory methods. */
+/** HttpResponse factory */
 object HttpResponse {
   /** Creates HttpResponse using supplied attributes. */
   def apply(statusLine: StatusLine, headers: Seq[Header], body: Entity): HttpResponse =
@@ -88,11 +97,14 @@ object HttpResponse {
 }
 
 private case class SimpleHttpResponse(startLine: StatusLine, headers: Seq[Header], body: Entity) extends HttpResponse {
-  def addHeaders(moreHeaders: Header*): HttpResponse =
-    copy(headers = headers ++ moreHeaders)
+  def addHeaders(newHeaders: Header*): HttpResponse =
+    copy(headers = headers ++ newHeaders)
 
   def withHeaders(newHeaders: Header*): HttpResponse =
     copy(headers = newHeaders)
+
+  def withCookies(newCookies: SetCookie*): HttpResponse =
+    copy(headers = headers.filterNot(_.key.equalsIgnoreCase("Set-Cookie")) ++ newCookies.map(c => Header("Set-Cookie", c.toString)))
 
   def withBody(newBody: Entity): HttpResponse =
     copy(body = newBody)

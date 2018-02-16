@@ -7,7 +7,7 @@ import scala.util.Try
 
 import Grammar._
 
-/** Provides key-value pair of HTTP header. */
+/** HTTP header */
 case class Header private(key: String, value: String) {
   /** Returns formatted HTTP header. */
   override val toString: String = s"$key: $value"
@@ -20,7 +20,7 @@ case class Header private(key: String, value: String) {
   def longValue: Long = value.toLong
 }
 
-/** Provides Header factory methods. */
+/** Header factory */
 object Header {
   /** Creates Header using supplied key and value. */
   def apply(key: String, value: String): Header =
