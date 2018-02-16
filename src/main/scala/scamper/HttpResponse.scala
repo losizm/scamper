@@ -23,27 +23,11 @@ trait HttpResponse extends HttpMessage {
     getHeaderValues("Set-Cookie").map(SetCookie.apply)
 
   /**
-   * Gets response date.
-   *
-   * Value retrieved from Date header.
-   */
-  def date: Option[OffsetDateTime] =
-    getHeader("Date").map(_.dateValue)
-
-  /**
-   * Gets entity tag.
-   *
-   * Value retrieved from ETag header.
-   */
-  def entityTag: Option[String] =
-   getHeaderValue("ETag")
-
-  /**
    * Gets location.
    *
    * Value retrieved from Location header.
    */
-  def location: Option[String] =
+  lazy val location: Option[String] =
     getHeaderValue("Location")
 
   /**
@@ -61,23 +45,7 @@ trait HttpResponse extends HttpMessage {
   def withVersion(version: Version): MessageType
 
   /**
-   * Creates new response replacing date.
-   *
-   * @return new response
-   */
-  def withDate(date: OffsetDateTime): MessageType =
-    withHeader(Header("Date", date))
-
-  /**
-   * Creates new message replacing entity tag.
-   *
-   * @return new response
-   */
-  def withEntityTag(tag: String): MessageType =
-    withHeader(Header("ETag", tag))
-
-  /**
-   * Creates new message replacing location.
+   * Creates new response replacing location.
    *
    * @return new response
    */

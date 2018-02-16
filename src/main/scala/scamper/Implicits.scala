@@ -75,7 +75,7 @@ object Implicits {
       val authority = uri.getAuthority
 
       if (authority != null) authority
-      else request.headerValue("host")
+      else request.host.getOrElse(throw HeaderNotFound("Host"))
     }
   }
 

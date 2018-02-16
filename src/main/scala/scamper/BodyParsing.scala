@@ -24,7 +24,7 @@ trait BodyParsing {
     message.body.withInputStream { in =>
       val dechunked =
         if (isChunked(message)) dechunkInputStream(in)
-        else new BoundInputStream(in, message.headerValue("Content-Length").toLong)
+        else new BoundInputStream(in, getContentLength(message))
 
       message.contentEncoding.getOrElse("identity") match {
         case "gzip" | "x-gzip" => f(new GZIPInputStream(dechunked))
@@ -39,5 +39,8 @@ trait BodyParsing {
 
   private def isChunked(message: HttpMessage): Boolean =
     message.isChunked && !message.getHeaderValue("X-Scamper-Decoding").exists(_.contains("chunked"))
+
+  private def getContentLength(message: HttpMessage): Long =
+    message.contentLength.getOrElse(throw HeaderNotFound("Content-Length"))
 }
 

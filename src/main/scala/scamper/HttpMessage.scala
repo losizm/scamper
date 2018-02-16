@@ -25,33 +25,6 @@ trait HttpMessage {
    * Gets header for specified key.
    *
    * If there are multiple headers for key, then first occurrence is retrieved.
-   *
-   * @throws HeaderNotFound if no header with specified key is present
-   *
-   * @see [[getHeader]]
-   */
-  def header(key: String): Header =
-    getHeader(key).getOrElse(throw HeaderNotFound(key))
-
-  /**
-   * Gets header value for specified key.
-   *
-   * If there are multiple headers for key, then value of first occurrence is
-   * retrieved.
-   *
-   * @throws HeaderNotFound if no header with specified key is present
-   *
-   * @see [[getHeaderValue]]
-   */
-  def headerValue(key: String): String =
-    getHeaderValue(key).getOrElse(throw HeaderNotFound(key))
-
-  /**
-   * Gets header for specified key.
-   *
-   * If there are multiple headers for key, then first occurrence is retrieved.
-   *
-   * @see [[header]]
    */
   def getHeader(key: String): Option[Header] =
     headers.find(_.key.equalsIgnoreCase(key))
@@ -61,8 +34,6 @@ trait HttpMessage {
    *
    * If there are multiple headers for key, then value of first occurrence is
    * retrieved.
-   *
-   * @see [[headerValue]]
    */
   def getHeaderValue(key: String): Option[String] =
     getHeader(key).map(_.value)
@@ -115,12 +86,20 @@ trait HttpMessage {
     getHeaderValue("Content-Encoding")
 
   /**
+   * Gets transfer encoding.
+   *
+   * Value retrieved from Transfer-Encoding header.
+   */
+  def transferEncoding: Option[String] =
+    getHeaderValue("Transfer-Encoding")
+
+  /**
    * Tests whether message body is chunked.
    *
    * Value determined by inspecting Transfer-Encoding header.
    */
   def isChunked: Boolean =
-    getHeaderValue("Transfer-Encoding").exists("chunked".equalsIgnoreCase)
+    transferEncoding.exists(_.matches(".*\\b(?i:chunked)\\b.*"))
 
   /**
    * Creates new message replacing start line.
@@ -147,7 +126,7 @@ trait HttpMessage {
    *
    * @return new message
    */
-  def withoutHeader(key: String): MessageType =
+  def removeHeader(key: String): MessageType =
     withHeaders {
       headers.filterNot(_.key.equalsIgnoreCase(key)) : _*
     }
@@ -213,6 +192,14 @@ trait HttpMessage {
   /**
    * Creates new message replacing transfer encoding.
    *
+   * @return new message
+   */
+  def withTransferEncoding(encoding: String): MessageType =
+    withHeader(Header("Transfer-Encoding", encoding))
+
+  /**
+   * Creates new message replacing transfer encoding.
+   *
    * If chunked is true, then Transfer-Encoding header is set to chunked;
    * otherwise, header is removed.
    *
@@ -220,6 +207,6 @@ trait HttpMessage {
    */
   def withChunked(chunked: Boolean): MessageType =
     if (chunked) withHeader(Header("Transfer-Encoding", "chunked"))
-    else withoutHeader("Transfer-Encoding")
+    else removeHeader("Transfer-Encoding")
 }
 

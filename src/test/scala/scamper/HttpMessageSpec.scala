@@ -22,10 +22,5 @@ class HttpMessageSpec extends FlatSpec {
     assert(response.location.contains("/find"))
     assert(response.isChunked)
   }
-
-  "HeaderNotFound" should "be thrown" in {
-    val request = HttpRequest("GET", "/")
-    assertThrows[HeaderNotFound](request.header("host"))
-  }
 }
 

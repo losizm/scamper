@@ -128,25 +128,25 @@ trait HttpRequest extends HttpMessage {
   def withQueryParameters(params: (String, String)*): HttpRequest
 
   /**
-   * Creates new message replacing host.
+   * Creates new request replacing host.
    *
-   * @return new message
+   * @return new request
    */
   def withHost(host: String): MessageType =
     withHeader(Header("Host", host))
 
   /**
-   * Creates new message replacing accepted content types.
+   * Creates new request replacing accepted content types.
    *
-   * @return new message
+   * @return new request
    */
   def withAccept(types: ContentType*): MessageType =
     withHeader(Header("Accept", types.mkString(", ")))
 
   /**
-   * Creates new message replacing accepted encodings.
+   * Creates new request replacing accepted encodings.
    *
-   * @return new message
+   * @return new request
    */
   def withAcceptEncoding(encodings: String*): MessageType =
     withHeader(Header("Accept-Encoding", encodings.mkString(", ")))
