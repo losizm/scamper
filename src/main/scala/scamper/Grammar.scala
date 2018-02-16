@@ -32,5 +32,13 @@ private object Grammar {
   object QuotableString extends Grammar {
     val regex = "([\\x20-\\x7E&&[^\"]]*)".r
   }
+
+  object CookieValue extends Grammar {
+    val regex = "([\\w!#$%&'\\(\\)*+\\-./:<=>?@\\[\\]^_`{|}~]*)".r
+  }
+
+  object QuotedCookieValue extends Grammar {
+    val regex = "\"([\\w!#$%&'\\(\\)*+\\-./:<=>?@\\[\\]^_`{|}~]*)\"".r
+  }
 }
 

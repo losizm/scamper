@@ -11,7 +11,7 @@ private object CookieHelper {
     }
 
   def Value(value: String): String =
-    Token.unapply(value).orElse(QuotedToken.unapply(value)).getOrElse {
+    CookieValue.unapply(value).orElse(QuotedCookieValue.unapply(value)).getOrElse {
       throw new IllegalArgumentException(s"Invalid cookie value: $value")
     }
 }
