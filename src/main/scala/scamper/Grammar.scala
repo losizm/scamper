@@ -34,11 +34,11 @@ private object Grammar {
   }
 
   object CookieValue extends Grammar {
-    val regex = "([\\w!#$%&'\\(\\)*+\\-./:<=>?@\\[\\]^_`{|}~]*)".r
+    val regex = "([\\x21-\\x7E&&[^\",;\\\\]]*)".r
   }
 
   object QuotedCookieValue extends Grammar {
-    val regex = "\"([\\w!#$%&'\\(\\)*+\\-./:<=>?@\\[\\]^_`{|}~]*)\"".r
+    val regex = "\"([\\x21-\\x7E&&[^\",;\\\\]]*)\"".r
   }
 }
 
