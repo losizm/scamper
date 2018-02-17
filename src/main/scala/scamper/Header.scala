@@ -3,9 +3,7 @@ package scamper
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => dateFormatter }
 
-import scala.util.Try
-
-import Grammar._
+import HeaderHelper._
 
 /** HTTP header */
 case class Header private(key: String, value: String) {
@@ -24,9 +22,7 @@ case class Header private(key: String, value: String) {
 object Header {
   /** Creates Header using supplied key and value. */
   def apply(key: String, value: String): Header =
-    Token.unapply(key).map(key => new Header(key, value)).getOrElse {
-      throw new IllegalArgumentException(s"Invalid header key: $key")
-    }
+    new Header(Key(key), Value(value))
 
   /** Creates Header using supplied key and value. */
   def apply(key: String, value: Long): Header =

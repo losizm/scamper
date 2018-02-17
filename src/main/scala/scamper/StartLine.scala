@@ -20,7 +20,7 @@ case class RequestLine(method: String, uri: String, version: Version) extends St
 
 /** RequestLine factory */
 object RequestLine {
-  private val LineRegex = """(\w+)\h+(\p{Graph}+)\h+HTTP/(\d+\.\d+)\h*""".r
+  private val LineRegex = """(\w+)[ \t]+(\p{Graph}+)[ \t]+HTTP/(\d+(?:\.\d+)?)[ \t]*""".r
 
   /** Parses formatted request line. */
   def apply(line: String): RequestLine =
@@ -42,7 +42,7 @@ case class StatusLine(version: Version, status: Status) extends StartLine {
 
 /** StatusLine factory */
 object StatusLine {
-  private val LineRegex = """HTTP/(\d+\.\d+)\h+(\d+)\h+(\p{Print}+)\h*""".r
+  private val LineRegex = """HTTP/(\d+(?:\.\d+)?)[ \t]+(\d+)[ \t]+(\p{Print}+)[ \t]*""".r
 
   /** Parses formatted status line. */
   def apply(line: String): StatusLine =

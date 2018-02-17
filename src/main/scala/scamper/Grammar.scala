@@ -40,5 +40,13 @@ private object Grammar {
   object QuotedCookieValue extends Grammar {
     val regex = "\"([\\x21-\\x7E&&[^\",;\\\\]]*)\"".r
   }
+
+  object HeaderValue extends Grammar {
+    val regex = "(\\p{Print}*)".r
+  }
+
+  object FoldedHeaderValue extends Grammar {
+    val regex = "((?:\\p{Print}*(?:\r\n|\r|\n)[ \t]+\\p{Print}*)*)".r
+  }
 }
 

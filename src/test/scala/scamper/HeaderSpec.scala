@@ -32,8 +32,16 @@ class HeaderSpec extends FlatSpec {
     assert(header == Header(header.toString))
   }
 
+  it should "be created using folded value" in {
+    val header = Header("Cookie", "user=guest,\r\n\tgroup=readonly")
+
+    assert(header.key == "Cookie")
+    assert(header.value == "user=guest,\r\n\tgroup=readonly")
+  }
+
   it should "not be created" in {
     assertThrows[IllegalArgumentException](Header("text/plain"))
+    assertThrows[IllegalArgumentException](Header("Cookie", "user=guest,\r\ngroup=readonly"))
   }
 }
 
