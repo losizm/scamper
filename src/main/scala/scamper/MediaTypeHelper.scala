@@ -2,7 +2,7 @@ package scamper
 
 import Grammar._
 
-private object ContentTypeHelper {
+private object MediaTypeHelper {
   def PrimaryType(value: String): String =
     Token.unapply(value).getOrElse {
       throw new IllegalArgumentException(s"Invalid primary type: $value")

@@ -11,7 +11,7 @@ class BodyParserSpec extends FlatSpec {
     val message = Ok.withContentType("text/plain").withBody(body).withContentLength(body.length.get)
 
     assert(message.status == Ok.status)
-    assert(message.contentType.contains(ContentType("text/plain")))
+    assert(message.contentType.contains(MediaType("text/plain")))
     assert(message.parse.get == "Hello, world!")
   }
 

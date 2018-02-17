@@ -3,7 +3,7 @@ package scamper
 import scala.util.Try
 
 /**
- * The start line of HTTP message
+ * Start line of HTTP message
  *
  * @see [[RequestLine]], [[StatusLine]]
  */
@@ -26,7 +26,7 @@ object RequestLine {
   def apply(line: String): RequestLine =
     line match {
       case LineRegex(method, uri, version) =>
-        Try(RequestLine(method, uri, Version(version))).getOrElse {
+        Try(RequestLine(method, uri, Version(version))) getOrElse {
           throw new IllegalArgumentException(s"Malformed request line: $line")
         }
       case _ =>
@@ -48,7 +48,7 @@ object StatusLine {
   def apply(line: String): StatusLine =
     line match {
       case LineRegex(version, code, reason) =>
-        Try(StatusLine(Version(version), Status(code.toInt, reason))).getOrElse {
+        Try(StatusLine(Version(version), Status(code.toInt, reason))) getOrElse {
           throw new IllegalArgumentException(s"Malformed status line: $line")
         }
       case _ =>

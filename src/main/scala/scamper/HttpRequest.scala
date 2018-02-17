@@ -58,14 +58,14 @@ trait HttpRequest extends HttpMessage {
     getHeaderValue("Host")
 
   /**
-   * Get accepted content types.
+   * Get accepted media types.
    *
    * Value retrieved from Accept header.
    */
-  lazy val accept: Seq[ContentType] =
+  lazy val accept: Seq[MediaType] =
     getHeaderValue("Accept")
       .map(_.split("\\s*,\\s*")
-      .map(ContentType.apply).toSeq)
+      .map(MediaType.apply).toSeq)
       .getOrElse(Nil)
 
   /**
@@ -136,11 +136,11 @@ trait HttpRequest extends HttpMessage {
     withHeader(Header("Host", host))
 
   /**
-   * Creates new request replacing accepted content types.
+   * Creates new request replacing accepted media types.
    *
    * @return new request
    */
-  def withAccept(types: ContentType*): MessageType =
+  def withAccept(types: MediaType*): MessageType =
     withHeader(Header("Accept", types.mkString(", ")))
 
   /**

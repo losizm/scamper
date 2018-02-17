@@ -66,8 +66,8 @@ trait HttpMessage {
    *
    * Value retrieved from Content-Type header.
    */
-  def contentType: Option[ContentType] =
-    getHeaderValue("Content-Type").map(ContentType.apply)
+  def contentType: Option[MediaType] =
+    getHeaderValue("Content-Type").map(MediaType.apply)
 
   /**
    * Gets content length.
@@ -170,7 +170,7 @@ trait HttpMessage {
    *
    * @return new message
    */
-  def withContentType(contentType: ContentType): MessageType =
+  def withContentType(contentType: MediaType): MessageType =
     withHeader(Header("Content-Type", contentType.toString))
 
   /**
