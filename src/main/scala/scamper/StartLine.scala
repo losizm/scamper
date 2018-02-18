@@ -24,13 +24,12 @@ object RequestLine {
 
   /** Parses formatted request line. */
   def apply(line: String): RequestLine =
-    line match {
-      case LineRegex(method, uri, version) =>
-        Try(RequestLine(method, uri, Version(version))) getOrElse {
-          throw new IllegalArgumentException(s"Malformed request line: $line")
-        }
-      case _ =>
-        throw new IllegalArgumentException(s"Malformed request line: $line")
+    Try {
+      line match {
+        case LineRegex(method, uri, version) => RequestLine(method, uri, Version(version))
+      }
+    } getOrElse {
+      throw new IllegalArgumentException(s"Malformed request line: $line")
     }
 }
 
@@ -46,13 +45,12 @@ object StatusLine {
 
   /** Parses formatted status line. */
   def apply(line: String): StatusLine =
-    line match {
-      case LineRegex(version, code, reason) =>
-        Try(StatusLine(Version(version), Status(code.toInt, reason))) getOrElse {
-          throw new IllegalArgumentException(s"Malformed status line: $line")
-        }
-      case _ =>
-        throw new IllegalArgumentException(s"Malformed status line: $line")
+    Try {
+      line match {
+        case LineRegex(version, code, reason) => StatusLine(Version(version), Status(code.toInt, reason))
+      }
+    } getOrElse {
+      throw new IllegalArgumentException(s"Malformed status line: $line")
     }
 }
 
