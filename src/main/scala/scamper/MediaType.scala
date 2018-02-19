@@ -8,9 +8,6 @@ import Grammar._
 
 /** Internet media type */
 case class MediaType private (primaryType: String, subtype: String, params: Map[String, String]) {
-  /** Returns formatted media type. */
-  override val toString: String = s"$primaryType/$subtype$paramsToString"
-
   /** Tests whether primary type is text. */
   def isText: Boolean = primaryType == "text"
 
@@ -29,11 +26,13 @@ case class MediaType private (primaryType: String, subtype: String, params: Map[
   /** Tests whether primary type is message. */
   def isMessage: Boolean = primaryType == "message"
 
-  private def paramsToString: String =
-    params.map(param => s"; ${param._1}=${quote(param._2)}").mkString
+  /** Returns formatted media type. */
+  override lazy val toString: String = primaryType + '/' + subtype + formatParams
 
-  private def quote(value: String): String =
-    Token.unapply(value).getOrElse('"' + value + '"')
+  private def formatParams: String = {
+    def quote(value: String) = Token.unapply(value).getOrElse('"' + value + '"')
+    params.map { case (name, value) => s"; $name=${quote(value)}" }.mkString
+  }
 }
 
 /** MediaType factory */
