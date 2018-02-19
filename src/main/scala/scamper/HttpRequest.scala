@@ -22,7 +22,7 @@ trait HttpRequest extends HttpMessage {
   def query: Option[String]
 
   /** Query parameters */
-  lazy val queryParameters: Map[String, Seq[String]] =
+  lazy val queryParams: Map[String, Seq[String]] =
     query.map(QueryParser.parse).getOrElse(Map.empty)
 
   /**
@@ -31,12 +31,12 @@ trait HttpRequest extends HttpMessage {
    * If there are multiple parameters with given name, then value of first
    * occurrence is retrieved.
    */
-  def getQueryParameterValue(name: String): Option[String] =
-    queryParameters.get(name).flatMap(_.headOption)
+  def getQueryParamValue(name: String): Option[String] =
+    queryParams.get(name).flatMap(_.headOption)
 
   /** Gets all values for named query parameter. */
-  def getQueryParameterValues(name: String): Seq[String] =
-    queryParameters.get(name).getOrElse(Nil)
+  def getQueryParamValues(name: String): Seq[String] =
+    queryParams.get(name).getOrElse(Nil)
 
   /**
    * Gets all request cookies.
@@ -118,14 +118,14 @@ trait HttpRequest extends HttpMessage {
    *
    * @return new request
    */
-  def withQueryParameters(params: Map[String, Seq[String]]): HttpRequest
+  def withQueryParams(params: Map[String, Seq[String]]): HttpRequest
 
   /**
    * Creates new request replacing query parameters.
    *
    * @return new request
    */
-  def withQueryParameters(params: (String, String)*): HttpRequest
+  def withQueryParams(params: (String, String)*): HttpRequest
 
   /**
    * Creates new request replacing host.
@@ -201,10 +201,10 @@ private case class SimpleHttpRequest(startLine: RequestLine, headers: Seq[Header
   def withQuery(newQuery: String): HttpRequest =
     withURI(uriObject.withQuery(newQuery).toString)
 
-  def withQueryParameters(params: Map[String, Seq[String]]): HttpRequest =
-    withURI(uriObject.withQueryParameters(params).toString)
+  def withQueryParams(params: Map[String, Seq[String]]): HttpRequest =
+    withURI(uriObject.withQueryParams(params).toString)
 
-  def withQueryParameters(params: (String, String)*): HttpRequest =
-    withURI(uriObject.withQueryParameters(params : _*).toString)
+  def withQueryParams(params: (String, String)*): HttpRequest =
+    withURI(uriObject.withQueryParams(params : _*).toString)
 }
 

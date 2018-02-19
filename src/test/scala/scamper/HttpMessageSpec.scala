@@ -12,7 +12,7 @@ class HttpMessageSpec extends FlatSpec {
     assert(request.uri == "/find?user=root")
     assert(request.path == "/find")
     assert(request.query.contains("user=root"))
-    assert(request.getQueryParameterValue("user").contains("root"))
+    assert(request.getQueryParamValue("user").contains("root"))
     assert(request.host.contains("localhost:8080"))
   }
 

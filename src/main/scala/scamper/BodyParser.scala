@@ -104,7 +104,7 @@ private class TextBodyParser(maxLength: Int) extends BodyParser[String] {
 
   def apply(message: HttpMessage): String =
     message.contentType
-      .flatMap(_.parameters.get("charset"))
+      .flatMap(_.params.get("charset"))
       .orElse(Some("UTF-8"))
       .map(new String(bodyParser(message), _)).get
 }

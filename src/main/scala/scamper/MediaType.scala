@@ -7,7 +7,7 @@ import MediaTypeHelper._
 import Grammar._
 
 /** Internet media type */
-case class MediaType private (primaryType: String, subtype: String, parameters: Map[String, String]) {
+case class MediaType private (primaryType: String, subtype: String, params: Map[String, String]) {
   /** Returns formatted media type. */
   override val toString: String = s"$primaryType/$subtype$paramsToString"
 
@@ -30,7 +30,7 @@ case class MediaType private (primaryType: String, subtype: String, parameters: 
   def isMessage: Boolean = primaryType == "message"
 
   private def paramsToString: String =
-    parameters.map(param => s"; ${param._1}=${quote(param._2)}").mkString
+    params.map(param => s"; ${param._1}=${quote(param._2)}").mkString
 
   private def quote(value: String): String =
     Token.unapply(value).getOrElse('"' + value + '"')
@@ -44,33 +44,33 @@ object MediaType {
   private val withQuotedValue   = """\s*;\s*([^\s/=;"]+)\s*=\s*"([^"]*)"\s*""".r
 
   /** Creates MediaType using supplied attributes. */
-  def apply(primaryType: String, subtype: String, parameters: Map[String, String]): MediaType =
-    new MediaType(PrimaryType(primaryType), Subtype(subtype), Parameters(parameters))
+  def apply(primaryType: String, subtype: String, params: Map[String, String]): MediaType =
+    new MediaType(PrimaryType(primaryType), Subtype(subtype), Params(params))
 
   /** Creates MediaType using supplied attributes. */
-  def apply(primaryType: String, subtype: String, parameters: (String, String)*): MediaType =
-    apply(primaryType, subtype, parameters.toMap)
+  def apply(primaryType: String, subtype: String, params: (String, String)*): MediaType =
+    apply(primaryType, subtype, params.toMap)
 
   /** Parses formatted media type. */
   def apply(mediaType: String): MediaType =
     mediaType match {
       case withoutParams(primary, sub) => MediaType(primary, sub)
-      case withParams(primary, sub, params) => MediaType(primary, sub, parseParameters(params))
+      case withParams(primary, sub, params) => MediaType(primary, sub, parseParams(params))
       case _ => throw new IllegalArgumentException(s"Malformed media type: $mediaType")
     }
 
   @tailrec
-  private def parseParameters(s: String, params: Map[String, String] = Map.empty): Map[String, String] =
-    findPrefixParameter(s) match {
+  private def parseParams(s: String, params: Map[String, String] = Map.empty): Map[String, String] =
+    findPrefixParam(s) match {
       case None =>
         if (s.matches("(\\s*;)?\\s*")) params
         else throw new IllegalArgumentException(s"Malformed media type parameters: $params")
 
       case Some(m) =>
-        parseParameters(m.after.toString, params + (m.group(1) -> m.group(2)))
+        parseParams(m.after.toString, params + (m.group(1) -> m.group(2)))
     }
 
-  private def findPrefixParameter(s: String): Option[Match] =
+  private def findPrefixParam(s: String): Option[Match] =
     withUnquotedValue.findPrefixMatchOf(s).orElse(withQuotedValue.findPrefixMatchOf(s))
 }
 

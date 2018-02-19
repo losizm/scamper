@@ -85,7 +85,7 @@ object Implicits {
    */
   implicit class URIType(uri: URI) {
     /** Gets query parameters. */
-    def getQueryParameters(): Map[String, Seq[String]] =
+    def getQueryParams(): Map[String, Seq[String]] =
       QueryParser.parse(uri.getQuery)
 
     /**
@@ -94,12 +94,12 @@ object Implicits {
      * If there are multiple parameters with given name, then value of first
      * occurrence is retrieved.
      */
-    def getQueryParameterValue(name: String): Option[String] =
-      getQueryParameters.get(name).flatMap(_.headOption)
+    def getQueryParamValue(name: String): Option[String] =
+      getQueryParams.get(name).flatMap(_.headOption)
 
     /** Gets all values for named query parameter. */
-    def getQueryParameterValues(name: String): Seq[String] =
-      getQueryParameters.get(name).getOrElse(Nil)
+    def getQueryParamValues(name: String): Seq[String] =
+      getQueryParams.get(name).getOrElse(Nil)
 
     /** Converts URI to URL using supplied scheme and authority. */
     def toURL(scheme: String, authority: String): URL =
@@ -114,11 +114,11 @@ object Implicits {
       createURI(uri.getPath, query)
 
     /** Creates new URI replacing query parameters. */
-    def withQueryParameters(params: Map[String, Seq[String]]): URI =
+    def withQueryParams(params: Map[String, Seq[String]]): URI =
       withQuery(QueryParser.format(params))
 
     /** Creates new URI replacing query parameters. */
-    def withQueryParameters(params: (String, String)*): URI =
+    def withQueryParams(params: (String, String)*): URI =
       withQuery(QueryParser.format(params : _*))
 
     private def createURI(path: String, query: String): URI =
@@ -131,7 +131,7 @@ object Implicits {
    */
   implicit class URLType(url: URL) {
     /** Gets the query parameters. */
-    def getQueryParameters(): Map[String, Seq[String]] =
+    def getQueryParams(): Map[String, Seq[String]] =
       QueryParser.parse(url.getQuery)
 
     /**
@@ -140,12 +140,12 @@ object Implicits {
      * If there are multiple parameters with given name, then value of first
      * occurrence is retrieved.
      */
-    def getQueryParameterValue(name: String): Option[String] =
-      getQueryParameters.get(name).flatMap(_.headOption)
+    def getQueryParamValue(name: String): Option[String] =
+      getQueryParams.get(name).flatMap(_.headOption)
 
     /** Gets all values for named query parameter. */
-    def getQueryParameterValues(name: String): Seq[String] =
-      getQueryParameters.get(name).getOrElse(Nil)
+    def getQueryParamValues(name: String): Seq[String] =
+      getQueryParams.get(name).getOrElse(Nil)
 
     /** Creates new URL replacing path. */
     def withPath(path: String): URL =
@@ -156,11 +156,11 @@ object Implicits {
       createURL(url.getPath, query)
 
     /** Creates new URL replacing query parameters. */
-    def withQueryParameters(params: Map[String, Seq[String]]): URL =
+    def withQueryParams(params: Map[String, Seq[String]]): URL =
       createURL(url.getPath, QueryParser.format(params))
 
     /** Creates new URL replacing query parameters. */
-    def withQueryParameters(params: (String, String)*): URL =
+    def withQueryParams(params: (String, String)*): URL =
       createURL(url.getPath, QueryParser.format(params : _*))
 
     /**

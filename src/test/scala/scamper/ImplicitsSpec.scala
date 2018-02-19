@@ -15,7 +15,7 @@ class ImplicitsSpec extends FlatSpec {
   it should "be created with new query" in {
     val newURI = new URI("/index.html?name=guest")
     assert(uri.withQuery("name=guest") == newURI)
-    assert(uri.withQueryParameters("name" -> "guest") == newURI)
+    assert(uri.withQueryParams("name" -> "guest") == newURI)
   }
 
   it should "be converted to URL" in {
@@ -30,7 +30,7 @@ class ImplicitsSpec extends FlatSpec {
   it should "be created with new query" in {
     val newURL = new URL("http://localhost:8080/index.html?name=guest")
     assert(url.withQuery("name=guest") == newURL)
-    assert(url.withQueryParameters("name" -> "guest") == newURL)
+    assert(url.withQueryParams("name" -> "guest") == newURL)
   }
 }
 
