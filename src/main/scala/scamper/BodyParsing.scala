@@ -12,8 +12,7 @@ trait BodyParsing {
   def maxBufferSize: Int
 
   /**
-   * Provides decoded input stream to message body. That is, the input stream
-   * passed to handler is uncompressed and dechunked.
+   * Provides input stream to decoded message body.
    *
    * @param message HTTP message
    * @param f input stream handler

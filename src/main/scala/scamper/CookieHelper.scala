@@ -1,7 +1,5 @@
 package scamper
 
-import java.time.OffsetDateTime
-
 import Grammar._
 
 private object CookieHelper {

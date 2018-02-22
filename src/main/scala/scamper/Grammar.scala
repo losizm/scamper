@@ -21,10 +21,6 @@ private object Grammar {
     val regex = "([\\w!#$%&'*+.^`{}|~-]+)".r
   }
 
-  object QuotedToken extends Grammar {
-    val regex = "\"([\\w!#$%&'*+.^`{}|~-]*)\"".r
-  }
-
   object QuotedString extends Grammar {
     val regex = "\"([\\x20-\\x7E&&[^\"]]*)\"".r
   }

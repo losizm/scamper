@@ -20,9 +20,6 @@ sealed trait Cookie {
 
 /** HTTP Plain Cookie */
 case class PlainCookie private (name: String, value: String) extends Cookie {
-  /** Returns formatted cookie. */
-  override val toString: String = s"$name=$value"
-
   /** Converts to SetCookie using name-value pair. */
   def toSetCookie: SetCookie = SetCookie(name, value)
 
@@ -30,6 +27,9 @@ case class PlainCookie private (name: String, value: String) extends Cookie {
   def toSetCookie(path: Option[String] = None, domain: Option[String] = None, maxAge: Option[Long] = None,
       expires: Option[OffsetDateTime] = None, secure: Boolean = false, httpOnly: Boolean = false): SetCookie =
     SetCookie(name, value, path, domain, maxAge, expires, secure, httpOnly)
+
+  /** Returns formatted cookie. */
+  override lazy val toString: String = s"$name=$value"
 }
 
 /** PlainCookie factory */
@@ -50,10 +50,10 @@ object PlainCookie {
 case class SetCookie private (name: String, value: String, path: Option[String], domain: Option[String], maxAge: Option[Long],
     expires: Option[OffsetDateTime], secure: Boolean, httpOnly: Boolean) extends Cookie {
   /** Converts to PlainCookie using name-value pair. */
-  lazy val toPlainCookie: PlainCookie = PlainCookie(name, value)
+  def toPlainCookie: PlainCookie = PlainCookie(name, value)
 
   /** Returns formatted cookie. */
-  override def toString(): String = {
+  override lazy val toString: String = {
     val cookie = new StringBuilder
 
     cookie.append(name).append('=').append(value)

@@ -1,6 +1,7 @@
 package scamper
 
 import bantam.nx.lang._
+import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => dateFormatter }
 import org.scalatest.FlatSpec
 
 class HeaderSpec extends FlatSpec {
@@ -22,12 +23,11 @@ class HeaderSpec extends FlatSpec {
   }
 
   it should "be created using date value" in {
-    val formatter = java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
     val date = "2016-11-08T09:00:00+04:00".toOffsetDateTime
     val header = Header("If-Modified-Since", date)
 
     assert(header.key == "If-Modified-Since")
-    assert(header.value == formatter.format(date))
+    assert(header.value == dateFormatter.format(date))
     assert(header.dateValue == date)
     assert(header == Header(header.toString))
   }

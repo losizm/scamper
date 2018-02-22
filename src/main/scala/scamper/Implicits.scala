@@ -6,7 +6,6 @@ import java.io.File
 import java.net.{ HttpURLConnection, URI, URL }
 import scala.annotation.tailrec
 import scala.util.Try
-import scamper._
 
 /** Provides implicit conversion functions and type classes. */
 object Implicits {

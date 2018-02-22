@@ -7,15 +7,15 @@ import HeaderHelper._
 
 /** HTTP header */
 case class Header private(key: String, value: String) {
-  /** Returns formatted HTTP header. */
-  override val toString: String = s"$key: $value"
-
   /** Gets header value as OffsetDateTime. */
   def dateValue: OffsetDateTime =
     OffsetDateTime.parse(value, dateFormatter)
 
   /** Gets header value as Long. */
   def longValue: Long = value.toLong
+
+  /** Returns formatted HTTP header. */
+  override lazy val toString: String = s"$key: $value"
 }
 
 /** Header factory */

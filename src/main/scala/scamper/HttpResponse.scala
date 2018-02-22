@@ -1,7 +1,5 @@
 package scamper
 
-import java.time.OffsetDateTime
-
 /** HTTP response */
 trait HttpResponse extends HttpMessage {
   type MessageType = HttpResponse
