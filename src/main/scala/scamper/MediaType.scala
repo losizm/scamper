@@ -41,6 +41,14 @@ trait MediaType {
   /** Tests whether main type is message. */
   def isMessage: Boolean = mainType == "message"
 
+  /**
+   * Gets qvalue of media type.
+   *
+   * Value retrieved from "q" parameter.
+   */
+  def qvalue: Float =
+    params.get("q").map(_.toFloat).getOrElse(1.0f)
+
   /** Returns formatted media type. */
   override lazy val toString: String = mainType + '/' + subtype + formatParams
 

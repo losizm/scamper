@@ -10,7 +10,7 @@ sealed trait StartLine {
 
 /** HTTP request line */
 case class RequestLine(method: String, uri: String, version: Version) extends StartLine {
-  /** Returns formatted HTTP request line. */
+  /** Returns formatted request line. */
   override lazy val toString: String = s"$method $uri HTTP/$version"
 }
 
@@ -31,7 +31,7 @@ object RequestLine {
 
 /** HTTP status line */
 case class StatusLine(version: Version, status: Status) extends StartLine {
-  /** Returns formatted HTTP status line. */
+  /** Returns formatted status line. */
   override lazy val toString: String = s"HTTP/$version ${status.code} ${status.reason}"
 }
 
