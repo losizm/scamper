@@ -79,8 +79,7 @@ object Implicits {
   }
 
   /**
-   * Type class of <code>java.net.URI</code> that adds methods for building new
-   * URI.
+   * Type class of {@code java.net.URI} that adds methods for building new URI.
    */
   implicit class URIType(uri: URI) {
     /** Gets query parameters. */
@@ -125,8 +124,8 @@ object Implicits {
   }
 
   /**
-   * Type class of <code>java.net.URL</code> that adds methods for building new
-   * URL and sending HTTP request.
+   * Type class of {@code java.net.URL} that adds methods for building new URL
+   * and sending HTTP request.
    */
   implicit class URLType(url: URL) {
     /** Gets the query parameters. */
@@ -304,7 +303,7 @@ object Implicits {
       val headers = getHeaders(conn, 1, Nil)
 
       if ("chunked".equalsIgnoreCase(conn.getHeaderField("Transfer-Encoding")))
-        headers :+ Header("X-Scamper-Decoding: chunked")
+        headers :+ Header("X-Scamper-Transfer-Decoding: chunked")
       else headers
     }
 

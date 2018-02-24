@@ -6,7 +6,13 @@ import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => dateFormatter 
 import HeaderHelper._
 
 /** HTTP header */
-case class Header private(key: String, value: String) {
+trait Header {
+  /** Header key */
+  def key: String
+
+  /** Header value */
+  def value: String
+
   /** Gets header value as OffsetDateTime. */
   def dateValue: OffsetDateTime =
     OffsetDateTime.parse(value, dateFormatter)
@@ -22,7 +28,7 @@ case class Header private(key: String, value: String) {
 object Header {
   /** Creates Header using supplied key and value. */
   def apply(key: String, value: String): Header =
-    new Header(Key(key), Value(value))
+    HeaderImpl(Key(key), Value(value))
 
   /** Creates Header using supplied key and value. */
   def apply(key: String, value: Long): Header =
@@ -38,5 +44,11 @@ object Header {
       case Array(key, value) => apply(key.trim, value.trim)
       case _ => throw new IllegalArgumentException(s"Malformed header: $header")
     }
+
+  /** Destructures Header to key-value pair. */
+  def unapply(header: Header): Option[(String, String)] =
+    Some(header.key -> header.value)
 }
+
+private case class HeaderImpl(key: String, value: String) extends Header
 

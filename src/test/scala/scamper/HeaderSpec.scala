@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => dateFormatter 
 import org.scalatest.FlatSpec
 
 class HeaderSpec extends FlatSpec {
-  "Header" should "be created using formatted value" in {
+  "Header" should "be created from formatted value" in {
     val header = Header("Content-Type: text/plain")
 
     assert(header.key == "Content-Type")
@@ -39,7 +39,17 @@ class HeaderSpec extends FlatSpec {
     assert(header.value == "user=guest,\r\n\tgroup=readonly")
   }
 
-  it should "not be created" in {
+  it should "be destructured to its constituent parts" in {
+    val header = Header("Content-Type: text/plain")
+    
+    header match {
+      case Header(key, value) =>
+        assert(header.key == "Content-Type")
+        assert(header.value == "text/plain")
+    }
+  }
+
+  it should "not be created from malformed value" in {
     assertThrows[IllegalArgumentException](Header("text/plain"))
     assertThrows[IllegalArgumentException](Header("Cookie", "user=guest,\r\ngroup=readonly"))
   }

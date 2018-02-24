@@ -37,7 +37,7 @@ trait BodyParsing {
     new SequenceInputStream(new ChunkEnumeration(in, maxBufferSize, maxLength))
 
   private def isChunked(message: HttpMessage): Boolean =
-    message.isChunked && !message.getHeaderValue("X-Scamper-Decoding").exists(_.contains("chunked"))
+    message.transferEncoding.contains("chunked") && !message.getHeaderValue("X-Scamper-Transfer-Decoding").contains("chunked")
 
   private def getContentLength(message: HttpMessage): Long =
     message.contentLength.getOrElse(throw HeaderNotFound("Content-Length"))

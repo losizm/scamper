@@ -2,11 +2,7 @@ package scamper
 
 import scala.util.Try
 
-/**
- * HTTP message
- *
- * @see [[HttpRequest]], [[HttpResponse]]
- */
+/** HTTP message */
 trait HttpMessage {
   type MessageType <: HttpMessage
   type LineType <: StartLine
@@ -92,14 +88,6 @@ trait HttpMessage {
    */
   def transferEncoding: Option[String] =
     getHeaderValue("Transfer-Encoding")
-
-  /**
-   * Tests whether message body is chunked.
-   *
-   * Value determined by inspecting Transfer-Encoding header.
-   */
-  def isChunked: Boolean =
-    transferEncoding.exists(_.matches(".*\\b(?i:chunked)\\b.*"))
 
   /**
    * Creates new message replacing start line.
@@ -196,17 +184,5 @@ trait HttpMessage {
    */
   def withTransferEncoding(encoding: String): MessageType =
     withHeader(Header("Transfer-Encoding", encoding))
-
-  /**
-   * Creates new message replacing transfer encoding.
-   *
-   * If chunked is true, then Transfer-Encoding header is set to chunked;
-   * otherwise, header is removed.
-   *
-   * @return new message
-   */
-  def withChunked(chunked: Boolean): MessageType =
-    if (chunked) withHeader(Header("Transfer-Encoding", "chunked"))
-    else removeHeader("Transfer-Encoding")
 }
 

@@ -55,14 +55,14 @@ trait HttpResponse extends HttpMessage {
 object HttpResponse {
   /** Creates HttpResponse using supplied attributes. */
   def apply(statusLine: StatusLine, headers: Seq[Header], body: Entity): HttpResponse =
-    SimpleHttpResponse(statusLine, headers, body)
+    HttpResponseImpl(statusLine, headers, body)
 
   /** Creates HttpResponse using supplied attributes. */
   def apply(status: Status, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpResponse =
-    SimpleHttpResponse(StatusLine(version, status), headers, body)
+    HttpResponseImpl(StatusLine(version, status), headers, body)
 }
 
-private case class SimpleHttpResponse(startLine: StatusLine, headers: Seq[Header], body: Entity) extends HttpResponse {
+private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity) extends HttpResponse {
   def addHeaders(newHeaders: Header*): HttpResponse =
     copy(headers = headers ++ newHeaders)
 

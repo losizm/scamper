@@ -7,27 +7,42 @@ import MediaTypeHelper._
 import Grammar._
 
 /** Internet media type */
-case class MediaType private (primaryType: String, subtype: String, params: Map[String, String]) {
-  /** Tests whether primary type is text. */
-  def isText: Boolean = primaryType == "text"
+trait MediaType {
+  /** Main type of media type */
+  def mainType: String
 
-  /** Tests whether primary type is audio. */
-  def isAudio: Boolean = primaryType == "audio"
+  /** Subtype of media type */
+  def subtype: String
 
-  /** Tests whether primary type is video. */
-  def isVideo: Boolean = primaryType == "video"
+  /** Media type parameters */
+  def params: Map[String, String]
 
-  /** Tests whether primary type is application. */
-  def isApplication: Boolean = primaryType == "application"
+  /** Tests whether main type is text. */
+  def isText: Boolean = mainType == "text"
 
-  /** Tests whether primary type is multipart. */
-  def isMultipart: Boolean = primaryType == "multipart"
+  /** Tests whether main type is audio. */
+  def isAudio: Boolean = mainType == "audio"
 
-  /** Tests whether primary type is message. */
-  def isMessage: Boolean = primaryType == "message"
+  /** Tests whether main type is video. */
+  def isVideo: Boolean = mainType == "video"
+
+  /** Tests whether main type is image. */
+  def isImage: Boolean = mainType == "image"
+
+  /** Tests whether main type is font. */
+  def isFont: Boolean = mainType == "font"
+
+  /** Tests whether main type is application. */
+  def isApplication: Boolean = mainType == "application"
+
+  /** Tests whether main type is multipart. */
+  def isMultipart: Boolean = mainType == "multipart"
+
+  /** Tests whether main type is message. */
+  def isMessage: Boolean = mainType == "message"
 
   /** Returns formatted media type. */
-  override lazy val toString: String = primaryType + '/' + subtype + formatParams
+  override lazy val toString: String = mainType + '/' + subtype + formatParams
 
   private def formatParams: String = {
     def quote(value: String) = Token.unapply(value).getOrElse('"' + value + '"')
@@ -43,20 +58,24 @@ object MediaType {
   private val withQuotedValue   = """\s*;\s*([^\s/=;"]+)\s*=\s*"([^"]*)"\s*""".r
 
   /** Creates MediaType using supplied attributes. */
-  def apply(primaryType: String, subtype: String, params: Map[String, String]): MediaType =
-    new MediaType(PrimaryType(primaryType), Subtype(subtype), Params(params))
+  def apply(mainType: String, subtype: String, params: Map[String, String]): MediaType =
+    MediaTypeImpl(MainType(mainType), Subtype(subtype), Params(params))
 
   /** Creates MediaType using supplied attributes. */
-  def apply(primaryType: String, subtype: String, params: (String, String)*): MediaType =
-    apply(primaryType, subtype, params.toMap)
+  def apply(mainType: String, subtype: String, params: (String, String)*): MediaType =
+    apply(mainType, subtype, params.toMap)
 
   /** Parses formatted media type. */
   def apply(mediaType: String): MediaType =
     mediaType match {
-      case withoutParams(primary, sub) => MediaType(primary, sub)
-      case withParams(primary, sub, params) => MediaType(primary, sub, parseParams(params))
+      case withoutParams(main, sub) => MediaType(main, sub)
+      case withParams(main, sub, params) => MediaType(main, sub, parseParams(params))
       case _ => throw new IllegalArgumentException(s"Malformed media type: $mediaType")
     }
+
+  /** Destructures media type to main type, subtype, and parameters. */
+  def unapply(mediaType: MediaType): Option[(String, String, Map[String, String])] =
+    Some((mediaType.mainType, mediaType.subtype, mediaType.params))
 
   @tailrec
   private def parseParams(s: String, params: Map[String, String] = Map.empty): Map[String, String] =
@@ -72,4 +91,6 @@ object MediaType {
   private def findPrefixParam(s: String): Option[Match] =
     withUnquotedValue.findPrefixMatchOf(s).orElse(withQuotedValue.findPrefixMatchOf(s))
 }
+
+private case class MediaTypeImpl(mainType: String, subtype: String, params: Map[String, String]) extends MediaType; 
 

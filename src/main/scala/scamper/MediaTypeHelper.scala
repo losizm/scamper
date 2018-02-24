@@ -3,14 +3,14 @@ package scamper
 import Grammar._
 
 private object MediaTypeHelper {
-  def PrimaryType(value: String): String =
+  def MainType(value: String): String =
     Token.unapply(value).getOrElse {
-      throw new IllegalArgumentException(s"Invalid primary type: $value")
+      throw new IllegalArgumentException(s"Invalid main type: $value")
     }
 
   def Subtype(value: String): String =
     Token.unapply(value).getOrElse {
-      throw new IllegalArgumentException(s"Invalid primary type: $value")
+      throw new IllegalArgumentException(s"Invalid subtype: $value")
     }
 
   def ParamAttribute(value: String): String =

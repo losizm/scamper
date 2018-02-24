@@ -28,15 +28,13 @@ object Status {
   private val statuses = new scala.collection.mutable.TreeMap[Int, Status]
 
   /**
-   * Gets defined status for given code. <code>NoSuchElementException</code> is
-   * thrown if a status is not defined for code.
+   * Gets defined Status for given code.
+   *
+   * {@code NoSuchElementException} is thrown if a status is not defined for
+   * code.
    */
   def apply(code: Int): Status =
     statuses(code)
-
-  /** Gets defined status for given code. */
-  def get(code: Int): Option[Status] =
-    statuses.get(code)
 
   private def add(code: Int, reason: String): Unit =
     statuses += code -> Status(code, reason)

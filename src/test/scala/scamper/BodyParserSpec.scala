@@ -18,7 +18,7 @@ class BodyParserSpec extends FlatSpec {
   it should "parse response with chunked text body" in {
     implicit val bodyParser = BodyParser.text
     val message = Ok.withContentType("text/plain; charset=utf8")
-      .withChunked(true)
+      .withTransferEncoding("chunked")
       .withBody("7\r\nHello, \r\n6\r\nworld!\r\n0\r\n")
 
     assert(message.parse.get == "Hello, world!")

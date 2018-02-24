@@ -5,11 +5,7 @@ import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => dateFormatter 
 
 import CookieHelper._
 
-/**
- * HTTP Cookie
- *
- * @see [[PlainCookie]], [[SetCookie]]
- */
+/** HTTP Cookie */
 sealed trait Cookie {
   /** Cookie name */
   def name: String
@@ -19,7 +15,7 @@ sealed trait Cookie {
 }
 
 /** HTTP Plain Cookie */
-case class PlainCookie private (name: String, value: String) extends Cookie {
+class PlainCookie private (val name: String, val value: String) extends Cookie {
   /** Converts to SetCookie using name-value pair. */
   def toSetCookie: SetCookie = SetCookie(name, value)
 
@@ -47,8 +43,8 @@ object PlainCookie {
 }
 
 /** HTTP Set-Cookie */
-case class SetCookie private (name: String, value: String, path: Option[String], domain: Option[String], maxAge: Option[Long],
-    expires: Option[OffsetDateTime], secure: Boolean, httpOnly: Boolean) extends Cookie {
+class SetCookie private (val name: String, val value: String, val path: Option[String], val domain: Option[String],
+    val maxAge: Option[Long], val expires: Option[OffsetDateTime], val secure: Boolean, val httpOnly: Boolean) extends Cookie {
   /** Converts to PlainCookie using name-value pair. */
   def toPlainCookie: PlainCookie = PlainCookie(name, value)
 
