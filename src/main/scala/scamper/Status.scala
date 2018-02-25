@@ -21,6 +21,10 @@ case class Status(code: Int, reason: String) {
   /** Tests for server error status code. */
   def isServerError: Boolean =
     code >= 500 && code <= 599
+
+  /** Creates HttpResponse from status and supplied body. */
+  def apply(body: Entity = Entity.empty): HttpResponse =
+    HttpResponse(this, Nil, body)
 }
 
 /** Status factory */

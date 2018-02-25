@@ -1,6 +1,10 @@
 package scamper
 
-/** HTTP request */
+/**
+ * HTTP request
+ *
+ * @see [[HttpResponse]]
+ */
 trait HttpRequest extends HttpMessage {
   type MessageType = HttpRequest
   type LineType = RequestLine
@@ -55,7 +59,7 @@ object HttpRequest {
     HttpRequestImpl(requestLine, headers, body)
 
   /** Creates HttpRequest using supplied attributes. */
-  def apply(method: String, uri: String, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpRequest =
+  def apply(method: String, uri: String = "/", headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpRequest =
     HttpRequestImpl(RequestLine(method, uri, version), headers, body)
 }
 

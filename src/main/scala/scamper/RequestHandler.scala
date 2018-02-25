@@ -20,10 +20,10 @@ class RequestHandlerChain private (handler: RequestHandler, next: RequestHandler
 
 /** RequestHandlerChain factory */
 object RequestHandlerChain {
-  private val notFound = new RequestHandlerChain((_, _) => HttpResponses.NotFound, null)
+  private val chain = new RequestHandlerChain((req, _) => throw new HttpException(s"Unhandled request: ${req.startLine}"), null)
 
   /** Creates request handler chain with supplied handlers. */
   def apply(handlers: RequestHandler*): RequestHandlerChain =
-    handlers.foldRight(notFound) { (handler, next) => new RequestHandlerChain(handler, next) }
+    handlers.foldRight(chain) { (handler, next) => new RequestHandlerChain(handler, next) }
 }
 

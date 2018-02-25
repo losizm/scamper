@@ -1,6 +1,10 @@
 package scamper
 
-/** HTTP response */
+/**
+ * HTTP response
+ *
+ * @see [[HttpRequest]]
+ */
 trait HttpResponse extends HttpMessage {
   type MessageType = HttpResponse
   type LineType = StatusLine

@@ -22,15 +22,6 @@ object Implicits {
   /** Converts tuple to [[Header]] where tuple is key-value pair. */
   implicit val tupleToHeaderWithDateValue = (header: (String, OffsetDateTime)) => Header(header._1, header._2)
 
-  /** Converts string to [[MediaType]]. */
-  implicit val stringToMediaType = (mediaType: String) => MediaType(mediaType)
-
-  /** Converts string to [[Version]]. */
-  implicit val stringToVersion = (version: String) => Version(version)
-
-  /** Converts integer to [[Status]]. */
-  implicit val intToStatus = (status: Int) => Status(status)
-
   /** Converts byte array to [[Entity]]. */
   implicit val bytesToEntity = (entity: Array[Byte]) => Entity(entity)
 
@@ -77,12 +68,8 @@ object Implicits {
       }
     }
 
-    private def getHost(uri: URI): String = {
-      val authority = uri.getAuthority
-
-      if (authority != null) authority
-      else request.getHeaderValue("Host").getOrElse(throw HeaderNotFound("Host"))
-    }
+    private def getHost(uri: URI): String =
+      Option(uri.getAuthority).orElse(request.getHeaderValue("Host")).getOrElse(throw HeaderNotFound("Host"))
   }
 
   /**

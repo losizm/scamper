@@ -1,11 +1,10 @@
 package scamper
 
 import org.scalatest.FlatSpec
-import HttpResponses._
 import Implicits._
 
-class RequestHandlerSpec extends FlatSpec {
-  "RequestHandlerChain" should "be traversed" in {
+class RequestHandlerSpec extends FlatSpec with Statuses {
+  "RequestHandlerChain" should "be traversed and handle request" in {
     val chain = RequestHandlerChain(
       (req, next) => next(req.addHeaders("user: guest")),
       (req, next) => next(req.addHeaders("access: read")),
@@ -14,14 +13,18 @@ class RequestHandlerSpec extends FlatSpec {
         val access = req.getHeaderValue("access").get
         val body = Entity(s"Hello, $user. You have $access access.", "utf8")
 
-        Ok.withHeader("Content-Length" -> body.length.get).withBody(body)
+        Ok(body).withHeader("Content-Length" -> body.length.get)
       }
     )
 
-    val resp = chain(HttpRequest("GET", "/"))
-
-    assert(resp.status == Ok.status)
+    val resp = chain(HttpRequest("GET"))
+    assert(resp.status == Ok)
     assert(resp.parse(BodyParser.text).get == "Hello, guest. You have read access.")
+  }
+
+  it should "be exhausted and not handle request" in {
+    val chain = RequestHandlerChain()
+    assertThrows[HttpException](chain(HttpRequest("GET")))
   }
 }
 
