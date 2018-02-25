@@ -8,7 +8,7 @@ class MediaTypeSpec extends FlatSpec {
     assert(contentType.mainType == "text")
     assert(contentType.subtype == "html")
     assert(contentType.isText)
-    assert(contentType == MediaType(contentType.toString))
+    assert(contentType.toString == "text/html")
   }
 
   it should "be created with parameters" in {
@@ -17,14 +17,14 @@ class MediaTypeSpec extends FlatSpec {
     assert(contentType.subtype == "html")
     assert(contentType.params("charset") == "iso-8859-1")
     assert(contentType.isText)
-    assert(contentType == MediaType(contentType.toString))
+    assert(contentType.toString == "text/html; charset=iso-8859-1")
 
     contentType = MediaType("text", "html", "charset" -> "iso-8859-1")
     assert(contentType.mainType == "text")
     assert(contentType.subtype == "html")
     assert(contentType.params("charset") == "iso-8859-1")
     assert(contentType.isText)
-    assert(contentType == MediaType(contentType.toString))
+    assert(contentType.toString == "text/html; charset=iso-8859-1")
 
     contentType = MediaType("text", "html", "charset" -> "utf-8", "not-a-charset" -> "iso 8859 1")
     assert(contentType.mainType == "text")
@@ -32,7 +32,7 @@ class MediaTypeSpec extends FlatSpec {
     assert(contentType.params("charset") == "utf-8")
     assert(contentType.params("not-a-charset") == "iso 8859 1")
     assert(contentType.isText)
-    assert(contentType == MediaType(contentType.toString))
+    assert(contentType.toString == "text/html; charset=utf-8; not-a-charset=\"iso 8859 1\"")
   }
 
   it should "be destructured to its constituent parts" in {

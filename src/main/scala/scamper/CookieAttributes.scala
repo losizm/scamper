@@ -10,16 +10,16 @@ private case class CookieAttributes(path: Option[String] = None, domain: Option[
 
 private object CookieAttributes {
   def apply(attribs: String): CookieAttributes =
-    attribs.split(";").map(_.split("=", 2)).foldRight(CookieAttributes())(append)
+    attribs.split(";").map(_.split("=", 2).map(_.trim.toLowerCase)).foldRight(CookieAttributes())(append)
 
   private def append(attrib: Array[String], attribs: CookieAttributes): CookieAttributes =
     attrib match {
-      case Array(name, value) if name.trim.equalsIgnoreCase("Path")     => attribs.copy(path = Some(value))
-      case Array(name, value) if name.trim.equalsIgnoreCase("Domain")   => attribs.copy(domain = Some(value))
-      case Array(name, value) if name.trim.equalsIgnoreCase("Max-Age")  => attribs.copy(maxAge = toMaxAge(value))
-      case Array(name, value) if name.trim.equalsIgnoreCase("Expires")  => attribs.copy(expires = toExpires(value))
-      case Array(name)        if name.trim.equalsIgnoreCase("Secure")   => attribs.copy(secure = true)
-      case Array(name)        if name.trim.equalsIgnoreCase("HttpOnly") => attribs.copy(httpOnly = true)
+      case Array(name, value) if name == "path"     => attribs.copy(path = Some(value))
+      case Array(name, value) if name == "domain"   => attribs.copy(domain = Some(value))
+      case Array(name, value) if name == "max-age"  => attribs.copy(maxAge = toMaxAge(value))
+      case Array(name, value) if name == "expires"  => attribs.copy(expires = toExpires(value))
+      case Array(name)        if name == "secure"   => attribs.copy(secure = true)
+      case Array(name)        if name == "httponly" => attribs.copy(httpOnly = true)
       case _ => attribs
     }
 

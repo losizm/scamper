@@ -59,7 +59,7 @@ object MediaType {
 
   /** Creates MediaType using supplied attributes. */
   def apply(mainType: String, subtype: String, params: Map[String, String]): MediaType =
-    MediaTypeImpl(MainType(mainType), Subtype(subtype), Params(params))
+    new MediaTypeImpl(MainType(mainType), Subtype(subtype), Params(params))
 
   /** Creates MediaType using supplied attributes. */
   def apply(mainType: String, subtype: String, params: (String, String)*): MediaType =
@@ -68,12 +68,12 @@ object MediaType {
   /** Parses formatted media type. */
   def apply(mediaType: String): MediaType =
     mediaType match {
-      case withoutParams(main, sub) => MediaType(main, sub)
-      case withParams(main, sub, params) => MediaType(main, sub, parseParams(params))
+      case withoutParams(mainType, subtype) => MediaType(mainType, subtype)
+      case withParams(mainType, subtype, params) => MediaType(mainType, subtype, parseParams(params))
       case _ => throw new IllegalArgumentException(s"Malformed media type: $mediaType")
     }
 
-  /** Destructures media type to main type, subtype, and parameters. */
+  /** Destructures MediaType to main type, subtype, and parameters. */
   def unapply(mediaType: MediaType): Option[(String, String, Map[String, String])] =
     Some((mediaType.mainType, mediaType.subtype, mediaType.params))
 
@@ -83,7 +83,6 @@ object MediaType {
       case None =>
         if (s.matches("(\\s*;)?\\s*")) params
         else throw new IllegalArgumentException(s"Malformed media type parameters: $params")
-
       case Some(m) =>
         parseParams(m.after.toString, params + (m.group(1) -> m.group(2)))
     }
@@ -92,5 +91,5 @@ object MediaType {
     withUnquotedValue.findPrefixMatchOf(s).orElse(withQuotedValue.findPrefixMatchOf(s))
 }
 
-private case class MediaTypeImpl(mainType: String, subtype: String, params: Map[String, String]) extends MediaType
+private class MediaTypeImpl(val mainType: String, val subtype: String, val params: Map[String, String]) extends MediaType
 

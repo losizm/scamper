@@ -3,19 +3,19 @@ package scamper
 import Grammar._
 
 private object MediaTypeHelper {
-  def MainType(value: String): String =
-    Token(value) getOrElse {
-      throw new IllegalArgumentException(s"Invalid main type: $value")
+  def MainType(mainType: String): String =
+    Token(mainType) getOrElse {
+      throw new IllegalArgumentException(s"Invalid main type: $mainType")
     }
 
-  def Subtype(value: String): String =
-    Token(value) getOrElse {
-      throw new IllegalArgumentException(s"Invalid subtype: $value")
+  def Subtype(subtype: String): String =
+    Token(subtype) getOrElse {
+      throw new IllegalArgumentException(s"Invalid subtype: $subtype")
     }
 
-  def ParamName(value: String): String =
-    Token(value) getOrElse {
-      throw new IllegalArgumentException(s"Invalid parameter name: $value")
+  def ParamName(name: String): String =
+    Token(name) getOrElse {
+      throw new IllegalArgumentException(s"Invalid parameter name: $name")
     }
 
   def ParamValue(value: String): String =
