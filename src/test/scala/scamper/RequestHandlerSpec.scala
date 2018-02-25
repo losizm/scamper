@@ -14,7 +14,7 @@ class RequestHandlerSpec extends FlatSpec {
         val access = req.getHeaderValue("access").get
         val body = Entity(s"Hello, $user. You have $access access.", "utf8")
 
-        Ok.withBody(body).withContentLength(body.length.get)
+        Ok.withHeader("Content-Length" -> body.length.get).withBody(body)
       }
     )
 

@@ -103,7 +103,8 @@ private class TextBodyParser(maxLength: Int) extends BodyParser[String] {
   private val bodyParser = new ByteArrayBodyParser(maxLength)
 
   def apply(message: HttpMessage): String =
-    message.contentType
+    message.getHeaderValue("Content-Type")
+      .map(MediaType.apply)
       .flatMap(_.params.get("charset"))
       .orElse(Some("UTF-8"))
       .map(new String(bodyParser(message), _)).get
@@ -113,7 +114,7 @@ private class FormBodyParser(maxLength: Int) extends BodyParser[Map[String, Seq[
   private val bodyParser = new TextBodyParser(maxLength)
 
   def apply(message: HttpMessage): Map[String, Seq[String]] =
-    QueryParser.parse(bodyParser(message))
+    Query.parse(bodyParser(message))
 }
 
 private class FileBodyParser(dest: File, val maxLength: Long, val maxBufferSize: Int) extends BodyParser[File] with BodyParsing {

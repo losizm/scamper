@@ -58,38 +58,6 @@ trait HttpMessage {
     Try(bodyParser(this))
 
   /**
-   * Gets content type.
-   *
-   * Value retrieved from Content-Type header.
-   */
-  def contentType: Option[MediaType] =
-    getHeaderValue("Content-Type").map(MediaType.apply)
-
-  /**
-   * Gets content length.
-   *
-   * Value retrieved from Content-Length header.
-   */
-  def contentLength: Option[Long] =
-    getHeader("Content-Length").map(_.longValue)
-
-  /**
-   * Gets content encoding.
-   *
-   * Value retrieved from Content-Encoding header.
-   */
-  def contentEncoding: Option[String] =
-    getHeaderValue("Content-Encoding")
-
-  /**
-   * Gets transfer encoding.
-   *
-   * Value retrieved from Transfer-Encoding header.
-   */
-  def transferEncoding: Option[String] =
-    getHeaderValue("Transfer-Encoding")
-
-  /**
    * Creates new message replacing start line.
    *
    * @return new message
@@ -110,14 +78,14 @@ trait HttpMessage {
     }
 
   /**
-   * Creates new message removing all headers having supplied key.
+   * Creates new message replacing headers.
+   *
+   * All previous headers are removed, and new message contains only supplied
+   * headers.
    *
    * @return new message
    */
-  def removeHeader(key: String): MessageType =
-    withHeaders {
-      headers.filterNot(_.key.equalsIgnoreCase(key)) : _*
-    }
+  def withHeaders(headers: Header*): MessageType
 
   /**
    * Creates new message including additional headers.
@@ -127,14 +95,14 @@ trait HttpMessage {
   def addHeaders(headers: Header*): MessageType
 
   /**
-   * Creates new message replacing headers.
-   *
-   * All previous headers are removed, and new message contains only supplied
-   * headers.
+   * Creates new message removing all headers having supplied keys.
    *
    * @return new message
    */
-  def withHeaders(headers: Header*): MessageType
+  def removeHeaders(keys: String*): MessageType =
+    withHeaders {
+      headers.filterNot(header => keys.exists(header.key.equalsIgnoreCase)) : _*
+    }
 
   /**
    * Creates new message replacing cookies.
@@ -152,37 +120,5 @@ trait HttpMessage {
    * @return new message
    */
   def withBody(body: Entity): MessageType
-
-  /**
-   * Creates new message replacing content type.
-   *
-   * @return new message
-   */
-  def withContentType(contentType: MediaType): MessageType =
-    withHeader(Header("Content-Type", contentType.toString))
-
-  /**
-   * Creates new message replacing content length.
-   *
-   * @return new message
-   */
-  def withContentLength(length: Long): MessageType =
-    withHeader(Header("Content-Length", length))
-
-  /**
-   * Creates new message replacing content encoding.
-   *
-   * @return new message
-   */
-  def withContentEncoding(encoding: String): MessageType =
-    withHeader(Header("Content-Encoding", encoding))
-
-  /**
-   * Creates new message replacing transfer encoding.
-   *
-   * @return new message
-   */
-  def withTransferEncoding(encoding: String): MessageType =
-    withHeader(Header("Transfer-Encoding", encoding))
 }
 

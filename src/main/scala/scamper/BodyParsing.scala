@@ -25,7 +25,7 @@ trait BodyParsing {
         if (isChunked(message)) dechunkInputStream(in)
         else new BoundInputStream(in, getContentLength(message))
 
-      message.contentEncoding.getOrElse("identity") match {
+      message.getHeaderValue("Content-Encoding").map(_.toLowerCase).getOrElse("identity") match {
         case "gzip" | "x-gzip" => f(new GZIPInputStream(dechunked))
         case "deflate"         => f(new InflaterInputStream(dechunked))
         case "identity"        => f(dechunked)
@@ -37,9 +37,10 @@ trait BodyParsing {
     new SequenceInputStream(new ChunkEnumeration(in, maxBufferSize, maxLength))
 
   private def isChunked(message: HttpMessage): Boolean =
-    message.transferEncoding.contains("chunked") && !message.getHeaderValue("X-Scamper-Transfer-Decoding").contains("chunked")
+    message.getHeaderValue("Transfer-Encoding").contains("chunked") &&
+      !message.getHeaderValue("X-Scamper-Transfer-Decoding").contains("chunked")
 
   private def getContentLength(message: HttpMessage): Long =
-    message.contentLength.getOrElse(throw HeaderNotFound("Content-Length"))
+    message.getHeaderValue("Content-Length").map(_.toLong).getOrElse(throw HeaderNotFound("Content-Length"))
 }
 

@@ -13,9 +13,9 @@ private object MediaTypeHelper {
       throw new IllegalArgumentException(s"Invalid subtype: $value")
     }
 
-  def ParamAttribute(value: String): String =
+  def ParamName(value: String): String =
     Token.unapply(value).getOrElse {
-      throw new IllegalArgumentException(s"Invalid parameter attribute: $value")
+      throw new IllegalArgumentException(s"Invalid parameter name: $value")
     }
 
   def ParamValue(value: String): String =
@@ -24,6 +24,6 @@ private object MediaTypeHelper {
     }
 
   def Params(params: Map[String, String]): Map[String, String] =
-    params.map { case (name, value) => ParamAttribute(name) -> ParamValue(value) }
+    params.map { case (name, value) => ParamName(name) -> ParamValue(value) }
 }
 

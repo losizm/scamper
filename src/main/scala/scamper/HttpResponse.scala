@@ -21,14 +21,6 @@ trait HttpResponse extends HttpMessage {
     getHeaderValues("Set-Cookie").map(SetCookie.apply)
 
   /**
-   * Gets location.
-   *
-   * Value retrieved from Location header.
-   */
-  lazy val location: Option[String] =
-    getHeaderValue("Location")
-
-  /**
    * Creates new response replacing status.
    *
    * @return new response
@@ -41,14 +33,6 @@ trait HttpResponse extends HttpMessage {
    * @return new response
    */
   def withVersion(version: Version): MessageType
-
-  /**
-   * Creates new response replacing location.
-   *
-   * @return new response
-   */
-  def withLocation(location: String): MessageType =
-    withHeader(Header("Location", location))
 }
 
 /** HttpResponse factory */

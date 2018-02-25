@@ -1,8 +1,8 @@
 package scamper
 
-private object QueryParser {
-  import bantam.nx.lang.StringType
+import bantam.nx.lang.StringType
 
+private object Query {
   def parse(query: String): Map[String, Seq[String]] =
     query.split("&").map(_.split("=")) collect {
       case Array(name, value) if !name.isEmpty => name.toURLDecoded -> value.toURLDecoded
@@ -13,7 +13,7 @@ private object QueryParser {
 
   def format(params: Map[String, Seq[String]]): String =
     params map {
-      case (name, values) => format(values.map(name -> _) : _*)
+      case (name, values) => format(values.map(value => name -> value) : _*)
     } mkString "&"
 
   def format(params: (String, String)*): String =
@@ -21,5 +21,4 @@ private object QueryParser {
       case (name, value) => s"${name.toURLEncoded}=${value.toURLEncoded}"
     } mkString "&"
 }
-
 

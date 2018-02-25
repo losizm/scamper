@@ -27,35 +27,6 @@ trait HttpRequest extends HttpMessage {
       .getOrElse(Nil)
 
   /**
-   * Gets requested host.
-   *
-   * Value retrieved from Host header.
-   */
-  lazy val host: Option[String] =
-    getHeaderValue("Host")
-
-  /**
-   * Get accepted media types.
-   *
-   * Value retrieved from Accept header.
-   */
-  lazy val accept: Seq[MediaType] =
-    getHeaderValue("Accept")
-      .map(_.split("\\s*,\\s*")
-      .map(MediaType.apply).toSeq)
-      .getOrElse(Nil)
-
-  /**
-   * Get accepted encodings.
-   *
-   * Value retrieved from Accept-Encoding header.
-   */
-  lazy val acceptEncoding: Seq[String] =
-    getHeaderValue("Accept-Encoding")
-      .map(_.split("\\s*,\\s*").toSeq)
-      .getOrElse(Nil)
-
-  /**
    * Creates new request replacing method.
    *
    * @return new request
@@ -75,30 +46,6 @@ trait HttpRequest extends HttpMessage {
    * @return new request
    */
   def withVersion(version: Version): MessageType
-
-  /**
-   * Creates new request replacing host.
-   *
-   * @return new request
-   */
-  def withHost(host: String): MessageType =
-    withHeader(Header("Host", host))
-
-  /**
-   * Creates new request replacing accepted media types.
-   *
-   * @return new request
-   */
-  def withAccept(types: MediaType*): MessageType =
-    withHeader(Header("Accept", types.mkString(", ")))
-
-  /**
-   * Creates new request replacing accepted encodings.
-   *
-   * @return new request
-   */
-  def withAcceptEncoding(encodings: String*): MessageType =
-    withHeader(Header("Accept-Encoding", encodings.mkString(", ")))
 }
 
 /** HttpRequest factory */

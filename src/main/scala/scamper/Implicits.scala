@@ -3,6 +3,7 @@ package scamper
 import bantam.nx.io._
 import bantam.nx.lang._
 import java.io.File
+import java.time.OffsetDateTime
 import java.net.{ HttpURLConnection, URI, URL }
 import scala.annotation.tailrec
 import scala.util.Try
@@ -14,6 +15,12 @@ object Implicits {
 
   /** Converts tuple to [[Header]] where tuple is key-value pair. */
   implicit val tupleToHeader = (header: (String, String)) => Header(header._1, header._2)
+
+  /** Converts tuple to [[Header]] where tuple is key-value pair. */
+  implicit val tupleToHeaderWithLongValue = (header: (String, Long)) => Header(header._1, header._2)
+
+  /** Converts tuple to [[Header]] where tuple is key-value pair. */
+  implicit val tupleToHeaderWithDateValue = (header: (String, OffsetDateTime)) => Header(header._1, header._2)
 
   /** Converts string to [[MediaType]]. */
   implicit val stringToMediaType = (mediaType: String) => MediaType(mediaType)
@@ -74,7 +81,7 @@ object Implicits {
       val authority = uri.getAuthority
 
       if (authority != null) authority
-      else request.host.getOrElse(throw HeaderNotFound("Host"))
+      else request.getHeaderValue("Host").getOrElse(throw HeaderNotFound("Host"))
     }
   }
 
@@ -84,7 +91,7 @@ object Implicits {
   implicit class URIType(uri: URI) {
     /** Gets query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
-      QueryParser.parse(uri.getQuery)
+      Query.parse(uri.getQuery)
 
     /**
      * Gets value for named query parameter.
@@ -113,11 +120,11 @@ object Implicits {
 
     /** Creates new URI replacing query parameters. */
     def withQueryParams(params: Map[String, Seq[String]]): URI =
-      withQuery(QueryParser.format(params))
+      withQuery(Query.format(params))
 
     /** Creates new URI replacing query parameters. */
     def withQueryParams(params: (String, String)*): URI =
-      withQuery(QueryParser.format(params : _*))
+      withQuery(Query.format(params : _*))
 
     private def createURI(path: String, query: String): URI =
       buildURI(uri.getScheme, uri.getRawAuthority, path, query, uri.getRawFragment).toURI
@@ -130,7 +137,7 @@ object Implicits {
   implicit class URLType(url: URL) {
     /** Gets the query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
-      QueryParser.parse(url.getQuery)
+      Query.parse(url.getQuery)
 
     /**
      * Gets value for named query parameter.
@@ -155,11 +162,11 @@ object Implicits {
 
     /** Creates new URL replacing query parameters. */
     def withQueryParams(params: Map[String, Seq[String]]): URL =
-      createURL(url.getPath, QueryParser.format(params))
+      createURL(url.getPath, Query.format(params))
 
     /** Creates new URL replacing query parameters. */
     def withQueryParams(params: (String, String)*): URL =
-      createURL(url.getPath, QueryParser.format(params : _*))
+      createURL(url.getPath, Query.format(params : _*))
 
     /**
      * Opens HTTP connection and passes it to supplied handler.
