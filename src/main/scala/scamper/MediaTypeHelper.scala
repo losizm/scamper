@@ -4,22 +4,22 @@ import Grammar._
 
 private object MediaTypeHelper {
   def MainType(value: String): String =
-    Token.unapply(value).getOrElse {
+    Token(value) getOrElse {
       throw new IllegalArgumentException(s"Invalid main type: $value")
     }
 
   def Subtype(value: String): String =
-    Token.unapply(value).getOrElse {
+    Token(value) getOrElse {
       throw new IllegalArgumentException(s"Invalid subtype: $value")
     }
 
   def ParamName(value: String): String =
-    Token.unapply(value).getOrElse {
+    Token(value) getOrElse {
       throw new IllegalArgumentException(s"Invalid parameter name: $value")
     }
 
   def ParamValue(value: String): String =
-    Token.unapply(value).orElse(QuotableString.unapply(value)).getOrElse {
+    Token(value) orElse QuotableString(value) getOrElse {
       throw new IllegalArgumentException(s"Invalid parameter value: $value")
     }
 

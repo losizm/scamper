@@ -4,12 +4,12 @@ import Grammar._
 
 private object CookieHelper {
   def Name(name: String): String =
-    Token.unapply(name).getOrElse {
+    Token(name) getOrElse {
       throw new IllegalArgumentException(s"Invalid cookie name: $name")
     }
 
   def Value(value: String): String =
-    CookieValue.unapply(value).orElse(QuotedCookieValue.unapply(value)).getOrElse {
+    CookieValue(value) orElse QuotedCookieValue(value) getOrElse {
       throw new IllegalArgumentException(s"Invalid cookie value: $value")
     }
 }

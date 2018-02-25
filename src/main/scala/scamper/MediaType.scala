@@ -45,7 +45,7 @@ trait MediaType {
   override lazy val toString: String = mainType + '/' + subtype + formatParams
 
   private def formatParams: String = {
-    def quote(value: String) = Token.unapply(value).getOrElse('"' + value + '"')
+    def quote(value: String) = Token(value).getOrElse('"' + value + '"')
     params.map { case (name, value) => s"; $name=${quote(value)}" }.mkString
   }
 }
