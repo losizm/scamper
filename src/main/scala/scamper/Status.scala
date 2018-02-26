@@ -1,7 +1,17 @@
 package scamper
 
-/** HTTP response status */
-case class Status(code: Int, reason: String) {
+/**
+ * HTTP response status
+ *
+ * @see [[Statuses]]
+ */
+trait Status {
+  /** Status code */
+  def code: Int
+
+  /** Reason phrase */
+  def reason: String
+
   /** Tests for informational status code. */
   def isInformational: Boolean =
     code >= 100 && code <= 199
@@ -27,7 +37,11 @@ case class Status(code: Int, reason: String) {
     HttpResponse(this, Nil, body)
 }
 
-/** Status factory */
+/**
+ * Status factory
+ *
+ * @see [[Statuses]]
+ */
 object Status {
   private val statuses = new scala.collection.mutable.TreeMap[Int, Status]
 
@@ -39,6 +53,14 @@ object Status {
    */
   def apply(code: Int): Status =
     statuses(code)
+
+  /** Creates Status from supplied code and reason. */
+  def apply(code: Int, reason: String): Status =
+    new StatusImpl(code, reason)
+
+  /** Destructures Status. */
+  def unapply(status: Status): Option[(Int, String)] =
+    Some((status.code, status.reason))
 
   private def add(code: Int, reason: String): Unit =
     statuses += code -> Status(code, reason)
@@ -83,5 +105,13 @@ object Status {
   add(503, "Service Unavailable")
   add(504, "Gateway Timeout")
   add(505, "HTTP Version Not Supported")
+}
+
+private class StatusImpl(val code: Int, val reason: String) extends Status {
+  override def equals(that: Any): Boolean =
+    that match {
+      case Status(code, reason) => this.code == code && this.reason == reason
+      case _ => false
+    }
 }
 

@@ -47,7 +47,7 @@ object HttpResponse {
 
   /** Creates HttpResponse using supplied attributes. */
   def apply(status: Status, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpResponse =
-    HttpResponseImpl(StatusLine(version, status), headers, body)
+    HttpResponseImpl(StatusLine(status, version), headers, body)
 }
 
 private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity) extends HttpResponse {
@@ -67,9 +67,9 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
     copy(startLine = line)
 
   def withStatus(newStatus: Status): HttpResponse =
-    copy(startLine = startLine.copy(status = newStatus))
+    copy(startLine = StatusLine(newStatus, version))
 
   def withVersion(newVersion: Version): HttpResponse =
-    copy(startLine = startLine.copy(version = newVersion))
+    copy(startLine = StatusLine(status, newVersion))
 }
 

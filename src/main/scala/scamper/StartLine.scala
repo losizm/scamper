@@ -3,13 +3,22 @@ package scamper
 import scala.util.Try
 
 /** Start line of HTTP message */
-sealed trait StartLine {
+trait StartLine {
   /** HTTP version */
   def version: Version
 }
 
 /** HTTP request line */
-case class RequestLine(method: String, uri: String, version: Version) extends StartLine {
+trait RequestLine extends StartLine {
+  /** Request method */
+  def method: String
+
+  /** Request URI */
+  def uri: String
+
+  /** HTTP version */
+  def version: Version
+
   /** Returns formatted request line. */
   override lazy val toString: String = s"$method $uri HTTP/$version"
 }
@@ -22,15 +31,31 @@ object RequestLine {
   def apply(line: String): RequestLine =
     Try {
       line match {
-        case syntax(method, uri, version) => RequestLine(method, uri, Version(version))
+        case syntax(method, uri, version) => new RequestLineImpl(method, uri, Version(version))
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Malformed request line: $line")
     }
+
+  /** Creates RequestLine from supplied attributes. */
+  def apply(method: String, uri: String, version: Version = Version(1, 1)): RequestLine =
+    new RequestLineImpl(method, uri, version)
+
+  /** Destructures RequestLine. */
+  def unapply(line: RequestLine): Option[(String, String, Version)] =
+    Some((line.method, line.uri, line.version))
 }
 
+private class RequestLineImpl(val method: String, val uri: String, val version: Version) extends RequestLine
+
 /** HTTP status line */
-case class StatusLine(version: Version, status: Status) extends StartLine {
+trait StatusLine extends StartLine {
+  /** Response status */
+  def status: Status
+
+  /** Response version */
+  def version: Version
+
   /** Returns formatted status line. */
   override lazy val toString: String = s"HTTP/$version ${status.code} ${status.reason}"
 }
@@ -43,10 +68,19 @@ object StatusLine {
   def apply(line: String): StatusLine =
     Try {
       line match {
-        case syntax(version, code, reason) => StatusLine(Version(version), Status(code.toInt, reason))
+        case syntax(version, code, reason) => new StatusLineImpl(Status(code.toInt, reason), Version(version))
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Malformed status line: $line")
     }
+
+  /** Creates StatusLine from supplied attributes. */
+  def apply(status: Status, version: Version = Version(1, 1)): StatusLine =
+    new StatusLineImpl(status, version)
+
+  /** Destructures StatusLine. */
+  def unapply(line: StatusLine): Option[(Status, Version)] =
+    Some((line.status, line.version))
 }
 
+private class StatusLineImpl(val status: Status, val version: Version) extends StatusLine

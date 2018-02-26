@@ -73,7 +73,7 @@ object MediaType {
       case _ => throw new IllegalArgumentException(s"Malformed media type: $mediaType")
     }
 
-  /** Destructures MediaType to main type, subtype, and parameters. */
+  /** Destructures MediaType. */
   def unapply(mediaType: MediaType): Option[(String, String, Map[String, String])] =
     Some((mediaType.mainType, mediaType.subtype, mediaType.params))
 

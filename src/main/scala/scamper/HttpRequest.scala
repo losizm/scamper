@@ -80,12 +80,12 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
     copy(startLine = newStartLine)
 
   def withMethod(newMethod: String): HttpRequest =
-    copy(startLine = startLine.copy(method = newMethod))
+    copy(startLine = RequestLine(newMethod, uri, version))
 
   def withURI(newURI: String): HttpRequest =
-    copy(startLine = startLine.copy(uri = newURI))
+    copy(startLine = RequestLine(method, newURI, version))
 
   def withVersion(newVersion: Version): HttpRequest =
-    copy(startLine = startLine.copy(version = newVersion))
+    copy(startLine = RequestLine(method, uri, newVersion))
 }
 

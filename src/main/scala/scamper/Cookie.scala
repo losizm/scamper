@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => dateFormatter 
 import CookieHelper._
 
 /** HTTP Cookie */
-sealed trait Cookie {
+trait Cookie {
   /** Cookie name */
   def name: String
 
@@ -41,7 +41,7 @@ object PlainCookie {
       case _ => throw new IllegalArgumentException(s"Malformed cookie: $cookie")
     }
 
-  /** Destructures PlainCookie to name-value pair. */
+  /** Destructures PlainCookie. */
   def unapply(cookie: PlainCookie): Option[(String, String)] =
     Some((cookie.name, cookie.value))
 }
@@ -112,7 +112,7 @@ object SetCookie {
         }
     }
 
-  /** Destructures SetCookie to name-value pair and attributes. */
+  /** Destructures SetCookie. */
   def unapply(cookie: SetCookie): Option[(String, String, Option[String], Option[String], Option[OffsetDateTime], Option[Long], Boolean, Boolean)] =
     Some((cookie.name, cookie.value, cookie.domain, cookie.path, cookie.expires, cookie.maxAge, cookie.secure, cookie.httpOnly))
 }
