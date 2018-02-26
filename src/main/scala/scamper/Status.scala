@@ -108,6 +108,8 @@ object Status {
 }
 
 private class StatusImpl(val code: Int, val reason: String) extends Status {
+  override lazy val toString: String = s"$code $reason"
+
   override def equals(that: Any): Boolean =
     that match {
       case Status(code, reason) => this.code == code && this.reason == reason

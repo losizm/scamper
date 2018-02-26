@@ -20,6 +20,9 @@ object Implicits {
   implicit val tupleToHeaderWithLongValue = (header: (String, Long)) => Header(header._1, header._2)
 
   /** Converts tuple to [[Header]] where tuple is key-value pair. */
+  implicit val tupleToHeaderWithIntValue = (header: (String, Int)) => Header(header._1, header._2)
+
+  /** Converts tuple to [[Header]] where tuple is key-value pair. */
   implicit val tupleToHeaderWithDateValue = (header: (String, OffsetDateTime)) => Header(header._1, header._2)
 
   /** Converts byte array to [[Entity]]. */
