@@ -1,7 +1,7 @@
 package scamper
 
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => dateFormatter }
+import java.time.{ OffsetDateTime, ZoneOffset }
+import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => DateFormatter }
 
 import HeaderHelper._
 
@@ -15,7 +15,7 @@ trait Header {
 
   /** Gets header value as OffsetDateTime. */
   def dateValue: OffsetDateTime =
-    OffsetDateTime.parse(value, dateFormatter)
+    OffsetDateTime.parse(value, DateFormatter)
 
   /** Gets header value as Long. */
   def longValue: Long = value.toLong
@@ -26,6 +26,8 @@ trait Header {
 
 /** Header factory */
 object Header {
+  private val z = ZoneOffset.of("Z")
+
   /** Creates Header using supplied key and value. */
   def apply(key: String, value: String): Header =
     new HeaderImpl(Key(key), Value(value))
@@ -36,7 +38,7 @@ object Header {
 
   /** Creates Header using supplied key and value. */
   def apply(key: String, value: OffsetDateTime): Header =
-    apply(key, dateFormatter.format(value))
+    apply(key, DateFormatter.format(value.atZoneSameInstant(z)))
 
   /** Parses formatted header. */
   def apply(header: String): Header =
