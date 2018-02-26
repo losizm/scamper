@@ -15,14 +15,14 @@ sealed trait Cookie {
 }
 
 /** HTTP Plain Cookie */
-class PlainCookie private (val name: String, val value: String) extends Cookie {
+trait PlainCookie extends Cookie {
   /** Converts to SetCookie using name-value pair. */
   def toSetCookie: SetCookie = SetCookie(name, value)
 
   /** Converts to SetCookie using name-value pair and supplied attributes. */
-  def toSetCookie(path: Option[String] = None, domain: Option[String] = None, maxAge: Option[Long] = None,
-      expires: Option[OffsetDateTime] = None, secure: Boolean = false, httpOnly: Boolean = false): SetCookie =
-    SetCookie(name, value, path, domain, maxAge, expires, secure, httpOnly)
+  def toSetCookie(domain: Option[String] = None, path: Option[String] = None, expires: Option[OffsetDateTime] = None,
+      maxAge: Option[Long] = None, secure: Boolean = false, httpOnly: Boolean = false): SetCookie =
+    SetCookie(name, value, domain, path, expires, maxAge, secure, httpOnly)
 
   /** Returns formatted cookie. */
   override lazy val toString: String = s"$name=$value"
@@ -30,9 +30,9 @@ class PlainCookie private (val name: String, val value: String) extends Cookie {
 
 /** PlainCookie factory */
 object PlainCookie {
-  /** Creates PlainCookie using supplied name and value. */
+  /** Creates PlainCookie from supplied name-value pair. */
   def apply(name: String, value: String): PlainCookie =
-    new PlainCookie(Name(name), Value(value))
+    new PlainCookieImpl(Name(name), Value(value))
 
   /** Parses formatted cookie. */
   def apply(cookie: String): PlainCookie =
@@ -40,11 +40,37 @@ object PlainCookie {
       case Array(name, value) => apply(name.trim, value.trim)
       case _ => throw new IllegalArgumentException(s"Malformed cookie: $cookie")
     }
+
+  /** Destructures PlainCookie to name-value pair. */
+  def unapply(cookie: PlainCookie): Option[(String, String)] =
+    Some((cookie.name, cookie.value))
 }
 
+private class PlainCookieImpl(val name: String, val value: String) extends PlainCookie
+
 /** HTTP Set-Cookie */
-class SetCookie private (val name: String, val value: String, val path: Option[String], val domain: Option[String],
-    val maxAge: Option[Long], val expires: Option[OffsetDateTime], val secure: Boolean, val httpOnly: Boolean) extends Cookie {
+trait SetCookie extends Cookie {
+  /** Gets cookie domain. */
+  def domain: Option[String]
+
+  /** Gets cookie path. */
+  def path: Option[String]
+
+  /** Gets maximum liftetime of cookie represented as time of expiry. */
+  def expires: Option[OffsetDateTime]
+
+  /**
+   * Gets maximum liftetime of cookie represented as number of seconds until
+   * expiry.
+   */
+  def maxAge: Option[Long]
+
+  /** Tests whether cookie should be limited to secure channels. */
+  def secure: Boolean
+
+  /** Tests whether cookie should be limited to HTTP requests. */
+  def httpOnly: Boolean
+
   /** Converts to PlainCookie using name-value pair. */
   def toPlainCookie: PlainCookie = PlainCookie(name, value)
 
@@ -54,10 +80,10 @@ class SetCookie private (val name: String, val value: String, val path: Option[S
 
     cookie.append(name).append('=').append(value)
 
-    path.foreach(cookie.append("; Path=").append(_))
     domain.foreach(cookie.append("; Domain=").append(_))
-    maxAge.foreach(cookie.append("; Max-Age=").append(_))
+    path.foreach(cookie.append("; Path=").append(_))
     expires.foreach(date => cookie.append("; Expires=").append(dateFormatter.format(date)))
+    maxAge.foreach(cookie.append("; Max-Age=").append(_))
 
     if (secure) cookie.append("; Secure")
     if (httpOnly) cookie.append("; HttpOnly")
@@ -68,19 +94,35 @@ class SetCookie private (val name: String, val value: String, val path: Option[S
 
 /** SetCookie factory */
 object SetCookie {
-  /** Creates SetCookie using supplied name, value, and attributes. */
-  def apply(name: String, value: String, path: Option[String] = None, domain: Option[String] = None, maxAge: Option[Long] = None,
-      expires: Option[OffsetDateTime] = None, secure: Boolean = false, httpOnly: Boolean = false): SetCookie =
-    new SetCookie(Name(name), Value(value), path, domain, maxAge, expires, secure, httpOnly)
+  /** Creates SetCookie from supplied name, value, and attributes. */
+  def apply(name: String, value: String, domain: Option[String] = None, path: Option[String] = None, expires: Option[OffsetDateTime] = None,
+      maxAge: Option[Long] = None, secure: Boolean = false, httpOnly: Boolean = false): SetCookie =
+    new SetCookieImpl(Name(name), Value(value), CookieAttributes(domain, path, expires, maxAge, secure, httpOnly))
 
   /** Parses formatted cookie. */
   def apply(cookie: String): SetCookie =
     cookie.split(";", 2) match {
-      case Array(pair, attribs) => apply(PlainCookie(pair), CookieAttributes(attribs))
-      case Array(pair)          => apply(PlainCookie(pair), CookieAttributes())
+      case Array(pair, attribs) =>
+        pair.split("=") match {
+          case Array(name, value) => new SetCookieImpl(Name(name), Value(value), CookieAttributes(attribs))
+        }
+      case Array(pair) =>
+        pair.split("=") match {
+          case Array(name, value) => new SetCookieImpl(Name(name), Value(value), CookieAttributes())
+        }
     }
 
-  private def apply(cookie: PlainCookie, attribs: CookieAttributes): SetCookie =
-    apply(cookie.name, cookie.value, attribs.path, attribs.domain, attribs.maxAge, attribs.expires, attribs.secure, attribs.httpOnly)
+  /** Destructures SetCookie to name-value pair and attributes. */
+  def unapply(cookie: SetCookie): Option[(String, String, Option[String], Option[String], Option[OffsetDateTime], Option[Long], Boolean, Boolean)] =
+    Some((cookie.name, cookie.value, cookie.domain, cookie.path, cookie.expires, cookie.maxAge, cookie.secure, cookie.httpOnly))
+}
+
+private class SetCookieImpl(val name: String, val value: String, val attribs: CookieAttributes) extends SetCookie {
+  def domain: Option[String] = attribs.domain
+  def path: Option[String] = attribs.path
+  def expires: Option[OffsetDateTime] = attribs.expires
+  def maxAge: Option[Long] = attribs.maxAge
+  def secure: Boolean = attribs.secure
+  def httpOnly: Boolean = attribs.httpOnly
 }
 

@@ -10,7 +10,7 @@ class HeaderSpec extends FlatSpec {
 
     assert(header.key == "Content-Type")
     assert(header.value == "text/plain")
-    assert(header == Header(header.toString))
+    assert(header.toString == "Content-Type: text/plain")
   }
 
   it should "be created using long value" in {
@@ -19,7 +19,7 @@ class HeaderSpec extends FlatSpec {
     assert(header.key == "Content-Length")
     assert(header.value == "80")
     assert(header.longValue == 80)
-    assert(header == Header(header.toString))
+    assert(header.toString == "Content-Length: 80")
   }
 
   it should "be created using date value" in {
@@ -29,7 +29,7 @@ class HeaderSpec extends FlatSpec {
     assert(header.key == "If-Modified-Since")
     assert(header.value == dateFormatter.format(date))
     assert(header.dateValue == date)
-    assert(header == Header(header.toString))
+    assert(header.toString == "If-Modified-Since: Tue, 8 Nov 2016 09:00:00 +0400")
   }
 
   it should "be created using folded value" in {
