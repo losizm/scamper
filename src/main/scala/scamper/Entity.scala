@@ -48,7 +48,7 @@ object Entity {
     ByteArrayEntity(copy)
   }
 
-  /** Creates entity from input stream returned from supplied function. */
+  /** Creates entity with input stream returned from supplied function. */
   def apply(f: () => InputStream): Entity =
     InputStreamEntity(f)
 

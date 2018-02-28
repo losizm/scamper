@@ -39,7 +39,7 @@ object MediaRange {
     }
   }
 
-  /** Creates MediaRange from supplied attributes. */
+  /** Creates MediaRange with supplied attributes. */
   def apply(mainType: String, subtype: String, qvalue: Float = 1.0f, params: Map[String, String] = Map.empty): MediaRange =
     new MediaRangeImpl(MainType(mainType), Subtype(subtype), Qvalue(qvalue), Params(params))
 

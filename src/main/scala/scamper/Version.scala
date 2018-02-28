@@ -31,7 +31,7 @@ object Version {
       throw new IllegalArgumentException(s"Invalid version: $version")
     }
 
-  /** Creates Version from supplied major and minor numbers. */
+  /** Creates Version with supplied major and minor numbers. */
   def apply(major: Int, minor: Int = 0): Version =
     new VersionImpl(major, minor)
 

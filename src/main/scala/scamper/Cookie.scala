@@ -30,7 +30,7 @@ trait PlainCookie extends Cookie {
 
 /** PlainCookie factory */
 object PlainCookie {
-  /** Creates PlainCookie from supplied name-value pair. */
+  /** Creates PlainCookie with supplied name-value pair. */
   def apply(name: String, value: String): PlainCookie =
     new PlainCookieImpl(Name(name), Value(value))
 
@@ -94,7 +94,7 @@ trait SetCookie extends Cookie {
 
 /** SetCookie factory */
 object SetCookie {
-  /** Creates SetCookie from supplied name, value, and attributes. */
+  /** Creates SetCookie with supplied name, value, and attributes. */
   def apply(name: String, value: String, domain: Option[String] = None, path: Option[String] = None, expires: Option[OffsetDateTime] = None,
       maxAge: Option[Long] = None, secure: Boolean = false, httpOnly: Boolean = false): SetCookie =
     new SetCookieImpl(Name(name), Value(value), CookieAttributes(domain, path, expires, maxAge, secure, httpOnly))

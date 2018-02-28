@@ -22,7 +22,7 @@ class RequestHandlerChain private (handler: RequestHandler, next: RequestHandler
 object RequestHandlerChain {
   private val chain = new RequestHandlerChain((req, _) => throw new HttpException(s"Unhandled request: ${req.startLine}"), null)
 
-  /** Creates chain from supplied handlers. */
+  /** Creates chain with supplied handlers. */
   def apply(handlers: RequestHandler*): RequestHandlerChain =
     handlers.foldRight(chain) { (handler, next) => new RequestHandlerChain(handler, next) }
 }

@@ -32,7 +32,7 @@ trait Status {
   def isServerError: Boolean =
     code >= 500 && code <= 599
 
-  /** Creates HttpResponse from status and supplied body. */
+  /** Creates HttpResponse with status and supplied body. */
   def apply(body: Entity = Entity.empty): HttpResponse =
     HttpResponse(this, Nil, body)
 }
@@ -54,7 +54,7 @@ object Status {
   def apply(code: Int): Status =
     statuses(code)
 
-  /** Creates Status from supplied code and reason. */
+  /** Creates Status with supplied code and reason. */
   def apply(code: Int, reason: String): Status =
     new StatusImpl(code, reason)
 
