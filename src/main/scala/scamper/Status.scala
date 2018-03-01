@@ -99,6 +99,7 @@ object Status {
   add(415, "Unsupported Media Type")
   add(416, "Requested Range Not Satisfiable")
   add(417, "Expectation Failed")
+  add(426, "Upgrade Required")
   add(500, "Internal Server Error")
   add(501, "Not Implemented")
   add(502, "Bad Gateway")

@@ -104,6 +104,9 @@ trait Statuses {
   /** 417 Expectation Failed */
   val ExpectationFailed = Status(417)
 
+  /** 426 Upgrade Required */
+  val UpgradeRequired = Status(426)
+
   /** 500 Internal Server Error */
   val InternalServerError = Status(500)
 
