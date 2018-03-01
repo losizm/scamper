@@ -1,7 +1,6 @@
 package scamper
 
 import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => dateFormatter }
 
 import scala.util.Try
 
@@ -27,6 +26,6 @@ private object CookieAttributes {
     Try(value.trim.toLong).toOption
 
   private def toExpires(value: String): Option[OffsetDateTime] =
-    Try(OffsetDateTime.parse(value.trim, dateFormatter)).toOption
+    Try(DateValue.parse(value.trim)).toOption
 }
 

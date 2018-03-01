@@ -2,7 +2,6 @@ package scamper
 
 import bantam.nx.lang._
 import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => DateFormatter }
 import org.scalatest.FlatSpec
 
 class HeaderSpec extends FlatSpec {
@@ -25,7 +24,7 @@ class HeaderSpec extends FlatSpec {
     val header = Header("If-Modified-Since", "2016-11-08T17:00:00-04:00".toOffsetDateTime)
     assert(header.key == "If-Modified-Since")
     assert(header.value == "Tue, 8 Nov 2016 21:00:00 GMT")
-    assert(header.dateValue == OffsetDateTime.parse("Tue, 8 Nov 2016 21:00:00 GMT", DateFormatter))
+    assert(header.dateValue == DateValue.parse("Tue, 8 Nov 2016 21:00:00 GMT"))
     assert(header.toString == "If-Modified-Since: Tue, 8 Nov 2016 21:00:00 GMT")
   }
 

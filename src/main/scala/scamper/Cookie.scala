@@ -1,7 +1,6 @@
 package scamper
 
 import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => dateFormatter }
 
 import CookieHelper._
 
@@ -82,7 +81,7 @@ trait SetCookie extends Cookie {
 
     domain.foreach(cookie.append("; Domain=").append(_))
     path.foreach(cookie.append("; Path=").append(_))
-    expires.foreach(date => cookie.append("; Expires=").append(dateFormatter.format(date)))
+    expires.foreach(date => cookie.append("; Expires=").append(DateValue.format(date)))
     maxAge.foreach(cookie.append("; Max-Age=").append(_))
 
     if (secure) cookie.append("; Secure")

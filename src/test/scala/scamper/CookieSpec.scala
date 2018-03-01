@@ -1,7 +1,6 @@
 package scamper
 
 import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => expiresFormatter }
 
 import org.scalatest.FlatSpec
 
@@ -28,7 +27,7 @@ class CookieSpec extends FlatSpec {
     assert(cookie.name == "SID")
     assert(cookie.value == "31d4d96e407aad42")
     assert(cookie.path.contains("/"))
-    assert(cookie.expires.contains(OffsetDateTime.parse("Wed, 09 Jun 2021 10:18:14 GMT", expiresFormatter)))
+    assert(cookie.expires.contains(DateValue.parse("Wed, 09 Jun 2021 10:18:14 GMT")))
     assert(cookie.secure)
 
     cookie match {
