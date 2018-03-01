@@ -6,9 +6,42 @@ import scala.util.matching.Regex
 import MediaTypeHelper._
 
 /** Internet media range */
-trait MediaRange extends MediaType {
+trait MediaRange {
   /** Gets quality value of media range */
   def qvalue: Float
+
+  /** Main type of media range */
+  def mainType: String
+
+  /** Subtype of media range */
+  def subtype: String
+
+  /** Media range parameters */
+  def params: Map[String, String]
+
+  /** Tests whether main type is text. */
+  def isText: Boolean = mainType == "text"
+
+  /** Tests whether main type is audio. */
+  def isAudio: Boolean = mainType == "audio"
+
+  /** Tests whether main type is video. */
+  def isVideo: Boolean = mainType == "video"
+
+  /** Tests whether main type is image. */
+  def isImage: Boolean = mainType == "image"
+
+  /** Tests whether main type is font. */
+  def isFont: Boolean = mainType == "font"
+
+  /** Tests whether main type is application. */
+  def isApplication: Boolean = mainType == "application"
+
+  /** Tests whether main type is multipart. */
+  def isMultipart: Boolean = mainType == "multipart"
+
+  /** Tests whether main type is message. */
+  def isMessage: Boolean = mainType == "message"
 
   /** Tests whether main type is wildcard. */
   def isWildcard: Boolean = mainType == "*"

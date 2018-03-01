@@ -39,6 +39,12 @@ object Implicits {
   /** Converts file to [[Entity]]. */
   implicit val fileToEntity = (entity: File) => Entity(entity)
 
+  /** Converts string to [[MediaType]]. */
+  implicit val stringToMediaType = (value: String) => MediaType(value)
+
+  /** Converts string to [[MediaRange]]. */
+  implicit val stringToMediaRange = (value: String) => MediaRange(value)
+
   /**
    * Type class of [[HttpRequest]] that adds method for sending request and
    * receiving [[HttpResponse]].
