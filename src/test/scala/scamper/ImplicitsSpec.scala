@@ -2,7 +2,8 @@ package scamper
 
 import java.net.{ URI, URL }
 import org.scalatest.FlatSpec
-import Implicits._
+import ImplicitConversions._
+import ImplicitExtensions._
 
 class ImplicitsSpec extends FlatSpec {
   val uri = new URI("/index.html")

@@ -2,7 +2,8 @@ package scamper
 
 import java.time.OffsetDateTime
 
-package object headers {
+/** Contains type classes that add support for accessing message headers. */
+object ImplicitHeaders {
   /** Supports Accept header. */
   implicit class Accept[T <: HttpRequest](val request: T) {
     /**
@@ -361,7 +362,7 @@ package object headers {
      *
      * @throws HeaderNotFound if ETag is not present
      */
-    def eTag: String =
+    def etag: String =
       getETag.getOrElse(throw new HeaderNotFound("ETag"))
 
     /** Gets ETag header value if present. */
@@ -844,15 +845,15 @@ package object headers {
      *
      * @throws HeaderNotFound if Via is not present
      */
-    def via: OffsetDateTime =
+    def via: String =
       getVia.getOrElse(throw new HeaderNotFound("Via"))
 
     /** Gets Via header value if present. */
-    def getVia: Option[OffsetDateTime] =
-      response.getHeaderValue("Via").map(DateValue.parse)
+    def getVia: Option[String] =
+      response.getHeaderValue("Via")
 
     /** Creates new response setting Via header to supplied value. */
-    def withVia(value: OffsetDateTime): response.MessageType =
+    def withVia(value: String): response.MessageType =
       response.withHeader(Header("Via", value))
 
     /** Creates new response removing Via header. */

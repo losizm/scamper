@@ -1,7 +1,7 @@
 package scamper
 
 import org.scalatest.FlatSpec
-import Implicits._
+import ImplicitConversions._
 
 class HttpMessageSpec extends FlatSpec with Statuses {
   "HttpRequest" should "be created" in {

@@ -2,54 +2,17 @@ package scamper
 
 import bantam.nx.io._
 import bantam.nx.lang._
-import java.io.File
-import java.time.OffsetDateTime
 import java.net.{ HttpURLConnection, URI, URL }
 import scala.annotation.tailrec
 import scala.util.Try
 
-/** Provides implicit conversion functions and type classes. */
-object Implicits {
-  /** Converts string to [[Header]]. */
-  implicit val stringToHeader = (header: String) => Header(header)
-
-  /** Converts tuple to [[Header]] where tuple is key-value pair. */
-  implicit val tupleToHeader = (header: (String, String)) => Header(header._1, header._2)
-
-  /** Converts tuple to [[Header]] where tuple is key-value pair. */
-  implicit val tupleToHeaderWithLongValue = (header: (String, Long)) => Header(header._1, header._2)
-
-  /** Converts tuple to [[Header]] where tuple is key-value pair. */
-  implicit val tupleToHeaderWithIntValue = (header: (String, Int)) => Header(header._1, header._2)
-
-  /** Converts tuple to [[Header]] where tuple is key-value pair. */
-  implicit val tupleToHeaderWithDateValue = (header: (String, OffsetDateTime)) => Header(header._1, header._2)
-
-  /** Converts byte array to [[Entity]]. */
-  implicit val bytesToEntity = (entity: Array[Byte]) => Entity(entity)
-
-  /** Converts string to [[Entity]] where text is UTF-8 encoded. */
-  implicit val stringToEntity = (entity: String) => Entity(entity, "UTF-8")
-
-  /**
-   * Converts tuple to [[Entity]] where tuple is text and character encoding.
-   */
-  implicit val tupleToEntity = (entity: (String, String)) => Entity(entity._1, entity._2)
-
-  /** Converts file to [[Entity]]. */
-  implicit val fileToEntity = (entity: File) => Entity(entity)
-
-  /** Converts string to [[MediaType]]. */
-  implicit val stringToMediaType = (value: String) => MediaType(value)
-
-  /** Converts string to [[MediaRange]]. */
-  implicit val stringToMediaRange = (value: String) => MediaRange(value)
-
+/** Contains type classes as extensions to HttpRequest, URI, and URL. */
+object ImplicitExtensions {
   /**
    * Type class of [[HttpRequest]] that adds method for sending request and
    * receiving [[HttpResponse]].
    */
-  implicit class HttpRequestType(request: HttpRequest) {
+  implicit class HttpRequestExt(request: HttpRequest) {
     /**
      * Sends request and passes response to supplied handler.
      *
@@ -84,7 +47,7 @@ object Implicits {
   /**
    * Type class of {@code java.net.URI} that adds methods for building new URI.
    */
-  implicit class URIType(uri: URI) {
+  implicit class URIExt(uri: URI) {
     /** Gets query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
       Query.parse(uri.getQuery)
@@ -130,7 +93,7 @@ object Implicits {
    * Type class of {@code java.net.URL} that adds methods for building new URL
    * and sending HTTP request.
    */
-  implicit class URLType(url: URL) {
+  implicit class URLExt(url: URL) {
     /** Gets the query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
       Query.parse(url.getQuery)
