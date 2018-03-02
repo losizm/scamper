@@ -40,9 +40,9 @@ class MediaTypeSpec extends FlatSpec {
 
     contentType match {
       case MediaType(mainType, subtype, params) =>
-        assert(contentType.mainType == "text")
-        assert(contentType.subtype == "html")
-        assert(contentType.params("charset") == "iso-8859-1")
+        assert(mainType == contentType.mainType)
+        assert(subtype == contentType.subtype)
+        assert(params == contentType.params)
     }
   }
 

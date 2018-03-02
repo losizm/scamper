@@ -86,10 +86,10 @@ class MediaRangeSpec extends FlatSpec {
 
     range match {
       case MediaRange(mainType, subtype, qvalue, params) =>
-        assert(range.mainType == "text")
-        assert(range.subtype == "html")
-        assert(range.qvalue == 1.0f)
-        assert(range.params("charset") == "iso-8859-1")
+        assert(mainType == range.mainType)
+        assert(subtype == range.subtype)
+        assert(qvalue == range.qvalue)
+        assert(params == range.params)
     }
   }
 
