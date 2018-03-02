@@ -96,6 +96,33 @@ object ImplicitHeaders {
       request.removeHeaders("Accept-Language")
   }
 
+  /** Supports Accept-Ranges header. */
+  implicit class AcceptRanges[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Accept-Ranges header value.
+     *
+     * @throws HeaderNotFound if Accept-Ranges is not present
+     */
+    def acceptRanges: Seq[String] =
+      getAcceptRanges.getOrElse(throw new HeaderNotFound("Accept-Ranges"))
+
+    /** Gets Accept-Ranges header value if present. */
+    def getAcceptRanges: Option[Seq[String]] =
+      response.getHeaderValue("Accept-Ranges").map(_.split(",").map(_.trim).toSeq)
+
+    /** Creates new response setting Accept-Ranges header to supplied values. */
+    def withAcceptRanges(values: Seq[String]): response.MessageType =
+      response.withHeader(Header("Accept-Ranges", values.mkString(", ")))
+
+    /** Creates new response setting Accept-Ranges header to supplied value. */
+    def withAcceptRanges(value: String): response.MessageType =
+      response.withHeader(Header("Accept-Ranges", value))
+
+    /** Creates new response removing Accept-Ranges header. */
+    def removeAcceptRanges: response.MessageType =
+      response.removeHeaders("Accept-Ranges")
+  }
+
   /** Supports Age header. */
   implicit class Age[T <: HttpResponse](val response: T) {
     /**
@@ -117,6 +144,59 @@ object ImplicitHeaders {
     /** Creates new response removing Age header. */
     def removeAge: response.MessageType =
       response.removeHeaders("Age")
+  }
+
+  /** Supports Allow header. */
+  implicit class Allow[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Allow header value.
+     *
+     * @throws HeaderNotFound if Allow is not present
+     */
+    def allow: Seq[String] =
+      getAllow.getOrElse(throw new HeaderNotFound("Allow"))
+
+    /** Gets Allow header value if present. */
+    def getAllow: Option[Seq[String]] =
+      response.getHeaderValue("Allow").map(_.split(",").map(_.trim).toSeq)
+
+    /** Creates new response setting Allow header to supplied values. */
+    def withAllow(values: Seq[String]): response.MessageType =
+      response.withHeader(Header("Allow", values.mkString(", ")))
+
+    /** Creates new response setting Allow header to supplied value. */
+    def withAllow(value: String): response.MessageType =
+      response.withHeader(Header("Allow", value))
+
+    /** Creates new response removing Allow header. */
+    def removeAllow: response.MessageType =
+      response.removeHeaders("Allow")
+  }
+
+  /** Supports Authentication-Info header. */
+  implicit class AuthenticationInfo[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Authentication-Info header value.
+     *
+     * @throws HeaderNotFound if Authentication-Info is not present
+     */
+    def authenticationInfo: String =
+      getAuthenticationInfo.getOrElse(throw new HeaderNotFound("Authentication-Info"))
+
+    /** Gets Authentication-Info header value if present. */
+    def getAuthenticationInfo: Option[String] =
+      response.getHeaderValue("Authentication-Info")
+
+    /**
+     * Creates new response setting Authentication-Info header to supplied
+     * value.
+     */
+    def withAuthenticationInfo(value: String): response.MessageType =
+      response.withHeader(Header("Authentication-Info", value))
+
+    /** Creates new response removing Authentication-Info header. */
+    def removeAuthenticationInfo: response.MessageType =
+      response.removeHeaders("Authentication-Info")
   }
 
   /** Supports Authorization header. */
@@ -143,7 +223,7 @@ object ImplicitHeaders {
   }
 
   /** Supports Cache-Control header. */
-  implicit class CacheControl[T <: HttpRequest](val request: T) {
+  implicit class CacheControl[T <: HttpMessage](val message: T) {
     /**
      * Gets Cache-Control header value.
      *
@@ -154,17 +234,15 @@ object ImplicitHeaders {
 
     /** Gets Cache-Control header value if present. */
     def getCacheControl: Option[String] =
-      request.getHeaderValue("Cache-Control")
+      message.getHeaderValue("Cache-Control")
 
-    /**
-     * Creates new request setting Cache-Control header to supplied value.
-     */
-    def withCacheControl(values: Seq[String]): request.MessageType =
-      request.withHeader(Header("Cache-Control", values.mkString(", ")))
+    /** Creates new message setting Cache-Control header to supplied value. */
+    def withCacheControl(value: String): message.MessageType =
+      message.withHeader(Header("Cache-Control", value))
 
-    /** Creates new request removing Cache-Control header. */
-    def removeCacheControl: request.MessageType =
-      request.removeHeaders("Cache-Control")
+    /** Creates new message removing Cache-Control header. */
+    def removeCacheControl: message.MessageType =
+      message.removeHeaders("Cache-Control")
   }
 
   /** Supports Content-Disposition header. */
@@ -182,7 +260,8 @@ object ImplicitHeaders {
       response.getHeaderValue("Content-Disposition")
 
     /**
-     * Creates new response setting Content-Disposition header to supplied value.
+     * Creates new response setting Content-Disposition header to supplied
+     * value.
      */
     def withContentDisposition(value: String): response.MessageType =
       response.withHeader(Header("Content-Disposition", value))
@@ -207,10 +286,16 @@ object ImplicitHeaders {
       message.getHeaderValue("Content-Encoding").map(_.split(",").map(_.trim).toSeq)
 
     /**
-     * Creates new message setting Content-Encoding header to supplied value.
+     * Creates new message setting Content-Encoding header to supplied values.
      */
     def withContentEncoding(values: Seq[String]): message.MessageType =
       message.withHeader(Header("Content-Encoding", values.mkString(", ")))
+
+    /**
+     * Creates new message setting Content-Encoding header to supplied value.
+     */
+    def withContentEncoding(value: String): message.MessageType =
+      message.withHeader(Header("Content-Encoding", value))
 
     /** Creates new message removing Content-Encoding header. */
     def removeContentEncoding: message.MessageType =
@@ -530,7 +615,9 @@ object ImplicitHeaders {
     def getIfUnmodifiedSince: Option[OffsetDateTime] =
       request.getHeaderValue("If-Unmodified-Since").map(DateValue.parse)
 
-    /** Creates new request setting If-Unmodified-Since header to supplied value. */
+    /**
+     * Creates new request setting If-Unmodified-Since header to supplied value.
+     */
     def withIfUnmodifiedSince(value: OffsetDateTime): request.MessageType =
       request.withHeader(Header("If-Unmodified-Since", value))
 
@@ -560,6 +647,29 @@ object ImplicitHeaders {
     /** Creates new response removing Last-Modified header. */
     def removeLastModified: response.MessageType =
       response.removeHeaders("Last-Modified")
+  }
+
+  /** Supports Link header. */
+  implicit class Link[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Link header value.
+     *
+     * @throws HeaderNotFound if Link is not present
+     */
+    def link: String =
+      getLink.getOrElse(throw new HeaderNotFound("Link"))
+
+    /** Gets Link header value if present. */
+    def getLink: Option[String] =
+      response.getHeaderValue("Link")
+
+    /** Creates new response setting Link header to supplied value. */
+    def withLink(value: String): response.MessageType =
+      response.withHeader(Header("Link", value))
+
+    /** Creates new response removing Link header. */
+    def removeLink: response.MessageType =
+      response.removeHeaders("Link")
   }
 
   /** Supports Location header. */
@@ -645,13 +755,42 @@ object ImplicitHeaders {
     def getProxyAuthentication: Option[String] =
       response.getHeaderValue("Proxy-Authentication")
 
-    /** Creates new response setting Proxy-Authentication header to supplied value. */
+    /**
+     * Creates new response setting Proxy-Authentication header to supplied
+     * value.
+     */
     def withProxyAuthentication(value: String): response.MessageType =
       response.withHeader(Header("Proxy-Authentication", value))
 
     /** Creates new response removing Date header. */
     def removeProxyAuthentication: response.MessageType =
       response.removeHeaders("Proxy-Authentication")
+  }
+
+  /** Supports Proxy-Authentication-Info header. */
+  implicit class ProxyAuthenticationInfo[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Proxy-Authentication-Info header value.
+     *
+     * @throws HeaderNotFound if Proxy-Authentication-Info is not present
+     */
+    def proxyAuthenticationInfo: String =
+      getProxyAuthenticationInfo.getOrElse(throw new HeaderNotFound("Proxy-Authentication-Info"))
+
+    /** Gets Proxy-Authentication-Info header value if present. */
+    def getProxyAuthenticationInfo: Option[String] =
+      response.getHeaderValue("Proxy-Authentication-Info")
+
+    /**
+     * Creates new response setting Proxy-Authentication-Info header to supplied
+     * value.
+     */
+    def withProxyAuthenticationInfo(value: String): response.MessageType =
+      response.withHeader(Header("Proxy-Authentication-Info", value))
+
+    /** Creates new response removing Date header. */
+    def removeProxyAuthenticationInfo: response.MessageType =
+      response.removeHeaders("Proxy-Authentication-Info")
   }
 
   /** Supports Proxy-Authorization header. */
@@ -668,7 +807,9 @@ object ImplicitHeaders {
     def getProxyAuthorization: Option[String] =
       request.getHeaderValue("Proxy-Authorization")
 
-    /** Creates new request setting Proxy-Authorization header to supplied value. */
+    /**
+     * Creates new request setting Proxy-Authorization header to supplied value.
+     */
     def withProxyAuthorization(value: String): request.MessageType =
       request.withHeader(Header("Proxy-Authorization", value))
 
@@ -723,6 +864,29 @@ object ImplicitHeaders {
       request.removeHeaders("Referer")
   }
 
+  /** Supports Retry-After header. */
+  implicit class RetryAfter[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Retry-After header value.
+     *
+     * @throws HeaderNotFound if Retry-After is not present
+     */
+    def retryAfter: OffsetDateTime =
+      getRetryAfter.getOrElse(throw new HeaderNotFound("Retry-After"))
+
+    /** Gets Retry-After header value if present. */
+    def getRetryAfter: Option[OffsetDateTime] =
+      response.getHeaderValue("Retry-After").map(DateValue.parse)
+
+    /** Creates new response setting Retry-After header to supplied value. */
+    def withRetryAfter(value: OffsetDateTime): response.MessageType =
+      response.withHeader(Header("Retry-After", value))
+
+    /** Creates new response removing Retry-After header. */
+    def removeRetryAfter: response.MessageType =
+      response.removeHeaders("Retry-After")
+  }
+
   /** Supports Server header. */
   implicit class Server[T <: HttpResponse](val response: T) {
     /**
@@ -730,15 +894,15 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Server is not present
      */
-    def server: OffsetDateTime =
+    def server: String =
       getServer.getOrElse(throw new HeaderNotFound("Server"))
 
     /** Gets Server header value if present. */
-    def getServer: Option[OffsetDateTime] =
-      response.getHeaderValue("Server").map(DateValue.parse)
+    def getServer: Option[String] =
+      response.getHeaderValue("Server")
 
     /** Creates new response setting Server header to supplied value. */
-    def withServer(value: OffsetDateTime): response.MessageType =
+    def withServer(value: String): response.MessageType =
       response.withHeader(Header("Server", value))
 
     /** Creates new response removing Server header. */
@@ -776,12 +940,16 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Trailer is not present
      */
-    def trailer: String =
+    def vary: Seq[String] =
       getTrailer.getOrElse(throw new HeaderNotFound("Trailer"))
 
     /** Gets Trailer header value if present. */
-    def getTrailer: Option[String] =
-      message.getHeaderValue("Trailer")
+    def getTrailer: Option[Seq[String]] =
+      message.getHeaderValue("Trailer").map(_.split(",").map(_.trim).toSeq)
+
+    /** Creates new message setting Trailer header to supplied values. */
+    def withTrailer(values: Seq[String]): message.MessageType =
+      message.withHeader(Header("Trailer", values.mkString(", ")))
 
     /** Creates new message setting Trailer header to supplied value. */
     def withTrailer(value: String): message.MessageType =
@@ -793,7 +961,7 @@ object ImplicitHeaders {
   }
 
   /** Supports Transfer-Encoding header. */
-  implicit class TransferEncoding[T <: HttpRequest](val message: T) {
+  implicit class TransferEncoding[T <: HttpMessage](val message: T) {
     /**
      * Gets Transfer-Encoding header value.
      *
@@ -806,12 +974,14 @@ object ImplicitHeaders {
     def getTransferEncoding: Option[String] =
       message.getHeaderValue("Transfer-Encoding")
 
-    /** Creates new request setting Transfer-Encoding header to supplied value. */
+    /**
+     * Creates new message setting Transfer-Encoding header to supplied value.
+     */
     def withTransferEncoding(value: String): message.MessageType =
       message.withHeader(Header("Transfer-Encoding", value))
 
     /** Creates new message removing Transfer-Encoding header. */
-    def removeTranferEncoding: message.MessageType =
+    def removeTransferEncoding: message.MessageType =
       message.removeHeaders("Transfer-Encoding")
   }
 
@@ -836,6 +1006,33 @@ object ImplicitHeaders {
     /** Creates new request removing User-Agent header. */
     def removeUserAgent: request.MessageType =
       request.removeHeaders("User-Agent")
+  }
+
+  /** Supports Vary header. */
+  implicit class Vary[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Vary header value.
+     *
+     * @throws HeaderNotFound if Vary is not present
+     */
+    def vary: Seq[String] =
+      getVary.getOrElse(throw new HeaderNotFound("Vary"))
+
+    /** Gets Vary header value if present. */
+    def getVary: Option[Seq[String]] =
+      response.getHeaderValue("Vary").map(_.split(",").map(_.trim).toSeq)
+
+    /** Creates new response setting Vary header to supplied values. */
+    def withVary(values: Seq[String]): response.MessageType =
+      response.withHeader(Header("Vary", values.mkString(", ")))
+
+    /** Creates new response setting Vary header to supplied value. */
+    def withVary(value: String): response.MessageType =
+      response.withHeader(Header("Vary", value))
+
+    /** Creates new response removing Vary header. */
+    def removeVary: response.MessageType =
+      response.removeHeaders("Vary")
   }
 
   /** Supports Via header. */
@@ -868,15 +1065,15 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Warning is not present
      */
-    def warning: OffsetDateTime =
+    def warning: String =
       getWarning.getOrElse(throw new HeaderNotFound("Warning"))
 
     /** Gets Warning header value if present. */
-    def getWarning: Option[OffsetDateTime] =
-      response.getHeaderValue("Warning").map(DateValue.parse)
+    def getWarning: Option[String] =
+      response.getHeaderValue("Warning")
 
     /** Creates new response setting Warning header to supplied value. */
-    def withWarning(value: OffsetDateTime): response.MessageType =
+    def withWarning(value: String): response.MessageType =
       response.withHeader(Header("Warning", value))
 
     /** Creates new response removing Warning header. */
@@ -898,7 +1095,9 @@ object ImplicitHeaders {
     def getWWWAuthentication: Option[String] =
       response.getHeaderValue("WWW-Authentication")
 
-    /** Creates new response setting WWW-Authentication header to supplied value. */
+    /**
+     * Creates new response setting WWW-Authentication header to supplied value.
+     */
     def withWWWAuthentication(value: String): response.MessageType =
       response.withHeader(Header("WWW-Authentication", value))
 
