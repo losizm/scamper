@@ -64,8 +64,8 @@ package object headers {
       request.getHeaderValue("Accept-Encoding")
 
     /** Creates new request setting Accept-Encoding header to supplied value. */
-    def withAcceptEncoding(values: String): request.MessageType =
-      request.withHeader(Header("Accept-Encoding", values))
+    def withAcceptEncoding(value: String): request.MessageType =
+      request.withHeader(Header("Accept-Encoding", value))
 
     /** Creates new request removing Accept-Encoding header. */
     def removeAcceptEncoding: request.MessageType =
@@ -95,6 +95,29 @@ package object headers {
       request.removeHeaders("Accept-Language")
   }
 
+  /** Supports Age header. */
+  implicit class Age[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Age header value.
+     *
+     * @throws HeaderNotFound if Age is not present
+     */
+    def age: Long =
+      getAge.getOrElse(throw new HeaderNotFound("Age"))
+
+    /** Gets Age header value if present. */
+    def getAge: Option[Long] =
+      response.getHeaderValue("Age").map(_.toLong)
+
+    /** Creates new response setting Age header to supplied value. */
+    def withAge(value: Long): response.MessageType =
+      response.withHeader(Header("Age", value))
+
+    /** Creates new response removing Age header. */
+    def removeAge: response.MessageType =
+      response.removeHeaders("Age")
+  }
+
   /** Supports Authorization header. */
   implicit class Authorization[T <: HttpRequest](val request: T) {
     /**
@@ -116,6 +139,56 @@ package object headers {
     /** Creates new request removing Authorization header. */
     def removeAuthorization: request.MessageType =
       request.removeHeaders("Authorization")
+  }
+
+  /** Supports Cache-Control header. */
+  implicit class CacheControl[T <: HttpRequest](val request: T) {
+    /**
+     * Gets Cache-Control header value.
+     *
+     * @throws HeaderNotFound if Cache-Control is not present
+     */
+    def cacheControl: String =
+      getCacheControl.getOrElse(throw new HeaderNotFound("Cache-Control"))
+
+    /** Gets Cache-Control header value if present. */
+    def getCacheControl: Option[String] =
+      request.getHeaderValue("Cache-Control")
+
+    /**
+     * Creates new request setting Cache-Control header to supplied value.
+     */
+    def withCacheControl(values: Seq[String]): request.MessageType =
+      request.withHeader(Header("Cache-Control", values.mkString(", ")))
+
+    /** Creates new request removing Cache-Control header. */
+    def removeCacheControl: request.MessageType =
+      request.removeHeaders("Cache-Control")
+  }
+
+  /** Supports Content-Disposition header. */
+  implicit class ContentDisposition[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Content-Disposition header value.
+     *
+     * @throws HeaderNotFound if Content-Disposition is not present
+     */
+    def contentDisposition: String =
+      getContentDisposition.getOrElse(throw new HeaderNotFound("Content-Disposition"))
+
+    /** Gets Content-Disposition header value if present. */
+    def getContentDisposition: Option[String] =
+      response.getHeaderValue("Content-Disposition")
+
+    /**
+     * Creates new response setting Content-Disposition header to supplied value.
+     */
+    def withContentDisposition(value: String): response.MessageType =
+      response.withHeader(Header("Content-Disposition", value))
+
+    /** Creates new response removing Content-Disposition header. */
+    def removeContentDisposition: response.MessageType =
+      response.removeHeaders("Content-Disposition")
   }
 
   /** Supports Content-Encoding header. */
@@ -235,6 +308,29 @@ package object headers {
       message.removeHeaders("Content-Type")
   }
 
+  /** Supports Connection header. */
+  implicit class Connection[T <: HttpMessage](val message: T) {
+    /**
+     * Gets Connection header value.
+     *
+     * @throws HeaderNotFound if Connection is not present
+     */
+    def connection: String =
+      getConnection.getOrElse(throw new HeaderNotFound("Connection"))
+
+    /** Gets Connection header value if present. */
+    def getConnection: Option[String] =
+      message.getHeaderValue("Connection")
+
+    /** Creates new message setting Connection header to supplied value. */
+    def withConnection(value: String): message.MessageType =
+      message.withHeader(Header("Connection", value))
+
+    /** Creates new message removing Connection header. */
+    def removeConnection: message.MessageType =
+      message.removeHeaders("Connection")
+  }
+
   /** Supports Date header. */
   implicit class Date[T <: HttpResponse](val response: T) {
     /**
@@ -279,6 +375,52 @@ package object headers {
     /** Creates new response removing ETag header. */
     def removeETag: response.MessageType =
       response.removeHeaders("ETag")
+  }
+
+  /** Supports Expect header. */
+  implicit class Expect[T <: HttpRequest](val request: T) {
+    /**
+     * Gets Expect header value.
+     *
+     * @throws HeaderNotFound if Expect is not present
+     */
+    def expect: String =
+      getExpect.getOrElse(throw new HeaderNotFound("Expect"))
+
+    /** Gets Expect header value if present. */
+    def getExpect: Option[String] =
+      request.getHeaderValue("Expect")
+
+    /** Creates new request setting Expect header to supplied value. */
+    def withExpect(value: String): request.MessageType =
+      request.withHeader(Header("Expect", value))
+
+    /** Creates new request removing Expect header. */
+    def removeExpect: request.MessageType =
+      request.removeHeaders("Expect")
+  }
+
+  /** Supports Expires header. */
+  implicit class Expires[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Expires header value.
+     *
+     * @throws HeaderNotFound if Expires is not present
+     */
+    def expires: OffsetDateTime =
+      getExpires.getOrElse(throw new HeaderNotFound("Expires"))
+
+    /** Gets Expires header value if present. */
+    def getExpires: Option[OffsetDateTime] =
+      response.getHeaderValue("Expires").map(DateValue.parse)
+
+    /** Creates new response setting Expires header to supplied value. */
+    def withExpires(value: OffsetDateTime): response.MessageType =
+      response.withHeader(Header("Expires", value))
+
+    /** Creates new response removing Expires header. */
+    def removeExpires: response.MessageType =
+      response.removeHeaders("Expires")
   }
 
   /** Supports Host header. */
@@ -442,6 +584,52 @@ package object headers {
       response.removeHeaders("Location")
   }
 
+  /** Supports Max-Forwards header. */
+  implicit class MaxForwards[T <: HttpRequest](val request: T) {
+    /**
+     * Gets Max-Forwards header value.
+     *
+     * @throws HeaderNotFound if Max-Forwards is not present
+     */
+    def maxForwards: Long =
+      getMaxForwards.getOrElse(throw new HeaderNotFound("Max-Forwards"))
+
+    /** Gets Max-Forwards header value if present. */
+    def getMaxForwards: Option[Long] =
+      request.getHeaderValue("Max-Forwards").map(_.toLong)
+
+    /** Creates new request setting Max-Forwards header to supplied value. */
+    def withMaxForwards(value: Long): request.MessageType =
+      request.withHeader(Header("Max-Forwards", value))
+
+    /** Creates new request removing Max-Forwards header. */
+    def removeMaxForwards: request.MessageType =
+      request.removeHeaders("Max-Forwards")
+  }
+
+  /** Supports Pragma header. */
+  implicit class Pragma[T <: HttpRequest](val request: T) {
+    /**
+     * Gets Pragma header value.
+     *
+     * @throws HeaderNotFound if Pragma is not present
+     */
+    def pragma: String =
+      getPragma.getOrElse(throw new HeaderNotFound("Pragma"))
+
+    /** Gets Pragma header value if present. */
+    def getPragma: Option[String] =
+      request.getHeaderValue("Pragma")
+
+    /** Creates new request setting Pragma header to supplied value. */
+    def withPragma(value: String): request.MessageType =
+      request.withHeader(Header("Pragma", value))
+
+    /** Creates new request removing Pragma header. */
+    def removePragma: request.MessageType =
+      request.removeHeaders("Pragma")
+  }
+
   /** Supports Proxy-Authentication header. */
   implicit class ProxyAuthentication[T <: HttpResponse](val response: T) {
     /**
@@ -534,6 +722,29 @@ package object headers {
       request.removeHeaders("Referer")
   }
 
+  /** Supports Server header. */
+  implicit class Server[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Server header value.
+     *
+     * @throws HeaderNotFound if Server is not present
+     */
+    def server: OffsetDateTime =
+      getServer.getOrElse(throw new HeaderNotFound("Server"))
+
+    /** Gets Server header value if present. */
+    def getServer: Option[OffsetDateTime] =
+      response.getHeaderValue("Server").map(DateValue.parse)
+
+    /** Creates new response setting Server header to supplied value. */
+    def withServer(value: OffsetDateTime): response.MessageType =
+      response.withHeader(Header("Server", value))
+
+    /** Creates new response removing Server header. */
+    def removeServer: response.MessageType =
+      response.removeHeaders("Server")
+  }
+
   /** Supports TE header. */
   implicit class TE[T <: HttpRequest](val request: T) {
     /**
@@ -624,6 +835,52 @@ package object headers {
     /** Creates new request removing User-Agent header. */
     def removeUserAgent: request.MessageType =
       request.removeHeaders("User-Agent")
+  }
+
+  /** Supports Via header. */
+  implicit class Via[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Via header value.
+     *
+     * @throws HeaderNotFound if Via is not present
+     */
+    def via: OffsetDateTime =
+      getVia.getOrElse(throw new HeaderNotFound("Via"))
+
+    /** Gets Via header value if present. */
+    def getVia: Option[OffsetDateTime] =
+      response.getHeaderValue("Via").map(DateValue.parse)
+
+    /** Creates new response setting Via header to supplied value. */
+    def withVia(value: OffsetDateTime): response.MessageType =
+      response.withHeader(Header("Via", value))
+
+    /** Creates new response removing Via header. */
+    def removeVia: response.MessageType =
+      response.removeHeaders("Via")
+  }
+
+  /** Supports Warning header. */
+  implicit class Warning[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Warning header value.
+     *
+     * @throws HeaderNotFound if Warning is not present
+     */
+    def warning: OffsetDateTime =
+      getWarning.getOrElse(throw new HeaderNotFound("Warning"))
+
+    /** Gets Warning header value if present. */
+    def getWarning: Option[OffsetDateTime] =
+      response.getHeaderValue("Warning").map(DateValue.parse)
+
+    /** Creates new response setting Warning header to supplied value. */
+    def withWarning(value: OffsetDateTime): response.MessageType =
+      response.withHeader(Header("Warning", value))
+
+    /** Creates new response removing Warning header. */
+    def removeWarning: response.MessageType =
+      response.removeHeaders("Warning")
   }
 
   /** Supports WWW-Authentication header. */
