@@ -7,7 +7,7 @@ class MediaRangeSpec extends FlatSpec {
     var range = MediaRange("text/html")
     assert(range.mainType == "text")
     assert(range.subtype == "html")
-    assert(range.qvalue == 1f)
+    assert(range.weight == 1f)
     assert(range.params.isEmpty)
     assert(range.isText)
     assert(range.toString == "text/html; q=1.0")
@@ -15,7 +15,7 @@ class MediaRangeSpec extends FlatSpec {
     range = MediaRange("text/html; q=0.7")
     assert(range.mainType == "text")
     assert(range.subtype == "html")
-    assert(range.qvalue == 0.7f)
+    assert(range.weight == 0.7f)
     assert(range.params.isEmpty)
     assert(range.isText)
     assert(range.toString == "text/html; q=0.7")
@@ -23,7 +23,7 @@ class MediaRangeSpec extends FlatSpec {
     range = MediaRange("*/html; q=7.")
     assert(range.mainType == "*")
     assert(range.subtype == "html")
-    assert(range.qvalue == 1f)
+    assert(range.weight == 1f)
     assert(range.params.isEmpty)
     assert(range.isWildcard)
     assert(range.toString == "*/html; q=1.0")
@@ -31,7 +31,7 @@ class MediaRangeSpec extends FlatSpec {
     range = MediaRange("text", "html", -7f)
     assert(range.mainType == "text")
     assert(range.subtype == "html")
-    assert(range.qvalue == 0f)
+    assert(range.weight == 0f)
     assert(range.params.isEmpty)
     assert(range.isText)
     assert(range.toString == "text/html; q=0.0")
@@ -85,10 +85,10 @@ class MediaRangeSpec extends FlatSpec {
     val range = MediaRange("text/html; charset=iso-8859-1")
 
     range match {
-      case MediaRange(mainType, subtype, qvalue, params) =>
+      case MediaRange(mainType, subtype, weight, params) =>
         assert(mainType == range.mainType)
         assert(subtype == range.subtype)
-        assert(qvalue == range.qvalue)
+        assert(weight == range.weight)
         assert(params == range.params)
     }
   }

@@ -7,8 +7,8 @@ import MediaTypeHelper._
 
 /** Internet media range */
 trait MediaRange {
-  /** Gets quality value of media range */
-  def qvalue: Float
+  /** Gets weight of media range */
+  def weight: Float
 
   /** Main type of media range */
   def mainType: String
@@ -50,7 +50,7 @@ trait MediaRange {
   def matches(mediaType: MediaType): Boolean
 
   /** Returns formatted media range. */
-  override lazy val toString: String = mainType + '/' + subtype + "; q=" + qvalue + FormatParams(params)
+  override lazy val toString: String = mainType + '/' + subtype + "; q=" + weight + FormatParams(params)
 }
 
 /** MediaRange factory */
@@ -59,32 +59,31 @@ object MediaRange {
   private val qvalueRegex = """(\d+(?:\.\d*))""".r
 
   /** Parse formatted media range. */
-  def apply(mediaRange: String): MediaRange = {
+  def apply(mediaRange: String): MediaRange =
     ParseMediaType(mediaRange) match {
       case (mainType, subtype, params) =>
         params.collectFirst {
           case (qkeyRegex(key), qvalueRegex(value)) => (value.toFloat, (params - key))
         } map {
-          case (qvalue, params) => new MediaRangeImpl(MainType(mainType), Subtype(subtype), Qvalue(qvalue), Params(params))
+          case (weight, params) => new MediaRangeImpl(MainType(mainType), Subtype(subtype), Qvalue(weight), Params(params))
         } getOrElse {
           new MediaRangeImpl(MainType(mainType), Subtype(subtype), 1.0f, Params(params))
         }
     }
-  }
 
   /** Creates MediaRange with supplied attributes. */
-  def apply(mainType: String, subtype: String, qvalue: Float = 1.0f, params: Map[String, String] = Map.empty): MediaRange =
-    new MediaRangeImpl(MainType(mainType), Subtype(subtype), Qvalue(qvalue), Params(params))
+  def apply(mainType: String, subtype: String, weight: Float = 1.0f, params: Map[String, String] = Map.empty): MediaRange =
+    new MediaRangeImpl(MainType(mainType), Subtype(subtype), Qvalue(weight), Params(params))
 
   /** Destructures MediaRange. */
   def unapply(mediaRange: MediaRange): Option[(String, String, Float, Map[String, String])] =
-    Some((mediaRange.mainType, mediaRange.subtype, mediaRange.qvalue, mediaRange.params))
+    Some((mediaRange.mainType, mediaRange.subtype, mediaRange.weight, mediaRange.params))
 
   private def Qvalue(qvalue: Float): Float =
     (qvalue.max(0f).min(1f) * 1000).floor / 1000
 }
 
-private class MediaRangeImpl(val mainType: String, val subtype: String, val qvalue: Float, val params: Map[String, String]) extends MediaRange {
+private class MediaRangeImpl(val mainType: String, val subtype: String, val weight: Float, val params: Map[String, String]) extends MediaRange {
   private val range = (regex(mainType) + "/" + regex(subtype)).r
 
   def matches(mediaType: MediaType): Boolean =
