@@ -7,6 +7,7 @@ import scala.util.Try
 import scala.collection.mutable.ArrayBuffer
 
 private class ChunkEnumeration(in: InputStream, maxChunkSize: Int, maxTotalLength: Long) extends Enumeration[InputStream] {
+  private val chunkLine = "(\\d+)(\\s*;\\s*.+=.+)*".r
   private var chunkSize = nextChunkSize
   private var totalLength = chunkSize
 
@@ -36,13 +37,11 @@ private class ChunkEnumeration(in: InputStream, maxChunkSize: Int, maxTotalLengt
     new ByteArrayInputStream(buffer)
   }
 
-  private def nextChunkSize: Int = {
-    val line = nextLine
-
-    Try(Integer.parseInt(line)) getOrElse {
-      throw new ChunkException(s"Invalid chunk size: $line")
+  private def nextChunkSize: Int =
+    nextLine match {
+      case chunkLine(size, _*) => size.toInt
+      case line => throw new ChunkException(s"Invalid chunk size: $line")
     }
-  }
 
   private def nextLine: String = {
     def nextByte: Int =
