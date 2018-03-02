@@ -3,25 +3,6 @@ package scamper
 import java.time.OffsetDateTime
 
 package object headers {
-  /** Supports Authorization header. */
-  implicit class Authorization[T <: HttpRequest](val request: T) {
-    /**
-     * Gets Authorization header value.
-     *
-     * @throws HeaderNotFound if Authorization is not present
-     */
-    def authorization: String =
-      getAuthorization.getOrElse(throw new HeaderNotFound("Authorization"))
-
-    /** Gets Authorization header value if present. */
-    def getAuthorization: Option[String] =
-      request.getHeaderValue("Authorization").map(_.toString)
-
-    /** Creates new request setting Authorization header to supplied value. */
-    def withAuthorization(value: String): request.MessageType =
-      request.withHeader(Header("Authorization", value))
-  }
-
   /** Supports Accept header. */
   implicit class Accept[T <: HttpRequest](val request: T) {
     /**
@@ -39,6 +20,10 @@ package object headers {
     /** Creates new request setting Accept header to supplied value. */
     def withAccept(value: String): request.MessageType =
       request.withHeader(Header("Accept", value))
+
+    /** Creates new request removing Accept header. */
+    def removeAccept: request.MessageType =
+      request.removeHeaders("Accept")
   }
 
   /** Supports Accept-Charset header. */
@@ -58,6 +43,10 @@ package object headers {
     /** Creates new request setting Accept-Charset header to supplied value. */
     def withAcceptCharset(value: String): request.MessageType =
       request.withHeader(Header("Accept-Charset", value))
+
+    /** Creates new request removing Accept-Charset header. */
+    def removeAcceptCharset: request.MessageType =
+      request.removeHeaders("Accept-Charset")
   }
 
   /** Supports Accept-Encoding header. */
@@ -77,6 +66,10 @@ package object headers {
     /** Creates new request setting Accept-Encoding header to supplied value. */
     def withAcceptEncoding(values: String): request.MessageType =
       request.withHeader(Header("Accept-Encoding", values))
+
+    /** Creates new request removing Accept-Encoding header. */
+    def removeAcceptEncoding: request.MessageType =
+      request.removeHeaders("Accept-Encoding")
   }
 
   /** Supports Accept-Language header. */
@@ -96,6 +89,33 @@ package object headers {
     /** Creates new request setting Accept-Language header to supplied value. */
     def withAcceptLanguage(value: String): request.MessageType =
       request.withHeader(Header("Accept-Language", value))
+
+    /** Creates new request removing Accept-Language header. */
+    def removeAcceptLanguage: request.MessageType =
+      request.removeHeaders("Accept-Language")
+  }
+
+  /** Supports Authorization header. */
+  implicit class Authorization[T <: HttpRequest](val request: T) {
+    /**
+     * Gets Authorization header value.
+     *
+     * @throws HeaderNotFound if Authorization is not present
+     */
+    def authorization: String =
+      getAuthorization.getOrElse(throw new HeaderNotFound("Authorization"))
+
+    /** Gets Authorization header value if present. */
+    def getAuthorization: Option[String] =
+      request.getHeaderValue("Authorization")
+
+    /** Creates new request setting Authorization header to supplied value. */
+    def withAuthorization(value: String): request.MessageType =
+      request.withHeader(Header("Authorization", value))
+
+    /** Creates new request removing Authorization header. */
+    def removeAuthorization: request.MessageType =
+      request.removeHeaders("Authorization")
   }
 
   /** Supports Content-Encoding header. */
@@ -117,6 +137,10 @@ package object headers {
      */
     def withContentEncoding(values: Seq[String]): message.MessageType =
       message.withHeader(Header("Content-Encoding", values.mkString(", ")))
+
+    /** Creates new message removing Content-Encoding header. */
+    def removeContentEncoding: message.MessageType =
+      message.removeHeaders("Content-Encoding")
   }
 
   /** Supports Content-Language header. */
@@ -131,11 +155,15 @@ package object headers {
 
     /** Gets Content-Language header value if present. */
     def getContentLanguage: Option[String] =
-      message.getHeaderValue("Content-Language").map(_.toString)
+      message.getHeaderValue("Content-Language")
 
     /** Creates new message setting Content-Language header to supplied value. */
     def withContentLanguage(value: String): message.MessageType =
       message.withHeader(Header("Content-Type", value))
+
+    /** Creates new message removing Content-Language header. */
+    def removeContentLanguage: message.MessageType =
+      message.removeHeaders("Content-Language")
   }
 
   /** Supports Content-Length header. */
@@ -155,6 +183,10 @@ package object headers {
     /** Creates new message setting Content-Length header to supplied value. */
     def withContentLength(value: Long): message.MessageType =
       message.withHeader(Header("Content-Length", value))
+
+    /** Creates new message removing Content-Length header. */
+    def removeContentLength: message.MessageType =
+      message.removeHeaders("Content-Length")
   }
 
   /** Supports Content-Range header. */
@@ -169,11 +201,15 @@ package object headers {
 
     /** Gets Content-Range header value if present. */
     def getContentRange: Option[String] =
-      message.getHeaderValue("Content-Range").map(_.toString)
+      message.getHeaderValue("Content-Range")
 
     /** Creates new message setting Content-Range header to supplied value. */
     def withContentRange(value: String): message.MessageType =
-      message.withHeader(Header("Content-Type", value))
+      message.withHeader(Header("Content-Range", value))
+
+    /** Creates new message removing Content-Range header. */
+    def removeContentRange: message.MessageType =
+      message.removeHeaders("Content-Range")
   }
 
   /** Supports Content-Type header. */
@@ -193,6 +229,10 @@ package object headers {
     /** Creates new message setting Content-Type header to supplied value. */
     def withContentType(value: MediaType): message.MessageType =
       message.withHeader(Header("Content-Type", value.toString))
+
+    /** Creates new message removing Content-Type header. */
+    def removeContentType: message.MessageType =
+      message.removeHeaders("Content-Type")
   }
 
   /** Supports Date header. */
@@ -212,6 +252,10 @@ package object headers {
     /** Creates new response setting Date header to supplied value. */
     def withDate(value: OffsetDateTime): response.MessageType =
       response.withHeader(Header("Date", value))
+
+    /** Creates new response removing Date header. */
+    def removeDate: response.MessageType =
+      response.removeHeaders("Date")
   }
 
   /** Supports ETag header. */
@@ -226,11 +270,15 @@ package object headers {
 
     /** Gets ETag header value if present. */
     def getETag: Option[String] =
-      response.getHeaderValue("ETag").map(_.toString)
+      response.getHeaderValue("ETag")
 
     /** Creates new response setting ETag header to supplied value. */
     def withETag(value: String): response.MessageType =
       response.withHeader(Header("ETag", value))
+
+    /** Creates new response removing ETag header. */
+    def removeETag: response.MessageType =
+      response.removeHeaders("ETag")
   }
 
   /** Supports Host header. */
@@ -245,11 +293,15 @@ package object headers {
 
     /** Gets Host header value if present. */
     def getHost: Option[String] =
-      request.getHeaderValue("Host").map(_.toString)
+      request.getHeaderValue("Host")
 
     /** Creates new request setting Host header to supplied value. */
     def withHost(value: String): request.MessageType =
       request.withHeader(Header("Host", value))
+
+    /** Creates new request removing Host header. */
+    def removeHost: request.MessageType =
+      request.removeHeaders("Host")
   }
 
   /** Supports If-Match header. */
@@ -264,11 +316,15 @@ package object headers {
 
     /** Gets If-Match header value if present. */
     def getIfMatch: Option[String] =
-      request.getHeaderValue("If-Match").map(_.toString)
+      request.getHeaderValue("If-Match")
 
     /** Creates new request setting If-Match header to supplied value. */
     def withIfMatch(value: String): request.MessageType =
       request.withHeader(Header("If-Match", value))
+
+    /** Creates new request removing If-Match header. */
+    def removeIfMatch: request.MessageType =
+      request.removeHeaders("If-Match")
   }
 
   /** Supports If-Modified-Since header. */
@@ -288,6 +344,10 @@ package object headers {
     /** Creates new request setting If-Modified-Since header to supplied value. */
     def withIfModifiedSince(value: OffsetDateTime): request.MessageType =
       request.withHeader(Header("If-Modified-Since", value))
+
+    /** Creates new request removing If-Modified-Since header. */
+    def removeIfModifiedSince: request.MessageType =
+      request.removeHeaders("If-Modified-Since")
   }
 
   /** Supports If-Range header. */
@@ -302,11 +362,15 @@ package object headers {
 
     /** Gets If-Range header value if present. */
     def getIfRange: Option[String] =
-      request.getHeaderValue("If-Range").map(_.toString)
+      request.getHeaderValue("If-Range")
 
     /** Creates new request setting If-Range header to supplied value. */
     def withIfRange(value: String): request.MessageType =
       request.withHeader(Header("If-Range", value))
+
+    /** Creates new request removing If-Range header. */
+    def removeIfRange: request.MessageType =
+      request.removeHeaders("If-Range")
   }
 
   /** Supports If-Unmodified-Since header. */
@@ -326,6 +390,10 @@ package object headers {
     /** Creates new request setting If-Unmodified-Since header to supplied value. */
     def withIfUnmodifiedSince(value: OffsetDateTime): request.MessageType =
       request.withHeader(Header("If-Unmodified-Since", value))
+
+    /** Creates new request removing If-Unmodified-Since header. */
+    def removeIfUnmodifiedSince: request.MessageType =
+      request.removeHeaders("If-Unmodified-Since")
   }
 
   /** Supports Last-Modified header. */
@@ -345,6 +413,10 @@ package object headers {
     /** Creates new response setting Last-Modified header to supplied value. */
     def withLastModified(value: OffsetDateTime): response.MessageType =
       response.withHeader(Header("Last-Modified", value))
+
+    /** Creates new response removing Last-Modified header. */
+    def removeLastModified: response.MessageType =
+      response.removeHeaders("Last-Modified")
   }
 
   /** Supports Location header. */
@@ -359,11 +431,15 @@ package object headers {
 
     /** Gets Location header value if present. */
     def getLocation: Option[String] =
-      response.getHeaderValue("Location").map(_.toString)
+      response.getHeaderValue("Location")
 
     /** Creates new response setting Location header to supplied value. */
     def withLocation(value: String): response.MessageType =
       response.withHeader(Header("Location", value))
+
+    /** Creates new response removing Location header. */
+    def removeLocation: response.MessageType =
+      response.removeHeaders("Location")
   }
 
   /** Supports Proxy-Authentication header. */
@@ -378,11 +454,15 @@ package object headers {
 
     /** Gets Proxy-Authentication header value if present. */
     def getProxyAuthentication: Option[String] =
-      response.getHeaderValue("Proxy-Authentication").map(_.toString)
+      response.getHeaderValue("Proxy-Authentication")
 
     /** Creates new response setting Proxy-Authentication header to supplied value. */
     def withProxyAuthentication(value: String): response.MessageType =
       response.withHeader(Header("Proxy-Authentication", value))
+
+    /** Creates new response removing Date header. */
+    def removeProxyAuthentication: response.MessageType =
+      response.removeHeaders("Proxy-Authentication")
   }
 
   /** Supports Proxy-Authorization header. */
@@ -397,15 +477,19 @@ package object headers {
 
     /** Gets Proxy-Authorization header value if present. */
     def getProxyAuthorization: Option[String] =
-      request.getHeaderValue("Proxy-Authorization").map(_.toString)
+      request.getHeaderValue("Proxy-Authorization")
 
     /** Creates new request setting Proxy-Authorization header to supplied value. */
     def withProxyAuthorization(value: String): request.MessageType =
       request.withHeader(Header("Proxy-Authorization", value))
+
+    /** Creates new request removing Proxy-Authorization header. */
+    def removeProxyAuthorization: request.MessageType =
+      request.removeHeaders("Proxy-Authorization")
   }
 
   /** Supports Range header. */
-  implicit class Range[T <: HttpRequest](val message: T) {
+  implicit class Range[T <: HttpRequest](val request: T) {
     /**
      * Gets Range header value.
      *
@@ -416,11 +500,15 @@ package object headers {
 
     /** Gets Range header value if present. */
     def getRange: Option[String] =
-      message.getHeaderValue("Range").map(_.toString)
+      request.getHeaderValue("Range")
 
     /** Creates new request setting Range header to supplied value. */
-    def withRange(value: String): message.MessageType =
-      message.withHeader(Header("Range", value))
+    def withRange(value: String): request.MessageType =
+      request.withHeader(Header("Range", value))
+
+    /** Creates new request removing Range header. */
+    def removeRange: request.MessageType =
+      request.removeHeaders("Range")
   }
 
   /** Supports Referer header. */
@@ -435,11 +523,15 @@ package object headers {
 
     /** Gets Referer header value if present. */
     def getReferer: Option[String] =
-      request.getHeaderValue("Referer").map(_.toString)
+      request.getHeaderValue("Referer")
 
     /** Creates new request setting Referer header to supplied value. */
     def withReferer(value: String): request.MessageType =
       request.withHeader(Header("Referer", value))
+
+    /** Creates new request removing Referer header. */
+    def removeReferer: request.MessageType =
+      request.removeHeaders("Referer")
   }
 
   /** Supports TE header. */
@@ -454,11 +546,15 @@ package object headers {
 
     /** Gets TE header value if present. */
     def getTE: Option[String] =
-      request.getHeaderValue("TE").map(_.toString)
+      request.getHeaderValue("TE")
 
     /** Creates new request setting TE header to supplied value. */
     def withTE(value: String): request.MessageType =
       request.withHeader(Header("TE", value))
+
+    /** Creates new request removing TE header. */
+    def removeTE: request.MessageType =
+      request.removeHeaders("TE")
   }
 
   /** Supports Trailer header. */
@@ -473,11 +569,15 @@ package object headers {
 
     /** Gets Trailer header value if present. */
     def getTrailer: Option[String] =
-      message.getHeaderValue("Trailer").map(_.toString)
+      message.getHeaderValue("Trailer")
 
     /** Creates new message setting Trailer header to supplied value. */
     def withTrailer(value: String): message.MessageType =
       message.withHeader(Header("Trailer", value))
+
+    /** Creates new message removing Trailer header. */
+    def removeTrailer: message.MessageType =
+      message.removeHeaders("Trailer")
   }
 
   /** Supports Transfer-Encoding header. */
@@ -492,15 +592,19 @@ package object headers {
 
     /** Gets Transfer-Encoding header value if present. */
     def getTransferEncoding: Option[String] =
-      message.getHeaderValue("Transfer-Encoding").map(_.toString)
+      message.getHeaderValue("Transfer-Encoding")
 
     /** Creates new request setting Transfer-Encoding header to supplied value. */
     def withTransferEncoding(value: String): message.MessageType =
       message.withHeader(Header("Transfer-Encoding", value))
+
+    /** Creates new message removing Transfer-Encoding header. */
+    def removeTranferEncoding: message.MessageType =
+      message.removeHeaders("Transfer-Encoding")
   }
 
   /** Supports User-Agent header. */
-  implicit class UserAgent[T <: HttpRequest](val message: T) {
+  implicit class UserAgent[T <: HttpRequest](val request: T) {
     /**
      * Gets User-Agent header value.
      *
@@ -511,11 +615,15 @@ package object headers {
 
     /** Gets User-Agent header value if present. */
     def getUserAgent: Option[String] =
-      message.getHeaderValue("User-Agent").map(_.toString)
+      request.getHeaderValue("User-Agent")
 
     /** Creates new request setting User-Agent header to supplied value. */
-    def withUserAgent(value: String): message.MessageType =
-      message.withHeader(Header("User-Agent", value))
+    def withUserAgent(value: String): request.MessageType =
+      request.withHeader(Header("User-Agent", value))
+
+    /** Creates new request removing User-Agent header. */
+    def removeUserAgent: request.MessageType =
+      request.removeHeaders("User-Agent")
   }
 
   /** Supports WWW-Authentication header. */
@@ -530,11 +638,15 @@ package object headers {
 
     /** Gets WWW-Authentication header value if present. */
     def getWWWAuthentication: Option[String] =
-      response.getHeaderValue("WWW-Authentication").map(_.toString)
+      response.getHeaderValue("WWW-Authentication")
 
     /** Creates new response setting WWW-Authentication header to supplied value. */
     def withWWWAuthentication(value: String): response.MessageType =
       response.withHeader(Header("WWW-Authentication", value))
+
+    /** Creates new response removing WWW-Authentication header. */
+    def removeWWWAuthentication: response.MessageType =
+      response.removeHeaders("WWW-Authentication")
   }
 }
 
