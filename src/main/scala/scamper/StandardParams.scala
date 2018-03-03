@@ -1,4 +1,4 @@
-package scamper                                                                                                                                                                                                     
+package scamper
 
 import scala.annotation.tailrec
 import Grammar._
@@ -21,7 +21,7 @@ private object StandardParams {
     findPrefixParam(params) match {
       case None => (collected, params.trim)
       case Some((name, value, suffix)) => parseParams(suffix, collected + (name -> value))
-    }   
+    }
 
   private def findPrefixParam(text: String): Option[(String, String, String)] =
     TokenParam.findPrefixMatchOf(text).orElse(QuotedParam.findPrefixMatchOf(text)).map { m =>
