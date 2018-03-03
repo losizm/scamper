@@ -59,16 +59,20 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Accept-Encoding is not present
      */
-    def acceptEncoding: String =
+    def acceptEncoding: Seq[ContentCodingRange] =
       getAcceptEncoding.getOrElse(throw new HeaderNotFound("Accept-Encoding"))
 
     /** Gets Accept-Encoding header value if present. */
-    def getAcceptEncoding: Option[String] =
+    def getAcceptEncoding: Option[Seq[ContentCodingRange]] =
       request.getHeaderValue("Accept-Encoding")
+        .map(ListParser.apply)
+        .map(_.map(ContentCodingRange.apply))
 
-    /** Creates new request setting Accept-Encoding header to supplied value. */
-    def withAcceptEncoding(value: String): request.MessageType =
-      request.withHeader(Header("Accept-Encoding", value))
+    /**
+     * Creates new request setting Accept-Encoding header to supplied values.
+     */
+    def withAcceptEncoding(values: ContentCodingRange*): request.MessageType =
+      request.withHeader(Header("Accept-Encoding", values.mkString(", ")))
 
     /** Creates new request removing Accept-Encoding header. */
     def removeAcceptEncoding: request.MessageType =
@@ -82,16 +86,16 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Accept-Language is not present
      */
-    def acceptLanguage: String =
+    def acceptLanguage: Seq[String] =
       getAcceptLanguage.getOrElse(throw new HeaderNotFound("Accept-Language"))
 
     /** Gets Accept-Language header value if present. */
-    def getAcceptLanguage: Option[String] =
-      request.getHeaderValue("Accept-Language")
+    def getAcceptLanguage: Option[Seq[String]] =
+      request.getHeaderValue("Accept-Language").map(ListParser.apply)
 
-    /** Creates new request setting Accept-Language header to supplied value. */
-    def withAcceptLanguage(value: String): request.MessageType =
-      request.withHeader(Header("Accept-Language", value))
+    /** Creates new request setting Accept-Language header to supplied values. */
+    def withAcceptLanguage(values: String*): request.MessageType =
+      request.withHeader(Header("Accept-Language", values.mkString(", ")))
 
     /** Creates new request removing Accept-Language header. */
     def removeAcceptLanguage: request.MessageType =
@@ -110,7 +114,7 @@ object ImplicitHeaders {
 
     /** Gets Accept-Ranges header value if present. */
     def getAcceptRanges: Option[Seq[String]] =
-      response.getHeaderValue("Accept-Ranges").map(_.split(",").map(_.trim).toSeq)
+      response.getHeaderValue("Accept-Ranges").map(ListParser.apply)
 
     /** Creates new response setting Accept-Ranges header to supplied values. */
     def withAcceptRanges(values: String*): response.MessageType =
@@ -156,7 +160,7 @@ object ImplicitHeaders {
 
     /** Gets Allow header value if present. */
     def getAllow: Option[Seq[String]] =
-      response.getHeaderValue("Allow").map(_.split(",").map(_.trim).toSeq)
+      response.getHeaderValue("Allow").map(ListParser.apply)
 
     /** Creates new response setting Allow header to supplied values. */
     def withAllow(values: String*): response.MessageType =
@@ -272,17 +276,19 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Content-Encoding is not present
      */
-    def contentEncoding: Seq[String] =
+    def contentEncoding: Seq[ContentCoding] =
       getContentEncoding.getOrElse(throw new HeaderNotFound("Content-Encoding"))
 
     /** Gets Content-Encoding header value if present. */
-    def getContentEncoding: Option[Seq[String]] =
-      message.getHeaderValue("Content-Encoding").map(_.split(",").map(_.trim).toSeq)
+    def getContentEncoding: Option[Seq[ContentCoding]] =
+      message.getHeaderValue("Content-Encoding")
+        .map(ListParser.apply)
+        .map(_.map(ContentCoding.apply))
 
     /**
      * Creates new message setting Content-Encoding header to supplied values.
      */
-    def withContentEncoding(values: String*): message.MessageType =
+    def withContentEncoding(values: ContentCoding*): message.MessageType =
       message.withHeader(Header("Content-Encoding", values.mkString(", ")))
 
     /** Creates new message removing Content-Encoding header. */
@@ -644,16 +650,16 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Link is not present
      */
-    def link: String =
+    def link: Seq[String] =
       getLink.getOrElse(throw new HeaderNotFound("Link"))
 
     /** Gets Link header value if present. */
-    def getLink: Option[String] =
-      response.getHeaderValue("Link")
+    def getLink: Option[Seq[String]] =
+      response.getHeaderValue("Link").map(ListParser.apply)
 
-    /** Creates new response setting Link header to supplied value. */
-    def withLink(value: String): response.MessageType =
-      response.withHeader(Header("Link", value))
+    /** Creates new response setting Link header to supplied values. */
+    def withLink(values: String*): response.MessageType =
+      response.withHeader(Header("Link", values.mkString(", ")))
 
     /** Creates new response removing Link header. */
     def removeLink: response.MessageType =
@@ -935,7 +941,7 @@ object ImplicitHeaders {
 
     /** Gets Trailer header value if present. */
     def getTrailer: Option[Seq[String]] =
-      message.getHeaderValue("Trailer").map(_.split(",").map(_.trim).toSeq)
+      message.getHeaderValue("Trailer").map(ListParser.apply)
 
     /** Creates new message setting Trailer header to supplied values. */
     def withTrailer(values: String*): message.MessageType =
@@ -1008,7 +1014,7 @@ object ImplicitHeaders {
 
     /** Gets Vary header value if present. */
     def getVary: Option[Seq[String]] =
-      response.getHeaderValue("Vary").map(_.split(",").map(_.trim).toSeq)
+      response.getHeaderValue("Vary").map(ListParser.apply)
 
     /** Creates new response setting Vary header to supplied values. */
     def withVary(values: String*): response.MessageType =
@@ -1026,16 +1032,16 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Via is not present
      */
-    def via: String =
+    def via: Seq[String] =
       getVia.getOrElse(throw new HeaderNotFound("Via"))
 
     /** Gets Via header value if present. */
-    def getVia: Option[String] =
-      response.getHeaderValue("Via")
+    def getVia: Option[Seq[String]] =
+      response.getHeaderValue("Via").map(ListParser.apply)
 
-    /** Creates new response setting Via header to supplied value. */
-    def withVia(value: String): response.MessageType =
-      response.withHeader(Header("Via", value))
+    /** Creates new response setting Via header to supplied values. */
+    def withVia(values: String*): response.MessageType =
+      response.withHeader(Header("Via", values.mkString(", ")))
 
     /** Creates new response removing Via header. */
     def removeVia: response.MessageType =

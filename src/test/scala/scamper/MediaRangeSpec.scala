@@ -81,7 +81,7 @@ class MediaRangeSpec extends FlatSpec {
     assert(!range.matches(MediaType("text/html; charset=utf-8")))
   }
 
-  it should "be destructured to its constituent parts" in {
+  it should "be destructured" in {
     val range = MediaRange("text/html; charset=iso-8859-1")
 
     range match {

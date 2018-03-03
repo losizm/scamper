@@ -43,7 +43,7 @@ trait MediaRange {
   /** Tests whether main type is message. */
   def isMessage: Boolean = mainType == "message"
 
-  /** Tests whether main type is wildcard. */
+  /** Tests whether main type is wildcard (*). */
   def isWildcard: Boolean = mainType == "*"
 
   /** Tests whether supplied media type matches range. */

@@ -35,7 +35,7 @@ class MediaTypeSpec extends FlatSpec {
     assert(contentType.toString == "text/html; charset=utf-8; not-a-charset=\"iso 8859 1\"")
   }
 
-  it should "be destructured to its constituent parts" in {
+  it should "be destructured" in {
     val contentType = MediaType("text/html; charset=iso-8859-1")
 
     contentType match {

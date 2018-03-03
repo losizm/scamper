@@ -35,7 +35,7 @@ class TCodingSpec extends FlatSpec {
     assert(tcoding.toString == "gzip; q=0.1; level=\"1 2 3\"")
   }
 
-  it should "be destructured to its constituent parts" in {
+  it should "be destructured" in {
     val tcoding = TCoding("""Deflate; a=1; b=two; c="x y z" """)
 
     tcoding match {

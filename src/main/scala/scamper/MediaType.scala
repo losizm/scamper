@@ -37,9 +37,9 @@ trait MediaType {
   /** Tests whether main type is message. */
   def isMessage: Boolean = mainType == "message"
 
-  /** Converts to MediaRange with supplied qvalue. */
-  def toRange(qvalue: Float): MediaRange =
-    MediaRange(mainType, subtype, qvalue, params)
+  /** Converts to MediaRange with supplied weight. */
+  def toRange(weight: Float = 1.0f): MediaRange =
+    MediaRange(mainType, subtype, weight, params)
 
   /** Returns formatted media type. */
   override lazy val toString: String = mainType + '/' + subtype + FormatParams(params)

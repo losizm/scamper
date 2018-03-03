@@ -34,6 +34,12 @@ object ImplicitConverters {
   /** Converts file to [[Entity]]. */
   implicit val fileToEntity = (entity: File) => Entity(entity)
 
+  /** Converts string to [[ContentCoding]]. */
+  implicit val stringToContentCoding = (value: String) => ContentCoding(value)
+
+  /** Converts string to [[ContentCodingRange]]. */
+  implicit val stringToContentCodingRange = (value: String) => ContentCodingRange(value)
+
   /** Converts string to [[MediaType]]. */
   implicit val stringToMediaType = (value: String) => MediaType(value)
 

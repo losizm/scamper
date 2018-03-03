@@ -34,7 +34,7 @@ class HeaderSpec extends FlatSpec {
     assert(header.value == "user=guest,\r\n\tgroup=readonly")
   }
 
-  it should "be destructured to its constituent parts" in {
+  it should "be destructured" in {
     val header = Header("Content-Type: text/plain")
     
     header match {

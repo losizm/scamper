@@ -32,7 +32,7 @@ class TransferCodingSpec extends FlatSpec {
     assert(coding.toString == "gzip; q=0.1; level=\"1 2 3\"" || coding.toString == "gzip; level=\"1 2 3\"; q=0.1")
   }
 
-  it should "be destructured to its constituent parts" in {
+  it should "be destructured" in {
     val coding = TransferCoding("""Deflate; a=1; b=two; c="x y z" """)
 
     coding match {
