@@ -6,7 +6,7 @@ import scala.util.matching.Regex.Match
 import Grammar._
 
 private object TransferCodingHelper {
-  private val CodingRegex        = """([^\s/=;"]+)((?:\s*;\s*.+=.+)*)""".r
+  private val CodingRegex        = """\s*([^\s/=;"]+)((?:\s*;\s*.+=.+)*)""".r
   private val UnquotedParamRegex = """\s*;\s*([^\s/=;"]+)\s*=\s*([^\s/=;"]+)\s*""".r
   private val QuotedParamRegex   = """\s*;\s*([^\s/=;"]+)\s*=\s*"([^"]*)"\s*""".r
 
@@ -50,6 +50,6 @@ private object TransferCodingHelper {
   private def findPrefixParam(s: String): Option[Match] =
     UnquotedParamRegex.findPrefixMatchOf(s).orElse(QuotedParamRegex.findPrefixMatchOf(s))
 
-  private def quoteParamValue(value: String) = Token(value).getOrElse('"' + value + '"')
+  private def quoteParamValue(value: String): String = Token(value).getOrElse('"' + value + '"')
 }
 

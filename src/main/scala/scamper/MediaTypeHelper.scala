@@ -6,10 +6,9 @@ import scala.util.matching.Regex.Match
 import Grammar._
 
 private object MediaTypeHelper {
-  private val withoutParams     = """\s*([^\s/=;"]+)/([^\s/=;"]+)\s*""".r
-  private val withParams        = """\s*([^\s/=;"]+)/([^\s/=;"]+)\s*(;.*)\s*""".r
-  private val withUnquotedValue = """\s*;\s*([^\s/=;"]+)\s*=\s*([^\s/=;"]+)\s*""".r
-  private val withQuotedValue   = """\s*;\s*([^\s/=;"]+)\s*=\s*"([^"]*)"\s*""".r
+  private val MediaTypeRegex     = """\s*([^\s/=;"]+)/([^\s/=;"]+)((?:\s*;\s*.+=.+)*)""".r
+  private val UnquotedParamRegex = """\s*;\s*([^\s/=;"]+)\s*=\s*([^\s/=;"]+)\s*""".r
+  private val QuotedParamRegex   = """\s*;\s*([^\s/=;"]+)\s*=\s*"([^"]*)"\s*""".r
 
   def MainType(mainType: String): String =
     Token(mainType) getOrElse {
@@ -36,8 +35,7 @@ private object MediaTypeHelper {
 
   def ParseMediaType(mediaType: String): (String, String, Map[String, String]) =
     mediaType match {
-      case withoutParams(mainType, subtype) => (mainType, subtype, Map.empty)
-      case withParams(mainType, subtype, params) => (mainType, subtype, ParseParams(params))
+      case MediaTypeRegex(mainType, subtype, params) => (mainType, subtype, ParseParams(params))
       case _ => throw new IllegalArgumentException(s"Malformed media type: $mediaType")
     }
 
@@ -55,8 +53,8 @@ private object MediaTypeHelper {
     params.map { case (name, value) => s"; $name=${quoteParamValue(value)}" }.mkString
 
   private def findPrefixParam(s: String): Option[Match] =
-    withUnquotedValue.findPrefixMatchOf(s).orElse(withQuotedValue.findPrefixMatchOf(s))
+    UnquotedParamRegex.findPrefixMatchOf(s).orElse(QuotedParamRegex.findPrefixMatchOf(s))
 
-  private def quoteParamValue(value: String) = Token(value).getOrElse('"' + value + '"')
+  private def quoteParamValue(value: String): String = Token(value).getOrElse('"' + value + '"')
 }
 
