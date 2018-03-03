@@ -1,7 +1,7 @@
 package scamper
 
 import org.scalatest.FlatSpec
-import ImplicitConversions._
+import ImplicitConverters._
 import ImplicitHeaders._
 
 class BodyParserSpec extends FlatSpec with Statuses {

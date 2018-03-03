@@ -3,8 +3,8 @@ package scamper
 import java.io.File
 import java.time.OffsetDateTime
 
-/** Contains implicit conversion functions. */
-object ImplicitConversions {
+/** Contains implicit converter functions. */
+object ImplicitConverters {
   /** Converts string to [[Header]]. */
   implicit val stringToHeader = (header: String) => Header(header)
 

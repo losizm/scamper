@@ -2,7 +2,7 @@ package scamper
 
 import java.net.{ URI, URL }
 import org.scalatest.FlatSpec
-import ImplicitConversions._
+import ImplicitConverters._
 import ImplicitExtensions._
 
 class ImplicitsSpec extends FlatSpec {

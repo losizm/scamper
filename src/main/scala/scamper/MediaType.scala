@@ -47,19 +47,19 @@ trait MediaType {
 
 /** MediaType factory */
 object MediaType {
-  /** Creates MediaType using supplied attributes. */
-  def apply(mainType: String, subtype: String, params: Map[String, String]): MediaType =
-    new MediaTypeImpl(MainType(mainType), Subtype(subtype), Params(params))
-
-  /** Creates MediaType using supplied attributes. */
-  def apply(mainType: String, subtype: String, params: (String, String)*): MediaType =
-    apply(mainType, subtype, params.toMap)
-
   /** Parses formatted media type. */
   def apply(mediaType: String): MediaType =
     ParseMediaType(mediaType) match {
       case (mainType, subtype, params) => apply(mainType, subtype, params)
     }
+
+  /** Creates MediaType with supplied values. */
+  def apply(mainType: String, subtype: String, params: Map[String, String]): MediaType =
+    new MediaTypeImpl(MainType(mainType), Subtype(subtype), Params(params))
+
+  /** Creates MediaType with supplied values. */
+  def apply(mainType: String, subtype: String, params: (String, String)*): MediaType =
+    apply(mainType, subtype, params.toMap)
 
   /** Destructures MediaType. */
   def unapply(mediaType: MediaType): Option[(String, String, Map[String, String])] =

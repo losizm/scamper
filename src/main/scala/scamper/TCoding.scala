@@ -32,7 +32,7 @@ trait TCoding {
   override lazy val toString: String = {
     val tcoding = new StringBuilder
     tcoding.append(name)
-    if (isTrailers || rank < 1f) tcoding.append("; q=").append(rank)
+    if (rank < 1f) tcoding.append("; q=").append(rank)
     if (params.nonEmpty) tcoding.append(FormatParams(params))
     tcoding.toString
   }
@@ -40,32 +40,26 @@ trait TCoding {
 
 /** TCoding factory */
 object TCoding {
-  private val qkeyRegex = "([Qq])".r
-  private val qvalueRegex = """(\d+(?:\.\d*))""".r
-
-  /** Creates TCoding using supplied values. */
-  def apply(name: String, rank: Float = 1.0f, params: Map[String, String] = Map.empty): TCoding =
-    new TCodingImpl(Name(name), Qvalue(rank), Params(params))
-
   /** Parses formatted t-coding. */
   def apply(tcoding: String): TCoding =
     ParseTransferCoding(tcoding) match {
       case (name, params) =>
         params.collectFirst {
-          case (qkeyRegex(key), qvalueRegex(value)) => (value.toFloat, (params - key))
+          case (QValue.key(key), QValue.value(value)) => (value.toFloat, (params - key))
         } map {
-          case (rank, params) => new TCodingImpl(Name(name), Qvalue(rank), Params(params))
+          case (rank, params) => new TCodingImpl(Name(name), QValue(rank), Params(params))
         } getOrElse {
           new TCodingImpl(Name(name), 1.0f, Params(params))
         }
     }
 
+  /** Creates TCoding with supplied values. */
+  def apply(name: String, rank: Float = 1.0f, params: Map[String, String] = Map.empty): TCoding =
+    new TCodingImpl(Name(name), QValue(rank), Params(params))
+
   /** Destructures TCoding. */
   def unapply(tcoding: TCoding): Option[(String, Float, Map[String, String])] =
     Some((tcoding.name, tcoding.rank, tcoding.params))
-
-  private def Qvalue(qvalue: Float): Float =
-    (qvalue.max(0f).min(1f) * 1000).floor / 1000
 }
 
 private class TCodingImpl(val name: String, val rank: Float, val params: Map[String, String]) extends TCoding

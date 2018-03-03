@@ -1,14 +1,9 @@
 package scamper
 
-import scala.annotation.tailrec
-import scala.util.matching.Regex.Match
-
 import Grammar._
 
 private object MediaTypeHelper {
-  private val MediaTypeRegex     = """\s*([^\s/=;"]+)/([^\s/=;"]+)((?:\s*;\s*.+=.+)*)""".r
-  private val UnquotedParamRegex = """\s*;\s*([^\s/=;"]+)\s*=\s*([^\s/=;"]+)\s*""".r
-  private val QuotedParamRegex   = """\s*;\s*([^\s/=;"]+)\s*=\s*"([^"]*)"\s*""".r
+  private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)/([\w!#$%&'*+.^`|~-]+)(\s*(?:;.*)?)""".r
 
   def MainType(mainType: String): String =
     Token(mainType) getOrElse {
@@ -20,6 +15,9 @@ private object MediaTypeHelper {
       throw new IllegalArgumentException(s"Invalid subtype: $subtype")
     }
 
+  def Params(params: Map[String, String]): Map[String, String] =
+    params.map { case (name, value) => ParamName(name) -> ParamValue(value) }
+
   def ParamName(name: String): String =
     Token(name) getOrElse {
       throw new IllegalArgumentException(s"Invalid parameter name: $name")
@@ -30,31 +28,16 @@ private object MediaTypeHelper {
       throw new IllegalArgumentException(s"Invalid parameter value: $value")
     }
 
-  def Params(params: Map[String, String]): Map[String, String] =
-    params.map { case (name, value) => ParamName(name) -> ParamValue(value) }
-
   def ParseMediaType(mediaType: String): (String, String, Map[String, String]) =
     mediaType match {
-      case MediaTypeRegex(mainType, subtype, params) => (mainType, subtype, ParseParams(params))
+      case syntax(mainType, subtype, params) => (mainType, subtype, ParseParams(params))
       case _ => throw new IllegalArgumentException(s"Malformed media type: $mediaType")
     }
 
-  @tailrec
-  def ParseParams(params: String, include: Map[String, String] = Map.empty): Map[String, String] =
-    findPrefixParam(params) match {
-      case None =>
-        if (params.matches("(\\s*;)?\\s*")) include
-        else throw new IllegalArgumentException(s"Malformed media type parameters: $params")
-      case Some(m) =>
-        ParseParams(m.after.toString, include + (m.group(1) -> m.group(2)))
-    }
+  def ParseParams(params: String): Map[String, String] =
+    StandardParams.parse(params)
 
   def FormatParams(params: Map[String, String]): String =
-    params.map { case (name, value) => s"; $name=${quoteParamValue(value)}" }.mkString
-
-  private def findPrefixParam(s: String): Option[Match] =
-    UnquotedParamRegex.findPrefixMatchOf(s).orElse(QuotedParamRegex.findPrefixMatchOf(s))
-
-  private def quoteParamValue(value: String): String = Token(value).getOrElse('"' + value + '"')
+    StandardParams.format(params)
 }
 

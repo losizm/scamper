@@ -28,19 +28,19 @@ trait TransferCoding {
 
 /** TransferCoding factory */
 object TransferCoding {
-  /** Creates TransferCoding using supplied values. */
-  def apply(name: String, params: Map[String, String]): TransferCoding =
-    new TransferCodingImpl(Name(name), Params(params))
-
-  /** Creates TransferCoding using supplied values. */
-  def apply(name: String, params: (String, String)*): TransferCoding =
-    apply(name, params.toMap)
-
   /** Parses formatted transfer coding. */
   def apply(coding: String): TransferCoding =
     ParseTransferCoding(coding) match {
       case (name, params) => apply(name, params)
     }
+
+  /** Creates TransferCoding with supplied values. */
+  def apply(name: String, params: Map[String, String]): TransferCoding =
+    new TransferCodingImpl(Name(name), Params(params))
+
+  /** Creates TransferCoding with supplied values. */
+  def apply(name: String, params: (String, String)*): TransferCoding =
+    apply(name, params.toMap)
 
   /** Destructures TransferCoding. */
   def unapply(coding: TransferCoding): Option[(String, Map[String, String])] =
