@@ -11,16 +11,18 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Accept is not present
      */
-    def accept: String =
+    def accept: Seq[MediaRange] =
       getAccept.getOrElse(throw new HeaderNotFound("Accept"))
 
     /** Gets Accept header value if present. */
-    def getAccept: Option[String] =
+    def getAccept: Option[Seq[MediaRange]] =
       request.getHeaderValue("Accept")
+        .map(ListParser.apply)
+        .map(_.map(MediaRange.apply))
 
-    /** Creates new request setting Accept header to supplied value. */
-    def withAccept(value: String): request.MessageType =
-      request.withHeader(Header("Accept", value))
+    /** Creates new request setting Accept header to supplied values. */
+    def withAccept(values: MediaRange*): request.MessageType =
+      request.withHeader(Header("Accept", values.mkString(", ")))
 
     /** Creates new request removing Accept header. */
     def removeAccept: request.MessageType =
@@ -111,12 +113,8 @@ object ImplicitHeaders {
       response.getHeaderValue("Accept-Ranges").map(_.split(",").map(_.trim).toSeq)
 
     /** Creates new response setting Accept-Ranges header to supplied values. */
-    def withAcceptRanges(values: Seq[String]): response.MessageType =
+    def withAcceptRanges(values: String*): response.MessageType =
       response.withHeader(Header("Accept-Ranges", values.mkString(", ")))
-
-    /** Creates new response setting Accept-Ranges header to supplied value. */
-    def withAcceptRanges(value: String): response.MessageType =
-      response.withHeader(Header("Accept-Ranges", value))
 
     /** Creates new response removing Accept-Ranges header. */
     def removeAcceptRanges: response.MessageType =
@@ -161,12 +159,8 @@ object ImplicitHeaders {
       response.getHeaderValue("Allow").map(_.split(",").map(_.trim).toSeq)
 
     /** Creates new response setting Allow header to supplied values. */
-    def withAllow(values: Seq[String]): response.MessageType =
+    def withAllow(values: String*): response.MessageType =
       response.withHeader(Header("Allow", values.mkString(", ")))
-
-    /** Creates new response setting Allow header to supplied value. */
-    def withAllow(value: String): response.MessageType =
-      response.withHeader(Header("Allow", value))
 
     /** Creates new response removing Allow header. */
     def removeAllow: response.MessageType =
@@ -288,14 +282,8 @@ object ImplicitHeaders {
     /**
      * Creates new message setting Content-Encoding header to supplied values.
      */
-    def withContentEncoding(values: Seq[String]): message.MessageType =
+    def withContentEncoding(values: String*): message.MessageType =
       message.withHeader(Header("Content-Encoding", values.mkString(", ")))
-
-    /**
-     * Creates new message setting Content-Encoding header to supplied value.
-     */
-    def withContentEncoding(value: String): message.MessageType =
-      message.withHeader(Header("Content-Encoding", value))
 
     /** Creates new message removing Content-Encoding header. */
     def removeContentEncoding: message.MessageType =
@@ -917,16 +905,18 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if TE is not present
      */
-    def te: String =
+    def te: Seq[TCoding] =
       getTE.getOrElse(throw new HeaderNotFound("TE"))
 
     /** Gets TE header value if present. */
-    def getTE: Option[String] =
+    def getTE: Option[Seq[TCoding]] =
       request.getHeaderValue("TE")
+        .map(ListParser.apply)
+        .map(_.map(TCoding.apply))
 
-    /** Creates new request setting TE header to supplied value. */
-    def withTE(value: String): request.MessageType =
-      request.withHeader(Header("TE", value))
+    /** Creates new request setting TE header to supplied values. */
+    def withTE(values: TCoding*): request.MessageType =
+      request.withHeader(Header("TE", values.mkString(", ")))
 
     /** Creates new request removing TE header. */
     def removeTE: request.MessageType =
@@ -948,12 +938,8 @@ object ImplicitHeaders {
       message.getHeaderValue("Trailer").map(_.split(",").map(_.trim).toSeq)
 
     /** Creates new message setting Trailer header to supplied values. */
-    def withTrailer(values: Seq[String]): message.MessageType =
+    def withTrailer(values: String*): message.MessageType =
       message.withHeader(Header("Trailer", values.mkString(", ")))
-
-    /** Creates new message setting Trailer header to supplied value. */
-    def withTrailer(value: String): message.MessageType =
-      message.withHeader(Header("Trailer", value))
 
     /** Creates new message removing Trailer header. */
     def removeTrailer: message.MessageType =
@@ -967,18 +953,20 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Transfer-Encoding is not present
      */
-    def transferEncoding: String =
+    def transferEncoding: Seq[TransferCoding] =
       getTransferEncoding.getOrElse(throw new HeaderNotFound("Transfer-Encoding"))
 
     /** Gets Transfer-Encoding header value if present. */
-    def getTransferEncoding: Option[String] =
+    def getTransferEncoding: Option[Seq[TransferCoding]] =
       message.getHeaderValue("Transfer-Encoding")
+        .map(ListParser.apply)
+        .map(_.map(TransferCoding.apply))
 
     /**
-     * Creates new message setting Transfer-Encoding header to supplied value.
+     * Creates new message setting Transfer-Encoding header to supplied values.
      */
-    def withTransferEncoding(value: String): message.MessageType =
-      message.withHeader(Header("Transfer-Encoding", value))
+    def withTransferEncoding(values: TransferCoding*): message.MessageType =
+      message.withHeader(Header("Transfer-Encoding", values.mkString(", ")))
 
     /** Creates new message removing Transfer-Encoding header. */
     def removeTransferEncoding: message.MessageType =
@@ -1023,12 +1011,8 @@ object ImplicitHeaders {
       response.getHeaderValue("Vary").map(_.split(",").map(_.trim).toSeq)
 
     /** Creates new response setting Vary header to supplied values. */
-    def withVary(values: Seq[String]): response.MessageType =
+    def withVary(values: String*): response.MessageType =
       response.withHeader(Header("Vary", values.mkString(", ")))
-
-    /** Creates new response setting Vary header to supplied value. */
-    def withVary(value: String): response.MessageType =
-      response.withHeader(Header("Vary", value))
 
     /** Creates new response removing Vary header. */
     def removeVary: response.MessageType =
