@@ -2,7 +2,7 @@ package scamper
 
 import java.time.OffsetDateTime
 
-/** Contains type classes that add support for accessing message headers. */
+/** Contains type classes for accessing message headers. */
 object ImplicitHeaders {
   /** Supports Accept header. */
   implicit class Accept[T <: HttpRequest](val request: T) {

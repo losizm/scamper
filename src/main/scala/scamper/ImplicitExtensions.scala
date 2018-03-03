@@ -6,15 +6,16 @@ import java.net.{ HttpURLConnection, URI, URL }
 import scala.annotation.tailrec
 import scala.util.Try
 
-/** Contains type classes as extensions to HttpRequest, URI, and URL. */
+/** Contains type classes of HttpRequest, URI, and URL. */
 object ImplicitExtensions {
-  /**
-   * Type class of [[HttpRequest]] that adds method for sending request and
-   * receiving [[HttpResponse]].
-   */
+  /** Type class of [[HttpRequest]]. */
   implicit class HttpRequestExt(request: HttpRequest) {
     /**
      * Sends request and passes response to supplied handler.
+     *
+     * To make effective use of this method, either the Host header must be set,
+     * or the request URI must be absolute. Also note that if the request URI is
+     * absolute, its scheme is overridden in accordance to {@code secure}.
      *
      * @param secure specifies whether to use HTTPS protocol
      * @param f response handler
@@ -24,20 +25,10 @@ object ImplicitExtensions {
     def send[T](secure: Boolean = false)(f: HttpResponse => T): T = {
       val scheme = if (secure) "https" else "http"
       val uri = request.uri.toURI
+      val host = getHost(uri)
+      val headers = Header("Host", host) +: request.headers.filterNot(_.key.equalsIgnoreCase("Host"))
 
-      if (uri.isAbsolute) {
-        val host = uri.getAuthority
-        val url = uri.toURL(scheme, host)
-        val headers = Header("Host", host) +: request.headers.filterNot(_.key.equalsIgnoreCase("Host"))
-
-        url.request(request.method, headers, Some(request.body))(f)
-      } else {
-        val host = getHost(uri)
-        val url = uri.toURL(scheme, host)
-        val headers = Header("Host", host) +: request.headers.filterNot(_.key.equalsIgnoreCase("Host"))
-
-        url.request(request.method, headers, Some(request.body))(f)
-      }
+      uri.toURL(scheme, host).request(request.method, headers, Some(request.body))(f)
     }
 
     private def getHost(uri: URI): String =
@@ -45,7 +36,7 @@ object ImplicitExtensions {
   }
 
   /**
-   * Type class of {@code java.net.URI} that adds methods for building new URI.
+   * Type class of {@code java.net.URI}.
    */
   implicit class URIExt(uri: URI) {
     /** Gets query parameters. */
@@ -89,10 +80,7 @@ object ImplicitExtensions {
       buildURI(uri.getScheme, uri.getRawAuthority, path, query, uri.getRawFragment).toURI
   }
 
-  /**
-   * Type class of {@code java.net.URL} that adds methods for building new URL
-   * and sending HTTP request.
-   */
+  /** Type class of {@code java.net.URL}. */
   implicit class URLExt(url: URL) {
     /** Gets the query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
