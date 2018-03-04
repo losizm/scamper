@@ -250,19 +250,19 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Content-Disposition is not present
      */
-    def contentDisposition: String =
+    def contentDisposition: ContentDispositionType =
       getContentDisposition.getOrElse(throw new HeaderNotFound("Content-Disposition"))
 
     /** Gets Content-Disposition header value if present. */
-    def getContentDisposition: Option[String] =
-      response.getHeaderValue("Content-Disposition")
+    def getContentDisposition: Option[ContentDispositionType] =
+      response.getHeaderValue("Content-Disposition").map(ContentDispositionType.apply)
 
     /**
      * Creates new response setting Content-Disposition header to supplied
      * value.
      */
-    def withContentDisposition(value: String): response.MessageType =
-      response.withHeader(Header("Content-Disposition", value))
+    def withContentDisposition(value: ContentDispositionType): response.MessageType =
+      response.withHeader(Header("Content-Disposition", value.toString))
 
     /** Creates new response removing Content-Disposition header. */
     def removeContentDisposition: response.MessageType =
