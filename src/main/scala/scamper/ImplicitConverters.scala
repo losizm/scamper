@@ -46,8 +46,8 @@ object ImplicitConverters {
   /** Converts string to [[MediaRange]]. */
   implicit val stringToMediaRange = (value: String) => MediaRange(value)
 
-  /** Converts string to [[TCoding]]. */
-  implicit val stringToTCoding = (value: String) => TCoding(value)
+  /** Converts string to [[TransferCodingRange]]. */
+  implicit val stringToTransferCodingRange = (value: String) => TransferCodingRange(value)
 
   /** Converts string to [[TransferCoding]]. */
   implicit val stringToTransferCoding = (value: String) => TransferCoding(value)

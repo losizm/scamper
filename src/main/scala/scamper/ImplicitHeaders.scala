@@ -911,17 +911,17 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if TE is not present
      */
-    def te: Seq[TCoding] =
+    def te: Seq[TransferCodingRange] =
       getTE.getOrElse(throw new HeaderNotFound("TE"))
 
     /** Gets TE header value if present. */
-    def getTE: Option[Seq[TCoding]] =
+    def getTE: Option[Seq[TransferCodingRange]] =
       request.getHeaderValue("TE")
         .map(ListParser.apply)
-        .map(_.map(TCoding.apply))
+        .map(_.map(TransferCodingRange.apply))
 
     /** Creates new request setting TE header to supplied values. */
-    def withTE(values: TCoding*): request.MessageType =
+    def withTE(values: TransferCodingRange*): request.MessageType =
       request.withHeader(Header("TE", values.mkString(", ")))
 
     /** Creates new request removing TE header. */
