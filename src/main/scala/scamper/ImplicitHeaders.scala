@@ -227,16 +227,16 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Cache-Control is not present
      */
-    def cacheControl: String =
+    def cacheControl: Seq[String] =
       getCacheControl.getOrElse(throw new HeaderNotFound("Cache-Control"))
 
     /** Gets Cache-Control header value if present. */
-    def getCacheControl: Option[String] =
-      message.getHeaderValue("Cache-Control")
+    def getCacheControl: Option[Seq[String]] =
+      message.getHeaderValue("Cache-Control").map(ListParser.apply)
 
-    /** Creates new message setting Cache-Control header to supplied value. */
-    def withCacheControl(value: String): message.MessageType =
-      message.withHeader(Header("Cache-Control", value))
+    /** Creates new message setting Cache-Control header to supplied values. */
+    def withCacheControl(values: String*): message.MessageType =
+      message.withHeader(Header("Cache-Control", values.mkString(", ")))
 
     /** Creates new message removing Cache-Control header. */
     def removeCacheControl: message.MessageType =
@@ -767,16 +767,16 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Pragma is not present
      */
-    def pragma: String =
+    def pragma: Seq[String] =
       getPragma.getOrElse(throw new HeaderNotFound("Pragma"))
 
     /** Gets Pragma header value if present. */
-    def getPragma: Option[String] =
-      request.getHeaderValue("Pragma")
+    def getPragma: Option[Seq[String]] =
+      request.getHeaderValue("Pragma").map(ListParser.apply)
 
-    /** Creates new request setting Pragma header to supplied value. */
-    def withPragma(value: String): request.MessageType =
-      request.withHeader(Header("Pragma", value))
+    /** Creates new request setting Pragma header to supplied values. */
+    def withPragma(values: String*): request.MessageType =
+      request.withHeader(Header("Pragma", values.mkString(", ")))
 
     /** Creates new request removing Pragma header. */
     def removePragma: request.MessageType =

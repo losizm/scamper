@@ -35,21 +35,21 @@ object ImplicitConverters {
   implicit val fileToEntity = (entity: File) => Entity(entity)
 
   /** Converts string to [[ContentCoding]]. */
-  implicit val stringToContentCoding = (value: String) => ContentCoding(value)
+  implicit val stringToContentCoding = (coding: String) => ContentCoding(coding)
 
   /** Converts string to [[ContentCodingRange]]. */
-  implicit val stringToContentCodingRange = (value: String) => ContentCodingRange(value)
+  implicit val stringToContentCodingRange = (range: String) => ContentCodingRange(range)
 
   /** Converts string to [[MediaType]]. */
-  implicit val stringToMediaType = (value: String) => MediaType(value)
+  implicit val stringToMediaType = (mediaType: String) => MediaType(mediaType)
 
   /** Converts string to [[MediaRange]]. */
-  implicit val stringToMediaRange = (value: String) => MediaRange(value)
-
-  /** Converts string to [[TransferCodingRange]]. */
-  implicit val stringToTransferCodingRange = (value: String) => TransferCodingRange(value)
+  implicit val stringToMediaRange = (range: String) => MediaRange(range)
 
   /** Converts string to [[TransferCoding]]. */
-  implicit val stringToTransferCoding = (value: String) => TransferCoding(value)
+  implicit val stringToTransferCoding = (coding: String) => TransferCoding(coding)
+
+  /** Converts string to [[TransferCodingRange]]. */
+  implicit val stringToTransferCodingRange = (range: String) => TransferCodingRange(range)
 }
 
