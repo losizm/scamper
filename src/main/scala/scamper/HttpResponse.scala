@@ -13,7 +13,7 @@ trait HttpResponse extends HttpMessage {
   /** Response status */
   def status: Status = startLine.status
 
-  /** HTTP version of response message */
+  /** HTTP version */
   def version: Version = startLine.version
 
   /**

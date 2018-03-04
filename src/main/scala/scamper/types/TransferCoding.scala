@@ -1,11 +1,11 @@
-package scamper
+package scamper.types
 
 import TransferCodingHelper._
 
 /**
- * Transfer Coding
+ * Standardized type for Transfer-Encoding header value.
  *
- * @see [[ImplicitHeaders.TransferEncoding]]
+ * @see [[scamper.headers.TransferEncoding]]
  */
 trait TransferCoding {
   /** Coding name */
@@ -16,16 +16,16 @@ trait TransferCoding {
 
   /** Tests whether name is chunked. */
   def isChunked: Boolean = name == "chunked"
-  
+
   /** Tests whether name is compress. */
   def isCompress: Boolean = name == "compress"
-  
+
   /** Tests whether name is deflate. */
   def isDeflate: Boolean = name == "deflate"
-  
+
   /** Tests whether name is gzip. */
   def isGzip: Boolean = name == "gzip"
-  
+
   /** Returns formatted transfer coding. */
   override lazy val toString: String = name + FormatParams(params)
 }

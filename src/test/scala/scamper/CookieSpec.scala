@@ -1,7 +1,6 @@
 package scamper
 
 import java.time.OffsetDateTime
-
 import org.scalatest.FlatSpec
 
 class CookieSpec extends FlatSpec {

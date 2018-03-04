@@ -1,6 +1,6 @@
-package scamper
+package scamper.types
 
-import Grammar._
+import scamper.Grammar._
 
 private object MediaTypeHelper {
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)/([\w!#$%&'*+.^`|~-]+)(\s*(?:;.*)?)""".r

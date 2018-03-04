@@ -1,4 +1,4 @@
-package scamper
+package scamper.types
 
 import org.scalatest.FlatSpec
 

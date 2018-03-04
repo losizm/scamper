@@ -1,11 +1,11 @@
-package scamper
+package scamper.types
 
 import ContentDispositionTypeHelper._
 
 /**
- * Content Disposition
+ * Standardized type for Content-Disposition header value.
  *
- * @see [[ImplicitHeaders.ContentDisposition]]
+ * @see [[scamper.headers.ContentDisposition]]
  */
 trait ContentDispositionType {
   /** Disposition type name */
@@ -16,27 +16,27 @@ trait ContentDispositionType {
 
   /** Tests whether disposition type is attachment. */
   def isAttachment: Boolean = name == "attachment"
-  
+
   /** Tests whether disposition type is inline. */
   def isInline: Boolean = name == "inline"
-  
-  /** Returns formatted content disposition. */
+
+  /** Returns formatted content disposition type and parameters. */
   override lazy val toString: String = name + FormatParams(params)
 }
 
 /** ContentDispositionType factory */
 object ContentDispositionType {
-  /** Parses formatted content disposition. */
+  /** Parses formatted content disposition type and optional parameters. */
   def apply(disposition: String): ContentDispositionType =
     ParseContentDisposition(disposition) match {
       case (name, params) => apply(name, params)
     }
 
-  /** Creates ContentDispositionType with supplied values. */
+  /** Creates ContentDispositionType with supplied name and parameters. */
   def apply(name: String, params: Map[String, String]): ContentDispositionType =
     new ContentDispositionTypeImpl(Name(name), Params(params))
 
-  /** Creates ContentDispositionType with supplied values. */
+  /** Creates ContentDispositionType with supplied name and paramaters. */
   def apply(name: String, params: (String, String)*): ContentDispositionType =
     apply(name, params.toMap)
 

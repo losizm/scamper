@@ -1,8 +1,8 @@
-package scamper
+package scamper.types
 
-import Grammar._
+import scamper.Grammar._
 
-private object TransferCodingHelper {
+private object ContentDispositionTypeHelper {
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)(\s*(?:;.*)?)""".r
 
   def Name(name: String): String =
@@ -23,7 +23,7 @@ private object TransferCodingHelper {
       throw new IllegalArgumentException(s"Invalid parameter value: $value")
     }
 
-  def ParseTransferCoding(coding: String): (String, Map[String, String]) =
+  def ParseContentDisposition(coding: String): (String, Map[String, String]) =
     coding match {
       case syntax(name, params) => (name.trim, ParseParams(params))
       case _ => throw new IllegalArgumentException(s"Malformed transfer coding: $coding")

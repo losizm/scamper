@@ -1,11 +1,11 @@
-package scamper
+package scamper.types
 
 import MediaTypeHelper._
 
 /**
- * Internet media type
+ * Standardized type for Content-Type header value.
  *
- * @see [[ImplicitHeaders.ContentType]]
+ * @see [[scamper.headers.ContentType]]
  */
 trait MediaType {
   /** Main type of media type */

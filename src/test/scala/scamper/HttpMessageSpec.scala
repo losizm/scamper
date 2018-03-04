@@ -1,7 +1,7 @@
 package scamper
 
 import org.scalatest.FlatSpec
-import ImplicitHeaders._
+import scamper.headers.{ Host, Location }
 
 class HttpMessageSpec extends FlatSpec with Statuses {
   "HttpRequest" should "be created" in {

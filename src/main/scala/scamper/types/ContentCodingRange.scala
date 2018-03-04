@@ -1,11 +1,11 @@
-package scamper
+package scamper.types
 
-import Grammar.Token
+import scamper.Grammar.Token
 
 /**
- * Content Coding Range
+ * Standardized type for Accept-Encoding header value.
  *
- * @see [[ImplicitHeaders.AcceptEncoding]]
+ * @see [[scamper.headers.AcceptEncoding]]
  */
 trait ContentCodingRange {
   /** Coding name */

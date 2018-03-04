@@ -1,4 +1,6 @@
-package scamper
+package scamper.util
+
+import scamper._
 
 /** Handles HTTP request. */
 trait RequestHandler {

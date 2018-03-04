@@ -1,11 +1,11 @@
-package scamper
+package scamper.types
 
-import Grammar.Token
+import scamper.Grammar.Token
 
 /**
- * Content Coding
+ * Standardized type for Content-Encoding header value.
  *
- * @see [[ImplicitHeaders.ContentEncoding]]
+ * @see [[scamper.headers.ContentEncoding]]
  */
 trait ContentCoding {
   /** Coding name */

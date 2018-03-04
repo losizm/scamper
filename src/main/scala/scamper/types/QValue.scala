@@ -1,4 +1,4 @@
-package scamper
+package scamper.types
 
 private object QValue {
   val key = "([Qq])".r

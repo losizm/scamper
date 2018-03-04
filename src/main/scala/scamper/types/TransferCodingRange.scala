@@ -1,11 +1,11 @@
-package scamper
+package scamper.types
 
 import TransferCodingHelper._
 
 /**
- * Transfer Coding Range
+ * Standardized type for TE header value.
  *
- * @see [[ImplicitHeaders.TE]]
+ * @see [[scamper.headers.TE]]
  */
 trait TransferCodingRange {
   /** Coding name */
@@ -19,19 +19,19 @@ trait TransferCodingRange {
 
   /** Tests whether name is chunked. */
   def isChunked: Boolean = name == "chunked"
-  
+
   /** Tests whether name is compress. */
   def isCompress: Boolean = name == "compress"
-  
+
   /** Tests whether name is deflate. */
   def isDeflate: Boolean = name == "deflate"
-  
+
   /** Tests whether name is gzip. */
   def isGzip: Boolean = name == "gzip"
-  
+
   /** Tests whether name is {@code trailers}. */
   def isTrailers: Boolean = name == "trailers"
-  
+
   /** Returns formatted transfer coding range. */
   override lazy val toString: String = {
     val range = new StringBuilder

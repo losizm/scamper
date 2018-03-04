@@ -7,9 +7,9 @@ import scala.annotation.tailrec
 import scala.util.Try
 
 /** Contains type classes of HttpRequest, URI, and URL. */
-object ImplicitExtensions {
+package object extensions {
   /** Type class of [[HttpRequest]]. */
-  implicit class HttpRequestExt(request: HttpRequest) {
+  implicit class HttpRequestExtension(request: HttpRequest) {
     /**
      * Sends request and passes response to supplied handler.
      *
@@ -38,7 +38,7 @@ object ImplicitExtensions {
   /**
    * Type class of {@code java.net.URI}.
    */
-  implicit class URIExt(uri: URI) {
+  implicit class URIExtension(uri: URI) {
     /** Gets query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
       Query.parse(uri.getQuery)
@@ -81,7 +81,7 @@ object ImplicitExtensions {
   }
 
   /** Type class of {@code java.net.URL}. */
-  implicit class URLExt(url: URL) {
+  implicit class URLExtension(url: URL) {
     /** Gets the query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
       Query.parse(url.getQuery)

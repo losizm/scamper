@@ -1,7 +1,7 @@
-package scamper
+package scamper.types
 
 import scala.annotation.tailrec
-import Grammar._
+import scamper.Grammar._
 
 private object StandardParams {
   private val TokenParam = """\s*;\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r

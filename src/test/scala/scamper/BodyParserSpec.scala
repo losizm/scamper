@@ -1,8 +1,9 @@
 package scamper
 
 import org.scalatest.FlatSpec
-import ImplicitConverters._
-import ImplicitHeaders._
+
+import scamper.headers.{ ContentLength, ContentType, TransferEncoding }
+import scamper.types.ImplicitConverters._
 
 class BodyParserSpec extends FlatSpec with Statuses {
   "BodyParser" should "parse response with text body" in {
@@ -19,7 +20,8 @@ class BodyParserSpec extends FlatSpec with Statuses {
 
   it should "parse response with chunked text body" in {
     implicit val bodyParser = BodyParser.text
-    val message = Ok("7\r\nHello, \r\n6\r\nworld!\r\n0\r\n").withContentType("text/plain; charset=utf8").withTransferEncoding("chunked")
+    val body = Entity("7\r\nHello, \r\n6\r\nworld!\r\n0\r\n")
+    val message = Ok(body).withContentType("text/plain; charset=utf8").withTransferEncoding("chunked")
 
     assert(message.parse.get == "Hello, world!")
   }

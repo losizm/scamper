@@ -8,6 +8,8 @@ import java.io.{ File, InputStream }
 
 import scala.collection.mutable.ArrayBuffer
 
+import scamper.types._
+
 /** Provides utility for parsing HTTP message body. */
 trait BodyParser[T] {
   /**
@@ -91,7 +93,7 @@ private class ByteArrayBodyParser(val maxLength: Long) extends BodyParser[Array[
     while ({ length = in.read(buffer); length != -1 }) {
       val totalLength = out.length + length
       if (totalLength > maxLength)
-        throw new EntityException(s"Entity too large: $totalLength > $maxLength")
+        throw new HttpException(s"Entity too large: $totalLength > $maxLength")
       out ++= buffer.take(length)
     }
 

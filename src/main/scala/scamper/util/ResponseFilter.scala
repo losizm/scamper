@@ -1,4 +1,6 @@
-package scamper
+package scamper.util
+
+import scamper._
 
 /** Provides utility for filtering HTTP response. */
 trait ResponseFilter {

@@ -1,4 +1,4 @@
-package scamper
+package scamper.types
 
 import scala.annotation.tailrec
 import scala.util.matching.Regex
@@ -6,9 +6,9 @@ import scala.util.matching.Regex
 import MediaTypeHelper._
 
 /**
- * Media Range
+ * Standardized type for Accept header value.
  *
- * @see [[ImplicitHeaders.Accept]]
+ * @see [[scamper.headers.Accept]]
  */
 trait MediaRange {
   /** Gets weight of media range */
