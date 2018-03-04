@@ -36,16 +36,16 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Accept-Charset is not present
      */
-    def acceptCharset: String =
+    def acceptCharset: Seq[String] =
       getAcceptCharset.getOrElse(throw new HeaderNotFound("Accept-Charset"))
 
     /** Gets Accept-Charset header value if present. */
-    def getAcceptCharset: Option[String] =
-      request.getHeaderValue("Accept-Charset")
+    def getAcceptCharset: Option[Seq[String]] =
+      request.getHeaderValue("Accept-Charset").map(ListParser.apply)
 
-    /** Creates new request setting Accept-Charset header to supplied value. */
-    def withAcceptCharset(value: String): request.MessageType =
-      request.withHeader(Header("Accept-Charset", value))
+    /** Creates new request setting Accept-Charset header to supplied values. */
+    def withAcceptCharset(values: String*): request.MessageType =
+      request.withHeader(Header("Accept-Charset", values.mkString(", ")))
 
     /** Creates new request removing Accept-Charset header. */
     def removeAcceptCharset: request.MessageType =
@@ -312,7 +312,7 @@ object ImplicitHeaders {
 
     /** Creates new message setting Content-Language header to supplied value. */
     def withContentLanguage(value: String): message.MessageType =
-      message.withHeader(Header("Content-Type", value))
+      message.withHeader(Header("Content-Language", value))
 
     /** Creates new message removing Content-Language header. */
     def removeContentLanguage: message.MessageType =
@@ -340,6 +340,31 @@ object ImplicitHeaders {
     /** Creates new message removing Content-Length header. */
     def removeContentLength: message.MessageType =
       message.removeHeaders("Content-Length")
+  }
+
+  /** Supports Content-Location header. */
+  implicit class ContentLocation[T <: HttpResponse](val response: T) {
+    /**
+     * Gets Content-Location header value.
+     *
+     * @throws HeaderNotFound if Content-Location is not present
+     */
+    def contentLocation: String =
+      getContentLocation.getOrElse(throw new HeaderNotFound("Content-Location"))
+
+    /** Gets Content-Location header value if present. */
+    def getContentLocation: Option[String] =
+      response.getHeaderValue("Content-Location")
+
+    /**
+     * Creates new response setting Content-Location header to supplied value.
+     */
+    def withContentLocation(value: String): response.MessageType =
+      response.withHeader(Header("Content-Location", value))
+
+    /** Creates new response removing Content-Location header. */
+    def removeContentLocation: response.MessageType =
+      response.removeHeaders("Content-Location")
   }
 
   /** Supports Content-Range header. */
@@ -501,6 +526,29 @@ object ImplicitHeaders {
     /** Creates new response removing Expires header. */
     def removeExpires: response.MessageType =
       response.removeHeaders("Expires")
+  }
+
+  /** Supports From header. */
+  implicit class From[T <: HttpRequest](val request: T) {
+    /**
+     * Gets From header value.
+     *
+     * @throws HeaderNotFound if From is not present
+     */
+    def from: String =
+      getFrom.getOrElse(throw new HeaderNotFound("From"))
+
+    /** Gets From header value if present. */
+    def getFrom: Option[String] =
+      request.getHeaderValue("From")
+
+    /** Creates new request setting From header to supplied value. */
+    def withFrom(value: String): request.MessageType =
+      request.withHeader(Header("From", value))
+
+    /** Creates new request removing From header. */
+    def removeFrom: request.MessageType =
+      request.removeHeaders("From")
   }
 
   /** Supports Host header. */

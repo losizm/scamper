@@ -1,5 +1,7 @@
 package scamper
 
+import Grammar.Token
+
 /** Content Coding Range */
 trait ContentCodingRange {
   /** Coding name */
@@ -34,7 +36,7 @@ trait ContentCodingRange {
 
 /** ContentCodingRange factory */
 object ContentCodingRange {
-  private val syntax = """([\w-]+|\*)(?:\s*;\s*q\s*=\s*(\d+(?:\.\d*)?))?""".r
+  private val syntax = """(\p{Graph}+)(?:\s*;\s*q\s*=\s*(\d+(?:\.\d*)?))?""".r
 
   /** Parses formatted content coding range. */
   def apply(range: String): ContentCodingRange =
@@ -46,9 +48,9 @@ object ContentCodingRange {
 
   /** Creates ContentCodingRange with supplied name and weight. */
   def apply(name: String, weight: Float): ContentCodingRange =
-    if (name.matches("(?i:(x-)?compress|deflate|(x-)?gzip|identity|\\*)"))
-      new ContentCodingRangeImpl(name.toLowerCase, QValue(weight))
-    else throw new IllegalArgumentException(s"Invalid content coding name: $name")
+    Token(name).map(name => new ContentCodingRangeImpl(name.toLowerCase, QValue(weight))).getOrElse {
+      throw new IllegalArgumentException(s"Invalid content coding name: $name")
+    }
 
   /** Destructures ContentCodingRange. */
   def unapply(range: ContentCodingRange): Option[(String, Float)] =

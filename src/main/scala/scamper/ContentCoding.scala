@@ -1,5 +1,7 @@
 package scamper
 
+import Grammar.Token
+
 /** Content Coding */
 trait ContentCoding {
   /** Coding name */
@@ -29,8 +31,9 @@ trait ContentCoding {
 object ContentCoding {
   /** Creates ContentCoding with supplied name. */
   def apply(name: String): ContentCoding =
-    if (name.matches("(?i:(x-)?compress|deflate|(x-)?gzip|identity)")) new ContentCodingImpl(name.toLowerCase)
-    else throw new IllegalArgumentException(s"Invalid content coding name: $name")
+    Token(name).map(name => new ContentCodingImpl(name.toLowerCase)).getOrElse {
+      throw new IllegalArgumentException(s"Invalid content coding name: $name")
+    }
 
   /** Destructures ContentCoding. */
   def unapply(coding: ContentCoding): Option[String] =
