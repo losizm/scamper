@@ -3,9 +3,9 @@ package scamper
 import java.time.OffsetDateTime
 import scamper.types._
 
-/** Contains type classes for specialized access to message headers. */
+/** Contains type classes for standardized access to message headers. */
 package object headers {
-  /** Provides specialized access to Accept header. */
+  /** Provides standardized access to Accept header. */
   implicit class Accept[T <: HttpRequest](val request: T) {
     /**
      * Gets Accept header value.
@@ -30,7 +30,7 @@ package object headers {
       request.removeHeaders("Accept")
   }
 
-  /** Provides specialized access to Accept-Charset header. */
+  /** Provides standardized access to Accept-Charset header. */
   implicit class AcceptCharset[T <: HttpRequest](val request: T) {
     /**
      * Gets Accept-Charset header value.
@@ -53,7 +53,7 @@ package object headers {
       request.removeHeaders("Accept-Charset")
   }
 
-  /** Provides specialized access to Accept-Encoding header. */
+  /** Provides standardized access to Accept-Encoding header. */
   implicit class AcceptEncoding[T <: HttpRequest](val request: T) {
     /**
      * Gets Accept-Encoding header value.
@@ -80,7 +80,7 @@ package object headers {
       request.removeHeaders("Accept-Encoding")
   }
 
-  /** Provides specialized access to Accept-Language header. */
+  /** Provides standardized access to Accept-Language header. */
   implicit class AcceptLanguage[T <: HttpRequest](val request: T) {
     /**
      * Gets Accept-Language header value.
@@ -103,7 +103,7 @@ package object headers {
       request.removeHeaders("Accept-Language")
   }
 
-  /** Provides specialized access to Accept-Ranges header. */
+  /** Provides standardized access to Accept-Ranges header. */
   implicit class AcceptRanges[T <: HttpResponse](val response: T) {
     /**
      * Gets Accept-Ranges header value.
@@ -126,7 +126,7 @@ package object headers {
       response.removeHeaders("Accept-Ranges")
   }
 
-  /** Provides specialized access to Age header. */
+  /** Provides standardized access to Age header. */
   implicit class Age[T <: HttpResponse](val response: T) {
     /**
      * Gets Age header value.
@@ -149,7 +149,7 @@ package object headers {
       response.removeHeaders("Age")
   }
 
-  /** Provides specialized access to Allow header. */
+  /** Provides standardized access to Allow header. */
   implicit class Allow[T <: HttpResponse](val response: T) {
     /**
      * Gets Allow header value.
@@ -172,7 +172,7 @@ package object headers {
       response.removeHeaders("Allow")
   }
 
-  /** Provides specialized access to Authentication-Info header. */
+  /** Provides standardized access to Authentication-Info header. */
   implicit class AuthenticationInfo[T <: HttpResponse](val response: T) {
     /**
      * Gets Authentication-Info header value.
@@ -198,7 +198,7 @@ package object headers {
       response.removeHeaders("Authentication-Info")
   }
 
-  /** Provides specialized access to Authorization header. */
+  /** Provides standardized access to Authorization header. */
   implicit class Authorization[T <: HttpRequest](val request: T) {
     /**
      * Gets Authorization header value.
@@ -221,7 +221,7 @@ package object headers {
       request.removeHeaders("Authorization")
   }
 
-  /** Provides specialized access to Cache-Control header. */
+  /** Provides standardized access to Cache-Control header. */
   implicit class CacheControl[T <: HttpMessage](val message: T) {
     /**
      * Gets Cache-Control header value.
@@ -244,7 +244,7 @@ package object headers {
       message.removeHeaders("Cache-Control")
   }
 
-  /** Provides specialized access to Content-Disposition header. */
+  /** Provides standardized access to Content-Disposition header. */
   implicit class ContentDisposition[T <: HttpResponse](val response: T) {
     /**
      * Gets Content-Disposition header value.
@@ -270,7 +270,7 @@ package object headers {
       response.removeHeaders("Content-Disposition")
   }
 
-  /** Provides specialized access to Content-Encoding header. */
+  /** Provides standardized access to Content-Encoding header. */
   implicit class ContentEncoding[T <: HttpMessage](val message: T) {
     /**
      * Gets Content-Encoding header value.
@@ -297,7 +297,7 @@ package object headers {
       message.removeHeaders("Content-Encoding")
   }
 
-  /** Provides specialized access to Content-Language header. */
+  /** Provides standardized access to Content-Language header. */
   implicit class ContentLanguage[T <: HttpMessage](val message: T) {
     /**
      * Gets Content-Language header value.
@@ -320,7 +320,7 @@ package object headers {
       message.removeHeaders("Content-Language")
   }
 
-  /** Provides specialized access to Content-Length header. */
+  /** Provides standardized access to Content-Length header. */
   implicit class ContentLength[T <: HttpMessage](val message: T) {
     /**
      * Gets Content-Length header value.
@@ -343,7 +343,7 @@ package object headers {
       message.removeHeaders("Content-Length")
   }
 
-  /** Provides specialized access to Content-Location header. */
+  /** Provides standardized access to Content-Location header. */
   implicit class ContentLocation[T <: HttpResponse](val response: T) {
     /**
      * Gets Content-Location header value.
@@ -368,7 +368,7 @@ package object headers {
       response.removeHeaders("Content-Location")
   }
 
-  /** Provides specialized access to Content-Range header. */
+  /** Provides standardized access to Content-Range header. */
   implicit class ContentRange[T <: HttpMessage](val message: T) {
     /**
      * Gets Content-Range header value.
@@ -391,7 +391,7 @@ package object headers {
       message.removeHeaders("Content-Range")
   }
 
-  /** Provides specialized access to Content-Type header. */
+  /** Provides standardized access to Content-Type header. */
   implicit class ContentType[T <: HttpMessage](val message: T) {
     /**
      * Gets Content-Type header value.
@@ -414,7 +414,7 @@ package object headers {
       message.removeHeaders("Content-Type")
   }
 
-  /** Provides specialized access to Connection header. */
+  /** Provides standardized access to Connection header. */
   implicit class Connection[T <: HttpMessage](val message: T) {
     /**
      * Gets Connection header value.
@@ -437,7 +437,7 @@ package object headers {
       message.removeHeaders("Connection")
   }
 
-  /** Provides specialized access to Date header. */
+  /** Provides standardized access to Date header. */
   implicit class Date[T <: HttpResponse](val response: T) {
     /**
      * Gets Date header value.
@@ -460,7 +460,7 @@ package object headers {
       response.removeHeaders("Date")
   }
 
-  /** Provides specialized access to ETag header. */
+  /** Provides standardized access to ETag header. */
   implicit class ETag[T <: HttpResponse](val response: T) {
     /**
      * Gets ETag header value.
@@ -483,7 +483,7 @@ package object headers {
       response.removeHeaders("ETag")
   }
 
-  /** Provides specialized access to Expect header. */
+  /** Provides standardized access to Expect header. */
   implicit class Expect[T <: HttpRequest](val request: T) {
     /**
      * Gets Expect header value.
@@ -506,7 +506,7 @@ package object headers {
       request.removeHeaders("Expect")
   }
 
-  /** Provides specialized access to Expires header. */
+  /** Provides standardized access to Expires header. */
   implicit class Expires[T <: HttpResponse](val response: T) {
     /**
      * Gets Expires header value.
@@ -529,7 +529,7 @@ package object headers {
       response.removeHeaders("Expires")
   }
 
-  /** Provides specialized access to From header. */
+  /** Provides standardized access to From header. */
   implicit class From[T <: HttpRequest](val request: T) {
     /**
      * Gets From header value.
@@ -552,7 +552,7 @@ package object headers {
       request.removeHeaders("From")
   }
 
-  /** Provides specialized access to Host header. */
+  /** Provides standardized access to Host header. */
   implicit class Host[T <: HttpRequest](val request: T) {
     /**
      * Gets Host header value.
@@ -575,7 +575,7 @@ package object headers {
       request.removeHeaders("Host")
   }
 
-  /** Provides specialized access to If-Match header. */
+  /** Provides standardized access to If-Match header. */
   implicit class IfMatch[T <: HttpRequest](val request: T) {
     /**
      * Gets If-Match header value.
@@ -598,7 +598,7 @@ package object headers {
       request.removeHeaders("If-Match")
   }
 
-  /** Provides specialized access to If-Modified-Since header. */
+  /** Provides standardized access to If-Modified-Since header. */
   implicit class IfModifiedSince[T <: HttpRequest](val request: T) {
     /**
      * Gets If-Modified-Since header value.
@@ -621,7 +621,7 @@ package object headers {
       request.removeHeaders("If-Modified-Since")
   }
 
-  /** Provides specialized access to If-Range header. */
+  /** Provides standardized access to If-Range header. */
   implicit class IfRange[T <: HttpRequest](val request: T) {
     /**
      * Gets If-Range header value.
@@ -644,7 +644,7 @@ package object headers {
       request.removeHeaders("If-Range")
   }
 
-  /** Provides specialized access to If-Unmodified-Since header. */
+  /** Provides standardized access to If-Unmodified-Since header. */
   implicit class IfUnmodifiedSince[T <: HttpRequest](val request: T) {
     /**
      * Gets If-Unmodified-Since header value.
@@ -669,7 +669,7 @@ package object headers {
       request.removeHeaders("If-Unmodified-Since")
   }
 
-  /** Provides specialized access to Last-Modified header. */
+  /** Provides standardized access to Last-Modified header. */
   implicit class LastModified[T <: HttpResponse](val response: T) {
     /**
      * Gets Last-Modified header value.
@@ -692,7 +692,7 @@ package object headers {
       response.removeHeaders("Last-Modified")
   }
 
-  /** Provides specialized access to Link header. */
+  /** Provides standardized access to Link header. */
   implicit class Link[T <: HttpResponse](val response: T) {
     /**
      * Gets Link header value.
@@ -715,7 +715,7 @@ package object headers {
       response.removeHeaders("Link")
   }
 
-  /** Provides specialized access to Location header. */
+  /** Provides standardized access to Location header. */
   implicit class Location[T <: HttpResponse](val response: T) {
     /**
      * Gets Location header value.
@@ -738,7 +738,7 @@ package object headers {
       response.removeHeaders("Location")
   }
 
-  /** Provides specialized access to Max-Forwards header. */
+  /** Provides standardized access to Max-Forwards header. */
   implicit class MaxForwards[T <: HttpRequest](val request: T) {
     /**
      * Gets Max-Forwards header value.
@@ -761,7 +761,7 @@ package object headers {
       request.removeHeaders("Max-Forwards")
   }
 
-  /** Provides specialized access to Pragma header. */
+  /** Provides standardized access to Pragma header. */
   implicit class Pragma[T <: HttpRequest](val request: T) {
     /**
      * Gets Pragma header value.
@@ -784,7 +784,7 @@ package object headers {
       request.removeHeaders("Pragma")
   }
 
-  /** Provides specialized access to Proxy-Authentication header. */
+  /** Provides standardized access to Proxy-Authentication header. */
   implicit class ProxyAuthentication[T <: HttpResponse](val response: T) {
     /**
      * Gets Proxy-Authentication header value.
@@ -810,7 +810,7 @@ package object headers {
       response.removeHeaders("Proxy-Authentication")
   }
 
-  /** Provides specialized access to Proxy-Authentication-Info header. */
+  /** Provides standardized access to Proxy-Authentication-Info header. */
   implicit class ProxyAuthenticationInfo[T <: HttpResponse](val response: T) {
     /**
      * Gets Proxy-Authentication-Info header value.
@@ -836,7 +836,7 @@ package object headers {
       response.removeHeaders("Proxy-Authentication-Info")
   }
 
-  /** Provides specialized access to Proxy-Authorization header. */
+  /** Provides standardized access to Proxy-Authorization header. */
   implicit class ProxyAuthorization[T <: HttpRequest](val request: T) {
     /**
      * Gets Proxy-Authorization header value.
@@ -861,7 +861,7 @@ package object headers {
       request.removeHeaders("Proxy-Authorization")
   }
 
-  /** Provides specialized access to Range header. */
+  /** Provides standardized access to Range header. */
   implicit class Range[T <: HttpRequest](val request: T) {
     /**
      * Gets Range header value.
@@ -884,7 +884,7 @@ package object headers {
       request.removeHeaders("Range")
   }
 
-  /** Provides specialized access to Referer header. */
+  /** Provides standardized access to Referer header. */
   implicit class Referer[T <: HttpRequest](val request: T) {
     /**
      * Gets Referer header value.
@@ -907,7 +907,7 @@ package object headers {
       request.removeHeaders("Referer")
   }
 
-  /** Provides specialized access to Retry-After header. */
+  /** Provides standardized access to Retry-After header. */
   implicit class RetryAfter[T <: HttpResponse](val response: T) {
     /**
      * Gets Retry-After header value.
@@ -930,7 +930,7 @@ package object headers {
       response.removeHeaders("Retry-After")
   }
 
-  /** Provides specialized access to Server header. */
+  /** Provides standardized access to Server header. */
   implicit class Server[T <: HttpResponse](val response: T) {
     /**
      * Gets Server header value.
@@ -953,7 +953,7 @@ package object headers {
       response.removeHeaders("Server")
   }
 
-  /** Provides specialized access to TE header. */
+  /** Provides standardized access to TE header. */
   implicit class TE[T <: HttpRequest](val request: T) {
     /**
      * Gets TE header value.
@@ -978,7 +978,7 @@ package object headers {
       request.removeHeaders("TE")
   }
 
-  /** Provides specialized access to Trailer header. */
+  /** Provides standardized access to Trailer header. */
   implicit class Trailer[T <: HttpMessage](val message: T) {
     /**
      * Gets Trailer header value.
@@ -1001,7 +1001,7 @@ package object headers {
       message.removeHeaders("Trailer")
   }
 
-  /** Provides specialized access to Transfer-Encoding header. */
+  /** Provides standardized access to Transfer-Encoding header. */
   implicit class TransferEncoding[T <: HttpMessage](val message: T) {
     /**
      * Gets Transfer-Encoding header value.
@@ -1028,7 +1028,7 @@ package object headers {
       message.removeHeaders("Transfer-Encoding")
   }
 
-  /** Provides specialized access to User-Agent header. */
+  /** Provides standardized access to User-Agent header. */
   implicit class UserAgent[T <: HttpRequest](val request: T) {
     /**
      * Gets User-Agent header value.
@@ -1051,7 +1051,7 @@ package object headers {
       request.removeHeaders("User-Agent")
   }
 
-  /** Provides specialized access to Vary header. */
+  /** Provides standardized access to Vary header. */
   implicit class Vary[T <: HttpResponse](val response: T) {
     /**
      * Gets Vary header value.
@@ -1074,7 +1074,7 @@ package object headers {
       response.removeHeaders("Vary")
   }
 
-  /** Provides specialized access to Via header. */
+  /** Provides standardized access to Via header. */
   implicit class Via[T <: HttpResponse](val response: T) {
     /**
      * Gets Via header value.
@@ -1097,7 +1097,7 @@ package object headers {
       response.removeHeaders("Via")
   }
 
-  /** Provides specialized access to Warning header. */
+  /** Provides standardized access to Warning header. */
   implicit class Warning[T <: HttpResponse](val response: T) {
     /**
      * Gets Warning header value.
@@ -1120,7 +1120,7 @@ package object headers {
       response.removeHeaders("Warning")
   }
 
-  /** Provides specialized access to WWW-Authentication header. */
+  /** Provides standardized access to WWW-Authentication header. */
   implicit class WWWAuthentication[T <: HttpResponse](val response: T) {
     /**
      * Gets WWW-Authentication header value.
