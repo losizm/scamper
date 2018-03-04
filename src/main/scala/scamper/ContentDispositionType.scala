@@ -2,7 +2,11 @@ package scamper
 
 import ContentDispositionTypeHelper._
 
-/** Content Disposition */
+/**
+ * Content Disposition
+ *
+ * @see [[ImplicitHeaders.ContentDisposition]]
+ */
 trait ContentDispositionType {
   /** Disposition type name */
   def name: String

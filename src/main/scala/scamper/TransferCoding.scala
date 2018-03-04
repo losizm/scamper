@@ -2,7 +2,11 @@ package scamper
 
 import TransferCodingHelper._
 
-/** Transfer Coding */
+/**
+ * Transfer Coding
+ *
+ * @see [[ImplicitHeaders.TransferEncoding]]
+ */
 trait TransferCoding {
   /** Coding name */
   def name: String

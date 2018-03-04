@@ -2,7 +2,11 @@ package scamper
 
 import MediaTypeHelper._
 
-/** Internet media type */
+/**
+ * Internet media type
+ *
+ * @see [[ImplicitHeaders.ContentType]]
+ */
 trait MediaType {
   /** Main type of media type */
   def mainType: String

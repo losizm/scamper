@@ -5,7 +5,11 @@ import scala.util.matching.Regex
 
 import MediaTypeHelper._
 
-/** Media Range */
+/**
+ * Media Range
+ *
+ * @see [[ImplicitHeaders.Accept]]
+ */
 trait MediaRange {
   /** Gets weight of media range */
   def weight: Float

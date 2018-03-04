@@ -2,7 +2,11 @@ package scamper
 
 import Grammar.Token
 
-/** Content Coding */
+/**
+ * Content Coding
+ *
+ * @see [[ImplicitHeaders.ContentEncoding]]
+ */
 trait ContentCoding {
   /** Coding name */
   def name: String
