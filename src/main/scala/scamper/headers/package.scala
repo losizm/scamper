@@ -13,7 +13,7 @@ package object headers {
      * @throws HeaderNotFound if Accept is not present
      */
     def accept: Seq[MediaRange] =
-      getAccept.getOrElse(throw new HeaderNotFound("Accept"))
+      getAccept.getOrElse(throw HeaderNotFound("Accept"))
 
     /** Gets Accept header value if present. */
     def getAccept: Option[Seq[MediaRange]] =
@@ -38,7 +38,7 @@ package object headers {
      * @throws HeaderNotFound if Accept-Charset is not present
      */
     def acceptCharset: Seq[String] =
-      getAcceptCharset.getOrElse(throw new HeaderNotFound("Accept-Charset"))
+      getAcceptCharset.getOrElse(throw HeaderNotFound("Accept-Charset"))
 
     /** Gets Accept-Charset header value if present. */
     def getAcceptCharset: Option[Seq[String]] =
@@ -61,7 +61,7 @@ package object headers {
      * @throws HeaderNotFound if Accept-Encoding is not present
      */
     def acceptEncoding: Seq[ContentCodingRange] =
-      getAcceptEncoding.getOrElse(throw new HeaderNotFound("Accept-Encoding"))
+      getAcceptEncoding.getOrElse(throw HeaderNotFound("Accept-Encoding"))
 
     /** Gets Accept-Encoding header value if present. */
     def getAcceptEncoding: Option[Seq[ContentCodingRange]] =
@@ -88,7 +88,7 @@ package object headers {
      * @throws HeaderNotFound if Accept-Language is not present
      */
     def acceptLanguage: Seq[String] =
-      getAcceptLanguage.getOrElse(throw new HeaderNotFound("Accept-Language"))
+      getAcceptLanguage.getOrElse(throw HeaderNotFound("Accept-Language"))
 
     /** Gets Accept-Language header value if present. */
     def getAcceptLanguage: Option[Seq[String]] =
@@ -111,7 +111,7 @@ package object headers {
      * @throws HeaderNotFound if Accept-Ranges is not present
      */
     def acceptRanges: Seq[String] =
-      getAcceptRanges.getOrElse(throw new HeaderNotFound("Accept-Ranges"))
+      getAcceptRanges.getOrElse(throw HeaderNotFound("Accept-Ranges"))
 
     /** Gets Accept-Ranges header value if present. */
     def getAcceptRanges: Option[Seq[String]] =
@@ -134,7 +134,7 @@ package object headers {
      * @throws HeaderNotFound if Age is not present
      */
     def age: Long =
-      getAge.getOrElse(throw new HeaderNotFound("Age"))
+      getAge.getOrElse(throw HeaderNotFound("Age"))
 
     /** Gets Age header value if present. */
     def getAge: Option[Long] =
@@ -157,7 +157,7 @@ package object headers {
      * @throws HeaderNotFound if Allow is not present
      */
     def allow: Seq[String] =
-      getAllow.getOrElse(throw new HeaderNotFound("Allow"))
+      getAllow.getOrElse(throw HeaderNotFound("Allow"))
 
     /** Gets Allow header value if present. */
     def getAllow: Option[Seq[String]] =
@@ -180,7 +180,7 @@ package object headers {
      * @throws HeaderNotFound if Authentication-Info is not present
      */
     def authenticationInfo: String =
-      getAuthenticationInfo.getOrElse(throw new HeaderNotFound("Authentication-Info"))
+      getAuthenticationInfo.getOrElse(throw HeaderNotFound("Authentication-Info"))
 
     /** Gets Authentication-Info header value if present. */
     def getAuthenticationInfo: Option[String] =
@@ -206,7 +206,7 @@ package object headers {
      * @throws HeaderNotFound if Authorization is not present
      */
     def authorization: String =
-      getAuthorization.getOrElse(throw new HeaderNotFound("Authorization"))
+      getAuthorization.getOrElse(throw HeaderNotFound("Authorization"))
 
     /** Gets Authorization header value if present. */
     def getAuthorization: Option[String] =
@@ -229,7 +229,7 @@ package object headers {
      * @throws HeaderNotFound if Cache-Control is not present
      */
     def cacheControl: Seq[String] =
-      getCacheControl.getOrElse(throw new HeaderNotFound("Cache-Control"))
+      getCacheControl.getOrElse(throw HeaderNotFound("Cache-Control"))
 
     /** Gets Cache-Control header value if present. */
     def getCacheControl: Option[Seq[String]] =
@@ -252,7 +252,7 @@ package object headers {
      * @throws HeaderNotFound if Content-Disposition is not present
      */
     def contentDisposition: ContentDispositionType =
-      getContentDisposition.getOrElse(throw new HeaderNotFound("Content-Disposition"))
+      getContentDisposition.getOrElse(throw HeaderNotFound("Content-Disposition"))
 
     /** Gets Content-Disposition header value if present. */
     def getContentDisposition: Option[ContentDispositionType] =
@@ -278,7 +278,7 @@ package object headers {
      * @throws HeaderNotFound if Content-Encoding is not present
      */
     def contentEncoding: Seq[ContentCoding] =
-      getContentEncoding.getOrElse(throw new HeaderNotFound("Content-Encoding"))
+      getContentEncoding.getOrElse(throw HeaderNotFound("Content-Encoding"))
 
     /** Gets Content-Encoding header value if present. */
     def getContentEncoding: Option[Seq[ContentCoding]] =
@@ -305,7 +305,7 @@ package object headers {
      * @throws HeaderNotFound if Content-Language is not present
      */
     def contentLanguage: String =
-      getContentLanguage.getOrElse(throw new HeaderNotFound("Content-Language"))
+      getContentLanguage.getOrElse(throw HeaderNotFound("Content-Language"))
 
     /** Gets Content-Language header value if present. */
     def getContentLanguage: Option[String] =
@@ -328,7 +328,7 @@ package object headers {
      * @throws HeaderNotFound if Content-Length is not present
      */
     def contentLength: Long =
-      getContentLength.getOrElse(throw new HeaderNotFound("Content-Length"))
+      getContentLength.getOrElse(throw HeaderNotFound("Content-Length"))
 
     /** Gets Content-Length header value if present. */
     def getContentLength: Option[Long] =
@@ -351,7 +351,7 @@ package object headers {
      * @throws HeaderNotFound if Content-Location is not present
      */
     def contentLocation: String =
-      getContentLocation.getOrElse(throw new HeaderNotFound("Content-Location"))
+      getContentLocation.getOrElse(throw HeaderNotFound("Content-Location"))
 
     /** Gets Content-Location header value if present. */
     def getContentLocation: Option[String] =
@@ -376,7 +376,7 @@ package object headers {
      * @throws HeaderNotFound if Content-Range is not present
      */
     def contentRange: String =
-      getContentRange.getOrElse(throw new HeaderNotFound("Content-Range"))
+      getContentRange.getOrElse(throw HeaderNotFound("Content-Range"))
 
     /** Gets Content-Range header value if present. */
     def getContentRange: Option[String] =
@@ -399,7 +399,7 @@ package object headers {
      * @throws HeaderNotFound if Content-Type is not present
      */
     def contentType: MediaType =
-      getContentType.getOrElse(throw new HeaderNotFound("Content-Type"))
+      getContentType.getOrElse(throw HeaderNotFound("Content-Type"))
 
     /** Gets Content-Type header value if present. */
     def getContentType: Option[MediaType] =
@@ -422,7 +422,7 @@ package object headers {
      * @throws HeaderNotFound if Connection is not present
      */
     def connection: String =
-      getConnection.getOrElse(throw new HeaderNotFound("Connection"))
+      getConnection.getOrElse(throw HeaderNotFound("Connection"))
 
     /** Gets Connection header value if present. */
     def getConnection: Option[String] =
@@ -445,7 +445,7 @@ package object headers {
      * @throws HeaderNotFound if Date is not present
      */
     def date: OffsetDateTime =
-      getDate.getOrElse(throw new HeaderNotFound("Date"))
+      getDate.getOrElse(throw HeaderNotFound("Date"))
 
     /** Gets Date header value if present. */
     def getDate: Option[OffsetDateTime] =
@@ -468,7 +468,7 @@ package object headers {
      * @throws HeaderNotFound if ETag is not present
      */
     def etag: String =
-      getETag.getOrElse(throw new HeaderNotFound("ETag"))
+      getETag.getOrElse(throw HeaderNotFound("ETag"))
 
     /** Gets ETag header value if present. */
     def getETag: Option[String] =
@@ -491,7 +491,7 @@ package object headers {
      * @throws HeaderNotFound if Expect is not present
      */
     def expect: String =
-      getExpect.getOrElse(throw new HeaderNotFound("Expect"))
+      getExpect.getOrElse(throw HeaderNotFound("Expect"))
 
     /** Gets Expect header value if present. */
     def getExpect: Option[String] =
@@ -514,7 +514,7 @@ package object headers {
      * @throws HeaderNotFound if Expires is not present
      */
     def expires: OffsetDateTime =
-      getExpires.getOrElse(throw new HeaderNotFound("Expires"))
+      getExpires.getOrElse(throw HeaderNotFound("Expires"))
 
     /** Gets Expires header value if present. */
     def getExpires: Option[OffsetDateTime] =
@@ -537,7 +537,7 @@ package object headers {
      * @throws HeaderNotFound if From is not present
      */
     def from: String =
-      getFrom.getOrElse(throw new HeaderNotFound("From"))
+      getFrom.getOrElse(throw HeaderNotFound("From"))
 
     /** Gets From header value if present. */
     def getFrom: Option[String] =
@@ -560,7 +560,7 @@ package object headers {
      * @throws HeaderNotFound if Host is not present
      */
     def host: String =
-      getHost.getOrElse(throw new HeaderNotFound("Host"))
+      getHost.getOrElse(throw HeaderNotFound("Host"))
 
     /** Gets Host header value if present. */
     def getHost: Option[String] =
@@ -583,7 +583,7 @@ package object headers {
      * @throws HeaderNotFound if If-Match is not present
      */
     def ifMatch: String =
-      getIfMatch.getOrElse(throw new HeaderNotFound("If-Match"))
+      getIfMatch.getOrElse(throw HeaderNotFound("If-Match"))
 
     /** Gets If-Match header value if present. */
     def getIfMatch: Option[String] =
@@ -606,7 +606,7 @@ package object headers {
      * @throws HeaderNotFound if If-Modified-Since is not present
      */
     def ifModifiedSince: OffsetDateTime =
-      getIfModifiedSince.getOrElse(throw new HeaderNotFound("If-Modified-Since"))
+      getIfModifiedSince.getOrElse(throw HeaderNotFound("If-Modified-Since"))
 
     /** Gets If-Modified-Since header value if present. */
     def getIfModifiedSince: Option[OffsetDateTime] =
@@ -629,7 +629,7 @@ package object headers {
      * @throws HeaderNotFound if If-Range is not present
      */
     def ifRange: String =
-      getIfRange.getOrElse(throw new HeaderNotFound("If-Range"))
+      getIfRange.getOrElse(throw HeaderNotFound("If-Range"))
 
     /** Gets If-Range header value if present. */
     def getIfRange: Option[String] =
@@ -652,7 +652,7 @@ package object headers {
      * @throws HeaderNotFound if If-Unmodified-Since is not present
      */
     def ifUnmodifiedSince: OffsetDateTime =
-      getIfUnmodifiedSince.getOrElse(throw new HeaderNotFound("If-Unmodified-Since"))
+      getIfUnmodifiedSince.getOrElse(throw HeaderNotFound("If-Unmodified-Since"))
 
     /** Gets If-Unmodified-Since header value if present. */
     def getIfUnmodifiedSince: Option[OffsetDateTime] =
@@ -677,7 +677,7 @@ package object headers {
      * @throws HeaderNotFound if Last-Modified is not present
      */
     def lastModified: OffsetDateTime =
-      getLastModified.getOrElse(throw new HeaderNotFound("Last-Modified"))
+      getLastModified.getOrElse(throw HeaderNotFound("Last-Modified"))
 
     /** Gets Last-Modified header value if present. */
     def getLastModified: Option[OffsetDateTime] =
@@ -700,7 +700,7 @@ package object headers {
      * @throws HeaderNotFound if Link is not present
      */
     def link: Seq[String] =
-      getLink.getOrElse(throw new HeaderNotFound("Link"))
+      getLink.getOrElse(throw HeaderNotFound("Link"))
 
     /** Gets Link header value if present. */
     def getLink: Option[Seq[String]] =
@@ -723,7 +723,7 @@ package object headers {
      * @throws HeaderNotFound if Location is not present
      */
     def location: String =
-      getLocation.getOrElse(throw new HeaderNotFound("Location"))
+      getLocation.getOrElse(throw HeaderNotFound("Location"))
 
     /** Gets Location header value if present. */
     def getLocation: Option[String] =
@@ -746,7 +746,7 @@ package object headers {
      * @throws HeaderNotFound if Max-Forwards is not present
      */
     def maxForwards: Long =
-      getMaxForwards.getOrElse(throw new HeaderNotFound("Max-Forwards"))
+      getMaxForwards.getOrElse(throw HeaderNotFound("Max-Forwards"))
 
     /** Gets Max-Forwards header value if present. */
     def getMaxForwards: Option[Long] =
@@ -769,7 +769,7 @@ package object headers {
      * @throws HeaderNotFound if Pragma is not present
      */
     def pragma: Seq[String] =
-      getPragma.getOrElse(throw new HeaderNotFound("Pragma"))
+      getPragma.getOrElse(throw HeaderNotFound("Pragma"))
 
     /** Gets Pragma header value if present. */
     def getPragma: Option[Seq[String]] =
@@ -792,7 +792,7 @@ package object headers {
      * @throws HeaderNotFound if Proxy-Authentication is not present
      */
     def proxyAuthentication: String =
-      getProxyAuthentication.getOrElse(throw new HeaderNotFound("Proxy-Authentication"))
+      getProxyAuthentication.getOrElse(throw HeaderNotFound("Proxy-Authentication"))
 
     /** Gets Proxy-Authentication header value if present. */
     def getProxyAuthentication: Option[String] =
@@ -818,7 +818,7 @@ package object headers {
      * @throws HeaderNotFound if Proxy-Authentication-Info is not present
      */
     def proxyAuthenticationInfo: String =
-      getProxyAuthenticationInfo.getOrElse(throw new HeaderNotFound("Proxy-Authentication-Info"))
+      getProxyAuthenticationInfo.getOrElse(throw HeaderNotFound("Proxy-Authentication-Info"))
 
     /** Gets Proxy-Authentication-Info header value if present. */
     def getProxyAuthenticationInfo: Option[String] =
@@ -844,7 +844,7 @@ package object headers {
      * @throws HeaderNotFound if Proxy-Authorization is not present
      */
     def proxyAuthorization: String =
-      getProxyAuthorization.getOrElse(throw new HeaderNotFound("Proxy-Authorization"))
+      getProxyAuthorization.getOrElse(throw HeaderNotFound("Proxy-Authorization"))
 
     /** Gets Proxy-Authorization header value if present. */
     def getProxyAuthorization: Option[String] =
@@ -869,7 +869,7 @@ package object headers {
      * @throws HeaderNotFound if Range is not present
      */
     def range: String =
-      getRange.getOrElse(throw new HeaderNotFound("Range"))
+      getRange.getOrElse(throw HeaderNotFound("Range"))
 
     /** Gets Range header value if present. */
     def getRange: Option[String] =
@@ -892,7 +892,7 @@ package object headers {
      * @throws HeaderNotFound if Referer is not present
      */
     def referer: String =
-      getReferer.getOrElse(throw new HeaderNotFound("Referer"))
+      getReferer.getOrElse(throw HeaderNotFound("Referer"))
 
     /** Gets Referer header value if present. */
     def getReferer: Option[String] =
@@ -915,7 +915,7 @@ package object headers {
      * @throws HeaderNotFound if Retry-After is not present
      */
     def retryAfter: OffsetDateTime =
-      getRetryAfter.getOrElse(throw new HeaderNotFound("Retry-After"))
+      getRetryAfter.getOrElse(throw HeaderNotFound("Retry-After"))
 
     /** Gets Retry-After header value if present. */
     def getRetryAfter: Option[OffsetDateTime] =
@@ -938,7 +938,7 @@ package object headers {
      * @throws HeaderNotFound if Server is not present
      */
     def server: String =
-      getServer.getOrElse(throw new HeaderNotFound("Server"))
+      getServer.getOrElse(throw HeaderNotFound("Server"))
 
     /** Gets Server header value if present. */
     def getServer: Option[String] =
@@ -961,7 +961,7 @@ package object headers {
      * @throws HeaderNotFound if TE is not present
      */
     def te: Seq[TransferCodingRange] =
-      getTE.getOrElse(throw new HeaderNotFound("TE"))
+      getTE.getOrElse(throw HeaderNotFound("TE"))
 
     /** Gets TE header value if present. */
     def getTE: Option[Seq[TransferCodingRange]] =
@@ -986,7 +986,7 @@ package object headers {
      * @throws HeaderNotFound if Trailer is not present
      */
     def vary: Seq[String] =
-      getTrailer.getOrElse(throw new HeaderNotFound("Trailer"))
+      getTrailer.getOrElse(throw HeaderNotFound("Trailer"))
 
     /** Gets Trailer header value if present. */
     def getTrailer: Option[Seq[String]] =
@@ -1009,7 +1009,7 @@ package object headers {
      * @throws HeaderNotFound if Transfer-Encoding is not present
      */
     def transferEncoding: Seq[TransferCoding] =
-      getTransferEncoding.getOrElse(throw new HeaderNotFound("Transfer-Encoding"))
+      getTransferEncoding.getOrElse(throw HeaderNotFound("Transfer-Encoding"))
 
     /** Gets Transfer-Encoding header value if present. */
     def getTransferEncoding: Option[Seq[TransferCoding]] =
@@ -1036,7 +1036,7 @@ package object headers {
      * @throws HeaderNotFound if User-Agent is not present
      */
     def userAgent: String =
-      getUserAgent.getOrElse(throw new HeaderNotFound("User-Agent"))
+      getUserAgent.getOrElse(throw HeaderNotFound("User-Agent"))
 
     /** Gets User-Agent header value if present. */
     def getUserAgent: Option[String] =
@@ -1059,7 +1059,7 @@ package object headers {
      * @throws HeaderNotFound if Vary is not present
      */
     def vary: Seq[String] =
-      getVary.getOrElse(throw new HeaderNotFound("Vary"))
+      getVary.getOrElse(throw HeaderNotFound("Vary"))
 
     /** Gets Vary header value if present. */
     def getVary: Option[Seq[String]] =
@@ -1082,7 +1082,7 @@ package object headers {
      * @throws HeaderNotFound if Via is not present
      */
     def via: Seq[String] =
-      getVia.getOrElse(throw new HeaderNotFound("Via"))
+      getVia.getOrElse(throw HeaderNotFound("Via"))
 
     /** Gets Via header value if present. */
     def getVia: Option[Seq[String]] =
@@ -1105,7 +1105,7 @@ package object headers {
      * @throws HeaderNotFound if Warning is not present
      */
     def warning: String =
-      getWarning.getOrElse(throw new HeaderNotFound("Warning"))
+      getWarning.getOrElse(throw HeaderNotFound("Warning"))
 
     /** Gets Warning header value if present. */
     def getWarning: Option[String] =
@@ -1128,7 +1128,7 @@ package object headers {
      * @throws HeaderNotFound if WWW-Authentication is not present
      */
     def wwwAuthentication: String =
-      getWWWAuthentication.getOrElse(throw new HeaderNotFound("WWW-Authentication"))
+      getWWWAuthentication.getOrElse(throw HeaderNotFound("WWW-Authentication"))
 
     /** Gets WWW-Authentication header value if present. */
     def getWWWAuthentication: Option[String] =

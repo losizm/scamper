@@ -1,31 +1,33 @@
 package scamper.util
 
 import org.scalatest.FlatSpec
-import scamper.{ BodyParser, Entity, HttpException, HttpRequest, Statuses }
+import scamper.{ BodyParsers, Entity, HttpException, HttpRequest, Statuses }
 import scamper.ImplicitConverters.{ stringToHeader, tupleToHeaderWithLongValue }
 
 class RequestHandlerSpec extends FlatSpec with Statuses {
-  "RequestHandlerChain" should "be traversed and handle request" in {
-    val chain = RequestHandlerChain(
-      (req, next) => next(req.addHeaders("user: guest")),
-      (req, next) => next(req.addHeaders("access: read")),
-      (req, next) => {
+  "RequestHandlerChain" should "be traversed and response generated" in {
+    implicit val bodyParser = BodyParsers.text
+
+    val handlers =  Seq[RequestHandler](
+      req => Left(req.addHeaders("user: guest")),
+      req => Left(req.addHeaders("access: read")),
+      req => {
         val user = req.getHeaderValue("user").get
         val access = req.getHeaderValue("access").get
         val body = Entity(s"Hello, $user. You have $access access.", "utf8")
 
-        Ok(body).withHeader("Content-Length" -> body.length.get)
-      }
+        Right(Ok(body).withHeader("Content-Length" -> body.length.get))
+      },
+      req => throw RequestNotSatisfied(req)
     )
+    val resp = RequestHandlerChain.getResponse(HttpRequest("GET"), handlers)
 
-    val resp = chain(HttpRequest("GET"))
     assert(resp.status == Ok)
-    assert(resp.parse(BodyParser.text).get == "Hello, guest. You have read access.")
+    assert(resp.parse.get == "Hello, guest. You have read access.")
   }
 
-  it should "be exhausted and not handle request" in {
-    val chain = RequestHandlerChain()
-    assertThrows[HttpException](chain(HttpRequest("GET")))
+  it should "be traversed and no response generated" in {
+    assertThrows[RequestNotSatisfied](RequestHandlerChain.getResponse(HttpRequest("GET"), Nil))
   }
 }
 

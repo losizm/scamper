@@ -19,7 +19,7 @@ trait BodyParser[T] {
 }
 
 /** Provides body parser implementations. */
-object BodyParser {
+object BodyParsers {
   private val config = ConfigFactory.load()
   private val maxBufferSize = Math.min(config.getBytes("scamper.parser.maxBufferSize"), Int.MaxValue).toInt
   private val maxFileSize = config.getBytes("scamper.parser.maxFileSize")

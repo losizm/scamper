@@ -8,51 +8,48 @@ trait ResponseFilter {
   def apply(response: HttpResponse): Boolean
 
   /**
-   * Returns Some(response) if response matches filter condition, None
-   * otherwise.
+   * Returns {@code Some(response)} if response matches filter condition,
+   * {@code None} otherwise.
    */
   def unapply(response: HttpResponse): Option[HttpResponse] =
     if (apply(response)) Some(response) else None
 }
 
-/** Provides status-based response filter implementations. */
-object ResponseFilter {
+/** Provides status-based {@code ResponseFilter} implementations. */
+object ResponseFilters {
   /**
    * Filters informational responses.
    *
    * See [[Status.isInformational]].
    */
-  val Informational = ResponseFilter(_.status.isInformational)
+  val Informational: ResponseFilter = (res => res.status.isInformational)
 
   /**
    * Filters successful responses.
    *
    * See [[Status.isSuccessful]].
    */
-  val Successful = ResponseFilter(_.status.isSuccessful)
+  val Successful: ResponseFilter = (res => res.status.isSuccessful)
 
   /**
    * Filters redirection responses.
    *
    * See [[Status.isRedirection]].
    */
-  val Redirection = ResponseFilter(_.status.isRedirection)
+  val Redirection: ResponseFilter = (res => res.status.isRedirection)
 
   /**
    * Filters client error responses.
    *
    * See [[Status.isClientError]].
    */
-  val ClientError = ResponseFilter(_.status.isClientError)
+  val ClientError: ResponseFilter = (res => res.status.isClientError)
 
   /**
    * Filters server error responses.
    *
    * See [[Status.isServerError]].
    */
-  val ServerError = ResponseFilter(_.status.isServerError)
-
-  private def apply(predicate: HttpResponse => Boolean): ResponseFilter =
-    new ResponseFilter { def apply(response: HttpResponse) = predicate(response) }
+  val ServerError: ResponseFilter = (res => res.status.isServerError)
 }
 
