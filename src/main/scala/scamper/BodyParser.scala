@@ -44,10 +44,14 @@ object BodyParsers {
   /**
    * Gets body parser to store message body to file.
    *
-   * @param dest destination file to which message body is stored
+   * If {@code dest} is a directory, then the parser creates a new file in the
+   * specified directory on each parsing invocation. Otherwise, the parser
+   * overwrites the specified file on each invocation.
+   *
+   * @param dest destination to which message body is stored
    * @param maxLength maximum length in bytes allowed
    */
-  def file(dest: File, maxLength: Long = 4 * 1024 * 1024): BodyParser[File] =
+  def file(dest: File = new File(sys.props("java.io.tmpdir")), maxLength: Long = 4 * 1024 * 1024): BodyParser[File] =
     new FileBodyParser(dest, maxLength, maxLength.min(Int.MaxValue).toInt)
 }
 
@@ -95,7 +99,8 @@ private class FormBodyParser(maxLength: Int) extends BodyParser[Map[String, Seq[
 private class FileBodyParser(dest: File, val maxLength: Long, val maxBufferSize: Int) extends BodyParser[File] with BodyParsing {
   def apply(message: HttpMessage): File =
     withInputStream(message) { in =>
-      val out = new FileOutputStream(dest)
+      val destFile = getDestFile
+      val out = new FileOutputStream(destFile)
 
       try {
         val buf = new Array[Byte](maxBufferSize.min(8192))
@@ -104,8 +109,12 @@ private class FileBodyParser(dest: File, val maxLength: Long, val maxBufferSize:
         while ({ len = in.read(buf); len != -1 })
           out.write(buf, 0, len)
 
-        dest
+        destFile
       } finally Try(out.close())
     }
+
+  private def getDestFile(): File =
+    if (dest.isDirectory) File.createTempFile("scamper-dest-file-", ".tmp", dest)
+    else dest
 }
 
