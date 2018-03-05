@@ -31,7 +31,7 @@ object RequestLine {
   def apply(line: String): RequestLine =
     Try {
       line match {
-        case syntax(method, uri, version) => new RequestLineImpl(method, uri, Version(version))
+        case syntax(method, uri, version) => new RequestLineImpl(method.toUpperCase, uri, Version(version))
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Malformed request line: $line")
@@ -39,7 +39,7 @@ object RequestLine {
 
   /** Creates RequestLine with supplied attributes. */
   def apply(method: String, uri: String, version: Version = Version(1, 1)): RequestLine =
-    new RequestLineImpl(method, uri, version)
+    new RequestLineImpl(method.toUpperCase, uri, version)
 
   /** Destructures RequestLine. */
   def unapply(line: RequestLine): Option[(String, String, Version)] =
