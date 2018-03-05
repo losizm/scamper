@@ -11,9 +11,7 @@ trait Version {
   def minor: Int
 
   /** Returns formatted version. */
-  override lazy val toString: String =
-    if (minor == 0) major.toString
-    else s"$major.$minor"
+  override val toString: String = s"$major.$minor"
 }
 
 /** Version factory */
@@ -32,7 +30,7 @@ object Version {
     }
 
   /** Creates Version with supplied major and minor numbers. */
-  def apply(major: Int, minor: Int = 0): Version =
+  def apply(major: Int, minor: Int): Version =
     new VersionImpl(major, minor)
 
   /** Destructures Version. */
@@ -44,5 +42,6 @@ private class VersionImpl(val major: Int, val minor: Int) extends Version {
   override def equals(that: Any): Boolean =
     that match {
       case Version(major, minor) => this.major == major && this.minor == minor
+      case _ => false
     }
 }

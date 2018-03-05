@@ -11,10 +11,9 @@ class VersionSpec extends FlatSpec {
   }
 
   it should "be formatted" in {
-    assert(Version("1.0").toString == "1")
+    assert(Version("1.0").toString == "1.0")
     assert(Version("1.1").toString == "1.1")
-    assert(Version("2.0").toString == "2")
-    assert(Version("2").toString == "2")
+    assert(Version("2").toString == "2.0")
   }
 
   it should "not be created" in {
