@@ -1,12 +1,9 @@
 package scamper
 
-import bantam.nx.io._
-
-import com.typesafe.config.ConfigFactory
-
-import java.io.{ File, InputStream }
+import java.io.{ File, FileOutputStream, InputStream }
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Try
 
 import scamper.types._
 
@@ -20,53 +17,29 @@ trait BodyParser[T] {
 
 /** Provides body parser implementations. */
 object BodyParsers {
-  private val config = ConfigFactory.load()
-  private val maxBufferSize = Math.min(config.getBytes("scamper.parser.maxBufferSize"), Int.MaxValue).toInt
-  private val maxFileSize = config.getBytes("scamper.parser.maxFileSize")
-
-  /** Gets body parser to collect raw bytes of message body. */
-  def bytes: BodyParser[Array[Byte]] =
-    bytes(maxBufferSize)
-
   /**
    * Gets body parser to collect raw bytes of message body.
    *
    * @param maxLength maximum length in bytes allowed
    */
-  def bytes(maxLength: Int): BodyParser[Array[Byte]] =
+  def bytes(maxLength: Int = 4 * 1024 * 1024): BodyParser[Array[Byte]] =
     new ByteArrayBodyParser(maxLength)
-
-  /** Gets body parser to collect text content. */
-  def text: BodyParser[String] =
-    text(maxBufferSize)
 
   /**
    * Gets body parser to collect text content.
    *
    * @param maxLength maximum length in bytes allowed
    */
-  def text(maxLength: Int): BodyParser[String] =
+  def text(maxLength: Int = 4 * 1024 * 1024): BodyParser[String] =
     new TextBodyParser(maxLength)
-
-  /** Gets body parser to collect form data. */
-  def form: BodyParser[Map[String, Seq[String]]] =
-    form(maxBufferSize)
 
   /**
    * Gets body parser to collect form data.
    *
    * @param maxLength maximum length in bytes allowed
    */
-  def form(maxLength: Int): BodyParser[Map[String, Seq[String]]] =
+  def form(maxLength: Int = 4 * 1024 * 1024): BodyParser[Map[String, Seq[String]]] =
     new FormBodyParser(maxLength)
-
-  /**
-   * Gets body parser to store message body to file.
-   *
-   * @param dest destination file to which message body is stored
-   */
-  def file(dest: File): BodyParser[File] =
-    file(dest, maxFileSize)
 
   /**
    * Gets body parser to store message body to file.
@@ -74,8 +47,8 @@ object BodyParsers {
    * @param dest destination file to which message body is stored
    * @param maxLength maximum length in bytes allowed
    */
-  def file(dest: File, maxLength: Long): BodyParser[File] =
-    new FileBodyParser(dest, maxLength, maxBufferSize)
+  def file(dest: File, maxLength: Long = 4 * 1024 * 1024): BodyParser[File] =
+    new FileBodyParser(dest, maxLength, maxLength.min(Int.MaxValue).toInt)
 }
 
 private class ByteArrayBodyParser(val maxLength: Long) extends BodyParser[Array[Byte]] with BodyParsing {
@@ -87,14 +60,14 @@ private class ByteArrayBodyParser(val maxLength: Long) extends BodyParser[Array[
 
   private def toByteArray(in: InputStream): Array[Byte] = {
     val out = new ArrayBuffer[Byte](bufferSize)
-    val buffer = new Array[Byte](bufferSize)
-    var length = 0
+    val buf = new Array[Byte](bufferSize)
+    var len = 0
+    var tot = 0
 
-    while ({ length = in.read(buffer); length != -1 }) {
-      val totalLength = out.length + length
-      if (totalLength > maxLength)
-        throw new HttpException(s"Entity too large: $totalLength > $maxLength")
-      out ++= buffer.take(length)
+    while ({ len = in.read(buf); len != -1 }) {
+      tot += len
+      if (tot > maxLength) throw new HttpException(s"Entity too large: length > $maxLength")
+      out ++= buf.take(len)
     }
 
     out.toArray
@@ -116,14 +89,23 @@ private class FormBodyParser(maxLength: Int) extends BodyParser[Map[String, Seq[
   private val bodyParser = new TextBodyParser(maxLength)
 
   def apply(message: HttpMessage): Map[String, Seq[String]] =
-    Query.parse(bodyParser(message))
+    QueryParams.parse(bodyParser(message))
 }
 
 private class FileBodyParser(dest: File, val maxLength: Long, val maxBufferSize: Int) extends BodyParser[File] with BodyParsing {
   def apply(message: HttpMessage): File =
     withInputStream(message) { in =>
-      dest.withOutputStream(out => out << in)
-      dest
+      val out = new FileOutputStream(dest)
+
+      try {
+        val buf = new Array[Byte](maxBufferSize.min(8192))
+        var len = 0
+
+        while ({ len = in.read(buf); len != -1 })
+          out.write(buf, 0, len)
+
+        dest
+      } finally Try(out.close())
     }
 }
 

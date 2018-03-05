@@ -1,12 +1,13 @@
 package scamper
 
-import bantam.nx.lang.StringType
+import java.net.URLDecoder.decode
+import java.net.URLEncoder.encode
 
-private object Query {
+private object QueryParams {
   def parse(query: String): Map[String, Seq[String]] =
     query.split("&").map(_.split("=")) collect {
-      case Array(name, value) if !name.isEmpty => name.toURLDecoded -> value.toURLDecoded
-      case Array(name)        if !name.isEmpty => name.toURLDecoded -> ""
+      case Array(name, value) if !name.isEmpty => decode(name, "UTF-8") -> decode(value, "UTF-8")
+      case Array(name)        if !name.isEmpty => decode(name, "UTF-8") -> ""
     } groupBy(_._1) map {
       case (name, value) => name -> value.map(_._2).toSeq
     }
@@ -18,7 +19,7 @@ private object Query {
 
   def format(params: (String, String)*): String =
     params map {
-      case (name, value) => s"${name.toURLEncoded}=${value.toURLEncoded}"
+      case (name, value) => s"${encode(name, "UTF-8")}=${encode(value, "UTF-8")}"
     } mkString "&"
 }
 

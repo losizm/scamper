@@ -1,7 +1,5 @@
 package scamper
 
-import bantam.nx.io._
-import bantam.nx.lang._
 import java.net.{ HttpURLConnection, URI, URL }
 import scala.annotation.tailrec
 import scala.util.Try
@@ -24,7 +22,7 @@ package object extensions {
      */
     def send[T](secure: Boolean = false)(f: HttpResponse => T): T = {
       val scheme = if (secure) "https" else "http"
-      val uri = request.uri.toURI
+      val uri = new URI(request.uri)
       val host = getHost(uri)
       val headers = Header("Host", host) +: request.headers.filterNot(_.key.equalsIgnoreCase("Host"))
 
@@ -41,7 +39,7 @@ package object extensions {
   implicit class URIExtension(uri: URI) {
     /** Gets query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
-      Query.parse(uri.getQuery)
+      QueryParams.parse(uri.getQuery)
 
     /**
      * Gets value for named query parameter.
@@ -58,7 +56,7 @@ package object extensions {
 
     /** Converts URI to URL using supplied scheme and authority. */
     def toURL(scheme: String, authority: String): URL =
-      buildURI(scheme, authority, uri.getPath, uri.getQuery, uri.getFragment).toURL
+      new URL(buildURI(scheme, authority, uri.getPath, uri.getQuery, uri.getFragment))
 
     /** Creates new URI replacing path. */
     def withPath(path: String): URI =
@@ -70,21 +68,21 @@ package object extensions {
 
     /** Creates new URI replacing query parameters. */
     def withQueryParams(params: Map[String, Seq[String]]): URI =
-      withQuery(Query.format(params))
+      withQuery(QueryParams.format(params))
 
     /** Creates new URI replacing query parameters. */
     def withQueryParams(params: (String, String)*): URI =
-      withQuery(Query.format(params : _*))
+      withQuery(QueryParams.format(params : _*))
 
     private def createURI(path: String, query: String): URI =
-      buildURI(uri.getScheme, uri.getRawAuthority, path, query, uri.getRawFragment).toURI
+      new URI(buildURI(uri.getScheme, uri.getRawAuthority, path, query, uri.getRawFragment))
   }
 
   /** Type class of {@code java.net.URL}. */
   implicit class URLExtension(url: URL) {
     /** Gets the query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
-      Query.parse(url.getQuery)
+      QueryParams.parse(url.getQuery)
 
     /**
      * Gets value for named query parameter.
@@ -109,11 +107,11 @@ package object extensions {
 
     /** Creates new URL replacing query parameters. */
     def withQueryParams(params: Map[String, Seq[String]]): URL =
-      createURL(url.getPath, Query.format(params))
+      createURL(url.getPath, QueryParams.format(params))
 
     /** Creates new URL replacing query parameters. */
     def withQueryParams(params: (String, String)*): URL =
-      createURL(url.getPath, Query.format(params : _*))
+      createURL(url.getPath, QueryParams.format(params : _*))
 
     /**
      * Opens HTTP connection and passes it to supplied handler.
@@ -237,7 +235,7 @@ package object extensions {
       request("OPTIONS", headers)(f)
 
     private def createURL(path: String, query: String): URL =
-      buildURI(url.getProtocol, url.getAuthority, path, query, url.getRef).toURL
+      new URL(buildURI(url.getProtocol, url.getAuthority, path, query, url.getRef))
 
     private def writeBody(conn: HttpURLConnection, body: Entity): Unit = {
       body.length match {
@@ -250,7 +248,14 @@ package object extensions {
           conn.setChunkedStreamingMode(8192)
       }
 
-      body.withInputStream(conn.getOutputStream << _)
+      body.withInputStream { in =>
+        val out = conn.getOutputStream
+        val buf = new Array[Byte](8192)
+        var len = 0
+
+        while ({ len = in.read(buf); len != -1 })
+          out.write(buf, 0, len)
+      }
     }
 
     private def getHeaders(conn: HttpURLConnection): Seq[Header] = {

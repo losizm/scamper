@@ -6,7 +6,7 @@ import scamper.ImplicitConverters.{ stringToHeader, tupleToHeaderWithLongValue }
 
 class RequestHandlerSpec extends FlatSpec with Statuses {
   "RequestHandlerChain" should "be traversed and response generated" in {
-    implicit val bodyParser = BodyParsers.text
+    implicit val bodyParser = BodyParsers.text(80)
 
     val handlers =  Seq[RequestHandler](
       req => Left(req.addHeaders("user: guest")),

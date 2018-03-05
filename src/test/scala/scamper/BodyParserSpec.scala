@@ -7,7 +7,7 @@ import scamper.types.ImplicitConverters._
 
 class BodyParserSpec extends FlatSpec with Statuses {
   "BodyParser" should "parse response with text body" in {
-    implicit val bodyParser = BodyParsers.text
+    implicit val bodyParser = BodyParsers.text()
     val body = Entity("Hello, world!")
     val message = Ok(body).withContentType("text/plain").withContentLength(body.length.get)
 
@@ -19,7 +19,7 @@ class BodyParserSpec extends FlatSpec with Statuses {
   }
 
   it should "parse response with chunked text body" in {
-    implicit val bodyParser = BodyParsers.text
+    implicit val bodyParser = BodyParsers.text()
     val body = Entity("7\r\nHello, \r\n6\r\nworld!\r\n0\r\n")
     val message = Ok(body).withContentType("text/plain; charset=utf8").withTransferEncoding("chunked")
 
@@ -27,13 +27,21 @@ class BodyParserSpec extends FlatSpec with Statuses {
   }
 
   it should "parse request with form body" in {
-    implicit val bodyParser = BodyParsers.form
+    implicit val bodyParser = BodyParsers.form()
     val body = Entity("id=0&name=root")
     val request = HttpRequest("POST", "users").withContentLength(body.length.get).withBody(body)
     val form = request.parse.get
 
     assert(form("id").head == "0")
     assert(form("name").head == "root")
+  }
+
+  it should "not parse response with large body" in {
+    implicit val bodyParser = BodyParsers.text(8)
+    val body = Entity("Hello, world!")
+    val message = Ok(body).withContentType("text/plain").withContentLength(body.length.get)
+
+    assertThrows[HttpException](message.parse.get)
   }
 }
 

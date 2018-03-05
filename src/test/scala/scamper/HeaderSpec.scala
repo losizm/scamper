@@ -1,7 +1,5 @@
 package scamper
 
-import bantam.nx.lang._
-import java.time.OffsetDateTime
 import org.scalatest.FlatSpec
 
 class HeaderSpec extends FlatSpec {
@@ -21,11 +19,11 @@ class HeaderSpec extends FlatSpec {
   }
 
   it should "be created using date value" in {
-    val header = Header("If-Modified-Since", "2016-11-08T17:00:00-04:00".toOffsetDateTime)
+    val header = Header("If-Modified-Since", DateValue.parse("Tue, 8 Nov 2016 21:00:00 -0400"))
     assert(header.key == "If-Modified-Since")
-    assert(header.value == "Tue, 8 Nov 2016 21:00:00 GMT")
-    assert(header.dateValue == DateValue.parse("Tue, 8 Nov 2016 21:00:00 GMT"))
-    assert(header.toString == "If-Modified-Since: Tue, 8 Nov 2016 21:00:00 GMT")
+    assert(header.value == "Wed, 9 Nov 2016 01:00:00 GMT")
+    assert(header.dateValue == DateValue.parse("Wed, 9 Nov 2016 01:00:00 GMT"))
+    assert(header.toString == "If-Modified-Since: Wed, 9 Nov 2016 01:00:00 GMT")
   }
 
   it should "be created using folded value" in {
