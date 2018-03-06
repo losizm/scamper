@@ -1,10 +1,11 @@
 package scamper
 
-import java.net.{ HttpURLConnection, URI, URL }
+import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
+import java.net.{ HttpURLConnection, URI, URL, URLDecoder, URLEncoder }
 import scala.annotation.tailrec
 import scala.util.Try
 
-/** Contains type classes of HttpRequest, URI, and URL. */
+/** Contains type classes of HttpRequest, String, URI, and URL. */
 package object extensions {
   /** Type class of [[HttpRequest]]. */
   implicit class HttpRequestExtension(request: HttpRequest) {
@@ -22,7 +23,7 @@ package object extensions {
      */
     def send[T](secure: Boolean = false)(f: HttpResponse => T): T = {
       val scheme = if (secure) "https" else "http"
-      val uri = new URI(request.uri)
+      val uri = request.uri.toURI
       val host = getHost(uri)
       val headers = Header("Host", host) +: request.headers.filterNot(_.key.equalsIgnoreCase("Host"))
 
@@ -33,9 +34,61 @@ package object extensions {
       Option(uri.getAuthority).orElse(request.getHeaderValue("Host")).getOrElse(throw HeaderNotFound("Host"))
   }
 
-  /**
-   * Type class of {@code java.net.URI}.
-   */
+  /** Type class of {@code String}. */
+  implicit class StringExtension(string: String) {
+    /**
+     * Converts to LocalDate.
+     *
+     * The date string must be in ISO-8601 extended local date format, such as
+     * {@code 2016-11-08}.
+     */
+    def toLocalDate: LocalDate = LocalDate.parse(string)
+
+    /**
+     * Converts to LocalDateTime.
+     *
+     * The date string must be in ISO-8601 extended local date-time format, such
+     * as {@code 2016-11-08T21:00:00}.
+     */
+    def toLocalDateTime: LocalDateTime = LocalDateTime.parse(string)
+
+    /**
+     * Converts to OffsetDateTime.
+     *
+     * The date string must be in either one of two formats:
+     *
+     * <ul>
+     *   <li>ISO-8601 extended offset date-time format, such as
+     *   {@code 2016-11-08T21:00:00-05:00}</li>
+     *   <li>RFC 1123 format, such as
+     *   {@code Tue, 8 Nov 2016 21:00:00 -0500}</li>
+     * </ul>
+     */
+    def toOffsetDateTime: OffsetDateTime =
+      Try(OffsetDateTime.parse(string)).getOrElse(DateValue.parse(string))
+
+    /** Converts to URI. */
+    def toURI: URI = new URI(string)
+
+    /** Converts to URL. */
+    def toURL: URL = new URL(string)
+
+    /**
+     * Encodes to application/x-www-form-urlencoded using the given character encoding.
+     *
+     * @param encoding the character encoding
+     */
+    def toURLEncoded(encoding: String): String = URLEncoder.encode(string, encoding)
+
+    /**
+     * Decodes from application/x-www-form-urlencoded using the given character encoding.
+     *
+     * @param encoding the character encoding
+     */
+    def toURLDecoded(encoding: String): String = URLDecoder.decode(string, encoding)
+  }
+
+  /** Type class of {@code java.net.URI}. */
   implicit class URIExtension(uri: URI) {
     /** Gets query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
@@ -56,7 +109,7 @@ package object extensions {
 
     /** Converts URI to URL using supplied scheme and authority. */
     def toURL(scheme: String, authority: String): URL =
-      new URL(buildURI(scheme, authority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment))
+      buildURI(scheme, authority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment).toURL
 
     /** Creates new URI replacing path. */
     def withPath(path: String): URI =
@@ -75,7 +128,7 @@ package object extensions {
       withQuery(QueryParams.format(params : _*))
 
     private def createURI(path: String, query: String): URI =
-      new URI(buildURI(uri.getScheme, uri.getRawAuthority, path, query, uri.getRawFragment))
+      buildURI(uri.getScheme, uri.getRawAuthority, path, query, uri.getRawFragment).toURI
   }
 
   /** Type class of {@code java.net.URL}. */
@@ -235,7 +288,7 @@ package object extensions {
       request("OPTIONS", headers)(f)
 
     private def createURL(path: String, query: String): URL =
-      new URL(buildURI(url.getProtocol, url.getAuthority, path, query, url.getRef))
+      buildURI(url.getProtocol, url.getAuthority, path, query, url.getRef).toURL
 
     private def writeBody(conn: HttpURLConnection, body: Entity): Unit = {
       body.length match {

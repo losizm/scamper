@@ -19,11 +19,11 @@ class HeaderSpec extends FlatSpec {
   }
 
   it should "be created using date value" in {
-    val header = Header("If-Modified-Since", DateValue.parse("Tue, 8 Nov 2016 21:00:00 -0400"))
+    val header = Header("If-Modified-Since", DateValue.parse("Tue, 8 Nov 2016 21:00:00 -0500"))
     assert(header.key == "If-Modified-Since")
-    assert(header.value == "Wed, 9 Nov 2016 01:00:00 GMT")
-    assert(header.dateValue == DateValue.parse("Wed, 9 Nov 2016 01:00:00 GMT"))
-    assert(header.toString == "If-Modified-Since: Wed, 9 Nov 2016 01:00:00 GMT")
+    assert(header.value == "Wed, 9 Nov 2016 02:00:00 GMT")
+    assert(header.dateValue == DateValue.parse("Wed, 9 Nov 2016 02:00:00 GMT"))
+    assert(header.toString == "If-Modified-Since: Wed, 9 Nov 2016 02:00:00 GMT")
   }
 
   it should "be created using folded value" in {

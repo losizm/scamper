@@ -621,6 +621,29 @@ package object headers {
       request.removeHeaders("If-Modified-Since")
   }
 
+  /** Provides standardized access to If-None-Match header. */
+  implicit class IfNoneMatch[T <: HttpRequest](val request: T) {
+    /**
+     * Gets If-None-Match header value.
+     *
+     * @throws HeaderNotFound if If-None-Match is not present
+     */
+    def ifNoneMatch: String =
+      getIfNoneMatch.getOrElse(throw HeaderNotFound("If-None-Match"))
+
+    /** Gets If-None-Match header value if present. */
+    def getIfNoneMatch: Option[String] =
+      request.getHeaderValue("If-None-Match")
+
+    /** Creates new request setting If-None-Match header to supplied value. */
+    def withIfNoneMatch(value: String): request.MessageType =
+      request.withHeader(Header("If-None-Match", value))
+
+    /** Creates new request removing If-None-Match header. */
+    def removeIfNoneMatch: request.MessageType =
+      request.removeHeaders("If-None-Match")
+  }
+
   /** Provides standardized access to If-Range header. */
   implicit class IfRange[T <: HttpRequest](val request: T) {
     /**

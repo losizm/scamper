@@ -1,6 +1,7 @@
 package scamper.extensions
 
 import java.net.{ URI, URL }
+import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
 import org.scalatest.FlatSpec
 
 class ExtensionsSpec extends FlatSpec {
@@ -30,6 +31,19 @@ class ExtensionsSpec extends FlatSpec {
     val newURL = new URL("http://localhost:8080/index.html?name=guest")
     assert(url.withQuery("name=guest") == newURL)
     assert(url.withQueryParams("name" -> "guest") == newURL)
+  }
+
+  "String" should "be converted to LocalDate" in {
+    assert("2006-02-14".toLocalDate == LocalDate.parse("2006-02-14"))
+  }
+
+  it should "be converted to LocalDateTime" in {
+    assert("2006-02-14T11:15:37".toLocalDateTime == LocalDateTime.parse("2006-02-14T11:15:37"))
+  }
+
+  it should "be converted to OffsetDateTime" in {
+    assert("2006-02-14T11:15:37-05:00".toOffsetDateTime == OffsetDateTime.parse("2006-02-14T11:15:37-05:00"))
+    assert("Tue, 14 Feb 2006 11:15:37 -0500".toOffsetDateTime == OffsetDateTime.parse("2006-02-14T11:15:37-05:00"))
   }
 }
 
