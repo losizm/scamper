@@ -39,7 +39,7 @@ package object extensions {
   implicit class URIExtension(uri: URI) {
     /** Gets query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
-      QueryParams.parse(uri.getQuery)
+      QueryParams.parse(uri.getRawQuery)
 
     /**
      * Gets value for named query parameter.
@@ -56,15 +56,15 @@ package object extensions {
 
     /** Converts URI to URL using supplied scheme and authority. */
     def toURL(scheme: String, authority: String): URL =
-      new URL(buildURI(scheme, authority, uri.getPath, uri.getQuery, uri.getFragment))
+      new URL(buildURI(scheme, authority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment))
 
     /** Creates new URI replacing path. */
     def withPath(path: String): URI =
-      createURI(path, uri.getQuery)
+      createURI(path, uri.getRawQuery)
 
     /** Creates new URI replacing query. */
     def withQuery(query: String): URI =
-      createURI(uri.getPath, query)
+      createURI(uri.getRawPath, query)
 
     /** Creates new URI replacing query parameters. */
     def withQueryParams(params: Map[String, Seq[String]]): URI =

@@ -9,7 +9,7 @@ private object QueryParams {
       case Array(name, value) if !name.isEmpty => decode(name, "UTF-8") -> decode(value, "UTF-8")
       case Array(name)        if !name.isEmpty => decode(name, "UTF-8") -> ""
     } groupBy(_._1) map {
-      case (name, value) => name -> value.map(_._2).toSeq
+      case (name, params) => name -> params.map(_._2).toSeq
     }
 
   def format(params: Map[String, Seq[String]]): String =

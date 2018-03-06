@@ -1,5 +1,8 @@
 package scamper
 
+import java.net.URI
+import scamper.extensions.URIExtension
+
 /**
  * HTTP request
  *
@@ -18,6 +21,23 @@ trait HttpRequest extends HttpMessage {
 
   /** HTTP version */
   def version: Version = startLine.version
+
+  /** Path component of URI */
+  def path: String
+
+  /** Query parameters */
+  def queryParams: Map[String, Seq[String]]
+
+  /**
+   * Gets value for named query parameter.
+   *
+   * If there are multiple parameters with given name, then value of first
+   * occurrence is retrieved.
+   */
+  def getQueryParamValue(name: String): Option[String]
+
+  /** Gets all values for named query parameter. */
+  def getQueryParamValues(name: String): Seq[String]
 
   /**
    * Gets all request cookies.
@@ -45,6 +65,27 @@ trait HttpRequest extends HttpMessage {
   def withURI(uri: String): MessageType
 
   /**
+   * Creates new request replacing path component of URI.
+   *
+   * @return new request
+   */
+  def withPath(path: String): MessageType
+
+  /**
+   * Creates new request replacing query parameters.
+   *
+   * @return new request
+   */
+  def withQueryParams(params: Map[String, Seq[String]]): MessageType
+
+  /**
+   * Creates new request replacing query parameters.
+   *
+   * @return new request
+   */
+  def withQueryParams(params: (String, String)*): MessageType
+
+  /**
    * Creates new request replacing version.
    *
    * @return new request
@@ -64,6 +105,22 @@ object HttpRequest {
 }
 
 private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header], body: Entity) extends HttpRequest {
+  private lazy val uriObject = new URI(uri)
+
+  lazy val path: String = uriObject.getRawPath
+
+  lazy val queryParams: Map[String, Seq[String]] =
+    uriObject.getRawQuery match {
+      case null  => Map.empty
+      case query => QueryParams.parse(query)
+    }
+
+  def getQueryParamValue(name: String): Option[String] =
+    queryParams.get(name).flatMap(_.headOption)
+
+  def getQueryParamValues(name: String): Seq[String] =
+    queryParams.get(name).getOrElse(Nil)
+
   def addHeaders(newHeaders: Header*): HttpRequest =
     copy(headers = headers ++ newHeaders)
 
@@ -87,5 +144,14 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
 
   def withVersion(newVersion: Version): HttpRequest =
     copy(startLine = RequestLine(method, uri, newVersion))
+
+  def withPath(newPath: String): HttpRequest =
+    withURI(uriObject.withPath(newPath).toString)
+
+  def withQueryParams(params: Map[String, Seq[String]]): HttpRequest =
+    withURI(uriObject.withQueryParams(params).toString)
+
+  def withQueryParams(params: (String, String)*): HttpRequest =
+    withURI(uriObject.withQueryParams(params : _*).toString)
 }
 
