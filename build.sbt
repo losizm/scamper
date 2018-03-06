@@ -1,5 +1,5 @@
 name := "scamper"
-version := "0.8.2-SNAPSHOT"
+version := "0.8.2"
 organization := "losizm.scamper"
 
 scalaVersion := "2.12.4"
