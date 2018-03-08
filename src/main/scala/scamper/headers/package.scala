@@ -375,16 +375,16 @@ package object headers {
      *
      * @throws HeaderNotFound if Content-Range is not present
      */
-    def contentRange: String =
+    def contentRange: ByteContentRange =
       getContentRange.getOrElse(throw HeaderNotFound("Content-Range"))
 
     /** Gets Content-Range header value if present. */
-    def getContentRange: Option[String] =
-      message.getHeaderValue("Content-Range")
+    def getContentRange: Option[ByteContentRange] =
+      message.getHeaderValue("Content-Range").map(ByteContentRange.apply)
 
     /** Creates new message setting Content-Range header to supplied value. */
-    def withContentRange(value: String): message.MessageType =
-      message.withHeader(Header("Content-Range", value))
+    def withContentRange(value: ByteContentRange): message.MessageType =
+      message.withHeader(Header("Content-Range", value.toString))
 
     /** Creates new message removing Content-Range header. */
     def removeContentRange: message.MessageType =
@@ -891,16 +891,16 @@ package object headers {
      *
      * @throws HeaderNotFound if Range is not present
      */
-    def range: String =
+    def range: ByteRange =
       getRange.getOrElse(throw HeaderNotFound("Range"))
 
     /** Gets Range header value if present. */
-    def getRange: Option[String] =
-      request.getHeaderValue("Range")
+    def getRange: Option[ByteRange] =
+      request.getHeaderValue("Range").map(ByteRange.apply)
 
     /** Creates new request setting Range header to supplied value. */
-    def withRange(value: String): request.MessageType =
-      request.withHeader(Header("Range", value))
+    def withRange(value: ByteRange): request.MessageType =
+      request.withHeader(Header("Range", value.toString))
 
     /** Creates new request removing Range header. */
     def removeRange: request.MessageType =
