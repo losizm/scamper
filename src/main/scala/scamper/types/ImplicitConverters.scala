@@ -20,6 +20,9 @@ object ImplicitConverters {
   /** Converts string to [[TransferCodingRange]]. */
   implicit val stringToTransferCodingRange = (range: String) => TransferCodingRange(range)
 
+  /** Converts string to [[ContentDispositionType]]. */
+  implicit val stringToContentDispositionType = (disposition: String) => ContentDispositionType(disposition)
+
   /** Converts string to [[ByteRange]]. */
   implicit val stringToByteRange = (range: String) => ByteRange(range)
 
