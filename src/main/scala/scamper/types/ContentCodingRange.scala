@@ -39,7 +39,7 @@ trait ContentCodingRange {
 
 /** ContentCodingRange factory */
 object ContentCodingRange {
-  private val syntax = """(\p{Graph}+)(?:\s*;\s*q\s*=\s*(\d+(?:\.\d*)?))?""".r
+  private val syntax = """([^\s;=]+)(?:\s*;\s*q\s*=\s*(\d+(?:\.\d*)?))?""".r
 
   /** Parses formatted content coding range. */
   def apply(range: String): ContentCodingRange =

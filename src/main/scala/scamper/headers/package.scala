@@ -37,15 +37,17 @@ package object headers {
      *
      * @throws HeaderNotFound if Accept-Charset is not present
      */
-    def acceptCharset: Seq[String] =
+    def acceptCharset: Seq[CharsetRange] =
       getAcceptCharset.getOrElse(throw HeaderNotFound("Accept-Charset"))
 
     /** Gets Accept-Charset header value if present. */
-    def getAcceptCharset: Option[Seq[String]] =
-      request.getHeaderValue("Accept-Charset").map(ListParser(_))
+    def getAcceptCharset: Option[Seq[CharsetRange]] =
+      request.getHeaderValue("Accept-Charset")
+        .map(ListParser(_))
+        .map(_.map(CharsetRange(_)))
 
     /** Creates new request setting Accept-Charset header to supplied values. */
-    def withAcceptCharset(values: String*): request.MessageType =
+    def withAcceptCharset(values: CharsetRange*): request.MessageType =
       request.withHeader(Header("Accept-Charset", values.mkString(", ")))
 
     /** Creates new request removing Accept-Charset header. */

@@ -8,6 +8,9 @@ object ImplicitConverters {
   /** Converts string to [[ByteContentRange]]. */
   implicit val stringToByteContentRange = (range: String) => ByteContentRange(range)
 
+  /** Converts string to [[CharsetRange]]. */
+  implicit val stringToCharsetRange = (range: String) => CharsetRange(range)
+
   /** Converts string to [[ContentCoding]]. */
   implicit val stringToContentCoding = (coding: String) => ContentCoding(coding)
 
