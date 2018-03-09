@@ -32,6 +32,9 @@ trait TransferCodingRange {
   /** Tests whether name is {@code trailers}. */
   def isTrailers: Boolean = name == "trailers"
 
+  /** Tests whether supplied transfer coding matches range. */
+  def matches(coding: TransferCoding): Boolean
+
   /** Returns formatted transfer coding range. */
   override lazy val toString: String = {
     val range = new StringBuilder
@@ -66,5 +69,12 @@ object TransferCodingRange {
     Some((range.name, range.rank, range.params))
 }
 
-private class TransferCodingRangeImpl(val name: String, val rank: Float, val params: Map[String, String]) extends TransferCodingRange
+private class TransferCodingRangeImpl(val name: String, val rank: Float, val params: Map[String, String]) extends TransferCodingRange {
+  def matches(coding: TransferCoding): Boolean =
+    name.equalsIgnoreCase(coding.name) && params.forall { case (name, value) => exists(name, value, coding.params) }
+
+  private def exists(name: String, value: String, ps: Map[String, String]): Boolean =
+    ps.exists { case (n, v) => name.equalsIgnoreCase(n) && value.equalsIgnoreCase(v) }
+
+}
 

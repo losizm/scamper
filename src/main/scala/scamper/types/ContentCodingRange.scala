@@ -29,6 +29,9 @@ trait ContentCodingRange {
   /** Tests whether name is wildcard (*). */
   def isWildcard: Boolean = name == "*"
 
+  /** Tests whether supplied content coding matches range. */
+  def matches(coding: ContentCoding): Boolean
+
   /** Returns formatted content coding range. */
   override lazy val toString: String = {
     val range = new StringBuilder
@@ -61,5 +64,8 @@ object ContentCodingRange {
     Some((range.name, range.weight))
 }
 
-private class ContentCodingRangeImpl(val name: String, val weight: Float) extends ContentCodingRange
+private class ContentCodingRangeImpl(val name: String, val weight: Float) extends ContentCodingRange {
+  def matches(coding: ContentCoding): Boolean =
+    isWildcard || name.equalsIgnoreCase(coding.name)
+}
 

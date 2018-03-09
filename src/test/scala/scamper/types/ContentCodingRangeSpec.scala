@@ -17,8 +17,25 @@ class ContentCodingRangeSpec extends FlatSpec {
     assert(range.toString == "*")
   }
 
+  it should "match ContentCoding" in {
+    assert(ContentCodingRange("gzip").matches(ContentCoding("gzip")))
+    assert(ContentCodingRange("gzip; q=0.6").matches(ContentCoding("gzip")))
+    assert(ContentCodingRange("*").matches(ContentCoding("gzip")))
+    assert(ContentCodingRange("*").matches(ContentCoding("deflate")))
+    assert(ContentCodingRange("*").matches(ContentCoding("compress")))
+    assert(ContentCodingRange("*").matches(ContentCoding("identity")))
+    assert(ContentCodingRange("*").matches(ContentCoding("other")))
+  }
+
+  it should "not match ContentCoding" in {
+    assert(!ContentCodingRange("gzip").matches(ContentCoding("compress")))
+    assert(!ContentCodingRange("gzip").matches(ContentCoding("deflate")))
+    assert(!ContentCodingRange("deflate").matches(ContentCoding("gzip")))
+    assert(!ContentCodingRange("deflate").matches(ContentCoding("identity")))
+  }
+
   it should "be destructured" in {
-    val range = ContentCodingRange("""Deflate; q=1.7777""")
+    val range = ContentCodingRange("Deflate; q=0.7")
 
     range match {
       case ContentCodingRange(name, weight) =>
