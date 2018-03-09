@@ -33,12 +33,8 @@ trait ContentCodingRange {
   def matches(coding: ContentCoding): Boolean
 
   /** Returns formatted content coding range. */
-  override lazy val toString: String = {
-    val range = new StringBuilder
-    range.append(name)
-    if (weight < 1f) range.append("; q=").append(weight)
-    range.toString
-  }
+  override lazy val toString: String =
+    name + "; q=" + weight
 }
 
 /** ContentCodingRange factory */

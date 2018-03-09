@@ -18,8 +18,8 @@ package object headers {
     /** Gets Accept header value if present. */
     def getAccept: Option[Seq[MediaRange]] =
       request.getHeaderValue("Accept")
-        .map(ListParser.apply)
-        .map(_.map(MediaRange.apply))
+        .map(ListParser(_))
+        .map(_.map(MediaRange(_)))
 
     /** Creates new request setting Accept header to supplied values. */
     def withAccept(values: MediaRange*): request.MessageType =
@@ -42,7 +42,7 @@ package object headers {
 
     /** Gets Accept-Charset header value if present. */
     def getAcceptCharset: Option[Seq[String]] =
-      request.getHeaderValue("Accept-Charset").map(ListParser.apply)
+      request.getHeaderValue("Accept-Charset").map(ListParser(_))
 
     /** Creates new request setting Accept-Charset header to supplied values. */
     def withAcceptCharset(values: String*): request.MessageType =
@@ -66,8 +66,8 @@ package object headers {
     /** Gets Accept-Encoding header value if present. */
     def getAcceptEncoding: Option[Seq[ContentCodingRange]] =
       request.getHeaderValue("Accept-Encoding")
-        .map(ListParser.apply)
-        .map(_.map(ContentCodingRange.apply))
+        .map(ListParser(_))
+        .map(_.map(ContentCodingRange(_)))
 
     /**
      * Creates new request setting Accept-Encoding header to supplied values.
@@ -87,15 +87,17 @@ package object headers {
      *
      * @throws HeaderNotFound if Accept-Language is not present
      */
-    def acceptLanguage: Seq[String] =
+    def acceptLanguage: Seq[LanguageRange] =
       getAcceptLanguage.getOrElse(throw HeaderNotFound("Accept-Language"))
 
     /** Gets Accept-Language header value if present. */
-    def getAcceptLanguage: Option[Seq[String]] =
-      request.getHeaderValue("Accept-Language").map(ListParser.apply)
+    def getAcceptLanguage: Option[Seq[LanguageRange]] =
+      request.getHeaderValue("Accept-Language")
+        .map(ListParser(_))
+        .map(_.map(LanguageRange(_)))
 
     /** Creates new request setting Accept-Language header to supplied values. */
-    def withAcceptLanguage(values: String*): request.MessageType =
+    def withAcceptLanguage(values: LanguageRange*): request.MessageType =
       request.withHeader(Header("Accept-Language", values.mkString(", ")))
 
     /** Creates new request removing Accept-Language header. */
@@ -115,7 +117,7 @@ package object headers {
 
     /** Gets Accept-Ranges header value if present. */
     def getAcceptRanges: Option[Seq[String]] =
-      response.getHeaderValue("Accept-Ranges").map(ListParser.apply)
+      response.getHeaderValue("Accept-Ranges").map(ListParser(_))
 
     /** Creates new response setting Accept-Ranges header to supplied values. */
     def withAcceptRanges(values: String*): response.MessageType =
@@ -161,7 +163,7 @@ package object headers {
 
     /** Gets Allow header value if present. */
     def getAllow: Option[Seq[String]] =
-      response.getHeaderValue("Allow").map(ListParser.apply)
+      response.getHeaderValue("Allow").map(ListParser(_))
 
     /** Creates new response setting Allow header to supplied values. */
     def withAllow(values: String*): response.MessageType =
@@ -233,7 +235,7 @@ package object headers {
 
     /** Gets Cache-Control header value if present. */
     def getCacheControl: Option[Seq[String]] =
-      message.getHeaderValue("Cache-Control").map(ListParser.apply)
+      message.getHeaderValue("Cache-Control").map(ListParser(_))
 
     /** Creates new message setting Cache-Control header to supplied values. */
     def withCacheControl(values: String*): message.MessageType =
@@ -256,7 +258,7 @@ package object headers {
 
     /** Gets Content-Disposition header value if present. */
     def getContentDisposition: Option[ContentDispositionType] =
-      response.getHeaderValue("Content-Disposition").map(ContentDispositionType.apply)
+      response.getHeaderValue("Content-Disposition").map(ContentDispositionType(_))
 
     /**
      * Creates new response setting Content-Disposition header to supplied
@@ -283,8 +285,8 @@ package object headers {
     /** Gets Content-Encoding header value if present. */
     def getContentEncoding: Option[Seq[ContentCoding]] =
       message.getHeaderValue("Content-Encoding")
-        .map(ListParser.apply)
-        .map(_.map(ContentCoding.apply))
+        .map(ListParser(_))
+        .map(_.map(ContentCoding(_)))
 
     /**
      * Creates new message setting Content-Encoding header to supplied values.
@@ -304,16 +306,18 @@ package object headers {
      *
      * @throws HeaderNotFound if Content-Language is not present
      */
-    def contentLanguage: String =
+    def contentLanguage: Seq[LanguageTag] =
       getContentLanguage.getOrElse(throw HeaderNotFound("Content-Language"))
 
     /** Gets Content-Language header value if present. */
-    def getContentLanguage: Option[String] =
+    def getContentLanguage: Option[Seq[LanguageTag]] =
       message.getHeaderValue("Content-Language")
+        .map(ListParser(_))
+        .map(_.map(LanguageTag(_)))
 
     /** Creates new message setting Content-Language header to supplied value. */
-    def withContentLanguage(value: String): message.MessageType =
-      message.withHeader(Header("Content-Language", value))
+    def withContentLanguage(values: LanguageTag*): message.MessageType =
+      message.withHeader(Header("Content-Language", values.mkString(", ")))
 
     /** Creates new message removing Content-Language header. */
     def removeContentLanguage: message.MessageType =
@@ -380,7 +384,7 @@ package object headers {
 
     /** Gets Content-Range header value if present. */
     def getContentRange: Option[ByteContentRange] =
-      message.getHeaderValue("Content-Range").map(ByteContentRange.apply)
+      message.getHeaderValue("Content-Range").map(ByteContentRange(_))
 
     /** Creates new message setting Content-Range header to supplied value. */
     def withContentRange(value: ByteContentRange): message.MessageType =
@@ -403,7 +407,7 @@ package object headers {
 
     /** Gets Content-Type header value if present. */
     def getContentType: Option[MediaType] =
-      message.getHeaderValue("Content-Type").map(MediaType.apply)
+      message.getHeaderValue("Content-Type").map(MediaType(_))
 
     /** Creates new message setting Content-Type header to supplied value. */
     def withContentType(value: MediaType): message.MessageType =
@@ -727,7 +731,7 @@ package object headers {
 
     /** Gets Link header value if present. */
     def getLink: Option[Seq[String]] =
-      response.getHeaderValue("Link").map(ListParser.apply)
+      response.getHeaderValue("Link").map(ListParser(_))
 
     /** Creates new response setting Link header to supplied values. */
     def withLink(values: String*): response.MessageType =
@@ -796,7 +800,7 @@ package object headers {
 
     /** Gets Pragma header value if present. */
     def getPragma: Option[Seq[String]] =
-      request.getHeaderValue("Pragma").map(ListParser.apply)
+      request.getHeaderValue("Pragma").map(ListParser(_))
 
     /** Creates new request setting Pragma header to supplied values. */
     def withPragma(values: String*): request.MessageType =
@@ -896,7 +900,7 @@ package object headers {
 
     /** Gets Range header value if present. */
     def getRange: Option[ByteRange] =
-      request.getHeaderValue("Range").map(ByteRange.apply)
+      request.getHeaderValue("Range").map(ByteRange(_))
 
     /** Creates new request setting Range header to supplied value. */
     def withRange(value: ByteRange): request.MessageType =
@@ -989,8 +993,8 @@ package object headers {
     /** Gets TE header value if present. */
     def getTE: Option[Seq[TransferCodingRange]] =
       request.getHeaderValue("TE")
-        .map(ListParser.apply)
-        .map(_.map(TransferCodingRange.apply))
+        .map(ListParser(_))
+        .map(_.map(TransferCodingRange(_)))
 
     /** Creates new request setting TE header to supplied values. */
     def withTE(values: TransferCodingRange*): request.MessageType =
@@ -1013,7 +1017,7 @@ package object headers {
 
     /** Gets Trailer header value if present. */
     def getTrailer: Option[Seq[String]] =
-      message.getHeaderValue("Trailer").map(ListParser.apply)
+      message.getHeaderValue("Trailer").map(ListParser(_))
 
     /** Creates new message setting Trailer header to supplied values. */
     def withTrailer(values: String*): message.MessageType =
@@ -1037,8 +1041,8 @@ package object headers {
     /** Gets Transfer-Encoding header value if present. */
     def getTransferEncoding: Option[Seq[TransferCoding]] =
       message.getHeaderValue("Transfer-Encoding")
-        .map(ListParser.apply)
-        .map(_.map(TransferCoding.apply))
+        .map(ListParser(_))
+        .map(_.map(TransferCoding(_)))
 
     /**
      * Creates new message setting Transfer-Encoding header to supplied values.
@@ -1086,7 +1090,7 @@ package object headers {
 
     /** Gets Vary header value if present. */
     def getVary: Option[Seq[String]] =
-      response.getHeaderValue("Vary").map(ListParser.apply)
+      response.getHeaderValue("Vary").map(ListParser(_))
 
     /** Creates new response setting Vary header to supplied values. */
     def withVary(values: String*): response.MessageType =
@@ -1109,7 +1113,7 @@ package object headers {
 
     /** Gets Via header value if present. */
     def getVia: Option[Seq[String]] =
-      response.getHeaderValue("Via").map(ListParser.apply)
+      response.getHeaderValue("Via").map(ListParser(_))
 
     /** Creates new response setting Via header to supplied values. */
     def withVia(values: String*): response.MessageType =

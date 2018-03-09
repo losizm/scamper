@@ -9,7 +9,7 @@ class TransferCodingRangeSpec extends FlatSpec {
     assert(tcoding.isChunked)
     assert(tcoding.rank == 1.0f)
     assert(tcoding.params.isEmpty)
-    assert(tcoding.toString == "chunked")
+    assert(tcoding.toString == "chunked; q=1.0")
 
     tcoding = TransferCodingRange("GZIP; q=0.7")
     assert(tcoding.name == "gzip")
@@ -25,7 +25,7 @@ class TransferCodingRangeSpec extends FlatSpec {
     assert(tcoding.isChunked)
     assert(tcoding.rank == 1.0f)
     assert(tcoding.params("x") == "abc")
-    assert(tcoding.toString == "chunked; x=abc")
+    assert(tcoding.toString == "chunked; q=1.0; x=abc")
 
     tcoding = TransferCodingRange("""GZIP; q=0.1; level="1 2 3" """)
     assert(tcoding.name == "gzip")

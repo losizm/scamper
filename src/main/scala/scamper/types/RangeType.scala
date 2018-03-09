@@ -46,15 +46,19 @@ object ByteRange {
   private val suffix = """-(\d+)?""".r
 
   /** Parses formatted byte range. */
-  def apply(byteRange: String): ByteRange =
-    byteRange match {
+  def apply(range: String): ByteRange =
+    range match {
       case syntax(set) => new ByteRangeImpl(parseSet(set))
-      case _ => throw new IllegalArgumentException(s"Malformed byte range: $byteRange")
+      case _ => throw new IllegalArgumentException(s"Malformed byte range: $range")
     }
 
   /** Creates ByteRange from supplied specs. */
   def apply(specs: ByteRangeSpec*): ByteRange =
     new ByteRangeImpl(specs)
+
+  /** Destructures ByteRange. */
+  def unapply(range: ByteRange): Option[(String, Seq[ByteRangeSpec])] =
+    Some((range.unit, range.set))
 
   private def parseSet(set: String): Seq[ByteRangeSpec] =
     ListParser(set).map {

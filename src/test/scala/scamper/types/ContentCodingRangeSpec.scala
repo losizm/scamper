@@ -14,7 +14,7 @@ class ContentCodingRangeSpec extends FlatSpec {
     assert(range.name == "*")
     assert(range.isWildcard)
     assert(range.weight == 1.0f)
-    assert(range.toString == "*")
+    assert(range.toString == "*; q=1.0")
   }
 
   it should "match ContentCoding" in {
