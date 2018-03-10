@@ -1,0 +1,63 @@
+package scamper.types
+
+import java.util.Base64
+import org.scalatest.FlatSpec
+
+class ChallengeSpec extends FlatSpec {
+  "Challenge" should "be created without token and params" in {
+    val challenge = Challenge(s"Basic")
+    assert(challenge.scheme == "Basic")
+    assert(!challenge.token.isDefined)
+    assert(challenge.params.isEmpty)
+    assert(challenge.toString == "Basic")
+  }
+
+  it should "be created with token and no params" in {
+    val token = Base64.getEncoder().encodeToString("realm=xyz".getBytes)
+    val challenge = Challenge(s"Basic $token")
+    assert(challenge.scheme == "Basic")
+    assert(challenge.token.contains(token))
+    assert(challenge.params.isEmpty)
+    assert(challenge.toString == s"Basic $token")
+  }
+
+  "Challenge" should "be created with params and no token" in {
+    val challenge = Challenge("Basic realm=\"Admin Console\", description=none")
+    assert(challenge.scheme == "Basic")
+    assert(!challenge.token.isDefined)
+    assert(challenge.params("realm") == "Admin Console")
+    assert(challenge.params("description") == "none")
+    assert(challenge.toString == "Basic realm=\"Admin Console\", description=none")
+  }
+
+  it should "be destructured" in {
+    Challenge("Basic") match {
+      case Challenge(scheme, token, params) =>
+        assert(scheme == "Basic")
+        assert(!token.isDefined)
+        assert(params.isEmpty)
+    }
+
+    Challenge("Basic realm=\"Admin Console\", description=none") match {
+      case Challenge(scheme, token, params) =>
+        assert(scheme == "Basic")
+        assert(!token.isDefined)
+        assert(params("realm") == "Admin Console")
+        assert(params("description") == "none")
+    }
+
+    Challenge("Basic admin$secret") match {
+      case Challenge(scheme, Some(token), params) =>
+        assert(scheme == "Basic")
+        assert(token.contains("admin$secret"))
+        assert(params.isEmpty)
+    }
+  }
+
+  it should "not be created with malformed value" in {
+    assertThrows[IllegalArgumentException](Challenge("Basic /"))
+    assertThrows[IllegalArgumentException](Challenge("Basic ="))
+    assertThrows[IllegalArgumentException](Challenge("Basic =secret"))
+  }
+}
+

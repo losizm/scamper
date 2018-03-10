@@ -5,17 +5,28 @@ import scamper.types._
 
 /** Contains type classes for standardized access to message headers. */
 package object headers {
+  private object AuthTypeListParser {
+    val StartAuthType = """((?:[\w!#$%&'*+.^`|~-]+)(?:\s+(?:.+))?)""".r
+
+    def apply(list: String): Seq[String] =
+      ListParser(list).foldLeft(Seq.empty[String]) {
+        case (xs, StartAuthType(x)) => xs :+ x
+        case (head :+ tail, x) => head :+ (tail + ", " + x)
+        case (Nil, x) => Seq(x)
+      }
+  }
+
   /** Provides standardized access to Accept header. */
   implicit class Accept[T <: HttpRequest](val request: T) {
     /**
-     * Gets Accept header value.
+     * Gets Accept header values.
      *
-     * @throws HeaderNotFound if Accept is not present
+     * @return the header values or an empty sequence if Accept is not present
      */
     def accept: Seq[MediaRange] =
-      getAccept.getOrElse(throw HeaderNotFound("Accept"))
+      getAccept.getOrElse(Nil)
 
-    /** Gets Accept header value if present. */
+    /** Gets Accept header values if present. */
     def getAccept: Option[Seq[MediaRange]] =
       request.getHeaderValue("Accept")
         .map(ListParser(_))
@@ -33,14 +44,14 @@ package object headers {
   /** Provides standardized access to Accept-Charset header. */
   implicit class AcceptCharset[T <: HttpRequest](val request: T) {
     /**
-     * Gets Accept-Charset header value.
+     * Gets Accept-Charset header values.
      *
-     * @throws HeaderNotFound if Accept-Charset is not present
+     * @return the header values or an empty sequence if Accept-Charset is not present
      */
     def acceptCharset: Seq[CharsetRange] =
-      getAcceptCharset.getOrElse(throw HeaderNotFound("Accept-Charset"))
+      getAcceptCharset.getOrElse(Nil)
 
-    /** Gets Accept-Charset header value if present. */
+    /** Gets Accept-Charset header values if present. */
     def getAcceptCharset: Option[Seq[CharsetRange]] =
       request.getHeaderValue("Accept-Charset")
         .map(ListParser(_))
@@ -58,14 +69,14 @@ package object headers {
   /** Provides standardized access to Accept-Encoding header. */
   implicit class AcceptEncoding[T <: HttpRequest](val request: T) {
     /**
-     * Gets Accept-Encoding header value.
+     * Gets Accept-Encoding header values.
      *
-     * @throws HeaderNotFound if Accept-Encoding is not present
+     * @return the header values or an empty sequence if Accept-Encoding is not present
      */
     def acceptEncoding: Seq[ContentCodingRange] =
-      getAcceptEncoding.getOrElse(throw HeaderNotFound("Accept-Encoding"))
+      getAcceptEncoding.getOrElse(Nil)
 
-    /** Gets Accept-Encoding header value if present. */
+    /** Gets Accept-Encoding header values if present. */
     def getAcceptEncoding: Option[Seq[ContentCodingRange]] =
       request.getHeaderValue("Accept-Encoding")
         .map(ListParser(_))
@@ -85,20 +96,22 @@ package object headers {
   /** Provides standardized access to Accept-Language header. */
   implicit class AcceptLanguage[T <: HttpRequest](val request: T) {
     /**
-     * Gets Accept-Language header value.
+     * Gets Accept-Language header values.
      *
-     * @throws HeaderNotFound if Accept-Language is not present
+     * @return the header values or an empty sequence if Accept-Language is not present
      */
     def acceptLanguage: Seq[LanguageRange] =
-      getAcceptLanguage.getOrElse(throw HeaderNotFound("Accept-Language"))
+      getAcceptLanguage.getOrElse(Nil)
 
-    /** Gets Accept-Language header value if present. */
+    /** Gets Accept-Language header values if present. */
     def getAcceptLanguage: Option[Seq[LanguageRange]] =
       request.getHeaderValue("Accept-Language")
         .map(ListParser(_))
         .map(_.map(LanguageRange(_)))
 
-    /** Creates new request setting Accept-Language header to supplied values. */
+    /**
+     * Creates new request setting Accept-Language header to supplied values.
+     */
     def withAcceptLanguage(values: LanguageRange*): request.MessageType =
       request.withHeader(Header("Accept-Language", values.mkString(", ")))
 
@@ -110,14 +123,14 @@ package object headers {
   /** Provides standardized access to Accept-Ranges header. */
   implicit class AcceptRanges[T <: HttpResponse](val response: T) {
     /**
-     * Gets Accept-Ranges header value.
+     * Gets Accept-Ranges header values.
      *
-     * @throws HeaderNotFound if Accept-Ranges is not present
+     * @return the header values or an empty sequence if Accept-Ranges is not present
      */
     def acceptRanges: Seq[String] =
-      getAcceptRanges.getOrElse(throw HeaderNotFound("Accept-Ranges"))
+      getAcceptRanges.getOrElse(Nil)
 
-    /** Gets Accept-Ranges header value if present. */
+    /** Gets Accept-Ranges header values if present. */
     def getAcceptRanges: Option[Seq[String]] =
       response.getHeaderValue("Accept-Ranges").map(ListParser(_))
 
@@ -156,14 +169,14 @@ package object headers {
   /** Provides standardized access to Allow header. */
   implicit class Allow[T <: HttpResponse](val response: T) {
     /**
-     * Gets Allow header value.
+     * Gets Allow header values.
      *
-     * @throws HeaderNotFound if Allow is not present
+     * @return the header values or an empty sequence if Allow is not present
      */
     def allow: Seq[String] =
-      getAllow.getOrElse(throw HeaderNotFound("Allow"))
+      getAllow.getOrElse(Nil)
 
-    /** Gets Allow header value if present. */
+    /** Gets Allow header values if present. */
     def getAllow: Option[Seq[String]] =
       response.getHeaderValue("Allow").map(ListParser(_))
 
@@ -209,16 +222,16 @@ package object headers {
      *
      * @throws HeaderNotFound if Authorization is not present
      */
-    def authorization: String =
+    def authorization: Credentials =
       getAuthorization.getOrElse(throw HeaderNotFound("Authorization"))
 
     /** Gets Authorization header value if present. */
-    def getAuthorization: Option[String] =
-      request.getHeaderValue("Authorization")
+    def getAuthorization: Option[Credentials] =
+      request.getHeaderValue("Authorization").map(Credentials(_))
 
     /** Creates new request setting Authorization header to supplied value. */
-    def withAuthorization(value: String): request.MessageType =
-      request.withHeader(Header("Authorization", value))
+    def withAuthorization(value: Credentials): request.MessageType =
+      request.withHeader(Header("Authorization", value.toString))
 
     /** Creates new request removing Authorization header. */
     def removeAuthorization: request.MessageType =
@@ -228,14 +241,14 @@ package object headers {
   /** Provides standardized access to Cache-Control header. */
   implicit class CacheControl[T <: HttpMessage](val message: T) {
     /**
-     * Gets Cache-Control header value.
+     * Gets Cache-Control header values.
      *
-     * @throws HeaderNotFound if Cache-Control is not present
+     * @return the header values or an empty sequence if Cache-Control is not present
      */
     def cacheControl: Seq[String] =
-      getCacheControl.getOrElse(throw HeaderNotFound("Cache-Control"))
+      getCacheControl.getOrElse(Nil)
 
-    /** Gets Cache-Control header value if present. */
+    /** Gets Cache-Control header values if present. */
     def getCacheControl: Option[Seq[String]] =
       message.getHeaderValue("Cache-Control").map(ListParser(_))
 
@@ -277,14 +290,14 @@ package object headers {
   /** Provides standardized access to Content-Encoding header. */
   implicit class ContentEncoding[T <: HttpMessage](val message: T) {
     /**
-     * Gets Content-Encoding header value.
+     * Gets Content-Encoding header values.
      *
-     * @throws HeaderNotFound if Content-Encoding is not present
+     * @return the header values or an empty sequence if Content-Encoding is not present
      */
     def contentEncoding: Seq[ContentCoding] =
-      getContentEncoding.getOrElse(throw HeaderNotFound("Content-Encoding"))
+      getContentEncoding.getOrElse(Nil)
 
-    /** Gets Content-Encoding header value if present. */
+    /** Gets Content-Encoding header values if present. */
     def getContentEncoding: Option[Seq[ContentCoding]] =
       message.getHeaderValue("Content-Encoding")
         .map(ListParser(_))
@@ -304,20 +317,20 @@ package object headers {
   /** Provides standardized access to Content-Language header. */
   implicit class ContentLanguage[T <: HttpMessage](val message: T) {
     /**
-     * Gets Content-Language header value.
+     * Gets Content-Language header values.
      *
-     * @throws HeaderNotFound if Content-Language is not present
+     * @return the header values or an empty sequence if Content-Language is not present
      */
     def contentLanguage: Seq[LanguageTag] =
-      getContentLanguage.getOrElse(throw HeaderNotFound("Content-Language"))
+      getContentLanguage.getOrElse(Nil)
 
-    /** Gets Content-Language header value if present. */
+    /** Gets Content-Language header values if present. */
     def getContentLanguage: Option[Seq[LanguageTag]] =
       message.getHeaderValue("Content-Language")
         .map(ListParser(_))
         .map(_.map(LanguageTag(_)))
 
-    /** Creates new message setting Content-Language header to supplied value. */
+    /** Creates new message setting Content-Language header to supplied values. */
     def withContentLanguage(values: LanguageTag*): message.MessageType =
       message.withHeader(Header("Content-Language", values.mkString(", ")))
 
@@ -724,14 +737,14 @@ package object headers {
   /** Provides standardized access to Link header. */
   implicit class Link[T <: HttpResponse](val response: T) {
     /**
-     * Gets Link header value.
+     * Gets Link header values.
      *
-     * @throws HeaderNotFound if Link is not present
+     * @return the header values or an empty sequence if Link is not present
      */
     def link: Seq[String] =
-      getLink.getOrElse(throw HeaderNotFound("Link"))
+      getLink.getOrElse(Nil)
 
-    /** Gets Link header value if present. */
+    /** Gets Link header values if present. */
     def getLink: Option[Seq[String]] =
       response.getHeaderValue("Link").map(ListParser(_))
 
@@ -793,14 +806,14 @@ package object headers {
   /** Provides standardized access to Pragma header. */
   implicit class Pragma[T <: HttpRequest](val request: T) {
     /**
-     * Gets Pragma header value.
+     * Gets Pragma header values.
      *
-     * @throws HeaderNotFound if Pragma is not present
+     * @return the header values or an empty sequence if Pragma is not present
      */
     def pragma: Seq[String] =
-      getPragma.getOrElse(throw HeaderNotFound("Pragma"))
+      getPragma.getOrElse(Nil)
 
-    /** Gets Pragma header value if present. */
+    /** Gets Pragma header values if present. */
     def getPragma: Option[Seq[String]] =
       request.getHeaderValue("Pragma").map(ListParser(_))
 
@@ -813,30 +826,37 @@ package object headers {
       request.removeHeaders("Pragma")
   }
 
-  /** Provides standardized access to Proxy-Authentication header. */
-  implicit class ProxyAuthentication[T <: HttpResponse](val response: T) {
+  /** Provides standardized access to Proxy-Authenticate header. */
+  implicit class ProxyAuthenticate[T <: HttpResponse](val response: T) {
     /**
-     * Gets Proxy-Authentication header value.
+     * Gets Proxy-Authenticate header values.
      *
-     * @throws HeaderNotFound if Proxy-Authentication is not present
+     * @return the header values or an empty sequence if Proxy-Authenticate is not present
      */
-    def proxyAuthentication: String =
-      getProxyAuthentication.getOrElse(throw HeaderNotFound("Proxy-Authentication"))
+    def proxyAuthenticate: Seq[Challenge] =
+      response.getHeaderValues("Proxy-Authenticate")
+        .flatMap(AuthTypeListParser(_))
+        .map(Challenge(_))
 
-    /** Gets Proxy-Authentication header value if present. */
-    def getProxyAuthentication: Option[String] =
-      response.getHeaderValue("Proxy-Authentication")
+    /** Gets Proxy-Authenticate header values if present. */
+    def getProxyAuthenticate: Option[Seq[Challenge]] =
+      response.getHeaderValues("Proxy-Authenticate")
+        .flatMap(AuthTypeListParser(_))
+        .map(Challenge(_)) match {
+          case Nil => None
+          case seq => Some(seq)
+        }
 
     /**
-     * Creates new response setting Proxy-Authentication header to supplied
-     * value.
+     * Creates new response setting Proxy-Authenticate header to supplied
+     * values.
      */
-    def withProxyAuthentication(value: String): response.MessageType =
-      response.withHeader(Header("Proxy-Authentication", value))
+    def withProxyAuthenticate(values: Challenge*): response.MessageType =
+      response.withHeader(Header("Proxy-Authenticate", values.mkString(", ")))
 
     /** Creates new response removing Date header. */
-    def removeProxyAuthentication: response.MessageType =
-      response.removeHeaders("Proxy-Authentication")
+    def removeProxyAuthenticate: response.MessageType =
+      response.removeHeaders("Proxy-Authenticate")
   }
 
   /** Provides standardized access to Proxy-Authentication-Info header. */
@@ -872,18 +892,18 @@ package object headers {
      *
      * @throws HeaderNotFound if Proxy-Authorization is not present
      */
-    def proxyAuthorization: String =
+    def proxyAuthorization: Credentials =
       getProxyAuthorization.getOrElse(throw HeaderNotFound("Proxy-Authorization"))
 
     /** Gets Proxy-Authorization header value if present. */
-    def getProxyAuthorization: Option[String] =
-      request.getHeaderValue("Proxy-Authorization")
+    def getProxyAuthorization: Option[Credentials] =
+      request.getHeaderValue("Proxy-Authorization").map(Credentials(_))
 
     /**
      * Creates new request setting Proxy-Authorization header to supplied value.
      */
-    def withProxyAuthorization(value: String): request.MessageType =
-      request.withHeader(Header("Proxy-Authorization", value))
+    def withProxyAuthorization(value: Credentials): request.MessageType =
+      request.withHeader(Header("Proxy-Authorization", value.toString))
 
     /** Creates new request removing Proxy-Authorization header. */
     def removeProxyAuthorization: request.MessageType =
@@ -985,14 +1005,14 @@ package object headers {
   /** Provides standardized access to TE header. */
   implicit class TE[T <: HttpRequest](val request: T) {
     /**
-     * Gets TE header value.
+     * Gets TE header values.
      *
-     * @throws HeaderNotFound if TE is not present
+     * @return the header values or an empty sequence if TE is not present
      */
     def te: Seq[TransferCodingRange] =
-      getTE.getOrElse(throw HeaderNotFound("TE"))
+      getTE.getOrElse(Nil)
 
-    /** Gets TE header value if present. */
+    /** Gets TE header values if present. */
     def getTE: Option[Seq[TransferCodingRange]] =
       request.getHeaderValue("TE")
         .map(ListParser(_))
@@ -1010,14 +1030,14 @@ package object headers {
   /** Provides standardized access to Trailer header. */
   implicit class Trailer[T <: HttpMessage](val message: T) {
     /**
-     * Gets Trailer header value.
+     * Gets Trailer header values.
      *
-     * @throws HeaderNotFound if Trailer is not present
+     * @return the header values or an empty sequence if Trailer is not present
      */
     def vary: Seq[String] =
-      getTrailer.getOrElse(throw HeaderNotFound("Trailer"))
+      getTrailer.getOrElse(Nil)
 
-    /** Gets Trailer header value if present. */
+    /** Gets Trailer header values if present. */
     def getTrailer: Option[Seq[String]] =
       message.getHeaderValue("Trailer").map(ListParser(_))
 
@@ -1033,14 +1053,14 @@ package object headers {
   /** Provides standardized access to Transfer-Encoding header. */
   implicit class TransferEncoding[T <: HttpMessage](val message: T) {
     /**
-     * Gets Transfer-Encoding header value.
+     * Gets Transfer-Encoding header values.
      *
-     * @throws HeaderNotFound if Transfer-Encoding is not present
+     * @return the header values or an empty sequence if Transfer-Encoding is not present
      */
     def transferEncoding: Seq[TransferCoding] =
-      getTransferEncoding.getOrElse(throw HeaderNotFound("Transfer-Encoding"))
+      getTransferEncoding.getOrElse(Nil)
 
-    /** Gets Transfer-Encoding header value if present. */
+    /** Gets Transfer-Encoding header values if present. */
     def getTransferEncoding: Option[Seq[TransferCoding]] =
       message.getHeaderValue("Transfer-Encoding")
         .map(ListParser(_))
@@ -1083,14 +1103,14 @@ package object headers {
   /** Provides standardized access to Vary header. */
   implicit class Vary[T <: HttpResponse](val response: T) {
     /**
-     * Gets Vary header value.
+     * Gets Vary header values.
      *
-     * @throws HeaderNotFound if Vary is not present
+     * @return the header values or an empty sequence if Vary is not present
      */
     def vary: Seq[String] =
-      getVary.getOrElse(throw HeaderNotFound("Vary"))
+      getVary.getOrElse(Nil)
 
-    /** Gets Vary header value if present. */
+    /** Gets Vary header values if present. */
     def getVary: Option[Seq[String]] =
       response.getHeaderValue("Vary").map(ListParser(_))
 
@@ -1106,14 +1126,14 @@ package object headers {
   /** Provides standardized access to Via header. */
   implicit class Via[T <: HttpResponse](val response: T) {
     /**
-     * Gets Via header value.
+     * Gets Via header values.
      *
-     * @throws HeaderNotFound if Via is not present
+     * @return the header values or an empty sequence if Via is not present
      */
     def via: Seq[String] =
-      getVia.getOrElse(throw HeaderNotFound("Via"))
+      getVia.getOrElse(Nil)
 
-    /** Gets Via header value if present. */
+    /** Gets Via header values if present. */
     def getVia: Option[Seq[String]] =
       response.getHeaderValue("Via").map(ListParser(_))
 
@@ -1149,29 +1169,36 @@ package object headers {
       response.removeHeaders("Warning")
   }
 
-  /** Provides standardized access to WWW-Authentication header. */
-  implicit class WWWAuthentication[T <: HttpResponse](val response: T) {
+  /** Provides standardized access to WWW-Authenticate header. */
+  implicit class WWWAuthenticate[T <: HttpResponse](val response: T) {
     /**
-     * Gets WWW-Authentication header value.
+     * Gets WWW-Authenticate header values.
      *
-     * @throws HeaderNotFound if WWW-Authentication is not present
+     * @return the header values or an empty sequence if WWW-Authenticate is not present
      */
-    def wwwAuthentication: String =
-      getWWWAuthentication.getOrElse(throw HeaderNotFound("WWW-Authentication"))
+    def wwwAuthenticate: Seq[Challenge] =
+      response.getHeaderValues("WWW-Authenticate")
+        .flatMap(AuthTypeListParser(_))
+        .map(Challenge(_))
 
-    /** Gets WWW-Authentication header value if present. */
-    def getWWWAuthentication: Option[String] =
-      response.getHeaderValue("WWW-Authentication")
+    /** Gets WWW-Authenticate header values if present. */
+    def getWWWAuthenticate: Option[Seq[Challenge]] =
+      response.getHeaderValues("WWW-Authenticate")
+        .flatMap(AuthTypeListParser(_))
+        .map(Challenge(_)) match {
+          case Nil => None
+          case seq => Some(seq)
+        }
 
     /**
-     * Creates new response setting WWW-Authentication header to supplied value.
+     * Creates new response setting WWW-Authenticate header to supplied values.
      */
-    def withWWWAuthentication(value: String): response.MessageType =
-      response.withHeader(Header("WWW-Authentication", value))
+    def withWWWAuthenticate(values: Challenge*): response.MessageType =
+      response.withHeader(Header("WWW-Authenticate", values.mkString(", ")))
 
-    /** Creates new response removing WWW-Authentication header. */
-    def removeWWWAuthentication: response.MessageType =
-      response.removeHeaders("WWW-Authentication")
+    /** Creates new response removing WWW-Authenticate header. */
+    def removeWWWAuthenticate: response.MessageType =
+      response.removeHeaders("WWW-Authenticate")
   }
 }
 

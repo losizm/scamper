@@ -8,6 +8,12 @@ object ImplicitConverters {
   /** Converts string to [[ByteContentRange]]. */
   implicit val stringToByteContentRange = (range: String) => ByteContentRange(range)
 
+  /** Converts string to [[Challenge]]. */
+  implicit val stringToChallenge = (challenge: String) => Challenge(challenge)
+
+  /** Converts string to [[Credentials]]. */
+  implicit val stringToCredentials = (credentials: String) => Credentials(credentials)
+
   /** Converts string to [[CharsetRange]]. */
   implicit val stringToCharsetRange = (range: String) => CharsetRange(range)
 
