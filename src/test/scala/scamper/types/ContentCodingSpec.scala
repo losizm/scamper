@@ -10,9 +10,9 @@ class ContentCodingSpec extends FlatSpec {
     assert(coding.toString == "compress")
 
     coding = ContentCoding("X-COMPRESS")
-    assert(coding.name == "x-compress")
+    assert(coding.name == "compress")
     assert(coding.isCompress)
-    assert(coding.toString == "x-compress")
+    assert(coding.toString == "compress")
 
     coding = ContentCoding("GZIP")
     assert(coding.name == "gzip")
@@ -20,9 +20,9 @@ class ContentCodingSpec extends FlatSpec {
     assert(coding.toString == "gzip")
 
     coding = ContentCoding("x-GZIP")
-    assert(coding.name == "x-gzip")
+    assert(coding.name == "gzip")
     assert(coding.isGzip)
-    assert(coding.toString == "x-gzip")
+    assert(coding.toString == "gzip")
   }
 
   it should "be destructured" in {

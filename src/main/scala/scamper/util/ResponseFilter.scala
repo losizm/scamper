@@ -9,7 +9,7 @@ trait ResponseFilter {
 
   /**
    * Returns {@code Some(response)} if response matches filter condition,
-   * {@code None} otherwise.
+   * and {@code None} otherwise.
    */
   def unapply(response: HttpResponse): Option[HttpResponse] =
     if (apply(response)) Some(response) else None

@@ -47,7 +47,7 @@ trait HttpRequest extends HttpMessage {
   lazy val cookies: Seq[PlainCookie] =
     getHeaderValue("Cookie")
       .map(_.split("\\s*;\\s*"))
-      .map(_.map(PlainCookie.apply).toSeq)
+      .map(_.map(PlainCookie(_)).toSeq)
       .getOrElse(Nil)
 
   /**

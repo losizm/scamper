@@ -1,6 +1,6 @@
 package scamper.types
 
-import TransferCodingHelper._
+import CodingHelper._
 
 /**
  * Standardized type for Transfer-Encoding header value.

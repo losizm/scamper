@@ -22,7 +22,7 @@ trait HttpResponse extends HttpMessage {
    * Values retrieved from Set-Cookie headers.
    */
   lazy val cookies: Seq[SetCookie] =
-    getHeaderValues("Set-Cookie").map(SetCookie.apply)
+    getHeaderValues("Set-Cookie").map(SetCookie(_))
 
   /**
    * Creates new response replacing status.

@@ -1,6 +1,6 @@
 package scamper.types
 
-import scamper.Grammar.Token
+import CodingHelper.Name
 
 /**
  * Standardized type for Accept-Encoding header value.
@@ -15,13 +15,13 @@ trait ContentCodingRange {
   def weight: Float
 
   /** Tests whether name is compress. */
-  def isCompress: Boolean = name == "compress" || name == "x-compress"
+  def isCompress: Boolean = name == "compress"
 
   /** Tests whether name is deflate. */
   def isDeflate: Boolean = name == "deflate"
 
   /** Tests whether name is gzip. */
-  def isGzip: Boolean = name == "gzip" || name == "x-gzip"
+  def isGzip: Boolean = name == "gzip"
 
   /** Tests whether name is identity. */
   def isIdentity: Boolean = name == "identity"
@@ -51,9 +51,7 @@ object ContentCodingRange {
 
   /** Creates ContentCodingRange with supplied name and weight. */
   def apply(name: String, weight: Float): ContentCodingRange =
-    Token(name).map(name => new ContentCodingRangeImpl(name.toLowerCase, QValue(weight))).getOrElse {
-      throw new IllegalArgumentException(s"Invalid content coding name: $name")
-    }
+    new ContentCodingRangeImpl(Name(name), QValue(weight))
 
   /** Destructures ContentCodingRange. */
   def unapply(range: ContentCodingRange): Option[(String, Float)] =

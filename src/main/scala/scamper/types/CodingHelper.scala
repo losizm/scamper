@@ -2,13 +2,17 @@ package scamper.types
 
 import scamper.Grammar._
 
-private object TransferCodingHelper {
+private object CodingHelper {
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)(\s*(?:;.*)?)""".r
 
   def Name(name: String): String =
     Token(name).getOrElse {
       throw new IllegalArgumentException(s"Invalid name: $name")
-    }.toLowerCase
+    }.toLowerCase match {
+      case "x-compress" => "compress"
+      case "x-gzip"     => "gzip"
+      case name         => name
+    }
 
   def Params(params: Map[String, String]): Map[String, String] =
     params.map { case (name, value) => ParamName(name) -> ParamValue(value) }

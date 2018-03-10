@@ -52,6 +52,8 @@ object Challenge {
     Some((challenge.scheme, challenge.token, challenge.params))
 }
 
+private class ChallengeImpl(val scheme: String, val token: Option[String], val params: Map[String, String]) extends Challenge
+
 /**
  * Standardized type for Authorization and Proxy-Authorization header value.
  *
@@ -85,8 +87,6 @@ object Credentials {
   def unapply(credentials: Credentials): Option[(String, Option[String], Map[String, String])] =
     Some((credentials.scheme, credentials.token, credentials.params))
 }
-
-private class ChallengeImpl(val scheme: String, val token: Option[String], val params: Map[String, String]) extends Challenge
 
 private class CredentialsImpl(val scheme: String, val token: Option[String], val params: Map[String, String]) extends Credentials
 

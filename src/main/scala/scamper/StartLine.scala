@@ -25,7 +25,7 @@ trait RequestLine extends StartLine {
 
 /** RequestLine factory */
 object RequestLine {
-  private val syntax = """(\w+)[ \t]+(\p{Graph}+)[ \t]+HTTP/(\d+(?:\.\d+)?)[ \t]*""".r
+  private val syntax = """([\w!#$%&'*+.^`|~-]+)\h+(\p{Graph}+)\h+HTTP/(\d+(?:\.\d+)?)\h*""".r
 
   /** Parses formatted request line. */
   def apply(line: String): RequestLine =
@@ -62,7 +62,7 @@ trait StatusLine extends StartLine {
 
 /** StatusLine factory */
 object StatusLine {
-  private val syntax = """HTTP/(\d+(?:\.\d+)?)[ \t]+(\d+)[ \t]+(\p{Print}+)[ \t]*""".r
+  private val syntax = """HTTP/(\d+(?:\.\d+)?)\h+(\d+)\h+(\p{Print}+)\h*""".r
 
   /** Parses formatted status line. */
   def apply(line: String): StatusLine =
@@ -84,3 +84,4 @@ object StatusLine {
 }
 
 private class StatusLineImpl(val status: Status, val version: Version) extends StatusLine
+
