@@ -12,10 +12,10 @@ object ImplicitConverters {
   implicit val stringToCacheDirective = (directive: String) => CacheDirective.parse(directive)
 
   /** Converts string to [[Challenge]]. */
-  implicit val stringToChallenge = (challenge: String) => Challenge(challenge)
+  implicit val stringToChallenge = (challenge: String) => Challenge.parse(challenge)
 
   /** Converts string to [[Credentials]]. */
-  implicit val stringToCredentials = (credentials: String) => Credentials(credentials)
+  implicit val stringToCredentials = (credentials: String) => Credentials.parse(credentials)
 
   /** Converts string to [[CharsetRange]]. */
   implicit val stringToCharsetRange = (range: String) => CharsetRange(range)

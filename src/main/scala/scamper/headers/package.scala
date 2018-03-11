@@ -5,17 +5,6 @@ import scamper.types._
 
 /** Contains type classes for standardized access to message headers. */
 package object headers {
-  private object AuthTypeListParser {
-    val StartAuthType = """((?:[\w!#$%&'*+.^`|~-]+)(?:\s+(?:.+))?)""".r
-
-    def apply(list: String): Seq[String] =
-      ListParser(list).foldLeft(Seq.empty[String]) {
-        case (xs, StartAuthType(x)) => xs :+ x
-        case (head :+ tail, x) => head :+ (tail + ", " + x)
-        case (Nil, x) => Seq(x)
-      }
-  }
-
   /** Provides standardized access to Accept header. */
   implicit class Accept[T <: HttpRequest](val request: T) {
     /**
@@ -227,7 +216,7 @@ package object headers {
 
     /** Gets Authorization header value if present. */
     def getAuthorization: Option[Credentials] =
-      request.getHeaderValue("Authorization").map(Credentials(_))
+      request.getHeaderValue("Authorization").map(Credentials.parse)
 
     /** Creates new request setting Authorization header to supplied value. */
     def withAuthorization(value: Credentials): request.MessageType =
@@ -834,15 +823,12 @@ package object headers {
      * @return the header values or an empty sequence if Proxy-Authenticate is not present
      */
     def proxyAuthenticate: Seq[Challenge] =
-      response.getHeaderValues("Proxy-Authenticate")
-        .flatMap(AuthTypeListParser(_))
-        .map(Challenge(_))
+      getProxyAuthenticate.getOrElse(Nil)
 
     /** Gets Proxy-Authenticate header values if present. */
     def getProxyAuthenticate: Option[Seq[Challenge]] =
       response.getHeaderValues("Proxy-Authenticate")
-        .flatMap(AuthTypeListParser(_))
-        .map(Challenge(_)) match {
+        .flatMap(Challenge.parseAll) match {
           case Nil => None
           case seq => Some(seq)
         }
@@ -897,7 +883,7 @@ package object headers {
 
     /** Gets Proxy-Authorization header value if present. */
     def getProxyAuthorization: Option[Credentials] =
-      request.getHeaderValue("Proxy-Authorization").map(Credentials(_))
+      request.getHeaderValue("Proxy-Authorization").map(Credentials.parse)
 
     /**
      * Creates new request setting Proxy-Authorization header to supplied value.
@@ -1177,15 +1163,12 @@ package object headers {
      * @return the header values or an empty sequence if WWW-Authenticate is not present
      */
     def wwwAuthenticate: Seq[Challenge] =
-      response.getHeaderValues("WWW-Authenticate")
-        .flatMap(AuthTypeListParser(_))
-        .map(Challenge(_))
+      getWWWAuthenticate.getOrElse(Nil)
 
     /** Gets WWW-Authenticate header values if present. */
     def getWWWAuthenticate: Option[Seq[Challenge]] =
       response.getHeaderValues("WWW-Authenticate")
-        .flatMap(AuthTypeListParser(_))
-        .map(Challenge(_)) match {
+        .flatMap(Challenge.parseAll) match {
           case Nil => None
           case seq => Some(seq)
         }

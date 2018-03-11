@@ -1,9 +1,11 @@
 package scamper.types
 
 import scamper.Grammar.{ QuotableString, Token => StandardToken, Token68 }
+import scamper.ListParser
 
 private object AuthTypeHelper {
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)(?:\s+(?:([\w!#$%&'*+.^`|~-]+=*)|([\w.~+/-]+\s*=\s*[^ =].*)))?\s*""".r
+  private val StartSyntax = """((?:[\w!#$%&'*+.^`|~-]+)(?:\s+(?:.+))?)""".r
 
   def Scheme(value: String): String =
     StandardToken(value) getOrElse {
@@ -34,6 +36,13 @@ private object AuthTypeHelper {
       case syntax(scheme, token, null)  => (scheme, Some(token), Map.empty)
       case syntax(scheme, null, params) => (scheme, None, AuthParams.parse(params))
       case _ => throw new IllegalArgumentException(s"Malformed auth type: $auth")
+    }
+
+  def SplitAuthTypes(auths: String): Seq[String] =
+    ListParser(auths).foldLeft(Seq.empty[String]) {
+      case (xs, StartSyntax(x)) => xs :+ x
+      case (head :+ tail, x) => head :+ (tail + ", " + x)
+      case (Nil, x) => Seq(x)
     }
 
   def ParseParams(params: String): Map[String, String] =

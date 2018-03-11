@@ -30,10 +30,14 @@ trait Challenge extends AuthType
 /** Challenge factory */
 object Challenge {
   /** Parses formatted challenge. */
-  def apply(challenge: String): Challenge =
+  def parse(challenge: String): Challenge =
     ParseAuthType(challenge) match {
       case (scheme, token, params) => new ChallengeImpl(scheme, token, params)
     }
+
+  /** Parses formatted list of challenges. */
+  def parseAll(challenges: String): Seq[Challenge] =
+    SplitAuthTypes(challenges).map(parse)
 
   /** Creates Challenge with supplied auth scheme and token. */
   def apply(scheme: String, token: String): Challenge =
@@ -66,7 +70,7 @@ trait Credentials extends AuthType
 /** Credentials factory */
 object Credentials {
   /** Parses formatted credentials. */
-  def apply(credentials: String): Credentials =
+  def parse(credentials: String): Credentials =
     ParseAuthType(credentials) match {
       case (scheme, token, params) => new CredentialsImpl(scheme, token, params)
     }
