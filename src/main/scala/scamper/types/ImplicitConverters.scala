@@ -41,6 +41,9 @@ object ImplicitConverters {
   /** Converts string to [[MediaRange]]. */
   implicit val stringToMediaRange = (range: String) => MediaRange(range)
 
+  /** Converts string to [[ProductType]]. */
+  implicit val stringToProductType = (product: String) => ProductType(product)
+
   /** Converts string to [[TransferCoding]]. */
   implicit val stringToTransferCoding = (coding: String) => TransferCoding(coding)
 

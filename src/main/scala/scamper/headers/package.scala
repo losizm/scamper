@@ -968,20 +968,20 @@ package object headers {
   /** Provides standardized access to Server header. */
   implicit class Server[T <: HttpResponse](val response: T) {
     /**
-     * Gets Server header value.
+     * Gets Server header values.
      *
-     * @throws HeaderNotFound if Server is not present
+     * @return the header values or an empty sequence if Server is not present
      */
-    def server: String =
-      getServer.getOrElse(throw HeaderNotFound("Server"))
+    def server: Seq[ProductType] =
+      getServer.getOrElse(Nil)
 
-    /** Gets Server header value if present. */
-    def getServer: Option[String] =
-      response.getHeaderValue("Server")
+    /** Gets Server header values if present. */
+    def getServer: Option[Seq[ProductType]] =
+      response.getHeaderValue("Server").map(ProductType.parseAll)
 
-    /** Creates new response setting Server header to supplied value. */
-    def withServer(value: String): response.MessageType =
-      response.withHeader(Header("Server", value))
+    /** Creates new response setting Server header to supplied values. */
+    def withServer(values: ProductType*): response.MessageType =
+      response.withHeader(Header("Server", values.mkString(" ")))
 
     /** Creates new response removing Server header. */
     def removeServer: response.MessageType =
@@ -1066,20 +1066,20 @@ package object headers {
   /** Provides standardized access to User-Agent header. */
   implicit class UserAgent[T <: HttpRequest](val request: T) {
     /**
-     * Gets User-Agent header value.
+     * Gets User-Agent header values.
      *
-     * @throws HeaderNotFound if User-Agent is not present
+     * @return the header values or an empty sequence if User-Agent is not present
      */
-    def userAgent: String =
-      getUserAgent.getOrElse(throw HeaderNotFound("User-Agent"))
+    def userAgent: Seq[ProductType] =
+      getUserAgent.getOrElse(Nil)
 
-    /** Gets User-Agent header value if present. */
-    def getUserAgent: Option[String] =
-      request.getHeaderValue("User-Agent")
+    /** Gets User-Agent header values if present. */
+    def getUserAgent: Option[Seq[ProductType]] =
+      request.getHeaderValue("User-Agent").map(ProductType.parseAll)
 
     /** Creates new request setting User-Agent header to supplied value. */
-    def withUserAgent(value: String): request.MessageType =
-      request.withHeader(Header("User-Agent", value))
+    def withUserAgent(values: ProductType*): request.MessageType =
+      request.withHeader(Header("User-Agent", values.mkString(" ")))
 
     /** Creates new request removing User-Agent header. */
     def removeUserAgent: request.MessageType =
