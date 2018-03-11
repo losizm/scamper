@@ -8,6 +8,9 @@ object ImplicitConverters {
   /** Converts string to [[ByteContentRange]]. */
   implicit val stringToByteContentRange = (range: String) => ByteContentRange(range)
 
+  /** Converts string to [[CacheDirective]]. */
+  implicit val stringToCacheDirective = (directive: String) => CacheDirective.parse(directive)
+
   /** Converts string to [[Challenge]]. */
   implicit val stringToChallenge = (challenge: String) => Challenge(challenge)
 

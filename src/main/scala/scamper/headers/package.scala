@@ -245,15 +245,15 @@ package object headers {
      *
      * @return the header values or an empty sequence if Cache-Control is not present
      */
-    def cacheControl: Seq[String] =
+    def cacheControl: Seq[CacheDirective] =
       getCacheControl.getOrElse(Nil)
 
     /** Gets Cache-Control header values if present. */
-    def getCacheControl: Option[Seq[String]] =
-      message.getHeaderValue("Cache-Control").map(ListParser(_))
+    def getCacheControl: Option[Seq[CacheDirective]] =
+      message.getHeaderValue("Cache-Control").map(CacheDirective.parseAll)
 
     /** Creates new message setting Cache-Control header to supplied values. */
-    def withCacheControl(values: String*): message.MessageType =
+    def withCacheControl(values: CacheDirective*): message.MessageType =
       message.withHeader(Header("Cache-Control", values.mkString(", ")))
 
     /** Creates new message removing Cache-Control header. */

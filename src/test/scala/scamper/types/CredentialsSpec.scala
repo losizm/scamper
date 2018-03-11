@@ -5,7 +5,7 @@ import org.scalatest.FlatSpec
 
 class CredentialsSpec extends FlatSpec {
   "Credentials" should "be created without token and params" in {
-    val credentials = Credentials(s"Basic")
+    val credentials = Credentials("Basic")
     assert(credentials.scheme == "Basic")
     assert(!credentials.token.isDefined)
     assert(credentials.params.isEmpty)

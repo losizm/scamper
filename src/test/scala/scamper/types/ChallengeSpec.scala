@@ -5,7 +5,7 @@ import org.scalatest.FlatSpec
 
 class ChallengeSpec extends FlatSpec {
   "Challenge" should "be created without token and params" in {
-    val challenge = Challenge(s"Basic")
+    val challenge = Challenge("Basic")
     assert(challenge.scheme == "Basic")
     assert(!challenge.token.isDefined)
     assert(challenge.params.isEmpty)
