@@ -1149,20 +1149,20 @@ package object headers {
   /** Provides standardized access to Warning header. */
   implicit class Warning[T <: HttpResponse](val response: T) {
     /**
-     * Gets Warning header value.
+     * Gets Warning header values.
      *
-     * @throws HeaderNotFound if Warning is not present
+     * @return the header values or an empty sequence if Warning is not present
      */
-    def warning: String =
-      getWarning.getOrElse(throw HeaderNotFound("Warning"))
+    def warning: Seq[WarningType] =
+      getWarning.getOrElse(Nil)
 
-    /** Gets Warning header value if present. */
-    def getWarning: Option[String] =
-      response.getHeaderValue("Warning")
+    /** Gets Warning header values if present. */
+    def getWarning: Option[Seq[WarningType]] =
+      response.getHeaderValue("Warning").map(WarningType.parseAll)
 
-    /** Creates new response setting Warning header to supplied value. */
-    def withWarning(value: String): response.MessageType =
-      response.withHeader(Header("Warning", value))
+    /** Creates new response setting Warning header to supplied values. */
+    def withWarning(values: WarningType*): response.MessageType =
+      response.withHeader(Header("Warning", values.mkString(", ")))
 
     /** Creates new response removing Warning header. */
     def removeWarning: response.MessageType =

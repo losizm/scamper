@@ -46,5 +46,8 @@ object ImplicitConverters {
 
   /** Converts string to [[TransferCodingRange]]. */
   implicit val stringToTransferCodingRange = (range: String) => TransferCodingRange(range)
+
+  /** Converts string to [[WarningType]]. */
+  implicit val stringToWarningType = (warning: String) => WarningType.parse(warning)
 }
 
