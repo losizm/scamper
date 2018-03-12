@@ -59,7 +59,7 @@ object MediaType {
 
   /** Creates MediaType with supplied values. */
   def apply(mainType: String, subtype: String, params: Map[String, String]): MediaType =
-    new MediaTypeImpl(MainType(mainType), Subtype(subtype), Params(params))
+    MediaTypeImpl(MainType(mainType), Subtype(subtype), Params(params))
 
   /** Creates MediaType with supplied values. */
   def apply(mainType: String, subtype: String, params: (String, String)*): MediaType =
@@ -70,5 +70,5 @@ object MediaType {
     Some((mediaType.mainType, mediaType.subtype, mediaType.params))
 }
 
-private class MediaTypeImpl(val mainType: String, val subtype: String, val params: Map[String, String]) extends MediaType
+private case class MediaTypeImpl(mainType: String, subtype: String, params: Map[String, String]) extends MediaType
 

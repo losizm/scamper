@@ -32,7 +32,7 @@ object Challenge {
   /** Parses formatted challenge. */
   def parse(challenge: String): Challenge =
     ParseAuthType(challenge) match {
-      case (scheme, token, params) => new ChallengeImpl(scheme, token, params)
+      case (scheme, token, params) => ChallengeImpl(scheme, token, params)
     }
 
   /** Parses formatted list of challenges. */
@@ -41,22 +41,22 @@ object Challenge {
 
   /** Creates Challenge with supplied auth scheme and token. */
   def apply(scheme: String, token: String): Challenge =
-    new ChallengeImpl(scheme, Some(token), Map.empty)
+    ChallengeImpl(scheme, Some(token), Map.empty)
 
   /** Creates Challenge with supplied auth scheme and parameters. */
   def apply(scheme: String, params: Map[String, String]): Challenge =
-    new ChallengeImpl(scheme, None, params)
+    ChallengeImpl(scheme, None, params)
 
   /** Creates Challenge with supplied auth scheme and parameters. */
   def apply(scheme: String, token: Option[String], params: Map[String, String]): Challenge =
-    new ChallengeImpl(scheme, token, params)
+    ChallengeImpl(scheme, token, params)
 
   /** Destructures Challenge. */
   def unapply(challenge: Challenge): Option[(String, Option[String], Map[String, String])] =
     Some((challenge.scheme, challenge.token, challenge.params))
 }
 
-private class ChallengeImpl(val scheme: String, val token: Option[String], val params: Map[String, String]) extends Challenge
+private case class ChallengeImpl(scheme: String, token: Option[String], params: Map[String, String]) extends Challenge
 
 /**
  * Standardized type for Authorization and Proxy-Authorization header value.
@@ -72,25 +72,25 @@ object Credentials {
   /** Parses formatted credentials. */
   def parse(credentials: String): Credentials =
     ParseAuthType(credentials) match {
-      case (scheme, token, params) => new CredentialsImpl(scheme, token, params)
+      case (scheme, token, params) => CredentialsImpl(scheme, token, params)
     }
 
   /** Creates Credentials with supplied auth scheme and token. */
   def apply(scheme: String, token: String): Credentials =
-    new CredentialsImpl(scheme, Some(token), Map.empty)
+    CredentialsImpl(scheme, Some(token), Map.empty)
 
   /** Creates Credentials with supplied auth scheme and parameters. */
   def apply(scheme: String, params: Map[String, String]): Credentials =
-    new CredentialsImpl(scheme, None, params)
+    CredentialsImpl(scheme, None, params)
 
   /** Creates Credentials with supplied auth scheme and parameters. */
   def apply(scheme: String, token: Option[String], params: Map[String, String]): Credentials =
-    new CredentialsImpl(scheme, token, params)
+    CredentialsImpl(scheme, token, params)
 
   /** Destructures Credentials. */
   def unapply(credentials: Credentials): Option[(String, Option[String], Map[String, String])] =
     Some((credentials.scheme, credentials.token, credentials.params))
 }
 
-private class CredentialsImpl(val scheme: String, val token: Option[String], val params: Map[String, String]) extends Credentials
+private case class CredentialsImpl(scheme: String, token: Option[String], params: Map[String, String]) extends Credentials
 

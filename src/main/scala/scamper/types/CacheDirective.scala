@@ -68,5 +68,5 @@ object CacheDirective {
     ListParser(directives).map(parse)
 }
 
-private case class CacheDirectiveImpl(val name: String, val value: Option[String]) extends CacheDirective
+private case class CacheDirectiveImpl(name: String, value: Option[String]) extends CacheDirective
 

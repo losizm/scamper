@@ -36,14 +36,14 @@ object LanguageRange {
 
   /** Creates LanguageRange with supplied language tag and weight. */
   def apply(tag: String, weight: Float): LanguageRange =
-    new LanguageRangeImpl(tag, QValue(weight))
+    LanguageRangeImpl(tag, QValue(weight))
 
   /** Destructures LanguageRange. */
   def unapply(range: LanguageRange): Option[(String, Float)] =
     Some((range.tag, range.weight))
 }
 
-private class LanguageRangeImpl(val tag: String, val weight: Float) extends LanguageRange {
+private case class LanguageRangeImpl(tag: String, weight: Float) extends LanguageRange {
   private val languageTag = if (tag == "*") None else Some(LanguageTag(tag))
 
   def matches(that: LanguageTag): Boolean =

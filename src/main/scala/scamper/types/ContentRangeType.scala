@@ -46,13 +46,13 @@ object ByteContentRange {
   /** Parses formatted byte content range. */
   def apply(range: String): ByteContentRange =
     range match {
-      case syntax(resp) => new ByteContentRangeImpl(parseResp(resp))
+      case syntax(resp) => ByteContentRangeImpl(parseResp(resp))
       case _ => throw new IllegalArgumentException(s"Malformed byte content range: $range")
     }
 
   /** Creates ByteContentRange from supplied response. */
   def apply(resp: ByteRangeResp): ByteContentRange =
-    new ByteContentRangeImpl(resp)
+    ByteContentRangeImpl(resp)
 
   /** Destructures ByteContentRange. */
   def unapply(range: ByteContentRange): Option[(String, ByteRangeResp)] =
@@ -79,5 +79,5 @@ object ByteContentRange {
   case class Unsatisfied(completeLength: Long) extends ByteRangeResp
 }
 
-private class ByteContentRangeImpl(val resp: ByteContentRange.ByteRangeResp) extends ByteContentRange
+private case class ByteContentRangeImpl(resp: ByteContentRange.ByteRangeResp) extends ByteContentRange
 

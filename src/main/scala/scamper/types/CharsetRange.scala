@@ -39,7 +39,7 @@ object CharsetRange {
 
   /** Creates CharsetRange with supplied charset and weight. */
   def apply(charset: String, weight: Float): CharsetRange =
-    Token(charset).map(charset => new CharsetRangeImpl(charset, QValue(weight))).getOrElse {
+    Token(charset).map(charset => CharsetRangeImpl(charset, QValue(weight))).getOrElse {
       throw new IllegalArgumentException(s"Invalid charset: $charset")
     }
 
@@ -48,7 +48,7 @@ object CharsetRange {
     Some((range.charset, range.weight))
 }
 
-private class CharsetRangeImpl(val charset: String, val weight: Float) extends CharsetRange {
+private case class CharsetRangeImpl(charset: String, weight: Float) extends CharsetRange {
   def matches(that: String): Boolean =
     isWildcard || charset.equalsIgnoreCase(that)
 }

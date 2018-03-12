@@ -40,7 +40,7 @@ object TransferCoding {
 
   /** Creates TransferCoding with supplied values. */
   def apply(name: String, params: Map[String, String]): TransferCoding =
-    new TransferCodingImpl(Name(name), Params(params))
+    TransferCodingImpl(Name(name), Params(params))
 
   /** Creates TransferCoding with supplied values. */
   def apply(name: String, params: (String, String)*): TransferCoding =
@@ -51,5 +51,5 @@ object TransferCoding {
     Some((coding.name, coding.params))
 }
 
-private class TransferCodingImpl(val name: String, val params: Map[String, String]) extends TransferCoding
+private case class TransferCodingImpl(name: String, params: Map[String, String]) extends TransferCoding
 

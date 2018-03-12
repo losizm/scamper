@@ -35,12 +35,12 @@ trait ContentCoding {
 object ContentCoding {
   /** Creates ContentCoding with supplied name. */
   def apply(name: String): ContentCoding =
-    new ContentCodingImpl(Name(name))
+    ContentCodingImpl(Name(name))
 
   /** Destructures ContentCoding. */
   def unapply(coding: ContentCoding): Option[String] =
     Some(coding.name)
 }
 
-private class ContentCodingImpl(val name: String) extends ContentCoding
+private case class ContentCodingImpl(name: String) extends ContentCoding
 

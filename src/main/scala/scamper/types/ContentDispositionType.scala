@@ -34,7 +34,7 @@ object ContentDispositionType {
 
   /** Creates ContentDispositionType with supplied name and parameters. */
   def apply(name: String, params: Map[String, String]): ContentDispositionType =
-    new ContentDispositionTypeImpl(Name(name), Params(params))
+    ContentDispositionTypeImpl(Name(name), Params(params))
 
   /** Creates ContentDispositionType with supplied name and paramaters. */
   def apply(name: String, params: (String, String)*): ContentDispositionType =
@@ -45,5 +45,5 @@ object ContentDispositionType {
     Some((disposition.name, disposition.params))
 }
 
-private class ContentDispositionTypeImpl(val name: String, val params: Map[String, String]) extends ContentDispositionType
+private case class ContentDispositionTypeImpl(name: String, params: Map[String, String]) extends ContentDispositionType
 

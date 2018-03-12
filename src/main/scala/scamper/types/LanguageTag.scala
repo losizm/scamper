@@ -37,7 +37,7 @@ object LanguageTag {
 
   /** Creates LanguageTag with primary subtag and additional subtags. */
   def apply(primary: String, others: Seq[String]): LanguageTag =
-    new LanguageTagImpl(Primary(primary), others.collect(Other))
+    LanguageTagImpl(Primary(primary), others.collect(Other))
 
 
   /** Destructures LanguageTag. */
@@ -55,5 +55,5 @@ object LanguageTag {
   }
 }
 
-private class LanguageTagImpl(val primary: String, val others: Seq[String]) extends LanguageTag
+private case class LanguageTagImpl(primary: String, others: Seq[String]) extends LanguageTag
 

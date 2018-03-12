@@ -22,8 +22,8 @@ object Version {
   def apply(version: String): Version =
     Try {
       version match {
-        case syntax(major, null)  => new VersionImpl(major.toInt, 0)
-        case syntax(major, minor) => new VersionImpl(major.toInt, minor.toInt)
+        case syntax(major, null)  => VersionImpl(major.toInt, 0)
+        case syntax(major, minor) => VersionImpl(major.toInt, minor.toInt)
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Invalid version: $version")
@@ -31,17 +31,12 @@ object Version {
 
   /** Creates Version with supplied major and minor numbers. */
   def apply(major: Int, minor: Int): Version =
-    new VersionImpl(major, minor)
+    VersionImpl(major, minor)
 
   /** Destructures Version. */
   def unapply(version: Version): Option[(Int, Int)] =
     Some((version.major, version.minor))
 }
 
-private class VersionImpl(val major: Int, val minor: Int) extends Version {
-  override def equals(that: Any): Boolean =
-    that match {
-      case Version(major, minor) => this.major == major && this.minor == minor
-      case _ => false
-    }
-}
+private case class VersionImpl(major: Int, minor: Int) extends Version
+

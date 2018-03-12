@@ -31,7 +31,7 @@ trait PlainCookie extends Cookie {
 object PlainCookie {
   /** Creates PlainCookie with supplied name-value pair. */
   def apply(name: String, value: String): PlainCookie =
-    new PlainCookieImpl(Name(name), Value(value))
+    PlainCookieImpl(Name(name), Value(value))
 
   /** Parses formatted cookie. */
   def apply(cookie: String): PlainCookie =
@@ -45,7 +45,7 @@ object PlainCookie {
     Some((cookie.name, cookie.value))
 }
 
-private class PlainCookieImpl(val name: String, val value: String) extends PlainCookie
+private case class PlainCookieImpl(name: String, value: String) extends PlainCookie
 
 /** HTTP Set-Cookie */
 trait SetCookie extends Cookie {
@@ -96,18 +96,18 @@ object SetCookie {
   /** Creates SetCookie with supplied name, value, and attributes. */
   def apply(name: String, value: String, domain: Option[String] = None, path: Option[String] = None, expires: Option[OffsetDateTime] = None,
       maxAge: Option[Long] = None, secure: Boolean = false, httpOnly: Boolean = false): SetCookie =
-    new SetCookieImpl(Name(name), Value(value), CookieAttributes(domain, path, expires, maxAge, secure, httpOnly))
+    SetCookieImpl(Name(name), Value(value), CookieAttributes(domain, path, expires, maxAge, secure, httpOnly))
 
   /** Parses formatted cookie. */
   def apply(cookie: String): SetCookie =
     cookie.split(";", 2) match {
       case Array(pair, attribs) =>
         pair.split("=") match {
-          case Array(name, value) => new SetCookieImpl(Name(name), Value(value), CookieAttributes(attribs))
+          case Array(name, value) => SetCookieImpl(Name(name), Value(value), CookieAttributes(attribs))
         }
       case Array(pair) =>
         pair.split("=") match {
-          case Array(name, value) => new SetCookieImpl(Name(name), Value(value), CookieAttributes())
+          case Array(name, value) => SetCookieImpl(Name(name), Value(value), CookieAttributes())
         }
     }
 
@@ -116,7 +116,7 @@ object SetCookie {
     Some((cookie.name, cookie.value, cookie.domain, cookie.path, cookie.expires, cookie.maxAge, cookie.secure, cookie.httpOnly))
 }
 
-private class SetCookieImpl(val name: String, val value: String, val attribs: CookieAttributes) extends SetCookie {
+private case class SetCookieImpl(name: String, value: String, attribs: CookieAttributes) extends SetCookie {
   def domain: Option[String] = attribs.domain
   def path: Option[String] = attribs.path
   def expires: Option[OffsetDateTime] = attribs.expires

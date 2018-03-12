@@ -51,14 +51,14 @@ object ContentCodingRange {
 
   /** Creates ContentCodingRange with supplied name and weight. */
   def apply(name: String, weight: Float): ContentCodingRange =
-    new ContentCodingRangeImpl(Name(name), QValue(weight))
+    ContentCodingRangeImpl(Name(name), QValue(weight))
 
   /** Destructures ContentCodingRange. */
   def unapply(range: ContentCodingRange): Option[(String, Float)] =
     Some((range.name, range.weight))
 }
 
-private class ContentCodingRangeImpl(val name: String, val weight: Float) extends ContentCodingRange {
+private case class ContentCodingRangeImpl(name: String, weight: Float) extends ContentCodingRange {
   def matches(coding: ContentCoding): Boolean =
     isWildcard || name.equalsIgnoreCase(coding.name)
 }

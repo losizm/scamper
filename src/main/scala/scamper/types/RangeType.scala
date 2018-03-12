@@ -48,13 +48,13 @@ object ByteRange {
   /** Parses formatted byte range. */
   def apply(range: String): ByteRange =
     range match {
-      case syntax(set) => new ByteRangeImpl(parseSet(set))
+      case syntax(set) => ByteRangeImpl(parseSet(set))
       case _ => throw new IllegalArgumentException(s"Malformed byte range: $range")
     }
 
   /** Creates ByteRange from supplied specs. */
   def apply(specs: ByteRangeSpec*): ByteRange =
-    new ByteRangeImpl(specs)
+    ByteRangeImpl(specs)
 
   /** Destructures ByteRange. */
   def unapply(range: ByteRange): Option[(String, Seq[ByteRangeSpec])] =
@@ -81,5 +81,5 @@ object ByteRange {
   case class Suffix(length: Long) extends ByteRangeSpec
 }
 
-private class ByteRangeImpl(val set: Seq[ByteRange.ByteRangeSpec]) extends ByteRange
+private case class ByteRangeImpl(set: Seq[ByteRange.ByteRangeSpec]) extends ByteRange
 

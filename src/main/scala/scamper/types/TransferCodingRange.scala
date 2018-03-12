@@ -54,27 +54,26 @@ object TransferCodingRange {
         params.collectFirst {
           case (QValue.key(key), QValue.value(value)) => (value.toFloat, (params - key))
         } map {
-          case (rank, params) => new TransferCodingRangeImpl(Name(name), QValue(rank), Params(params))
+          case (rank, params) => TransferCodingRangeImpl(Name(name), QValue(rank), Params(params))
         } getOrElse {
-          new TransferCodingRangeImpl(Name(name), 1.0f, Params(params))
+          TransferCodingRangeImpl(Name(name), 1.0f, Params(params))
         }
     }
 
   /** Creates TransferCodingRange with supplied values. */
   def apply(name: String, rank: Float = 1.0f, params: Map[String, String] = Map.empty): TransferCodingRange =
-    new TransferCodingRangeImpl(Name(name), QValue(rank), Params(params))
+    TransferCodingRangeImpl(Name(name), QValue(rank), Params(params))
 
   /** Destructures TransferCodingRange. */
   def unapply(range: TransferCodingRange): Option[(String, Float, Map[String, String])] =
     Some((range.name, range.rank, range.params))
 }
 
-private class TransferCodingRangeImpl(val name: String, val rank: Float, val params: Map[String, String]) extends TransferCodingRange {
+private case class TransferCodingRangeImpl(name: String, rank: Float, params: Map[String, String]) extends TransferCodingRange {
   def matches(coding: TransferCoding): Boolean =
     name.equalsIgnoreCase(coding.name) && params.forall { case (name, value) => exists(name, value, coding.params) }
 
   private def exists(name: String, value: String, ps: Map[String, String]): Boolean =
     ps.exists { case (n, v) => name.equalsIgnoreCase(n) && value.equalsIgnoreCase(v) }
-
 }
 

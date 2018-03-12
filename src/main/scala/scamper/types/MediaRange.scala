@@ -66,22 +66,22 @@ object MediaRange {
         params.collectFirst {
           case (QValue.key(key), QValue.value(value)) => (value.toFloat, (params - key))
         } map {
-          case (weight, params) => new MediaRangeImpl(MainType(mainType), Subtype(subtype), QValue(weight), Params(params))
+          case (weight, params) => MediaRangeImpl(MainType(mainType), Subtype(subtype), QValue(weight), Params(params))
         } getOrElse {
-          new MediaRangeImpl(MainType(mainType), Subtype(subtype), 1.0f, Params(params))
+          MediaRangeImpl(MainType(mainType), Subtype(subtype), 1.0f, Params(params))
         }
     }
 
   /** Creates MediaRange with supplied values. */
   def apply(mainType: String, subtype: String, weight: Float = 1.0f, params: Map[String, String] = Map.empty): MediaRange =
-    new MediaRangeImpl(MainType(mainType), Subtype(subtype), QValue(weight), Params(params))
+    MediaRangeImpl(MainType(mainType), Subtype(subtype), QValue(weight), Params(params))
 
   /** Destructures MediaRange. */
   def unapply(mediaRange: MediaRange): Option[(String, String, Float, Map[String, String])] =
     Some((mediaRange.mainType, mediaRange.subtype, mediaRange.weight, mediaRange.params))
 }
 
-private class MediaRangeImpl(val mainType: String, val subtype: String, val weight: Float, val params: Map[String, String]) extends MediaRange {
+private case class MediaRangeImpl(mainType: String, subtype: String, weight: Float, params: Map[String, String]) extends MediaRange {
   private val range = (regex(mainType) + "/" + regex(subtype)).r
 
   def matches(mediaType: MediaType): Boolean =

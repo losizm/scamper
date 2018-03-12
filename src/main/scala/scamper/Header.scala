@@ -27,7 +27,7 @@ trait Header {
 object Header {
   /** Creates Header using supplied key and value. */
   def apply(key: String, value: String): Header =
-    new HeaderImpl(Key(key), Value(value))
+    HeaderImpl(Key(key), Value(value))
 
   /** Creates Header using supplied key and value. */
   def apply(key: String, value: Long): Header =
@@ -49,5 +49,5 @@ object Header {
     Some(header.key -> header.value)
 }
 
-private class HeaderImpl(val key: String, val value: String) extends Header
+private case class HeaderImpl(key: String, value: String) extends Header
 
