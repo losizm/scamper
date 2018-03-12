@@ -20,35 +20,35 @@ object ResponseFilters {
   /**
    * Filters informational responses.
    *
-   * See [[Status.isInformational]].
+   * See [[ResponseStatus.isInformational]].
    */
   val Informational: ResponseFilter = (res => res.status.isInformational)
 
   /**
    * Filters successful responses.
    *
-   * See [[Status.isSuccessful]].
+   * See [[ResponseStatus.isSuccessful]].
    */
   val Successful: ResponseFilter = (res => res.status.isSuccessful)
 
   /**
    * Filters redirection responses.
    *
-   * See [[Status.isRedirection]].
+   * See [[ResponseStatus.isRedirection]].
    */
   val Redirection: ResponseFilter = (res => res.status.isRedirection)
 
   /**
    * Filters client error responses.
    *
-   * See [[Status.isClientError]].
+   * See [[ResponseStatus.isClientError]].
    */
   val ClientError: ResponseFilter = (res => res.status.isClientError)
 
   /**
    * Filters server error responses.
    *
-   * See [[Status.isServerError]].
+   * See [[ResponseStatus.isServerError]].
    */
   val ServerError: ResponseFilter = (res => res.status.isServerError)
 }

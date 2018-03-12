@@ -51,7 +51,7 @@ private case class RequestLineImpl(method: RequestMethod, uri: String, version: 
 /** HTTP status line */
 trait StatusLine extends StartLine {
   /** Response status */
-  def status: Status
+  def status: ResponseStatus
 
   /** Response version */
   def version: Version
@@ -68,20 +68,20 @@ object StatusLine {
   def apply(line: String): StatusLine =
     Try {
       line match {
-        case syntax(version, code, reason) => StatusLineImpl(Status(code.toInt, reason), Version(version))
+        case syntax(version, code, reason) => StatusLineImpl(ResponseStatus(code.toInt, reason), Version(version))
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Malformed status line: $line")
     }
 
   /** Creates StatusLine with supplied attributes. */
-  def apply(status: Status, version: Version = Version(1, 1)): StatusLine =
+  def apply(status: ResponseStatus, version: Version = Version(1, 1)): StatusLine =
     StatusLineImpl(status, version)
 
   /** Destructures StatusLine. */
-  def unapply(line: StatusLine): Option[(Status, Version)] =
+  def unapply(line: StatusLine): Option[(ResponseStatus, Version)] =
     Some((line.status, line.version))
 }
 
-private case class StatusLineImpl(status: Status, version: Version) extends StatusLine
+private case class StatusLineImpl(status: ResponseStatus, version: Version) extends StatusLine
 

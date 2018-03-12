@@ -3,9 +3,9 @@ package scamper
 /**
  * HTTP response status
  *
- * @see [[Statuses]]
+ * @see [[ResponseStatuses]]
  */
-trait Status {
+trait ResponseStatus {
   /** Status code */
   def code: Int
 
@@ -38,32 +38,32 @@ trait Status {
 }
 
 /**
- * Status factory
+ * ResponseStatus factory
  *
- * @see [[Statuses]]
+ * @see [[ResponseStatuses]]
  */
-object Status {
-  private val statuses = new scala.collection.mutable.TreeMap[Int, Status]
+object ResponseStatus {
+  private val statuses = new scala.collection.mutable.TreeMap[Int, ResponseStatus]
 
   /**
-   * Gets defined Status for given code.
+   * Gets registered ResponseStatus for given status code.
    *
-   * {@code NoSuchElementException} is thrown if a status is not defined for
-   * code.
+   * {@code NoSuchElementException} is thrown if a response status is not
+   * registered for status code.
    */
-  def apply(code: Int): Status =
+  def apply(code: Int): ResponseStatus =
     statuses(code)
 
-  /** Creates Status with supplied code and reason. */
-  def apply(code: Int, reason: String): Status =
-    new StatusImpl(code, reason)
+  /** Creates ResponseStatus with supplied code and reason. */
+  def apply(code: Int, reason: String): ResponseStatus =
+    new ResponseStatusImpl(code, reason)
 
-  /** Destructures Status. */
-  def unapply(status: Status): Option[(Int, String)] =
+  /** Destructures ResponseStatus. */
+  def unapply(status: ResponseStatus): Option[(Int, String)] =
     Some((status.code, status.reason))
 
   private def add(code: Int, reason: String): Unit =
-    statuses += code -> Status(code, reason)
+    statuses += code -> ResponseStatus(code, reason)
 
   add(100, "Continue")
   add(101, "Switching Protocols")
@@ -108,13 +108,7 @@ object Status {
   add(505, "HTTP Version Not Supported")
 }
 
-private class StatusImpl(val code: Int, val reason: String) extends Status {
+private case class ResponseStatusImpl(code: Int, reason: String) extends ResponseStatus {
   override lazy val toString: String = s"$code $reason"
-
-  override def equals(that: Any): Boolean =
-    that match {
-      case Status(code, reason) => this.code == code && this.reason == reason
-      case _ => false
-    }
 }
 

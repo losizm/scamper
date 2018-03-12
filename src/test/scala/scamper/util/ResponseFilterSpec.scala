@@ -1,10 +1,10 @@
 package scamper.util
 
 import org.scalatest.FlatSpec
-import scamper.Statuses
+import scamper.ResponseStatuses._
 import scamper.util.ResponseFilters._
 
-class ResponseFilterSpec extends FlatSpec with Statuses {
+class ResponseFilterSpec extends FlatSpec {
   "ResponseFilter" should "filter response based on status code" in {
     assert { Informational(Continue()) }
     assert { Successful(Created()) }

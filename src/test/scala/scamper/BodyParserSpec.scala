@@ -3,10 +3,11 @@ package scamper
 import org.scalatest.FlatSpec
 
 import scamper.RequestMethods._
+import scamper.ResponseStatuses._
 import scamper.headers.{ ContentLength, ContentType, TransferEncoding }
 import scamper.types.ImplicitConverters._
 
-class BodyParserSpec extends FlatSpec with Statuses {
+class BodyParserSpec extends FlatSpec {
   "BodyParser" should "parse response with text body" in {
     implicit val bodyParser = BodyParsers.text()
     val body = Entity("Hello, world!")

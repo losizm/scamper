@@ -11,7 +11,7 @@ trait HttpResponse extends HttpMessage {
   type CookieType = SetCookie
 
   /** Response status */
-  def status: Status = startLine.status
+  def status: ResponseStatus = startLine.status
 
   /** HTTP version */
   def version: Version = startLine.version
@@ -29,7 +29,7 @@ trait HttpResponse extends HttpMessage {
    *
    * @return new response
    */
-  def withStatus(status: Status): MessageType
+  def withStatus(status: ResponseStatus): MessageType
 
   /**
    * Creates new response replacing version.
@@ -46,7 +46,7 @@ object HttpResponse {
     HttpResponseImpl(statusLine, headers, body)
 
   /** Creates HttpResponse using supplied attributes. */
-  def apply(status: Status, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpResponse =
+  def apply(status: ResponseStatus, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpResponse =
     HttpResponseImpl(StatusLine(status, version), headers, body)
 }
 
@@ -66,7 +66,7 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
   def withStartLine(line: StatusLine) =
     copy(startLine = line)
 
-  def withStatus(newStatus: Status): HttpResponse =
+  def withStatus(newStatus: ResponseStatus): HttpResponse =
     copy(startLine = StatusLine(newStatus, version))
 
   def withVersion(newVersion: Version): HttpResponse =

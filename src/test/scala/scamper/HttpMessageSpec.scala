@@ -2,9 +2,10 @@ package scamper
 
 import org.scalatest.FlatSpec
 import scamper.RequestMethods._
+import scamper.ResponseStatuses._
 import scamper.headers.{ Host, Location }
 
-class HttpMessageSpec extends FlatSpec with Statuses {
+class HttpMessageSpec extends FlatSpec {
   "HttpRequest" should "be created with path" in {
     val req = GET("?user=root&group=wheel").withPath("/find")
     assert(req.method.name == "GET")
