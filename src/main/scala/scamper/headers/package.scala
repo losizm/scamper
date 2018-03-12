@@ -1160,15 +1160,15 @@ package object headers {
      *
      * @return the header values or an empty sequence if Via is not present
      */
-    def via: Seq[String] =
+    def via: Seq[ViaType] =
       getVia.getOrElse(Nil)
 
     /** Gets Via header values if present. */
-    def getVia: Option[Seq[String]] =
-      response.getHeaderValue("Via").map(ListParser(_))
+    def getVia: Option[Seq[ViaType]] =
+      response.getHeaderValue("Via").map(ViaType.parseAll)
 
     /** Creates new response setting Via header to supplied values. */
-    def withVia(values: String*): response.MessageType =
+    def withVia(values: ViaType*): response.MessageType =
       response.withHeader(Header("Via", values.mkString(", ")))
 
     /** Creates new response removing Via header. */
