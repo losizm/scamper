@@ -816,15 +816,15 @@ package object headers {
      *
      * @return the header values or an empty sequence if Pragma is not present
      */
-    def pragma: Seq[String] =
+    def pragma: Seq[PragmaDirective] =
       getPragma.getOrElse(Nil)
 
     /** Gets Pragma header values if present. */
-    def getPragma: Option[Seq[String]] =
-      request.getHeaderValue("Pragma").map(ListParser(_))
+    def getPragma: Option[Seq[PragmaDirective]] =
+      request.getHeaderValue("Pragma").map(PragmaDirective.parseAll)
 
     /** Creates new request setting Pragma header to supplied values. */
-    def withPragma(values: String*): request.MessageType =
+    def withPragma(values: PragmaDirective*): request.MessageType =
       request.withHeader(Header("Pragma", values.mkString(", ")))
 
     /** Creates new request removing Pragma header. */

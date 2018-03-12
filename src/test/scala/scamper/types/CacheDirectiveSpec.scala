@@ -65,9 +65,8 @@ class CacheDirectiveSpec extends FlatSpec {
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](CacheDirective("Basic /"))
-    assertThrows[IllegalArgumentException](CacheDirective("Basic ="))
-    assertThrows[IllegalArgumentException](CacheDirective("Basic =secret"))
+    assertThrows[IllegalArgumentException](CacheDirective("no-cache /"))
+    assertThrows[IllegalArgumentException](CacheDirective("no-cache ="))
   }
 }
 

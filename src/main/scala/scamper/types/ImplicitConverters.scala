@@ -44,6 +44,9 @@ object ImplicitConverters {
   /** Converts string to [[MediaRange]]. */
   implicit val stringToMediaRange = (range: String) => MediaRange(range)
 
+  /** Converts string to [[PragmaDirective]]. */
+  implicit val stringToPragmaDirective = (directive: String) => PragmaDirective.parse(directive)
+
   /** Converts string to [[ProductType]]. */
   implicit val stringToProductType = (product: String) => ProductType(product)
 

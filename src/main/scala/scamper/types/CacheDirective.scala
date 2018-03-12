@@ -12,7 +12,7 @@ trait CacheDirective {
   /** Directive name */
   def name: String
 
-  /** Directive optional value */
+  /** Optional directive value */
   def value: Option[String]
 
   /** Returns formatted cache directive. */
@@ -20,10 +20,10 @@ trait CacheDirective {
     name + value.map(x => '=' + Token(x).getOrElse('"' + x + '"')).getOrElse("")
 }
 
-import CacheDirectives._
-
 /** CacheDirective factory */
 object CacheDirective {
+  import CacheDirectives._
+
   private val syntax1 = """\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val syntax2 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val syntax3 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*"([^"]*)"\s*""".r

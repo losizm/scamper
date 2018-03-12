@@ -18,15 +18,15 @@ trait RequestMethod {
     HttpRequest(this, uri, headers, body)
 }
 
-import Grammar.Token
-import RequestMethods._
-
 /**
  * RequestMethod factory
  *
  * @see [[RequestMethods]]
  */
 object RequestMethod {
+  import Grammar.Token
+  import RequestMethods._
+
   /** Gets RequestMethod for given code. */
   def apply(name: String): RequestMethod =
     name match {
