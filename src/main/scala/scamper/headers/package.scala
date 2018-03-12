@@ -678,7 +678,7 @@ package object headers {
 
     /** Creates new request setting If-Range header to supplied value. */
     def withIfRange(value: Either[EntityTag, OffsetDateTime]): request.MessageType =
-      request.withHeader(Header("If-Range", value.fold(_.toString, _.toString)))
+      request.withHeader(Header("If-Range", value.fold(_.toString, DateValue.format)))
 
     /** Creates new request setting If-Range header to supplied value. */
     def withIfRange(value: EntityTag): request.MessageType =
@@ -686,7 +686,7 @@ package object headers {
 
     /** Creates new request setting If-Range header to supplied value. */
     def withIfRange(value: OffsetDateTime): request.MessageType =
-      request.withHeader(Header("If-Range", value.toString))
+      request.withHeader(Header("If-Range", value))
 
     /** Creates new request removing If-Range header. */
     def removeIfRange: request.MessageType =

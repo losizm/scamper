@@ -23,7 +23,7 @@ trait EntityTag {
 
 /** EntityTag factory */
 object EntityTag {
-  private val syntax = """(W/)?("[^"]*")""".r
+  private val syntax = """\s*(W/)?("[^"]*")\s*""".r
 
   /** Parse formatted entity tag. */
   def apply(tag: String): EntityTag =
