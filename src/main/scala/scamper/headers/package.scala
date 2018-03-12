@@ -1082,6 +1082,31 @@ package object headers {
       message.removeHeaders("Transfer-Encoding")
   }
 
+  /** Provides standardized access to Upgrade header. */
+  implicit class Upgrade[T <: HttpRequest](val request: T) {
+    /**
+     * Gets Upgrade header values.
+     *
+     * @return the header values or an empty sequence if Upgrade is not present
+     */
+    def upgrade: Seq[Protocol] =
+      getUpgrade.getOrElse(Nil)
+
+    /** Gets Upgrade header values if present. */
+    def getUpgrade: Option[Seq[Protocol]] =
+      request.getHeaderValue("Upgrade")
+        .map(ListParser(_))
+        .map(_.map(Protocol(_)))
+
+    /** Creates new request setting Upgrade header to supplied values. */
+    def withUpgrade(values: Protocol*): request.MessageType =
+      request.withHeader(Header("Upgrade", values.mkString(", ")))
+
+    /** Creates new request removing Upgrade header. */
+    def removeUpgrade: request.MessageType =
+      request.removeHeaders("Upgrade")
+  }
+
   /** Provides standardized access to User-Agent header. */
   implicit class UserAgent[T <: HttpRequest](val request: T) {
     /**

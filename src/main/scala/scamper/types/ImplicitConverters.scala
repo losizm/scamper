@@ -53,6 +53,9 @@ object ImplicitConverters {
   /** Converts string to [[ProductType]]. */
   implicit val stringToProductType = (product: String) => ProductType(product)
 
+  /** Converts string to [[Protocol]]. */
+  implicit val stringToProtocol = (protocol: String) => Protocol(protocol)
+
   /** Converts string to [[TransferCoding]]. */
   implicit val stringToTransferCoding = (coding: String) => TransferCoding(coding)
 
