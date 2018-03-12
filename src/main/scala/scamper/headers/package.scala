@@ -747,15 +747,15 @@ package object headers {
      *
      * @return the header values or an empty sequence if Link is not present
      */
-    def link: Seq[String] =
+    def link: Seq[LinkValue] =
       getLink.getOrElse(Nil)
 
     /** Gets Link header values if present. */
-    def getLink: Option[Seq[String]] =
-      response.getHeaderValue("Link").map(ListParser(_))
+    def getLink: Option[Seq[LinkValue]] =
+      response.getHeaderValue("Link").map(LinkValue.parseAll)
 
     /** Creates new response setting Link header to supplied values. */
-    def withLink(values: String*): response.MessageType =
+    def withLink(values: LinkValue*): response.MessageType =
       response.withHeader(Header("Link", values.mkString(", ")))
 
     /** Creates new response removing Link header. */
