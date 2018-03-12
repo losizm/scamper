@@ -1,5 +1,6 @@
 package scamper.types
 
+import scamper.AuthParams
 import AuthTypeHelper._
 
 /** Base type for authentication header types. */

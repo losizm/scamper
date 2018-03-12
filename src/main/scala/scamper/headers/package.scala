@@ -184,23 +184,24 @@ package object headers {
   /** Provides standardized access to Authentication-Info header. */
   implicit class AuthenticationInfo[T <: HttpResponse](val response: T) {
     /**
-     * Gets Authentication-Info header value.
+     * Gets Authentication-Info header values.
      *
-     * @throws HeaderNotFound if Authentication-Info is not present
+     * @return the header values or an empty sequence if Authentication-Info is
+     * not present
      */
-    def authenticationInfo: String =
-      getAuthenticationInfo.getOrElse(throw HeaderNotFound("Authentication-Info"))
+    def authenticationInfo: Map[String, String] =
+      getAuthenticationInfo.getOrElse(Map.empty)
 
-    /** Gets Authentication-Info header value if present. */
-    def getAuthenticationInfo: Option[String] =
-      response.getHeaderValue("Authentication-Info")
+    /** Gets Authentication-Info header values if present. */
+    def getAuthenticationInfo: Option[Map[String, String]] =
+      response.getHeaderValue("Authentication-Info").map(AuthParams.parse)
 
     /**
      * Creates new response setting Authentication-Info header to supplied
-     * value.
+     * values.
      */
-    def withAuthenticationInfo(value: String): response.MessageType =
-      response.withHeader(Header("Authentication-Info", value))
+    def withAuthenticationInfo(values: (String, String)*): response.MessageType =
+      response.withHeader(Header("Authentication-Info", AuthParams.format(values.toMap).trim))
 
     /** Creates new response removing Authentication-Info header. */
     def removeAuthenticationInfo: response.MessageType =
@@ -865,23 +866,24 @@ package object headers {
   /** Provides standardized access to Proxy-Authentication-Info header. */
   implicit class ProxyAuthenticationInfo[T <: HttpResponse](val response: T) {
     /**
-     * Gets Proxy-Authentication-Info header value.
+     * Gets Proxy-Authentication-Info header values.
      *
-     * @throws HeaderNotFound if Proxy-Authentication-Info is not present
+     * @return the header values or an empty sequence if
+     * Proxy-Authentication-Info is not present
      */
-    def proxyAuthenticationInfo: String =
-      getProxyAuthenticationInfo.getOrElse(throw HeaderNotFound("Proxy-Authentication-Info"))
+    def proxyAuthenticationInfo: Map[String, String] =
+      getProxyAuthenticationInfo.getOrElse(Map.empty)
 
-    /** Gets Proxy-Authentication-Info header value if present. */
-    def getProxyAuthenticationInfo: Option[String] =
-      response.getHeaderValue("Proxy-Authentication-Info")
+    /** Gets Proxy-Authentication-Info header values if present. */
+    def getProxyAuthenticationInfo: Option[Map[String, String]] =
+      response.getHeaderValue("Proxy-Authentication-Info").map(AuthParams.parse)
 
     /**
      * Creates new response setting Proxy-Authentication-Info header to supplied
      * value.
      */
-    def withProxyAuthenticationInfo(value: String): response.MessageType =
-      response.withHeader(Header("Proxy-Authentication-Info", value))
+    def withProxyAuthenticationInfo(values: (String, String)*): response.MessageType =
+      response.withHeader(Header("Proxy-Authentication-Info", AuthParams.format(values.toMap).trim))
 
     /** Creates new response removing Date header. */
     def removeProxyAuthenticationInfo: response.MessageType =
