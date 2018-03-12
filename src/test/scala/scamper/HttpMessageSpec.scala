@@ -1,12 +1,13 @@
 package scamper
 
 import org.scalatest.FlatSpec
+import scamper.RequestMethods._
 import scamper.headers.{ Host, Location }
 
 class HttpMessageSpec extends FlatSpec with Statuses {
   "HttpRequest" should "be created with path" in {
-    val req = HttpRequest("GET", "?user=root&group=wheel").withPath("/find")
-    assert(req.method == "GET")
+    val req = GET("?user=root&group=wheel").withPath("/find")
+    assert(req.method.name == "GET")
     assert(req.uri == "/find?user=root&group=wheel")
     assert(req.path == "/find")
     assert(req.getQueryParamValue("user").contains("root"))
@@ -14,7 +15,8 @@ class HttpMessageSpec extends FlatSpec with Statuses {
   }
 
   it should "be created with query parameters" in {
-    val req = HttpRequest("GET", "/find").withQueryParams("user" -> "root", "group" -> "wheel")
+    val req = GET("/find").withQueryParams("user" -> "root", "group" -> "wheel")
+    assert(req.method.name == "GET")
     assert(req.uri == "/find?user=root&group=wheel")
     assert(req.path == "/find")
     assert(req.getQueryParamValue("user").contains("root"))
@@ -22,8 +24,8 @@ class HttpMessageSpec extends FlatSpec with Statuses {
   }
 
   it should "be created with host" in {
-    val req = HttpRequest("GET", "/find?user=root&group=wheel").withHost("localhost:8080")
-    assert(req.method == "GET")
+    val req = GET("/find?user=root&group=wheel").withHost("localhost:8080")
+    assert(req.method.name == "GET")
     assert(req.uri == "/find?user=root&group=wheel")
     assert(req.path == "/find")
     assert(req.getQueryParamValue("user").contains("root"))

@@ -33,7 +33,7 @@ object WarningType {
 
   /** Creates WarningType with supplied values. */
   def apply(code: Int, agent: String, text: String, date: Option[OffsetDateTime] = None): WarningType =
-    new WarningTypeImpl(code, agent, text, date)
+    WarningTypeImpl(code, agent, text, date)
 
   /** Destructures WarningType. */
   def unapply(warning: WarningType): Option[(Int, String, String, Option[OffsetDateTime])] =

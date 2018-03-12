@@ -2,6 +2,7 @@ package scamper
 
 import org.scalatest.FlatSpec
 
+import scamper.RequestMethods._
 import scamper.headers.{ ContentLength, ContentType, TransferEncoding }
 import scamper.types.ImplicitConverters._
 
@@ -29,7 +30,7 @@ class BodyParserSpec extends FlatSpec with Statuses {
   it should "parse request with form body" in {
     implicit val bodyParser = BodyParsers.form()
     val body = Entity("id=0&name=root")
-    val request = HttpRequest("POST", "users").withContentLength(body.length.get).withBody(body)
+    val request = POST("users", body).withContentLength(body.length.get)
     val form = request.parse.get
 
     assert(form("id").head == "0")

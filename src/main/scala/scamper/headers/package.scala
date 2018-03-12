@@ -1,6 +1,7 @@
 package scamper
 
 import java.time.OffsetDateTime
+import scala.util.Try
 import scamper.types._
 
 /** Contains type classes for standardized access to message headers. */
@@ -162,15 +163,17 @@ package object headers {
      *
      * @return the header values or an empty sequence if Allow is not present
      */
-    def allow: Seq[String] =
+    def allow: Seq[RequestMethod] =
       getAllow.getOrElse(Nil)
 
     /** Gets Allow header values if present. */
-    def getAllow: Option[Seq[String]] =
-      response.getHeaderValue("Allow").map(ListParser(_))
+    def getAllow: Option[Seq[RequestMethod]] =
+      response.getHeaderValue("Allow")
+        .map(ListParser(_))
+        .map(_.map(RequestMethod(_)))
 
     /** Creates new response setting Allow header to supplied values. */
-    def withAllow(values: String*): response.MessageType =
+    def withAllow(values: RequestMethod*): response.MessageType =
       response.withHeader(Header("Allow", values.mkString(", ")))
 
     /** Creates new response removing Allow header. */
@@ -475,16 +478,16 @@ package object headers {
      *
      * @throws HeaderNotFound if ETag is not present
      */
-    def etag: String =
+    def etag: EntityTag =
       getETag.getOrElse(throw HeaderNotFound("ETag"))
 
     /** Gets ETag header value if present. */
-    def getETag: Option[String] =
-      response.getHeaderValue("ETag")
+    def getETag: Option[EntityTag] =
+      response.getHeaderValue("ETag").map(EntityTag(_))
 
     /** Creates new response setting ETag header to supplied value. */
-    def withETag(value: String): response.MessageType =
-      response.withHeader(Header("ETag", value))
+    def withETag(value: EntityTag): response.MessageType =
+      response.withHeader(Header("ETag", value.toString))
 
     /** Creates new response removing ETag header. */
     def removeETag: response.MessageType =
@@ -590,16 +593,16 @@ package object headers {
      *
      * @throws HeaderNotFound if If-Match is not present
      */
-    def ifMatch: String =
+    def ifMatch: EntityTag =
       getIfMatch.getOrElse(throw HeaderNotFound("If-Match"))
 
     /** Gets If-Match header value if present. */
-    def getIfMatch: Option[String] =
-      request.getHeaderValue("If-Match")
+    def getIfMatch: Option[EntityTag] =
+      request.getHeaderValue("If-Match").map(EntityTag(_))
 
     /** Creates new request setting If-Match header to supplied value. */
-    def withIfMatch(value: String): request.MessageType =
-      request.withHeader(Header("If-Match", value))
+    def withIfMatch(value: EntityTag): request.MessageType =
+      request.withHeader(Header("If-Match", value.toString))
 
     /** Creates new request removing If-Match header. */
     def removeIfMatch: request.MessageType =
@@ -636,16 +639,16 @@ package object headers {
      *
      * @throws HeaderNotFound if If-None-Match is not present
      */
-    def ifNoneMatch: String =
+    def ifNoneMatch: EntityTag =
       getIfNoneMatch.getOrElse(throw HeaderNotFound("If-None-Match"))
 
     /** Gets If-None-Match header value if present. */
-    def getIfNoneMatch: Option[String] =
-      request.getHeaderValue("If-None-Match")
+    def getIfNoneMatch: Option[EntityTag] =
+      request.getHeaderValue("If-None-Match").map(EntityTag(_))
 
     /** Creates new request setting If-None-Match header to supplied value. */
-    def withIfNoneMatch(value: String): request.MessageType =
-      request.withHeader(Header("If-None-Match", value))
+    def withIfNoneMatch(value: EntityTag): request.MessageType =
+      request.withHeader(Header("If-None-Match", value.toString))
 
     /** Creates new request removing If-None-Match header. */
     def removeIfNoneMatch: request.MessageType =
@@ -659,16 +662,30 @@ package object headers {
      *
      * @throws HeaderNotFound if If-Range is not present
      */
-    def ifRange: String =
+    def ifRange: Either[EntityTag, OffsetDateTime] =
       getIfRange.getOrElse(throw HeaderNotFound("If-Range"))
 
     /** Gets If-Range header value if present. */
-    def getIfRange: Option[String] =
-      request.getHeaderValue("If-Range")
+    def getIfRange: Option[Either[EntityTag, OffsetDateTime]] =
+      request.getHeaderValue("If-Range").map { value =>
+        Try {
+          Left(EntityTag(value))
+        }.orElse {
+          Try(Right(DateValue.parse(value)))
+        }.get
+      }
 
     /** Creates new request setting If-Range header to supplied value. */
-    def withIfRange(value: String): request.MessageType =
-      request.withHeader(Header("If-Range", value))
+    def withIfRange(value: Either[EntityTag, OffsetDateTime]): request.MessageType =
+      request.withHeader(Header("If-Range", value.fold(_.toString, _.toString)))
+
+    /** Creates new request setting If-Range header to supplied value. */
+    def withIfRange(value: EntityTag): request.MessageType =
+      request.withHeader(Header("If-Range", value.toString))
+
+    /** Creates new request setting If-Range header to supplied value. */
+    def withIfRange(value: OffsetDateTime): request.MessageType =
+      request.withHeader(Header("If-Range", value.toString))
 
     /** Creates new request removing If-Range header. */
     def removeIfRange: request.MessageType =

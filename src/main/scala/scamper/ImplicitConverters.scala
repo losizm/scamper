@@ -33,5 +33,8 @@ object ImplicitConverters {
 
   /** Converts file to [[Entity]]. */
   implicit val fileToEntity = (entity: File) => Entity(entity)
+
+  /** Converts string to [[RequestMethod]]. */
+  implicit val stringToRequestMethod = (method: String) => RequestMethod(method)
 }
 

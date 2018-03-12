@@ -27,7 +27,7 @@ package object extensions {
       val host = getHost(uri)
       val headers = Header("Host", host) +: request.headers.filterNot(_.key.equalsIgnoreCase("Host"))
 
-      uri.toURL(scheme, host).request(request.method, headers, Some(request.body))(f)
+      uri.toURL(scheme, host).request(request.method.name, headers, Some(request.body))(f)
     }
 
     private def getHost(uri: URI): String =

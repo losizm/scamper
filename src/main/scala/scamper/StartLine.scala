@@ -11,7 +11,7 @@ trait StartLine {
 /** HTTP request line */
 trait RequestLine extends StartLine {
   /** Request method */
-  def method: String
+  def method: RequestMethod
 
   /** Request URI */
   def uri: String
@@ -31,22 +31,22 @@ object RequestLine {
   def apply(line: String): RequestLine =
     Try {
       line match {
-        case syntax(method, uri, version) => new RequestLineImpl(method.toUpperCase, uri, Version(version))
+        case syntax(method, uri, version) => RequestLineImpl(RequestMethod(method), uri, Version(version))
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Malformed request line: $line")
     }
 
   /** Creates RequestLine with supplied attributes. */
-  def apply(method: String, uri: String, version: Version = Version(1, 1)): RequestLine =
-    new RequestLineImpl(method.toUpperCase, uri, version)
+  def apply(method: RequestMethod, uri: String, version: Version = Version(1, 1)): RequestLine =
+    RequestLineImpl(method, uri, version)
 
   /** Destructures RequestLine. */
-  def unapply(line: RequestLine): Option[(String, String, Version)] =
+  def unapply(line: RequestLine): Option[(RequestMethod, String, Version)] =
     Some((line.method, line.uri, line.version))
 }
 
-private class RequestLineImpl(val method: String, val uri: String, val version: Version) extends RequestLine
+private case class RequestLineImpl(method: RequestMethod, uri: String, version: Version) extends RequestLine
 
 /** HTTP status line */
 trait StatusLine extends StartLine {
@@ -68,7 +68,7 @@ object StatusLine {
   def apply(line: String): StatusLine =
     Try {
       line match {
-        case syntax(version, code, reason) => new StatusLineImpl(Status(code.toInt, reason), Version(version))
+        case syntax(version, code, reason) => StatusLineImpl(Status(code.toInt, reason), Version(version))
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Malformed status line: $line")
@@ -76,12 +76,12 @@ object StatusLine {
 
   /** Creates StatusLine with supplied attributes. */
   def apply(status: Status, version: Version = Version(1, 1)): StatusLine =
-    new StatusLineImpl(status, version)
+    StatusLineImpl(status, version)
 
   /** Destructures StatusLine. */
   def unapply(line: StatusLine): Option[(Status, Version)] =
     Some((line.status, line.version))
 }
 
-private class StatusLineImpl(val status: Status, val version: Version) extends StatusLine
+private case class StatusLineImpl(status: Status, version: Version) extends StatusLine
 

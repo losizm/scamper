@@ -31,13 +31,13 @@ object ProductType {
   /** Parses formatted product. */
   def apply(product: String): ProductType =
     product match {
-      case syntax(name, version) => new ProductTypeImpl(name, Option(version))
+      case syntax(name, version) => ProductTypeImpl(name, Option(version))
       case _ => throw new IllegalArgumentException(s"Malformed product: $product")
     }
 
   /** Creates ProductType with supplied values. */
   def apply(name: String, version: Option[String]): ProductType =
-    new ProductTypeImpl(CheckToken(name), version.map(CheckToken))
+    ProductTypeImpl(CheckToken(name), version.map(CheckToken))
 
   /** Destructures ProductType. */
   def unapply(product: ProductType): Option[(String, Option[String])] =

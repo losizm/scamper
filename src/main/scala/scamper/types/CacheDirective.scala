@@ -45,7 +45,7 @@ object CacheDirective {
       case "s-maxage"               => `s-maxage`(value.getOrElse("0").toLong)
       case "stale-if-error"         => `stale-if-error`(value.getOrElse("0").toLong)
       case "stale-while-revalidate" => `stale-while-revalidate`(value.getOrElse("0").toLong)
-      case token                    => new CacheDirectiveImpl(token, value)
+      case token                    => CacheDirectiveImpl(token, value)
     } getOrElse {
       throw new IllegalArgumentException(s"Invalid cache directive name: $name")
     }

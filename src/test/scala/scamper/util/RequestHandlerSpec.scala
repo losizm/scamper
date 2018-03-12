@@ -2,7 +2,7 @@ package scamper.util
 
 import org.scalatest.FlatSpec
 import scamper.{ BodyParsers, Entity, HttpException, HttpRequest, Statuses }
-import scamper.ImplicitConverters.{ stringToHeader, tupleToHeaderWithLongValue }
+import scamper.ImplicitConverters.{ stringToHeader, stringToRequestMethod, tupleToHeaderWithLongValue }
 
 class RequestHandlerSpec extends FlatSpec with Statuses {
   "RequestHandlerChain" should "be traversed and response generated" in {

@@ -14,7 +14,7 @@ trait HttpRequest extends HttpMessage {
   type CookieType = PlainCookie
 
   /** Request method */
-  def method: String = startLine.method
+  def method: RequestMethod = startLine.method
 
   /** Request URI */
   def uri: String = startLine.uri
@@ -55,7 +55,7 @@ trait HttpRequest extends HttpMessage {
    *
    * @return new request
    */
-  def withMethod(method: String): MessageType
+  def withMethod(method: RequestMethod): MessageType
 
   /**
    * Creates new request replacing URI.
@@ -100,7 +100,7 @@ object HttpRequest {
     HttpRequestImpl(requestLine, headers, body)
 
   /** Creates HttpRequest using supplied attributes. */
-  def apply(method: String, uri: String = "/", headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpRequest =
+  def apply(method: RequestMethod, uri: String = "/", headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpRequest =
     HttpRequestImpl(RequestLine(method, uri, version), headers, body)
 }
 
@@ -136,7 +136,7 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
   def withStartLine(newStartLine: RequestLine): HttpRequest =
     copy(startLine = newStartLine)
 
-  def withMethod(newMethod: String): HttpRequest =
+  def withMethod(newMethod: RequestMethod): HttpRequest =
     copy(startLine = RequestLine(newMethod, uri, version))
 
   def withURI(newURI: String): HttpRequest =

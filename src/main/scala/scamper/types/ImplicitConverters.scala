@@ -29,6 +29,9 @@ object ImplicitConverters {
   /** Converts string to [[ContentDispositionType]]. */
   implicit val stringToContentDispositionType = (disposition: String) => ContentDispositionType(disposition)
 
+  /** Converts string to [[EntityTag]]. */
+  implicit val stringToEntityTag = (tag: String) => EntityTag(tag)
+
   /** Converts string to [[LanguageTag]]. */
   implicit val stringToLanguageTag = (tag: String) => LanguageTag(tag)
 
