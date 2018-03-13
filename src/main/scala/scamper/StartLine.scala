@@ -62,13 +62,14 @@ trait StatusLine extends StartLine {
 
 /** StatusLine factory */
 object StatusLine {
-  private val syntax = """HTTP/(\d+(?:\.\d+)?)\h+(\d+)\h+(\p{Print}+)\h*""".r
+  private val syntax = """HTTP/(\d+(?:\.\d+)?)\h+(\d+)(?:\h+(\p{Print}*?))?\h*""".r
 
   /** Parses formatted status line. */
   def apply(line: String): StatusLine =
     Try {
       line match {
-        case syntax(version, code, reason) => StatusLineImpl(ResponseStatus(code.toInt, reason), Version(version))
+        case syntax(version, code, null | "") => StatusLineImpl(ResponseStatus(code.toInt), Version(version))
+        case syntax(version, code, reason)    => StatusLineImpl(ResponseStatus(code.toInt, reason), Version(version))
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Malformed status line: $line")

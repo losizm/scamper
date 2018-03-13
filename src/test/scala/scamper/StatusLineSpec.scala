@@ -15,12 +15,16 @@ class StatusLineSpec extends FlatSpec {
     response = StatusLine("HTTP/1.1 500 Internal Server Error")
     assert(response.version == Version("1.1"))
     assert(response.status == ResponseStatus(500, "Internal Server Error"))
+
+    response = StatusLine("HTTP/2 200")
+    assert(response.version == Version("2.0"))
+    assert(response.status == ResponseStatus(200, "OK"))
   }
 
   it should "not be created" in {
     assertThrows[IllegalArgumentException](StatusLine("HTTP/1.1"))
-    assertThrows[IllegalArgumentException](StatusLine("HTTP/1.1 200"))
-    assertThrows[IllegalArgumentException](StatusLine("HTTP/1.1 OK"))
+    assertThrows[IllegalArgumentException](StatusLine("HTTP/1.1-200"))
+    assertThrows[IllegalArgumentException](StatusLine("HTTP/ OK"))
   }
 }
 
