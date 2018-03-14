@@ -11,8 +11,7 @@ private class ChunkEnumeration(in: InputStream, maxChunkSize: Int, maxTotalLengt
   private var chunkSize = nextChunkSize
   private var totalLength = chunkSize
 
-  def hasMoreElements(): Boolean =
-    chunkSize > 0
+  def hasMoreElements(): Boolean = chunkSize > 0
 
   def nextElement(): InputStream = {
     if (!hasMoreElements) throw new NoSuchElementException("No more chunks")

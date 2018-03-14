@@ -327,10 +327,10 @@ package object extensions {
       }
 
     private def getBody(conn: HttpURLConnection): Entity =
-      Entity(() =>
+      Entity { () =>
         if (conn.getResponseCode < 400) conn.getInputStream
         else conn.getErrorStream
-      )
+      }
   }
 
   private def buildURI(scheme: String, authority: String, path: String, query: String, fragment: String): String = {
