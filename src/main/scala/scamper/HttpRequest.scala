@@ -121,9 +121,6 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
   def getQueryParamValues(name: String): Seq[String] =
     queryParams.get(name).getOrElse(Nil)
 
-  def addHeaders(newHeaders: Header*): HttpRequest =
-    copy(headers = headers ++ newHeaders)
-
   def withHeaders(newHeaders: Header*): HttpRequest =
     copy(headers = newHeaders)
 

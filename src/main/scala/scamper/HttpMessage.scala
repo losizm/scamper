@@ -73,9 +73,7 @@ trait HttpMessage {
    * @return new message
    */
   def withHeader(header: Header): MessageType =
-    withHeaders {
-      headers.filterNot(_.key.equalsIgnoreCase(header.key)) :+ header : _*
-    }
+    withHeaders(headers.filterNot(_.key.equalsIgnoreCase(header.key)) :+ header : _*)
 
   /**
    * Creates new message replacing headers.
@@ -92,7 +90,8 @@ trait HttpMessage {
    *
    * @return new message
    */
-  def addHeaders(headers: Header*): MessageType
+  def addHeaders(headers: Header*): MessageType =
+    withHeaders(this.headers ++ headers : _*)
 
   /**
    * Creates new message removing all headers having supplied keys.
@@ -100,9 +99,7 @@ trait HttpMessage {
    * @return new message
    */
   def removeHeaders(keys: String*): MessageType =
-    withHeaders {
-      headers.filterNot(header => keys.exists(header.key.equalsIgnoreCase)) : _*
-    }
+    withHeaders(headers.filterNot(header => keys.exists(header.key.equalsIgnoreCase)) : _*)
 
   /**
    * Creates new message replacing cookies.

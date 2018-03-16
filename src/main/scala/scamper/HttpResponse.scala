@@ -51,9 +51,6 @@ object HttpResponse {
 }
 
 private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity) extends HttpResponse {
-  def addHeaders(newHeaders: Header*): HttpResponse =
-    copy(headers = headers ++ newHeaders)
-
   def withHeaders(newHeaders: Header*): HttpResponse =
     copy(headers = newHeaders)
 
