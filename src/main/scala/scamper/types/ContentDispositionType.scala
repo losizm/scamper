@@ -5,7 +5,7 @@ import ContentDispositionTypeHelper._
 /**
  * Standardized type for Content-Disposition header value.
  *
- * @see [[scamper.headers.ContentDisposition]]
+ * @see [[scamper.ImplicitHeaders.ContentDisposition]]
  */
 trait ContentDispositionType {
   /** Disposition type name */

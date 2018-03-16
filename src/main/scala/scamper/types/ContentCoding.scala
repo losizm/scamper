@@ -5,7 +5,7 @@ import CodingHelper.Name
 /**
  * Standardized type for Content-Encoding header value.
  *
- * @see [[scamper.headers.ContentEncoding]]
+ * @see [[scamper.ImplicitHeaders.ContentEncoding]]
  */
 trait ContentCoding {
   /** Coding name */

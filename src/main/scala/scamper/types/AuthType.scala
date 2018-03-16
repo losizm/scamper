@@ -22,8 +22,8 @@ trait AuthType {
 /**
  * Standardized type for WWW-Authenticate and Proxy-Authenticate header value.
  *
- * @see [[scamper.headers.WWWAuthenticate]]
- * @see [[scamper.headers.ProxyAuthenticate]]
+ * @see [[scamper.ImplicitHeaders.WWWAuthenticate]]
+ * @see [[scamper.ImplicitHeaders.ProxyAuthenticate]]
  * @see [[Credentials]]
  */
 trait Challenge extends AuthType
@@ -62,8 +62,8 @@ private case class ChallengeImpl(scheme: String, token: Option[String], params: 
 /**
  * Standardized type for Authorization and Proxy-Authorization header value.
  *
- * @see [[scamper.headers.Authorization]]
- * @see [[scamper.headers.ProxyAuthorization]]
+ * @see [[scamper.ImplicitHeaders.Authorization]]
+ * @see [[scamper.ImplicitHeaders.ProxyAuthorization]]
  * @see [[Challenge]]
  */
 trait Credentials extends AuthType

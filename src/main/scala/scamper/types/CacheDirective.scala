@@ -6,7 +6,7 @@ import scamper.ListParser
 /**
  * Standardized type for Cache-Control header value.
  *
- * @see [[scamper.headers.CacheControl]]
+ * @see [[scamper.ImplicitHeaders.CacheControl]]
  */
 trait CacheDirective {
   /** Directive name */

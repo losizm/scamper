@@ -5,7 +5,7 @@ import scamper.ListParser
 /**
  * Standardized type for Link header value.
  *
- * @see [[scamper.headers.Link]]
+ * @see [[scamper.ImplicitHeaders.Link]]
  */
 trait LinkValue {
   /** Link reference */

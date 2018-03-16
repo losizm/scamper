@@ -2,9 +2,9 @@ package scamper
 
 import org.scalatest.FlatSpec
 
+import scamper.ImplicitHeaders._
 import scamper.RequestMethods._
 import scamper.ResponseStatuses._
-import scamper.headers.{ ContentLength, ContentType, TransferEncoding }
 import scamper.types.ImplicitConverters._
 
 class BodyParserSpec extends FlatSpec {

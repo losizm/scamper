@@ -8,7 +8,7 @@ import MediaTypeHelper._
 /**
  * Standardized type for Accept header value.
  *
- * @see [[scamper.headers.Accept]]
+ * @see [[scamper.ImplicitHeaders.Accept]]
  */
 trait MediaRange {
   /** Gets weight of media range */

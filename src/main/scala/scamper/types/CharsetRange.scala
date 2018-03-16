@@ -5,7 +5,7 @@ import scamper.Grammar.Token
 /**
  * Standardized type for Accept-Charset header value.
  *
- * @see [[scamper.headers.AcceptCharset]]
+ * @see [[scamper.ImplicitHeaders.AcceptCharset]]
  */
 trait CharsetRange {
   /** Charset */

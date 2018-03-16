@@ -6,7 +6,7 @@ import scamper.ListParser
 /**
  * Standardized type for Pragma header value.
  *
- * @see [[scamper.headers.Pragma]]
+ * @see [[scamper.ImplicitHeaders.Pragma]]
  */
 trait PragmaDirective {
   /** Directive name */

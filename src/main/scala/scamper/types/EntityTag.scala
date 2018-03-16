@@ -4,10 +4,10 @@ package scamper.types
  * Standardized type for ETag, If-Match, If-None-Match, and If-Range header
  * value.
  *
- * @see [[scamper.headers.ETag]]
- * @see [[scamper.headers.IfMatch]]
- * @see [[scamper.headers.IfNoneMatch]]
- * @see [[scamper.headers.IfRange]]
+ * @see [[scamper.ImplicitHeaders.ETag]]
+ * @see [[scamper.ImplicitHeaders.IfMatch]]
+ * @see [[scamper.ImplicitHeaders.IfNoneMatch]]
+ * @see [[scamper.ImplicitHeaders.IfRange]]
  */
 trait EntityTag {
   /** Entity tag's opaque value */

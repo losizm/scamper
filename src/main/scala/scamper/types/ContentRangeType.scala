@@ -5,7 +5,7 @@ import scala.util.Try
 /**
  * Standardized type for Content-Range header value.
  *
- * @see [[scamper.headers.ContentRange]]
+ * @see [[scamper.ImplicitHeaders.ContentRange]]
  */
 trait ContentRangeType {
   /** Range unit */
@@ -18,7 +18,7 @@ trait ContentRangeType {
 /**
  * Standardized type for Content-Range header value.
  *
- * @see [[scamper.headers.ContentRange]]
+ * @see [[scamper.ImplicitHeaders.ContentRange]]
  */
 trait ByteContentRange extends ContentRangeType {
   import ByteContentRange._

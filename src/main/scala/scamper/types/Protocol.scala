@@ -5,7 +5,7 @@ import scamper.Grammar.Token
 /**
  * Standardized type for Upgrade header value.
  *
- * @see [[scamper.headers.Upgrade]]
+ * @see [[scamper.ImplicitHeaders.Upgrade]]
  */
 trait Protocol {
   /** Protocol name */

@@ -3,7 +3,7 @@ package scamper
 import java.io.{ InputStream, SequenceInputStream }
 import java.util.zip.{ GZIPInputStream, InflaterInputStream }
 
-import scamper.headers.{ ContentEncoding, ContentLength, TransferEncoding }
+import scamper.ImplicitHeaders.{ ContentEncoding, ContentLength, TransferEncoding }
 
 /** A mixin that provides access to decoded message body. */
 trait BodyParsing {

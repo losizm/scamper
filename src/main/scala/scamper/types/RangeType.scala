@@ -6,7 +6,7 @@ import scamper.ListParser
 /**
  * Standardized type for Range header value.
  *
- * @see [[scamper.headers.Range]]
+ * @see [[scamper.ImplicitHeaders.Range]]
  */
 trait RangeType {
   /** Range unit */
@@ -19,7 +19,7 @@ trait RangeType {
 /**
  * Standardized type for Range header value.
  *
- * @see [[scamper.headers.Range]]
+ * @see [[scamper.ImplicitHeaders.Range]]
  */
 trait ByteRange extends RangeType {
   import ByteRange._

@@ -5,7 +5,7 @@ import scala.util.Try
 import scamper.types._
 
 /** Contains type classes for standardized access to message headers. */
-package object headers {
+object ImplicitHeaders {
   /** Provides standardized access to Accept header. */
   implicit class Accept[T <: HttpRequest](val request: T) {
     /**
