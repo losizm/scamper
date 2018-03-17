@@ -17,14 +17,6 @@ trait HttpResponse extends HttpMessage {
   def version: Version = startLine.version
 
   /**
-   * Gets all response cookies.
-   *
-   * Values retrieved from Set-Cookie headers.
-   */
-  lazy val cookies: Seq[SetCookie] =
-    getHeaderValues("Set-Cookie").map(SetCookie(_))
-
-  /**
    * Creates new response replacing status.
    *
    * @return new response
@@ -51,6 +43,9 @@ object HttpResponse {
 }
 
 private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity) extends HttpResponse {
+  lazy val cookies: Seq[SetCookie] =
+    getHeaderValues("Set-Cookie").map(SetCookie(_))
+
   def withHeaders(newHeaders: Header*): HttpResponse =
     copy(headers = newHeaders)
 

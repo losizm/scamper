@@ -40,17 +40,6 @@ trait HttpRequest extends HttpMessage {
   def getQueryParamValues(name: String): Seq[String]
 
   /**
-   * Gets all request cookies.
-   *
-   * Values retrieved from Cookie header.
-   */
-  lazy val cookies: Seq[PlainCookie] =
-    getHeaderValue("Cookie")
-      .map(_.split("\\s*;\\s*"))
-      .map(_.map(PlainCookie(_)).toSeq)
-      .getOrElse(Nil)
-
-  /**
    * Creates new request replacing method.
    *
    * @return new request
@@ -114,6 +103,12 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
       case null  => Map.empty
       case query => QueryParams.parse(query)
     }
+
+  lazy val cookies: Seq[PlainCookie] =
+    getHeaderValue("Cookie")
+      .map(ListParser(_, true))
+      .map(_.map(PlainCookie(_)).toSeq)
+      .getOrElse(Nil)
 
   def getQueryParamValue(name: String): Option[String] =
     queryParams.get(name).flatMap(_.headOption)
