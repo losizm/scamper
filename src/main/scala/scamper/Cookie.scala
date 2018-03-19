@@ -13,7 +13,11 @@ trait Cookie {
   def value: String
 }
 
-/** HTTP Plain Cookie */
+/**
+ * HTTP request cookie
+ *
+ * @see [[SetCookie]]
+ */
 trait PlainCookie extends Cookie {
   /** Converts to SetCookie using name-value pair. */
   def toSetCookie: SetCookie = SetCookie(name, value)
@@ -47,7 +51,11 @@ object PlainCookie {
 
 private case class PlainCookieImpl(name: String, value: String) extends PlainCookie
 
-/** HTTP Set-Cookie */
+/**
+ * HTTP response cookie
+ *
+ * @see [[PlainCookie]]
+ */
 trait SetCookie extends Cookie {
   /** Gets cookie domain. */
   def domain: Option[String]

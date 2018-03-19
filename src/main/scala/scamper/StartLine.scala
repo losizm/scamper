@@ -8,7 +8,11 @@ trait StartLine {
   def version: HttpVersion
 }
 
-/** HTTP request line */
+/**
+ * HTTP request line
+ *
+ * @see [[StatusLine]]
+ */
 trait RequestLine extends StartLine {
   /** Request method */
   def method: RequestMethod
@@ -48,7 +52,11 @@ object RequestLine {
 
 private case class RequestLineImpl(method: RequestMethod, uri: String, version: HttpVersion) extends RequestLine
 
-/** HTTP status line */
+/**
+ * HTTP status line
+ *
+ * @see [[RequestLine]]
+ */
 trait StatusLine extends StartLine {
   /** Response status */
   def status: ResponseStatus
