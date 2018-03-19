@@ -14,7 +14,7 @@ trait HttpResponse extends HttpMessage {
   def status: ResponseStatus = startLine.status
 
   /** HTTP version */
-  def version: Version = startLine.version
+  def version: HttpVersion = startLine.version
 
   /**
    * Creates new response replacing status.
@@ -28,7 +28,7 @@ trait HttpResponse extends HttpMessage {
    *
    * @return new response
    */
-  def withVersion(version: Version): MessageType
+  def withVersion(version: HttpVersion): MessageType
 }
 
 /** HttpResponse factory */
@@ -38,7 +38,7 @@ object HttpResponse {
     HttpResponseImpl(statusLine, headers, body)
 
   /** Creates HttpResponse using supplied attributes. */
-  def apply(status: ResponseStatus, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpResponse =
+  def apply(status: ResponseStatus, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: HttpVersion = HttpVersion(1, 1)): HttpResponse =
     HttpResponseImpl(StatusLine(status, version), headers, body)
 }
 
@@ -61,7 +61,7 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
   def withStatus(newStatus: ResponseStatus): HttpResponse =
     copy(startLine = StatusLine(newStatus, version))
 
-  def withVersion(newVersion: Version): HttpResponse =
+  def withVersion(newVersion: HttpVersion): HttpResponse =
     copy(startLine = StatusLine(status, newVersion))
 }
 

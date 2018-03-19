@@ -20,7 +20,7 @@ trait HttpRequest extends HttpMessage {
   def uri: String = startLine.uri
 
   /** HTTP version */
-  def version: Version = startLine.version
+  def version: HttpVersion = startLine.version
 
   /** Path component of URI */
   def path: String
@@ -79,7 +79,7 @@ trait HttpRequest extends HttpMessage {
    *
    * @return new request
    */
-  def withVersion(version: Version): MessageType
+  def withVersion(version: HttpVersion): MessageType
 }
 
 /** HttpRequest factory */
@@ -89,7 +89,7 @@ object HttpRequest {
     HttpRequestImpl(requestLine, headers, body)
 
   /** Creates HttpRequest using supplied attributes. */
-  def apply(method: RequestMethod, uri: String = "/", headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: Version = Version(1, 1)): HttpRequest =
+  def apply(method: RequestMethod, uri: String = "/", headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: HttpVersion = HttpVersion(1, 1)): HttpRequest =
     HttpRequestImpl(RequestLine(method, uri, version), headers, body)
 }
 
@@ -134,7 +134,7 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
   def withURI(newURI: String): HttpRequest =
     copy(startLine = RequestLine(method, newURI, version))
 
-  def withVersion(newVersion: Version): HttpRequest =
+  def withVersion(newVersion: HttpVersion): HttpRequest =
     copy(startLine = RequestLine(method, uri, newVersion))
 
   def withPath(newPath: String): HttpRequest =

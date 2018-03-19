@@ -5,19 +5,19 @@ import org.scalatest.FlatSpec
 class StatusLineSpec extends FlatSpec {
   "StatusLine" should "be created" in {
     var response = StatusLine("HTTP/1.1 200 OK")
-    assert(response.version == Version("1.1"))
+    assert(response.version == HttpVersion("1.1"))
     assert(response.status == ResponseStatus(200, "OK"))
 
     response = StatusLine("HTTP/1.1 400 Bad Request")
-    assert(response.version == Version("1.1"))
+    assert(response.version == HttpVersion("1.1"))
     assert(response.status == ResponseStatus(400, "Bad Request"))
 
     response = StatusLine("HTTP/1.1 500 Internal Server Error")
-    assert(response.version == Version("1.1"))
+    assert(response.version == HttpVersion("1.1"))
     assert(response.status == ResponseStatus(500, "Internal Server Error"))
 
     response = StatusLine("HTTP/2 200")
-    assert(response.version == Version("2.0"))
+    assert(response.version == HttpVersion("2.0"))
     assert(response.status == ResponseStatus(200, "OK"))
   }
 
