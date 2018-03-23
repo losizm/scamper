@@ -17,8 +17,8 @@ private class BoundInputStream(in: InputStream, maxLength: Long) extends FilterI
     if (position >= maxLength) -1
     else
       in.read(buffer, offset, length.min(maxRead)) match {
-        case -1   => -1
-        case byte => position += 1; byte
+        case -1  => -1
+        case len => position += len; len
       }
 
   private def maxRead: Int =
