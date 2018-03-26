@@ -21,7 +21,7 @@ class ChallengeSpec extends FlatSpec {
     assert(challenge.toString == s"Basic $token")
   }
 
-  "Challenge" should "be created with params and no token" in {
+  it should "be created with params and no token" in {
     val challenge = Challenge.parse("Basic realm=\"Admin Console\", description=none")
     assert(challenge.scheme == "Basic")
     assert(!challenge.token.isDefined)

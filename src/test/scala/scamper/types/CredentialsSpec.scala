@@ -21,7 +21,7 @@ class CredentialsSpec extends FlatSpec {
     assert(credentials.toString == s"Basic $token")
   }
 
-  "Credentials" should "be created with params and no token" in {
+  it should "be created with params and no token" in {
     val credentials = Credentials.parse("Basic user=admin, password=\"secr,t\"")
     assert(credentials.scheme == "Basic")
     assert(!credentials.token.isDefined)
