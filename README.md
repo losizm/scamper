@@ -1,10 +1,14 @@
 # Scamper - HTTP Library for Scala
-
 Scamper provides an API for reading and writing HTTP messages. It defines a set
 of general interfaces, and it extends the feature set using the _Type Class
 Pattern_ for specialized access to HTTP headers.
 
-## Building HTTP Requests
+## HTTP Messages
+The details of an HTTP message are captured in the `scamper.HttpMessage` trait.
+The `HttpRequest` and `HttpResponse` traits extend the specification to define
+additional characteristics for their respective message types.
+
+### Building Requests
 The simplest way to build a request is to make use of the API's implicit
 headers and type converters.
 
@@ -13,15 +17,13 @@ import scamper.ImplicitHeaders._
 import scamper.RequestMethods._
 import scamper.types.ImplicitConverters._
 
-object RequestFactory {
-  def get = GET("/index.html")
-    .withHost("localhost:8080")
-    .withUserAgent("Scamper/1.0")
-    .withAccept("text/html", "*/*; q=0.5")
-}
+val request = GET("/index.html")
+  .withHost("localhost:8080")
+  .withUserAgent("Scamper/1.0")
+  .withAccept("text/html", "*/*; q=0.5")
 ```
 
-## Building HTTP Responses
+### Building Responses
 Likewise, you can use the implicit headers and type converters to build a
 response.
 
@@ -31,26 +33,28 @@ import scamper.ImplicitHeaders._
 import scamper.ResponseStatuses._
 import scamper.types.ImplicitConverters._
 
-object ResponseFactory {
-  def get = Ok("Hello, world!")
-    .withContentType("text/plain")
-    .withServer("Scamper/1.0")
-    .withConnection("close")
-}
+val response = Ok("Hello, world!")
+  .withContentType("text/plain")
+  .withServer("Scamper/1.0")
+  .withConnection("close")
 ```
 
-## Using HTTP Client Extension
-Scamper comes equipped with client extensions for sending a request and handling
-the response.
+## Using HTTP Client Extensions
+Scamper comes equipped with client extensions for sending requests and handling
+the responses.
+
+In this example, an extension to `HttpRequest` is used to send the request, and
+a `scamper.util.ResponseFilter` stack forms a pattern-matching expression to
+handle the `HttpResponse`:
 
 ```scala
 import scamper.ImplicitConverters._
 import scamper.ImplicitHeaders._
 import scamper.RequestMethods._
-import scamper.ResponseStatuses._
-import scamper.extensions._
 import scamper.types.ImplicitConverters._
 import scamper.util.ResponseFilters._
+// Adds methods to HttpRequest
+import scamper.extensions.HttpRequestExtension
 
 object UserAdminClient {
   def createUser(id: Int, name: String): Unit = {
@@ -71,15 +75,44 @@ object UserAdminClient {
     }
   }
 }
-````
+```
+
+There are also method extensions to `java.net.URL` corresponding to the standard
+HTTP request methods (GET, POST, etc.). Here's a rewrite of the above example
+using the URL extension:
+
+```scala
+import java.net.URL
+import scamper.ImplicitConverters._
+import scamper.ImplicitHeaders.Location
+import scamper.types.ImplicitConverters._
+import scamper.util.ResponseFilters._
+// Adds methods to java.net.URL
+import scamper.extensions.URLExtension
+
+object UserAdminClient {
+  def createUser(id: Int, name: String): Unit = {
+    val url = new URL("https://localhost:9000/users")
+
+    // The post method is added implicitly via URLExtension
+    url.post(s"""{"id":$id, "name":"$name"}""", "Content-Type: application/json") {
+      case Successful(_)    => println("Successful")
+      case Redirection(res) => println(s"Redirection: ${res.location}")
+      case ClientError(res) => println(s"Client error: ${res.status}")
+      case ServerError(res) => println(s"Server error: ${res.status}")
+      case Informational(_) => println("Informational")
+    }
+  }
+}
+```
+
 ## Working with Message Body
 The message body is represented as an instance of `scamper.Entity`, which
 provides access to an input stream.
 
-### Creating message body
-When creating an HTTP message (i.e., `HttpRequest` or `HttpResponse`), you can
-use either of the Entity factory methods to create the message body.
-For example:
+### Creating Message Body
+When building an `HttpRequest` or `HttpResponse`, you can use one of the Entity
+factory methods to create the message body. For example:
 
 ```scala
 val body = Entity("""
@@ -103,7 +136,7 @@ val body = Entity(new java.io.File("./db/weather-data.json"))
 val res = Ok(body).withContentType("application/json")
 ```
 
-### Parsing message body
+### Parsing Message Body
 
 When handling an incoming message, you need to use an appropriate
 `scamper.BodyParser` to parse the message body. There is a set of standard
@@ -112,8 +145,7 @@ parser implementations in `scamper.BodyParsers`.
 ```scala
 import java.net.URL
 import scala.util.Try
-import scamper._
-// Adds extra methods to java.net.URL
+import scamper.BodyParsers
 import scamper.extensions.URLExtension
 
 val url = new URL("http://localhost:8080/db/weather-data.json")
@@ -125,25 +157,24 @@ val jsonText: Try[String] = url.get() { res =>
 ```
 
 You can also create a custom `BodyParser`. Here's one that gets a little help
-from the standard text body parser and [play-json](https://github.com/playframework/play-json):
+from a standard body parser and [play-json](https://github.com/playframework/play-json):
 
 ```scala
 import java.net.URL
 import play.api.libs.json._
-import scamper._
-// Adds extra methods to java.net.URL
+import scamper.{ BodyParser, BodyParsers, HttpMessage }
 import scamper.extensions.URLExtension
 
 case class User(id: Long, name: String)
 
-// Converts JSON body to User
 object UserBodyParser extends BodyParser[User] {
   // Create standard text body parser
   implicit val textBodyParser = BodyParsers.text(maxLength = 1024)
   // Create play-json parser
   implicit val userReads = Json.reads[User]
 
-  def apply(message: HttpMessage) =
+  // Parses JSON message body to User
+  def apply(message: HttpMessage): User =
     Json.parse(textBodyParser(message)).as[User]
 }
 
