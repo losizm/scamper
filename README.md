@@ -39,74 +39,42 @@ val response = Ok("Hello, world!")
   .withConnection("close")
 ```
 
-## Using HTTP Client Extensions
-Scamper provides client extensions for sending requests and handling the
-responses.
+## Implicit Headers and Type Converters
+The implicit headers and type converters are defined in
+`scamper.ImplicitHeaders` and `scamper.types.ImplicitConverters`. They allow
+type-safe access to message headers.
 
-In this example, an extension to `HttpRequest` is used to send the request, and
-a `scamper.util.ResponseFilter` stack forms a pattern-matching expression to
-handle the `HttpResponse`:
-
-```scala
-import scamper.ImplicitConverters._
-import scamper.ImplicitHeaders._
-import scamper.RequestMethods._
-import scamper.types.ImplicitConverters._
-import scamper.util.ResponseFilters._
-// Adds methods to HttpRequest
-import scamper.extensions.HttpRequestExtension
-
-object UserAdminClient {
-  def createUser(id: Int, name: String): Unit = {
-    // Build POST request
-    val req = POST("/users")
-      .withHost("localhost:9000")
-      .withContentType("application/json")
-      .withBody(s"""{"id":$id, "name":"$name"}""")
-
-    // Send request over SSL
-    req.send(secure = true) {
-      // Handle different response types
-      case Successful(_)    => println("Successful")
-      case Redirection(res) => println(s"Redirection: ${res.location}")
-      case ClientError(res) => println(s"Client error: ${res.status}")
-      case ServerError(res) => println(s"Server error: ${res.status}")
-      case Informational(_) => println("Informational")
-    }
-  }
-}
-```
-
-There are also method extensions to `java.net.URL` corresponding to the standard
-HTTP request methods (GET, POST, etc.). Here's a rewrite of the above example
-using the URL extension:
+For example, the `ContentType` header adds the following methods to
+`HttpMessage`:
 
 ```scala
-import java.net.URL
-import scamper.ImplicitConverters._
-import scamper.ImplicitHeaders.Location
-import scamper.types.ImplicitConverters._
-import scamper.util.ResponseFilters._
-// Adds methods to java.net.URL
-import scamper.extensions.URLExtension
-
-object UserAdminClient {
-  def createUser(id: Int, name: String): Unit = {
-    val url = new URL("https://localhost:9000/users")
-
-    // The post method is added implicitly via URLExtension
-    url.post(s"""{"id":$id, "name":"$name"}""", "Content-Type: application/json") {
-      case Successful(_)    => println("Successful")
-      case Redirection(res) => println(s"Redirection: ${res.location}")
-      case ClientError(res) => println(s"Client error: ${res.status}")
-      case ServerError(res) => println(s"Server error: ${res.status}")
-      case Informational(_) => println("Informational")
-    }
-  }
-}
+/** Gets Content-Type header value */
+def contentType: MediaType
+/** Gets Content-Type header value if present */
+def getContentType: Option[MediaType]
+/** Creates message with Content-Type header */
+def withContentType(value: MediaType): HttpMessage
+/** Creates message without Content-Type header */
+def removeContentType: HttpMessage
 ```
 
-## Working with Message Body
+So you can work with the message header in a type-safe manner:
+
+```scala
+val req = POST("/api/users").withContentType(MediaType("application/json"))
+println(req.contentType.mainType) // application
+println(req.contentType.subtype) // json
+```
+
+And with `stringToMediaType` in scope, you can implicitly convert `String` to
+`MediaType`:
+
+```scala
+val req = POST("/api/users").withContentType("application/json")
+println(req.contentType.mainType) // application
+println(req.contentType.subtype) // json
+```
+## Message Body
 The message body is represented as an instance of `scamper.Entity`, which
 provides access to an input stream.
 
@@ -187,38 +155,69 @@ url.get() { res =>
 }
 ```
 
-## Implicit Headers and Type Converters
-The implicit headers and type converters are defined in
-`scamper.ImplicitHeaders` and `scamper.types.ImplicitConverters`. They allow
-type-safe access to message headers.
+## HTTP Client Extensions
+Scamper provides client extensions for sending requests and handling the
+responses.
 
-For example, the `ContentType` header adds the following methods to
-`HttpMessage`:
+In this example, an extension to `HttpRequest` is used to send the request, and
+a `scamper.util.ResponseFilter` stack forms a pattern-matching expression to
+handle the `HttpResponse`:
 
 ```scala
-/** Gets Content-Type header value */
-def contentType: MediaType
-/** Gets Content-Type header value if present */
-def getContentType: Option[MediaType]
-/** Creates message with Content-Type header */
-def withContentType(value: MediaType): HttpMessage
-/** Creates message without Content-Type header */
-def removeContentType: HttpMessage
+import scamper.ImplicitConverters._
+import scamper.ImplicitHeaders._
+import scamper.RequestMethods._
+import scamper.types.ImplicitConverters._
+import scamper.util.ResponseFilters._
+// Adds methods to HttpRequest
+import scamper.extensions.HttpRequestExtension
+
+object UserAdminClient {
+  def createUser(id: Int, name: String): Unit = {
+    // Build POST request
+    val req = POST("/users")
+      .withHost("localhost:9000")
+      .withContentType("application/json")
+      .withBody(s"""{"id":$id, "name":"$name"}""")
+
+    // Send request over SSL
+    req.send(secure = true) {
+      // Handle different response types
+      case Successful(_)    => println("Successful")
+      case Redirection(res) => println(s"Redirection: ${res.location}")
+      case ClientError(res) => println(s"Client error: ${res.status}")
+      case ServerError(res) => println(s"Server error: ${res.status}")
+      case Informational(_) => println("Informational")
+    }
+  }
+}
 ```
 
-So you can work with the message header in a type-safe manner:
+There are also method extensions to `java.net.URL` corresponding to the standard
+HTTP request methods (GET, POST, etc.). Here's a rewrite of the above example
+using the URL extension:
 
 ```scala
-val req = POST("/api/users").withContentType(MediaType("application/json"))
-println(req.contentType.mainType) // application
-println(req.contentType.subtype) // json
-```
+import java.net.URL
+import scamper.ImplicitConverters._
+import scamper.ImplicitHeaders.Location
+import scamper.types.ImplicitConverters._
+import scamper.util.ResponseFilters._
+// Adds methods to java.net.URL
+import scamper.extensions.URLExtension
 
-And with `stringToMediaType` in scope, you can implicitly convert `String` to
-`MediaType`:
+object UserAdminClient {
+  def createUser(id: Int, name: String): Unit = {
+    val url = new URL("https://localhost:9000/users")
 
-```scala
-val req = POST("/api/users").withContentType("application/json")
-println(req.contentType.mainType) // application
-println(req.contentType.subtype) // json
+    // The post method is added implicitly via URLExtension
+    url.post(s"""{"id":$id, "name":"$name"}""", "Content-Type: application/json") {
+      case Successful(_)    => println("Successful")
+      case Redirection(res) => println(s"Redirection: ${res.location}")
+      case ClientError(res) => println(s"Client error: ${res.status}")
+      case ServerError(res) => println(s"Server error: ${res.status}")
+      case Informational(_) => println("Informational")
+    }
+  }
+}
 ```
