@@ -4,9 +4,10 @@ of general interfaces, and it extends the feature set using the _Type Class
 Pattern_ for specialized access to HTTP headers.
 
 ## HTTP Messages
-The details of an HTTP message are defined in the `scamper.HttpMessage` trait.
-The `HttpRequest` and `HttpResponse` traits extend the specification to define
-additional characteristics for their respective message types.
+At the heart of Scamper is `HttpMessage`, which is a trait that defines the
+basic characteristics of an HTTP message. `HttpRequest` and `HttpResponse`
+extend the specification to define additional characteristics of their
+respective message types.
 
 ### Building Requests
 An easy way to build a request is to make use of the API's [implicit headers and
@@ -61,28 +62,41 @@ def removeContentType: HttpMessage
 So you can work with the message header in a type-safe manner:
 
 ```scala
+import scamper.ImplicitHeaders.ContentType
+import scamper.RequestMethods.POST
+import scamper.types.MediaType
+
 val req = POST("/api/users").withContentType(MediaType("application/json"))
 println(req.contentType.mainType) // application
 println(req.contentType.subtype) // json
 ```
 
-And with `stringToMediaType` in scope, you can implicitly convert `String` to
-`MediaType`:
+And with `stringToMediaType` in scope, you can implicitly convert a `String` to
+a `MediaType`:
 
 ```scala
+import scamper.ImplicitHeaders.ContentType
+import scamper.RequestMethods.POST
+import scamper.types.ImplicitConverters.stringToMediaType
+
 val req = POST("/api/users").withContentType("application/json")
 println(req.contentType.mainType) // application
 println(req.contentType.subtype) // json
 ```
 ## Message Body
-The message body is represented as an instance of `scamper.Entity`, which
-provides access to an input stream.
+The message body is represented as an instance of `Entity`, which provides
+access to an input stream.
 
 ### Creating Message Body
-When building an `HttpRequest` or `HttpResponse`, you can use one of the Entity
-factory methods to create the message body. For example:
+When building an `HttpRequest` or `HttpResponse`, you can use one of the
+`Entity` factory methods to create the message body. For example:
 
 ```scala
+import scamper.Entity
+import scamper.ImplicitHeaders.ContentType
+import scamper.ResponseStatuses.Ok
+import scamper.types.ImplicitConverters.stringToMediaType
+
 val body = Entity("""
 <!DOCTYPE html>
 <html>
@@ -100,38 +114,48 @@ val res = Ok(body).withContentType("text/html; charset=utf-8")
 And here's another example using a file as the entity:
 
 ```scala
-val body = Entity(new java.io.File("./db/weather-data.json"))
+import java.io.File
+import scamper.Entity
+import scamper.ImplicitHeaders.ContentType
+import scamper.ResponseStatuses.Ok
+import scamper.types.ImplicitConverters.stringToMediaType
+
+val body = Entity(new File("./db/weather-data.json"))
 val res = Ok(body).withContentType("application/json")
 ```
 
 ### Parsing Message Body
 
-When handling an incoming message, you need to use an appropriate
-`scamper.BodyParser` to parse the message body. There is a set of standard
-parser implementations in `scamper.BodyParsers`.
+When handling an incoming message, you need to use an appropriate `BodyParser`
+to parse the message body. There is a set of standard parser implementations in
+`BodyParsers`.
 
 ```scala
-import java.net.URL
-import scala.util.Try
-import scamper.BodyParsers
-import scamper.extensions.URLExtension
+import scala.Console.{ RED, RESET }
+import scala.util.{ Failure, Success, Try }
+import scamper.{ BodyParser, BodyParsers, HttpMessage }
 
-val url = new URL("http://localhost:8080/db/weather-data.json")
+def printTextBody(message: HttpMessage): Unit = {
+  // Creates a text body parser
+  val textBodyParser: BodyParser[String] = BodyParsers.text(maxLength = 1024)
+  // Attempts to parse message body to String
+  val body: Try[String] = message.parse(textBodyParser)
 
-val jsonText: Try[String] = url.get() { res =>
-  // Parses the body as text
-  res.parse(BodyParsers.text(maxLength = 1024))
+  body match {
+    case Success(text)  => println(text)
+    case Failure(error) => println(s"$RED$error$RESET")
+  }
 }
 ```
 
-You can also create a custom `BodyParser`. Here's one that gets a little help
+You can also implement a custom body parser. Here's one that gets a little help
 from a standard body parser and [play-json](https://github.com/playframework/play-json):
 
 ```scala
-import java.net.URL
 import play.api.libs.json._
+import scala.Console.{ RED, RESET }
+import scala.util.{ Failure, Success, Try }
 import scamper.{ BodyParser, BodyParsers, HttpMessage }
-import scamper.extensions.URLExtension
 
 case class User(id: Long, name: String)
 
@@ -146,11 +170,13 @@ object UserBodyParser extends BodyParser[User] {
     Json.parse(textBodyParser(message)).as[User]
 }
 
-val url = new URL("http://localhost:9000/users/500")
+def printUserBody(message: HttpMessage): Unit = {
+  // Attempts to parse message body to User
+  val user: Try[User] = message.parse(UserBodyParser)
 
-url.get() { res =>
-  res.parse(UserBodyParser).foreach {
-    case User(id, name) => println(s"$id -> $name")
+  user match {
+    case Success(User(id, name)) => println(s"$id -> $name")
+    case Failure(error) => println(s"$RED$error$RESET")
   }
 }
 ```
