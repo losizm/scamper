@@ -4,13 +4,13 @@ of general interfaces, and it extends the feature set using the _Type Class
 Pattern_ for specialized access to HTTP headers.
 
 ## HTTP Messages
-The details of an HTTP message are captured in the `scamper.HttpMessage` trait.
+The details of an HTTP message are defined in the `scamper.HttpMessage` trait.
 The `HttpRequest` and `HttpResponse` traits extend the specification to define
 additional characteristics for their respective message types.
 
 ### Building Requests
-The simplest way to build a request is to make use of the API's implicit
-headers and type converters.
+An easy way to build a request is to make use of the API's [implicit headers and
+type converters](#implicit-headers-and-type-converters).
 
 ```scala
 import scamper.ImplicitHeaders._
@@ -24,8 +24,8 @@ val request = GET("/index.html")
 ```
 
 ### Building Responses
-Likewise, you can use the implicit headers and type converters to build a
-response.
+Likewise, you can use the [implicit headers and type converters](#implicit-headers-and-type-converters)
+to build a response.
 
 ```scala
 import scamper.ImplicitConverters._
@@ -40,8 +40,8 @@ val response = Ok("Hello, world!")
 ```
 
 ## Using HTTP Client Extensions
-Scamper comes equipped with client extensions for sending requests and handling
-the responses.
+Scamper provides client extensions for sending requests and handling the
+responses.
 
 In this example, an extension to `HttpRequest` is used to send the request, and
 a `scamper.util.ResponseFilter` stack forms a pattern-matching expression to
@@ -180,10 +180,45 @@ object UserBodyParser extends BodyParser[User] {
 
 val url = new URL("http://localhost:9000/users/500")
 
-url.get() { response =>
-  response.parse(UserBodyParser).foreach {
+url.get() { res =>
+  res.parse(UserBodyParser).foreach {
     case User(id, name) => println(s"$id -> $name")
   }
 }
 ```
 
+## Implicit Headers and Type Converters
+The implicit headers and type converters are defined in
+`scamper.ImplicitHeaders` and `scamper.types.ImplicitConverters`. They allow
+type-safe access to message headers.
+
+For example, the `ContentType` header adds the following methods to
+`HttpMessage`:
+
+```scala
+/** Gets Content-Type header value */
+def contentType: MediaType
+/** Gets Content-Type header value if present */
+def getContentType: Option[MediaType]
+/** Creates message with Content-Type header */
+def withContentType(value: MediaType): HttpMessage
+/** Creates message without Content-Type header */
+def removeContentType: HttpMessage
+```
+
+So you can work with the message header in a type-safe manner:
+
+```scala
+val req = POST("/api/users").withContentType(MediaType("application/json"))
+println(req.contentType.mainType) // application
+println(req.contentType.subtype) // json
+```
+
+And with `stringToMediaType` in scope, you can implicitly convert `String` to
+`MediaType`:
+
+```scala
+val req = POST("/api/users").withContentType("application/json")
+println(req.contentType.mainType) // application
+println(req.contentType.subtype) // json
+```
