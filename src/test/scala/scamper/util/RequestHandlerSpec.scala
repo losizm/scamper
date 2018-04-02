@@ -39,7 +39,7 @@ class RequestHandlerSpec extends FlatSpec {
     val resp = RequestHandlerChain.getResponse(HttpRequest("GET"), handlers)
 
     assert(resp.status == Ok)
-    assert(resp.parse.get == "Hello, guest. You have read access.")
+    assert(resp.bodyAs[String] == "Hello, guest. You have read access.")
   }
 
   it should "be traversed and no response generated" in {

@@ -15,8 +15,6 @@
  */
 package scamper
 
-import scala.util.Try
-
 /** HTTP message */
 trait HttpMessage {
   type MessageType <: HttpMessage
@@ -68,9 +66,9 @@ trait HttpMessage {
   /** Message body */
   def body: Entity
 
-  /** Parses message body. */
-  def parse[T](implicit bodyParser: BodyParser[T]): Try[T] =
-    Try(bodyParser(this))
+  /** Gets message body as defined type. */
+  def bodyAs[T](implicit bodyParser: BodyParser[T]): T =
+    bodyParser(this)
 
   /**
    * Creates new message replacing start line.

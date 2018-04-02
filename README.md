@@ -131,20 +131,16 @@ to parse the message body. There is a set of standard parser implementations in
 `BodyParsers`.
 
 ```scala
-import scala.Console.{ RED, RESET }
-import scala.util.{ Failure, Success, Try }
-import scamper.{ BodyParser, BodyParsers, HttpMessage }
+import scamper.{ BodyParsers, HttpMessage }
 
-def printTextBody(message: HttpMessage): Unit = {
-  // Creates a text body parser
-  val textBodyParser: BodyParser[String] = BodyParsers.text(maxLength = 1024)
-  // Attempts to parse message body to String
-  val body: Try[String] = message.parse(textBodyParser)
+// Creates a text body parser
+implicit val textBodyParser = BodyParsers.text(maxLength = 1024)
 
-  body match {
-    case Success(text)  => println(text)
-    case Failure(error) => println(s"$RED$error$RESET")
-  }
+def printText(message: HttpMessage): Unit = {
+  // Parses message body to String implicitly using text body parser
+  val text = message.bodyAs[String]
+
+  println(text)
 }
 ```
 
@@ -153,13 +149,11 @@ from a standard body parser and [play-json](https://github.com/playframework/pla
 
 ```scala
 import play.api.libs.json._
-import scala.Console.{ RED, RESET }
-import scala.util.{ Failure, Success, Try }
 import scamper.{ BodyParser, BodyParsers, HttpMessage }
 
 case class User(id: Long, name: String)
 
-object UserBodyParser extends BodyParser[User] {
+implicit object UserBodyParser extends BodyParser[User] {
   // Create standard text body parser
   implicit val textBodyParser = BodyParsers.text(maxLength = 1024)
   // Create play-json parser
@@ -167,17 +161,14 @@ object UserBodyParser extends BodyParser[User] {
 
   // Parses JSON message body to User
   def apply(message: HttpMessage): User =
-    Json.parse(textBodyParser(message)).as[User]
+    Json.parse(message.bodyAs[String]).as[User]
 }
 
-def printUserBody(message: HttpMessage): Unit = {
-  // Attempts to parse message body to User
-  val user: Try[User] = message.parse(UserBodyParser)
+def printUser(message: HttpMessage): Unit = {
+  // Parse message body to User
+  val user = message.bodyAs[User]
 
-  user match {
-    case Success(User(id, name)) => println(s"$id -> $name")
-    case Failure(error) => println(s"$RED$error$RESET")
-  }
+  println(s"uid=${user.id}(${user.name})")
 }
 ```
 
