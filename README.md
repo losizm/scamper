@@ -210,8 +210,8 @@ object UserAdminClient {
 ```
 
 There are also method extensions to `java.net.URL` corresponding to the standard
-HTTP request methods (GET, POST, etc.). Here's a rewrite of the above example
-using the URL extension:
+HTTP request methods (i.e., GET, POST, etc.). Here's a rewrite of the above
+example using the URL extension:
 
 ```scala
 import java.net.URL
