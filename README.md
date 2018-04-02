@@ -10,13 +10,14 @@ extend the specification to define additional characteristics of their
 respective message types.
 
 ### Building Requests
-An easy way to build a request is to make use of the API's [implicit headers and
-type converters](#implicit-headers-and-type-converters).
+An `HttpRequest` can be created using any of the factory methods defined in the
+companion object. Or you can start with a `RequestMethod` and build the request
+using [implicit headers and type converters](#implicit-headers-and-type-converters):
 
 ```scala
-import scamper.ImplicitHeaders._
-import scamper.RequestMethods._
-import scamper.types.ImplicitConverters._
+import scamper.ImplicitHeaders.{ Accept, Host, UserAgent }
+import scamper.RequestMethods.GET
+import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToProductType }
 
 val request = GET("/index.html")
   .withHost("localhost:8080")
@@ -25,14 +26,15 @@ val request = GET("/index.html")
 ```
 
 ### Building Responses
-Likewise, you can use the [implicit headers and type converters](#implicit-headers-and-type-converters)
-to build a response.
+Likewise, an `HttpResponse` can be created using a factory method defined in its
+companion object. Or start with a `ResponseStatus` and build the response using
+[implicit headers and type converters](#implicit-headers-and-type-converters):
 
 ```scala
-import scamper.ImplicitConverters._
-import scamper.ImplicitHeaders._
-import scamper.ResponseStatuses._
-import scamper.types.ImplicitConverters._
+import scamper.ImplicitConverters.stringToEntity
+import scamper.ImplicitHeaders.{ Connection, ContentType, Server }
+import scamper.ResponseStatuses.Ok
+import scamper.types.ImplicitConverters.{ stringToMediaType, stringToProductType }
 
 val response = Ok("Hello, world!")
   .withContentType("text/plain")
@@ -56,7 +58,7 @@ def getContentType: Option[MediaType]
 /** Creates message with Content-Type header */
 def withContentType(value: MediaType): HttpMessage
 /** Creates message without Content-Type header */
-def removeContentType: HttpMessage
+def withoutContentType: HttpMessage
 ```
 
 So you can work with the message header in a type-safe manner:
@@ -111,7 +113,7 @@ val body = Entity("""
 val res = Ok(body).withContentType("text/html; charset=utf-8")
 ```
 
-And here's another example using a file as the entity:
+And here's another example with a file as the entity:
 
 ```scala
 import java.io.File
@@ -120,8 +122,8 @@ import scamper.ImplicitHeaders.ContentType
 import scamper.ResponseStatuses.Ok
 import scamper.types.ImplicitConverters.stringToMediaType
 
-val body = Entity(new File("./db/weather-data.json"))
-val res = Ok(body).withContentType("application/json")
+val body = Entity(new File("./index.html"))
+val res = Ok(body).withContentType("text/html; charset=utf-8")
 ```
 
 ### Parsing Message Body
@@ -137,14 +139,14 @@ import scamper.{ BodyParsers, HttpMessage }
 implicit val textBodyParser = BodyParsers.text(maxLength = 1024)
 
 def printText(message: HttpMessage): Unit = {
-  // Parses message body to String implicitly using text body parser
+  // Parses message body to String using implicit textBodyParser
   val text = message.bodyAs[String]
 
   println(text)
 }
 ```
 
-You can also implement a custom body parser. Here's one that gets a little help
+You can also implement custom body parsers. Here's one that gets a little help
 from a standard body parser and [play-json](https://github.com/playframework/play-json):
 
 ```scala
@@ -165,7 +167,7 @@ implicit object UserBodyParser extends BodyParser[User] {
 }
 
 def printUser(message: HttpMessage): Unit = {
-  // Parse message body to User
+  // Parses message body to User using implicit UserBodyParser
   val user = message.bodyAs[User]
 
   println(s"uid=${user.id}(${user.name})")
@@ -181,25 +183,22 @@ a `scamper.util.ResponseFilter` stack forms a pattern-matching expression to
 handle the `HttpResponse`:
 
 ```scala
-import scamper.ImplicitConverters._
-import scamper.ImplicitHeaders._
-import scamper.RequestMethods._
-import scamper.types.ImplicitConverters._
-import scamper.util.ResponseFilters._
-// Adds methods to HttpRequest
+import scamper.ImplicitConverters.stringToEntity
+import scamper.ImplicitHeaders.{ ContentType, Host, Location }
+import scamper.RequestMethods.POST
 import scamper.extensions.HttpRequestExtension
+import scamper.types.ImplicitConverters.stringToMediaType
+import scamper.util.ResponseFilters._
 
 object UserAdminClient {
   def createUser(id: Int, name: String): Unit = {
-    // Build POST request
     val req = POST("/users")
       .withHost("localhost:9000")
       .withContentType("application/json")
       .withBody(s"""{"id":$id, "name":"$name"}""")
 
-    // Send request over SSL
+    // The send method is added via HttpRequestExtension
     req.send(secure = true) {
-      // Handle different response types
       case Successful(_)    => println("Successful")
       case Redirection(res) => println(s"Redirection: ${res.location}")
       case ClientError(res) => println(s"Client error: ${res.status}")
@@ -216,18 +215,17 @@ using the URL extension:
 
 ```scala
 import java.net.URL
-import scamper.ImplicitConverters._
+import scamper.ImplicitConverters.{ stringToEntity, stringToHeader }
 import scamper.ImplicitHeaders.Location
-import scamper.types.ImplicitConverters._
-import scamper.util.ResponseFilters._
-// Adds methods to java.net.URL
 import scamper.extensions.URLExtension
+import scamper.types.ImplicitConverters.stringToMediaType
+import scamper.util.ResponseFilters._
 
 object UserAdminClient {
   def createUser(id: Int, name: String): Unit = {
     val url = new URL("https://localhost:9000/users")
 
-    // The post method is added implicitly via URLExtension
+    // The post method is added via URLExtension
     url.post(s"""{"id":$id, "name":"$name"}""", "Content-Type: application/json") {
       case Successful(_)    => println("Successful")
       case Redirection(res) => println(s"Redirection: ${res.location}")

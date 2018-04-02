@@ -42,7 +42,7 @@ object ImplicitHeaders {
       request.withHeader(Header("Accept", values.mkString(", ")))
 
     /** Creates new request removing Accept header. */
-    def removeAccept: T#MessageType =
+    def withoutAccept: T#MessageType =
       request.removeHeaders("Accept")
   }
 
@@ -67,7 +67,7 @@ object ImplicitHeaders {
       request.withHeader(Header("Accept-Charset", values.mkString(", ")))
 
     /** Creates new request removing Accept-Charset header. */
-    def removeAcceptCharset: T#MessageType =
+    def withoutAcceptCharset: T#MessageType =
       request.removeHeaders("Accept-Charset")
   }
 
@@ -94,7 +94,7 @@ object ImplicitHeaders {
       request.withHeader(Header("Accept-Encoding", values.mkString(", ")))
 
     /** Creates new request removing Accept-Encoding header. */
-    def removeAcceptEncoding: T#MessageType =
+    def withoutAcceptEncoding: T#MessageType =
       request.removeHeaders("Accept-Encoding")
   }
 
@@ -121,7 +121,7 @@ object ImplicitHeaders {
       request.withHeader(Header("Accept-Language", values.mkString(", ")))
 
     /** Creates new request removing Accept-Language header. */
-    def removeAcceptLanguage: T#MessageType =
+    def withoutAcceptLanguage: T#MessageType =
       request.removeHeaders("Accept-Language")
   }
 
@@ -144,7 +144,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Accept-Ranges", values.mkString(", ")))
 
     /** Creates new response removing Accept-Ranges header. */
-    def removeAcceptRanges: T#MessageType =
+    def withoutAcceptRanges: T#MessageType =
       response.removeHeaders("Accept-Ranges")
   }
 
@@ -167,7 +167,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Age", value))
 
     /** Creates new response removing Age header. */
-    def removeAge: T#MessageType =
+    def withoutAge: T#MessageType =
       response.removeHeaders("Age")
   }
 
@@ -192,7 +192,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Allow", values.mkString(", ")))
 
     /** Creates new response removing Allow header. */
-    def removeAllow: T#MessageType =
+    def withoutAllow: T#MessageType =
       response.removeHeaders("Allow")
   }
 
@@ -219,7 +219,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Authentication-Info", AuthParams.format(values.toMap).trim))
 
     /** Creates new response removing Authentication-Info header. */
-    def removeAuthenticationInfo: T#MessageType =
+    def withoutAuthenticationInfo: T#MessageType =
       response.removeHeaders("Authentication-Info")
   }
 
@@ -242,7 +242,7 @@ object ImplicitHeaders {
       request.withHeader(Header("Authorization", value.toString))
 
     /** Creates new request removing Authorization header. */
-    def removeAuthorization: T#MessageType =
+    def withoutAuthorization: T#MessageType =
       request.removeHeaders("Authorization")
   }
 
@@ -265,7 +265,7 @@ object ImplicitHeaders {
       message.withHeader(Header("Cache-Control", values.mkString(", ")))
 
     /** Creates new message removing Cache-Control header. */
-    def removeCacheControl: T#MessageType =
+    def withoutCacheControl: T#MessageType =
       message.removeHeaders("Cache-Control")
   }
 
@@ -291,7 +291,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Content-Disposition", value.toString))
 
     /** Creates new response removing Content-Disposition header. */
-    def removeContentDisposition: T#MessageType =
+    def withoutContentDisposition: T#MessageType =
       response.removeHeaders("Content-Disposition")
   }
 
@@ -318,7 +318,7 @@ object ImplicitHeaders {
       message.withHeader(Header("Content-Encoding", values.mkString(", ")))
 
     /** Creates new message removing Content-Encoding header. */
-    def removeContentEncoding: T#MessageType =
+    def withoutContentEncoding: T#MessageType =
       message.removeHeaders("Content-Encoding")
   }
 
@@ -343,7 +343,7 @@ object ImplicitHeaders {
       message.withHeader(Header("Content-Language", values.mkString(", ")))
 
     /** Creates new message removing Content-Language header. */
-    def removeContentLanguage: T#MessageType =
+    def withoutContentLanguage: T#MessageType =
       message.removeHeaders("Content-Language")
   }
 
@@ -366,7 +366,7 @@ object ImplicitHeaders {
       message.withHeader(Header("Content-Length", value))
 
     /** Creates new message removing Content-Length header. */
-    def removeContentLength: T#MessageType =
+    def withoutContentLength: T#MessageType =
       message.removeHeaders("Content-Length")
   }
 
@@ -391,7 +391,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Content-Location", value))
 
     /** Creates new response removing Content-Location header. */
-    def removeContentLocation: T#MessageType =
+    def withoutContentLocation: T#MessageType =
       response.removeHeaders("Content-Location")
   }
 
@@ -414,7 +414,7 @@ object ImplicitHeaders {
       message.withHeader(Header("Content-Range", value.toString))
 
     /** Creates new message removing Content-Range header. */
-    def removeContentRange: T#MessageType =
+    def withoutContentRange: T#MessageType =
       message.removeHeaders("Content-Range")
   }
 
@@ -437,7 +437,7 @@ object ImplicitHeaders {
       message.withHeader(Header("Content-Type", value.toString))
 
     /** Creates new message removing Content-Type header. */
-    def removeContentType: T#MessageType =
+    def withoutContentType: T#MessageType =
       message.removeHeaders("Content-Type")
   }
 
@@ -460,7 +460,7 @@ object ImplicitHeaders {
       message.withHeader(Header("Connection", value))
 
     /** Creates new message removing Connection header. */
-    def removeConnection: T#MessageType =
+    def withoutConnection: T#MessageType =
       message.removeHeaders("Connection")
   }
 
@@ -483,7 +483,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Date", value))
 
     /** Creates new response removing Date header. */
-    def removeDate: T#MessageType =
+    def withoutDate: T#MessageType =
       response.removeHeaders("Date")
   }
 
@@ -506,7 +506,7 @@ object ImplicitHeaders {
       response.withHeader(Header("ETag", value.toString))
 
     /** Creates new response removing ETag header. */
-    def removeETag: T#MessageType =
+    def withoutETag: T#MessageType =
       response.removeHeaders("ETag")
   }
 
@@ -529,7 +529,7 @@ object ImplicitHeaders {
       request.withHeader(Header("Expect", value))
 
     /** Creates new request removing Expect header. */
-    def removeExpect: T#MessageType =
+    def withoutExpect: T#MessageType =
       request.removeHeaders("Expect")
   }
 
@@ -552,7 +552,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Expires", value))
 
     /** Creates new response removing Expires header. */
-    def removeExpires: T#MessageType =
+    def withoutExpires: T#MessageType =
       response.removeHeaders("Expires")
   }
 
@@ -575,7 +575,7 @@ object ImplicitHeaders {
       request.withHeader(Header("From", value))
 
     /** Creates new request removing From header. */
-    def removeFrom: T#MessageType =
+    def withoutFrom: T#MessageType =
       request.removeHeaders("From")
   }
 
@@ -598,7 +598,7 @@ object ImplicitHeaders {
       request.withHeader(Header("Host", value))
 
     /** Creates new request removing Host header. */
-    def removeHost: T#MessageType =
+    def withoutHost: T#MessageType =
       request.removeHeaders("Host")
   }
 
@@ -621,7 +621,7 @@ object ImplicitHeaders {
       request.withHeader(Header("If-Match", value.toString))
 
     /** Creates new request removing If-Match header. */
-    def removeIfMatch: T#MessageType =
+    def withoutIfMatch: T#MessageType =
       request.removeHeaders("If-Match")
   }
 
@@ -644,7 +644,7 @@ object ImplicitHeaders {
       request.withHeader(Header("If-Modified-Since", value))
 
     /** Creates new request removing If-Modified-Since header. */
-    def removeIfModifiedSince: T#MessageType =
+    def withoutIfModifiedSince: T#MessageType =
       request.removeHeaders("If-Modified-Since")
   }
 
@@ -667,7 +667,7 @@ object ImplicitHeaders {
       request.withHeader(Header("If-None-Match", value.toString))
 
     /** Creates new request removing If-None-Match header. */
-    def removeIfNoneMatch: T#MessageType =
+    def withoutIfNoneMatch: T#MessageType =
       request.removeHeaders("If-None-Match")
   }
 
@@ -704,7 +704,7 @@ object ImplicitHeaders {
       request.withHeader(Header("If-Range", value))
 
     /** Creates new request removing If-Range header. */
-    def removeIfRange: T#MessageType =
+    def withoutIfRange: T#MessageType =
       request.removeHeaders("If-Range")
   }
 
@@ -729,7 +729,7 @@ object ImplicitHeaders {
       request.withHeader(Header("If-Unmodified-Since", value))
 
     /** Creates new request removing If-Unmodified-Since header. */
-    def removeIfUnmodifiedSince: T#MessageType =
+    def withoutIfUnmodifiedSince: T#MessageType =
       request.removeHeaders("If-Unmodified-Since")
   }
 
@@ -752,7 +752,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Last-Modified", value))
 
     /** Creates new response removing Last-Modified header. */
-    def removeLastModified: T#MessageType =
+    def withoutLastModified: T#MessageType =
       response.removeHeaders("Last-Modified")
   }
 
@@ -775,7 +775,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Link", values.mkString(", ")))
 
     /** Creates new response removing Link header. */
-    def removeLink: T#MessageType =
+    def withoutLink: T#MessageType =
       response.removeHeaders("Link")
   }
 
@@ -798,7 +798,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Location", value))
 
     /** Creates new response removing Location header. */
-    def removeLocation: T#MessageType =
+    def withoutLocation: T#MessageType =
       response.removeHeaders("Location")
   }
 
@@ -821,7 +821,7 @@ object ImplicitHeaders {
       request.withHeader(Header("Max-Forwards", value))
 
     /** Creates new request removing Max-Forwards header. */
-    def removeMaxForwards: T#MessageType =
+    def withoutMaxForwards: T#MessageType =
       request.removeHeaders("Max-Forwards")
   }
 
@@ -844,7 +844,7 @@ object ImplicitHeaders {
       request.withHeader(Header("Pragma", values.mkString(", ")))
 
     /** Creates new request removing Pragma header. */
-    def removePragma: T#MessageType =
+    def withoutPragma: T#MessageType =
       request.removeHeaders("Pragma")
   }
 
@@ -874,7 +874,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Proxy-Authenticate", values.mkString(", ")))
 
     /** Creates new response removing Date header. */
-    def removeProxyAuthenticate: T#MessageType =
+    def withoutProxyAuthenticate: T#MessageType =
       response.removeHeaders("Proxy-Authenticate")
   }
 
@@ -901,7 +901,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Proxy-Authentication-Info", AuthParams.format(values.toMap).trim))
 
     /** Creates new response removing Date header. */
-    def removeProxyAuthenticationInfo: T#MessageType =
+    def withoutProxyAuthenticationInfo: T#MessageType =
       response.removeHeaders("Proxy-Authentication-Info")
   }
 
@@ -926,7 +926,7 @@ object ImplicitHeaders {
       request.withHeader(Header("Proxy-Authorization", value.toString))
 
     /** Creates new request removing Proxy-Authorization header. */
-    def removeProxyAuthorization: T#MessageType =
+    def withoutProxyAuthorization: T#MessageType =
       request.removeHeaders("Proxy-Authorization")
   }
 
@@ -949,7 +949,7 @@ object ImplicitHeaders {
       request.withHeader(Header("Range", value.toString))
 
     /** Creates new request removing Range header. */
-    def removeRange: T#MessageType =
+    def withoutRange: T#MessageType =
       request.removeHeaders("Range")
   }
 
@@ -972,7 +972,7 @@ object ImplicitHeaders {
       request.withHeader(Header("Referer", value))
 
     /** Creates new request removing Referer header. */
-    def removeReferer: T#MessageType =
+    def withoutReferer: T#MessageType =
       request.removeHeaders("Referer")
   }
 
@@ -995,7 +995,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Retry-After", value))
 
     /** Creates new response removing Retry-After header. */
-    def removeRetryAfter: T#MessageType =
+    def withoutRetryAfter: T#MessageType =
       response.removeHeaders("Retry-After")
   }
 
@@ -1018,7 +1018,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Server", values.mkString(" ")))
 
     /** Creates new response removing Server header. */
-    def removeServer: T#MessageType =
+    def withoutServer: T#MessageType =
       response.removeHeaders("Server")
   }
 
@@ -1043,7 +1043,7 @@ object ImplicitHeaders {
       request.withHeader(Header("TE", values.mkString(", ")))
 
     /** Creates new request removing TE header. */
-    def removeTE: T#MessageType =
+    def withoutTE: T#MessageType =
       request.removeHeaders("TE")
   }
 
@@ -1066,7 +1066,7 @@ object ImplicitHeaders {
       message.withHeader(Header("Trailer", values.mkString(", ")))
 
     /** Creates new message removing Trailer header. */
-    def removeTrailer: T#MessageType =
+    def withoutTrailer: T#MessageType =
       message.removeHeaders("Trailer")
   }
 
@@ -1093,7 +1093,7 @@ object ImplicitHeaders {
       message.withHeader(Header("Transfer-Encoding", values.mkString(", ")))
 
     /** Creates new message removing Transfer-Encoding header. */
-    def removeTransferEncoding: T#MessageType =
+    def withoutTransferEncoding: T#MessageType =
       message.removeHeaders("Transfer-Encoding")
   }
 
@@ -1118,7 +1118,7 @@ object ImplicitHeaders {
       request.withHeader(Header("Upgrade", values.mkString(", ")))
 
     /** Creates new request removing Upgrade header. */
-    def removeUpgrade: T#MessageType =
+    def withoutUpgrade: T#MessageType =
       request.removeHeaders("Upgrade")
   }
 
@@ -1141,7 +1141,7 @@ object ImplicitHeaders {
       request.withHeader(Header("User-Agent", values.mkString(" ")))
 
     /** Creates new request removing User-Agent header. */
-    def removeUserAgent: T#MessageType =
+    def withoutUserAgent: T#MessageType =
       request.removeHeaders("User-Agent")
   }
 
@@ -1164,7 +1164,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Vary", values.mkString(", ")))
 
     /** Creates new response removing Vary header. */
-    def removeVary: T#MessageType =
+    def withoutVary: T#MessageType =
       response.removeHeaders("Vary")
   }
 
@@ -1187,7 +1187,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Via", values.mkString(", ")))
 
     /** Creates new response removing Via header. */
-    def removeVia: T#MessageType =
+    def withoutVia: T#MessageType =
       response.removeHeaders("Via")
   }
 
@@ -1210,7 +1210,7 @@ object ImplicitHeaders {
       response.withHeader(Header("Warning", values.mkString(", ")))
 
     /** Creates new response removing Warning header. */
-    def removeWarning: T#MessageType =
+    def withoutWarning: T#MessageType =
       response.removeHeaders("Warning")
   }
 
@@ -1239,7 +1239,7 @@ object ImplicitHeaders {
       response.withHeader(Header("WWW-Authenticate", values.mkString(", ")))
 
     /** Creates new response removing WWW-Authenticate header. */
-    def removeWWWAuthenticate: T#MessageType =
+    def withoutWWWAuthenticate: T#MessageType =
       response.removeHeaders("WWW-Authenticate")
   }
 }
