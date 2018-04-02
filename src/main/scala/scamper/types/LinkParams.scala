@@ -26,7 +26,7 @@ private object LinkParams {
   private val BadValue    = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*(.+)\s*""".r
 
   def parse(params: String): Map[String, Option[String]] =
-    ListParser(params, true).map {
+    ListParser(params, semicolon = true).map {
       case NoValue(name)            => name -> None
       case TokenValue(name, value)  => name -> Some(value)
       case QuotedValue(name, value) => name -> Some(value)

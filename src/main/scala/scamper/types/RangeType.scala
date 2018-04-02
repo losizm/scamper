@@ -15,7 +15,6 @@
  */
 package scamper.types
 
-import scala.util.Try
 import scamper.ListParser
 
 /**

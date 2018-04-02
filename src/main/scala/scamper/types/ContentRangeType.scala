@@ -15,8 +15,6 @@
  */
 package scamper.types
 
-import scala.util.Try
-
 /**
  * Standardized type for Content-Range header value.
  *

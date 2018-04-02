@@ -18,7 +18,6 @@ package scamper
 import java.io.{ ByteArrayInputStream, InputStream }
 import java.util.Enumeration
 
-import scala.util.Try
 import scala.collection.mutable.ArrayBuffer
 
 private class ChunkEnumeration(in: InputStream, maxChunkSize: Int, maxTotalLength: Long) extends Enumeration[InputStream] {

@@ -15,7 +15,6 @@
  */
 package scamper
 
-import scala.annotation.tailrec
 import Grammar._
 
 private object AuthParams {

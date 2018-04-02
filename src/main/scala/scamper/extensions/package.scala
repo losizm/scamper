@@ -116,11 +116,11 @@ package object extensions {
      * occurrence is retrieved.
      */
     def getQueryParamValue(name: String): Option[String] =
-      getQueryParams.get(name).flatMap(_.headOption)
+      getQueryParams().get(name).flatMap(_.headOption)
 
     /** Gets all values for named query parameter. */
     def getQueryParamValues(name: String): Seq[String] =
-      getQueryParams.get(name).getOrElse(Nil)
+      getQueryParams().getOrElse(name, Nil)
 
     /** Converts URI to URL using supplied scheme and authority. */
     def toURL(scheme: String, authority: String): URL =
@@ -159,11 +159,11 @@ package object extensions {
      * occurrence is retrieved.
      */
     def getQueryParamValue(name: String): Option[String] =
-      getQueryParams.get(name).flatMap(_.headOption)
+      getQueryParams().get(name).flatMap(_.headOption)
 
     /** Gets all values for named query parameter. */
     def getQueryParamValues(name: String): Seq[String] =
-      getQueryParams.get(name).getOrElse(Nil)
+      getQueryParams().getOrElse(name, Nil)
 
     /** Creates new URL replacing path. */
     def withPath(path: String): URL =

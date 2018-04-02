@@ -121,7 +121,7 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
 
   lazy val cookies: Seq[PlainCookie] =
     getHeaderValue("Cookie")
-      .map(ListParser(_, true))
+      .map(ListParser(_, semicolon = true))
       .map(_.map(PlainCookie(_)).toSeq)
       .getOrElse(Nil)
 
@@ -129,7 +129,7 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
     queryParams.get(name).flatMap(_.headOption)
 
   def getQueryParamValues(name: String): Seq[String] =
-    queryParams.get(name).getOrElse(Nil)
+    queryParams.getOrElse(name, Nil)
 
   def withHeaders(newHeaders: Header*): HttpRequest =
     copy(headers = newHeaders)

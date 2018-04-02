@@ -57,7 +57,7 @@ object RequestMethod {
       case "TRACE"   => TRACE
       case "CONNECT" => CONNECT
       case _  =>
-        Token(name).map(RequestMethodImpl(_)).getOrElse {
+        Token(name).map(RequestMethodImpl).getOrElse {
           throw new IllegalArgumentException(s"Invalid request method name: $name")
         }
     }

@@ -15,7 +15,6 @@
  */
 package scamper.types
 
-import scala.annotation.tailrec
 import scala.util.matching.Regex
 
 import MediaTypeHelper._
@@ -79,7 +78,7 @@ object MediaRange {
     ParseMediaType(mediaRange) match {
       case (mainType, subtype, params) =>
         params.collectFirst {
-          case (QValue.key(key), QValue.value(value)) => (value.toFloat, (params - key))
+          case (QValue.key(key), QValue.value(value)) => (value.toFloat, params - key)
         } map {
           case (weight, params) => MediaRangeImpl(MainType(mainType), Subtype(subtype), QValue(weight), Params(params))
         } getOrElse {

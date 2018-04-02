@@ -71,7 +71,7 @@ object ResponseStatus {
 
   /** Creates ResponseStatus with supplied code and reason. */
   def apply(code: Int, reason: String): ResponseStatus =
-    new ResponseStatusImpl(code, reason)
+    ResponseStatusImpl(code, reason)
 
   /** Destructures ResponseStatus. */
   def unapply(status: ResponseStatus): Option[(Int, String)] =

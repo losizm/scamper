@@ -114,7 +114,7 @@ private class FormBodyParser(maxLength: Int) extends BodyParser[Map[String, Seq[
 private class FileBodyParser(dest: File, val maxLength: Long, val maxBufferSize: Int) extends BodyParser[File] with BodyParsing {
   def apply(message: HttpMessage): File =
     withInputStream(message) { in =>
-      val destFile = getDestFile
+      val destFile = getDestFile()
       val out = new FileOutputStream(destFile)
 
       try {

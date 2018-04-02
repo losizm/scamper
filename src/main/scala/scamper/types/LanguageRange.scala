@@ -62,9 +62,9 @@ private case class LanguageRangeImpl(tag: String, weight: Float) extends Languag
   private val languageTag = if (tag == "*") None else Some(LanguageTag(tag))
 
   def matches(that: LanguageTag): Boolean =
-    languageTag.map { tag =>
+    languageTag.forall { tag =>
       tag.primary.equalsIgnoreCase(that.primary) && matchesOthers(tag.others, that.others)
-    }.getOrElse(true)
+    }
 
   private def matchesOthers(others: Seq[String], that: Seq[String]): Boolean =
     others.size <= that.size && others.zip(that).forall(x => x._1.equalsIgnoreCase(x._2))
