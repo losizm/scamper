@@ -1,7 +1,7 @@
 # Scamper - HTTP Library for Scala
 Scamper provides an API for reading and writing HTTP messages. It defines a set
-of general interfaces, and it extends the feature set using the _Type Class
-Pattern_ for specialized access to HTTP headers.
+of general interfaces, and it extends the feature set for specialized access to
+HTTP headers.
 
 ## HTTP Messages
 At the heart of Scamper is `HttpMessage`, which is a trait that defines the
@@ -113,7 +113,7 @@ val body = Entity("""
 val res = Ok(body).withContentType("text/html; charset=utf-8")
 ```
 
-And here's another example with a file as the entity:
+And here's an example with a file as the entity:
 
 ```scala
 import java.io.File
