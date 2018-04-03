@@ -32,14 +32,14 @@ trait HttpResponse extends HttpMessage {
   def version: HttpVersion = startLine.version
 
   /**
-   * Creates new response replacing status.
+   * Creates response with new response status.
    *
    * @return new response
    */
   def withStatus(status: ResponseStatus): MessageType
 
   /**
-   * Creates new response replacing version.
+   * Creates response new HTTP version.
    *
    * @return new response
    */
@@ -48,11 +48,11 @@ trait HttpResponse extends HttpMessage {
 
 /** HttpResponse factory */
 object HttpResponse {
-  /** Creates HttpResponse using supplied attributes. */
+  /** Creates HttpResponse with supplied values. */
   def apply(statusLine: StatusLine, headers: Seq[Header], body: Entity): HttpResponse =
     HttpResponseImpl(statusLine, headers, body)
 
-  /** Creates HttpResponse using supplied attributes. */
+  /** Creates HttpResponse with supplied values. */
   def apply(status: ResponseStatus, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: HttpVersion = HttpVersion(1, 1)): HttpResponse =
     HttpResponseImpl(StatusLine(status, version), headers, body)
 }

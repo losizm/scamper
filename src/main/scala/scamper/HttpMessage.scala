@@ -71,17 +71,16 @@ trait HttpMessage {
     bodyParser(this)
 
   /**
-   * Creates new message replacing start line.
+   * Creates message with new start line.
    *
    * @return new message
    */
   def withStartLine(line: LineType): MessageType
 
   /**
-   * Creates new message replacing supplied header.
+   * Creates message with supplied header.
    *
-   * All previous headers having same key as supplied header are removed and
-   * replaced with single header instance.
+   * Previous headers having same key as supplied header are removed.
    *
    * @return new message
    */
@@ -89,17 +88,16 @@ trait HttpMessage {
     withHeaders(headers.filterNot(_.key.equalsIgnoreCase(header.key)) :+ header : _*)
 
   /**
-   * Creates new message replacing headers.
+   * Creates message with new headers.
    *
-   * All previous headers are removed, and new message contains only supplied
-   * headers.
+   * All previous headers are removed.
    *
    * @return new message
    */
   def withHeaders(headers: Header*): MessageType
 
   /**
-   * Creates new message including additional headers.
+   * Creates message with additional headers.
    *
    * @return new message
    */
@@ -107,7 +105,7 @@ trait HttpMessage {
     withHeaders(this.headers ++ headers : _*)
 
   /**
-   * Creates new message removing all headers having supplied keys.
+   * Creates message removing headers having supplied keys.
    *
    * @return new message
    */
@@ -115,17 +113,16 @@ trait HttpMessage {
     withHeaders(headers.filterNot(header => keys.exists(header.key.equalsIgnoreCase)) : _*)
 
   /**
-   * Creates new message replacing cookies.
+   * Creates message with new cookies.
    *
-   * All previous cookies are removed, and new message contains only supplied
-   * cookies.
+   * All previous cookies are removed.
    *
    * @return new message
    */
   def withCookies(cookies: CookieType*): MessageType
 
   /**
-   * Creates new message replacing body.
+   * Creates message with new body.
    *
    * @return new message
    */

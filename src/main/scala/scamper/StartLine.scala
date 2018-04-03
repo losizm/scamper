@@ -17,7 +17,7 @@ package scamper
 
 import scala.util.Try
 
-/** Start line of HTTP message */
+/** HTTP message start line */
 trait StartLine {
   /** HTTP version */
   def version: HttpVersion

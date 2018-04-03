@@ -37,7 +37,7 @@ trait HttpRequest extends HttpMessage {
   /** HTTP version */
   def version: HttpVersion = startLine.version
 
-  /** Path component of URI */
+  /** URI path component */
   def path: String
 
   /** Query parameters */
@@ -55,42 +55,42 @@ trait HttpRequest extends HttpMessage {
   def getQueryParamValues(name: String): Seq[String]
 
   /**
-   * Creates new request replacing method.
+   * Creates request with new method.
    *
    * @return new request
    */
   def withMethod(method: RequestMethod): MessageType
 
   /**
-   * Creates new request replacing URI.
+   * Creates request with new URI.
    *
    * @return new request
    */
   def withURI(uri: String): MessageType
 
   /**
-   * Creates new request replacing path component of URI.
+   * Creates request with new URI path component.
    *
    * @return new request
    */
   def withPath(path: String): MessageType
 
   /**
-   * Creates new request replacing query parameters.
+   * Creates request with new query parameters.
    *
    * @return new request
    */
   def withQueryParams(params: Map[String, Seq[String]]): MessageType
 
   /**
-   * Creates new request replacing query parameters.
+   * Creates request with new query parameters.
    *
    * @return new request
    */
   def withQueryParams(params: (String, String)*): MessageType
 
   /**
-   * Creates new request replacing version.
+   * Creates request with new HTTP version.
    *
    * @return new request
    */
@@ -99,11 +99,11 @@ trait HttpRequest extends HttpMessage {
 
 /** HttpRequest factory */
 object HttpRequest {
-  /** Creates HttpRequest using supplied attributes. */
+  /** Creates HttpRequest with supplied values. */
   def apply(requestLine: RequestLine, headers: Seq[Header], body: Entity): HttpRequest =
     HttpRequestImpl(requestLine, headers, body)
 
-  /** Creates HttpRequest using supplied attributes. */
+  /** Creates HttpRequest with supplied values. */
   def apply(method: RequestMethod, uri: String = "/", headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: HttpVersion = HttpVersion(1, 1)): HttpRequest =
     HttpRequestImpl(RequestLine(method, uri, version), headers, body)
 }

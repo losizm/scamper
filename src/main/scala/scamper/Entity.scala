@@ -22,7 +22,7 @@ import scala.util.Try
 
 /** HTTP entity */
 trait Entity {
-  /** The length in bytes, if known. */
+  /** Length in bytes if known */
   def length: Option[Long]
 
   /** Tests whether entity is known to be empty. */
@@ -30,15 +30,15 @@ trait Entity {
     length.contains(0)
 
   /** Gets input stream to entity. */
-  def getInputStream: InputStream
+  def getInputStream(): InputStream
 
   /**
    * Provides access to input stream with automatic resource management.
    *
-   * The input stream is passed to supplied function, and stream is closed upon
-   * function's return.
+   * Input stream is passed to supplied function and closed on function's
+   * return.
    *
-   * @return value returned from supplied function
+   * @return result of supplied function
    */
   def withInputStream[T](f: InputStream => T): T = {
     val in = getInputStream
@@ -49,11 +49,11 @@ trait Entity {
 
 /** Entity factory */
 object Entity {
-  /** Creates entity whose content is supplied bytes. */
+  /** Creates entity with supplied bytes. */
   def apply(bytes: Array[Byte]): Entity =
     apply(bytes, 0, bytes.length)
 
-  /** Creates entity whose content is supplied bytes. */
+  /** Creates entity with supplied bytes. */
   def apply(bytes: Array[Byte], start: Int, length: Int): Entity = {
     require(start >= 0, "Start must be nonnegative")
     require(start + length <= bytes.length, "Applied start and length must not exceed data length")
@@ -63,53 +63,53 @@ object Entity {
     ByteArrayEntity(copy)
   }
 
-  /** Creates entity with input stream returned from supplied function. */
+  /** Creates entity with input stream from supplied function. */
   def apply(f: () => InputStream): Entity =
     InputStreamEntity(f)
 
-  /** Creates entity whose content is data in supplied file. */
+  /** Creates entity with data from supplied file. */
   def apply(file: File): Entity =
     FileEntity(file)
 
-  /** Creates entity whose content is data in file at supplied path. */
+  /** Creates entity with data from file at supplied path. */
   def apply(path: Path): Entity =
     FileEntity(path.toFile)
 
-  /** Creates entity whose content is UTF-8 encoded bytes of supplied text. */
+  /** Creates entity with UTF-8 encoded bytes of supplied text. */
   def apply(text: String): Entity =
     ByteArrayEntity(text.getBytes("UTF-8"))
 
-  /** Creates entity whose content is encoded bytes of supplied text. */
+  /** Creates entity with encoded bytes of supplied text. */
   def apply(text: String, charset: String): Entity =
     ByteArrayEntity(text.getBytes(charset))
 
-  /** Creates entity whose content is encoded bytes of supplied text. */
+  /** Creates entity with encoded bytes of supplied text. */
   def apply(text: String, charset: Charset): Entity =
     ByteArrayEntity(text.getBytes(charset))
 
-  /** Creates entity whose content is supplied form data. */
+  /** Creates entity with URL encoded value of supplied form data. */
   def apply(form: Map[String, Seq[String]]): Entity =
     Entity(QueryParams.format(form))
 
-  /** Creates entity whose content is supplied form data. */
+  /** Creates entity with URL encoded value of supplied form data. */
   def apply(form: (String, String)*): Entity =
     Entity(QueryParams.format(form : _*))
 
   /** Creates empty entity. */
-  def empty: Entity = ByteArrayEntity(Array.empty)
-}
-
-private case class InputStreamEntity(f: () => InputStream) extends Entity {
-  val length = None
-  def getInputStream = f()
+  def empty(): Entity = ByteArrayEntity(Array.empty)
 }
 
 private case class ByteArrayEntity(bytes: Array[Byte]) extends Entity {
   val length = Some(bytes.length)
-  def getInputStream = new ByteArrayInputStream(bytes)
+  val getInputStream = new ByteArrayInputStream(bytes)
 }
 
 private case class FileEntity(file: File) extends Entity {
-  def length = Some(file.length)
-  def getInputStream = new FileInputStream(file)
+  lazy val length = Some(file.length)
+  lazy val getInputStream = new FileInputStream(file)
+}
+
+private case class InputStreamEntity(f: () => InputStream) extends Entity {
+  val length = None
+  lazy val getInputStream = f()
 }

@@ -89,8 +89,8 @@ The message body is represented as an instance of `Entity`, which provides
 access to an input stream.
 
 ### Creating Message Body
-When building an `HttpRequest` or `HttpResponse`, you can use one of the
-`Entity` factory methods to create the message body. For example:
+When building a message, you can use one of the `Entity` factory methods to
+create the message body. For example:
 
 ```scala
 import scamper.Entity
@@ -127,9 +127,8 @@ val res = Ok(body).withContentType("text/html; charset=utf-8")
 
 ### Parsing Message Body
 
-When handling an incoming message, you need to use an appropriate `BodyParser`
-to parse the message body. There is a set of standard parser implementations in
-`BodyParsers`.
+When handling an incoming message, use an appropriate `BodyParser` to parse the
+message body. There is a set of standard parsers in `BodyParsers`.
 
 ```scala
 import scamper.{ BodyParsers, HttpMessage }
