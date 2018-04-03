@@ -113,4 +113,3 @@ private case class MediaRangeImpl(mainType: String, subtype: String, weight: Flo
     if (value.equals("*")) ".+"
     else Regex.quote(value)
 }
-

@@ -65,4 +65,3 @@ object ProductType {
 }
 
 private case class ProductTypeImpl(name: String, version: Option[String]) extends ProductType
-

@@ -22,4 +22,3 @@ private object QValue {
   def apply(value: Float): Float =
     (value.max(0f).min(1f) * 1000).floor / 1000
 }
-

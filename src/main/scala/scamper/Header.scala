@@ -65,4 +65,3 @@ object Header {
 }
 
 private case class HeaderImpl(key: String, value: String) extends Header
-

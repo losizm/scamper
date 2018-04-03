@@ -51,4 +51,3 @@ class RangeTypeSpec extends FlatSpec {
     assert(range.toString == "bytes=0-9,100-124,-256")
   }
 }
-

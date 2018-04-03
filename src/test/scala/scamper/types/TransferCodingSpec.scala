@@ -63,4 +63,3 @@ class TransferCodingSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](TransferCoding("chunked; =0.1"))
   }
 }
-

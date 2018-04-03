@@ -68,4 +68,3 @@ class MediaTypeSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](MediaType("text/html; charset=iso 8859 1"))
   }
 }
-

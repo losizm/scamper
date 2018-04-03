@@ -91,4 +91,3 @@ private case class TransferCodingRangeImpl(name: String, rank: Float, params: Ma
   private def exists(name: String, value: String, ps: Map[String, String]): Boolean =
     ps.exists { case (n, v) => name.equalsIgnoreCase(n) && value.equalsIgnoreCase(v) }
 }
-

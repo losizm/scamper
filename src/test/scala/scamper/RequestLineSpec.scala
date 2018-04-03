@@ -47,4 +47,3 @@ class RequestLineSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](RequestLine("GET HTTP/1.1"))
   }
 }
-

@@ -67,4 +67,3 @@ object TransferCoding {
 }
 
 private case class TransferCodingImpl(name: String, params: Map[String, String]) extends TransferCoding
-

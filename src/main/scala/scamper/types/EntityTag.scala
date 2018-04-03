@@ -64,4 +64,3 @@ object EntityTag {
 }
 
 private case class EntityTagImpl(opaque: String, weak: Boolean) extends EntityTag
-

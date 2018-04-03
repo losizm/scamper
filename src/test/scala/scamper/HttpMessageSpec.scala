@@ -56,4 +56,3 @@ class HttpMessageSpec extends FlatSpec {
     assert(response.location == "/find")
   }
 }
-

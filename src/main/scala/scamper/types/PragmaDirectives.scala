@@ -23,4 +23,3 @@ case object PragmaDirectives {
     val value: Option[String] = None
   }
 }
-

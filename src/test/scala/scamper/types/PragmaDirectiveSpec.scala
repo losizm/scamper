@@ -56,4 +56,3 @@ class PragmaDirectiveSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](PragmaDirective("no-cache ="))
   }
 }
-

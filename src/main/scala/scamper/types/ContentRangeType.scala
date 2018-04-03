@@ -93,4 +93,3 @@ object ByteContentRange {
 }
 
 private case class ByteContentRangeImpl(resp: ByteContentRange.ByteRangeResp) extends ByteContentRange
-

@@ -38,4 +38,3 @@ class ContentRangeTypeSpec extends FlatSpec {
     assert(range.toString == "bytes */8192")
   }
 }
-

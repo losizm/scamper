@@ -1243,4 +1243,3 @@ object ImplicitHeaders {
       response.removeHeaders("WWW-Authenticate")
   }
 }
-

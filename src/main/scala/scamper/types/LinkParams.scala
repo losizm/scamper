@@ -44,4 +44,3 @@ private object LinkParams {
 
   private def formatParamValue(value: String): String = Token(value).getOrElse('"' + value + '"')
 }
-

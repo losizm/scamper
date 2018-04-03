@@ -62,4 +62,3 @@ class CookieSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](SetCookie("SID=3\\1d4d96e407aad42"))
   }
 }
-

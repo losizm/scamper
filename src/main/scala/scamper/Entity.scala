@@ -113,4 +113,3 @@ private case class FileEntity(file: File) extends Entity {
   def length = Some(file.length)
   def getInputStream = new FileInputStream(file)
 }
-

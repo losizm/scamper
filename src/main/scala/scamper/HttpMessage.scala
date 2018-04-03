@@ -131,4 +131,3 @@ trait HttpMessage {
    */
   def withBody(body: Entity): MessageType
 }
-

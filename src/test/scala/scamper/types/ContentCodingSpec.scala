@@ -50,4 +50,3 @@ class ContentCodingSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](ContentCoding("gzip; q=1.0"))
   }
 }
-

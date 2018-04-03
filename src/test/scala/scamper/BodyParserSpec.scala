@@ -61,4 +61,3 @@ class BodyParserSpec extends FlatSpec {
     assertThrows[HttpException](message.bodyAs[String])
   }
 }
-

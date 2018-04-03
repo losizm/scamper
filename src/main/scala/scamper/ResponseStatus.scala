@@ -126,4 +126,3 @@ object ResponseStatus {
 private case class ResponseStatusImpl(code: Int, reason: String) extends ResponseStatus {
   override lazy val toString: String = s"$code $reason"
 }
-

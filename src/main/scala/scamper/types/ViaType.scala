@@ -63,4 +63,3 @@ object ViaType {
 }
 
 private case class ViaTypeImpl(protocol: Protocol, by: String, comment: Option[String]) extends ViaType
-

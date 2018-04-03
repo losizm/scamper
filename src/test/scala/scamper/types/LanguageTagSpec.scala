@@ -55,4 +55,3 @@ class LanguageTagSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](LanguageTag("1995-en-US"))
   }
 }
-

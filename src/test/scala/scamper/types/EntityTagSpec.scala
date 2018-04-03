@@ -48,4 +48,3 @@ class EntityTagSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](EntityTag("\"abc\"xyz\""))
   }
 }
-

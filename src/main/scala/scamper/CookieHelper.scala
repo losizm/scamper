@@ -28,4 +28,3 @@ private object CookieHelper {
       throw new IllegalArgumentException(s"Invalid cookie value: $value")
     }
 }
-

@@ -57,4 +57,3 @@ trait BodyParsing {
     message.transferEncoding.exists(_.name == "chunked") &&
       !message.getHeaderValue("X-Scamper-Transfer-Decoding").contains("chunked")
 }
-

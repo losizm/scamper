@@ -68,4 +68,3 @@ object RequestMethod {
 }
 
 private case class RequestMethodImpl(name: String) extends RequestMethod
-

@@ -362,4 +362,3 @@ package object extensions {
     uriBuilder.toString
   }
 }
-

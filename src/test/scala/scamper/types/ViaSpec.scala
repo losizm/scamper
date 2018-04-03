@@ -69,4 +69,3 @@ class ViaTypeSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](ParseVia("HTTP/1.1 (Hub/0.1b)"))
   }
 }
-

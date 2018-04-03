@@ -27,4 +27,3 @@ private object DateValue {
   def parse(value: String): OffsetDateTime =
     OffsetDateTime.parse(value, DateFormatter)
 }
-

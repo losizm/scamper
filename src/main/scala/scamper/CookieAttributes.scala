@@ -43,4 +43,3 @@ private object CookieAttributes {
   private def toExpires(value: String): Option[OffsetDateTime] =
     Try(DateValue.parse(value.trim)).toOption
 }
-

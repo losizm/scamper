@@ -79,4 +79,3 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
   def withVersion(newVersion: HttpVersion): HttpResponse =
     copy(startLine = StatusLine(status, newVersion))
 }
-

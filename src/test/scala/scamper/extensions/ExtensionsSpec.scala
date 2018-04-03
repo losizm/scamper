@@ -61,4 +61,3 @@ class ExtensionsSpec extends FlatSpec {
     assert("Tue, 14 Feb 2006 11:15:37 -0500".toOffsetDateTime == OffsetDateTime.parse("2006-02-14T11:15:37-05:00"))
   }
 }
-

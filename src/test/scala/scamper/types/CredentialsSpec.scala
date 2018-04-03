@@ -75,4 +75,3 @@ class CredentialsSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](Credentials.parse("Basic =secret"))
   }
 }
-

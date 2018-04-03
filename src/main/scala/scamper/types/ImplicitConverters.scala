@@ -83,4 +83,3 @@ object ImplicitConverters {
   /** Converts string to [[WarningType]]. */
   implicit val stringToWarningType = (warning: String) => WarningType.parse(warning)
 }
-

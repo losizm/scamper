@@ -67,4 +67,3 @@ private case class CharsetRangeImpl(charset: String, weight: Float) extends Char
   def matches(that: String): Boolean =
     isWildcard || charset.equalsIgnoreCase(that)
 }
-

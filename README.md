@@ -1,13 +1,12 @@
 # Scamper - HTTP Library for Scala
-Scamper provides an API for reading and writing HTTP messages. It defines a set
-of general interfaces, and it extends the feature set for specialized access to
-HTTP headers.
+Scamper is an HTTP library for Scala. It defines an API for reading and writing
+HTTP messages.
 
 ## HTTP Messages
-At the heart of Scamper is `HttpMessage`, which is a trait that defines the
-basic characteristics of an HTTP message. `HttpRequest` and `HttpResponse`
-extend the specification to define additional characteristics of their
-respective message types.
+At the core of Scamper is `HttpMessage`, which is a trait that defines the
+fundamental characteristics of an HTTP message. `HttpRequest` and `HttpResponse`
+extend the specification to define characteristics specific to their respective
+message types.
 
 ### Building Requests
 An `HttpRequest` can be created using any of the factory methods defined in the

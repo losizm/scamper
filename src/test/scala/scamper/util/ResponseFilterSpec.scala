@@ -68,4 +68,3 @@ class ResponseFilterSpec extends FlatSpec {
     }
   }
 }
-

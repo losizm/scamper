@@ -108,4 +108,3 @@ object StatusLine {
 }
 
 private case class StatusLineImpl(status: ResponseStatus, version: HttpVersion) extends StatusLine
-

@@ -39,4 +39,3 @@ private class BoundInputStream(in: InputStream, maxLength: Long) extends FilterI
   private def maxRead: Int =
     (maxLength - position).min(Int.MaxValue).toInt
 }
-

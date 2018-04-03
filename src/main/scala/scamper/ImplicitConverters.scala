@@ -55,4 +55,3 @@ object ImplicitConverters {
   /** Converts int to [[ResponseStatus]]. */
   implicit val stringToResponseStatus = (statusCode: Int) => ResponseStatus(statusCode)
 }
-

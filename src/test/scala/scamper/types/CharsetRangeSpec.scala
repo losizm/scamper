@@ -67,4 +67,3 @@ class CharsetRangeSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](CharsetRange("ascii; =0.1"))
   }
 }
-

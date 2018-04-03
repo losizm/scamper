@@ -55,4 +55,3 @@ private object MediaTypeHelper {
   def FormatParams(params: Map[String, String]): String =
     StandardParams.format(params)
 }
-

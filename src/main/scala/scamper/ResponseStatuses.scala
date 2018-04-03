@@ -140,4 +140,3 @@ object ResponseStatuses {
   /** 505 HTTP Version Not Supported */
   val HttpVersionNotSupported = ResponseStatus(505)
 }
-

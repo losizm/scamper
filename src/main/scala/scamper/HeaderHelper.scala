@@ -28,4 +28,3 @@ private object HeaderHelper {
       throw new IllegalArgumentException(s"Invalid header value: $value")
     }
 }
-

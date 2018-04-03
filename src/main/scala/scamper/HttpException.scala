@@ -44,4 +44,3 @@ class HttpException(message: String, cause: Throwable) extends RuntimeException(
 
 /** Indicates absence of specified header. */
 case class HeaderNotFound(key: String) extends HttpException(key)
-

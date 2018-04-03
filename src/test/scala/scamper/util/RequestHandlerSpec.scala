@@ -46,4 +46,3 @@ class RequestHandlerSpec extends FlatSpec {
     assertThrows[RequestNotSatisfied](RequestHandlerChain.getResponse(HttpRequest("GET"), Nil))
   }
 }
-

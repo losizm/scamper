@@ -76,4 +76,3 @@ private class ChunkEnumeration(in: InputStream, maxChunkSize: Int, maxTotalLengt
     new String(buffer.toArray, "ASCII")
   }
 }
-

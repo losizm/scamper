@@ -115,4 +115,3 @@ class MediaRangeSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](MediaRange("text/html; charset=iso 8859 1"))
   }
 }
-

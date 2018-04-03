@@ -60,4 +60,3 @@ object Protocol {
 }
 
 private case class ProtocolImpl(name: String, version: Option[String]) extends Protocol
-

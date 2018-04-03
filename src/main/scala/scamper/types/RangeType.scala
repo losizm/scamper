@@ -96,4 +96,3 @@ object ByteRange {
 }
 
 private case class ByteRangeImpl(set: Seq[ByteRange.ByteRangeSpec]) extends ByteRange
-

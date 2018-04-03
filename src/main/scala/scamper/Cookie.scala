@@ -147,4 +147,3 @@ private case class SetCookieImpl(name: String, value: String, attribs: CookieAtt
   def secure: Boolean = attribs.secure
   def httpOnly: Boolean = attribs.httpOnly
 }
-

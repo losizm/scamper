@@ -57,4 +57,3 @@ class ProtocolSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](Protocol("HTTP/"))
   }
 }
-

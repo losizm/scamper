@@ -54,4 +54,3 @@ object HttpVersion {
 }
 
 private case class HttpVersionImpl(major: Int, minor: Int) extends HttpVersion
-

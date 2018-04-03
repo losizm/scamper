@@ -63,4 +63,3 @@ class LanguageRangeSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](LanguageRange("1995-en-US; q=1.0"))
   }
 }
-

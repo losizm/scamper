@@ -68,4 +68,3 @@ class ContentDispositionTypeSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](ContentDispositionType("inline; =0.1"))
   }
 }
-

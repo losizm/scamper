@@ -71,4 +71,3 @@ object PragmaDirective {
 }
 
 private case class PragmaDirectiveImpl(name: String, value: Option[String]) extends PragmaDirective
-

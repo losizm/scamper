@@ -58,4 +58,3 @@ class ProductTypeSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](ProductType("CERN-LineMode/"))
   }
 }
-

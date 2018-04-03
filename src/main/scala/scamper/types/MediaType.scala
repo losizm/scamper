@@ -86,4 +86,3 @@ object MediaType {
 }
 
 private case class MediaTypeImpl(mainType: String, subtype: String, params: Map[String, String]) extends MediaType
-

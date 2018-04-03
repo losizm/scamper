@@ -71,4 +71,3 @@ object LanguageTag {
 }
 
 private case class LanguageTagImpl(primary: String, others: Seq[String]) extends LanguageTag
-

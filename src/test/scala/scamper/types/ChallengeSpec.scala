@@ -75,4 +75,3 @@ class ChallengeSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](Challenge.parse("Basic =secret"))
   }
 }
-

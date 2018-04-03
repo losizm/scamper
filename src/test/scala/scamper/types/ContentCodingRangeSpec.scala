@@ -65,4 +65,3 @@ class ContentCodingRangeSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](ContentCodingRange("identity; =0.1"))
   }
 }
-

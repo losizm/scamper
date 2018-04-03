@@ -84,4 +84,3 @@ class CacheDirectiveSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](CacheDirective("no-cache ="))
   }
 }
-

@@ -42,4 +42,3 @@ class HttpVersionSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](HttpVersion("2999999999.2999999999"))
   }
 }
-

@@ -161,4 +161,3 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
   def withQueryParams(params: (String, String)*): HttpRequest =
     withURI(uriObject.withQueryParams(params : _*).toString)
 }
-

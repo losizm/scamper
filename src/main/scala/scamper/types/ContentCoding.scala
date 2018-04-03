@@ -58,4 +58,3 @@ object ContentCoding {
 }
 
 private case class ContentCodingImpl(name: String) extends ContentCoding
-

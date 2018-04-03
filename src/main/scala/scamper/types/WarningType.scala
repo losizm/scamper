@@ -68,4 +68,3 @@ object WarningType {
 }
 
 private case class WarningTypeImpl(code: Int, agent: String, text: String, date: Option[OffsetDateTime]) extends WarningType
-

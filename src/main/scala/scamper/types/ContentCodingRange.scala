@@ -77,4 +77,3 @@ private case class ContentCodingRangeImpl(name: String, weight: Float) extends C
   def matches(coding: ContentCoding): Boolean =
     isWildcard || name.equalsIgnoreCase(coding.name)
 }
-

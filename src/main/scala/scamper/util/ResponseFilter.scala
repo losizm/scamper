@@ -72,4 +72,3 @@ object ResponseFilters {
   val ServerError: ResponseFilter =
     res => res.status.isServerError
 }
-

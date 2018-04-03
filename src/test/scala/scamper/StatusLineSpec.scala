@@ -42,4 +42,3 @@ class StatusLineSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](StatusLine("HTTP/ OK"))
   }
 }
-

@@ -64,4 +64,3 @@ object LinkValue {
 }
 
 private case class LinkValueImpl(ref: String, params: Map[String, Option[String]]) extends LinkValue
-

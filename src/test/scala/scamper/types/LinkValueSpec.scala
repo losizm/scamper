@@ -58,4 +58,3 @@ class LinkValueSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](LinkValue.parse("/assets/icon.png>; size=64x64"))
   }
 }
-

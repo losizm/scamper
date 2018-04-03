@@ -109,4 +109,3 @@ object Credentials {
 }
 
 private case class CredentialsImpl(scheme: String, token: Option[String], params: Map[String, String]) extends Credentials
-

@@ -132,4 +132,3 @@ private class FileBodyParser(dest: File, val maxLength: Long, val maxBufferSize:
     if (dest.isDirectory) File.createTempFile("scamper-dest-file-", ".tmp", dest)
     else dest
 }
-

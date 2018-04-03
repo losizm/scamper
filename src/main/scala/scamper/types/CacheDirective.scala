@@ -84,4 +84,3 @@ object CacheDirective {
 }
 
 private case class CacheDirectiveImpl(name: String, value: Option[String]) extends CacheDirective
-

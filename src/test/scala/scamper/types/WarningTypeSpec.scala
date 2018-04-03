@@ -64,4 +64,3 @@ class WarningTypeSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](WarningType.parse("100 localhost:8000 \"Response is Stale\" Sat, 25 Aug 2012 23:34:45 GMT"))
   }
 }
-

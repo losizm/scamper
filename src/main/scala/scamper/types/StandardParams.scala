@@ -44,4 +44,3 @@ private object StandardParams {
 
   private def formatParamValue(value: String): String = Token(value).getOrElse('"' + value + '"')
 }
-

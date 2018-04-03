@@ -30,4 +30,3 @@ private object ListParser {
   private def split(regex: Regex, list: String): Seq[String] =
     regex.findAllIn(list).map(_.trim).toSeq
 }
-

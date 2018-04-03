@@ -61,4 +61,3 @@ object ContentDispositionType {
 }
 
 private case class ContentDispositionTypeImpl(name: String, params: Map[String, String]) extends ContentDispositionType
-

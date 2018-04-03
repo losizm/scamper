@@ -37,4 +37,3 @@ private object QueryParams {
       case (name, value) => s"${encode(name, "UTF-8")}=${encode(value, "UTF-8")}"
     } mkString "&"
 }
-

@@ -66,4 +66,3 @@ private object AuthTypeHelper {
   def FormatParams(params: Map[String, String]): String =
     AuthParams.format(params)
 }
-

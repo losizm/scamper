@@ -54,4 +54,3 @@ private object CodingHelper {
   def FormatParams(params: Map[String, String]): String =
     StandardParams.format(params)
 }
-

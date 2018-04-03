@@ -41,4 +41,3 @@ object RequestMethods {
   /** CONNECT request method */
   val CONNECT: RequestMethod = RequestMethodImpl("CONNECT")
 }
-

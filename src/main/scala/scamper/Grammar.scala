@@ -33,4 +33,3 @@ private object Grammar {
   val HeaderValue = new Grammar("(\\p{Print}*)".r)
   val FoldedHeaderValue = new Grammar("((?:\\p{Print}*(?:\r\n|\r|\n)[ \t]+\\p{Print}*)*)".r)
 }
-

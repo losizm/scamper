@@ -69,4 +69,3 @@ private case class LanguageRangeImpl(tag: String, weight: Float) extends Languag
   private def matchesOthers(others: Seq[String], that: Seq[String]): Boolean =
     others.size <= that.size && others.zip(that).forall(x => x._1.equalsIgnoreCase(x._2))
 }
-

@@ -62,4 +62,3 @@ class HeaderSpec extends FlatSpec {
     assertThrows[IllegalArgumentException](Header("Cookie", "user=guest,\r\ngroup=readonly"))
   }
 }
-
