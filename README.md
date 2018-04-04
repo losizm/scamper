@@ -9,9 +9,9 @@ extend the specification to define characteristics specific to their respective
 message types.
 
 ### Building Requests
-An `HttpRequest` can be created using any of the factory methods defined in the
-companion object. Or you can start with a `RequestMethod` and build the request
-using [implicit headers and type converters](#implicit-headers-and-type-converters):
+An `HttpRequest` can be created using either of the factory methods defined in
+the companion object. Or you can start with a `RequestMethod` and build the
+request using [implicit headers and type converters](#implicit-headers-and-type-converters):
 
 ```scala
 import scamper.ImplicitHeaders.{ Accept, Host, UserAgent }

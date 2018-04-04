@@ -109,12 +109,12 @@ object HttpRequest {
 }
 
 private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header], body: Entity) extends HttpRequest {
-  private lazy val uriObject = new URI(uri)
+  private lazy val uriInstance = new URI(uri)
 
-  lazy val path: String = uriObject.getRawPath
+  lazy val path: String = uriInstance.getRawPath
 
   lazy val queryParams: Map[String, Seq[String]] =
-    uriObject.getRawQuery match {
+    uriInstance.getRawQuery match {
       case null  => Map.empty
       case query => QueryParams.parse(query)
     }
@@ -153,11 +153,11 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
     copy(startLine = RequestLine(method, uri, newVersion))
 
   def withPath(newPath: String): HttpRequest =
-    withURI(uriObject.withPath(newPath).toString)
+    withURI(uriInstance.withPath(newPath).toString)
 
   def withQueryParams(params: Map[String, Seq[String]]): HttpRequest =
-    withURI(uriObject.withQueryParams(params).toString)
+    withURI(uriInstance.withQueryParams(params).toString)
 
   def withQueryParams(params: (String, String)*): HttpRequest =
-    withURI(uriObject.withQueryParams(params : _*).toString)
+    withURI(uriInstance.withQueryParams(params : _*).toString)
 }

@@ -68,7 +68,7 @@ trait HttpMessage {
 
   /** Gets message body as defined type. */
   def bodyAs[T](implicit bodyParser: BodyParser[T]): T =
-    bodyParser(this)
+    bodyParser.parse(this)
 
   /**
    * Creates message with new start line.
