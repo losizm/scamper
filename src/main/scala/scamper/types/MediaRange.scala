@@ -68,7 +68,9 @@ trait MediaRange {
   def matches(mediaType: MediaType): Boolean
 
   /** Returns formatted media range. */
-  override lazy val toString: String = mainType + '/' + subtype + "; q=" + weight + FormatParams(params)
+  override lazy val toString: String =
+    if (weight == 1.0f) mainType + '/' + subtype + FormatParams(params)
+    else mainType + '/' + subtype + "; q=" + weight + FormatParams(params)
 }
 
 /** MediaRange factory */

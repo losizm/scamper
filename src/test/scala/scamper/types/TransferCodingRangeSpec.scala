@@ -19,12 +19,12 @@ import org.scalatest.FlatSpec
 
 class TransferCodingRangeSpec extends FlatSpec {
   "TransferCodingRange" should "be created without parameters" in {
-    var range = TransferCodingRange("CHUNKED")
+    var range = TransferCodingRange("CHUNKED; q=1.0")
     assert(range.name == "chunked")
     assert(range.isChunked)
     assert(range.rank == 1.0f)
     assert(range.params.isEmpty)
-    assert(range.toString == "chunked; q=1.0")
+    assert(range.toString == "chunked")
 
     range = TransferCodingRange("X-GZIP; q=0.7")
     assert(range.name == "gzip")
@@ -40,7 +40,7 @@ class TransferCodingRangeSpec extends FlatSpec {
     assert(range.isChunked)
     assert(range.rank == 1.0f)
     assert(range.params("x") == "abc")
-    assert(range.toString == "chunked; q=1.0; x=abc")
+    assert(range.toString == "chunked; x=abc")
 
     range = TransferCodingRange("""GZIP; q=0.1; level="1 2 3" """)
     assert(range.name == "gzip")

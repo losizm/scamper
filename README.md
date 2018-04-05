@@ -25,9 +25,9 @@ val request = GET("/index.html")
 ```
 
 ### Building Responses
-Likewise, an `HttpResponse` can be created using a factory method defined in its
-companion object. Or start with a `ResponseStatus` and build the response using
-[implicit headers and type converters](#implicit-headers-and-type-converters):
+Likewise, an `HttpResponse` can be created using one of the factory methods
+defined in its companion object. Or start with a `ResponseStatus` and build the
+response using [implicit headers and type converters](#implicit-headers-and-type-converters):
 
 ```scala
 import scamper.ImplicitConverters.stringToEntity
@@ -160,7 +160,7 @@ implicit object UserBodyParser extends BodyParser[User] {
   implicit val userReads = Json.reads[User]
 
   // Parses JSON message body to User
-  def apply(message: HttpMessage): User =
+  def parse(message: HttpMessage): User =
     Json.parse(message.bodyAs[String]).as[User]
 }
 

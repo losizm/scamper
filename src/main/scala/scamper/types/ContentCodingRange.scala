@@ -49,7 +49,8 @@ trait ContentCodingRange {
 
   /** Returns formatted content coding range. */
   override lazy val toString: String =
-    name + "; q=" + weight
+    if (weight == 1.0f) name
+    else name + "; q=" + weight
 }
 
 /** ContentCodingRange factory */

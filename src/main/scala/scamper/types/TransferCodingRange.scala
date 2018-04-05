@@ -54,7 +54,7 @@ trait TransferCodingRange {
   override lazy val toString: String = {
     val range = new StringBuilder
     range.append(name)
-    if (!isTrailers) range.append("; q=").append(rank)
+    if (!isTrailers && rank != 1.0f) range.append("; q=").append(rank)
     if (params.nonEmpty) range.append(FormatParams(params))
     range.toString
   }

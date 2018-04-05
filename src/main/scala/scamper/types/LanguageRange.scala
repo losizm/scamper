@@ -34,7 +34,9 @@ trait LanguageRange {
   def matches(tag: LanguageTag): Boolean
 
   /** Returns formatted language range. */
-  override lazy val toString: String = tag + "; q=" + weight
+  override lazy val toString: String =
+    if (weight == 1.0f) tag
+    else tag + "; q=" + weight
 }
 
 /** LanguageRange factory */

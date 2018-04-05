@@ -23,7 +23,7 @@ class CharsetRangeSpec extends FlatSpec {
     assert(range.charset == "utf-8")
     assert(range.weight == 1f)
     assert(!range.isWildcard)
-    assert(range.toString == "utf-8; q=1.0")
+    assert(range.toString == "utf-8")
 
     range = CharsetRange("utf-8; q=0.60")
     assert(range.charset == "utf-8")
@@ -35,7 +35,7 @@ class CharsetRangeSpec extends FlatSpec {
     assert(range.charset == "*")
     assert(range.weight == 1.0f)
     assert(range.isWildcard)
-    assert(range.toString == "*; q=1.0")
+    assert(range.toString == "*")
   }
 
   it should "match Charset" in {

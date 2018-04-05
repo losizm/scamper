@@ -19,13 +19,13 @@ import org.scalatest.FlatSpec
 
 class MediaRangeSpec extends FlatSpec {
   "MediaRange" should "be created without parameters" in {
-    var range = MediaRange("text/html")
+    var range = MediaRange("text/html; q=1.0")
     assert(range.mainType == "text")
     assert(range.subtype == "html")
     assert(range.weight == 1f)
     assert(range.params.isEmpty)
     assert(range.isText)
-    assert(range.toString == "text/html; q=1.0")
+    assert(range.toString == "text/html")
 
     range = MediaRange("text/html; q=0.7")
     assert(range.mainType == "text")
@@ -41,7 +41,7 @@ class MediaRangeSpec extends FlatSpec {
     assert(range.weight == 1f)
     assert(range.params.isEmpty)
     assert(range.isWildcard)
-    assert(range.toString == "*/html; q=1.0")
+    assert(range.toString == "*/html")
 
     range = MediaRange("text", "html", -7f)
     assert(range.mainType == "text")
@@ -58,7 +58,7 @@ class MediaRangeSpec extends FlatSpec {
     assert(range.subtype == "html")
     assert(range.params("charset") == "iso-8859-1")
     assert(range.isText)
-    assert(range.toString == "text/html; q=1.0; charset=iso-8859-1")
+    assert(range.toString == "text/html; charset=iso-8859-1")
 
     range = MediaRange("text", "html", 0.7f, Map("charset" -> "utf-8", "not-a-charset" -> "iso 8859 1"))
     assert(range.mainType == "text")

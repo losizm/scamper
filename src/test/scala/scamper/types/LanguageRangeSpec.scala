@@ -22,7 +22,7 @@ class LanguageRangeSpec extends FlatSpec {
     var range = LanguageRange("en")
     assert(range.tag == "en")
     assert(range.weight == 1f)
-    assert(range.toString == "en; q=1.0")
+    assert(range.toString == "en")
 
     range = LanguageRange("en; q=0.5")
     assert(range.tag == "en")

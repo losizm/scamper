@@ -37,7 +37,8 @@ trait CharsetRange {
 
   /** Returns formatted charset range. */
   override lazy val toString: String =
-    charset + "; q=" + weight
+    if (weight == 1.0f) charset
+    else charset + "; q=" + weight
 }
 
 /** CharsetRange factory */
