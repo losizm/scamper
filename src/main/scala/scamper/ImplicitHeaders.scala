@@ -371,7 +371,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Content-Location header. */
-  implicit class ContentLocation[T <: HttpResponse](response: T) {
+  implicit class ContentLocation[T <: HttpMessage](message: T) {
     /**
      * Gets Content-Location header value.
      *
@@ -382,17 +382,17 @@ object ImplicitHeaders {
 
     /** Gets Content-Location header value if present. */
     def getContentLocation: Option[String] =
-      response.getHeaderValue("Content-Location")
+      message.getHeaderValue("Content-Location")
 
     /**
-     * Creates new response setting Content-Location header to supplied value.
+     * Creates new message setting Content-Location header to supplied value.
      */
     def withContentLocation(value: String): T#MessageType =
-      response.withHeader(Header("Content-Location", value))
+      message.withHeader(Header("Content-Location", value))
 
-    /** Creates new response removing Content-Location header. */
+    /** Creates new message removing Content-Location header. */
     def withoutContentLocation: T#MessageType =
-      response.removeHeaders("Content-Location")
+      message.removeHeaders("Content-Location")
   }
 
   /** Provides standardized access to Content-Range header. */

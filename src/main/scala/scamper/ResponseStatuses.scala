@@ -104,17 +104,17 @@ object ResponseStatuses {
   /** 412 Precondition Failed */
   val PreconditionFailed = ResponseStatus(412)
 
-  /** 413 Request Entity Too Long */
-  val RequestEntityTooLong = ResponseStatus(413)
+  /** 413 Payload Too Large */
+  val PayloadTooLarge = ResponseStatus(413)
 
-  /** 414 Request URI Too Long */
-  val RequestUriTooLong = ResponseStatus(414)
+  /** 414 URI Too Long */
+  val UriTooLong = ResponseStatus(414)
 
   /** 415 Unsupported Media Type */
   val UnsupportedMediaType = ResponseStatus(415)
 
-  /** 416 Requested Range Not Satisfiable */
-  val RequestedRangeNotSatisfiable = ResponseStatus(416)
+  /** 416 Range Not Satisfiable */
+  val RangeNotSatisfiable = ResponseStatus(416)
 
   /** 417 Expectation Failed */
   val ExpectationFailed = ResponseStatus(417)
