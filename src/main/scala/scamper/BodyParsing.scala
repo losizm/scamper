@@ -40,7 +40,7 @@ trait BodyParsing {
     message.body.withInputStream { in =>
       val dechunked =
         if (isChunked(message)) dechunkInputStream(in)
-        else new BoundInputStream(in, message.getContentLength.getOrElse(maxLength))
+        else new BoundedInputStream(in, message.getContentLength.getOrElse(maxLength))
 
       message.contentEncoding.headOption.map(_.name).getOrElse("identity") match {
         case "gzip"     => f(new GZIPInputStream(dechunked))

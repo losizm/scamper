@@ -17,7 +17,7 @@ package scamper
 
 import java.io.{ FilterInputStream, InputStream }
 
-private class BoundInputStream(in: InputStream, maxLength: Long) extends FilterInputStream(in) {
+private class BoundedInputStream(in: InputStream, maxLength: Long) extends FilterInputStream(in) {
   private var position: Long = 0
 
   override def read(): Int =
