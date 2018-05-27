@@ -22,7 +22,7 @@ import scamper.types._
 /** Contains type classes for standardized access to message headers. */
 object ImplicitHeaders {
   /** Provides standardized access to Accept header. */
-  implicit class Accept[T <: HttpRequest](request: T) {
+  implicit class Accept[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets Accept header values.
      *
@@ -47,7 +47,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Accept-Charset header. */
-  implicit class AcceptCharset[T <: HttpRequest](request: T) {
+  implicit class AcceptCharset[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets Accept-Charset header values.
      *
@@ -72,7 +72,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Accept-Encoding header. */
-  implicit class AcceptEncoding[T <: HttpRequest](request: T) {
+  implicit class AcceptEncoding[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets Accept-Encoding header values.
      *
@@ -99,7 +99,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Accept-Language header. */
-  implicit class AcceptLanguage[T <: HttpRequest](request: T) {
+  implicit class AcceptLanguage[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets Accept-Language header values.
      *
@@ -126,7 +126,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Accept-Ranges header. */
-  implicit class AcceptRanges[T <: HttpResponse](response: T) {
+  implicit class AcceptRanges[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Accept-Ranges header values.
      *
@@ -149,7 +149,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Age header. */
-  implicit class Age[T <: HttpResponse](response: T) {
+  implicit class Age[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Age header value.
      *
@@ -172,7 +172,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Allow header. */
-  implicit class Allow[T <: HttpResponse](response: T) {
+  implicit class Allow[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Allow header values.
      *
@@ -197,7 +197,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Authentication-Info header. */
-  implicit class AuthenticationInfo[T <: HttpResponse](response: T) {
+  implicit class AuthenticationInfo[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Authentication-Info header values.
      *
@@ -224,7 +224,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Authorization header. */
-  implicit class Authorization[T <: HttpRequest](request: T) {
+  implicit class Authorization[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets Authorization header value.
      *
@@ -247,7 +247,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Cache-Control header. */
-  implicit class CacheControl[T <: HttpMessage](message: T) {
+  implicit class CacheControl[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Cache-Control header values.
      *
@@ -270,7 +270,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Content-Disposition header. */
-  implicit class ContentDisposition[T <: HttpResponse](response: T) {
+  implicit class ContentDisposition[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Content-Disposition header value.
      *
@@ -296,7 +296,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Content-Encoding header. */
-  implicit class ContentEncoding[T <: HttpMessage](message: T) {
+  implicit class ContentEncoding[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Content-Encoding header values.
      *
@@ -323,7 +323,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Content-Language header. */
-  implicit class ContentLanguage[T <: HttpMessage](message: T) {
+  implicit class ContentLanguage[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Content-Language header values.
      *
@@ -348,7 +348,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Content-Length header. */
-  implicit class ContentLength[T <: HttpMessage](message: T) {
+  implicit class ContentLength[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Content-Length header value.
      *
@@ -371,7 +371,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Content-Location header. */
-  implicit class ContentLocation[T <: HttpMessage](message: T) {
+  implicit class ContentLocation[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Content-Location header value.
      *
@@ -396,7 +396,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Content-Range header. */
-  implicit class ContentRange[T <: HttpMessage](message: T) {
+  implicit class ContentRange[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Content-Range header value.
      *
@@ -419,7 +419,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Content-Type header. */
-  implicit class ContentType[T <: HttpMessage](message: T) {
+  implicit class ContentType[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Content-Type header value.
      *
@@ -442,7 +442,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Connection header. */
-  implicit class Connection[T <: HttpMessage](message: T) {
+  implicit class Connection[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Connection header value.
      *
@@ -465,7 +465,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Date header. */
-  implicit class Date[T <: HttpResponse](response: T) {
+  implicit class Date[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Date header value.
      *
@@ -488,7 +488,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to ETag header. */
-  implicit class ETag[T <: HttpResponse](response: T) {
+  implicit class ETag[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets ETag header value.
      *
@@ -511,7 +511,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Expect header. */
-  implicit class Expect[T <: HttpRequest](request: T) {
+  implicit class Expect[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets Expect header value.
      *
@@ -534,7 +534,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Expires header. */
-  implicit class Expires[T <: HttpResponse](response: T) {
+  implicit class Expires[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Expires header value.
      *
@@ -557,7 +557,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to From header. */
-  implicit class From[T <: HttpRequest](request: T) {
+  implicit class From[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets From header value.
      *
@@ -580,7 +580,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Host header. */
-  implicit class Host[T <: HttpRequest](request: T) {
+  implicit class Host[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets Host header value.
      *
@@ -603,7 +603,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to If-Match header. */
-  implicit class IfMatch[T <: HttpRequest](request: T) {
+  implicit class IfMatch[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets If-Match header value.
      *
@@ -626,7 +626,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to If-Modified-Since header. */
-  implicit class IfModifiedSince[T <: HttpRequest](request: T) {
+  implicit class IfModifiedSince[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets If-Modified-Since header value.
      *
@@ -649,7 +649,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to If-None-Match header. */
-  implicit class IfNoneMatch[T <: HttpRequest](request: T) {
+  implicit class IfNoneMatch[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets If-None-Match header value.
      *
@@ -672,7 +672,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to If-Range header. */
-  implicit class IfRange[T <: HttpRequest](request: T) {
+  implicit class IfRange[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets If-Range header value.
      *
@@ -709,7 +709,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to If-Unmodified-Since header. */
-  implicit class IfUnmodifiedSince[T <: HttpRequest](request: T) {
+  implicit class IfUnmodifiedSince[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets If-Unmodified-Since header value.
      *
@@ -734,7 +734,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Last-Modified header. */
-  implicit class LastModified[T <: HttpResponse](response: T) {
+  implicit class LastModified[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Last-Modified header value.
      *
@@ -757,7 +757,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Link header. */
-  implicit class Link[T <: HttpResponse](response: T) {
+  implicit class Link[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Link header values.
      *
@@ -780,7 +780,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Location header. */
-  implicit class Location[T <: HttpResponse](response: T) {
+  implicit class Location[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Location header value.
      *
@@ -803,7 +803,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Max-Forwards header. */
-  implicit class MaxForwards[T <: HttpRequest](request: T) {
+  implicit class MaxForwards[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets Max-Forwards header value.
      *
@@ -826,7 +826,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Pragma header. */
-  implicit class Pragma[T <: HttpRequest](request: T) {
+  implicit class Pragma[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets Pragma header values.
      *
@@ -849,7 +849,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Proxy-Authenticate header. */
-  implicit class ProxyAuthenticate[T <: HttpResponse](response: T) {
+  implicit class ProxyAuthenticate[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Proxy-Authenticate header values.
      *
@@ -879,7 +879,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Proxy-Authentication-Info header. */
-  implicit class ProxyAuthenticationInfo[T <: HttpResponse](response: T) {
+  implicit class ProxyAuthenticationInfo[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Proxy-Authentication-Info header values.
      *
@@ -906,7 +906,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Proxy-Authorization header. */
-  implicit class ProxyAuthorization[T <: HttpRequest](request: T) {
+  implicit class ProxyAuthorization[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets Proxy-Authorization header value.
      *
@@ -931,7 +931,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Range header. */
-  implicit class Range[T <: HttpRequest](request: T) {
+  implicit class Range[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets Range header value.
      *
@@ -954,7 +954,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Referer header. */
-  implicit class Referer[T <: HttpRequest](request: T) {
+  implicit class Referer[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets Referer header value.
      *
@@ -977,7 +977,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Retry-After header. */
-  implicit class RetryAfter[T <: HttpResponse](response: T) {
+  implicit class RetryAfter[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Retry-After header value.
      *
@@ -1000,7 +1000,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Server header. */
-  implicit class Server[T <: HttpResponse](response: T) {
+  implicit class Server[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Server header values.
      *
@@ -1023,7 +1023,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to TE header. */
-  implicit class TE[T <: HttpRequest](request: T) {
+  implicit class TE[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets TE header values.
      *
@@ -1048,7 +1048,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Trailer header. */
-  implicit class Trailer[T <: HttpMessage](message: T) {
+  implicit class Trailer[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Trailer header values.
      *
@@ -1071,7 +1071,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Transfer-Encoding header. */
-  implicit class TransferEncoding[T <: HttpMessage](message: T) {
+  implicit class TransferEncoding[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Transfer-Encoding header values.
      *
@@ -1098,7 +1098,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Upgrade header. */
-  implicit class Upgrade[T <: HttpRequest](request: T) {
+  implicit class Upgrade[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets Upgrade header values.
      *
@@ -1123,7 +1123,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to User-Agent header. */
-  implicit class UserAgent[T <: HttpRequest](request: T) {
+  implicit class UserAgent[T <: HttpRequest](val request: T) extends AnyVal {
     /**
      * Gets User-Agent header values.
      *
@@ -1146,7 +1146,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Vary header. */
-  implicit class Vary[T <: HttpResponse](response: T) {
+  implicit class Vary[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Vary header values.
      *
@@ -1169,7 +1169,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Via header. */
-  implicit class Via[T <: HttpResponse](response: T) {
+  implicit class Via[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Via header values.
      *
@@ -1192,7 +1192,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to Warning header. */
-  implicit class Warning[T <: HttpResponse](response: T) {
+  implicit class Warning[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets Warning header values.
      *
@@ -1215,7 +1215,7 @@ object ImplicitHeaders {
   }
 
   /** Provides standardized access to WWW-Authenticate header. */
-  implicit class WWWAuthenticate[T <: HttpResponse](response: T) {
+  implicit class WWWAuthenticate[T <: HttpResponse](val response: T) extends AnyVal {
     /**
      * Gets WWW-Authenticate header values.
      *
