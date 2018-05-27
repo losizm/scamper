@@ -37,7 +37,7 @@ trait HttpRequest extends HttpMessage {
   /** HTTP version */
   def version: HttpVersion = startLine.version
 
-  /** URI path component */
+  /** URI path */
   def path: String
 
   /** Query parameters */
@@ -69,7 +69,7 @@ trait HttpRequest extends HttpMessage {
   def withURI(uri: String): MessageType
 
   /**
-   * Creates request with new URI path component.
+   * Creates request with new URI path.
    *
    * @return new request
    */

@@ -19,10 +19,10 @@ import scala.util.Try
 
 /** HTTP version */
 trait HttpVersion {
-  /** Version major number */
+  /** Version major */
   def major: Int
 
-  /** Version minor number */
+  /** Version minor */
   def minor: Int
 
   /** Returns formatted HTTP version. */
@@ -44,7 +44,7 @@ object HttpVersion {
       throw new IllegalArgumentException(s"Invalid HTTP version: $version")
     }
 
-  /** Creates HttpVersion with supplied major and minor numbers. */
+  /** Creates HttpVersion with supplied major and minor. */
   def apply(major: Int, minor: Int): HttpVersion =
     HttpVersionImpl(major, minor)
 

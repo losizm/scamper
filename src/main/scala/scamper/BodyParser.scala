@@ -22,7 +22,11 @@ import scala.util.Try
 
 import scamper.types._
 
-/** Provides utility for parsing HTTP message body. */
+/**
+ * Provides utility for parsing HTTP message body.
+ *
+ * @see [[BodyParsers]]
+ */
 trait BodyParser[T] {
   /**
    * Parses body of supplied HTTP message and returns instance of defined type.
