@@ -23,6 +23,9 @@ object ResponseStatuses {
   /** 101 Switching Protocols */
   val SwitchingProtocols = ResponseStatus(101)
 
+  /** 103 Early Hints */
+  val EarlyHints = ResponseStatus(103)
+
   /** 200 OK */
   val Ok = ResponseStatus(200)
 
@@ -65,6 +68,9 @@ object ResponseStatuses {
   /** 307 Temporary Redirect */
   val TemporaryRedirect = ResponseStatus(307)
 
+  /** 308 Permanent Redirect */
+  val PermanentRedirect = ResponseStatus(308)
+
   /** 400 Bad Request */
   val BadRequest = ResponseStatus(400)
 
@@ -83,7 +89,7 @@ object ResponseStatuses {
   /** 405 Method Not Allowed */
   val MethodNotAllowed = ResponseStatus(405)
 
-  /** 406 Not Acceptabled */
+  /** 406 Not Acceptable */
   val NotAcceptable = ResponseStatus(406)
 
   /** 407 Proxy Authentication Required */
@@ -122,6 +128,18 @@ object ResponseStatuses {
   /** 426 Upgrade Required */
   val UpgradeRequired = ResponseStatus(426)
 
+  /** 428 Precondition Required */
+  val PreconditionRequired = ResponseStatus(428)
+
+  /** 429 Too Many Requests */
+  val TooManyRequests = ResponseStatus(429)
+
+  /** 431 Request Header Fields Too Large */
+  val RequestHeaderFieldsTooLarge = ResponseStatus(431)
+
+  /** 451 Unavailable For Legal Reasons */
+  val UnavailableForLegalReasons = ResponseStatus(451)
+
   /** 500 Internal Server Error */
   val InternalServerError = ResponseStatus(500)
 
@@ -139,4 +157,7 @@ object ResponseStatuses {
 
   /** 505 HTTP Version Not Supported */
   val HttpVersionNotSupported = ResponseStatus(505)
+
+  /** 511 Network Authentication Required */
+  val NetworkAuthenticationRequired = ResponseStatus(505)
 }

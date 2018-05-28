@@ -82,6 +82,7 @@ object ResponseStatus {
 
   add(100, "Continue")
   add(101, "Switching Protocols")
+  add(103, "Early Hints")
   add(200, "OK")
   add(201, "Created")
   add(202, "Accepted")
@@ -96,6 +97,7 @@ object ResponseStatus {
   add(304, "Not Modified")
   add(305, "Use Proxy")
   add(307, "Temporary Redirect")
+  add(308, "Permanent Redirect")
   add(400, "Bad Request")
   add(401, "Unauthorized")
   add(402, "Payment Required")
@@ -115,12 +117,17 @@ object ResponseStatus {
   add(416, "Range Not Satisfiable")
   add(417, "Expectation Failed")
   add(426, "Upgrade Required")
+  add(428, "Precondition Required")
+  add(429, "Too Many Requests")
+  add(431, "Request Header Fields Too Large")
+  add(451, "Unavailable For Legal Reasons")
   add(500, "Internal Server Error")
   add(501, "Not Implemented")
   add(502, "Bad Gateway")
   add(503, "Service Unavailable")
   add(504, "Gateway Timeout")
   add(505, "HTTP Version Not Supported")
+  add(511, "Network Authentication Required")
 }
 
 private case class ResponseStatusImpl(code: Int, reason: String) extends ResponseStatus {
