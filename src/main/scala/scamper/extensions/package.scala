@@ -259,6 +259,18 @@ package object extensions {
       request("PUT", headers, Option(body))(f)
 
     /**
+     * Sends PATCH request and passes response to supplied handler.
+     *
+     * @param body request entity body
+     * @param headers request headers
+     * @param f response handler
+     *
+     * @return value returned from supplied handler
+     */
+    def patch[T](body: Entity, headers: Header*)(f: HttpResponse => T): T =
+      request("PATCH", headers, Option(body))(f)
+
+    /**
      * Sends DELETE request and passes response to supplied handler.
      *
      * @param headers request headers

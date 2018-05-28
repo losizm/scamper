@@ -125,6 +125,31 @@ object ImplicitHeaders {
       request.removeHeaders("Accept-Language")
   }
 
+  /** Provides standardized access to Accept-Patch header. */
+  implicit class AcceptPatch[T <: HttpResponse](val response: T) extends AnyVal {
+    /**
+     * Gets Accept-Patch header values.
+     *
+     * @return the header values or an empty sequence if Accept-Patch is not present
+     */
+    def acceptPatch: Seq[MediaType] =
+      getAcceptPatch.getOrElse(Nil)
+
+    /** Gets Accept-Patch header values if present. */
+    def getAcceptPatch: Option[Seq[MediaType]] =
+      response.getHeaderValue("Accept-Patch")
+        .map(ListParser(_))
+        .map(_.map(MediaType(_)))
+
+    /** Creates new response setting Accept-Patch header to supplied values. */
+    def withAcceptPatch(values: MediaType*): T#MessageType =
+      response.withHeader(Header("Accept-Patch", values.mkString(", ")))
+
+    /** Creates new response removing Accept-Patch header. */
+    def withoutAcceptPatch: T#MessageType =
+      response.removeHeaders("Accept-Patch")
+  }
+
   /** Provides standardized access to Accept-Ranges header. */
   implicit class AcceptRanges[T <: HttpResponse](val response: T) extends AnyVal {
     /**

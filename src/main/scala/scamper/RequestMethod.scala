@@ -48,6 +48,7 @@ object RequestMethod {
       case "HEAD"    => HEAD
       case "POST"    => POST
       case "PUT"     => PUT
+      case "PATCH"   => PATCH
       case "DELETE"  => DELETE
       case "OPTIONS" => OPTIONS
       case "TRACE"   => TRACE

@@ -125,6 +125,9 @@ object ResponseStatuses {
   /** 417 Expectation Failed */
   val ExpectationFailed = ResponseStatus(417)
 
+  /** 422 Unprocessable Entity */
+  val UnprocessableEntity = ResponseStatus(422)
+
   /** 426 Upgrade Required */
   val UpgradeRequired = ResponseStatus(426)
 
