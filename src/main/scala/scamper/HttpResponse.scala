@@ -39,7 +39,7 @@ trait HttpResponse extends HttpMessage {
   def withStatus(status: ResponseStatus): MessageType
 
   /**
-   * Creates response new HTTP version.
+   * Creates response with new HTTP version.
    *
    * @return new response
    */

@@ -17,8 +17,13 @@ package scamper
 
 /** HTTP message */
 trait HttpMessage {
+  /** Type of HTTP message */
   type MessageType <: HttpMessage
+
+  /** Type of start line used in message */
   type LineType <: StartLine
+
+  /** Type of cookie used in message */
   type CookieType <: Cookie
 
   /** Message start line */

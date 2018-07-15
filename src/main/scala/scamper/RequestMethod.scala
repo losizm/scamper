@@ -41,7 +41,7 @@ object RequestMethod {
   import Grammar.Token
   import RequestMethods._
 
-  /** Gets RequestMethod for given code. */
+  /** Gets RequestMethod for given name. */
   def apply(name: String): RequestMethod =
     name match {
       case "GET"     => GET
