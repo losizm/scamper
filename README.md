@@ -234,3 +234,7 @@ object UserAdminClient {
   }
 }
 ```
+
+## License
+Scamper is licensed under the Apache license, version 2. See LICENSE file for
+more information.
