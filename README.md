@@ -9,9 +9,9 @@ extend the specification to define characteristics specific to their respective
 message types.
 
 ### Building Requests
-An `HttpRequest` can be created using either of the factory methods defined in
-the companion object. Or you can start with a `RequestMethod` and build the
-request using [implicit headers and type converters](#implicit-headers-and-type-converters):
+An `HttpRequest` can be created using one of the factory methods defined in its
+companion object. Or you can start with a `RequestMethod` and build the request
+using [implicit headers and type converters](#implicit-headers-and-type-converters):
 
 ```scala
 import scamper.ImplicitHeaders.{ Accept, Host, UserAgent }
@@ -25,8 +25,8 @@ val request = GET("/index.html")
 ```
 
 ### Building Responses
-Likewise, an `HttpResponse` can be created using one of the factory methods
-defined in its companion object. Or start with a `ResponseStatus` and build the
+An `HttpResponse` can be created using one of the factory methods defined in its
+companion object. Or you can start with a `ResponseStatus` and build the
 response using [implicit headers and type converters](#implicit-headers-and-type-converters):
 
 ```scala
@@ -60,7 +60,7 @@ def withContentType(value: MediaType): HttpMessage
 def withoutContentType: HttpMessage
 ```
 
-So you can work with the message header in a type-safe manner:
+So you can work with the message header in a type-safe manner.
 
 ```scala
 import scamper.ImplicitHeaders.ContentType
@@ -73,7 +73,7 @@ println(req.contentType.subtype) // json
 ```
 
 And with `stringToMediaType` in scope, you can implicitly convert a `String` to
-a `MediaType`:
+a `MediaType`.
 
 ```scala
 import scamper.ImplicitHeaders.ContentType
@@ -90,7 +90,7 @@ access to an input stream.
 
 ### Creating Message Body
 When building a message, you can use one of the `Entity` factory methods to
-create the message body. For example:
+create the message body. For example, you can create a text message body.
 
 ```scala
 import scamper.Entity
@@ -112,7 +112,7 @@ val body = Entity("""
 val res = Ok(body).withContentType("text/html; charset=utf-8")
 ```
 
-And here's an example with a file as the entity:
+Or you can create a message body from file content.
 
 ```scala
 import java.io.File
@@ -128,7 +128,8 @@ val res = Ok(body).withContentType("text/html; charset=utf-8")
 ### Parsing Message Body
 
 When handling an incoming message, use an appropriate `BodyParser` to parse the
-message body. There is a set of standard parsers in `BodyParsers`.
+message body. There is a set of standard parsers in `BodyParsers`, such as the
+one used for parsing general text content.
 
 ```scala
 import scamper.{ BodyParsers, HttpMessage }
@@ -176,9 +177,9 @@ def printUser(message: HttpMessage): Unit = {
 Scamper provides client extensions for sending requests and handling the
 responses.
 
-In this example, an extension to `HttpRequest` is used to send the request, and
-a `scamper.util.ResponseFilter` stack forms a pattern-matching expression to
-handle the `HttpResponse`:
+In this next example, an extension to `HttpRequest` is used to send the request,
+and a `scamper.util.ResponseFilter` stack forms a pattern-matching expression to
+handle the `HttpResponse`.
 
 ```scala
 import scamper.ImplicitConverters.stringToEntity
@@ -207,7 +208,7 @@ object UserAdminClient {
 }
 ```
 
-There are also method extensions to `java.net.URL` corresponding to the standard
+There are also extension methods to `java.net.URL` corresponding to the standard
 HTTP request methods (i.e., GET, POST, etc.). Here's a rewrite of the above
 example using the URL extension:
 
