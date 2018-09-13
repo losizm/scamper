@@ -11,7 +11,7 @@ message types.
 ### Building Requests
 An `HttpRequest` can be created using one of the factory methods defined in its
 companion object. Or you can start with a `RequestMethod` and build the request
-using [implicit headers and type converters](#implicit-headers-and-type-converters):
+using [implicit headers and type converters](#implicit-headers-and-type-converters).
 
 ```scala
 import scamper.ImplicitHeaders.{ Accept, Host, UserAgent }
@@ -27,7 +27,7 @@ val request = GET("/index.html")
 ### Building Responses
 An `HttpResponse` can be created using one of the factory methods defined in its
 companion object. Or you can start with a `ResponseStatus` and build the
-response using [implicit headers and type converters](#implicit-headers-and-type-converters):
+response using [implicit headers and type converters](#implicit-headers-and-type-converters).
 
 ```scala
 import scamper.ImplicitConverters.stringToEntity
