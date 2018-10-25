@@ -185,7 +185,7 @@ handle the `HttpResponse`.
 import scamper.ImplicitConverters.stringToEntity
 import scamper.ImplicitHeaders.{ ContentType, Host, Location }
 import scamper.RequestMethods.POST
-import scamper.extensions.HttpRequestExtension
+import scamper.extensions.HttpRequestType
 import scamper.types.ImplicitConverters.stringToMediaType
 import scamper.util.ResponseFilters._
 
@@ -196,7 +196,7 @@ object UserAdminClient {
       .withContentType("application/json")
       .withBody(s"""{"id":$id, "name":"$name"}""")
 
-    // The send method is added via HttpRequestExtension
+    // The send method is added via HttpRequestType
     req.send(secure = true) {
       case Successful(_)    => println("Successful")
       case Redirection(res) => println(s"Redirection: ${res.location}")
@@ -216,7 +216,7 @@ example using the URL extension:
 import java.net.URL
 import scamper.ImplicitConverters.{ stringToEntity, stringToHeader }
 import scamper.ImplicitHeaders.Location
-import scamper.extensions.URLExtension
+import scamper.extensions.URLType
 import scamper.types.ImplicitConverters.stringToMediaType
 import scamper.util.ResponseFilters._
 
@@ -224,7 +224,7 @@ object UserAdminClient {
   def createUser(id: Int, name: String): Unit = {
     val url = new URL("https://localhost:9000/users")
 
-    // The post method is added via URLExtension
+    // The post method is added via URLType
     url.post(s"""{"id":$id, "name":"$name"}""", "Content-Type: application/json") {
       case Successful(_)    => println("Successful")
       case Redirection(res) => println(s"Redirection: ${res.location}")
