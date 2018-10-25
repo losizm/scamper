@@ -35,6 +35,9 @@ trait HttpMessage {
   /** Message cookies */
   def cookies: Seq[CookieType]
 
+  /** Message body */
+  def body: Entity
+
   /**
    * Gets header for specified key.
    *
@@ -67,9 +70,6 @@ trait HttpMessage {
   /** Gets cookie value for specified name. */
   def getCookieValue(name: String): Option[String] =
     getCookie(name).map(_.value)
-
-  /** Message body */
-  def body: Entity
 
   /** Gets message body as defined type. */
   def bodyAs[T](implicit bodyParser: BodyParser[T]): T =

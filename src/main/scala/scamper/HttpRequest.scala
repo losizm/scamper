@@ -131,15 +131,6 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
   def getQueryParamValues(name: String): Seq[String] =
     queryParams.getOrElse(name, Nil)
 
-  def withHeaders(newHeaders: Header*): HttpRequest =
-    copy(headers = newHeaders)
-
-  def withCookies(newCookies: PlainCookie*): HttpRequest =
-    copy(headers = headers.filterNot(_.key.equalsIgnoreCase("Cookie")) :+ Header("Cookie", newCookies.mkString("; ")))
-
-  def withBody(newBody: Entity): HttpRequest =
-    copy(body = newBody)
-
   def withStartLine(newStartLine: RequestLine): HttpRequest =
     copy(startLine = newStartLine)
 
@@ -149,9 +140,6 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
   def withURI(newURI: String): HttpRequest =
     copy(startLine = RequestLine(method, newURI, version))
 
-  def withVersion(newVersion: HttpVersion): HttpRequest =
-    copy(startLine = RequestLine(method, uri, newVersion))
-
   def withPath(newPath: String): HttpRequest =
     withURI(uriInstance.withPath(newPath).toString)
 
@@ -160,4 +148,16 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
 
   def withQueryParams(params: (String, String)*): HttpRequest =
     withURI(uriInstance.withQueryParams(params : _*).toString)
+
+  def withVersion(newVersion: HttpVersion): HttpRequest =
+    copy(startLine = RequestLine(method, uri, newVersion))
+
+  def withHeaders(newHeaders: Header*): HttpRequest =
+    copy(headers = newHeaders)
+
+  def withCookies(newCookies: PlainCookie*): HttpRequest =
+    copy(headers = headers.filterNot(_.key.equalsIgnoreCase("Cookie")) :+ Header("Cookie", newCookies.mkString("; ")))
+
+  def withBody(newBody: Entity): HttpRequest =
+    copy(body = newBody)
 }

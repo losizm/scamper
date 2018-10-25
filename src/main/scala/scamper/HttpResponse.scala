@@ -58,17 +58,7 @@ object HttpResponse {
 }
 
 private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity) extends HttpResponse {
-  lazy val cookies: Seq[SetCookie] =
-    getHeaderValues("Set-Cookie").map(SetCookie(_))
-
-  def withHeaders(newHeaders: Header*): HttpResponse =
-    copy(headers = newHeaders)
-
-  def withCookies(newCookies: SetCookie*): HttpResponse =
-    copy(headers = headers.filterNot(_.key.equalsIgnoreCase("Set-Cookie")) ++ newCookies.map(c => Header("Set-Cookie", c.toString)))
-
-  def withBody(newBody: Entity): HttpResponse =
-    copy(body = newBody)
+  lazy val cookies: Seq[SetCookie] = getHeaderValues("Set-Cookie").map(SetCookie(_))
 
   def withStartLine(line: StatusLine) =
     copy(startLine = line)
@@ -78,4 +68,13 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
 
   def withVersion(newVersion: HttpVersion): HttpResponse =
     copy(startLine = StatusLine(status, newVersion))
+
+  def withHeaders(newHeaders: Header*): HttpResponse =
+    copy(headers = newHeaders)
+
+  def withCookies(newCookies: SetCookie*): HttpResponse =
+    copy(headers = headers.filterNot(_.key.equalsIgnoreCase("Set-Cookie")) ++ newCookies.map(c => Header("Set-Cookie", c.toString)))
+
+  def withBody(newBody: Entity): HttpResponse =
+    copy(body = newBody)
 }
