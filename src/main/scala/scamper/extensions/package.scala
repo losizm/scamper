@@ -23,7 +23,7 @@ import scala.util.Try
 /** Contains type classes of HttpRequest, String, URI, and URL. */
 package object extensions {
   /** Type class of [[HttpRequest]]. */
-  implicit class HttpRequestExtension(val request: HttpRequest) extends AnyVal {
+  implicit class HttpRequestType(val request: HttpRequest) extends AnyVal {
     /**
      * Sends request and passes response to supplied handler.
      *
@@ -50,7 +50,7 @@ package object extensions {
   }
 
   /** Type class of {@code String}. */
-  implicit class StringExtension(val string: String) extends AnyVal {
+  implicit class StringType(val string: String) extends AnyVal {
     /**
      * Converts to LocalDate.
      *
@@ -104,7 +104,7 @@ package object extensions {
   }
 
   /** Type class of {@code java.net.URI}. */
-  implicit class URIExtension(val uri: URI) extends AnyVal {
+  implicit class URIType(val uri: URI) extends AnyVal {
     /** Gets query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
       QueryParams.parse(uri.getRawQuery)
@@ -147,7 +147,7 @@ package object extensions {
   }
 
   /** Type class of {@code java.net.URL}. */
-  implicit class URLExtension(val url: URL) extends AnyVal {
+  implicit class URLType(val url: URL) extends AnyVal {
     /** Gets the query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
       QueryParams.parse(url.getQuery)
