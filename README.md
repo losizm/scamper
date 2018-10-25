@@ -1,6 +1,8 @@
-# Scamper - HTTP Library for Scala
+# Scamper
 Scamper is an HTTP library for Scala. It defines an API for reading and writing
 HTTP messages.
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_2.12.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_2.12%22)
 
 ## HTTP Messages
 At the core of Scamper is `HttpMessage`, which is a trait that defines the
@@ -20,7 +22,7 @@ import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToProductTyp
 
 val request = GET("/index.html")
   .withHost("localhost:8080")
-  .withUserAgent("Scamper/1.0")
+  .withUserAgent("Scamper/0.9")
   .withAccept("text/html", "*/*; q=0.5")
 ```
 
@@ -37,7 +39,7 @@ import scamper.types.ImplicitConverters.{ stringToMediaType, stringToProductType
 
 val response = Ok("Hello, world!")
   .withContentType("text/plain")
-  .withServer("Scamper/1.0")
+  .withServer("Scamper/0.9")
   .withConnection("close")
 ```
 
