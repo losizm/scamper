@@ -1,0 +1,99 @@
+:root {
+  font-size: 32px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1em;
+  background-color: #fcfcfc;
+  color: #333;
+}
+
+.hero {
+  margin-top: 5%;
+  text-align: center;
+}
+
+.hero > .brand {
+  color: #000;
+  font-size: 2em;
+  letter-spacing: -0.05em;
+}
+
+.hero > .brand > .sep {
+  color: #24d;
+}
+
+.hero > .brand > em {
+  font-style: normal;
+  color: #999;
+}
+
+.hero > .tagline {
+  color: #666;
+  font-weight: 300;
+  letter-spacing: 0.025em;
+}
+
+.hero > .stripe {
+  margin-top: 0.75rem;
+  padding: 2.5em;
+  border-top: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+  background-color: #f8f8f8;
+  font-size: 0.45em;
+  letter-spacing: 0.075em;
+}
+
+.hero > .stripe > .quote {
+  color: #d24
+}
+
+.hero > .stripe > .op {
+  color: #24a;
+}
+
+.hero > .controls {
+  margin-top: 0.5rem;
+}
+
+.hero > .controls > a.btn, .hero > .controls > a.btn:visited  {
+  font-size: 0.5em;
+  font-weight: normal;
+  padding: 0.75em 1.25em;
+  border: 1px solid #37e;
+  border-radius: 4px;
+  background-color: #26d;
+  color: #fff;
+  text-decoration: none;
+}
+
+.hero > .controls > a.btn:hover  {
+  background-color: #2f6fdf;
+  cursor: pointer;
+}
+
+.hero > .controls > a.btn:active  {
+  background-color: #37e;
+}
+
+.hero > .controls > a.btn.btn-alt, .hero > .controls > a.btn.btn-alt:visited {
+  border: 1px solid #ccc;
+  background-color: #fcfcfc;
+  color: #333;
+}
+
+.hero > .controls > a.btn.btn-alt:hover  {
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.hero > .controls > a.btn.btn-alt:active  {
+  background-color: #eee;
+}
+
+.hero > .controls > a.btn + a.btn {
+  margin-left: 1em;
+}
