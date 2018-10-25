@@ -26,7 +26,7 @@ object ImplicitHeaders {
     /**
      * Gets Accept header values.
      *
-     * @return the header values or an empty sequence if Accept is not present
+     * @return header values or empty sequence if Accept is not present
      */
     def accept: Seq[MediaRange] =
       getAccept.getOrElse(Nil)
@@ -51,7 +51,7 @@ object ImplicitHeaders {
     /**
      * Gets Accept-Charset header values.
      *
-     * @return the header values or an empty sequence if Accept-Charset is not present
+     * @return header values or empty sequence if Accept-Charset is not present
      */
     def acceptCharset: Seq[CharsetRange] =
       getAcceptCharset.getOrElse(Nil)
@@ -76,7 +76,7 @@ object ImplicitHeaders {
     /**
      * Gets Accept-Encoding header values.
      *
-     * @return the header values or an empty sequence if Accept-Encoding is not present
+     * @return header values or empty sequence if Accept-Encoding is not present
      */
     def acceptEncoding: Seq[ContentCodingRange] =
       getAcceptEncoding.getOrElse(Nil)
@@ -103,7 +103,7 @@ object ImplicitHeaders {
     /**
      * Gets Accept-Language header values.
      *
-     * @return the header values or an empty sequence if Accept-Language is not present
+     * @return header values or empty sequence if Accept-Language is not present
      */
     def acceptLanguage: Seq[LanguageRange] =
       getAcceptLanguage.getOrElse(Nil)
@@ -130,7 +130,7 @@ object ImplicitHeaders {
     /**
      * Gets Accept-Patch header values.
      *
-     * @return the header values or an empty sequence if Accept-Patch is not present
+     * @return header values or empty sequence if Accept-Patch is not present
      */
     def acceptPatch: Seq[MediaType] =
       getAcceptPatch.getOrElse(Nil)
@@ -155,7 +155,7 @@ object ImplicitHeaders {
     /**
      * Gets Accept-Ranges header values.
      *
-     * @return the header values or an empty sequence if Accept-Ranges is not present
+     * @return header values or empty sequence if Accept-Ranges is not present
      */
     def acceptRanges: Seq[String] =
       getAcceptRanges.getOrElse(Nil)
@@ -201,7 +201,7 @@ object ImplicitHeaders {
     /**
      * Gets Allow header values.
      *
-     * @return the header values or an empty sequence if Allow is not present
+     * @return header values or empty sequence if Allow is not present
      */
     def allow: Seq[RequestMethod] =
       getAllow.getOrElse(Nil)
@@ -226,8 +226,7 @@ object ImplicitHeaders {
     /**
      * Gets Authentication-Info header values.
      *
-     * @return the header values or an empty sequence if Authentication-Info is
-     * not present
+     * @return header values or empty sequence if Authentication-Info is not present
      */
     def authenticationInfo: Map[String, String] =
       getAuthenticationInfo.getOrElse(Map.empty)
@@ -276,7 +275,7 @@ object ImplicitHeaders {
     /**
      * Gets Cache-Control header values.
      *
-     * @return the header values or an empty sequence if Cache-Control is not present
+     * @return header values or empty sequence if Cache-Control is not present
      */
     def cacheControl: Seq[CacheDirective] =
       getCacheControl.getOrElse(Nil)
@@ -325,7 +324,7 @@ object ImplicitHeaders {
     /**
      * Gets Content-Encoding header values.
      *
-     * @return the header values or an empty sequence if Content-Encoding is not present
+     * @return header values or empty sequence if Content-Encoding is not present
      */
     def contentEncoding: Seq[ContentCoding] =
       getContentEncoding.getOrElse(Nil)
@@ -352,7 +351,7 @@ object ImplicitHeaders {
     /**
      * Gets Content-Language header values.
      *
-     * @return the header values or an empty sequence if Content-Language is not present
+     * @return header values or empty sequence if Content-Language is not present
      */
     def contentLanguage: Seq[LanguageTag] =
       getContentLanguage.getOrElse(Nil)
@@ -786,7 +785,7 @@ object ImplicitHeaders {
     /**
      * Gets Link header values.
      *
-     * @return the header values or an empty sequence if Link is not present
+     * @return header values or empty sequence if Link is not present
      */
     def link: Seq[LinkValue] =
       getLink.getOrElse(Nil)
@@ -855,7 +854,7 @@ object ImplicitHeaders {
     /**
      * Gets Pragma header values.
      *
-     * @return the header values or an empty sequence if Pragma is not present
+     * @return header values or empty sequence if Pragma is not present
      */
     def pragma: Seq[PragmaDirective] =
       getPragma.getOrElse(Nil)
@@ -878,7 +877,7 @@ object ImplicitHeaders {
     /**
      * Gets Proxy-Authenticate header values.
      *
-     * @return the header values or an empty sequence if Proxy-Authenticate is not present
+     * @return header values or empty sequence if Proxy-Authenticate is not present
      */
     def proxyAuthenticate: Seq[Challenge] =
       getProxyAuthenticate.getOrElse(Nil)
@@ -908,8 +907,7 @@ object ImplicitHeaders {
     /**
      * Gets Proxy-Authentication-Info header values.
      *
-     * @return the header values or an empty sequence if
-     * Proxy-Authentication-Info is not present
+     * @return header values or empty sequence if Proxy-Authentication-Info is not present
      */
     def proxyAuthenticationInfo: Map[String, String] =
       getProxyAuthenticationInfo.getOrElse(Map.empty)
@@ -1029,7 +1027,7 @@ object ImplicitHeaders {
     /**
      * Gets Server header values.
      *
-     * @return the header values or an empty sequence if Server is not present
+     * @return header values or empty sequence if Server is not present
      */
     def server: Seq[ProductType] =
       getServer.getOrElse(Nil)
@@ -1052,7 +1050,7 @@ object ImplicitHeaders {
     /**
      * Gets TE header values.
      *
-     * @return the header values or an empty sequence if TE is not present
+     * @return header values or empty sequence if TE is not present
      */
     def te: Seq[TransferCodingRange] =
       getTE.getOrElse(Nil)
@@ -1077,7 +1075,7 @@ object ImplicitHeaders {
     /**
      * Gets Trailer header values.
      *
-     * @return the header values or an empty sequence if Trailer is not present
+     * @return header values or empty sequence if Trailer is not present
      */
     def vary: Seq[String] =
       getTrailer.getOrElse(Nil)
@@ -1100,7 +1098,7 @@ object ImplicitHeaders {
     /**
      * Gets Transfer-Encoding header values.
      *
-     * @return the header values or an empty sequence if Transfer-Encoding is not present
+     * @return header values or empty sequence if Transfer-Encoding is not present
      */
     def transferEncoding: Seq[TransferCoding] =
       getTransferEncoding.getOrElse(Nil)
@@ -1127,7 +1125,7 @@ object ImplicitHeaders {
     /**
      * Gets Upgrade header values.
      *
-     * @return the header values or an empty sequence if Upgrade is not present
+     * @return header values or empty sequence if Upgrade is not present
      */
     def upgrade: Seq[Protocol] =
       getUpgrade.getOrElse(Nil)
@@ -1152,7 +1150,7 @@ object ImplicitHeaders {
     /**
      * Gets User-Agent header values.
      *
-     * @return the header values or an empty sequence if User-Agent is not present
+     * @return header values or empty sequence if User-Agent is not present
      */
     def userAgent: Seq[ProductType] =
       getUserAgent.getOrElse(Nil)
@@ -1175,7 +1173,7 @@ object ImplicitHeaders {
     /**
      * Gets Vary header values.
      *
-     * @return the header values or an empty sequence if Vary is not present
+     * @return header values or empty sequence if Vary is not present
      */
     def vary: Seq[String] =
       getVary.getOrElse(Nil)
@@ -1198,7 +1196,7 @@ object ImplicitHeaders {
     /**
      * Gets Via header values.
      *
-     * @return the header values or an empty sequence if Via is not present
+     * @return header values or empty sequence if Via is not present
      */
     def via: Seq[ViaType] =
       getVia.getOrElse(Nil)
@@ -1221,7 +1219,7 @@ object ImplicitHeaders {
     /**
      * Gets Warning header values.
      *
-     * @return the header values or an empty sequence if Warning is not present
+     * @return header values or empty sequence if Warning is not present
      */
     def warning: Seq[WarningType] =
       getWarning.getOrElse(Nil)
@@ -1244,7 +1242,7 @@ object ImplicitHeaders {
     /**
      * Gets WWW-Authenticate header values.
      *
-     * @return the header values or an empty sequence if WWW-Authenticate is not present
+     * @return header values or empty sequence if WWW-Authenticate is not present
      */
     def wwwAuthenticate: Seq[Challenge] =
       getWWWAuthenticate.getOrElse(Nil)
