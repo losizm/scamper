@@ -22,7 +22,7 @@ import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToProductTyp
 
 val request = GET("/index.html")
   .withHost("localhost:8080")
-  .withUserAgent("Scamper/0.9")
+  .withUserAgent("Scamper/0.10")
   .withAccept("text/html", "*/*; q=0.5")
 ```
 
@@ -39,7 +39,7 @@ import scamper.types.ImplicitConverters.{ stringToMediaType, stringToProductType
 
 val response = Ok("Hello, world!")
   .withContentType("text/plain")
-  .withServer("Scamper/0.9")
+  .withServer("Scamper/0.10")
   .withConnection("close")
 ```
 
@@ -69,7 +69,7 @@ import scamper.ImplicitHeaders.ContentType
 import scamper.RequestMethods.POST
 import scamper.types.MediaType
 
-val req = POST("/api/users").withContentType(MediaType("application/json"))
+val req = POST("/api/users").withContentType(MediaType.parse("application/json"))
 println(req.contentType.mainType) // application
 println(req.contentType.subtype) // json
 ```
@@ -147,20 +147,25 @@ def printText(message: HttpMessage): Unit = {
 }
 ```
 
-You can also implement custom body parsers. Here's one that gets a little help
-from a standard body parser and [play-json](https://github.com/playframework/play-json):
+You can also implement custom body parsers. Here's one that gets help
+from a standard body parser and [little-json](https://github.com/losizm/little-json):
 
 ```scala
-import play.api.libs.json._
+import javax.json.JsonObject
+import little.json.{ Json, FromJson }
+import little.json.Implicits._
 import scamper.{ BodyParser, BodyParsers, HttpMessage }
 
-case class User(id: Long, name: String)
+case class User(id: Int, name: String)
 
 implicit object UserBodyParser extends BodyParser[User] {
   // Create standard text body parser
   implicit val textBodyParser = BodyParsers.text(maxLength = 1024)
-  // Create play-json parser
-  implicit val userReads = Json.reads[User]
+
+  // Convert JSON to User
+  implicit val userFromJson: FromJson[User] = {
+    case json: JsonObject => User(json.getInt("id"), json.getString("name"))
+  }
 
   // Parses JSON message body to User
   def parse(message: HttpMessage): User =
@@ -175,21 +180,19 @@ def printUser(message: HttpMessage): Unit = {
 }
 ```
 
-## HTTP Client Extensions
-Scamper provides client extensions for sending requests and handling the
-responses.
+## HTTP Client
+Scamper provides a client for sending requests and handling the responses.
 
-In this next example, an extension to `HttpRequest` is used to send the request,
-and a `scamper.util.ResponseFilter` stack forms a pattern-matching expression to
-handle the `HttpResponse`.
+In this next example, an `HttpRequest` is sent, and a `ResponseFilter` stack
+is employed to handle the `HttpResponse`.
 
 ```scala
+import scamper.HttpClient
 import scamper.ImplicitConverters.stringToEntity
 import scamper.ImplicitHeaders.{ ContentType, Host, Location }
 import scamper.RequestMethods.POST
-import scamper.extensions.HttpRequestType
+import scamper.ResponseFilters._
 import scamper.types.ImplicitConverters.stringToMediaType
-import scamper.util.ResponseFilters._
 
 object UserAdminClient {
   def createUser(id: Int, name: String): Unit = {
@@ -198,36 +201,7 @@ object UserAdminClient {
       .withContentType("application/json")
       .withBody(s"""{"id":$id, "name":"$name"}""")
 
-    // The send method is added via HttpRequestType
-    req.send(secure = true) {
-      case Successful(_)    => println("Successful")
-      case Redirection(res) => println(s"Redirection: ${res.location}")
-      case ClientError(res) => println(s"Client error: ${res.status}")
-      case ServerError(res) => println(s"Server error: ${res.status}")
-      case Informational(_) => println("Informational")
-    }
-  }
-}
-```
-
-There are also extension methods to `java.net.URL` corresponding to the standard
-HTTP request methods (i.e., GET, POST, etc.). Here's a rewrite of the above
-example using the URL extension:
-
-```scala
-import java.net.URL
-import scamper.ImplicitConverters.{ stringToEntity, stringToHeader }
-import scamper.ImplicitHeaders.Location
-import scamper.extensions.URLType
-import scamper.types.ImplicitConverters.stringToMediaType
-import scamper.util.ResponseFilters._
-
-object UserAdminClient {
-  def createUser(id: Int, name: String): Unit = {
-    val url = new URL("https://localhost:9000/users")
-
-    // The post method is added via URLType
-    url.post(s"""{"id":$id, "name":"$name"}""", "Content-Type: application/json") {
+    HttpClient.send(req, secure = true) {
       case Successful(_)    => println("Successful")
       case Redirection(res) => println(s"Redirection: ${res.location}")
       case ClientError(res) => println(s"Client error: ${res.status}")
