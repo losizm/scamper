@@ -2,7 +2,7 @@ organization := "com.github.losizm"
 name := "scamper"
 version := "0.10.0-SNAPSHOT"
 
-scalaVersion := "2.12.6"
+scalaVersion := "2.12.7"
 scalacOptions := Seq("-deprecation", "-feature", "-Xcheckinit")
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
