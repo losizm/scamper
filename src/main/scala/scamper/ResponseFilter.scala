@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper.util
-
-import scamper._
+package scamper
 
 /** Provides utility for filtering HTTP response. */
 trait ResponseFilter {

@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper.util
+package scamper.server
 
 import org.scalatest.FlatSpec
+
 import scamper.{ BodyParsers, Entity, HttpException, HttpRequest }
 import scamper.ImplicitConverters.{ stringToHeader, stringToRequestMethod, tupleToHeaderWithLongValue }
 import scamper.ResponseStatuses._
