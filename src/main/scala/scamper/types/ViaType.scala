@@ -23,13 +23,13 @@ import scamper.ListParser
  * @see [[scamper.ImplicitHeaders.Via]]
  */
 trait ViaType {
-  /** Received protcol */
+  /** Gets received protcol. */
   def protocol: Protocol
 
-  /** Received by */
+  /** Gets received by. */
   def by: String
 
-  /** Comment */
+  /** Gets comment. */
   def comment: Option[String]
 
   /** Returns formatted via. */

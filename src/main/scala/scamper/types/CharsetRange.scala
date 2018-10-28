@@ -23,10 +23,10 @@ import scamper.Grammar.Token
  * @see [[scamper.ImplicitHeaders.AcceptCharset]]
  */
 trait CharsetRange {
-  /** Charset */
+  /** Gets charset. */
   def charset: String
 
-  /** Charset weight */
+  /** Gets charset weight. */
   def weight: Float
 
   /** Tests whether charset is wildcard (*). */

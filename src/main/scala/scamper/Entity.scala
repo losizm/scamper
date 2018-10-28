@@ -22,7 +22,7 @@ import scala.util.Try
 
 /** HTTP entity */
 trait Entity {
-  /** Length in bytes if known */
+  /** Gets length in bytes if known. */
   def length: Option[Long]
 
   /** Tests whether entity is known to be empty. */

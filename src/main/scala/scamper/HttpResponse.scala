@@ -25,11 +25,8 @@ trait HttpResponse extends HttpMessage {
   type LineType = StatusLine
   type CookieType = SetCookie
 
-  /** Response status */
+  /** Gets response status. */
   def status: ResponseStatus = startLine.status
-
-  /** HTTP version */
-  def version: HttpVersion = startLine.version
 
   /**
    * Creates response with new response status.
@@ -60,8 +57,8 @@ object HttpResponse {
 private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity) extends HttpResponse {
   lazy val cookies: Seq[SetCookie] = getHeaderValues("Set-Cookie").map(SetCookie.parse)
 
-  def withStartLine(line: StatusLine) =
-    copy(startLine = line)
+  def withStartLine(newStartLine: StatusLine) =
+    copy(startLine = newStartLine)
 
   def withStatus(newStatus: ResponseStatus): HttpResponse =
     copy(startLine = StatusLine(newStatus, version))

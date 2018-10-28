@@ -24,10 +24,10 @@ import scamper.Grammar.Token
  * @see [[scamper.ImplicitHeaders.Server]]
  */
 trait ProductType {
-  /** Product name */
+  /** Gets product name. */
   def name: String
 
-  /** Product version */
+  /** Gets product version. */
   def version: Option[String]
 
   /** Returns formatted product. */

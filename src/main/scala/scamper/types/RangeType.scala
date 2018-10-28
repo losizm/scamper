@@ -23,10 +23,10 @@ import scamper.ListParser
  * @see [[scamper.ImplicitHeaders.Range]]
  */
 trait RangeType {
-  /** Range unit */
+  /** Gets range unit. */
   def unit: String
 
-  /** Range set */
+  /** Gets range set. */
   def set: Any
 }
 
@@ -38,10 +38,10 @@ trait RangeType {
 trait ByteRange extends RangeType {
   import ByteRange._
 
-  /** Byte range unit (i.e., "bytes") */
+  /** Gets byte range unit (i.e., "bytes"). */
   val unit: String = "bytes"
 
-  /** Byte range set */
+  /** Gets byte range set. */
   def set: Seq[ByteRangeSpec]
 
   /** Gets formatted byte range. */

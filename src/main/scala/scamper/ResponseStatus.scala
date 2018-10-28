@@ -21,10 +21,10 @@ package scamper
  * @see [[ResponseStatuses]]
  */
 trait ResponseStatus {
-  /** Status code */
+  /** Gets status code. */
   def code: Int
 
-  /** Reason phrase */
+  /** Gets reason phrase. */
   def reason: String
 
   /** Tests for informational status code. */

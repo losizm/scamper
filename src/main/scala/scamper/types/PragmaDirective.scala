@@ -24,10 +24,10 @@ import scamper.ListParser
  * @see [[scamper.ImplicitHeaders.Pragma]]
  */
 trait PragmaDirective {
-  /** Directive name */
+  /** Gets directive name. */
   def name: String
 
-  /** Optinal directive value */
+  /** Gets optinal directive value. */
   def value: Option[String]
 
   /** Returns formatted pragma directive. */

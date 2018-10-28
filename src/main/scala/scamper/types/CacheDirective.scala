@@ -24,10 +24,10 @@ import scamper.ListParser
  * @see [[scamper.ImplicitHeaders.CacheControl]]
  */
 trait CacheDirective {
-  /** Directive name */
+  /** Gets directive name. */
   def name: String
 
-  /** Optional directive value */
+  /** Gets optional directive value. */
   def value: Option[String]
 
   /** Returns formatted cache directive. */

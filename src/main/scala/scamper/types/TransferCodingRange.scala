@@ -23,13 +23,13 @@ import CodingHelper._
  * @see [[scamper.ImplicitHeaders.TE]]
  */
 trait TransferCodingRange {
-  /** Coding name */
+  /** Gets coding name. */
   def name: String
 
   /** Gets coding rank. */
   def rank: Float
 
-  /** Coding parameters */
+  /** Gets coding parameters. */
   def params: Map[String, String]
 
   /** Tests whether name is chunked. */

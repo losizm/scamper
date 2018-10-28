@@ -23,10 +23,10 @@ import scamper.ListParser
  * @see [[scamper.ImplicitHeaders.Link]]
  */
 trait LinkValue {
-  /** Link reference */
+  /** Gets link reference. */
   def ref: String
 
-  /** Link parameters */
+  /** Gets link parameters. */
   def params: Map[String, Option[String]]
 
   /** Returns formatted link. */

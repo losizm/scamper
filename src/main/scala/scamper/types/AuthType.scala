@@ -20,13 +20,13 @@ import AuthTypeHelper._
 
 /** Base type for authentication header types. */
 trait AuthType {
-  /** Auth scheme */
+  /** Gets auth scheme. */
   def scheme: String
 
-  /** Auth token */
+  /** Gets auth token. */
   def token: Option[String]
 
-  /** Auth parameters */
+  /** Gets auth parameters. */
   def params: Map[String, String]
 
   /** Returns formatted auth type. */

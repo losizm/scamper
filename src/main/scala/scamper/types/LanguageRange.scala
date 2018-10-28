@@ -21,10 +21,10 @@ package scamper.types
  * @see [[scamper.ImplicitHeaders.AcceptLanguage]]
  */
 trait LanguageRange {
-  /** Language tag */
+  /** Gets language tag. */
   def tag: String
 
-  /** Language weight */
+  /** Gets language weight. */
   def weight: Float
 
   /** Tests whether language tag is wildcard (*). */

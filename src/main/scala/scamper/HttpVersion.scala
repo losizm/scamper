@@ -19,10 +19,10 @@ import scala.util.Try
 
 /** HTTP version */
 trait HttpVersion {
-  /** Version major */
+  /** Gets version major. */
   def major: Int
 
-  /** Version minor */
+  /** Gets version minor. */
   def minor: Int
 
   /** Returns formatted HTTP version. */

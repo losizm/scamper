@@ -21,10 +21,10 @@ import CookieHelper._
 
 /** HTTP Cookie */
 trait Cookie {
-  /** Cookie name */
+  /** Gets cookie name. */
   def name: String
 
-  /** Cookie value */
+  /** Gets cookie value. */
   def value: String
 }
 

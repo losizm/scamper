@@ -23,13 +23,13 @@ import MediaTypeHelper._
  * @see [[scamper.ImplicitHeaders.ContentType]]
  */
 trait MediaType {
-  /** Main type of media type */
+  /** Gets main type of media type. */
   def mainType: String
 
-  /** Subtype of media type */
+  /** Gets subtype of media type. */
   def subtype: String
 
-  /** Media type parameters */
+  /** Gets media type parameters. */
   def params: Map[String, String]
 
   /** Tests whether main type is text. */

@@ -21,10 +21,10 @@ import HeaderHelper._
 
 /** HTTP header */
 trait Header {
-  /** Header key */
+  /** Gets header key. */
   def key: String
 
-  /** Header value */
+  /** Gets header value. */
   def value: String
 
   /** Gets header value as OffsetDateTime. */

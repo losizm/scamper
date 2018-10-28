@@ -23,10 +23,10 @@ import scamper.Grammar.Token
  * @see [[scamper.ImplicitHeaders.Upgrade]]
  */
 trait Protocol {
-  /** Protocol name */
+  /** Gets protocol name. */
   def name: String
 
-  /** Protocol version */
+  /** Gets protocol version. */
   def version: Option[String]
 
   /** Returns formatted protocol. */

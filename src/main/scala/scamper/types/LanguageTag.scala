@@ -21,10 +21,10 @@ package scamper.types
  * @see [[scamper.ImplicitHeaders.ContentLanguage]]
  */
 trait LanguageTag {
-  /** Primary subtag */
+  /** Gets primary subtag. */
   def primary: String
 
-  /** Other subtags */
+  /** Gets other subtags. */
   def others: Seq[String]
 
   /** Converts to LanguageRange with supplied weight. */ 

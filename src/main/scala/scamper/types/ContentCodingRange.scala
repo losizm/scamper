@@ -23,10 +23,10 @@ import CodingHelper.Name
  * @see [[scamper.ImplicitHeaders.AcceptEncoding]]
  */
 trait ContentCodingRange {
-  /** Coding name */
+  /** Gets coding name. */
   def name: String
 
-  /** Coding weight */
+  /** Gets coding weight. */
   def weight: Float
 
   /** Tests whether name is compress. */

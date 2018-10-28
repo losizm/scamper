@@ -21,10 +21,10 @@ package scamper.types
  * @see [[scamper.ImplicitHeaders.ContentRange]]
  */
 trait ContentRangeType {
-  /** Range unit */
+  /** Gets range unit. */
   def unit: String
 
-  /** Range response */
+  /** Gets range response. */
   def resp: Any
 }
 
@@ -36,10 +36,10 @@ trait ContentRangeType {
 trait ByteContentRange extends ContentRangeType {
   import ByteContentRange._
 
-  /** Byte range unit (i.e., "bytes") */
+  /** Gets byte range unit (i.e., "bytes"). */
   val unit: String = "bytes"
 
-  /** Byte range response */
+  /** Gets byte range response. */
   def resp: ByteRangeResp
 
   /** Gets formatted byte content range. */

@@ -23,10 +23,10 @@ import CodingHelper._
  * @see [[scamper.ImplicitHeaders.TransferEncoding]]
  */
 trait TransferCoding {
-  /** Coding name */
+  /** Gets coding name. */
   def name: String
 
-  /** Coding parameters */
+  /** Gets coding parameters. */
   def params: Map[String, String]
 
   /** Tests whether name is chunked. */

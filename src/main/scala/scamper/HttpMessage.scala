@@ -26,16 +26,19 @@ trait HttpMessage {
   /** Type of cookie used in message */
   type CookieType <: Cookie
 
-  /** Message start line */
+  /** Gets message start line. */
   def startLine: LineType
 
-  /** Message headers */
+  /** Gets HTTP version. */
+  def version: HttpVersion = startLine.version
+
+  /** Gets message headers. */
   def headers: Seq[Header]
 
-  /** Message cookies */
+  /** Gets message cookies. */
   def cookies: Seq[CookieType]
 
-  /** Message body */
+  /** Gets message body. */
   def body: Entity
 
   /**
@@ -110,7 +113,7 @@ trait HttpMessage {
     withHeaders(this.headers ++ headers : _*)
 
   /**
-   * Creates message removing headers having supplied keys.
+   * Creates message removing headers having specified keys.
    *
    * @return new message
    */

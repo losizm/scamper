@@ -25,16 +25,16 @@ import scamper.{ DateValue, ListParser }
  * @see [[scamper.ImplicitHeaders.Warning]]
  */
 trait WarningType {
-  /** Warning code */
+  /** Gets warning code. */
   def code: Int
 
-  /** Warning agent */
+  /** Gets warning agent. */
   def agent: String
 
-  /** Warning text */
+  /** Gets warning text. */
   def text: String
 
-  /** Warning date */
+  /** Gets warning date. */
   def date: Option[OffsetDateTime]
 
   /** Returns formatted warning. */

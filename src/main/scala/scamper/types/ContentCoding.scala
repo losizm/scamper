@@ -23,7 +23,7 @@ import CodingHelper.Name
  * @see [[scamper.ImplicitHeaders.ContentEncoding]]
  */
 trait ContentCoding {
-  /** Coding name */
+  /** Gets coding name. */
   def name: String
 
   /** Tests whether name is compress. */

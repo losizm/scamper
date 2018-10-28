@@ -23,10 +23,10 @@ import ContentDispositionTypeHelper._
  * @see [[scamper.ImplicitHeaders.ContentDisposition]]
  */
 trait ContentDispositionType {
-  /** Disposition type name */
+  /** Gets disposition type name. */
   def name: String
 
-  /** Disposition parameters */
+  /** Gets disposition parameters. */
   def params: Map[String, String]
 
   /** Tests whether disposition type is attachment. */

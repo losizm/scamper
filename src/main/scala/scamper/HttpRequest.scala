@@ -28,19 +28,16 @@ trait HttpRequest extends HttpMessage {
   type LineType = RequestLine
   type CookieType = PlainCookie
 
-  /** Request method */
+  /** Gets request method. */
   def method: RequestMethod = startLine.method
 
-  /** Request URI */
+  /** Gets request URI. */
   def uri: String = startLine.uri
 
-  /** HTTP version */
-  def version: HttpVersion = startLine.version
-
-  /** URI path */
+  /** Gets URI path. */
   def path: String
 
-  /** Query parameters */
+  /** Gets query parameters. */
   def queryParams: Map[String, Seq[String]]
 
   /**

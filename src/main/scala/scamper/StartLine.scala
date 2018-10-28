@@ -19,7 +19,7 @@ import scala.util.Try
 
 /** HTTP message start line */
 trait StartLine {
-  /** HTTP version */
+  /** Gets HTTP version. */
   def version: HttpVersion
 }
 
@@ -29,14 +29,11 @@ trait StartLine {
  * @see [[StatusLine]]
  */
 trait RequestLine extends StartLine {
-  /** Request method */
+  /** Gets request method. */
   def method: RequestMethod
 
-  /** Request URI */
+  /** Gets request URI. */
   def uri: String
-
-  /** HTTP version */
-  def version: HttpVersion
 
   /** Returns formatted request line. */
   override lazy val toString: String = s"$method $uri HTTP/$version"
@@ -73,11 +70,8 @@ private case class RequestLineImpl(method: RequestMethod, uri: String, version: 
  * @see [[RequestLine]]
  */
 trait StatusLine extends StartLine {
-  /** Response status */
+  /** Gets response status. */
   def status: ResponseStatus
-
-  /** HTTP version */
-  def version: HttpVersion
 
   /** Returns formatted status line. */
   override lazy val toString: String = s"HTTP/$version ${status.code} ${status.reason}"

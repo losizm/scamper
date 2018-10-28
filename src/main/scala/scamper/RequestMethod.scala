@@ -21,7 +21,7 @@ package scamper
  * @see [[RequestMethods]]
  */
 trait RequestMethod {
-  /** Method name */
+  /** Gets method name. */
   def name: String
 
   /** Converts to HttpRequest with supplied URI and entity. */

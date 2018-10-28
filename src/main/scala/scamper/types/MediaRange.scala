@@ -25,16 +25,16 @@ import MediaTypeHelper._
  * @see [[scamper.ImplicitHeaders.Accept]]
  */
 trait MediaRange {
-  /** Gets weight of media range */
+  /** Gets weight of media range. */
   def weight: Float
 
-  /** Main type of media range */
+  /** Gets main type of media range. */
   def mainType: String
 
-  /** Subtype of media range */
+  /** Gets subtype of media range. */
   def subtype: String
 
-  /** Media range parameters */
+  /** Gets media range parameters. */
   def params: Map[String, String]
 
   /** Tests whether main type is text. */
