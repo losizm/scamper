@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper.extensions
+package scamper
 
 import java.net.{ URI, URL }
 import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
+
 import org.scalatest.FlatSpec
 
-class ExtensionsSpec extends FlatSpec {
+import ImplicitExtensions._
+
+class ImplicitExtensionsSpec extends FlatSpec {
   val uri = new URI("/index.html")
   val url = new URL("http://localhost:8080/index.html")
 

@@ -21,7 +21,7 @@ import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
 import scala.annotation.tailrec
 import scala.util.Try
 
-import extensions._
+import ImplicitExtensions._
 
 /** HTTP client */
 object HttpClient {

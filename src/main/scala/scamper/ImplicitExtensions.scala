@@ -20,10 +20,10 @@ import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
 
 import scala.util.Try
 
-/** Contains type classes of HttpRequest, String, URI, and URL. */
-package object extensions {
-  /** Type class of {@code String}. */
-  implicit class StringType(val string: String) extends AnyVal {
+/** Includes type classes for String, URI, and URL. */
+object ImplicitExtensions {
+  /** Adds HTTP related extension methods to {@code String}. */
+  implicit class HttpStringType(val string: String) extends AnyVal {
     /**
      * Converts to LocalDate.
      *
@@ -76,8 +76,8 @@ package object extensions {
     def toURLDecoded(encoding: String): String = URLDecoder.decode(string, encoding)
   }
 
-  /** Type class of {@code java.net.URI}. */
-  implicit class URIType(val uri: URI) extends AnyVal {
+  /** Adds HTTP related extension methods to {@code java.net.URI}. */
+  implicit class HttpUriType(val uri: URI) extends AnyVal {
     /** Gets query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
       QueryParams.parse(uri.getRawQuery)
@@ -119,8 +119,8 @@ package object extensions {
       buildURI(uri.getScheme, uri.getRawAuthority, path, query, uri.getRawFragment).toURI
   }
 
-  /** Type class of {@code java.net.URL}. */
-  implicit class URLType(val url: URL) extends AnyVal {
+  /** Adds HTTP related extension methods to {@code java.net.URL}. */
+  implicit class HttpUrlType(val url: URL) extends AnyVal {
     /** Gets the query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
       QueryParams.parse(url.getQuery)

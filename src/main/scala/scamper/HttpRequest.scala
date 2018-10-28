@@ -16,7 +16,7 @@
 package scamper
 
 import java.net.URI
-import scamper.extensions.URIType
+import scamper.ImplicitExtensions.HttpUriType
 
 /**
  * HTTP request
