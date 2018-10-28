@@ -43,19 +43,6 @@ object PragmaDirective {
   private val syntax2 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val syntax3 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*"([^"]*)"\s*""".r
 
-  /** Creates PragmaDirective with supplied name and value. */
-  def apply(name: String, value: Option[String] = None): PragmaDirective =
-    Token(name.toLowerCase).map {
-      case "no-cache" => `no-cache`
-      case token      => PragmaDirectiveImpl(token, value)
-    } getOrElse {
-      throw new IllegalArgumentException(s"Invalid pragma directive name: $name")
-    }
-
-  /** Destructures PragmaDirective. */
-  def unapply(directive: PragmaDirective): Option[(String, Option[String])] =
-    Some(directive.name -> directive.value)
-
   /** Parse formatted pragma directive. */
   def parse(directive: String): PragmaDirective =
     directive match {
@@ -68,6 +55,19 @@ object PragmaDirective {
   /** Parse formatted list of pragma directives. */
   def parseAll(directives: String): Seq[PragmaDirective] =
     ListParser(directives).map(parse)
+
+  /** Creates PragmaDirective with supplied name and value. */
+  def apply(name: String, value: Option[String] = None): PragmaDirective =
+    Token(name.toLowerCase).map {
+      case "no-cache" => `no-cache`
+      case token      => PragmaDirectiveImpl(token, value)
+    } getOrElse {
+      throw new IllegalArgumentException(s"Invalid pragma directive name: $name")
+    }
+
+  /** Destructures PragmaDirective. */
+  def unapply(directive: PragmaDirective): Option[(String, Option[String])] =
+    Some(directive.name -> directive.value)
 }
 
 private case class PragmaDirectiveImpl(name: String, value: Option[String]) extends PragmaDirective

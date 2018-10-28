@@ -38,18 +38,6 @@ trait LinkValue {
 object LinkValue {
   private val syntax = """\s*<([^,<>"]+)>\s*(;.+)?\s*""".r
 
-  /** Creates LinkValue with supplied values. */
-  def apply(ref: String, params: (String, Option[String])*): LinkValue =
-    LinkValueImpl(ref, params.toMap)
-
-  /** Creates LinkValue with supplied values. */
-  def apply(ref: String, params: Map[String, Option[String]]): LinkValue =
-    LinkValueImpl(ref, params)
-
-  /** Destructures LinkValue. */
-  def unapply(link: LinkValue): Option[(String, Map[String, Option[String]])] =
-    Some((link.ref, link.params))
-
   /** Parses formatted link. */
   def parse(link: String): LinkValue =
     link match {
@@ -61,6 +49,18 @@ object LinkValue {
   /** Parses formatted list of links. */
   def parseAll(links: String): Seq[LinkValue] =
     ListParser(links).map(parse)
+
+  /** Creates LinkValue with supplied values. */
+  def apply(ref: String, params: (String, Option[String])*): LinkValue =
+    LinkValueImpl(ref, params.toMap)
+
+  /** Creates LinkValue with supplied values. */
+  def apply(ref: String, params: Map[String, Option[String]]): LinkValue =
+    LinkValueImpl(ref, params)
+
+  /** Destructures LinkValue. */
+  def unapply(link: LinkValue): Option[(String, Map[String, Option[String]])] =
+    Some((link.ref, link.params))
 }
 
 private case class LinkValueImpl(ref: String, params: Map[String, Option[String]]) extends LinkValue

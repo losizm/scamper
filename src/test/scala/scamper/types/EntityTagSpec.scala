@@ -19,13 +19,13 @@ import org.scalatest.FlatSpec
 
 class EntityTagSpec extends FlatSpec {
   "EntityTag" should "be created" in {
-    var tag = EntityTag("\"abc\"")
+    var tag = EntityTag.parse("\"abc\"")
     assert(tag.opaque == "\"abc\"")
     assert(!tag.weak)
     assert(tag.toString == "\"abc\"")
     assert(tag == EntityTag("\"abc\"", false))
 
-    tag = EntityTag("W/\"xyz\"")
+    tag = EntityTag.parse("W/\"xyz\"")
     assert(tag.opaque == "\"xyz\"")
     assert(tag.weak)
     assert(tag.toString == "W/\"xyz\"")
@@ -33,18 +33,18 @@ class EntityTagSpec extends FlatSpec {
   }
 
   it should "be destructured" in {
-    EntityTag("\"abc\"") match {
+    EntityTag.parse("\"abc\"") match {
       case EntityTag(opaque, weak) => assert(opaque == "\"abc\"" && !weak)
     }
 
-    EntityTag("W/\"xyz\"") match {
+    EntityTag.parse("W/\"xyz\"") match {
       case EntityTag(opaque, weak) => assert(opaque == "\"xyz\"" && weak)
     }
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](EntityTag("w/\"abc\""))
-    assertThrows[IllegalArgumentException](EntityTag("abc"))
-    assertThrows[IllegalArgumentException](EntityTag("\"abc\"xyz\""))
+    assertThrows[IllegalArgumentException](EntityTag.parse("w/\"abc\""))
+    assertThrows[IllegalArgumentException](EntityTag.parse("abc"))
+    assertThrows[IllegalArgumentException](EntityTag.parse("\"abc\"xyz\""))
   }
 }

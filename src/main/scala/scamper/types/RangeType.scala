@@ -60,7 +60,7 @@ object ByteRange {
   private val suffix = """-(\d+)?""".r
 
   /** Parses formatted byte range. */
-  def apply(range: String): ByteRange =
+  def parse(range: String): ByteRange =
     range match {
       case syntax(set) => ByteRangeImpl(parseSet(set))
       case _ => throw new IllegalArgumentException(s"Malformed byte range: $range")

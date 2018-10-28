@@ -100,7 +100,7 @@ private class TextBodyParser(maxLength: Int) extends BodyParser[String] {
 
   def parse(message: HttpMessage): String =
     message.getHeaderValue("Content-Type")
-      .map(MediaType.apply)
+      .map(MediaType.parse)
       .flatMap(_.params.get("charset"))
       .orElse(Some("UTF-8"))
       .map(new String(bodyParser.parse(message), _)).get

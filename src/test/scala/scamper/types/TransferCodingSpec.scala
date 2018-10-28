@@ -19,13 +19,13 @@ import org.scalatest.FlatSpec
 
 class TransferCodingSpec extends FlatSpec {
   "TransferCoding" should "be created without parameters" in {
-    var coding = TransferCoding("CHUNKED")
+    var coding = TransferCoding.parse("CHUNKED")
     assert(coding.name == "chunked")
     assert(coding.isChunked)
     assert(coding.params.isEmpty)
     assert(coding.toString == "chunked")
 
-    coding = TransferCoding("GZIP")
+    coding = TransferCoding.parse("GZIP")
     assert(coding.name == "gzip")
     assert(coding.isGzip)
     assert(coding.params.isEmpty)
@@ -33,13 +33,13 @@ class TransferCodingSpec extends FlatSpec {
   }
 
   it should "be created with parameters" in {
-    var coding = TransferCoding("CHUNKED; q=0.1")
+    var coding = TransferCoding.parse("CHUNKED; q=0.1")
     assert(coding.name == "chunked")
     assert(coding.isChunked)
     assert(coding.params("q").equals("0.1"))
     assert(coding.toString == "chunked; q=0.1")
 
-    coding = TransferCoding("""GZIP; q=0.1; level="1 2 3" """)
+    coding = TransferCoding.parse("""GZIP; q=0.1; level="1 2 3" """)
     assert(coding.name == "gzip")
     assert(coding.isGzip)
     assert(coding.params("q").equals("0.1"))
@@ -48,7 +48,7 @@ class TransferCodingSpec extends FlatSpec {
   }
 
   it should "be destructured" in {
-    val coding = TransferCoding("""Deflate; a=1; b=two; c="x y z" """)
+    val coding = TransferCoding.parse("""Deflate; a=1; b=two; c="x y z" """)
 
     coding match {
       case TransferCoding(name, params) =>
@@ -58,8 +58,8 @@ class TransferCodingSpec extends FlatSpec {
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](TransferCoding("chunked; q"))
-    assertThrows[IllegalArgumentException](TransferCoding("chunked; q="))
-    assertThrows[IllegalArgumentException](TransferCoding("chunked; =0.1"))
+    assertThrows[IllegalArgumentException](TransferCoding.parse("chunked; q"))
+    assertThrows[IllegalArgumentException](TransferCoding.parse("chunked; q="))
+    assertThrows[IllegalArgumentException](TransferCoding.parse("chunked; =0.1"))
   }
 }

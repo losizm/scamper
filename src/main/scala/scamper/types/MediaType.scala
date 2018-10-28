@@ -67,7 +67,7 @@ trait MediaType {
 /** MediaType factory */
 object MediaType {
   /** Parses formatted media type. */
-  def apply(mediaType: String): MediaType =
+  def parse(mediaType: String): MediaType =
     ParseMediaType(mediaType) match {
       case (mainType, subtype, params) => apply(mainType, subtype, params)
     }

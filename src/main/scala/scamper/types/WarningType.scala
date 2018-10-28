@@ -46,14 +46,6 @@ trait WarningType {
 object WarningType {
   private val syntax = """\s*(\d{3})\s*([\p{Graph}&&[^",]]+)\s*"([^"]*)"\s*(?:"([\w, :+-]+)")?\s*""".r
 
-  /** Creates WarningType with supplied values. */
-  def apply(code: Int, agent: String, text: String, date: Option[OffsetDateTime] = None): WarningType =
-    WarningTypeImpl(code, agent, text, date)
-
-  /** Destructures WarningType. */
-  def unapply(warning: WarningType): Option[(Int, String, String, Option[OffsetDateTime])] =
-    Some((warning.code, warning.agent, warning.text, warning.date))
-
   /** Parses formatted warning. */
   def parse(warning: String): WarningType =
     warning match {
@@ -65,6 +57,14 @@ object WarningType {
   /** Parses formatted list of warnings. */
   def parseAll(warnings: String): Seq[WarningType] =
     ListParser(warnings).map(parse)
+
+  /** Creates WarningType with supplied values. */
+  def apply(code: Int, agent: String, text: String, date: Option[OffsetDateTime] = None): WarningType =
+    WarningTypeImpl(code, agent, text, date)
+
+  /** Destructures WarningType. */
+  def unapply(warning: WarningType): Option[(Int, String, String, Option[OffsetDateTime])] =
+    Some((warning.code, warning.agent, warning.text, warning.date))
 }
 
 private case class WarningTypeImpl(code: Int, agent: String, text: String, date: Option[OffsetDateTime]) extends WarningType

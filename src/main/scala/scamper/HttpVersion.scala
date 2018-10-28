@@ -34,7 +34,7 @@ object HttpVersion {
   private val syntax = """(\d+)(?:\.(\d+))?""".r
 
   /** Parses formatted HTTP version. */
-  def apply(version: String): HttpVersion =
+  def parse(version: String): HttpVersion =
     Try {
       version match {
         case syntax(major, null)  => HttpVersionImpl(major.toInt, 0)

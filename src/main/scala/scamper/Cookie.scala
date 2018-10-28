@@ -48,16 +48,16 @@ trait PlainCookie extends Cookie {
 
 /** PlainCookie factory */
 object PlainCookie {
-  /** Creates PlainCookie with supplied name-value pair. */
-  def apply(name: String, value: String): PlainCookie =
-    PlainCookieImpl(Name(name), Value(value))
-
   /** Parses formatted cookie. */
-  def apply(cookie: String): PlainCookie =
+  def parse(cookie: String): PlainCookie =
     cookie.split("=", 2) match {
       case Array(name, value) => apply(name.trim, value.trim)
       case _ => throw new IllegalArgumentException(s"Malformed cookie: $cookie")
     }
+
+  /** Creates PlainCookie with supplied name-value pair. */
+  def apply(name: String, value: String): PlainCookie =
+    PlainCookieImpl(Name(name), Value(value))
 
   /** Destructures PlainCookie. */
   def unapply(cookie: PlainCookie): Option[(String, String)] =
@@ -116,13 +116,8 @@ trait SetCookie extends Cookie {
 
 /** SetCookie factory */
 object SetCookie {
-  /** Creates SetCookie with supplied name, value, and attributes. */
-  def apply(name: String, value: String, domain: Option[String] = None, path: Option[String] = None, expires: Option[OffsetDateTime] = None,
-      maxAge: Option[Long] = None, secure: Boolean = false, httpOnly: Boolean = false): SetCookie =
-    SetCookieImpl(Name(name), Value(value), CookieAttributes(domain, path, expires, maxAge, secure, httpOnly))
-
   /** Parses formatted cookie. */
-  def apply(cookie: String): SetCookie =
+  def parse(cookie: String): SetCookie =
     cookie.split(";", 2) match {
       case Array(pair, attribs) =>
         pair.split("=") match {
@@ -133,6 +128,11 @@ object SetCookie {
           case Array(name, value) => SetCookieImpl(Name(name), Value(value), CookieAttributes())
         }
     }
+
+  /** Creates SetCookie with supplied name, value, and attributes. */
+  def apply(name: String, value: String, domain: Option[String] = None, path: Option[String] = None, expires: Option[OffsetDateTime] = None,
+      maxAge: Option[Long] = None, secure: Boolean = false, httpOnly: Boolean = false): SetCookie =
+    SetCookieImpl(Name(name), Value(value), CookieAttributes(domain, path, expires, maxAge, secure, httpOnly))
 
   /** Destructures SetCookie. */
   def unapply(cookie: SetCookie): Option[(String, String, Option[String], Option[String], Option[OffsetDateTime], Option[Long], Boolean, Boolean)] =

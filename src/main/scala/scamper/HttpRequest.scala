@@ -122,7 +122,7 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
   lazy val cookies: Seq[PlainCookie] =
     getHeaderValue("Cookie")
       .map(ListParser(_, semicolon = true))
-      .map(_.map(PlainCookie(_)).toSeq)
+      .map(_.map(PlainCookie.parse).toSeq)
       .getOrElse(Nil)
 
   def getQueryParamValue(name: String): Option[String] =

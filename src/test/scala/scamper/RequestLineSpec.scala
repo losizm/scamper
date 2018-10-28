@@ -20,30 +20,30 @@ import scamper.RequestMethods._
 
 class RequestLineSpec extends FlatSpec {
   "RequestLine" should "be created" in {
-    var request = RequestLine("GET / HTTP/1.1")
+    var request = RequestLine.parse("GET / HTTP/1.1")
     assert(request.method == GET)
     assert(request.uri == "/")
-    assert(request.version == HttpVersion("1.1"))
+    assert(request.version == HttpVersion(1, 1))
 
-    request = RequestLine("GET /index.html HTTP/1.1")
+    request = RequestLine.parse("GET /index.html HTTP/1.1")
     assert(request.method == GET)
     assert(request.uri == "/index.html")
-    assert(request.version == HttpVersion("1.1"))
+    assert(request.version == HttpVersion(1, 1))
 
-    request = RequestLine("GET /index.html?offset=25&limit=5 HTTP/1.1")
+    request = RequestLine.parse("GET /index.html?offset=25&limit=5 HTTP/1.1")
     assert(request.method == GET)
     assert(request.uri == "/index.html?offset=25&limit=5")
-    assert(request.version == HttpVersion("1.1"))
+    assert(request.version == HttpVersion(1, 1))
 
-    request = RequestLine("POST https://localhost:8787/admin/user/create HTTP/1.1")
+    request = RequestLine.parse("POST https://localhost:8787/admin/user/create HTTP/1.1")
     assert(request.method == POST)
     assert(request.uri == "https://localhost:8787/admin/user/create")
-    assert(request.version == HttpVersion("1.1"))
+    assert(request.version == HttpVersion(1, 1))
   }
 
   it should "not be created" in {
-    assertThrows[IllegalArgumentException](RequestLine("GET"))
-    assertThrows[IllegalArgumentException](RequestLine("GET /index.html"))
-    assertThrows[IllegalArgumentException](RequestLine("GET HTTP/1.1"))
+    assertThrows[IllegalArgumentException](RequestLine.parse("GET"))
+    assertThrows[IllegalArgumentException](RequestLine.parse("GET /index.html"))
+    assertThrows[IllegalArgumentException](RequestLine.parse("GET HTTP/1.1"))
   }
 }

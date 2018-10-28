@@ -19,14 +19,14 @@ import org.scalatest.FlatSpec
 
 class TransferCodingRangeSpec extends FlatSpec {
   "TransferCodingRange" should "be created without parameters" in {
-    var range = TransferCodingRange("CHUNKED; q=1.0")
+    var range = TransferCodingRange.parse("CHUNKED; q=1.0")
     assert(range.name == "chunked")
     assert(range.isChunked)
     assert(range.rank == 1.0f)
     assert(range.params.isEmpty)
     assert(range.toString == "chunked")
 
-    range = TransferCodingRange("X-GZIP; q=0.7")
+    range = TransferCodingRange.parse("X-GZIP; q=0.7")
     assert(range.name == "gzip")
     assert(range.isGzip)
     assert(range.rank == 0.7f)
@@ -35,14 +35,14 @@ class TransferCodingRangeSpec extends FlatSpec {
   }
 
   it should "be created with parameters" in {
-    var range = TransferCodingRange("CHUNKED; x=abc")
+    var range = TransferCodingRange.parse("CHUNKED; x=abc")
     assert(range.name == "chunked")
     assert(range.isChunked)
     assert(range.rank == 1.0f)
     assert(range.params("x") == "abc")
     assert(range.toString == "chunked; x=abc")
 
-    range = TransferCodingRange("""GZIP; q=0.1; level="1 2 3" """)
+    range = TransferCodingRange.parse("""GZIP; q=0.1; level="1 2 3" """)
     assert(range.name == "gzip")
     assert(range.isGzip)
     assert(range.rank == 0.1f)
@@ -51,21 +51,21 @@ class TransferCodingRangeSpec extends FlatSpec {
   }
 
   it should "match TransferCoding" in {
-    assert(TransferCodingRange("chunked; q=1.0; x=0").matches(TransferCoding("chunked; x=0; y=1")))
-    assert(TransferCodingRange("chunked; q=1.0; x=0; y=1").matches(TransferCoding("chunked; x=0; y=1")))
-    assert(TransferCodingRange("gzip").matches(TransferCoding("gzip")))
-    assert(TransferCodingRange("gzip").matches(TransferCoding("gzip; x=0")))
+    assert(TransferCodingRange.parse("chunked; q=1.0; x=0").matches(TransferCoding.parse("chunked; x=0; y=1")))
+    assert(TransferCodingRange.parse("chunked; q=1.0; x=0; y=1").matches(TransferCoding.parse("chunked; x=0; y=1")))
+    assert(TransferCodingRange.parse("gzip").matches(TransferCoding.parse("gzip")))
+    assert(TransferCodingRange.parse("gzip").matches(TransferCoding.parse("gzip; x=0")))
   }
 
   it should "not match TransferCoding" in {
-    assert(!TransferCodingRange("chunked; q=1.0; x=0").matches(TransferCoding("chunked; y=1")))
-    assert(!TransferCodingRange("chunked; q=1.0; x=0; y=1").matches(TransferCoding("chunked; x=0")))
-    assert(!TransferCodingRange("gzip; y=1").matches(TransferCoding("gzip; x=0")))
-    assert(!TransferCodingRange("gzip; y=1").matches(TransferCoding("gzip")))
+    assert(!TransferCodingRange.parse("chunked; q=1.0; x=0").matches(TransferCoding.parse("chunked; y=1")))
+    assert(!TransferCodingRange.parse("chunked; q=1.0; x=0; y=1").matches(TransferCoding.parse("chunked; x=0")))
+    assert(!TransferCodingRange.parse("gzip; y=1").matches(TransferCoding.parse("gzip; x=0")))
+    assert(!TransferCodingRange.parse("gzip; y=1").matches(TransferCoding.parse("gzip")))
   }
 
   it should "be destructured" in {
-    val range = TransferCodingRange("""Deflate; a=1; b=two; c="x y z" """)
+    val range = TransferCodingRange.parse("""Deflate; a=1; b=two; c="x y z" """)
 
     range match {
       case TransferCodingRange(name, rank, params) =>
@@ -76,8 +76,8 @@ class TransferCodingRangeSpec extends FlatSpec {
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](TransferCodingRange("chunked; q"))
-    assertThrows[IllegalArgumentException](TransferCodingRange("chunked; q="))
-    assertThrows[IllegalArgumentException](TransferCodingRange("chunked; =0.1"))
+    assertThrows[IllegalArgumentException](TransferCodingRange.parse("chunked; q"))
+    assertThrows[IllegalArgumentException](TransferCodingRange.parse("chunked; q="))
+    assertThrows[IllegalArgumentException](TransferCodingRange.parse("chunked; =0.1"))
   }
 }

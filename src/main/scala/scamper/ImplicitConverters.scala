@@ -21,7 +21,7 @@ import java.time.OffsetDateTime
 /** Contains implicit converter functions. */
 object ImplicitConverters {
   /** Converts string to [[Header]]. */
-  implicit val stringToHeader = (header: String) => Header(header)
+  implicit val stringToHeader = (header: String) => Header.parse(header)
 
   /** Converts tuple to [[Header]] where tuple is key-value pair. */
   implicit val tupleToHeader = (header: (String, String)) => Header(header._1, header._2)

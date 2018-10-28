@@ -58,7 +58,7 @@ object ContentCodingRange {
   private val syntax = """([^\s;=]+)(?:\s*;\s*q\s*=\s*(\d+(?:\.\d*)?))?""".r
 
   /** Parses formatted content coding range. */
-  def apply(range: String): ContentCodingRange =
+  def parse(range: String): ContentCodingRange =
     range match {
       case syntax(name, null) => apply(name, 1.0f)
       case syntax(name, weight) => apply(name, weight.toFloat)

@@ -42,7 +42,7 @@ trait ContentDispositionType {
 /** ContentDispositionType factory */
 object ContentDispositionType {
   /** Parses formatted content disposition type and optional parameters. */
-  def apply(disposition: String): ContentDispositionType =
+  def parse(disposition: String): ContentDispositionType =
     ParseContentDisposition(disposition) match {
       case (name, params) => apply(name, params)
     }

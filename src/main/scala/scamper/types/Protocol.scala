@@ -39,7 +39,7 @@ object Protocol {
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)(?:/([\w!#$%&'*+.^`|~-]+))?\s*""".r
 
   /** Parses formatted protocol. */
-  def apply(protocol: String): Protocol =
+  def parse(protocol: String): Protocol =
     protocol match {
       case syntax(name, version) => ProtocolImpl(name, Option(version))
       case _ => throw new IllegalArgumentException(s"Malformed protocol: $protocol")

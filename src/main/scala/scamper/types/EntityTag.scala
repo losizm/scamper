@@ -41,7 +41,7 @@ object EntityTag {
   private val syntax = """\s*(W/)?("[^"]*")\s*""".r
 
   /** Parse formatted entity tag. */
-  def apply(tag: String): EntityTag =
+  def parse(tag: String): EntityTag =
     tag match {
       case syntax(weak, opaque) => EntityTagImpl(opaque, weak != null)
       case _ => throw new IllegalArgumentException(s"Malformed entity tag: $tag")

@@ -19,7 +19,7 @@ import org.scalatest.FlatSpec
 
 class MediaTypeSpec extends FlatSpec {
   "MediaType" should "be created without parameters" in {
-    val contentType = MediaType("text/html")
+    val contentType = MediaType.parse("text/html")
     assert(contentType.mainType == "text")
     assert(contentType.subtype == "html")
     assert(contentType.isText)
@@ -27,7 +27,7 @@ class MediaTypeSpec extends FlatSpec {
   }
 
   it should "be created with parameters" in {
-    var contentType = MediaType("text/html; charset=iso-8859-1")
+    var contentType = MediaType.parse("text/html; charset=iso-8859-1")
     assert(contentType.mainType == "text")
     assert(contentType.subtype == "html")
     assert(contentType.params("charset") == "iso-8859-1")
@@ -51,7 +51,7 @@ class MediaTypeSpec extends FlatSpec {
   }
 
   it should "be destructured" in {
-    val contentType = MediaType("text/html; charset=iso-8859-1")
+    val contentType = MediaType.parse("text/html; charset=iso-8859-1")
 
     contentType match {
       case MediaType(mainType, subtype, params) =>
@@ -62,9 +62,9 @@ class MediaTypeSpec extends FlatSpec {
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](MediaType("(text)/html"))
-    assertThrows[IllegalArgumentException](MediaType("text/(html)"))
-    assertThrows[IllegalArgumentException](MediaType("text/html; charset"))
-    assertThrows[IllegalArgumentException](MediaType("text/html; charset=iso 8859 1"))
+    assertThrows[IllegalArgumentException](MediaType.parse("(text)/html"))
+    assertThrows[IllegalArgumentException](MediaType.parse("text/(html)"))
+    assertThrows[IllegalArgumentException](MediaType.parse("text/html; charset"))
+    assertThrows[IllegalArgumentException](MediaType.parse("text/html; charset=iso 8859 1"))
   }
 }

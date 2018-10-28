@@ -63,7 +63,7 @@ trait TransferCodingRange {
 /** TransferCodingRange factory */
 object TransferCodingRange {
   /** Parses formatted transfer coding range. */
-  def apply(range: String): TransferCodingRange =
+  def parse(range: String): TransferCodingRange =
     ParseTransferCoding(range) match {
       case (name, params) =>
         params.collectFirst {

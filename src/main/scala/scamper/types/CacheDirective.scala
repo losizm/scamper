@@ -43,6 +43,19 @@ object CacheDirective {
   private val syntax2 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val syntax3 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*"([^"]*)"\s*""".r
 
+  /** Parse formatted cache directive. */
+  def parse(directive: String): CacheDirective =
+    directive match {
+      case syntax1(name) => apply(name)
+      case syntax2(name, value) => apply(name, Some(value))
+      case syntax3(name, value) => apply(name, Some(value))
+      case _ => throw new IllegalArgumentException(s"Malformed cache directive: $directive")
+    }
+
+  /** Parse formatted list of cache directives. */
+  def parseAll(directives: String): Seq[CacheDirective] =
+    ListParser(directives).map(parse)
+
   /** Creates CacheDirective with supplied name and value. */
   def apply(name: String, value: Option[String] = None): CacheDirective =
     Token(name.toLowerCase) map {
@@ -68,19 +81,6 @@ object CacheDirective {
   /** Destructures CacheDirective. */
   def unapply(directive: CacheDirective): Option[(String, Option[String])] =
     Some(directive.name -> directive.value)
-
-  /** Parse formatted cache directive. */
-  def parse(directive: String): CacheDirective =
-    directive match {
-      case syntax1(name) => apply(name)
-      case syntax2(name, value) => apply(name, Some(value))
-      case syntax3(name, value) => apply(name, Some(value))
-      case _ => throw new IllegalArgumentException(s"Malformed cache directive: $directive")
-    }
-
-  /** Parse formatted list of cache directives. */
-  def parseAll(directives: String): Seq[CacheDirective] =
-    ListParser(directives).map(parse)
 }
 
 private case class CacheDirectiveImpl(name: String, value: Option[String]) extends CacheDirective

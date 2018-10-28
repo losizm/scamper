@@ -48,7 +48,7 @@ trait TransferCoding {
 /** TransferCoding factory */
 object TransferCoding {
   /** Parses formatted transfer coding. */
-  def apply(coding: String): TransferCoding =
+  def parse(coding: String): TransferCoding =
     ParseTransferCoding(coding) match {
       case (name, params) => apply(name, params)
     }

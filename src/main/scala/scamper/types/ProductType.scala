@@ -39,16 +39,16 @@ trait ProductType {
 object ProductType {
   private val syntax = """([\w!#$%&'*+.^`|~-]+)(?:/([\w!#$%&'*+.^`|~-]+))?(?:\s+\(.*\)\s*)?""".r
 
-  /** Parses formatted list of products. */
-  def parseAll(products: String): Seq[ProductType] =
-    syntax.findAllIn(products).map(apply).toSeq
-
   /** Parses formatted product. */
-  def apply(product: String): ProductType =
+  def parse(product: String): ProductType =
     product match {
       case syntax(name, version) => ProductTypeImpl(name, Option(version))
       case _ => throw new IllegalArgumentException(s"Malformed product: $product")
     }
+
+  /** Parses formatted list of products. */
+  def parseAll(products: String): Seq[ProductType] =
+    syntax.findAllIn(products).map(parse).toSeq
 
   /** Creates ProductType with supplied values. */
   def apply(name: String, version: Option[String]): ProductType =

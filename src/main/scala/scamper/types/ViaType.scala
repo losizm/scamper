@@ -41,14 +41,6 @@ trait ViaType {
 object ViaType {
   private val syntax = """\s*(?:([\w!#$%&'*+.^`|~-]+)/)?([\w!#$%&'*+.^`|~-]+)\s+([\w!#$%&'*+.:^`|~-]+)(?:\s+\(\s*(.*?)\s*\))?\s*""".r
 
-  /** Creates ViaType with supplied values. */
-  def apply(protocol: Protocol, by: String, comment: Option[String] = None): ViaType =
-    ViaTypeImpl(protocol, by, comment.map(_.trim))
-
-  /** Destructures ViaType. */
-  def unapply(via: ViaType): Option[(Protocol, String, Option[String])] =
-    Some((via.protocol, via.by, via.comment))
-
   /** Parses formatted via. */
   def parse(via: String): ViaType =
     via match {
@@ -60,6 +52,14 @@ object ViaType {
   /** Parses formatted list of vias. */
   def parseAll(vias: String): Seq[ViaType] =
     ListParser(vias).map(parse)
+
+  /** Creates ViaType with supplied values. */
+  def apply(protocol: Protocol, by: String, comment: Option[String] = None): ViaType =
+    ViaTypeImpl(protocol, by, comment.map(_.trim))
+
+  /** Destructures ViaType. */
+  def unapply(via: ViaType): Option[(Protocol, String, Option[String])] =
+    Some((via.protocol, via.by, via.comment))
 }
 
 private case class ViaTypeImpl(protocol: Protocol, by: String, comment: Option[String]) extends ViaType

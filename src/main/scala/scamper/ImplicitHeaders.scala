@@ -34,8 +34,8 @@ object ImplicitHeaders {
     /** Gets Accept header values if present. */
     def getAccept: Option[Seq[MediaRange]] =
       request.getHeaderValue("Accept")
-        .map(ListParser(_))
-        .map(_.map(MediaRange(_)))
+        .map(ListParser.apply)
+        .map(_.map(MediaRange.parse))
 
     /** Creates new request setting Accept header to supplied values. */
     def withAccept(values: MediaRange*): T#MessageType =
@@ -59,8 +59,8 @@ object ImplicitHeaders {
     /** Gets Accept-Charset header values if present. */
     def getAcceptCharset: Option[Seq[CharsetRange]] =
       request.getHeaderValue("Accept-Charset")
-        .map(ListParser(_))
-        .map(_.map(CharsetRange(_)))
+        .map(ListParser.apply)
+        .map(_.map(CharsetRange.parse))
 
     /** Creates new request setting Accept-Charset header to supplied values. */
     def withAcceptCharset(values: CharsetRange*): T#MessageType =
@@ -84,8 +84,8 @@ object ImplicitHeaders {
     /** Gets Accept-Encoding header values if present. */
     def getAcceptEncoding: Option[Seq[ContentCodingRange]] =
       request.getHeaderValue("Accept-Encoding")
-        .map(ListParser(_))
-        .map(_.map(ContentCodingRange(_)))
+        .map(ListParser.apply)
+        .map(_.map(ContentCodingRange.parse))
 
     /**
      * Creates new request setting Accept-Encoding header to supplied values.
@@ -111,8 +111,8 @@ object ImplicitHeaders {
     /** Gets Accept-Language header values if present. */
     def getAcceptLanguage: Option[Seq[LanguageRange]] =
       request.getHeaderValue("Accept-Language")
-        .map(ListParser(_))
-        .map(_.map(LanguageRange(_)))
+        .map(ListParser.apply)
+        .map(_.map(LanguageRange.parse))
 
     /**
      * Creates new request setting Accept-Language header to supplied values.
@@ -138,8 +138,8 @@ object ImplicitHeaders {
     /** Gets Accept-Patch header values if present. */
     def getAcceptPatch: Option[Seq[MediaType]] =
       response.getHeaderValue("Accept-Patch")
-        .map(ListParser(_))
-        .map(_.map(MediaType(_)))
+        .map(ListParser.apply)
+        .map(_.map(MediaType.parse))
 
     /** Creates new response setting Accept-Patch header to supplied values. */
     def withAcceptPatch(values: MediaType*): T#MessageType =
@@ -162,7 +162,7 @@ object ImplicitHeaders {
 
     /** Gets Accept-Ranges header values if present. */
     def getAcceptRanges: Option[Seq[String]] =
-      response.getHeaderValue("Accept-Ranges").map(ListParser(_))
+      response.getHeaderValue("Accept-Ranges").map(ListParser.apply)
 
     /** Creates new response setting Accept-Ranges header to supplied values. */
     def withAcceptRanges(values: String*): T#MessageType =
@@ -209,8 +209,8 @@ object ImplicitHeaders {
     /** Gets Allow header values if present. */
     def getAllow: Option[Seq[RequestMethod]] =
       response.getHeaderValue("Allow")
-        .map(ListParser(_))
-        .map(_.map(RequestMethod(_)))
+        .map(ListParser.apply)
+        .map(_.map(RequestMethod.apply))
 
     /** Creates new response setting Allow header to supplied values. */
     def withAllow(values: RequestMethod*): T#MessageType =
@@ -305,7 +305,7 @@ object ImplicitHeaders {
 
     /** Gets Content-Disposition header value if present. */
     def getContentDisposition: Option[ContentDispositionType] =
-      response.getHeaderValue("Content-Disposition").map(ContentDispositionType(_))
+      response.getHeaderValue("Content-Disposition").map(ContentDispositionType.parse)
 
     /**
      * Creates new response setting Content-Disposition header to supplied
@@ -332,8 +332,8 @@ object ImplicitHeaders {
     /** Gets Content-Encoding header values if present. */
     def getContentEncoding: Option[Seq[ContentCoding]] =
       message.getHeaderValue("Content-Encoding")
-        .map(ListParser(_))
-        .map(_.map(ContentCoding(_)))
+        .map(ListParser.apply)
+        .map(_.map(ContentCoding.apply))
 
     /**
      * Creates new message setting Content-Encoding header to supplied values.
@@ -359,8 +359,8 @@ object ImplicitHeaders {
     /** Gets Content-Language header values if present. */
     def getContentLanguage: Option[Seq[LanguageTag]] =
       message.getHeaderValue("Content-Language")
-        .map(ListParser(_))
-        .map(_.map(LanguageTag(_)))
+        .map(ListParser.apply)
+        .map(_.map(LanguageTag.parse))
 
     /** Creates new message setting Content-Language header to supplied values. */
     def withContentLanguage(values: LanguageTag*): T#MessageType =
@@ -431,7 +431,7 @@ object ImplicitHeaders {
 
     /** Gets Content-Range header value if present. */
     def getContentRange: Option[ByteContentRange] =
-      message.getHeaderValue("Content-Range").map(ByteContentRange(_))
+      message.getHeaderValue("Content-Range").map(ByteContentRange.parse)
 
     /** Creates new message setting Content-Range header to supplied value. */
     def withContentRange(value: ByteContentRange): T#MessageType =
@@ -454,7 +454,7 @@ object ImplicitHeaders {
 
     /** Gets Content-Type header value if present. */
     def getContentType: Option[MediaType] =
-      message.getHeaderValue("Content-Type").map(MediaType(_))
+      message.getHeaderValue("Content-Type").map(MediaType.parse)
 
     /** Creates new message setting Content-Type header to supplied value. */
     def withContentType(value: MediaType): T#MessageType =
@@ -523,7 +523,7 @@ object ImplicitHeaders {
 
     /** Gets ETag header value if present. */
     def getETag: Option[EntityTag] =
-      response.getHeaderValue("ETag").map(EntityTag(_))
+      response.getHeaderValue("ETag").map(EntityTag.parse)
 
     /** Creates new response setting ETag header to supplied value. */
     def withETag(value: EntityTag): T#MessageType =
@@ -638,7 +638,7 @@ object ImplicitHeaders {
 
     /** Gets If-Match header value if present. */
     def getIfMatch: Option[EntityTag] =
-      request.getHeaderValue("If-Match").map(EntityTag(_))
+      request.getHeaderValue("If-Match").map(EntityTag.parse)
 
     /** Creates new request setting If-Match header to supplied value. */
     def withIfMatch(value: EntityTag): T#MessageType =
@@ -684,7 +684,7 @@ object ImplicitHeaders {
 
     /** Gets If-None-Match header value if present. */
     def getIfNoneMatch: Option[EntityTag] =
-      request.getHeaderValue("If-None-Match").map(EntityTag(_))
+      request.getHeaderValue("If-None-Match").map(EntityTag.parse)
 
     /** Creates new request setting If-None-Match header to supplied value. */
     def withIfNoneMatch(value: EntityTag): T#MessageType =
@@ -709,7 +709,7 @@ object ImplicitHeaders {
     def getIfRange: Option[Either[EntityTag, OffsetDateTime]] =
       request.getHeaderValue("If-Range").map { value =>
         Try {
-          Left(EntityTag(value))
+          Left(EntityTag.parse(value))
         }.orElse {
           Try(Right(DateValue.parse(value)))
         }.get
@@ -965,7 +965,7 @@ object ImplicitHeaders {
 
     /** Gets Range header value if present. */
     def getRange: Option[ByteRange] =
-      request.getHeaderValue("Range").map(ByteRange(_))
+      request.getHeaderValue("Range").map(ByteRange.parse)
 
     /** Creates new request setting Range header to supplied value. */
     def withRange(value: ByteRange): T#MessageType =
@@ -1058,8 +1058,8 @@ object ImplicitHeaders {
     /** Gets TE header values if present. */
     def getTE: Option[Seq[TransferCodingRange]] =
       request.getHeaderValue("TE")
-        .map(ListParser(_))
-        .map(_.map(TransferCodingRange(_)))
+        .map(ListParser.apply)
+        .map(_.map(TransferCodingRange.parse))
 
     /** Creates new request setting TE header to supplied values. */
     def withTE(values: TransferCodingRange*): T#MessageType =
@@ -1082,7 +1082,7 @@ object ImplicitHeaders {
 
     /** Gets Trailer header values if present. */
     def getTrailer: Option[Seq[String]] =
-      message.getHeaderValue("Trailer").map(ListParser(_))
+      message.getHeaderValue("Trailer").map(ListParser.apply)
 
     /** Creates new message setting Trailer header to supplied values. */
     def withTrailer(values: String*): T#MessageType =
@@ -1106,8 +1106,8 @@ object ImplicitHeaders {
     /** Gets Transfer-Encoding header values if present. */
     def getTransferEncoding: Option[Seq[TransferCoding]] =
       message.getHeaderValue("Transfer-Encoding")
-        .map(ListParser(_))
-        .map(_.map(TransferCoding(_)))
+        .map(ListParser.apply)
+        .map(_.map(TransferCoding.parse))
 
     /**
      * Creates new message setting Transfer-Encoding header to supplied values.
@@ -1133,8 +1133,8 @@ object ImplicitHeaders {
     /** Gets Upgrade header values if present. */
     def getUpgrade: Option[Seq[Protocol]] =
       request.getHeaderValue("Upgrade")
-        .map(ListParser(_))
-        .map(_.map(Protocol(_)))
+        .map(ListParser.apply)
+        .map(_.map(Protocol.parse))
 
     /** Creates new request setting Upgrade header to supplied values. */
     def withUpgrade(values: Protocol*): T#MessageType =
@@ -1180,7 +1180,7 @@ object ImplicitHeaders {
 
     /** Gets Vary header values if present. */
     def getVary: Option[Seq[String]] =
-      response.getHeaderValue("Vary").map(ListParser(_))
+      response.getHeaderValue("Vary").map(ListParser.apply)
 
     /** Creates new response setting Vary header to supplied values. */
     def withVary(values: String*): T#MessageType =

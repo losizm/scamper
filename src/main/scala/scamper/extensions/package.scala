@@ -217,7 +217,7 @@ package object extensions {
           writeBody(conn, entity)
         }
 
-        val statusLine = StatusLine(conn.getHeaderField(0))
+        val statusLine = StatusLine.parse(conn.getHeaderField(0))
         val response = HttpResponse(statusLine, getHeaders(conn), getBody(conn))
 
         f(response)
@@ -342,7 +342,7 @@ package object extensions {
       val headers = getHeaders(conn, 1, Nil)
 
       if ("chunked".equalsIgnoreCase(conn.getHeaderField("Transfer-Encoding")))
-        headers :+ Header("X-Scamper-Transfer-Decoding: chunked")
+        headers :+ Header.parse("X-Scamper-Transfer-Decoding: chunked")
       else headers
     }
 

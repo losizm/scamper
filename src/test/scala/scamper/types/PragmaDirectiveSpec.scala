@@ -52,7 +52,7 @@ class PragmaDirectiveSpec extends FlatSpec {
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](PragmaDirective("no/cache"))
-    assertThrows[IllegalArgumentException](PragmaDirective("no-cache ="))
+    assertThrows[IllegalArgumentException](PragmaDirective.parse("no/cache"))
+    assertThrows[IllegalArgumentException](PragmaDirective.parse("no-cache ="))
   }
 }

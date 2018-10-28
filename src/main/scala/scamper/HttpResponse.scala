@@ -58,7 +58,7 @@ object HttpResponse {
 }
 
 private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity) extends HttpResponse {
-  lazy val cookies: Seq[SetCookie] = getHeaderValues("Set-Cookie").map(SetCookie(_))
+  lazy val cookies: Seq[SetCookie] = getHeaderValues("Set-Cookie").map(SetCookie.parse)
 
   def withStartLine(line: StatusLine) =
     copy(startLine = line)

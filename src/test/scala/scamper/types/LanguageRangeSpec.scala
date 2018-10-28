@@ -19,37 +19,37 @@ import org.scalatest.FlatSpec
 
 class LanguageRangeSpec extends FlatSpec {
   "LanguageRange" should "be created" in {
-    var range = LanguageRange("en")
+    var range = LanguageRange.parse("en")
     assert(range.tag == "en")
     assert(range.weight == 1f)
     assert(range.toString == "en")
 
-    range = LanguageRange("en; q=0.5")
+    range = LanguageRange.parse("en; q=0.5")
     assert(range.tag == "en")
     assert(range.weight == 0.5f)
     assert(range.toString == "en; q=0.5")
 
-    range = LanguageRange("en-US-1995; q=0.123456789")
+    range = LanguageRange.parse("en-US-1995; q=0.123456789")
     assert(range.tag == "en-US-1995")
     assert(range.weight == 0.123f)
     assert(range.toString == "en-US-1995; q=0.123")
   }
 
   it should "match LanguageTag" in {
-    assert(LanguageRange("en").matches(LanguageTag("EN")))
-    assert(LanguageRange("en; q=0.1").matches(LanguageTag("en-US")))
-    assert(LanguageRange("en-US").matches(LanguageTag("en-US")))
-    assert(LanguageRange("en-US; q=0.5").matches(LanguageTag("en-US-1995")))
+    assert(LanguageRange.parse("en").matches(LanguageTag.parse("EN")))
+    assert(LanguageRange.parse("en; q=0.1").matches(LanguageTag.parse("en-US")))
+    assert(LanguageRange.parse("en-US").matches(LanguageTag.parse("en-US")))
+    assert(LanguageRange.parse("en-US; q=0.5").matches(LanguageTag.parse("en-US-1995")))
   }
 
   it should "not match LanguageTag" in {
-    assert(!LanguageRange("en-US; q=0.1").matches(LanguageTag("en")))
-    assert(!LanguageRange("en-US-1995").matches(LanguageTag("en-US")))
-    assert(!LanguageRange("en").matches(LanguageTag("fr")))
+    assert(!LanguageRange.parse("en-US; q=0.1").matches(LanguageTag.parse("en")))
+    assert(!LanguageRange.parse("en-US-1995").matches(LanguageTag.parse("en-US")))
+    assert(!LanguageRange.parse("en").matches(LanguageTag.parse("fr")))
   }
 
   it should "be destructured" in {
-    val range = LanguageRange("en-US-1995; q=0.6")
+    val range = LanguageRange.parse("en-US-1995; q=0.6")
 
     range match {
       case LanguageRange(tag, weight) =>
@@ -59,7 +59,7 @@ class LanguageRangeSpec extends FlatSpec {
   }
 
   it should "not be created with invalid name" in {
-    assertThrows[IllegalArgumentException](LanguageRange("en-US; q="))
-    assertThrows[IllegalArgumentException](LanguageRange("1995-en-US; q=1.0"))
+    assertThrows[IllegalArgumentException](LanguageRange.parse("en-US; q="))
+    assertThrows[IllegalArgumentException](LanguageRange.parse("1995-en-US; q=1.0"))
   }
 }

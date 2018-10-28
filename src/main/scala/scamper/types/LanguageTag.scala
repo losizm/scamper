@@ -43,7 +43,7 @@ object LanguageTag {
   private val other = "(\\p{Alnum}{1,8})".r
 
   /** Parses formatted language tag. */
-  def apply(tag: String): LanguageTag =
+  def parse(tag: String): LanguageTag =
     tag match {
       case syntax(primary, "")   => apply(primary, Nil)
       case syntax(primary, others) => apply(primary, others.drop(1).split("-").toSeq)

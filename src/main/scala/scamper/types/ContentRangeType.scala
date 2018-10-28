@@ -57,7 +57,7 @@ object ByteContentRange {
   private val unsatisfied = """\*/(\d+)""".r
 
   /** Parses formatted byte content range. */
-  def apply(range: String): ByteContentRange =
+  def parse(range: String): ByteContentRange =
     range match {
       case syntax(resp) => ByteContentRangeImpl(parseResp(resp))
       case _ => throw new IllegalArgumentException(s"Malformed byte content range: $range")

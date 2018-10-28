@@ -19,13 +19,13 @@ import org.scalatest.FlatSpec
 
 class ContentCodingRangeSpec extends FlatSpec {
   "ContentCodingRange" should "be created" in {
-    var range = ContentCodingRange("GZIP; q=0.7")
+    var range = ContentCodingRange.parse("GZIP; q=0.7")
     assert(range.name == "gzip")
     assert(range.isGzip)
     assert(range.weight == 0.7f)
     assert(range.toString == "gzip; q=0.7")
 
-    range = ContentCodingRange("*; q=1.0")
+    range = ContentCodingRange.parse("*; q=1.0")
     assert(range.name == "*")
     assert(range.isWildcard)
     assert(range.weight == 1.0f)
@@ -33,24 +33,24 @@ class ContentCodingRangeSpec extends FlatSpec {
   }
 
   it should "match ContentCoding" in {
-    assert(ContentCodingRange("gzip").matches(ContentCoding("gzip")))
-    assert(ContentCodingRange("gzip; q=0.6").matches(ContentCoding("gzip")))
-    assert(ContentCodingRange("*").matches(ContentCoding("gzip")))
-    assert(ContentCodingRange("*").matches(ContentCoding("deflate")))
-    assert(ContentCodingRange("*").matches(ContentCoding("compress")))
-    assert(ContentCodingRange("*").matches(ContentCoding("identity")))
-    assert(ContentCodingRange("*").matches(ContentCoding("other")))
+    assert(ContentCodingRange.parse("gzip").matches(ContentCoding("gzip")))
+    assert(ContentCodingRange.parse("gzip; q=0.6").matches(ContentCoding("gzip")))
+    assert(ContentCodingRange.parse("*").matches(ContentCoding("gzip")))
+    assert(ContentCodingRange.parse("*").matches(ContentCoding("deflate")))
+    assert(ContentCodingRange.parse("*").matches(ContentCoding("compress")))
+    assert(ContentCodingRange.parse("*").matches(ContentCoding("identity")))
+    assert(ContentCodingRange.parse("*").matches(ContentCoding("other")))
   }
 
   it should "not match ContentCoding" in {
-    assert(!ContentCodingRange("gzip").matches(ContentCoding("compress")))
-    assert(!ContentCodingRange("gzip").matches(ContentCoding("deflate")))
-    assert(!ContentCodingRange("deflate").matches(ContentCoding("gzip")))
-    assert(!ContentCodingRange("deflate").matches(ContentCoding("identity")))
+    assert(!ContentCodingRange.parse("gzip").matches(ContentCoding("compress")))
+    assert(!ContentCodingRange.parse("gzip").matches(ContentCoding("deflate")))
+    assert(!ContentCodingRange.parse("deflate").matches(ContentCoding("gzip")))
+    assert(!ContentCodingRange.parse("deflate").matches(ContentCoding("identity")))
   }
 
   it should "be destructured" in {
-    val range = ContentCodingRange("Deflate; q=0.7")
+    val range = ContentCodingRange.parse("Deflate; q=0.7")
 
     range match {
       case ContentCodingRange(name, weight) =>
@@ -60,8 +60,8 @@ class ContentCodingRangeSpec extends FlatSpec {
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](ContentCodingRange("identity; q"))
-    assertThrows[IllegalArgumentException](ContentCodingRange("identity; q="))
-    assertThrows[IllegalArgumentException](ContentCodingRange("identity; =0.1"))
+    assertThrows[IllegalArgumentException](ContentCodingRange.parse("identity; q"))
+    assertThrows[IllegalArgumentException](ContentCodingRange.parse("identity; q="))
+    assertThrows[IllegalArgumentException](ContentCodingRange.parse("identity; =0.1"))
   }
 }

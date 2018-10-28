@@ -46,7 +46,7 @@ object CharsetRange {
   private val syntax = """([^\s;=]+)(?:\s*;\s*q\s*=\s*(\d+(?:\.\d*)?))?""".r
 
   /** Parses formatted charset range. */
-  def apply(range: String): CharsetRange =
+  def parse(range: String): CharsetRange =
     range match {
       case syntax(charset, null) => apply(charset, 1.0f)
       case syntax(charset, weight) => apply(charset, weight.toFloat)

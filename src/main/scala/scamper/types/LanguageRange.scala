@@ -44,7 +44,7 @@ object LanguageRange {
   private val syntax = """([\w*-]+)(?i:\s*;\s*q=(\d+(?:\.\d*)?))?""".r
 
   /** Parses formatted language range. */
-  def apply(range: String): LanguageRange =
+  def parse(range: String): LanguageRange =
     range match {
       case syntax(tag, null)   => apply(tag, 1.0f)
       case syntax(tag, weight) => apply(tag, weight.toFloat)
@@ -61,7 +61,7 @@ object LanguageRange {
 }
 
 private case class LanguageRangeImpl(tag: String, weight: Float) extends LanguageRange {
-  private val languageTag = if (tag == "*") None else Some(LanguageTag(tag))
+  private val languageTag = if (tag == "*") None else Some(LanguageTag.parse(tag))
 
   def matches(that: LanguageTag): Boolean =
     languageTag.forall { tag =>

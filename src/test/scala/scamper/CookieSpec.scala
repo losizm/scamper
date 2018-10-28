@@ -20,7 +20,7 @@ import org.scalatest.FlatSpec
 
 class CookieSpec extends FlatSpec {
   "PlainCookie" should "be created from formatted value" in {
-    val cookie = PlainCookie("SID=31d4d96e407aad42")
+    val cookie = PlainCookie.parse("SID=31d4d96e407aad42")
     assert(cookie.name == "SID")
     assert(cookie.value == "31d4d96e407aad42")
 
@@ -32,12 +32,12 @@ class CookieSpec extends FlatSpec {
   }
 
   it should "not be created from malformed value" in {
-    assertThrows[IllegalArgumentException](PlainCookie("S I D=31d4d96e407aad42"))
-    assertThrows[IllegalArgumentException](PlainCookie("SID=3 1d4d96e407aad4 2"))
+    assertThrows[IllegalArgumentException](PlainCookie.parse("S I D=31d4d96e407aad42"))
+    assertThrows[IllegalArgumentException](PlainCookie.parse("SID=3 1d4d96e407aad4 2"))
   }
 
   "SetCookie" should "be created from formatted value" in {
-    val cookie = SetCookie("SID=31d4d96e407aad42; Path=/; Secure; HttpOnly; Expires=Wed, 09 Jun 2021 10:18:14 GMT")
+    val cookie = SetCookie.parse("SID=31d4d96e407aad42; Path=/; Secure; HttpOnly; Expires=Wed, 09 Jun 2021 10:18:14 GMT")
     assert(cookie.name == "SID")
     assert(cookie.value == "31d4d96e407aad42")
     assert(cookie.path.contains("/"))
@@ -58,7 +58,7 @@ class CookieSpec extends FlatSpec {
   }
 
   it should "not be created from malformed value" in {
-    assertThrows[IllegalArgumentException](SetCookie("S I D=31d4d96e407aad42"))
-    assertThrows[IllegalArgumentException](SetCookie("SID=3\\1d4d96e407aad42"))
+    assertThrows[IllegalArgumentException](SetCookie.parse("S I D=31d4d96e407aad42"))
+    assertThrows[IllegalArgumentException](SetCookie.parse("SID=3\\1d4d96e407aad42"))
   }
 }

@@ -19,7 +19,7 @@ import org.scalatest.FlatSpec
 
 class MediaRangeSpec extends FlatSpec {
   "MediaRange" should "be created without parameters" in {
-    var range = MediaRange("text/html; q=1.0")
+    var range = MediaRange.parse("text/html; q=1.0")
     assert(range.mainType == "text")
     assert(range.subtype == "html")
     assert(range.weight == 1f)
@@ -27,7 +27,7 @@ class MediaRangeSpec extends FlatSpec {
     assert(range.isText)
     assert(range.toString == "text/html")
 
-    range = MediaRange("text/html; q=0.7")
+    range = MediaRange.parse("text/html; q=0.7")
     assert(range.mainType == "text")
     assert(range.subtype == "html")
     assert(range.weight == 0.7f)
@@ -35,7 +35,7 @@ class MediaRangeSpec extends FlatSpec {
     assert(range.isText)
     assert(range.toString == "text/html; q=0.7")
 
-    range = MediaRange("*/html; q=7.")
+    range = MediaRange.parse("*/html; q=7.")
     assert(range.mainType == "*")
     assert(range.subtype == "html")
     assert(range.weight == 1f)
@@ -53,7 +53,7 @@ class MediaRangeSpec extends FlatSpec {
   }
 
   it should "be created with parameters" in {
-    var range = MediaRange("text/html; charset=iso-8859-1")
+    var range = MediaRange.parse("text/html; charset=iso-8859-1")
     assert(range.mainType == "text")
     assert(range.subtype == "html")
     assert(range.params("charset") == "iso-8859-1")
@@ -70,34 +70,34 @@ class MediaRangeSpec extends FlatSpec {
   }
 
   it should "match MediaType" in {
-    var range = MediaRange("text/html")
-    assert(range.matches(MediaType("text/html")))
-    assert(range.matches(MediaType("text/html; charset=ascii")))
+    var range = MediaRange.parse("text/html")
+    assert(range.matches(MediaType.parse("text/html")))
+    assert(range.matches(MediaType.parse("text/html; charset=ascii")))
 
-    range = MediaRange("*/html")
-    assert(range.matches(MediaType("text/html")))
-    assert(range.matches(MediaType("text/html; charset=ascii")))
+    range = MediaRange.parse("*/html")
+    assert(range.matches(MediaType.parse("text/html")))
+    assert(range.matches(MediaType.parse("text/html; charset=ascii")))
 
-    range = MediaRange("*/*; q=0.1; charset=ascii")
-    assert(range.matches(MediaType("text/html; charset=ascii; level=1")))
-    assert(range.matches(MediaType("text/html; Charset=ASCII")))
+    range = MediaRange.parse("*/*; q=0.1; charset=ascii")
+    assert(range.matches(MediaType.parse("text/html; charset=ascii; level=1")))
+    assert(range.matches(MediaType.parse("text/html; Charset=ASCII")))
   }
 
   it should "not match MediaType" in {
-    var range = MediaRange("text/html")
-    assert(!range.matches(MediaType("text/plain")))
-    assert(!range.matches(MediaType("example/html; charset=ascii")))
+    var range = MediaRange.parse("text/html")
+    assert(!range.matches(MediaType.parse("text/plain")))
+    assert(!range.matches(MediaType.parse("example/html; charset=ascii")))
 
-    range = MediaRange("*/html")
-    assert(!range.matches(MediaType("text/plain")))
+    range = MediaRange.parse("*/html")
+    assert(!range.matches(MediaType.parse("text/plain")))
 
-    range = MediaRange("*/*; q=0.1; charset=ascii")
-    assert(!range.matches(MediaType("text/html; charset=utf-8; level=1")))
-    assert(!range.matches(MediaType("text/html; charset=utf-8")))
+    range = MediaRange.parse("*/*; q=0.1; charset=ascii")
+    assert(!range.matches(MediaType.parse("text/html; charset=utf-8; level=1")))
+    assert(!range.matches(MediaType.parse("text/html; charset=utf-8")))
   }
 
   it should "be destructured" in {
-    val range = MediaRange("text/html; charset=iso-8859-1")
+    val range = MediaRange.parse("text/html; charset=iso-8859-1")
 
     range match {
       case MediaRange(mainType, subtype, weight, params) =>
@@ -109,9 +109,9 @@ class MediaRangeSpec extends FlatSpec {
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](MediaRange("(text)/html"))
-    assertThrows[IllegalArgumentException](MediaRange("text/(html)"))
-    assertThrows[IllegalArgumentException](MediaRange("text/html; charset"))
-    assertThrows[IllegalArgumentException](MediaRange("text/html; charset=iso 8859 1"))
+    assertThrows[IllegalArgumentException](MediaRange.parse("(text)/html"))
+    assertThrows[IllegalArgumentException](MediaRange.parse("text/(html)"))
+    assertThrows[IllegalArgumentException](MediaRange.parse("text/html; charset"))
+    assertThrows[IllegalArgumentException](MediaRange.parse("text/html; charset=iso 8859 1"))
   }
 }
