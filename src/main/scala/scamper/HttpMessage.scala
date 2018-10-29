@@ -41,6 +41,10 @@ trait HttpMessage {
   /** Gets message body. */
   def body: Entity
 
+  /** Parses message body as defined type. */
+  def parse[T](implicit bodyParser: BodyParser[T]): T =
+    bodyParser.parse(this)
+
   /**
    * Gets header for specified key.
    *
@@ -73,10 +77,6 @@ trait HttpMessage {
   /** Gets cookie value for specified name. */
   def getCookieValue(name: String): Option[String] =
     getCookie(name).map(_.value)
-
-  /** Gets message body as defined type. */
-  def bodyAs[T](implicit bodyParser: BodyParser[T]): T =
-    bodyParser.parse(this)
 
   /**
    * Creates message with new start line.

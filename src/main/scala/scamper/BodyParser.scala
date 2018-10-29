@@ -34,7 +34,7 @@ trait BodyParser[T] {
   def parse(message: HttpMessage): T
 }
 
-/** Provides body parser implementations. */
+/** Includes default body parser implementations. */
 object BodyParsers {
   /**
    * Gets body parser to collect raw bytes of message body.
