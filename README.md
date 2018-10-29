@@ -1,11 +1,11 @@
 # Scamper
-Scamper is an HTTP library for Scala. It defines an API for reading and writing
+**Scamper** is an HTTP library for Scala. It defines an API for reading and writing
 HTTP messages.
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_2.12.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_2.12%22)
 
 ## HTTP Messages
-At the core of Scamper is `HttpMessage`, which is a trait that defines the
+At the core of **Scamper** is `HttpMessage`, which is a trait that defines the
 fundamental characteristics of an HTTP message. `HttpRequest` and `HttpResponse`
 extend the specification to define characteristics specific to their respective
 message types.
@@ -22,7 +22,7 @@ import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToProductTyp
 
 val request = GET("/index.html")
   .withHost("localhost:8080")
-  .withUserAgent("Scamper/0.11")
+  .withUserAgent("Scamper/0.11.1")
   .withAccept("text/html", "*/*; q=0.5")
 ```
 
@@ -39,7 +39,7 @@ import scamper.types.ImplicitConverters.{ stringToMediaType, stringToProductType
 
 val response = Ok("Hello, world!")
   .withContentType("text/plain")
-  .withServer("Scamper/0.11")
+  .withServer("Scamper/0.11.1")
   .withConnection("close")
 ```
 
@@ -181,7 +181,7 @@ def printUser(message: HttpMessage): Unit = {
 ```
 
 ## HTTP Client
-Scamper provides a client for sending requests and handling the responses.
+**Scamper** provides a client for sending requests and handling the responses.
 
 In this next example, an `HttpRequest` is sent, and a `ResponseFilter` stack
 is employed to handle the `HttpResponse`.
@@ -211,6 +211,11 @@ object UserAdminClient {
   }
 }
 ```
+
+## API Documentation
+
+This is only a taste of what **Scamper** offers. See [scaladoc](https://losizm.github.io/scamper/latest/api/scamper/index.html) for
+additional details.
 
 ## License
 Scamper is licensed under the Apache license, version 2. See LICENSE file for
