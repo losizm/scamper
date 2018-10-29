@@ -49,10 +49,45 @@ class HttpMessageSpec extends FlatSpec {
     assert(req.host == "localhost:8080")
   }
 
+  it should "get default value if header not found" in {
+    val userAgent = Header("User-Agent", "Scamper/x.x")
+    val host = Header("Host", "localhost:8080")
+    val req = GET("/find?user=root&group=wheel").withHeader(userAgent)
+
+    assert(req.getHeaderOrElse("User-Agent", throw HeaderNotFound("User-Agent")) == userAgent)
+    assert(req.getHeaderValueOrElse("User-Agent", throw HeaderNotFound("User-Agent")) == userAgent.value)
+
+    assert(req.getHeaderOrElse("Host", host) == host)
+    assert(req.getHeaderValueOrElse("Host", host.value) == "localhost:8080")
+  }
+
+  it should "throw exception if header not found" in {
+    val req = GET("/find?user=root&group=wheel")
+    assertThrows[HeaderNotFound](req.getHeaderOrElse("User-Agent", throw HeaderNotFound("User-Agent")))
+    assertThrows[HeaderNotFound](req.getHeaderValueOrElse("User-Agent", throw HeaderNotFound("User-Agent")))
+  }
 
   "HttpResponse" should "be created with location" in {
-    val response = SeeOther().withLocation("/find")
-    assert(response.status == SeeOther)
-    assert(response.location == "/find")
+    val res = SeeOther().withLocation("/find")
+    assert(res.status == SeeOther)
+    assert(res.location == "/find")
+  }
+
+  it should "get default value if header not found" in {
+    val server = Header("Server", "Scamper/x.x")
+    val location = Header("Location", "/find")
+    val res = SeeOther().withHeader(server)
+
+    assert(res.getHeaderOrElse("Server", throw HeaderNotFound("Server")) == server)
+    assert(res.getHeaderValueOrElse("Server", throw HeaderNotFound("Server")) == server.value)
+
+    assert(res.getHeaderOrElse("Location", location) == location)
+    assert(res.getHeaderValueOrElse("Location", location.value) == location.value)
+  }
+
+  it should "throw exception if header not found" in {
+    val res = SeeOther()
+    assertThrows[HeaderNotFound](res.getHeaderOrElse("Server", throw HeaderNotFound("Server")))
+    assertThrows[HeaderNotFound](res.getHeaderValueOrElse("Server", throw HeaderNotFound("Server")))
   }
 }
