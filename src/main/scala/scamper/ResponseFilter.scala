@@ -28,7 +28,7 @@ trait ResponseFilter {
     if (apply(response)) Some(response) else None
 }
 
-/** Provides status-based {@code ResponseFilter} implementations. */
+/** Includes status-based {@code ResponseFilter} implementations. */
 object ResponseFilters {
   /**
    * Filters informational responses.

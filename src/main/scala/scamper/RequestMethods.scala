@@ -15,7 +15,7 @@
  */
 package scamper
 
-/** Registered request methods */
+/** Includes registered request methods. */
 object RequestMethods {
   /** GET request method */
   val GET: RequestMethod = RequestMethodImpl("GET")

@@ -19,7 +19,7 @@ import java.time.OffsetDateTime
 import scala.util.Try
 import scamper.types._
 
-/** Contains type classes for standardized access to message headers. */
+/** Includes type classes for standardized access to message headers. */
 object ImplicitHeaders {
   /** Provides standardized access to Accept header. */
   implicit class Accept[T <: HttpRequest](val request: T) extends AnyVal {

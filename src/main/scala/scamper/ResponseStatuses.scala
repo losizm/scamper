@@ -15,7 +15,7 @@
  */
 package scamper
 
-/** Provides standard HTTP statuses. */
+/** Includes standard HTTP statuses. */
 object ResponseStatuses {
   /** 100 Continue */
   val Continue = ResponseStatus(100)
