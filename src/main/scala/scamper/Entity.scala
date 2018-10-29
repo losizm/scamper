@@ -89,11 +89,11 @@ object Entity {
 
   /** Creates entity with URL encoded value of supplied form data. */
   def apply(form: Map[String, Seq[String]]): Entity =
-    Entity(QueryParams.format(form))
+    apply(QueryParams.format(form))
 
   /** Creates entity with URL encoded value of supplied form data. */
   def apply(form: (String, String)*): Entity =
-    Entity(QueryParams.format(form : _*))
+    apply(QueryParams.format(form : _*))
 
   /** Creates empty entity. */
   def empty(): Entity = ByteArrayEntity(Array.empty)

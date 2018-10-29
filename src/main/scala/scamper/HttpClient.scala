@@ -22,6 +22,7 @@ import scala.annotation.tailrec
 import scala.util.Try
 
 import ImplicitExtensions._
+import types.ProductType
 
 /** HTTP client */
 object HttpClient {
@@ -42,11 +43,13 @@ object HttpClient {
     val scheme = if (secure) "https" else "http"
     val uri = request.uri.toURI
     val host = getHost(uri, request.getHeaderValue("Host"))
-    val headers = Header("Host", host) +: request.headers.filterNot(_.key.equalsIgnoreCase("Host"))
+    val userAgent = getUserAgent(request.getHeaderValue("User-Agent"))
+    val headers = Header("Host", host) +: Header("User-Agent", userAgent) +:
+      request.headers.filterNot(_.key.matches("(?i:Host|User-Agent)"))
 
     uri.toURL(scheme, host).withConnection { implicit conn =>
       conn.setRequestMethod(request.method.name)
-      request.headers.foreach(header => conn.addRequestProperty(header.key, header.value))
+      headers.foreach(header => conn.addRequestProperty(header.key, header.value))
 
       if (!request.body.isKnownEmpty)
         writeBody(request.body)
@@ -63,6 +66,9 @@ object HttpClient {
 
   private def getHost(uri: URI, default: => Option[String]): String =
     Option(uri.getAuthority).orElse(default).getOrElse(throw HeaderNotFound("Host"))
+
+  private def getUserAgent(products: Option[String]): String =
+    products.getOrElse(s"Java/${sys.props("java.version")} Scamper/0.11.1")
 
   private def writeBody(body: Entity)(implicit conn: HttpURLConnection): Unit = {
     conn.setDoOutput(true)
