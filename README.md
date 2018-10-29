@@ -22,7 +22,7 @@ import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToProductTyp
 
 val request = GET("/index.html")
   .withHost("localhost:8080")
-  .withUserAgent("Scamper/0.10")
+  .withUserAgent("Scamper/0.11")
   .withAccept("text/html", "*/*; q=0.5")
 ```
 
@@ -39,7 +39,7 @@ import scamper.types.ImplicitConverters.{ stringToMediaType, stringToProductType
 
 val response = Ok("Hello, world!")
   .withContentType("text/plain")
-  .withServer("Scamper/0.10")
+  .withServer("Scamper/0.11")
   .withConnection("close")
 ```
 
@@ -59,7 +59,7 @@ def getContentType: Option[MediaType]
 /** Creates message with Content-Type header */
 def withContentType(value: MediaType): HttpMessage
 /** Creates message without Content-Type header */
-def withoutContentType: HttpMessage
+def removeContentType: HttpMessage
 ```
 
 So you can work with the message header in a type-safe manner.
@@ -141,7 +141,7 @@ implicit val textBodyParser = BodyParsers.text(maxLength = 1024)
 
 def printText(message: HttpMessage): Unit = {
   // Parses message body to String using implicit textBodyParser
-  val text = message.bodyAs[String]
+  val text = message.parse[String]
 
   println(text)
 }
@@ -169,12 +169,12 @@ implicit object UserBodyParser extends BodyParser[User] {
 
   // Parses JSON message body to User
   def parse(message: HttpMessage): User =
-    Json.parse(message.bodyAs[String]).as[User]
+    Json.parse(message.parse[String]).as[User]
 }
 
 def printUser(message: HttpMessage): Unit = {
   // Parses message body to User using implicit UserBodyParser
-  val user = message.bodyAs[User]
+  val user = message.parse[User]
 
   println(s"uid=${user.id}(${user.name})")
 }
