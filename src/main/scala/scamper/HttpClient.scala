@@ -15,14 +15,11 @@
  */
 package scamper
 
-import java.net.{ HttpURLConnection, URI, URL }
-import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
+import java.net.{ HttpURLConnection, URI }
 
 import scala.annotation.tailrec
-import scala.util.Try
 
 import ImplicitExtensions._
-import types.ProductType
 
 /** HTTP client */
 object HttpClient {
@@ -46,7 +43,7 @@ object HttpClient {
     val url = uri.withScheme(scheme).withAuthority(host).toURL
     val userAgent = getUserAgent(request.getHeaderValue("User-Agent"))
     val headers = Header("Host", host) +: Header("User-Agent", userAgent) +:
-      request.headers.filterNot(_.name.matches("(?i:Host|User-Agent)"))
+      request.headers.filterNot(header => header.name.matches("(?i)Host|User-Agent"))
 
     url.withConnection { implicit conn =>
       conn.setRequestMethod(request.method.name)
@@ -71,13 +68,8 @@ object HttpClient {
     conn.setDoOutput(true)
 
     body.length match {
-      case Some(length) =>
-        conn.setRequestProperty("Content-Length", length.toString)
-        conn.setFixedLengthStreamingMode(length)
-
-      case None =>
-        conn.setRequestProperty("Transfer-Encoding", "chunked")
-        conn.setChunkedStreamingMode(8192)
+      case Some(length) => conn.setFixedLengthStreamingMode(length)
+      case None => conn.setChunkedStreamingMode(8192)
     }
 
     body.withInputStream { in =>
