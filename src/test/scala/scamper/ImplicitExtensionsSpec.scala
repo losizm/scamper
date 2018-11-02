@@ -37,18 +37,15 @@ class ImplicitExtensionsSpec extends FlatSpec {
   }
 
   it should "be converted to URL" in {
-    val newURL = uri.toURL("http", "localhost:8080")
+    val newURL = uri.withScheme("http").withAuthority("localhost:8080").toURL
     assert(url == newURL)
   }
 
-  "URL" should "be created with new path" in {
-    assert(url.withPath("home.html") == new URL("http://localhost:8080/home.html"))
-  }
-
-  it should "be created with new query" in {
-    val newURL = new URL("http://localhost:8080/index.html?name=guest")
-    assert(url.withQuery("name=guest") == newURL)
-    assert(url.withQueryParams("name" -> "guest") == newURL)
+  "URL" should "have access to its query parameters" in {
+    val newURL = new URL("http://localhost:8080/index.html?make=lexus&model=gs&model=ls")
+    assert(newURL.getQueryParamValue("make").contains("lexus"))
+    assert(newURL.getQueryParamValue("model").contains("gs"))
+    assert(newURL.getQueryParamValues("model").sameElements(Seq("gs", "ls")))
   }
 
   "String" should "be converted to LocalDate" in {

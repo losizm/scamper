@@ -95,17 +95,21 @@ object ImplicitExtensions {
     def getQueryParamValues(name: String): Seq[String] =
       getQueryParams().getOrElse(name, Nil)
 
-    /** Converts URI to URL using supplied scheme and authority. */
-    def toURL(scheme: String, authority: String): URL =
-      buildURI(scheme, authority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment).toURL
+    /** Creates new URI replacing scheme. */
+    def withScheme(scheme: String): URI =
+      buildURI(scheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
+
+    /** Creates new URI replacing authority. */
+    def withAuthority(authority: String): URI =
+      buildURI(uri.getScheme, authority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
 
     /** Creates new URI replacing path. */
     def withPath(path: String): URI =
-      createURI(path, uri.getRawQuery)
+      buildURI(uri.getScheme, uri.getRawAuthority, path, uri.getRawQuery, uri.getRawFragment)
 
     /** Creates new URI replacing query. */
     def withQuery(query: String): URI =
-      createURI(uri.getRawPath, query)
+      buildURI(uri.getScheme, uri.getRawAuthority, uri.getRawPath, query, uri.getRawFragment)
 
     /** Creates new URI replacing query parameters. */
     def withQueryParams(params: Map[String, Seq[String]]): URI =
@@ -115,13 +119,28 @@ object ImplicitExtensions {
     def withQueryParams(params: (String, String)*): URI =
       withQuery(QueryParams.format(params : _*))
 
-    private def createURI(path: String, query: String): URI =
-      buildURI(uri.getScheme, uri.getRawAuthority, path, query, uri.getRawFragment).toURI
+    /** Creates new URI replacing fragment. */
+    def withFragment(fragment: String): URI =
+      buildURI(uri.getScheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, fragment)
+
+    private def buildURI(scheme: String, authority: String, path: String, query: String, fragment: String): URI = {
+      val uriBuilder = new StringBuilder()
+
+      if (scheme != null) uriBuilder.append(scheme).append(":")
+      if (authority != null) uriBuilder.append("//").append(authority)
+
+      uriBuilder.append('/').append(path.dropWhile(_ == '/'))
+
+      if (query != null && !query.isEmpty) uriBuilder.append('?').append(query)
+      if (fragment != null) uriBuilder.append('#').append(fragment)
+
+      new URI(uriBuilder.toString)
+    }
   }
 
   /** Adds HTTP related extension methods to {@code java.net.URL}. */
   implicit class HttpUrlType(val url: URL) extends AnyVal {
-    /** Gets the query parameters. */
+    /** Gets query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
       QueryParams.parse(url.getQuery)
 
@@ -138,22 +157,6 @@ object ImplicitExtensions {
     def getQueryParamValues(name: String): Seq[String] =
       getQueryParams().getOrElse(name, Nil)
 
-    /** Creates new URL replacing path. */
-    def withPath(path: String): URL =
-      createURL(path, url.getQuery)
-
-    /** Creates new URL replacing query. */
-    def withQuery(query: String): URL =
-      createURL(url.getPath, query)
-
-    /** Creates new URL replacing query parameters. */
-    def withQueryParams(params: Map[String, Seq[String]]): URL =
-      createURL(url.getPath, QueryParams.format(params))
-
-    /** Creates new URL replacing query parameters. */
-    def withQueryParams(params: (String, String)*): URL =
-      createURL(url.getPath, QueryParams.format(params : _*))
-
     /**
      * Opens HTTP connection and passes it to supplied handler.
      *
@@ -168,22 +171,5 @@ object ImplicitExtensions {
       try handler(conn)
       finally Try(conn.disconnect())
     }
-
-    private def createURL(path: String, query: String): URL =
-      buildURI(url.getProtocol, url.getAuthority, path, query, url.getRef).toURL
-  }
-
-  private def buildURI(scheme: String, authority: String, path: String, query: String, fragment: String): String = {
-    val uriBuilder = new StringBuilder()
-
-    if (scheme != null) uriBuilder.append(scheme).append(":")
-    if (authority != null) uriBuilder.append("//").append(authority)
-
-    uriBuilder.append('/').append(path.dropWhile(_ == '/'))
-
-    if (query != null && !query.isEmpty) uriBuilder.append('?').append(query)
-    if (fragment != null) uriBuilder.append('#').append(fragment)
-
-    uriBuilder.toString
   }
 }

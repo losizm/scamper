@@ -43,22 +43,19 @@ object HttpClient {
     val scheme = if (secure) "https" else "http"
     val uri = request.uri.toURI
     val host = getHost(uri, request.getHeaderValue("Host"))
+    val url = uri.withScheme(scheme).withAuthority(host).toURL
     val userAgent = getUserAgent(request.getHeaderValue("User-Agent"))
     val headers = Header("Host", host) +: Header("User-Agent", userAgent) +:
       request.headers.filterNot(_.key.matches("(?i:Host|User-Agent)"))
 
-    uri.toURL(scheme, host).withConnection { implicit conn =>
+    url.withConnection { implicit conn =>
       conn.setRequestMethod(request.method.name)
       headers.foreach(header => conn.addRequestProperty(header.key, header.value))
 
       if (!request.body.isKnownEmpty)
         writeBody(request.body)
 
-      val response = HttpResponse(
-        StatusLine.parse(conn.getHeaderField(0)),
-        getResponseHeaders(),
-        getResponseBody()
-      )
+      val response = HttpResponse(getStatusLine(), getResponseHeaders(), getResponseBody())
 
       handler(response)
     }
@@ -92,6 +89,9 @@ object HttpClient {
         out.write(buf, 0, len)
     }
   }
+
+  private def getStatusLine()(implicit conn: HttpURLConnection): StatusLine =
+    StatusLine.parse(conn.getHeaderField(0))
 
   private def getResponseHeaders()(implicit conn: HttpURLConnection): Seq[Header] = {
     val headers = getResponseHeaders(1, Nil)
