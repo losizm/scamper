@@ -70,7 +70,7 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
     copy(headers = newHeaders)
 
   def withCookies(newCookies: SetCookie*): HttpResponse =
-    copy(headers = headers.filterNot(_.key.equalsIgnoreCase("Set-Cookie")) ++ newCookies.map(c => Header("Set-Cookie", c.toString)))
+    copy(headers = headers.filterNot(_.name.equalsIgnoreCase("Set-Cookie")) ++ newCookies.map(c => Header("Set-Cookie", c.toString)))
 
   def withBody(newBody: Entity): HttpResponse =
     copy(body = newBody)

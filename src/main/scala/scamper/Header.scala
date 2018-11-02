@@ -21,8 +21,8 @@ import HeaderHelper._
 
 /** HTTP header */
 trait Header {
-  /** Gets header key. */
-  def key: String
+  /** Gets header name. */
+  def name: String
 
   /** Gets header value. */
   def value: String
@@ -35,33 +35,33 @@ trait Header {
   def longValue: Long = value.toLong
 
   /** Returns formatted HTTP header. */
-  override lazy val toString: String = s"$key: $value"
+  override lazy val toString: String = s"$name: $value"
 }
 
 /** Header factory */
 object Header {
-  /** Creates Header using supplied key and value. */
-  def apply(key: String, value: String): Header =
-    HeaderImpl(Key(key), Value(value))
+  /** Creates Header using supplied name and value. */
+  def apply(name: String, value: String): Header =
+    HeaderImpl(Name(name), Value(value))
 
-  /** Creates Header using supplied key and value. */
-  def apply(key: String, value: Long): Header =
-    apply(key, value.toString)
+  /** Creates Header using supplied name and value. */
+  def apply(name: String, value: Long): Header =
+    apply(name, value.toString)
 
-  /** Creates Header using supplied key and value. */
-  def apply(key: String, value: OffsetDateTime): Header =
-    apply(key, DateValue.format(value))
+  /** Creates Header using supplied name and value. */
+  def apply(name: String, value: OffsetDateTime): Header =
+    apply(name, DateValue.format(value))
 
   /** Parses formatted header. */
   def parse(header: String): Header =
     header.split(":", 2) match {
-      case Array(key, value) => apply(key.trim, value.trim)
+      case Array(name, value) => apply(name.trim, value.trim)
       case _ => throw new IllegalArgumentException(s"Malformed header: $header")
     }
 
-  /** Destructures Header to key-value pair. */
+  /** Destructures Header to name-value pair. */
   def unapply(header: Header): Option[(String, String)] =
-    Some(header.key -> header.value)
+    Some(header.name -> header.value)
 }
 
-private case class HeaderImpl(key: String, value: String) extends Header
+private case class HeaderImpl(name: String, value: String) extends Header

@@ -18,9 +18,9 @@ package scamper
 import Grammar._
 
 private object HeaderHelper {
-  def Key(key: String): String =
-    Token(key) getOrElse {
-      throw new IllegalArgumentException(s"Invalid header key: $key")
+  def Name(name: String): String =
+    Token(name) getOrElse {
+      throw new IllegalArgumentException(s"Invalid header name: $name")
     }
 
   def Value(value: String): String =

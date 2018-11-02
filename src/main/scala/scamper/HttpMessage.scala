@@ -46,53 +46,55 @@ trait HttpMessage {
     bodyParser.parse(this)
 
   /**
-   * Gets header for specified key.
+   * Gets header with given name.
    *
-   * If there are multiple headers for key, then first occurrence is retrieved.
-   */
-  def getHeader(key: String): Option[Header] =
-    headers.find(_.key.equalsIgnoreCase(key))
-
-  /**
-   * Gets header for specified key or returns default if header not present.
-   *
-   * If there are multiple headers for key, then first occurrence is retrieved.
-   */
-  def getHeaderOrElse(key: String, default: => Header): Header =
-    getHeader(key).getOrElse(default)
-
-  /**
-   * Gets header value for specified key.
-   *
-   * If there are multiple headers for key, then value of first occurrence is
+   * If there are multiple headers with name, then first occurrence is
    * retrieved.
    */
-  def getHeaderValue(key: String): Option[String] =
-    getHeader(key).map(_.value)
+  def getHeader(name: String): Option[Header] =
+    headers.find(_.name.equalsIgnoreCase(name))
 
   /**
-   * Gets header value for specified key or returns default if header not
+   * Gets header with given name or returns default if header not present.
+   *
+   * If there are multiple headers with name, then first occurrence is
+   * retrieved.
+   */
+  def getHeaderOrElse(name: String, default: => Header): Header =
+    getHeader(name).getOrElse(default)
+
+  /**
+   * Gets value of header with given name.
+   *
+   * If there are multiple headers with name, then first occurrence is
+   * retrieved.
+   */
+  def getHeaderValue(name: String): Option[String] =
+    getHeader(name).map(_.value)
+
+  /**
+   * Gets value of header with given name or returns default if header not
    * present.
    *
-   * If there are multiple headers for key, then value of first occurrence is
+   * If there are multiple headers with name, then first occurrence is
    * retrieved.
    */
-  def getHeaderValueOrElse(key: String, default: => String): String =
-    getHeaderValue(key).getOrElse(default)
+  def getHeaderValueOrElse(name: String, default: => String): String =
+    getHeaderValue(name).getOrElse(default)
 
-  /** Gets all headers for specified key. */
-  def getHeaders(key: String): Seq[Header] =
-    headers.filter(_.key.equalsIgnoreCase(key))
+  /** Gets all headers with given name. */
+  def getHeaders(name: String): Seq[Header] =
+    headers.filter(_.name.equalsIgnoreCase(name))
 
-  /** Gets all header values for specified key. */
-  def getHeaderValues(key: String): Seq[String] =
-    getHeaders(key).map(_.value)
+  /** Gets all values of headers with given name. */
+  def getHeaderValues(name: String): Seq[String] =
+    getHeaders(name).map(_.value)
 
-  /** Gets cookie for specified name. */
+  /** Gets cookie with given name. */
   def getCookie(name: String): Option[CookieType] =
     cookies.find(_.name == name)
 
-  /** Gets cookie value for specified name. */
+  /** Gets value of cookie with given name. */
   def getCookieValue(name: String): Option[String] =
     getCookie(name).map(_.value)
 
@@ -106,12 +108,12 @@ trait HttpMessage {
   /**
    * Creates message with supplied header.
    *
-   * Previous headers having same key as supplied header are removed.
+   * Previous headers having same name as supplied header are removed.
    *
    * @return new message
    */
   def withHeader(header: Header): MessageType =
-    withHeaders(headers.filterNot(_.key.equalsIgnoreCase(header.key)) :+ header : _*)
+    withHeaders(headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header : _*)
 
   /**
    * Creates message with new headers.
@@ -131,12 +133,12 @@ trait HttpMessage {
     withHeaders(this.headers ++ headers : _*)
 
   /**
-   * Creates message removing headers having specified keys.
+   * Creates message removing headers with given names.
    *
    * @return new message
    */
-  def removeHeaders(keys: String*): MessageType =
-    withHeaders(headers.filterNot(header => keys.exists(header.key.equalsIgnoreCase)) : _*)
+  def removeHeaders(names: String*): MessageType =
+    withHeaders(headers.filterNot(header => names.exists(header.name.equalsIgnoreCase)) : _*)
 
   /**
    * Creates message with new cookies.

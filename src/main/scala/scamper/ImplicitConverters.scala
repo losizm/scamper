@@ -23,16 +23,16 @@ object ImplicitConverters {
   /** Converts string to [[Header]]. */
   implicit val stringToHeader = (header: String) => Header.parse(header)
 
-  /** Converts tuple to [[Header]] where tuple is key-value pair. */
+  /** Converts tuple to [[Header]] where tuple is name-value pair. */
   implicit val tupleToHeader = (header: (String, String)) => Header(header._1, header._2)
 
-  /** Converts tuple to [[Header]] where tuple is key-value pair. */
+  /** Converts tuple to [[Header]] where tuple is name-value pair. */
   implicit val tupleToHeaderWithLongValue = (header: (String, Long)) => Header(header._1, header._2)
 
-  /** Converts tuple to [[Header]] where tuple is key-value pair. */
+  /** Converts tuple to [[Header]] where tuple is name-value pair. */
   implicit val tupleToHeaderWithIntValue = (header: (String, Int)) => Header(header._1, header._2)
 
-  /** Converts tuple to [[Header]] where tuple is key-value pair. */
+  /** Converts tuple to [[Header]] where tuple is name-value pair. */
   implicit val tupleToHeaderWithDateValue = (header: (String, OffsetDateTime)) => Header(header._1, header._2)
 
   /** Converts byte array to [[Entity]]. */

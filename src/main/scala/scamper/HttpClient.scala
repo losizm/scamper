@@ -46,11 +46,11 @@ object HttpClient {
     val url = uri.withScheme(scheme).withAuthority(host).toURL
     val userAgent = getUserAgent(request.getHeaderValue("User-Agent"))
     val headers = Header("Host", host) +: Header("User-Agent", userAgent) +:
-      request.headers.filterNot(_.key.matches("(?i:Host|User-Agent)"))
+      request.headers.filterNot(_.name.matches("(?i:Host|User-Agent)"))
 
     url.withConnection { implicit conn =>
       conn.setRequestMethod(request.method.name)
-      headers.foreach(header => conn.addRequestProperty(header.key, header.value))
+      headers.foreach(header => conn.addRequestProperty(header.name, header.value))
 
       if (!request.body.isKnownEmpty)
         writeBody(request.body)
@@ -65,7 +65,7 @@ object HttpClient {
     Option(uri.getAuthority).orElse(default).getOrElse(throw HeaderNotFound("Host"))
 
   private def getUserAgent(products: Option[String]): String =
-    products.getOrElse(s"Java/${sys.props("java.version")} Scamper/0.11.1")
+    products.getOrElse(s"Java/${sys.props("java.version")} Scamper/0.12")
 
   private def writeBody(body: Entity)(implicit conn: HttpURLConnection): Unit = {
     conn.setDoOutput(true)

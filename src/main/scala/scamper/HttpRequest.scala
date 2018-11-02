@@ -153,7 +153,7 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
     copy(headers = newHeaders)
 
   def withCookies(newCookies: PlainCookie*): HttpRequest =
-    copy(headers = headers.filterNot(_.key.equalsIgnoreCase("Cookie")) :+ Header("Cookie", newCookies.mkString("; ")))
+    copy(headers = headers.filterNot(_.name.equalsIgnoreCase("Cookie")) :+ Header("Cookie", newCookies.mkString("; ")))
 
   def withBody(newBody: Entity): HttpRequest =
     copy(body = newBody)
