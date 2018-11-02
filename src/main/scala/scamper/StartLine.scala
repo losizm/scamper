@@ -15,6 +15,8 @@
  */
 package scamper
 
+import java.net.URI
+
 import scala.util.Try
 
 /** HTTP message start line */
@@ -32,11 +34,11 @@ trait RequestLine extends StartLine {
   /** Gets request method. */
   def method: RequestMethod
 
-  /** Gets request URI. */
-  def uri: String
+  /** Gets request target. */
+  def target: URI
 
   /** Returns formatted request line. */
-  override lazy val toString: String = s"$method $uri HTTP/$version"
+  override lazy val toString: String = s"$method $target HTTP/$version"
 }
 
 /** RequestLine factory */
@@ -47,22 +49,22 @@ object RequestLine {
   def parse(line: String): RequestLine =
     Try {
       line match {
-        case syntax(method, uri, version) => RequestLineImpl(RequestMethod(method), uri, HttpVersion.parse(version))
+        case syntax(method, target, version) => RequestLineImpl(RequestMethod(method), new URI(target), HttpVersion.parse(version))
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Malformed request line: $line")
     }
 
   /** Creates RequestLine with supplied attributes. */
-  def apply(method: RequestMethod, uri: String, version: HttpVersion = HttpVersion(1, 1)): RequestLine =
-    RequestLineImpl(method, uri, version)
+  def apply(method: RequestMethod, target: URI, version: HttpVersion = HttpVersion(1, 1)): RequestLine =
+    RequestLineImpl(method, target, version)
 
   /** Destructures RequestLine. */
-  def unapply(line: RequestLine): Option[(RequestMethod, String, HttpVersion)] =
-    Some((line.method, line.uri, line.version))
+  def unapply(line: RequestLine): Option[(RequestMethod, URI, HttpVersion)] =
+    Some((line.method, line.target, line.version))
 }
 
-private case class RequestLineImpl(method: RequestMethod, uri: String, version: HttpVersion) extends RequestLine
+private case class RequestLineImpl(method: RequestMethod, target: URI, version: HttpVersion) extends RequestLine
 
 /**
  * HTTP status line

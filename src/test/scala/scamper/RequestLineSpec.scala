@@ -22,22 +22,22 @@ class RequestLineSpec extends FlatSpec {
   "RequestLine" should "be created" in {
     var request = RequestLine.parse("GET / HTTP/1.1")
     assert(request.method == GET)
-    assert(request.uri == "/")
+    assert(request.target.toString == "/")
     assert(request.version == HttpVersion(1, 1))
 
     request = RequestLine.parse("GET /index.html HTTP/1.1")
     assert(request.method == GET)
-    assert(request.uri == "/index.html")
+    assert(request.target.toString == "/index.html")
     assert(request.version == HttpVersion(1, 1))
 
     request = RequestLine.parse("GET /index.html?offset=25&limit=5 HTTP/1.1")
     assert(request.method == GET)
-    assert(request.uri == "/index.html?offset=25&limit=5")
+    assert(request.target.toString == "/index.html?offset=25&limit=5")
     assert(request.version == HttpVersion(1, 1))
 
     request = RequestLine.parse("POST https://localhost:8787/admin/user/create HTTP/1.1")
     assert(request.method == POST)
-    assert(request.uri == "https://localhost:8787/admin/user/create")
+    assert(request.target.toString == "https://localhost:8787/admin/user/create")
     assert(request.version == HttpVersion(1, 1))
   }
 

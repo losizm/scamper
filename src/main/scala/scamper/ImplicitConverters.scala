@@ -16,10 +16,14 @@
 package scamper
 
 import java.io.File
+import java.net.URI
 import java.time.OffsetDateTime
 
 /** Includes implicit converter functions. */
 object ImplicitConverters {
+  /** Converts string to {@code java.net.URI}. */
+  implicit val stringToURI = (uri: String) => new URI(uri)
+
   /** Converts string to [[Header]]. */
   implicit val stringToHeader = (header: String) => Header.parse(header)
 

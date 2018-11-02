@@ -31,10 +31,10 @@ trait HttpRequest extends HttpMessage {
   /** Gets request method. */
   def method: RequestMethod = startLine.method
 
-  /** Gets request URI. */
-  def uri: String = startLine.uri
+  /** Gets request target. */
+  def target: URI = startLine.target
 
-  /** Gets URI path. */
+  /** Gets target path. */
   def path: String
 
   /** Gets query parameters. */
@@ -59,14 +59,14 @@ trait HttpRequest extends HttpMessage {
   def withMethod(method: RequestMethod): MessageType
 
   /**
-   * Creates request with new URI.
+   * Creates request with new target.
    *
    * @return new request
    */
-  def withURI(uri: String): MessageType
+  def withTarget(target: URI): MessageType
 
   /**
-   * Creates request with new URI path.
+   * Creates request with new target path.
    *
    * @return new request
    */
@@ -101,17 +101,15 @@ object HttpRequest {
     HttpRequestImpl(requestLine, headers, body)
 
   /** Creates HttpRequest with supplied values. */
-  def apply(method: RequestMethod, uri: String = "/", headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: HttpVersion = HttpVersion(1, 1)): HttpRequest =
-    HttpRequestImpl(RequestLine(method, uri, version), headers, body)
+  def apply(method: RequestMethod, target: URI = new URI("/"), headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: HttpVersion = HttpVersion(1, 1)): HttpRequest =
+    HttpRequestImpl(RequestLine(method, target, version), headers, body)
 }
 
 private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header], body: Entity) extends HttpRequest {
-  private lazy val uriInstance = new URI(uri)
-
-  lazy val path: String = uriInstance.getRawPath
+  lazy val path: String = target.getRawPath
 
   lazy val queryParams: Map[String, Seq[String]] =
-    uriInstance.getRawQuery match {
+    target.getRawQuery match {
       case null  => Map.empty
       case query => QueryParams.parse(query)
     }
@@ -132,22 +130,22 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
     copy(startLine = newStartLine)
 
   def withMethod(newMethod: RequestMethod): HttpRequest =
-    copy(startLine = RequestLine(newMethod, uri, version))
+    copy(startLine = RequestLine(newMethod, target, version))
 
-  def withURI(newURI: String): HttpRequest =
-    copy(startLine = RequestLine(method, newURI, version))
+  def withTarget(newTarget: URI): HttpRequest =
+    copy(startLine = RequestLine(method, newTarget, version))
 
   def withPath(newPath: String): HttpRequest =
-    withURI(uriInstance.withPath(newPath).toString)
+    withTarget(target.withPath(newPath))
 
   def withQueryParams(params: Map[String, Seq[String]]): HttpRequest =
-    withURI(uriInstance.withQueryParams(params).toString)
+    withTarget(target.withQueryParams(params))
 
   def withQueryParams(params: (String, String)*): HttpRequest =
-    withURI(uriInstance.withQueryParams(params : _*).toString)
+    withTarget(target.withQueryParams(params : _*))
 
   def withVersion(newVersion: HttpVersion): HttpRequest =
-    copy(startLine = RequestLine(method, uri, newVersion))
+    copy(startLine = RequestLine(method, target, newVersion))
 
   def withHeaders(newHeaders: Header*): HttpRequest =
     copy(headers = newHeaders)

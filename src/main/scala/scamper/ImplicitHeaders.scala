@@ -15,8 +15,11 @@
  */
 package scamper
 
+import java.net.URI
 import java.time.OffsetDateTime
+
 import scala.util.Try
+
 import scamper.types._
 
 /** Includes type classes for standardized access to message headers. */
@@ -401,18 +404,18 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Content-Location is not present
      */
-    def contentLocation: String =
+    def contentLocation: URI =
       getContentLocation.getOrElse(throw HeaderNotFound("Content-Location"))
 
     /** Gets Content-Location header value if present. */
-    def getContentLocation: Option[String] =
-      message.getHeaderValue("Content-Location")
+    def getContentLocation: Option[URI] =
+      message.getHeaderValue("Content-Location").map(new URI(_))
 
     /**
      * Creates new message setting Content-Location header to supplied value.
      */
-    def withContentLocation(value: String): T#MessageType =
-      message.withHeader(Header("Content-Location", value))
+    def withContentLocation(value: URI): T#MessageType =
+      message.withHeader(Header("Content-Location", value.toString))
 
     /** Creates new message removing Content-Location header. */
     def removeContentLocation: T#MessageType =
@@ -810,16 +813,16 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Location is not present
      */
-    def location: String =
+    def location: URI =
       getLocation.getOrElse(throw HeaderNotFound("Location"))
 
     /** Gets Location header value if present. */
-    def getLocation: Option[String] =
-      response.getHeaderValue("Location")
+    def getLocation: Option[URI] =
+      response.getHeaderValue("Location").map(new URI(_))
 
     /** Creates new response setting Location header to supplied value. */
-    def withLocation(value: String): T#MessageType =
-      response.withHeader(Header("Location", value))
+    def withLocation(value: URI): T#MessageType =
+      response.withHeader(Header("Location", value.toString))
 
     /** Creates new response removing Location header. */
     def removeLocation: T#MessageType =
@@ -983,16 +986,16 @@ object ImplicitHeaders {
      *
      * @throws HeaderNotFound if Referer is not present
      */
-    def referer: String =
+    def referer: URI =
       getReferer.getOrElse(throw HeaderNotFound("Referer"))
 
     /** Gets Referer header value if present. */
-    def getReferer: Option[String] =
-      request.getHeaderValue("Referer")
+    def getReferer: Option[URI] =
+      request.getHeaderValue("Referer").map(new URI(_))
 
     /** Creates new request setting Referer header to supplied value. */
-    def withReferer(value: String): T#MessageType =
-      request.withHeader(Header("Referer", value))
+    def withReferer(value: URI): T#MessageType =
+      request.withHeader(Header("Referer", value.toString))
 
     /** Creates new request removing Referer header. */
     def removeReferer: T#MessageType =

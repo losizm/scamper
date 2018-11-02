@@ -27,8 +27,9 @@ object HttpClient {
    * Sends request and passes response to supplied handler.
    *
    * To make effective use of this method, either the Host header must be set,
-   * or the request URI must be absolute. Also note that if the request URI is
-   * absolute, its scheme is overridden in accordance to {@code secure}.
+   * or the request target must be an absolute URI. Also note that if the
+   * request target is absolute, its scheme is overridden in accordance to
+   * {@code secure}.
    *
    * @param request HTTP request
    * @param secure specifies whether to use HTTPS protocol
@@ -38,19 +39,19 @@ object HttpClient {
    */
   def send[T](request: HttpRequest, secure: Boolean = false)(handler: HttpResponse => T): T = {
     val scheme = if (secure) "https" else "http"
-    val uri = request.uri.toURI
-    val host = getHost(uri, request.getHeaderValue("Host"))
+    val host = getHost(request.target, request.getHeaderValue("Host"))
+    val target = request.target.withScheme(scheme).withAuthority(host)
     val userAgent = getUserAgent(request.getHeaderValue("User-Agent"))
     val headers = Header("Host", host) +: Header("User-Agent", userAgent) +:
       request.headers.filterNot(header => header.name.matches("(?i)Host|User-Agent"))
 
-    val conn = getConnection(uri.withScheme(scheme).withAuthority(host))
+    val conn = getConnection(target)
     try handler(conn.send(request.withHeaders(headers : _*)))
     finally Try(conn.close())
   }
 
-  private def getHost(uri: URI, default: => Option[String]): String =
-    Option(uri.getAuthority).orElse(default).getOrElse(throw HeaderNotFound("Host"))
+  private def getHost(target: URI, default: => Option[String]): String =
+    Option(target.getAuthority).orElse(default).getOrElse(throw HeaderNotFound("Host"))
 
   private def getPort(uri: URI): Int =
     uri.getPort match {
@@ -61,6 +62,6 @@ object HttpClient {
   private def getUserAgent(products: Option[String]): String =
     products.getOrElse(s"Java/${sys.props("java.version")} Scamper/0.12")
 
-  private def getConnection(uri: URI): HttpClientConnection =
-    HttpClientConnection(uri.getHost, getPort(uri), uri.getScheme == "https")
+  private def getConnection(target: URI): HttpClientConnection =
+    HttpClientConnection(target.getHost, getPort(target), target.getScheme == "https")
 }
