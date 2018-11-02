@@ -15,16 +15,16 @@
  */
 package scamper
 
-import java.net.{ HttpURLConnection, Socket, URI, URL, URLDecoder, URLEncoder }
+import java.net.{ Socket, URI, URLDecoder, URLEncoder }
 import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
 
 import scala.util.Try
 
-/** Includes type classes for String, URI, and URL. */
+/** Includes HTTP related type classes. */
 object ImplicitExtensions {
   private val crlf = "\r\n".getBytes("ascii")
 
-  /** Adds HTTP related extension methods to {@code java.net.Socket}. */
+  /** Adds extension methods to {@code java.net.Socket}. */
   implicit class HttpSocketType(val socket: Socket) extends AnyVal {
     /**
      * Reads next byte from socket input stream.
@@ -115,7 +115,7 @@ object ImplicitExtensions {
     def writeLine(): Unit = write(crlf)
   }
 
-  /** Adds HTTP related extension methods to {@code String}. */
+  /** Adds extension methods to {@code String}. */
   implicit class HttpStringType(val string: String) extends AnyVal {
     /**
      * Converts to LocalDate.
@@ -151,9 +151,6 @@ object ImplicitExtensions {
     /** Converts to URI. */
     def toURI: URI = new URI(string)
 
-    /** Converts to URL. */
-    def toURL: URL = new URL(string)
-
     /**
      * Encodes to application/x-www-form-urlencoded using the given character encoding.
      *
@@ -169,7 +166,7 @@ object ImplicitExtensions {
     def toURLDecoded(encoding: String): String = URLDecoder.decode(string, encoding)
   }
 
-  /** Adds HTTP related extension methods to {@code java.net.URI}. */
+  /** Adds extension methods to {@code java.net.URI}. */
   implicit class HttpUriType(val uri: URI) extends AnyVal {
     /** Gets query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
@@ -228,41 +225,6 @@ object ImplicitExtensions {
       if (fragment != null) uriBuilder.append('#').append(fragment)
 
       new URI(uriBuilder.toString)
-    }
-  }
-
-  /** Adds HTTP related extension methods to {@code java.net.URL}. */
-  implicit class HttpUrlType(val url: URL) extends AnyVal {
-    /** Gets query parameters. */
-    def getQueryParams(): Map[String, Seq[String]] =
-      QueryParams.parse(url.getQuery)
-
-    /**
-     * Gets value for named query parameter.
-     *
-     * If there are multiple parameters with given name, then value of first
-     * occurrence is retrieved.
-     */
-    def getQueryParamValue(name: String): Option[String] =
-      getQueryParams().get(name).flatMap(_.headOption)
-
-    /** Gets all values for named query parameter. */
-    def getQueryParamValues(name: String): Seq[String] =
-      getQueryParams().getOrElse(name, Nil)
-
-    /**
-     * Opens HTTP connection and passes it to supplied handler.
-     *
-     * The connection is disconnected upon handler return.
-     *
-     * @param handler connection handler
-     *
-     * @return value from supplied handler
-     */
-    def withConnection[T](handler: HttpURLConnection => T): T = {
-      val conn = url.openConnection().asInstanceOf[HttpURLConnection]
-      try handler(conn)
-      finally Try(conn.disconnect())
     }
   }
 }

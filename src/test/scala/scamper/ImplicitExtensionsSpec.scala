@@ -15,7 +15,7 @@
  */
 package scamper
 
-import java.net.{ URI, URL }
+import java.net.URI
 import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
 
 import org.scalatest.FlatSpec
@@ -23,29 +23,21 @@ import org.scalatest.FlatSpec
 import ImplicitExtensions._
 
 class ImplicitExtensionsSpec extends FlatSpec {
-  val uri = new URI("/index.html")
-  val url = new URL("http://localhost:8080/index.html")
+  val uri = new URI("http://localhost:8080/index.html")
+  val uriPath = new URI("/index.html")
+  val uriPathWithParams = new URI("/index.html?name=guest")
 
   "URI" should "be created with new path" in {
-    assert(uri.withPath("/home.html") == new URI("/home.html"))
+    assert(uriPath.withPath("/home.html") == new URI("/home.html"))
   }
 
   it should "be created with new query" in {
-    val newURI = new URI("/index.html?name=guest")
-    assert(uri.withQuery("name=guest") == newURI)
-    assert(uri.withQueryParams("name" -> "guest") == newURI)
+    assert(uriPath.withQuery("name=guest") == uriPathWithParams)
+    assert(uriPath.withQueryParams("name" -> "guest") == uriPathWithParams)
   }
 
-  it should "be converted to URL" in {
-    val newURL = uri.withScheme("http").withAuthority("localhost:8080").toURL
-    assert(url == newURL)
-  }
-
-  "URL" should "have access to its query parameters" in {
-    val newURL = new URL("http://localhost:8080/index.html?make=lexus&model=gs&model=ls")
-    assert(newURL.getQueryParamValue("make").contains("lexus"))
-    assert(newURL.getQueryParamValue("model").contains("gs"))
-    assert(newURL.getQueryParamValues("model").sameElements(Seq("gs", "ls")))
+  it should "created with new scheme and authority" in {
+    assert(uriPath.withScheme("http").withAuthority("localhost:8080") == uri)
   }
 
   "String" should "be converted to LocalDate" in {
