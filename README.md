@@ -22,7 +22,7 @@ import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToProductTyp
 
 val request = GET("/index.html")
   .withHost("localhost:8080")
-  .withUserAgent("Scamper/0.11.1")
+  .withUserAgent("Scamper/0.12")
   .withAccept("text/html", "*/*; q=0.5")
 ```
 
@@ -39,7 +39,7 @@ import scamper.types.ImplicitConverters.{ stringToMediaType, stringToProductType
 
 val response = Ok("Hello, world!")
   .withContentType("text/plain")
-  .withServer("Scamper/0.11.1")
+  .withServer("Scamper/0.12")
   .withConnection("close")
 ```
 
