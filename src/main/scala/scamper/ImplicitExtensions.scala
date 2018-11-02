@@ -15,13 +15,106 @@
  */
 package scamper
 
-import java.net.{ HttpURLConnection, URI, URL, URLDecoder, URLEncoder }
+import java.net.{ HttpURLConnection, Socket, URI, URL, URLDecoder, URLEncoder }
 import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
 
 import scala.util.Try
 
 /** Includes type classes for String, URI, and URL. */
 object ImplicitExtensions {
+  private val crlf = "\r\n".getBytes("ascii")
+
+  /** Adds HTTP related extension methods to {@code java.net.Socket}. */
+  implicit class HttpSocketType(val socket: Socket) extends AnyVal {
+    /**
+     * Reads next byte from socket input stream.
+     *
+     * @return byte
+     */
+    def read(): Int = socket.getInputStream().read()
+
+    /**
+     * Reads bytes from socket input stream into supplied buffer.
+     *
+     * @param buffer buffer into which bytes are read
+     *
+     * @return number of bytes read
+     */
+    def read(buffer: Array[Byte]): Int = socket.getInputStream().read(buffer)
+
+    /**
+     * Reads bytes from socket input stream into supplied buffer.
+     *
+     * @param buffer buffer into which bytes are read
+     * @param offset starting offset in buffer
+     * @param length maximum number of bytes to read
+     *
+     * @return number of bytes read
+     */
+    def read(buffer: Array[Byte], offset: Int, length: Int): Int =
+      socket.getInputStream().read(buffer, offset, length)
+
+    /**
+     * Reads line of ASCII text from socket input stream.
+     *
+     * @param buffer byte buffer for text
+     *
+     * @return line of text
+     */
+    def readLine(buffer: Array[Byte]): String = {
+      var len = 0
+      var byte = -1
+
+      while ({ byte = read(); byte != '\n' && byte != -1}) {
+        buffer(len) = byte.toByte
+        len += 1
+      }
+
+      if (len > 0 && buffer(len - 1) == '\r')
+        len -= 1
+
+      new String(buffer, 0, len, "ascii")
+    }
+
+    /**
+     * Writes byte to socket output stream.
+     *
+     * @param byte byte to be written
+     */
+    def write(byte: Int): Unit = socket.getOutputStream().write(byte)
+
+    /**
+     * Writes bytes from supplied buffer to socket output stream.
+     *
+     * @param buffer buffer from which bytes are written
+     */
+    def write(buffer: Array[Byte]): Unit = socket.getOutputStream().write(buffer)
+
+    /**
+     * Writes bytes from supplied buffer to socket output stream.
+     *
+     * @param buffer buffer from which bytes are read
+     * @param offset starting offset in buffer
+     * @param length number of bytes to write
+     */
+    def write(buffer: Array[Byte], offset: Int, length: Int): Unit =
+      socket.getOutputStream().write(buffer, offset, length)
+
+    /**
+     * Writes line of ASCII text to socket output stream. The text is written
+     * followed by CRLF.
+     *
+     * @param text line of text
+     */
+    def writeLine(text: String): Unit = {
+      write(text.getBytes("ascii"))
+      write(crlf)
+    }
+
+    /** Writes empty line followed by CRLF. */
+    def writeLine(): Unit = write(crlf)
+  }
+
   /** Adds HTTP related extension methods to {@code String}. */
   implicit class HttpStringType(val string: String) extends AnyVal {
     /**

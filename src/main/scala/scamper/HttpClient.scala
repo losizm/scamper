@@ -15,11 +15,11 @@
  */
 package scamper
 
-import java.net.{ HttpURLConnection, URI }
+import java.net.URI
 
-import scala.annotation.tailrec
+import scala.util.Try
 
-import ImplicitExtensions._
+import ImplicitExtensions.{ HttpStringType, HttpUriType }
 
 /** HTTP client */
 object HttpClient {
@@ -40,69 +40,27 @@ object HttpClient {
     val scheme = if (secure) "https" else "http"
     val uri = request.uri.toURI
     val host = getHost(uri, request.getHeaderValue("Host"))
-    val url = uri.withScheme(scheme).withAuthority(host).toURL
     val userAgent = getUserAgent(request.getHeaderValue("User-Agent"))
     val headers = Header("Host", host) +: Header("User-Agent", userAgent) +:
       request.headers.filterNot(header => header.name.matches("(?i)Host|User-Agent"))
 
-    url.withConnection { implicit conn =>
-      conn.setRequestMethod(request.method.name)
-      headers.foreach(header => conn.addRequestProperty(header.name, header.value))
-
-      if (!request.body.isKnownEmpty)
-        writeBody(request.body)
-
-      val response = HttpResponse(getStatusLine(), getResponseHeaders(), getResponseBody())
-
-      handler(response)
-    }
+    val conn = getConnection(uri.withScheme(scheme).withAuthority(host))
+    try handler(conn.send(request.withHeaders(headers : _*)))
+    finally Try(conn.close())
   }
 
   private def getHost(uri: URI, default: => Option[String]): String =
     Option(uri.getAuthority).orElse(default).getOrElse(throw HeaderNotFound("Host"))
 
+  private def getPort(uri: URI): Int =
+    uri.getPort match {
+      case -1   => if (uri.getScheme == "https") 443 else 80
+      case port => port
+    }
+
   private def getUserAgent(products: Option[String]): String =
     products.getOrElse(s"Java/${sys.props("java.version")} Scamper/0.12")
 
-  private def writeBody(body: Entity)(implicit conn: HttpURLConnection): Unit = {
-    conn.setDoOutput(true)
-
-    body.length match {
-      case Some(length) => conn.setFixedLengthStreamingMode(length)
-      case None => conn.setChunkedStreamingMode(8192)
-    }
-
-    body.withInputStream { in =>
-      val out = conn.getOutputStream
-      val buf = new Array[Byte](8192)
-      var len = 0
-
-      while ({ len = in.read(buf); len != -1 })
-        out.write(buf, 0, len)
-    }
-  }
-
-  private def getStatusLine()(implicit conn: HttpURLConnection): StatusLine =
-    StatusLine.parse(conn.getHeaderField(0))
-
-  private def getResponseHeaders()(implicit conn: HttpURLConnection): Seq[Header] = {
-    val headers = getResponseHeaders(1, Nil)
-
-    if ("chunked".equalsIgnoreCase(conn.getHeaderField("Transfer-Encoding")))
-      headers :+ Header.parse("X-Scamper-Transfer-Decoding: chunked")
-    else headers
-  }
-
-  @tailrec
-  private def getResponseHeaders(keyIndex: Int, headers: Seq[Header])(implicit conn: HttpURLConnection): Seq[Header] =
-    conn.getHeaderFieldKey(keyIndex) match {
-      case null => headers
-      case key  => getResponseHeaders(keyIndex + 1, headers :+ Header(key, conn.getHeaderField(keyIndex)))
-    }
-
-  private def getResponseBody()(implicit conn: HttpURLConnection): Entity =
-    Entity { () =>
-      if (conn.getResponseCode < 400) conn.getInputStream
-      else conn.getErrorStream
-    }
+  private def getConnection(uri: URI): HttpClientConnection =
+    HttpClientConnection(uri.getHost, getPort(uri), uri.getScheme == "https")
 }
