@@ -16,13 +16,14 @@ companion object. Or you can start with a `RequestMethod` and build the request
 using [implicit headers and type converters](#implicit-headers-and-type-converters).
 
 ```scala
+import scamper.ImplicitConverters.stringToURI
 import scamper.ImplicitHeaders.{ Accept, Host, UserAgent }
 import scamper.RequestMethods.GET
 import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToProductType }
 
 val request = GET("/index.html")
   .withHost("localhost:8080")
-  .withUserAgent("Scamper/0.12")
+  .withUserAgent("Scamper/1.0")
   .withAccept("text/html", "*/*; q=0.5")
 ```
 
@@ -39,7 +40,7 @@ import scamper.types.ImplicitConverters.{ stringToMediaType, stringToProductType
 
 val response = Ok("Hello, world!")
   .withContentType("text/plain")
-  .withServer("Scamper/0.12")
+  .withServer("Scamper/1.0")
   .withConnection("close")
 ```
 
@@ -65,6 +66,7 @@ def removeContentType: HttpMessage
 So you can work with the message header in a type-safe manner.
 
 ```scala
+import scamper.ImplicitConverters.stringToURI
 import scamper.ImplicitHeaders.ContentType
 import scamper.RequestMethods.POST
 import scamper.types.MediaType
@@ -78,6 +80,7 @@ And with `stringToMediaType` in scope, you can implicitly convert a `String` to
 a `MediaType`.
 
 ```scala
+import scamper.ImplicitConverters.stringToURI
 import scamper.ImplicitHeaders.ContentType
 import scamper.RequestMethods.POST
 import scamper.types.ImplicitConverters.stringToMediaType
@@ -188,7 +191,7 @@ is employed to handle the `HttpResponse`.
 
 ```scala
 import scamper.HttpClient
-import scamper.ImplicitConverters.stringToEntity
+import scamper.ImplicitConverters.{ stringToEntity, stringToURI }
 import scamper.ImplicitHeaders.{ ContentType, Host, Location }
 import scamper.RequestMethods.POST
 import scamper.ResponseFilters._
