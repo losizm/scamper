@@ -22,35 +22,53 @@ import javax.net.ssl.SSLSocketFactory
 
 import scala.collection.mutable.ArrayBuffer
 
-import ImplicitExtensions._
+import ImplicitHeaders.TransferEncoding
+import ImplicitExtensions.HttpSocketType
 
 private class HttpClientConnection private (socket: Socket) extends Closeable {
-  private val buffer = new Array[Byte](8192)
-  private val headers = new ArrayBuffer[Header](32)
-
   socket.setSoTimeout(30000)
   socket.setSendBufferSize(8192)
   socket.setReceiveBufferSize(8192)
+
+  private val buffer = new Array[Byte](8192)
 
   def send(request: HttpRequest): HttpResponse = {
     socket.writeLine(request.startLine.toString)
     request.headers.map(_.toString).foreach(socket.writeLine)
     socket.writeLine()
 
-    var len = 0
+    if (! request.body.isKnownEmpty)
+      writeBody(request)
 
-    if (!request.body.isKnownEmpty) {
-      val in = request.body.getInputStream
-
-      while ({ len = in.read(buffer); len != -1 })
-        socket.write(buffer, 0, len)
-    }
-
+    socket.flush()
     getResponse()
   }
 
+  def close(): Unit = socket.close()
+
+  private def writeBody(request: HttpRequest): Unit =
+    request.getTransferEncoding.map { encoding =>
+      val in = request.body.getInputStream
+      var chunkSize = 0
+
+      while ({ chunkSize = in.read(buffer); chunkSize != -1 }) {
+        socket.writeLine(chunkSize.toString)
+        socket.write(buffer, 0, chunkSize)
+        socket.writeLine()
+      }
+
+      socket.writeLine("0")
+      socket.writeLine()
+    }.getOrElse {
+      val in = request.body.getInputStream
+      var length = 0
+      while ({ length = in.read(buffer); length != -1 })
+        socket.write(buffer, 0, length)
+    }
+
   private def getResponse(): HttpResponse = {
     val statusLine = StatusLine.parse(socket.readLine(buffer))
+    val headers = new ArrayBuffer[Header](8)
     var line = ""
 
     while ({ line = socket.readLine(buffer); line != "" })
@@ -58,8 +76,6 @@ private class HttpClientConnection private (socket: Socket) extends Closeable {
 
     HttpResponse(statusLine, headers.toSeq, Entity(() => socket.getInputStream))
   }
-
-  def close(): Unit = socket.close()
 }
 
 private object HttpClientConnection {

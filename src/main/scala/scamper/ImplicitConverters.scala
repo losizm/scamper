@@ -15,7 +15,7 @@
  */
 package scamper
 
-import java.io.File
+import java.io.{ File, InputStream }
 import java.net.URI
 import java.time.OffsetDateTime
 
@@ -52,6 +52,9 @@ object ImplicitConverters {
 
   /** Converts file to [[Entity]]. */
   implicit val fileToEntity = (entity: File) => Entity(entity)
+
+  /** Converts input stream to [[Entity]]. */
+  implicit val inputStreamToEntity = (entity: () => InputStream) => Entity(entity)
 
   /** Converts string to [[RequestMethod]]. */
   implicit val stringToRequestMethod = (method: String) => RequestMethod(method)

@@ -19,7 +19,11 @@ import java.net.URI
 
 import scala.util.Try
 
-import ImplicitExtensions.{ HttpStringType, HttpUriType }
+import types.TransferCoding
+
+import ImplicitExtensions.HttpUriType
+import ImplicitHeaders.{ ContentLength, Host, TransferEncoding }
+import RequestMethods._
 
 /** HTTP client */
 object HttpClient {
@@ -39,29 +43,63 @@ object HttpClient {
    */
   def send[T](request: HttpRequest, secure: Boolean = false)(handler: HttpResponse => T): T = {
     val scheme = if (secure) "https" else "http"
-    val host = getHost(request.target, request.getHeaderValue("Host"))
+    val host = getHost(request.target.getRawAuthority, request.getHost)
     val target = request.target.withScheme(scheme).withAuthority(host)
     val userAgent = getUserAgent(request.getHeaderValue("User-Agent"))
-    val headers = Header("Host", host) +: Header("User-Agent", userAgent) +:
-      request.headers.filterNot(header => header.name.matches("(?i)Host|User-Agent"))
 
-    val conn = getConnection(target)
-    try handler(conn.send(request.withHeaders(headers : _*)))
+    var effectiveRequest = request.method match {
+      case GET     => getNoBodyRequest(request)
+      case POST    => getBodyRequest(request)
+      case PUT     => getBodyRequest(request)
+      case DELETE  => getNoBodyRequest(request)
+      case HEAD    => getNoBodyRequest(request)
+      case TRACE   => getNoBodyRequest(request)
+      case OPTIONS => getBodyRequest(request)
+      case CONNECT => getNoBodyRequest(request)
+    }
+
+    effectiveRequest = effectiveRequest.withHeaders({
+      Header("Host", host) +:
+      Header("User-Agent", userAgent) +:
+      effectiveRequest.headers.filterNot(header => header.name.matches("(?i)Host|User-Agent"))
+    } : _*)
+
+    if (! effectiveRequest.path.startsWith("/"))
+      effectiveRequest = effectiveRequest.withPath("/" + effectiveRequest.path)
+
+    val conn = HttpClientConnection(target.getHost, getPort(target.getPort, secure), secure)
+    try handler(conn.send(effectiveRequest))
     finally Try(conn.close())
   }
 
-  private def getHost(target: URI, default: => Option[String]): String =
-    Option(target.getAuthority).orElse(default).getOrElse(throw HeaderNotFound("Host"))
+  private def getUserAgent(product: Option[String]): String =
+    product.getOrElse(s"Java/${sys.props("java.version")} Scamper/0.12")
 
-  private def getPort(uri: URI): Int =
-    uri.getPort match {
-      case -1   => if (uri.getScheme == "https") 443 else 80
-      case port => port
+  private def getHost(authority: String, default: => Option[String]): String =
+    Option(authority).orElse(default).getOrElse(throw new HttpException("Cannot determine host"))
+
+  private def getPort(port: Int, secure: Boolean): Int =
+   port match {
+      case -1 => if (secure) 443 else 80
+      case _  => port
     }
 
-  private def getUserAgent(products: Option[String]): String =
-    products.getOrElse(s"Java/${sys.props("java.version")} Scamper/0.12")
+  private def getNoBodyRequest(request: HttpRequest): HttpRequest =
+    request.withBody(Entity.empty).removeContentLength.removeTransferEncoding
 
-  private def getConnection(target: URI): HttpClientConnection =
-    HttpClientConnection(target.getHost, getPort(target), target.getScheme == "https")
+  private def getBodyRequest(request: HttpRequest): HttpRequest =
+    request.getContentLength.map {
+      case 0          => request.withBody(Entity.empty).removeTransferEncoding
+      case n if n > 0 => request.removeTransferEncoding
+      case length     => throw new HttpException(s"Invalid Content-Length: $length")
+    }.orElse {
+      request.getTransferEncoding.map(_ => request)
+    }.orElse {
+      request.body.length.collect {
+        case 0          => request.withBody(Entity.empty).withContentLength(0)
+        case n if n > 0 => request.withContentLength(n)
+      }
+    }.getOrElse {
+      request.withTransferEncoding(TransferCoding("chunked"))
+    }
 }

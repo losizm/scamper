@@ -55,7 +55,8 @@ object ImplicitExtensions {
       socket.getInputStream().read(buffer, offset, length)
 
     /**
-     * Reads line of ASCII text from socket input stream.
+     * Reads line of ASCII text from socket input stream. The CRLF characters
+     * are removed from text before value is returned.
      *
      * @param buffer byte buffer for text
      *
@@ -101,18 +102,20 @@ object ImplicitExtensions {
       socket.getOutputStream().write(buffer, offset, length)
 
     /**
-     * Writes line of ASCII text to socket output stream. The text is written
-     * followed by CRLF.
+     * Writes supplied text and CRLF characters to socket output stream.
      *
-     * @param text line of text
+     * @param text text
      */
     def writeLine(text: String): Unit = {
       write(text.getBytes("ascii"))
       write(crlf)
     }
 
-    /** Writes empty line followed by CRLF. */
+    /** Writes CRLF characters to output stream. */
     def writeLine(): Unit = write(crlf)
+
+    /** Flushes socket output stream. */
+    def flush(): Unit = socket.getOutputStream().flush()
   }
 
   /** Adds extension methods to {@code String}. */

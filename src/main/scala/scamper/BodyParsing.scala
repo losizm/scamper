@@ -54,6 +54,5 @@ trait BodyParsing {
     new SequenceInputStream(new ChunkEnumeration(in, maxBufferSize, maxLength))
 
   private def isChunked(message: HttpMessage): Boolean =
-    message.transferEncoding.exists(_.name == "chunked") &&
-      !message.getHeaderValue("X-Scamper-Transfer-Decoding").contains("chunked")
+    message.getTransferEncoding.isDefined && ! message.getHeaderValue("X-Scamper-Transfer-Decoding").contains("chunked")
 }
