@@ -39,7 +39,7 @@ trait BodyParsing {
   def withInputStream[T](message: HttpMessage)(f: InputStream => T): T =
     message.body.withInputStream { in =>
       val dechunked =
-        if (isChunked(message)) dechunkInputStream(in)
+        if (isChunked(message)) new ChunkedInputStream(in)
         else new BoundedInputStream(in, message.getContentLength.getOrElse(maxLength))
 
       message.contentEncoding.headOption.map(_.name).getOrElse("identity") match {
@@ -49,9 +49,6 @@ trait BodyParsing {
         case encoding   => throw new HttpException(s"Unsupported content encoding: $encoding")
       }
     }
-
-  private def dechunkInputStream(in: InputStream) =
-    new SequenceInputStream(new ChunkEnumeration(in, maxBufferSize, maxLength))
 
   private def isChunked(message: HttpMessage): Boolean =
     message.getTransferEncoding.isDefined && ! message.getHeaderValue("X-Scamper-Transfer-Decoding").contains("chunked")

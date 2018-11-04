@@ -44,6 +44,12 @@ class BodyParserSpec extends FlatSpec {
     assert(message.parse[String] == "Hello, world!")
   }
 
+  it should "detect truncation in chunked text body" in {
+    implicit val bodyParser = BodyParsers.text()
+    val message = Ok(Entity("100\r\nHello, world!")).withContentType("text/plain; charset=utf8").withTransferEncoding("chunked")
+    assertThrows[HttpException](message.parse[String])
+  }
+
   it should "parse request with form body" in {
     implicit val bodyParser = BodyParsers.form()
     val body = Entity("id=0&name=root")
