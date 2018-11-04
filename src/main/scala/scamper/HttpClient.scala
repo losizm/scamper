@@ -43,19 +43,19 @@ object HttpClient {
    */
   def send[T](request: HttpRequest, secure: Boolean = false)(handler: HttpResponse => T): T = {
     val scheme = if (secure) "https" else "http"
-    val host = getHost(request.target.getRawAuthority, request.getHost)
+    val host = getEffectiveHost(request.target.getRawAuthority, request.getHost)
     val target = request.target.withScheme(scheme).withAuthority(host)
-    val userAgent = getUserAgent(request.getHeaderValue("User-Agent"))
+    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/1.0.1")
 
     var effectiveRequest = request.method match {
-      case GET     => getNoBodyRequest(request)
-      case POST    => getBodyRequest(request)
-      case PUT     => getBodyRequest(request)
-      case DELETE  => getNoBodyRequest(request)
-      case HEAD    => getNoBodyRequest(request)
-      case TRACE   => getNoBodyRequest(request)
-      case OPTIONS => getBodyRequest(request)
-      case CONNECT => getNoBodyRequest(request)
+      case GET     => toBodilessRequest(request)
+      case POST    => toBodyRequest(request)
+      case PUT     => toBodyRequest(request)
+      case DELETE  => toBodilessRequest(request)
+      case HEAD    => toBodilessRequest(request)
+      case TRACE   => toBodilessRequest(request)
+      case OPTIONS => toBodyRequest(request)
+      case CONNECT => toBodilessRequest(request)
     }
 
     effectiveRequest = effectiveRequest.withHeaders({
@@ -67,27 +67,27 @@ object HttpClient {
     if (! effectiveRequest.path.startsWith("/"))
       effectiveRequest = effectiveRequest.withPath("/" + effectiveRequest.path)
 
-    val conn = HttpClientConnection(target.getHost, getPort(target.getPort, secure), secure)
+    val conn = HttpClientConnection(
+      target.getHost,
+      target.getPort match {
+        case -1   => if (secure) 443 else 80
+        case port => port
+      },
+      secure
+    )
+
     try handler(conn.send(effectiveRequest))
     finally Try(conn.close())
   }
 
-  private def getUserAgent(product: Option[String]): String =
-    product.getOrElse(s"Java/${sys.props("java.version")} Scamper/0.12")
+  private def getEffectiveHost(authority: String, default: => Option[String]): String =
+    if (authority != null) authority
+    else default.getOrElse(throw new HttpException("Cannot determine host"))
 
-  private def getHost(authority: String, default: => Option[String]): String =
-    Option(authority).orElse(default).getOrElse(throw new HttpException("Cannot determine host"))
-
-  private def getPort(port: Int, secure: Boolean): Int =
-   port match {
-      case -1 => if (secure) 443 else 80
-      case _  => port
-    }
-
-  private def getNoBodyRequest(request: HttpRequest): HttpRequest =
+  private def toBodilessRequest(request: HttpRequest): HttpRequest =
     request.withBody(Entity.empty).removeContentLength.removeTransferEncoding
 
-  private def getBodyRequest(request: HttpRequest): HttpRequest =
+  private def toBodyRequest(request: HttpRequest): HttpRequest =
     request.getContentLength.map {
       case 0          => request.withBody(Entity.empty).removeTransferEncoding
       case n if n > 0 => request.removeTransferEncoding
