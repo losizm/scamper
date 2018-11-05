@@ -217,17 +217,17 @@ object ImplicitExtensions {
       buildURI(uri.getScheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, fragment)
 
     private def buildURI(scheme: String, authority: String, path: String, query: String, fragment: String): URI = {
-      val uriBuilder = new StringBuilder()
+      val uri = new StringBuilder()
 
-      if (scheme != null) uriBuilder.append(scheme).append(":")
-      if (authority != null) uriBuilder.append("//").append(authority)
+      if (scheme != null) uri.append(scheme).append(":")
+      if (authority != null) uri.append("//").append(authority)
 
-      uriBuilder.append('/').append(path.dropWhile(_ == '/'))
+      uri.append('/').append(path.dropWhile(_ == '/'))
 
-      if (query != null && !query.isEmpty) uriBuilder.append('?').append(query)
-      if (fragment != null) uriBuilder.append('#').append(fragment)
+      if (query != null && ! query.isEmpty) uri.append('?').append(query)
+      if (fragment != null && ! fragment.isEmpty) uri.append('#').append(fragment)
 
-      new URI(uriBuilder.toString)
+      new URI(uri.toString)
     }
   }
 }
