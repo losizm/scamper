@@ -52,7 +52,7 @@ private class HttpClientConnection private (socket: Socket) extends Closeable {
       var chunkSize = 0
 
       while ({ chunkSize = in.read(buffer); chunkSize != -1 }) {
-        socket.writeLine(chunkSize.toString)
+        socket.writeLine(chunkSize.toHexString)
         socket.write(buffer, 0, chunkSize)
         socket.writeLine()
       }

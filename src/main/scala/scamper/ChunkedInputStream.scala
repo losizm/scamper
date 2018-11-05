@@ -24,7 +24,11 @@ private class ChunkedInputStream(in: InputStream) extends InputStream {
   nextChunk()
 
   override def read(): Int = withReadability {
-    case true  => position += 1; in.read()
+    case true =>
+      in.read() match {
+        case -1   => throw new HttpException("Truncation detected")
+        case byte => position += 1; byte
+      }
     case false => -1
   }
 
@@ -82,10 +86,10 @@ private class ChunkedInputStream(in: InputStream) extends InputStream {
     if (chunkSize > 0 && readLine().length != 0)
       throw new HttpException("Invalid chunk termination")
 
-    val regex = "(\\d+)(\\s*;\\s*.+=.+)*".r
+    val regex = "(\\p{XDigit}+)(\\s*;\\s*.+=.+)*".r
 
     readLine match {
-      case regex(size, _*) => size.toInt
+      case regex(size, _*) => Integer.parseInt(size, 16)
       case line => throw new HttpException(s"Invalid chunk size: $line")
     }
   }
