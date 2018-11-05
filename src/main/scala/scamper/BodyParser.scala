@@ -39,26 +39,26 @@ object BodyParsers {
   /**
    * Gets body parser to collect raw bytes of message body.
    *
-   * @param maxLength maximum length in bytes allowed
+   * @param maxLength maximum length
    */
   def bytes(maxLength: Int = 4 * 1024 * 1024): BodyParser[Array[Byte]] =
-    new ByteArrayBodyParser(maxLength)
+    new ByteArrayBodyParser(maxLength.max(0))
 
   /**
    * Gets body parser to collect text content.
    *
-   * @param maxLength maximum length in bytes allowed
+   * @param maxLength maximum length in bytes
    */
   def text(maxLength: Int = 4 * 1024 * 1024): BodyParser[String] =
-    new TextBodyParser(maxLength)
+    new TextBodyParser(maxLength.max(0))
 
   /**
    * Gets body parser to collect form data.
    *
-   * @param maxLength maximum length in bytes allowed
+   * @param maxLength maximum length in bytes
    */
   def form(maxLength: Int = 4 * 1024 * 1024): BodyParser[Map[String, Seq[String]]] =
-    new FormBodyParser(maxLength)
+    new FormBodyParser(maxLength.max(0))
 
   /**
    * Gets body parser to store message body to file.
@@ -68,15 +68,15 @@ object BodyParsers {
    * overwrites the specified file on each invocation.
    *
    * @param dest destination to which message body is stored
-   * @param maxLength maximum length in bytes allowed
+   * @param maxLength maximum length in bytes
+   * @param bufferSize buffer size in bytes
    */
-  def file(dest: File = new File(sys.props("java.io.tmpdir")), maxLength: Long = 4 * 1024 * 1024): BodyParser[File] =
-    new FileBodyParser(dest, maxLength, maxLength.min(Int.MaxValue).toInt)
+  def file(dest: File = new File(sys.props("java.io.tmpdir")), maxLength: Long = 4 * 1024 * 1024, bufferSize: Int = 8192): BodyParser[File] =
+    new FileBodyParser(dest, maxLength.max(0), bufferSize.max(8192))
 }
 
 private class ByteArrayBodyParser(val maxLength: Long) extends BodyParser[Array[Byte]] with BodyParsing {
-  val maxBufferSize = maxLength.toInt
-  private val bufferSize = maxBufferSize.min(8192)
+  val bufferSize = maxLength.min(8192).toInt
 
   def parse(message: HttpMessage): Array[Byte] =
     withInputStream(message) { in =>
@@ -103,7 +103,7 @@ private class TextBodyParser(maxLength: Int) extends BodyParser[String] {
       .map(MediaType.parse)
       .flatMap(_.params.get("charset"))
       .orElse(Some("UTF-8"))
-      .map(new String(bodyParser.parse(message), _)).get
+      .map(charset => new String(bodyParser.parse(message), charset)).get
 }
 
 private class FormBodyParser(maxLength: Int) extends BodyParser[Map[String, Seq[String]]] {
@@ -113,14 +113,14 @@ private class FormBodyParser(maxLength: Int) extends BodyParser[Map[String, Seq[
     QueryParams.parse(bodyParser.parse(message))
 }
 
-private class FileBodyParser(dest: File, val maxLength: Long, val maxBufferSize: Int) extends BodyParser[File] with BodyParsing {
+private class FileBodyParser(dest: File, val maxLength: Long, val bufferSize: Int) extends BodyParser[File] with BodyParsing {
   def parse(message: HttpMessage): File =
     withInputStream(message) { in =>
       val destFile = getDestFile()
       val out = new FileOutputStream(destFile)
 
       try {
-        val buf = new Array[Byte](maxBufferSize.min(8192))
+        val buf = new Array[Byte](bufferSize)
         var len = 0
 
         while ({ len = in.read(buf); len != -1 })

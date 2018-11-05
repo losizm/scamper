@@ -22,11 +22,11 @@ import scamper.ImplicitHeaders.{ ContentEncoding, ContentLength, TransferEncodin
 
 /** A mixin that provides access to decoded message body. */
 trait BodyParsing {
-  /** Maximum body length allowed */
+  /** Gets maximum body length. */
   def maxLength: Long
 
-  /** Maximum buffer size allowed */
-  def maxBufferSize: Int
+  /** Gets buffer size. */
+  def bufferSize: Int
 
   /**
    * Provides input stream to decoded message body.
