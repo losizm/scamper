@@ -41,7 +41,7 @@ object HttpClient {
    *
    * @return value from supplied handler
    */
-  def send[T](request: HttpRequest, secure: Boolean = false)(handler: HttpResponse => T): T = {
+  def send[T](request: HttpRequest, secure: Boolean = false, timeout: Int = 30000, bufferSize: Int = 8192)(handler: HttpResponse => T): T = {
     val scheme = if (secure) "https" else "http"
     val host = getEffectiveHost(request.target.getRawAuthority, request.getHost)
     val target = request.target.withScheme(scheme).withAuthority(host)
@@ -73,7 +73,9 @@ object HttpClient {
         case -1   => if (secure) 443 else 80
         case port => port
       },
-      secure
+      secure,
+      timeout,
+      bufferSize
     )
 
     try handler(conn.send(effectiveRequest))

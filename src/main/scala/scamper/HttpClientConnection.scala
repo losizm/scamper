@@ -21,15 +21,13 @@ import java.net.Socket
 import javax.net.ssl.SSLSocketFactory
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Try
+import scala.util.control.NonFatal
 
 import ImplicitHeaders.TransferEncoding
 import ImplicitExtensions.HttpSocketType
 
 private class HttpClientConnection private (socket: Socket) extends Closeable {
-  socket.setSoTimeout(30000)
-  socket.setSendBufferSize(8192)
-  socket.setReceiveBufferSize(8192)
-
   private val buffer = new Array[Byte](8192)
 
   def send(request: HttpRequest): HttpResponse = {
@@ -82,8 +80,19 @@ private object HttpClientConnection {
   private def createSslSocket(host: String, port: Int): Socket =
     SSLSocketFactory.getDefault.createSocket(host, port)
 
-  def apply(host: String, port: Int, secure: Boolean = false): HttpClientConnection = {
-    if (secure) new HttpClientConnection(createSslSocket(host, port))
-    else new HttpClientConnection(new Socket(host, port))
+  def apply(host: String, port: Int, secure: Boolean, timeout: Int, bufferSize: Int): HttpClientConnection = {
+    val socket = if (secure) createSslSocket(host, port) else new Socket(host, port)
+
+    try {
+      socket.setSoTimeout(timeout)
+      socket.setSendBufferSize(bufferSize)
+      socket.setReceiveBufferSize(bufferSize)
+    } catch {
+      case NonFatal(cause) =>
+        Try(socket.close())
+        throw cause
+    }
+
+    new HttpClientConnection(socket)
   }
 }
