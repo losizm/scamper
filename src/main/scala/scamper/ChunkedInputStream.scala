@@ -15,7 +15,7 @@
  */
 package scamper
 
-import java.io.{ InputStream, IOException }
+import java.io.{ EOFException, InputStream, IOException }
 
 private class ChunkedInputStream(in: InputStream) extends InputStream {
   private var chunkSize = 0
@@ -23,46 +23,42 @@ private class ChunkedInputStream(in: InputStream) extends InputStream {
 
   nextChunk()
 
-  override def read(): Int = withReadability {
+  override def read(): Int = isReadable() match {
     case true =>
       in.read() match {
-        case -1   => throw new HttpException("Truncation detected")
+        case -1   => throw new EOFException("Truncation detected")
         case byte => position += 1; byte
       }
     case false => -1
   }
 
-  override def read(buf: Array[Byte]): Int = read(buf, 0, buf.length)
+  override def read(buffer: Array[Byte]): Int = read(buffer, 0, buffer.length)
 
-  override def read(buf: Array[Byte], off: Int, len: Int): Int = withReadability {
+  override def read(buffer: Array[Byte], offset: Int, length: Int): Int = isReadable() match {
     case true =>
-      if (off < 0 || len < 0 || (off + len) > buf.length)
-        throw new IndexOutOfBoundsException()
-
-      in.read(buf, off, len.min(chunkSize - position)) match {
-        case -1 => throw new HttpException("Truncation detected")
-        case n  =>
-          position += n
-          n
-      }
-
+      var total = 0
+      while (total < length && isReadable())
+        in.read(buffer, offset + total, (length - total).min(chunkSize - position)) match {
+          case -1    => throw new EOFException("Truncation detected")
+          case count => total += count; position += count
+        }
+      total
     case false => -1
   }
 
-  override def available(): Int = withReadability {
+  override def available(): Int = isReadable() match {
     case true  => chunkSize - position
     case false => 0
   }
 
-  override def skip(count: Long): Long = withReadability {
+  override def skip(count: Long): Long = isReadable() match {
     case true =>
       if (count <= 0) 0
       else {
-        val len = count.min(8192).toInt
-        val buf = new Array[Byte](len)
-        read(buf).max(0)
+        val length = count.min(8192).toInt
+        val buffer = new Array[Byte](length)
+        read(buffer).max(0)
       }
-
     case false => 0
   }
 
@@ -71,10 +67,10 @@ private class ChunkedInputStream(in: InputStream) extends InputStream {
   override def reset(): Unit = throw new IOException("Mark/reset not supported")
   override def close(): Unit = in.close()
 
-  private def withReadability[T](f: Boolean => T): T = {
+  private def isReadable(): Boolean = {
     if (position == chunkSize && chunkSize > 0)
       nextChunk()
-    f(position < chunkSize)
+    position < chunkSize
   }
 
   private def nextChunk(): Unit = {
@@ -84,30 +80,30 @@ private class ChunkedInputStream(in: InputStream) extends InputStream {
 
   private def nextChunkSize: Int = {
     if (chunkSize > 0 && readLine().length != 0)
-      throw new HttpException("Invalid chunk termination")
+      throw new IOException("Invalid chunk termination")
 
     val regex = "(\\p{XDigit}+)(\\s*;\\s*.+=.+)*".r
 
     readLine match {
-      case regex(size, _*) => Integer.parseInt(size, 16)
-      case line => throw new HttpException(s"Invalid chunk size: $line")
+      case regex(size, _) => Integer.parseInt(size, 16)
+      case line => throw new IOException(s"Invalid chunk size: $line")
     }
   }
 
   private def readLine(): String = {
-    val buf = new Array[Byte](256)
+    val buffer = new Array[Byte](256)
     var byte = in.read()
-    var len = 0
+    var length = 0
 
     while (byte != '\n' && byte != -1) {
-      buf(len) = byte.toByte
+      buffer(length) = byte.toByte
       byte = in.read()
-      len += 1
+      length += 1
     }
 
-    if (len > 0 && buf(len - 1) == '\r')
-      len -= 1
+    if (length > 0 && buffer(length - 1) == '\r')
+      length -= 1
 
-    new String(buf, 0, len)
+    new String(buffer, 0, length)
   }
 }
