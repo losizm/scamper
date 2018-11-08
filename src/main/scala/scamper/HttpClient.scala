@@ -36,7 +36,9 @@ object HttpClient {
    * {@code secure}.
    *
    * @param request HTTP request
-   * @param secure specifies whether to use HTTPS protocol
+   * @param secure specifies whether to use HTTPS
+   * @param timeout sets read timeout (in milliseconds) of client socket
+   * @param bufferSize sets buffer size of client socket
    * @param handler response handler
    *
    * @return value from supplied handler
