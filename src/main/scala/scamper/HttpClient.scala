@@ -45,14 +45,15 @@ object HttpClient {
    */
   def send[T](request: HttpRequest, secure: Boolean = false, timeout: Int = 30000, bufferSize: Int = 8192)(handler: HttpResponse => T): T = {
     val scheme = if (secure) "https" else "http"
-    val host = getEffectiveHost(request.target.getRawAuthority, request.getHost)
+    val host = getEffectiveHost(request.target, request.getHost)
     val target = request.target.withScheme(scheme).withAuthority(host)
-    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/1.1")
+    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/1.3")
 
     var effectiveRequest = request.method match {
       case GET     => toBodilessRequest(request)
       case POST    => toBodyRequest(request)
       case PUT     => toBodyRequest(request)
+      case PATCH   => toBodyRequest(request)
       case DELETE  => toBodilessRequest(request)
       case HEAD    => toBodilessRequest(request)
       case TRACE   => toBodilessRequest(request)
@@ -84,9 +85,14 @@ object HttpClient {
     finally Try(conn.close())
   }
 
-  private def getEffectiveHost(authority: String, default: => Option[String]): String =
-    if (authority != null) authority
-    else default.getOrElse(throw new HttpException("Cannot determine host"))
+  private def getEffectiveHost(target: URI, default: => Option[String]): String =
+    target.getHost match {
+      case null => default.getOrElse(throw new HttpException("Cannot determine host"))
+      case host => target.getPort match {
+        case -1   => host
+        case port => s"$host:$port"
+      }
+    }
 
   private def toBodilessRequest(request: HttpRequest): HttpRequest =
     request.withBody(Entity.empty).removeContentLength.removeTransferEncoding

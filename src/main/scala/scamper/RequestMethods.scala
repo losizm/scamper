@@ -29,6 +29,9 @@ object RequestMethods {
   /** PUT request method */
   val PUT: RequestMethod = RequestMethodImpl("PUT")
 
+  /** PATCH request method */
+  val PATCH: RequestMethod = RequestMethodImpl("PATCH")
+
   /** DELETE request method */
   val DELETE: RequestMethod = RequestMethodImpl("DELETE")
 
