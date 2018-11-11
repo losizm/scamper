@@ -22,7 +22,7 @@ import scala.util.Try
 
 /** Includes HTTP related type classes. */
 object ImplicitExtensions {
-  private val crlf = "\r\n".getBytes("ascii")
+  private val crlf = "\r\n".getBytes("UTF-8")
 
   /** Adds extension methods to {@code java.net.Socket}. */
   implicit class HttpSocketType(val socket: Socket) extends AnyVal {
@@ -55,8 +55,8 @@ object ImplicitExtensions {
       socket.getInputStream().read(buffer, offset, length)
 
     /**
-     * Reads line of ASCII text from socket input stream. The CRLF characters
-     * are removed from text before value is returned.
+     * Reads line of text from socket input stream. The CRLF characters are
+     * removed before value is returned.
      *
      * @param buffer byte buffer for text
      *
@@ -74,7 +74,7 @@ object ImplicitExtensions {
       if (len > 0 && buffer(len - 1) == '\r')
         len -= 1
 
-      new String(buffer, 0, len, "ascii")
+      new String(buffer, 0, len, "UTF-8")
     }
 
     /**
@@ -107,7 +107,7 @@ object ImplicitExtensions {
      * @param text text
      */
     def writeLine(text: String): Unit = {
-      write(text.getBytes("ascii"))
+      write(text.getBytes("UTF-8"))
       write(crlf)
     }
 
