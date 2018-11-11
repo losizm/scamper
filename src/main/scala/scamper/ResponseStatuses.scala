@@ -162,5 +162,5 @@ object ResponseStatuses {
   val HttpVersionNotSupported = ResponseStatus(505)
 
   /** 511 Network Authentication Required */
-  val NetworkAuthenticationRequired = ResponseStatus(505)
+  val NetworkAuthenticationRequired = ResponseStatus(511)
 }
