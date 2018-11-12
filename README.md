@@ -45,20 +45,22 @@ val response = Ok("Hello, world!")
 ```
 
 ## Implicit Headers and Type Converters
-The implicit headers and type converters are defined in
-`scamper.ImplicitHeaders` and `scamper.types.ImplicitConverters`. They allow
-type-safe access to message headers.
+The implicit headers and type converters are defined in `scamper.ImplicitHeaders`
+and `scamper.types.ImplicitConverters`. They allow type-safe access to message
+headers.
 
-For example, the `ContentType` header adds the following methods to
-`HttpMessage`:
+For example, the `ContentType` header adds the following methods to `HttpMessage`:
 
 ```scala
 /** Gets Content-Type header value */
 def contentType: MediaType
+
 /** Gets Content-Type header value if present */
 def getContentType: Option[MediaType]
+
 /** Creates message with Content-Type header */
 def withContentType(value: MediaType): HttpMessage
+
 /** Creates message without Content-Type header */
 def removeContentType: HttpMessage
 ```
@@ -150,8 +152,8 @@ def printText(message: HttpMessage): Unit = {
 }
 ```
 
-You can also implement custom body parsers. Here's one that gets help
-from a standard body parser and [little-json](https://github.com/losizm/little-json):
+You can also implement custom body parsers. Here's one that gets some help from
+[little-json](https://github.com/losizm/little-json):
 
 ```scala
 import javax.json.JsonObject
@@ -165,7 +167,7 @@ implicit object UserBodyParser extends BodyParser[User] {
   // Create standard text body parser
   implicit val textBodyParser = BodyParsers.text(maxLength = 1024)
 
-  // Convert JSON to User
+  // Define how to convert JSON to User
   implicit val userFromJson: FromJson[User] = {
     case json: JsonObject => User(json.getInt("id"), json.getString("name"))
   }
@@ -186,8 +188,8 @@ def printUser(message: HttpMessage): Unit = {
 ## HTTP Client
 **Scamper** provides a client for sending requests and handling the responses.
 
-In this next example, an `HttpRequest` is sent, and a `ResponseFilter` stack
-is employed to handle the `HttpResponse`.
+In the following example, an `HttpRequest` is sent, and the `HttpResponse`
+handler prints a message in accordance to the response status.
 
 ```scala
 import scamper.HttpClient
