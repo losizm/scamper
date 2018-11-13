@@ -53,12 +53,11 @@ private class ChunkedInputStream(in: InputStream) extends InputStream {
 
   override def skip(count: Long): Long = isReadable() match {
     case true =>
-      if (count <= 0) 0
-      else {
-        val length = count.min(8192).toInt
-        val buffer = new Array[Byte](length)
-        read(buffer).max(0)
-      }
+      val buffer = new Array[Byte](count.max(0).min(8192).toInt)
+      var skipCount = 0L
+      while (skipCount < count && isReadable())
+        skipCount += read(buffer)
+      skipCount
     case false => 0
   }
 
