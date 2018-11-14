@@ -56,7 +56,7 @@ private class ChunkedInputStream(in: InputStream) extends InputStream {
       val buffer = new Array[Byte](count.max(0).min(8192).toInt)
       var skipCount = 0L
       while (skipCount < count && isReadable())
-        skipCount += read(buffer)
+        skipCount += read(buffer, 0, (count - skipCount).min(buffer.length).toInt)
       skipCount
     case false => 0
   }
