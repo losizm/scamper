@@ -18,43 +18,44 @@ package scamper
 /** Provides builder pattern for HTTP message. */
 trait MessageBuilder[T <: HttpMessage] {
   /**
-   * Creates message with new start line.
+   * Creates message with supplied start line.
+   *
+   * @param startLine message start line
    *
    * @return new message
    */
   def withStartLine(line: T#LineType): T
 
   /**
-   * Creates copy of message with new set of headers. All previous headers are
-   * removed.
+   * Creates message with supplied headers. All previous headers are removed.
    *
-   * @param headers new set of headers
+   * @param headers message headers
    *
    * @return new message
    */
   def withHeaders(headers: Header*): T
 
   /**
-   * Creates copy of message with additional headers.
+   * Creates message with additional headers.
    *
-   * @param headers additional headers
+   * @param headers additional message headers
    *
    * @return new message
    */
   def addHeaders(headers: Header*): T
 
   /**
-   * Creates copy of message excluding headers with supplied field names.
+   * Creates message excluding headers with given field names.
    *
-   * @param names field names
+   * @param names header field names
    *
    * @return new message
    */
   def removeHeaders(names: String*): T
 
   /**
-   * Creates copy of message with given header. All previous headers with same
-   * field name are removed.
+   * Creates message with supplied header. All previous headers with same field
+   * name are removed.
    *
    * @param header message header
    *
@@ -63,7 +64,7 @@ trait MessageBuilder[T <: HttpMessage] {
   def withHeader(header: Header): T
 
   /**
-   * Creates copy of message with given body.
+   * Creates message with supplied body.
    *
    * @param body message body
    *

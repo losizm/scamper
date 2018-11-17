@@ -27,28 +27,27 @@ trait Header {
   /** Gets header value. */
   def value: String
 
-  /** Gets header value as OffsetDateTime. */
-  def dateValue: OffsetDateTime =
-    DateValue.parse(value)
+  /** Gets header value as `OffsetDateTime`. */
+  def dateValue: OffsetDateTime = DateValue.parse(value)
 
   /** Gets header value as Long. */
   def longValue: Long = value.toLong
 
-  /** Returns formatted HTTP header. */
+  /** Returns formatted header. */
   override lazy val toString: String = s"$name: $value"
 }
 
-/** Header factory */
+/** Provided for factory for `Header`. */
 object Header {
-  /** Creates Header using supplied name and value. */
+  /** Creates `Header` using supplied name and value. */
   def apply(name: String, value: String): Header =
     HeaderImpl(Name(name), Value(value))
 
-  /** Creates Header using supplied name and value. */
+  /** Creates `Header` using supplied name and value. */
   def apply(name: String, value: Long): Header =
     apply(name, value.toString)
 
-  /** Creates Header using supplied name and value. */
+  /** Creates `Header` using supplied name and value. */
   def apply(name: String, value: OffsetDateTime): Header =
     apply(name, DateValue.format(value))
 
@@ -59,7 +58,7 @@ object Header {
       case _ => throw new IllegalArgumentException(s"Malformed header: $header")
     }
 
-  /** Destructures Header to name-value pair. */
+  /** Destructures `Header`. */
   def unapply(header: Header): Option[(String, String)] =
     Some(header.name -> header.value)
 }
