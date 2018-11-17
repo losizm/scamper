@@ -17,9 +17,9 @@ package scamper
 
 import org.scalatest.FlatSpec
 import scamper.ImplicitConverters.stringToURI
-import scamper.ImplicitHeaders._
 import scamper.RequestMethods._
 import scamper.ResponseStatuses._
+import scamper.headers._
 
 class HttpMessageSpec extends FlatSpec {
   "HttpRequest" should "be created with path" in {

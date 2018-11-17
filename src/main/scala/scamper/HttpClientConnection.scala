@@ -24,7 +24,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 import scala.util.control.NonFatal
 
-import ImplicitHeaders.TransferEncoding
+import scamper.headers.TransferEncoding
 import ImplicitExtensions.HttpSocketType
 
 private class HttpClientConnection private (socket: Socket) extends Closeable {

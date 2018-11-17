@@ -20,8 +20,8 @@ import scamper.Grammar.Token
 /**
  * Standardized type for User-Agent and Server header value.
  *
- * @see [[scamper.ImplicitHeaders.UserAgent]]
- * @see [[scamper.ImplicitHeaders.Server]]
+ * @see [[scamper.headers.UserAgent]]
+ * @see [[scamper.headers.Server]]
  */
 trait ProductType {
   /** Gets product name. */

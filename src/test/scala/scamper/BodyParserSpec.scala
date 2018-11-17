@@ -20,9 +20,9 @@ import java.io.EOFException
 import org.scalatest.FlatSpec
 
 import scamper.ImplicitConverters.stringToURI
-import scamper.ImplicitHeaders._
 import scamper.RequestMethods._
 import scamper.ResponseStatuses._
+import scamper.headers._
 import scamper.types.ImplicitConverters._
 
 class BodyParserSpec extends FlatSpec {

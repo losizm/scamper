@@ -23,7 +23,7 @@ import scala.util.Try
 import scamper.types._
 
 /** Includes type classes for standardized access to message headers. */
-object ImplicitHeaders {
+package object headers {
   /** Provides standardized access to Accept header. */
   implicit class Accept(val request: HttpRequest) extends AnyVal {
     /**

@@ -22,7 +22,7 @@ import scamper.ListParser
 /**
  * Standardized type for Link header value.
  *
- * @see [[scamper.ImplicitHeaders.Link]]
+ * @see [[scamper.headers.Link]]
  */
 trait LinkValue {
   /** Gets link reference. */

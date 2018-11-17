@@ -21,7 +21,7 @@ import scamper.ListParser
 /**
  * Standardized type for Pragma header value.
  *
- * @see [[scamper.ImplicitHeaders.Pragma]]
+ * @see [[scamper.headers.Pragma]]
  */
 trait PragmaDirective {
   /** Gets directive name. */

@@ -22,7 +22,7 @@ import scala.util.Try
 import types.TransferCoding
 
 import ImplicitExtensions.HttpUriType
-import ImplicitHeaders.{ ContentLength, Host, TransferEncoding }
+import scamper.headers.{ ContentLength, Host, TransferEncoding }
 import RequestMethods._
 
 /** HTTP client */

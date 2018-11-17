@@ -18,7 +18,7 @@ package scamper.types
 /**
  * Standardized type for Content-Language header value.
  *
- * @see [[scamper.ImplicitHeaders.ContentLanguage]]
+ * @see [[scamper.headers.ContentLanguage]]
  */
 trait LanguageTag {
   /** Gets primary subtag. */

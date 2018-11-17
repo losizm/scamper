@@ -18,7 +18,7 @@ package scamper.types
 /**
  * Standardized type for Content-Range header value.
  *
- * @see [[scamper.ImplicitHeaders.ContentRange]]
+ * @see [[scamper.headers.ContentRange]]
  */
 trait ContentRangeType {
   /** Gets range unit. */
@@ -31,7 +31,7 @@ trait ContentRangeType {
 /**
  * Standardized type for Content-Range header value.
  *
- * @see [[scamper.ImplicitHeaders.ContentRange]]
+ * @see [[scamper.headers.ContentRange]]
  */
 trait ByteContentRange extends ContentRangeType {
   import ByteContentRange._

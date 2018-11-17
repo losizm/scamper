@@ -20,7 +20,7 @@ import CodingHelper._
 /**
  * Standardized type for TE header value.
  *
- * @see [[scamper.ImplicitHeaders.TE]]
+ * @see [[scamper.headers.TE]]
  */
 trait TransferCodingRange {
   /** Gets coding name. */

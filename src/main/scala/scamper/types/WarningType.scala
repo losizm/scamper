@@ -22,7 +22,7 @@ import scamper.{ DateValue, ListParser }
 /**
  * Standardized type for Warning header value.
  *
- * @see [[scamper.ImplicitHeaders.Warning]]
+ * @see [[scamper.headers.Warning]]
  */
 trait WarningType {
   /** Gets warning code. */

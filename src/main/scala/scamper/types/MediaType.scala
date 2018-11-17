@@ -20,7 +20,7 @@ import MediaTypeHelper._
 /**
  * Standardized type for Content-Type header value.
  *
- * @see [[scamper.ImplicitHeaders.ContentType]]
+ * @see [[scamper.headers.ContentType]]
  */
 trait MediaType {
   /** Gets main type of media type. */

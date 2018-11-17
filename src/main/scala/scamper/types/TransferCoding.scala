@@ -20,7 +20,7 @@ import CodingHelper._
 /**
  * Standardized type for Transfer-Encoding header value.
  *
- * @see [[scamper.ImplicitHeaders.TransferEncoding]]
+ * @see [[scamper.headers.TransferEncoding]]
  */
 trait TransferCoding {
   /** Gets coding name. */

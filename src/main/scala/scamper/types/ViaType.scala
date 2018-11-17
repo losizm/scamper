@@ -20,7 +20,7 @@ import scamper.ListParser
 /**
  * Standardized type for Via header value.
  *
- * @see [[scamper.ImplicitHeaders.Via]]
+ * @see [[scamper.headers.Via]]
  */
 trait ViaType {
   /** Gets received protcol. */

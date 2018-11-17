@@ -20,7 +20,7 @@ import CodingHelper.Name
 /**
  * Standardized type for Content-Encoding header value.
  *
- * @see [[scamper.ImplicitHeaders.ContentEncoding]]
+ * @see [[scamper.headers.ContentEncoding]]
  */
 trait ContentCoding {
   /** Gets coding name. */

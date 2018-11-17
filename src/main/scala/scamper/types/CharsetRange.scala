@@ -20,7 +20,7 @@ import scamper.Grammar.Token
 /**
  * Standardized type for Accept-Charset header value.
  *
- * @see [[scamper.ImplicitHeaders.AcceptCharset]]
+ * @see [[scamper.headers.AcceptCharset]]
  */
 trait CharsetRange {
   /** Gets charset. */

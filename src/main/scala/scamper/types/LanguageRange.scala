@@ -18,7 +18,7 @@ package scamper.types
 /**
  * Standardized type for Accept-Language header value.
  *
- * @see [[scamper.ImplicitHeaders.AcceptLanguage]]
+ * @see [[scamper.headers.AcceptLanguage]]
  */
 trait LanguageRange {
   /** Gets language tag. */
