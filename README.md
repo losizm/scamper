@@ -17,13 +17,13 @@ using [implicit headers and type converters](#implicit-headers-and-type-converte
 
 ```scala
 import scamper.ImplicitConverters.stringToURI
-import scamper.ImplicitHeaders.{ Accept, Host, UserAgent }
 import scamper.RequestMethods.GET
+import scamper.headers.{ Accept, Host, UserAgent }
 import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToProductType }
 
 val request = GET("/index.html")
   .withHost("localhost:8080")
-  .withUserAgent("Scamper/1.3")
+  .withUserAgent("Scamper/2.0")
   .withAccept("text/html", "*/*; q=0.5")
 ```
 
@@ -34,18 +34,18 @@ response using [implicit headers and type converters](#implicit-headers-and-type
 
 ```scala
 import scamper.ImplicitConverters.stringToEntity
-import scamper.ImplicitHeaders.{ Connection, ContentType, Server }
 import scamper.ResponseStatuses.Ok
+import scamper.headers.{ Connection, ContentType, Server }
 import scamper.types.ImplicitConverters.{ stringToMediaType, stringToProductType }
 
 val response = Ok("Hello, world!")
   .withContentType("text/plain")
-  .withServer("Scamper/1.3")
+  .withServer("Scamper/2.0")
   .withConnection("close")
 ```
 
 ## Implicit Headers and Type Converters
-The implicit headers and type converters are defined in `scamper.ImplicitHeaders`
+The implicit headers and type converters are defined in `scamper.headers`
 and `scamper.types.ImplicitConverters`. They allow type-safe access to message
 headers.
 
@@ -69,8 +69,8 @@ So you can work with the message header in a type-safe manner.
 
 ```scala
 import scamper.ImplicitConverters.stringToURI
-import scamper.ImplicitHeaders.ContentType
 import scamper.RequestMethods.POST
+import scamper.headers.ContentType
 import scamper.types.MediaType
 
 val req = POST("/api/users").withContentType(MediaType.parse("application/json"))
@@ -83,8 +83,8 @@ a `MediaType`.
 
 ```scala
 import scamper.ImplicitConverters.stringToURI
-import scamper.ImplicitHeaders.ContentType
 import scamper.RequestMethods.POST
+import scamper.headers.ContentType
 import scamper.types.ImplicitConverters.stringToMediaType
 
 val req = POST("/api/users").withContentType("application/json")
@@ -101,8 +101,8 @@ create the message body. For example, you can create a text message body.
 
 ```scala
 import scamper.Entity
-import scamper.ImplicitHeaders.ContentType
 import scamper.ResponseStatuses.Ok
+import scamper.headers.ContentType
 import scamper.types.ImplicitConverters.stringToMediaType
 
 val body = Entity("""
@@ -124,8 +124,8 @@ Or you can create a message body from file content.
 ```scala
 import java.io.File
 import scamper.Entity
-import scamper.ImplicitHeaders.ContentType
 import scamper.ResponseStatuses.Ok
+import scamper.headers.ContentType
 import scamper.types.ImplicitConverters.stringToMediaType
 
 val body = Entity(new File("./index.html"))
@@ -194,9 +194,9 @@ handler prints a message in accordance to the response status.
 ```scala
 import scamper.HttpClient
 import scamper.ImplicitConverters.{ stringToEntity, stringToURI }
-import scamper.ImplicitHeaders.{ ContentType, Host, Location }
 import scamper.RequestMethods.POST
 import scamper.ResponseFilters._
+import scamper.headers.{ ContentType, Host, Location }
 import scamper.types.ImplicitConverters.stringToMediaType
 
 object UserAdminClient {
