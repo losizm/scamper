@@ -1241,17 +1241,17 @@ package object headers {
   }
 
   /** Provides standardized access to WWW-Authenticate header. */
-  implicit class WWWAuthenticate(val response: HttpResponse) extends AnyVal {
+  implicit class WwwAuthenticate(val response: HttpResponse) extends AnyVal {
     /**
      * Gets WWW-Authenticate header values.
      *
      * @return header values or empty sequence if WWW-Authenticate is not present
      */
     def wwwAuthenticate: Seq[Challenge] =
-      getWWWAuthenticate.getOrElse(Nil)
+      getWwwAuthenticate.getOrElse(Nil)
 
     /** Gets WWW-Authenticate header values if present. */
-    def getWWWAuthenticate: Option[Seq[Challenge]] =
+    def getWwwAuthenticate: Option[Seq[Challenge]] =
       response.getHeaderValues("WWW-Authenticate")
         .flatMap(Challenge.parseAll) match {
           case Nil => None
@@ -1261,11 +1261,11 @@ package object headers {
     /**
      * Creates new response setting WWW-Authenticate header to supplied values.
      */
-    def withWWWAuthenticate(values: Challenge*): HttpResponse =
+    def withWwwAuthenticate(values: Challenge*): HttpResponse =
       response.withHeader(Header("WWW-Authenticate", values.mkString(", ")))
 
     /** Creates new response removing WWW-Authenticate header. */
-    def removeWWWAuthenticate: HttpResponse =
+    def removeWwwAuthenticate: HttpResponse =
       response.removeHeaders("WWW-Authenticate")
   }
 }

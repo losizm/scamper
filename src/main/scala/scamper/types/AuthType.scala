@@ -37,7 +37,7 @@ trait AuthType {
 /**
  * Standardized type for WWW-Authenticate and Proxy-Authenticate header value.
  *
- * @see [[scamper.headers.WWWAuthenticate]]
+ * @see [[scamper.headers.WwwAuthenticate]]
  * @see [[scamper.headers.ProxyAuthenticate]]
  * @see [[Credentials]]
  */
