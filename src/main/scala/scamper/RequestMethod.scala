@@ -26,24 +26,23 @@ trait RequestMethod {
   /** Gets method name. */
   def name: String
 
-  /** Creates HttpRequest with request method and supplied URI. */
-  def apply(uri: URI): HttpRequest =
-    HttpRequest(this, uri, Nil, Entity.empty)
+  /** Creates `HttpRequest` with request method and supplied target. */
+  def apply(target: URI): HttpRequest =
+    HttpRequest(this, target, Nil, Entity.empty)
 
-  /** Returns method name */
-  override def toString: String = name
+  /** Returns method name. */
+  override def toString(): String = name
 }
 
 /**
- * RequestMethod factory
+ * Provided factory for `RequestMethod`.
  *
  * @see [[RequestMethods]]
  */
 object RequestMethod {
-  import Grammar.Token
   import RequestMethods._
 
-  /** Gets RequestMethod for given name. */
+  /** Gets `RequestMethod` for given name. */
   def apply(name: String): RequestMethod =
     name match {
       case "GET"     => GET
@@ -55,15 +54,13 @@ object RequestMethod {
       case "OPTIONS" => OPTIONS
       case "TRACE"   => TRACE
       case "CONNECT" => CONNECT
-      case _  =>
-        Token(name).map(RequestMethodImpl).getOrElse {
-          throw new IllegalArgumentException(s"Invalid request method name: $name")
-        }
+      case _         => Grammar.Token(name).map(RequestMethodImpl).getOrElse {
+        throw new IllegalArgumentException(s"Invalid request method name: $name")
+      }
     }
 
-  /** Destructures RequestMethod. */
-  def unapply(method: RequestMethod): Option[String] =
-    Some(method.name)
+  /** Destructures `RequestMethod`. */
+  def unapply(method: RequestMethod): Option[String] = Some(method.name)
 }
 
 private case class RequestMethodImpl(name: String) extends RequestMethod

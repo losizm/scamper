@@ -15,6 +15,8 @@
  */
 package scamper
 
+import scala.collection.mutable.TreeMap
+
 /**
  * HTTP response status
  *
@@ -47,33 +49,35 @@ trait ResponseStatus {
   def isServerError: Boolean =
     code >= 500 && code <= 599
 
-  /** Converts to HttpResponse with supplied body. */
-  def apply(body: Entity = Entity.empty): HttpResponse =
+  /** Creates `HttpResponse` with supplied body. */
+  def apply(body: Entity = Entity.empty()): HttpResponse =
     HttpResponse(this, Nil, body)
+
+  /** Returns formatted response status. */
+  override def toString(): String = s"$code $reason"
 }
 
 /**
- * ResponseStatus factory
+ * Provided factory for `ResponseStatus`.
  *
  * @see [[ResponseStatuses]]
  */
 object ResponseStatus {
-  private val statuses = new scala.collection.mutable.TreeMap[Int, ResponseStatus]
+  private val statuses = new TreeMap[Int, ResponseStatus]
 
   /**
-   * Gets registered ResponseStatus for given status code.
+   * Gets registered `ResponseStatus` for given status code.
    *
-   * {@code NoSuchElementException} is thrown if a response status is not
-   * registered for status code.
+   * Throws `NoSuchElementException` if status code is not registered.
    */
   def apply(code: Int): ResponseStatus =
     statuses(code)
 
-  /** Creates ResponseStatus with supplied code and reason. */
+  /** Creates `ResponseStatus` with supplied code and reason. */
   def apply(code: Int, reason: String): ResponseStatus =
     ResponseStatusImpl(code, reason)
 
-  /** Destructures ResponseStatus. */
+  /** Destructures `ResponseStatus`. */
   def unapply(status: ResponseStatus): Option[(Int, String)] =
     Some((status.code, status.reason))
 
@@ -131,6 +135,4 @@ object ResponseStatus {
   add(511, "Network Authentication Required")
 }
 
-private case class ResponseStatusImpl(code: Int, reason: String) extends ResponseStatus {
-  override lazy val toString: String = s"$code $reason"
-}
+private case class ResponseStatusImpl(code: Int, reason: String) extends ResponseStatus
