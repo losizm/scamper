@@ -20,12 +20,11 @@ import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
 
 import scala.util.Try
 
-/** Includes HTTP related type classes. */
 package object auxiliary {
   private val crlf = "\r\n".getBytes("UTF-8")
 
   /** Adds extension methods to {@code java.net.Socket}. */
-  implicit class HttpSocketType(val socket: Socket) extends AnyVal {
+  implicit class SocketType(val socket: Socket) extends AnyVal {
     /**
      * Reads next byte from socket input stream.
      *
@@ -119,7 +118,7 @@ package object auxiliary {
   }
 
   /** Adds extension methods to {@code String}. */
-  implicit class HttpStringType(val string: String) extends AnyVal {
+  implicit class StringType(val string: String) extends AnyVal {
     /**
      * Converts to LocalDate.
      *
@@ -170,7 +169,7 @@ package object auxiliary {
   }
 
   /** Adds extension methods to {@code java.net.URI}. */
-  implicit class HttpUriType(val uri: URI) extends AnyVal {
+  implicit class UriType(val uri: URI) extends AnyVal {
     /** Gets query parameters. */
     def getQueryParams(): Map[String, Seq[String]] =
       QueryParams.parse(uri.getRawQuery)

@@ -21,7 +21,7 @@ import scala.util.Try
 
 import types.TransferCoding
 
-import scamper.auxiliary.HttpUriType
+import scamper.auxiliary.UriType
 import scamper.headers.{ ContentLength, Host, TransferEncoding }
 import RequestMethods._
 
