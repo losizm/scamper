@@ -26,9 +26,9 @@ trait RequestMethod {
   /** Gets method name. */
   def name: String
 
-  /** Converts to HttpRequest with supplied URI and entity. */
-  def apply(uri: URI, body: Entity = Entity.empty): HttpRequest =
-    HttpRequest(this, uri, Nil, body)
+  /** Creates HttpRequest with request method and supplied URI. */
+  def apply(uri: URI): HttpRequest =
+    HttpRequest(this, uri, Nil, Entity.empty)
 
   /** Returns method name */
   override def toString: String = name

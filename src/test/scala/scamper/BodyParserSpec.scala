@@ -55,7 +55,7 @@ class BodyParserSpec extends FlatSpec {
   it should "parse request with form body" in {
     implicit val bodyParser = BodyParsers.form()
     val body = Entity("id=0&name=root")
-    val request = POST("users", body).withContentLength(body.length.get)
+    val request = POST("users").withBody(body).withContentLength(body.length.get)
     val form: Map[String, Seq[String]] = request.parse
 
     assert(form("id").head == "0")
