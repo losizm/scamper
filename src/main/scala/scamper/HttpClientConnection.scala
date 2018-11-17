@@ -72,7 +72,7 @@ private class HttpClientConnection private (socket: Socket) extends Closeable {
     while ({ line = socket.readLine(buffer); line != "" })
       headers += Header.parse(line)
 
-    HttpResponse(statusLine, headers.toSeq, Entity(() => socket.getInputStream))
+    HttpResponse(statusLine, headers.toSeq, Entity(socket.getInputStream))
   }
 }
 

@@ -17,7 +17,6 @@ package scamper
 
 import java.io.{ ByteArrayInputStream, File, FileInputStream, InputStream }
 import java.nio.file.Path
-import java.nio.charset.Charset
 import scala.util.Try
 
 /** HTTP entity */
@@ -47,55 +46,49 @@ trait Entity {
   }
 }
 
-/** Entity factory */
+/** Provided factory for `Entity`. */
 object Entity {
-  /** Creates entity with supplied bytes. */
+  /** Creates `Entity` with supplied bytes. */
   def apply(bytes: Array[Byte]): Entity =
-    apply(bytes, 0, bytes.length)
+    ByteArrayEntity(bytes)
 
-  /** Creates entity with supplied bytes. */
-  def apply(bytes: Array[Byte], start: Int, length: Int): Entity = {
-    require(start >= 0, "Start must be nonnegative")
-    require(start + length <= bytes.length, "Applied start and length must not exceed data length")
+  /** Creates `Entity` with bytes from supplied input stream. */
+  def apply(in: InputStream): Entity =
+    InputStreamEntity(in)
 
-    val copy = new Array[Byte](length)
-    bytes.copyToArray(copy, start, length)
-    ByteArrayEntity(copy)
-  }
-
-  /** Creates entity with input stream from supplied function. */
-  def apply(f: () => InputStream): Entity =
-    InputStreamEntity(f)
-
-  /** Creates entity with data from supplied file. */
+  /** Creates `Entity` with data from supplied file. */
   def apply(file: File): Entity =
     FileEntity(file)
 
-  /** Creates entity with data from file at supplied path. */
+  /** Creates `Entity` with data at supplied path. */
   def apply(path: Path): Entity =
     FileEntity(path.toFile)
 
-  /** Creates entity with UTF-8 encoded bytes of supplied text. */
+  /**
+   * Creates `Entity` with supplied text.
+   *
+   * The text is encoded using `UTF-8` charset.
+   */
   def apply(text: String): Entity =
     ByteArrayEntity(text.getBytes("UTF-8"))
 
-  /** Creates entity with encoded bytes of supplied text. */
-  def apply(text: String, charset: String): Entity =
-    ByteArrayEntity(text.getBytes(charset))
-
-  /** Creates entity with encoded bytes of supplied text. */
-  def apply(text: String, charset: Charset): Entity =
-    ByteArrayEntity(text.getBytes(charset))
-
-  /** Creates entity with URL encoded value of supplied form data. */
+  /**
+   * Creates `Entity` with supplied form data.
+   *
+   * The form data is converted to `application/x-www-form-urlencoded` format.
+   */
   def apply(form: Map[String, Seq[String]]): Entity =
     apply(QueryParams.format(form))
 
-  /** Creates entity with URL encoded value of supplied form data. */
+  /**
+   * Creates `Entity` with supplied form data.
+   *
+   * The form data is converted to `application/x-www-form-urlencoded` format.
+   */
   def apply(form: (String, String)*): Entity =
     apply(QueryParams.format(form : _*))
 
-  /** Creates empty entity. */
+  /** Creates empty `Entity`. */
   def empty(): Entity = ByteArrayEntity(Array.empty)
 }
 
@@ -109,7 +102,6 @@ private case class FileEntity(file: File) extends Entity {
   lazy val getInputStream = new FileInputStream(file)
 }
 
-private case class InputStreamEntity(f: () => InputStream) extends Entity {
+private case class InputStreamEntity(getInputStream: InputStream) extends Entity {
   val length = None
-  lazy val getInputStream = f()
 }

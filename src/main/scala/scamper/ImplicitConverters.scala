@@ -43,18 +43,13 @@ object ImplicitConverters {
   implicit val bytesToEntity = (entity: Array[Byte]) => Entity(entity)
 
   /** Converts string to [[Entity]] where text is UTF-8 encoded. */
-  implicit val stringToEntity = (entity: String) => Entity(entity, "UTF-8")
-
-  /**
-   * Converts tuple to [[Entity]] where tuple is text and character encoding.
-   */
-  implicit val tupleToEntity = (entity: (String, String)) => Entity(entity._1, entity._2)
+  implicit val stringToEntity = (entity: String) => Entity(entity)
 
   /** Converts file to [[Entity]]. */
   implicit val fileToEntity = (entity: File) => Entity(entity)
 
   /** Converts input stream to [[Entity]]. */
-  implicit val inputStreamToEntity = (entity: () => InputStream) => Entity(entity)
+  implicit val inputStreamToEntity = (entity: InputStream) => Entity(entity)
 
   /** Converts string to [[RequestMethod]]. */
   implicit val stringToRequestMethod = (method: String) => RequestMethod(method)
