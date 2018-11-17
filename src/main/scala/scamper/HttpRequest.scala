@@ -23,8 +23,7 @@ import scamper.ImplicitExtensions.HttpUriType
  *
  * @see [[HttpResponse]]
  */
-trait HttpRequest extends HttpMessage {
-  type MessageType = HttpRequest
+trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
   type LineType = RequestLine
   type CookieType = PlainCookie
 
@@ -56,42 +55,42 @@ trait HttpRequest extends HttpMessage {
    *
    * @return new request
    */
-  def withMethod(method: RequestMethod): MessageType
+  def withMethod(method: RequestMethod): HttpRequest
 
   /**
    * Creates request with new target.
    *
    * @return new request
    */
-  def withTarget(target: URI): MessageType
+  def withTarget(target: URI): HttpRequest
 
   /**
    * Creates request with new target path.
    *
    * @return new request
    */
-  def withPath(path: String): MessageType
+  def withPath(path: String): HttpRequest
 
   /**
    * Creates request with new query parameters.
    *
    * @return new request
    */
-  def withQueryParams(params: Map[String, Seq[String]]): MessageType
+  def withQueryParams(params: Map[String, Seq[String]]): HttpRequest
 
   /**
    * Creates request with new query parameters.
    *
    * @return new request
    */
-  def withQueryParams(params: (String, String)*): MessageType
+  def withQueryParams(params: (String, String)*): HttpRequest
 
   /**
    * Creates request with new HTTP version.
    *
    * @return new request
    */
-  def withVersion(version: HttpVersion): MessageType
+  def withVersion(version: HttpVersion): HttpRequest
 }
 
 /** HttpRequest factory */
@@ -149,6 +148,15 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
 
   def withHeaders(newHeaders: Header*): HttpRequest =
     copy(headers = newHeaders)
+
+  def addHeaders(newHeaders: Header*): HttpRequest =
+    withHeaders(headers ++ newHeaders : _*)
+
+  def removeHeaders(names: String*): HttpRequest =
+    withHeaders(headers.filterNot(header => names.exists(header.name.equalsIgnoreCase)) : _*)
+
+  def withHeader(header: Header): HttpRequest =
+    withHeaders(headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header : _*)
 
   def withCookies(newCookies: PlainCookie*): HttpRequest =
     copy(headers = headers.filterNot(_.name.equalsIgnoreCase("Cookie")) :+ Header("Cookie", newCookies.mkString("; ")))

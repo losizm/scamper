@@ -17,9 +17,6 @@ package scamper
 
 /** HTTP message */
 trait HttpMessage {
-  /** Type of HTTP message */
-  type MessageType <: HttpMessage
-
   /** Type of start line used in message */
   type LineType <: StartLine
 
@@ -97,62 +94,4 @@ trait HttpMessage {
   /** Gets value of cookie with given name. */
   def getCookieValue(name: String): Option[String] =
     getCookie(name).map(_.value)
-
-  /**
-   * Creates message with new start line.
-   *
-   * @return new message
-   */
-  def withStartLine(line: LineType): MessageType
-
-  /**
-   * Creates message with supplied header.
-   *
-   * Previous headers having same name as supplied header are removed.
-   *
-   * @return new message
-   */
-  def withHeader(header: Header): MessageType =
-    withHeaders(headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header : _*)
-
-  /**
-   * Creates message with new headers.
-   *
-   * All previous headers are removed.
-   *
-   * @return new message
-   */
-  def withHeaders(headers: Header*): MessageType
-
-  /**
-   * Creates message with additional headers.
-   *
-   * @return new message
-   */
-  def addHeaders(headers: Header*): MessageType =
-    withHeaders(this.headers ++ headers : _*)
-
-  /**
-   * Creates message removing headers with given names.
-   *
-   * @return new message
-   */
-  def removeHeaders(names: String*): MessageType =
-    withHeaders(headers.filterNot(header => names.exists(header.name.equalsIgnoreCase)) : _*)
-
-  /**
-   * Creates message with new cookies.
-   *
-   * All previous cookies are removed.
-   *
-   * @return new message
-   */
-  def withCookies(cookies: CookieType*): MessageType
-
-  /**
-   * Creates message with new body.
-   *
-   * @return new message
-   */
-  def withBody(body: Entity): MessageType
 }

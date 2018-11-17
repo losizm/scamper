@@ -25,7 +25,7 @@ import scamper.types._
 /** Includes type classes for standardized access to message headers. */
 object ImplicitHeaders {
   /** Provides standardized access to Accept header. */
-  implicit class Accept[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class Accept(val request: HttpRequest) extends AnyVal {
     /**
      * Gets Accept header values.
      *
@@ -41,16 +41,16 @@ object ImplicitHeaders {
         .map(_.map(MediaRange.parse))
 
     /** Creates new request setting Accept header to supplied values. */
-    def withAccept(values: MediaRange*): T#MessageType =
+    def withAccept(values: MediaRange*): HttpRequest =
       request.withHeader(Header("Accept", values.mkString(", ")))
 
     /** Creates new request removing Accept header. */
-    def removeAccept: T#MessageType =
+    def removeAccept: HttpRequest =
       request.removeHeaders("Accept")
   }
 
   /** Provides standardized access to Accept-Charset header. */
-  implicit class AcceptCharset[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class AcceptCharset(val request: HttpRequest) extends AnyVal {
     /**
      * Gets Accept-Charset header values.
      *
@@ -66,16 +66,16 @@ object ImplicitHeaders {
         .map(_.map(CharsetRange.parse))
 
     /** Creates new request setting Accept-Charset header to supplied values. */
-    def withAcceptCharset(values: CharsetRange*): T#MessageType =
+    def withAcceptCharset(values: CharsetRange*): HttpRequest =
       request.withHeader(Header("Accept-Charset", values.mkString(", ")))
 
     /** Creates new request removing Accept-Charset header. */
-    def removeAcceptCharset: T#MessageType =
+    def removeAcceptCharset: HttpRequest =
       request.removeHeaders("Accept-Charset")
   }
 
   /** Provides standardized access to Accept-Encoding header. */
-  implicit class AcceptEncoding[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class AcceptEncoding(val request: HttpRequest) extends AnyVal {
     /**
      * Gets Accept-Encoding header values.
      *
@@ -93,16 +93,16 @@ object ImplicitHeaders {
     /**
      * Creates new request setting Accept-Encoding header to supplied values.
      */
-    def withAcceptEncoding(values: ContentCodingRange*): T#MessageType =
+    def withAcceptEncoding(values: ContentCodingRange*): HttpRequest =
       request.withHeader(Header("Accept-Encoding", values.mkString(", ")))
 
     /** Creates new request removing Accept-Encoding header. */
-    def removeAcceptEncoding: T#MessageType =
+    def removeAcceptEncoding: HttpRequest =
       request.removeHeaders("Accept-Encoding")
   }
 
   /** Provides standardized access to Accept-Language header. */
-  implicit class AcceptLanguage[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class AcceptLanguage(val request: HttpRequest) extends AnyVal {
     /**
      * Gets Accept-Language header values.
      *
@@ -120,16 +120,16 @@ object ImplicitHeaders {
     /**
      * Creates new request setting Accept-Language header to supplied values.
      */
-    def withAcceptLanguage(values: LanguageRange*): T#MessageType =
+    def withAcceptLanguage(values: LanguageRange*): HttpRequest =
       request.withHeader(Header("Accept-Language", values.mkString(", ")))
 
     /** Creates new request removing Accept-Language header. */
-    def removeAcceptLanguage: T#MessageType =
+    def removeAcceptLanguage: HttpRequest =
       request.removeHeaders("Accept-Language")
   }
 
   /** Provides standardized access to Accept-Patch header. */
-  implicit class AcceptPatch[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class AcceptPatch(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Accept-Patch header values.
      *
@@ -145,16 +145,16 @@ object ImplicitHeaders {
         .map(_.map(MediaType.parse))
 
     /** Creates new response setting Accept-Patch header to supplied values. */
-    def withAcceptPatch(values: MediaType*): T#MessageType =
+    def withAcceptPatch(values: MediaType*): HttpResponse =
       response.withHeader(Header("Accept-Patch", values.mkString(", ")))
 
     /** Creates new response removing Accept-Patch header. */
-    def removeAcceptPatch: T#MessageType =
+    def removeAcceptPatch: HttpResponse =
       response.removeHeaders("Accept-Patch")
   }
 
   /** Provides standardized access to Accept-Ranges header. */
-  implicit class AcceptRanges[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class AcceptRanges(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Accept-Ranges header values.
      *
@@ -168,16 +168,16 @@ object ImplicitHeaders {
       response.getHeaderValue("Accept-Ranges").map(ListParser.apply)
 
     /** Creates new response setting Accept-Ranges header to supplied values. */
-    def withAcceptRanges(values: String*): T#MessageType =
+    def withAcceptRanges(values: String*): HttpResponse =
       response.withHeader(Header("Accept-Ranges", values.mkString(", ")))
 
     /** Creates new response removing Accept-Ranges header. */
-    def removeAcceptRanges: T#MessageType =
+    def removeAcceptRanges: HttpResponse =
       response.removeHeaders("Accept-Ranges")
   }
 
   /** Provides standardized access to Age header. */
-  implicit class Age[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class Age(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Age header value.
      *
@@ -191,16 +191,16 @@ object ImplicitHeaders {
       response.getHeaderValue("Age").map(_.toLong)
 
     /** Creates new response setting Age header to supplied value. */
-    def withAge(value: Long): T#MessageType =
+    def withAge(value: Long): HttpResponse =
       response.withHeader(Header("Age", value))
 
     /** Creates new response removing Age header. */
-    def removeAge: T#MessageType =
+    def removeAge: HttpResponse =
       response.removeHeaders("Age")
   }
 
   /** Provides standardized access to Allow header. */
-  implicit class Allow[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class Allow(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Allow header values.
      *
@@ -216,16 +216,16 @@ object ImplicitHeaders {
         .map(_.map(RequestMethod.apply))
 
     /** Creates new response setting Allow header to supplied values. */
-    def withAllow(values: RequestMethod*): T#MessageType =
+    def withAllow(values: RequestMethod*): HttpResponse =
       response.withHeader(Header("Allow", values.mkString(", ")))
 
     /** Creates new response removing Allow header. */
-    def removeAllow: T#MessageType =
+    def removeAllow: HttpResponse =
       response.removeHeaders("Allow")
   }
 
   /** Provides standardized access to Authentication-Info header. */
-  implicit class AuthenticationInfo[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class AuthenticationInfo(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Authentication-Info header values.
      *
@@ -242,16 +242,16 @@ object ImplicitHeaders {
      * Creates new response setting Authentication-Info header to supplied
      * values.
      */
-    def withAuthenticationInfo(values: (String, String)*): T#MessageType =
+    def withAuthenticationInfo(values: (String, String)*): HttpResponse =
       response.withHeader(Header("Authentication-Info", AuthParams.format(values.toMap).trim))
 
     /** Creates new response removing Authentication-Info header. */
-    def removeAuthenticationInfo: T#MessageType =
+    def removeAuthenticationInfo: HttpResponse =
       response.removeHeaders("Authentication-Info")
   }
 
   /** Provides standardized access to Authorization header. */
-  implicit class Authorization[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class Authorization(val request: HttpRequest) extends AnyVal {
     /**
      * Gets Authorization header value.
      *
@@ -265,16 +265,16 @@ object ImplicitHeaders {
       request.getHeaderValue("Authorization").map(Credentials.parse)
 
     /** Creates new request setting Authorization header to supplied value. */
-    def withAuthorization(value: Credentials): T#MessageType =
+    def withAuthorization(value: Credentials): HttpRequest =
       request.withHeader(Header("Authorization", value.toString))
 
     /** Creates new request removing Authorization header. */
-    def removeAuthorization: T#MessageType =
+    def removeAuthorization: HttpRequest =
       request.removeHeaders("Authorization")
   }
 
   /** Provides standardized access to Cache-Control header. */
-  implicit class CacheControl[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class CacheControl[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
     /**
      * Gets Cache-Control header values.
      *
@@ -288,16 +288,16 @@ object ImplicitHeaders {
       message.getHeaderValue("Cache-Control").map(CacheDirective.parseAll)
 
     /** Creates new message setting Cache-Control header to supplied values. */
-    def withCacheControl(values: CacheDirective*): T#MessageType =
+    def withCacheControl(values: CacheDirective*): T =
       message.withHeader(Header("Cache-Control", values.mkString(", ")))
 
     /** Creates new message removing Cache-Control header. */
-    def removeCacheControl: T#MessageType =
+    def removeCacheControl: T =
       message.removeHeaders("Cache-Control")
   }
 
   /** Provides standardized access to Content-Disposition header. */
-  implicit class ContentDisposition[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class ContentDisposition(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Content-Disposition header value.
      *
@@ -314,16 +314,16 @@ object ImplicitHeaders {
      * Creates new response setting Content-Disposition header to supplied
      * value.
      */
-    def withContentDisposition(value: ContentDispositionType): T#MessageType =
+    def withContentDisposition(value: ContentDispositionType): HttpResponse =
       response.withHeader(Header("Content-Disposition", value.toString))
 
     /** Creates new response removing Content-Disposition header. */
-    def removeContentDisposition: T#MessageType =
+    def removeContentDisposition: HttpResponse =
       response.removeHeaders("Content-Disposition")
   }
 
   /** Provides standardized access to Content-Encoding header. */
-  implicit class ContentEncoding[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class ContentEncoding[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
     /**
      * Gets Content-Encoding header values.
      *
@@ -341,16 +341,16 @@ object ImplicitHeaders {
     /**
      * Creates new message setting Content-Encoding header to supplied values.
      */
-    def withContentEncoding(values: ContentCoding*): T#MessageType =
+    def withContentEncoding(values: ContentCoding*): T =
       message.withHeader(Header("Content-Encoding", values.mkString(", ")))
 
     /** Creates new message removing Content-Encoding header. */
-    def removeContentEncoding: T#MessageType =
+    def removeContentEncoding: T =
       message.removeHeaders("Content-Encoding")
   }
 
   /** Provides standardized access to Content-Language header. */
-  implicit class ContentLanguage[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class ContentLanguage[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
     /**
      * Gets Content-Language header values.
      *
@@ -366,16 +366,16 @@ object ImplicitHeaders {
         .map(_.map(LanguageTag.parse))
 
     /** Creates new message setting Content-Language header to supplied values. */
-    def withContentLanguage(values: LanguageTag*): T#MessageType =
+    def withContentLanguage(values: LanguageTag*): T =
       message.withHeader(Header("Content-Language", values.mkString(", ")))
 
     /** Creates new message removing Content-Language header. */
-    def removeContentLanguage: T#MessageType =
+    def removeContentLanguage: T =
       message.removeHeaders("Content-Language")
   }
 
   /** Provides standardized access to Content-Length header. */
-  implicit class ContentLength[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class ContentLength[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
     /**
      * Gets Content-Length header value.
      *
@@ -389,16 +389,16 @@ object ImplicitHeaders {
       message.getHeaderValue("Content-Length").map(_.toLong)
 
     /** Creates new message setting Content-Length header to supplied value. */
-    def withContentLength(value: Long): T#MessageType =
+    def withContentLength(value: Long): T =
       message.withHeader(Header("Content-Length", value))
 
     /** Creates new message removing Content-Length header. */
-    def removeContentLength: T#MessageType =
+    def removeContentLength: T =
       message.removeHeaders("Content-Length")
   }
 
   /** Provides standardized access to Content-Location header. */
-  implicit class ContentLocation[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class ContentLocation[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
     /**
      * Gets Content-Location header value.
      *
@@ -414,16 +414,16 @@ object ImplicitHeaders {
     /**
      * Creates new message setting Content-Location header to supplied value.
      */
-    def withContentLocation(value: URI): T#MessageType =
+    def withContentLocation(value: URI): T =
       message.withHeader(Header("Content-Location", value.toString))
 
     /** Creates new message removing Content-Location header. */
-    def removeContentLocation: T#MessageType =
+    def removeContentLocation: T =
       message.removeHeaders("Content-Location")
   }
 
   /** Provides standardized access to Content-Range header. */
-  implicit class ContentRange[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class ContentRange[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
     /**
      * Gets Content-Range header value.
      *
@@ -437,16 +437,16 @@ object ImplicitHeaders {
       message.getHeaderValue("Content-Range").map(ByteContentRange.parse)
 
     /** Creates new message setting Content-Range header to supplied value. */
-    def withContentRange(value: ByteContentRange): T#MessageType =
+    def withContentRange(value: ByteContentRange): T =
       message.withHeader(Header("Content-Range", value.toString))
 
     /** Creates new message removing Content-Range header. */
-    def removeContentRange: T#MessageType =
+    def removeContentRange: T =
       message.removeHeaders("Content-Range")
   }
 
   /** Provides standardized access to Content-Type header. */
-  implicit class ContentType[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class ContentType[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
     /**
      * Gets Content-Type header value.
      *
@@ -460,16 +460,16 @@ object ImplicitHeaders {
       message.getHeaderValue("Content-Type").map(MediaType.parse)
 
     /** Creates new message setting Content-Type header to supplied value. */
-    def withContentType(value: MediaType): T#MessageType =
+    def withContentType(value: MediaType): T =
       message.withHeader(Header("Content-Type", value.toString))
 
     /** Creates new message removing Content-Type header. */
-    def removeContentType: T#MessageType =
+    def removeContentType: T =
       message.removeHeaders("Content-Type")
   }
 
   /** Provides standardized access to Connection header. */
-  implicit class Connection[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class Connection[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
     /**
      * Gets Connection header value.
      *
@@ -483,16 +483,16 @@ object ImplicitHeaders {
       message.getHeaderValue("Connection")
 
     /** Creates new message setting Connection header to supplied value. */
-    def withConnection(value: String): T#MessageType =
+    def withConnection(value: String): T =
       message.withHeader(Header("Connection", value))
 
     /** Creates new message removing Connection header. */
-    def removeConnection: T#MessageType =
+    def removeConnection: T =
       message.removeHeaders("Connection")
   }
 
   /** Provides standardized access to Date header. */
-  implicit class Date[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class Date(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Date header value.
      *
@@ -506,16 +506,16 @@ object ImplicitHeaders {
       response.getHeaderValue("Date").map(DateValue.parse)
 
     /** Creates new response setting Date header to supplied value. */
-    def withDate(value: OffsetDateTime): T#MessageType =
+    def withDate(value: OffsetDateTime): HttpResponse =
       response.withHeader(Header("Date", value))
 
     /** Creates new response removing Date header. */
-    def removeDate: T#MessageType =
+    def removeDate: HttpResponse =
       response.removeHeaders("Date")
   }
 
   /** Provides standardized access to ETag header. */
-  implicit class ETag[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class ETag(val response: HttpResponse) extends AnyVal {
     /**
      * Gets ETag header value.
      *
@@ -529,16 +529,16 @@ object ImplicitHeaders {
       response.getHeaderValue("ETag").map(EntityTag.parse)
 
     /** Creates new response setting ETag header to supplied value. */
-    def withETag(value: EntityTag): T#MessageType =
+    def withETag(value: EntityTag): HttpResponse =
       response.withHeader(Header("ETag", value.toString))
 
     /** Creates new response removing ETag header. */
-    def removeETag: T#MessageType =
+    def removeETag: HttpResponse =
       response.removeHeaders("ETag")
   }
 
   /** Provides standardized access to Expect header. */
-  implicit class Expect[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class Expect(val request: HttpRequest) extends AnyVal {
     /**
      * Gets Expect header value.
      *
@@ -552,16 +552,16 @@ object ImplicitHeaders {
       request.getHeaderValue("Expect")
 
     /** Creates new request setting Expect header to supplied value. */
-    def withExpect(value: String): T#MessageType =
+    def withExpect(value: String): HttpRequest =
       request.withHeader(Header("Expect", value))
 
     /** Creates new request removing Expect header. */
-    def removeExpect: T#MessageType =
+    def removeExpect: HttpRequest =
       request.removeHeaders("Expect")
   }
 
   /** Provides standardized access to Expires header. */
-  implicit class Expires[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class Expires(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Expires header value.
      *
@@ -575,16 +575,16 @@ object ImplicitHeaders {
       response.getHeaderValue("Expires").map(DateValue.parse)
 
     /** Creates new response setting Expires header to supplied value. */
-    def withExpires(value: OffsetDateTime): T#MessageType =
+    def withExpires(value: OffsetDateTime): HttpResponse =
       response.withHeader(Header("Expires", value))
 
     /** Creates new response removing Expires header. */
-    def removeExpires: T#MessageType =
+    def removeExpires: HttpResponse =
       response.removeHeaders("Expires")
   }
 
   /** Provides standardized access to From header. */
-  implicit class From[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class From(val request: HttpRequest) extends AnyVal {
     /**
      * Gets From header value.
      *
@@ -598,16 +598,16 @@ object ImplicitHeaders {
       request.getHeaderValue("From")
 
     /** Creates new request setting From header to supplied value. */
-    def withFrom(value: String): T#MessageType =
+    def withFrom(value: String): HttpRequest =
       request.withHeader(Header("From", value))
 
     /** Creates new request removing From header. */
-    def removeFrom: T#MessageType =
+    def removeFrom: HttpRequest =
       request.removeHeaders("From")
   }
 
   /** Provides standardized access to Host header. */
-  implicit class Host[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class Host(val request: HttpRequest) extends AnyVal {
     /**
      * Gets Host header value.
      *
@@ -621,16 +621,16 @@ object ImplicitHeaders {
       request.getHeaderValue("Host")
 
     /** Creates new request setting Host header to supplied value. */
-    def withHost(value: String): T#MessageType =
+    def withHost(value: String): HttpRequest =
       request.withHeader(Header("Host", value))
 
     /** Creates new request removing Host header. */
-    def removeHost: T#MessageType =
+    def removeHost: HttpRequest =
       request.removeHeaders("Host")
   }
 
   /** Provides standardized access to If-Match header. */
-  implicit class IfMatch[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class IfMatch(val request: HttpRequest) extends AnyVal {
     /**
      * Gets If-Match header value.
      *
@@ -644,16 +644,16 @@ object ImplicitHeaders {
       request.getHeaderValue("If-Match").map(EntityTag.parse)
 
     /** Creates new request setting If-Match header to supplied value. */
-    def withIfMatch(value: EntityTag): T#MessageType =
+    def withIfMatch(value: EntityTag): HttpRequest =
       request.withHeader(Header("If-Match", value.toString))
 
     /** Creates new request removing If-Match header. */
-    def removeIfMatch: T#MessageType =
+    def removeIfMatch: HttpRequest =
       request.removeHeaders("If-Match")
   }
 
   /** Provides standardized access to If-Modified-Since header. */
-  implicit class IfModifiedSince[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class IfModifiedSince(val request: HttpRequest) extends AnyVal {
     /**
      * Gets If-Modified-Since header value.
      *
@@ -667,16 +667,16 @@ object ImplicitHeaders {
       request.getHeaderValue("If-Modified-Since").map(DateValue.parse)
 
     /** Creates new request setting If-Modified-Since header to supplied value. */
-    def withIfModifiedSince(value: OffsetDateTime): T#MessageType =
+    def withIfModifiedSince(value: OffsetDateTime): HttpRequest =
       request.withHeader(Header("If-Modified-Since", value))
 
     /** Creates new request removing If-Modified-Since header. */
-    def removeIfModifiedSince: T#MessageType =
+    def removeIfModifiedSince: HttpRequest =
       request.removeHeaders("If-Modified-Since")
   }
 
   /** Provides standardized access to If-None-Match header. */
-  implicit class IfNoneMatch[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class IfNoneMatch(val request: HttpRequest) extends AnyVal {
     /**
      * Gets If-None-Match header value.
      *
@@ -690,16 +690,16 @@ object ImplicitHeaders {
       request.getHeaderValue("If-None-Match").map(EntityTag.parse)
 
     /** Creates new request setting If-None-Match header to supplied value. */
-    def withIfNoneMatch(value: EntityTag): T#MessageType =
+    def withIfNoneMatch(value: EntityTag): HttpRequest =
       request.withHeader(Header("If-None-Match", value.toString))
 
     /** Creates new request removing If-None-Match header. */
-    def removeIfNoneMatch: T#MessageType =
+    def removeIfNoneMatch: HttpRequest =
       request.removeHeaders("If-None-Match")
   }
 
   /** Provides standardized access to If-Range header. */
-  implicit class IfRange[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class IfRange(val request: HttpRequest) extends AnyVal {
     /**
      * Gets If-Range header value.
      *
@@ -719,24 +719,24 @@ object ImplicitHeaders {
       }
 
     /** Creates new request setting If-Range header to supplied value. */
-    def withIfRange(value: Either[EntityTag, OffsetDateTime]): T#MessageType =
+    def withIfRange(value: Either[EntityTag, OffsetDateTime]): HttpRequest =
       request.withHeader(Header("If-Range", value.fold(_.toString, DateValue.format)))
 
     /** Creates new request setting If-Range header to supplied value. */
-    def withIfRange(value: EntityTag): T#MessageType =
+    def withIfRange(value: EntityTag): HttpRequest =
       request.withHeader(Header("If-Range", value.toString))
 
     /** Creates new request setting If-Range header to supplied value. */
-    def withIfRange(value: OffsetDateTime): T#MessageType =
+    def withIfRange(value: OffsetDateTime): HttpRequest =
       request.withHeader(Header("If-Range", value))
 
     /** Creates new request removing If-Range header. */
-    def removeIfRange: T#MessageType =
+    def removeIfRange: HttpRequest =
       request.removeHeaders("If-Range")
   }
 
   /** Provides standardized access to If-Unmodified-Since header. */
-  implicit class IfUnmodifiedSince[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class IfUnmodifiedSince(val request: HttpRequest) extends AnyVal {
     /**
      * Gets If-Unmodified-Since header value.
      *
@@ -752,16 +752,16 @@ object ImplicitHeaders {
     /**
      * Creates new request setting If-Unmodified-Since header to supplied value.
      */
-    def withIfUnmodifiedSince(value: OffsetDateTime): T#MessageType =
+    def withIfUnmodifiedSince(value: OffsetDateTime): HttpRequest =
       request.withHeader(Header("If-Unmodified-Since", value))
 
     /** Creates new request removing If-Unmodified-Since header. */
-    def removeIfUnmodifiedSince: T#MessageType =
+    def removeIfUnmodifiedSince: HttpRequest =
       request.removeHeaders("If-Unmodified-Since")
   }
 
   /** Provides standardized access to Last-Modified header. */
-  implicit class LastModified[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class LastModified(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Last-Modified header value.
      *
@@ -775,16 +775,16 @@ object ImplicitHeaders {
       response.getHeaderValue("Last-Modified").map(DateValue.parse)
 
     /** Creates new response setting Last-Modified header to supplied value. */
-    def withLastModified(value: OffsetDateTime): T#MessageType =
+    def withLastModified(value: OffsetDateTime): HttpResponse =
       response.withHeader(Header("Last-Modified", value))
 
     /** Creates new response removing Last-Modified header. */
-    def removeLastModified: T#MessageType =
+    def removeLastModified: HttpResponse =
       response.removeHeaders("Last-Modified")
   }
 
   /** Provides standardized access to Link header. */
-  implicit class Link[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class Link(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Link header values.
      *
@@ -798,16 +798,16 @@ object ImplicitHeaders {
       response.getHeaderValue("Link").map(LinkValue.parseAll)
 
     /** Creates new response setting Link header to supplied values. */
-    def withLink(values: LinkValue*): T#MessageType =
+    def withLink(values: LinkValue*): HttpResponse =
       response.withHeader(Header("Link", values.mkString(", ")))
 
     /** Creates new response removing Link header. */
-    def removeLink: T#MessageType =
+    def removeLink: HttpResponse =
       response.removeHeaders("Link")
   }
 
   /** Provides standardized access to Location header. */
-  implicit class Location[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class Location(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Location header value.
      *
@@ -821,16 +821,16 @@ object ImplicitHeaders {
       response.getHeaderValue("Location").map(new URI(_))
 
     /** Creates new response setting Location header to supplied value. */
-    def withLocation(value: URI): T#MessageType =
+    def withLocation(value: URI): HttpResponse =
       response.withHeader(Header("Location", value.toString))
 
     /** Creates new response removing Location header. */
-    def removeLocation: T#MessageType =
+    def removeLocation: HttpResponse =
       response.removeHeaders("Location")
   }
 
   /** Provides standardized access to Max-Forwards header. */
-  implicit class MaxForwards[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class MaxForwards(val request: HttpRequest) extends AnyVal {
     /**
      * Gets Max-Forwards header value.
      *
@@ -844,16 +844,16 @@ object ImplicitHeaders {
       request.getHeaderValue("Max-Forwards").map(_.toLong)
 
     /** Creates new request setting Max-Forwards header to supplied value. */
-    def withMaxForwards(value: Long): T#MessageType =
+    def withMaxForwards(value: Long): HttpRequest =
       request.withHeader(Header("Max-Forwards", value))
 
     /** Creates new request removing Max-Forwards header. */
-    def removeMaxForwards: T#MessageType =
+    def removeMaxForwards: HttpRequest =
       request.removeHeaders("Max-Forwards")
   }
 
   /** Provides standardized access to Pragma header. */
-  implicit class Pragma[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class Pragma(val request: HttpRequest) extends AnyVal {
     /**
      * Gets Pragma header values.
      *
@@ -867,16 +867,16 @@ object ImplicitHeaders {
       request.getHeaderValue("Pragma").map(PragmaDirective.parseAll)
 
     /** Creates new request setting Pragma header to supplied values. */
-    def withPragma(values: PragmaDirective*): T#MessageType =
+    def withPragma(values: PragmaDirective*): HttpRequest =
       request.withHeader(Header("Pragma", values.mkString(", ")))
 
     /** Creates new request removing Pragma header. */
-    def removePragma: T#MessageType =
+    def removePragma: HttpRequest =
       request.removeHeaders("Pragma")
   }
 
   /** Provides standardized access to Proxy-Authenticate header. */
-  implicit class ProxyAuthenticate[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class ProxyAuthenticate(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Proxy-Authenticate header values.
      *
@@ -897,16 +897,16 @@ object ImplicitHeaders {
      * Creates new response setting Proxy-Authenticate header to supplied
      * values.
      */
-    def withProxyAuthenticate(values: Challenge*): T#MessageType =
+    def withProxyAuthenticate(values: Challenge*): HttpResponse =
       response.withHeader(Header("Proxy-Authenticate", values.mkString(", ")))
 
     /** Creates new response removing Date header. */
-    def removeProxyAuthenticate: T#MessageType =
+    def removeProxyAuthenticate: HttpResponse =
       response.removeHeaders("Proxy-Authenticate")
   }
 
   /** Provides standardized access to Proxy-Authentication-Info header. */
-  implicit class ProxyAuthenticationInfo[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class ProxyAuthenticationInfo(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Proxy-Authentication-Info header values.
      *
@@ -923,16 +923,16 @@ object ImplicitHeaders {
      * Creates new response setting Proxy-Authentication-Info header to supplied
      * value.
      */
-    def withProxyAuthenticationInfo(values: (String, String)*): T#MessageType =
+    def withProxyAuthenticationInfo(values: (String, String)*): HttpResponse =
       response.withHeader(Header("Proxy-Authentication-Info", AuthParams.format(values.toMap).trim))
 
     /** Creates new response removing Date header. */
-    def removeProxyAuthenticationInfo: T#MessageType =
+    def removeProxyAuthenticationInfo: HttpResponse =
       response.removeHeaders("Proxy-Authentication-Info")
   }
 
   /** Provides standardized access to Proxy-Authorization header. */
-  implicit class ProxyAuthorization[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class ProxyAuthorization(val request: HttpRequest) extends AnyVal {
     /**
      * Gets Proxy-Authorization header value.
      *
@@ -948,16 +948,16 @@ object ImplicitHeaders {
     /**
      * Creates new request setting Proxy-Authorization header to supplied value.
      */
-    def withProxyAuthorization(value: Credentials): T#MessageType =
+    def withProxyAuthorization(value: Credentials): HttpRequest =
       request.withHeader(Header("Proxy-Authorization", value.toString))
 
     /** Creates new request removing Proxy-Authorization header. */
-    def removeProxyAuthorization: T#MessageType =
+    def removeProxyAuthorization: HttpRequest =
       request.removeHeaders("Proxy-Authorization")
   }
 
   /** Provides standardized access to Range header. */
-  implicit class Range[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class Range(val request: HttpRequest) extends AnyVal {
     /**
      * Gets Range header value.
      *
@@ -971,16 +971,16 @@ object ImplicitHeaders {
       request.getHeaderValue("Range").map(ByteRange.parse)
 
     /** Creates new request setting Range header to supplied value. */
-    def withRange(value: ByteRange): T#MessageType =
+    def withRange(value: ByteRange): HttpRequest =
       request.withHeader(Header("Range", value.toString))
 
     /** Creates new request removing Range header. */
-    def removeRange: T#MessageType =
+    def removeRange: HttpRequest =
       request.removeHeaders("Range")
   }
 
   /** Provides standardized access to Referer header. */
-  implicit class Referer[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class Referer(val request: HttpRequest) extends AnyVal {
     /**
      * Gets Referer header value.
      *
@@ -994,16 +994,16 @@ object ImplicitHeaders {
       request.getHeaderValue("Referer").map(new URI(_))
 
     /** Creates new request setting Referer header to supplied value. */
-    def withReferer(value: URI): T#MessageType =
+    def withReferer(value: URI): HttpRequest =
       request.withHeader(Header("Referer", value.toString))
 
     /** Creates new request removing Referer header. */
-    def removeReferer: T#MessageType =
+    def removeReferer: HttpRequest =
       request.removeHeaders("Referer")
   }
 
   /** Provides standardized access to Retry-After header. */
-  implicit class RetryAfter[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class RetryAfter(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Retry-After header value.
      *
@@ -1017,16 +1017,16 @@ object ImplicitHeaders {
       response.getHeaderValue("Retry-After").map(DateValue.parse)
 
     /** Creates new response setting Retry-After header to supplied value. */
-    def withRetryAfter(value: OffsetDateTime): T#MessageType =
+    def withRetryAfter(value: OffsetDateTime): HttpResponse =
       response.withHeader(Header("Retry-After", value))
 
     /** Creates new response removing Retry-After header. */
-    def removeRetryAfter: T#MessageType =
+    def removeRetryAfter: HttpResponse =
       response.removeHeaders("Retry-After")
   }
 
   /** Provides standardized access to Server header. */
-  implicit class Server[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class Server(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Server header values.
      *
@@ -1040,16 +1040,16 @@ object ImplicitHeaders {
       response.getHeaderValue("Server").map(ProductType.parseAll)
 
     /** Creates new response setting Server header to supplied values. */
-    def withServer(values: ProductType*): T#MessageType =
+    def withServer(values: ProductType*): HttpResponse =
       response.withHeader(Header("Server", values.mkString(" ")))
 
     /** Creates new response removing Server header. */
-    def removeServer: T#MessageType =
+    def removeServer: HttpResponse =
       response.removeHeaders("Server")
   }
 
   /** Provides standardized access to TE header. */
-  implicit class TE[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class TE(val request: HttpRequest) extends AnyVal {
     /**
      * Gets TE header values.
      *
@@ -1065,16 +1065,16 @@ object ImplicitHeaders {
         .map(_.map(TransferCodingRange.parse))
 
     /** Creates new request setting TE header to supplied values. */
-    def withTE(values: TransferCodingRange*): T#MessageType =
+    def withTE(values: TransferCodingRange*): HttpRequest =
       request.withHeader(Header("TE", values.mkString(", ")))
 
     /** Creates new request removing TE header. */
-    def removeTE: T#MessageType =
+    def removeTE: HttpRequest =
       request.removeHeaders("TE")
   }
 
   /** Provides standardized access to Trailer header. */
-  implicit class Trailer[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class Trailer[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
     /**
      * Gets Trailer header values.
      *
@@ -1088,16 +1088,16 @@ object ImplicitHeaders {
       message.getHeaderValue("Trailer").map(ListParser.apply)
 
     /** Creates new message setting Trailer header to supplied values. */
-    def withTrailer(values: String*): T#MessageType =
+    def withTrailer(values: String*): T =
       message.withHeader(Header("Trailer", values.mkString(", ")))
 
     /** Creates new message removing Trailer header. */
-    def removeTrailer: T#MessageType =
+    def removeTrailer: T =
       message.removeHeaders("Trailer")
   }
 
   /** Provides standardized access to Transfer-Encoding header. */
-  implicit class TransferEncoding[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class TransferEncoding[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
     /**
      * Gets Transfer-Encoding header values.
      *
@@ -1115,16 +1115,16 @@ object ImplicitHeaders {
     /**
      * Creates new message setting Transfer-Encoding header to supplied values.
      */
-    def withTransferEncoding(values: TransferCoding*): T#MessageType =
+    def withTransferEncoding(values: TransferCoding*): T =
       message.withHeader(Header("Transfer-Encoding", values.mkString(", ")))
 
     /** Creates new message removing Transfer-Encoding header. */
-    def removeTransferEncoding: T#MessageType =
+    def removeTransferEncoding: T =
       message.removeHeaders("Transfer-Encoding")
   }
 
   /** Provides standardized access to Upgrade header. */
-  implicit class Upgrade[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class Upgrade(val request: HttpRequest) extends AnyVal {
     /**
      * Gets Upgrade header values.
      *
@@ -1140,16 +1140,16 @@ object ImplicitHeaders {
         .map(_.map(Protocol.parse))
 
     /** Creates new request setting Upgrade header to supplied values. */
-    def withUpgrade(values: Protocol*): T#MessageType =
+    def withUpgrade(values: Protocol*): HttpRequest =
       request.withHeader(Header("Upgrade", values.mkString(", ")))
 
     /** Creates new request removing Upgrade header. */
-    def removeUpgrade: T#MessageType =
+    def removeUpgrade: HttpRequest =
       request.removeHeaders("Upgrade")
   }
 
   /** Provides standardized access to User-Agent header. */
-  implicit class UserAgent[T <: HttpRequest](val request: T) extends AnyVal {
+  implicit class UserAgent(val request: HttpRequest) extends AnyVal {
     /**
      * Gets User-Agent header values.
      *
@@ -1163,16 +1163,16 @@ object ImplicitHeaders {
       request.getHeaderValue("User-Agent").map(ProductType.parseAll)
 
     /** Creates new request setting User-Agent header to supplied value. */
-    def withUserAgent(values: ProductType*): T#MessageType =
+    def withUserAgent(values: ProductType*): HttpRequest =
       request.withHeader(Header("User-Agent", values.mkString(" ")))
 
     /** Creates new request removing User-Agent header. */
-    def removeUserAgent: T#MessageType =
+    def removeUserAgent: HttpRequest =
       request.removeHeaders("User-Agent")
   }
 
   /** Provides standardized access to Vary header. */
-  implicit class Vary[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class Vary(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Vary header values.
      *
@@ -1186,16 +1186,16 @@ object ImplicitHeaders {
       response.getHeaderValue("Vary").map(ListParser.apply)
 
     /** Creates new response setting Vary header to supplied values. */
-    def withVary(values: String*): T#MessageType =
+    def withVary(values: String*): HttpResponse =
       response.withHeader(Header("Vary", values.mkString(", ")))
 
     /** Creates new response removing Vary header. */
-    def removeVary: T#MessageType =
+    def removeVary: HttpResponse =
       response.removeHeaders("Vary")
   }
 
   /** Provides standardized access to Via header. */
-  implicit class Via[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class Via(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Via header values.
      *
@@ -1209,16 +1209,16 @@ object ImplicitHeaders {
       response.getHeaderValue("Via").map(ViaType.parseAll)
 
     /** Creates new response setting Via header to supplied values. */
-    def withVia(values: ViaType*): T#MessageType =
+    def withVia(values: ViaType*): HttpResponse =
       response.withHeader(Header("Via", values.mkString(", ")))
 
     /** Creates new response removing Via header. */
-    def removeVia: T#MessageType =
+    def removeVia: HttpResponse =
       response.removeHeaders("Via")
   }
 
   /** Provides standardized access to Warning header. */
-  implicit class Warning[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class Warning(val response: HttpResponse) extends AnyVal {
     /**
      * Gets Warning header values.
      *
@@ -1232,16 +1232,16 @@ object ImplicitHeaders {
       response.getHeaderValue("Warning").map(WarningType.parseAll)
 
     /** Creates new response setting Warning header to supplied values. */
-    def withWarning(values: WarningType*): T#MessageType =
+    def withWarning(values: WarningType*): HttpResponse =
       response.withHeader(Header("Warning", values.mkString(", ")))
 
     /** Creates new response removing Warning header. */
-    def removeWarning: T#MessageType =
+    def removeWarning: HttpResponse =
       response.removeHeaders("Warning")
   }
 
   /** Provides standardized access to WWW-Authenticate header. */
-  implicit class WWWAuthenticate[T <: HttpResponse](val response: T) extends AnyVal {
+  implicit class WWWAuthenticate(val response: HttpResponse) extends AnyVal {
     /**
      * Gets WWW-Authenticate header values.
      *
@@ -1261,11 +1261,11 @@ object ImplicitHeaders {
     /**
      * Creates new response setting WWW-Authenticate header to supplied values.
      */
-    def withWWWAuthenticate(values: Challenge*): T#MessageType =
+    def withWWWAuthenticate(values: Challenge*): HttpResponse =
       response.withHeader(Header("WWW-Authenticate", values.mkString(", ")))
 
     /** Creates new response removing WWW-Authenticate header. */
-    def removeWWWAuthenticate: T#MessageType =
+    def removeWWWAuthenticate: HttpResponse =
       response.removeHeaders("WWW-Authenticate")
   }
 }

@@ -18,8 +18,6 @@ package scamper
 import java.io.{ InputStream, SequenceInputStream }
 import java.util.zip.{ GZIPInputStream, InflaterInputStream }
 
-import scamper.ImplicitHeaders.{ ContentEncoding, ContentLength, TransferEncoding }
-
 /** A mixin that provides access to decoded message body. */
 trait BodyParsing {
   /** Gets maximum body length. */
@@ -40,9 +38,9 @@ trait BodyParsing {
     message.body.withInputStream { in =>
       val dechunked =
         if (isChunked(message)) new ChunkedInputStream(in)
-        else new BoundedInputStream(in, message.getContentLength.getOrElse(maxLength))
+        else new BoundedInputStream(in, getContentLength(message))
 
-      message.contentEncoding.headOption.map(_.name).getOrElse("identity") match {
+      getContentEncoding(message) match {
         case "gzip"     => f(new GZIPInputStream(dechunked))
         case "deflate"  => f(new InflaterInputStream(dechunked))
         case "identity" => f(dechunked)
@@ -50,6 +48,12 @@ trait BodyParsing {
       }
     }
 
+  private def getContentLength(message: HttpMessage): Long =
+    message.getHeaderValue("Content-Length").map(_.toLong).getOrElse(maxLength)
+
+  private def getContentEncoding(message: HttpMessage): String =
+    message.getHeaderValue("Content-Encoding").map(ListParser.apply).flatMap(_.headOption).map(_.toLowerCase).getOrElse("identity")    
+
   private def isChunked(message: HttpMessage): Boolean =
-    message.getTransferEncoding.isDefined && ! message.getHeaderValue("X-Scamper-Transfer-Decoding").contains("chunked")
+    message.getHeader("Transfer-Encoding").isDefined && ! message.getHeaderValue("X-Scamper-Transfer-Decoding").contains("chunked")
 }

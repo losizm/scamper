@@ -20,8 +20,7 @@ package scamper
  *
  * @see [[HttpRequest]]
  */
-trait HttpResponse extends HttpMessage {
-  type MessageType = HttpResponse
+trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse] {
   type LineType = StatusLine
   type CookieType = SetCookie
 
@@ -33,14 +32,14 @@ trait HttpResponse extends HttpMessage {
    *
    * @return new response
    */
-  def withStatus(status: ResponseStatus): MessageType
+  def withStatus(status: ResponseStatus): HttpResponse
 
   /**
    * Creates response with new HTTP version.
    *
    * @return new response
    */
-  def withVersion(version: HttpVersion): MessageType
+  def withVersion(version: HttpVersion): HttpResponse
 }
 
 /** HttpResponse factory */
@@ -68,6 +67,15 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
 
   def withHeaders(newHeaders: Header*): HttpResponse =
     copy(headers = newHeaders)
+
+  def addHeaders(newHeaders: Header*): HttpResponse =
+    withHeaders(headers ++ newHeaders : _*)
+
+  def removeHeaders(names: String*): HttpResponse =
+    withHeaders(headers.filterNot(header => names.exists(header.name.equalsIgnoreCase)) : _*)
+
+  def withHeader(header: Header): HttpResponse =
+    withHeaders(headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header : _*)
 
   def withCookies(newCookies: SetCookie*): HttpResponse =
     copy(headers = headers.filterNot(_.name.equalsIgnoreCase("Set-Cookie")) ++ newCookies.map(c => Header("Set-Cookie", c.toString)))
