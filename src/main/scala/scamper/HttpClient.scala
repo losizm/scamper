@@ -47,7 +47,7 @@ object HttpClient {
     val scheme = if (secure) "https" else "http"
     val host = getEffectiveHost(request.target, request.getHost)
     val target = request.target.withScheme(scheme).withAuthority(host)
-    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/1.3")
+    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/2.0")
 
     var effectiveRequest = request.method match {
       case GET     => toBodilessRequest(request)
