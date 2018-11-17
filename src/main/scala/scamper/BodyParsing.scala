@@ -55,5 +55,5 @@ trait BodyParsing {
     message.getHeaderValue("Content-Encoding").map(ListParser.apply).flatMap(_.headOption).map(_.toLowerCase).getOrElse("identity")    
 
   private def isChunked(message: HttpMessage): Boolean =
-    message.getHeader("Transfer-Encoding").isDefined && ! message.getHeaderValue("X-Scamper-Transfer-Decoding").contains("chunked")
+    message.hasHeader("Transfer-Encoding") && ! message.getHeaderValue("X-Scamper-Transfer-Decoding").contains("chunked")
 }

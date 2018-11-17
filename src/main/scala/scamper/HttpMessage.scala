@@ -36,6 +36,10 @@ trait HttpMessage {
   def parse[T](implicit bodyParser: BodyParser[T]): T =
     bodyParser.parse(this)
 
+  /** Tests whether header with given name is present. */
+  def hasHeader(name: String): Boolean =
+    headers.exists(_.name.equalsIgnoreCase(name))
+
   /**
    * Gets header with given name.
    *
