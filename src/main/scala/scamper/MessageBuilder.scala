@@ -63,15 +63,6 @@ trait MessageBuilder[T <: HttpMessage] {
   def withHeader(header: Header): T
 
   /**
-   * Creates message with new cookies.
-   *
-   * All previous cookies are removed.
-   *
-   * @return new message
-   */
-  def withCookies(cookies: T#CookieType*): T
-
-  /**
    * Creates copy of message with given body.
    *
    * @param body message body

@@ -25,7 +25,6 @@ import scamper.auxiliary.UriType
  */
 trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
   type LineType = RequestLine
-  type CookieType = PlainCookie
 
   /** Gets request method. */
   def method: RequestMethod = startLine.method
@@ -113,12 +112,6 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
       case query => QueryParams.parse(query)
     }
 
-  lazy val cookies: Seq[PlainCookie] =
-    getHeaderValue("Cookie")
-      .map(ListParser(_, semicolon = true))
-      .map(_.map(PlainCookie.parse).toSeq)
-      .getOrElse(Nil)
-
   def getQueryParamValue(name: String): Option[String] =
     queryParams.get(name).flatMap(_.headOption)
 
@@ -157,9 +150,6 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
 
   def withHeader(header: Header): HttpRequest =
     withHeaders(headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header : _*)
-
-  def withCookies(newCookies: PlainCookie*): HttpRequest =
-    copy(headers = headers.filterNot(_.name.equalsIgnoreCase("Cookie")) :+ Header("Cookie", newCookies.mkString("; ")))
 
   def withBody(newBody: Entity): HttpRequest =
     copy(body = newBody)

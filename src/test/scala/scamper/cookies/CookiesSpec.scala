@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper
+package scamper.cookies
 
 import java.time.OffsetDateTime
 import org.scalatest.FlatSpec
 
-class CookieSpec extends FlatSpec {
+class CookiesSpec extends FlatSpec {
   "PlainCookie" should "be created from formatted value" in {
     val cookie = PlainCookie.parse("SID=31d4d96e407aad42")
     assert(cookie.name == "SID")
@@ -41,7 +41,7 @@ class CookieSpec extends FlatSpec {
     assert(cookie.name == "SID")
     assert(cookie.value == "31d4d96e407aad42")
     assert(cookie.path.contains("/"))
-    assert(cookie.expires.contains(DateValue.parse("Wed, 09 Jun 2021 10:18:14 GMT")))
+    assert(cookie.expires.contains(scamper.DateValue.parse("Wed, 09 Jun 2021 10:18:14 GMT")))
     assert(cookie.secure)
 
     cookie match {

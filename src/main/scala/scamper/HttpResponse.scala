@@ -22,7 +22,6 @@ package scamper
  */
 trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse] {
   type LineType = StatusLine
-  type CookieType = SetCookie
 
   /** Gets response status. */
   def status: ResponseStatus = startLine.status
@@ -54,8 +53,6 @@ object HttpResponse {
 }
 
 private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity) extends HttpResponse {
-  lazy val cookies: Seq[SetCookie] = getHeaderValues("Set-Cookie").map(SetCookie.parse)
-
   def withStartLine(newStartLine: StatusLine) =
     copy(startLine = newStartLine)
 
@@ -76,9 +73,6 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
 
   def withHeader(header: Header): HttpResponse =
     withHeaders(headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header : _*)
-
-  def withCookies(newCookies: SetCookie*): HttpResponse =
-    copy(headers = headers.filterNot(_.name.equalsIgnoreCase("Set-Cookie")) ++ newCookies.map(c => Header("Set-Cookie", c.toString)))
 
   def withBody(newBody: Entity): HttpResponse =
     copy(body = newBody)

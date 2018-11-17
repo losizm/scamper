@@ -20,9 +20,6 @@ trait HttpMessage {
   /** Type of start line used in message */
   type LineType <: StartLine
 
-  /** Type of cookie used in message */
-  type CookieType <: Cookie
-
   /** Gets message start line. */
   def startLine: LineType
 
@@ -31,9 +28,6 @@ trait HttpMessage {
 
   /** Gets message headers. */
   def headers: Seq[Header]
-
-  /** Gets message cookies. */
-  def cookies: Seq[CookieType]
 
   /** Gets message body. */
   def body: Entity
@@ -86,12 +80,4 @@ trait HttpMessage {
   /** Gets all values of headers with given name. */
   def getHeaderValues(name: String): Seq[String] =
     getHeaders(name).map(_.value)
-
-  /** Gets cookie with given name. */
-  def getCookie(name: String): Option[CookieType] =
-    cookies.find(_.name == name)
-
-  /** Gets value of cookie with given name. */
-  def getCookieValue(name: String): Option[String] =
-    getCookie(name).map(_.value)
 }
