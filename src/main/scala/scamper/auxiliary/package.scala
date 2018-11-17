@@ -21,7 +21,7 @@ import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
 import scala.util.Try
 
 /** Includes HTTP related type classes. */
-object ImplicitExtensions {
+package object auxiliary {
   private val crlf = "\r\n".getBytes("UTF-8")
 
   /** Adds extension methods to {@code java.net.Socket}. */

@@ -24,8 +24,8 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 import scala.util.control.NonFatal
 
+import scamper.auxiliary.HttpSocketType
 import scamper.headers.TransferEncoding
-import ImplicitExtensions.HttpSocketType
 
 private class HttpClientConnection private (socket: Socket) extends Closeable {
   private val buffer = new Array[Byte](8192)
