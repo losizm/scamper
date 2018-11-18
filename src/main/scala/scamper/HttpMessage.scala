@@ -33,7 +33,7 @@ trait HttpMessage {
   def body: Entity
 
   /** Parses message body as defined type. */
-  def parse[T](implicit bodyParser: BodyParser[T]): T =
+  def as[T](implicit bodyParser: BodyParser[T]): T =
     bodyParser.parse(this)
 
   /** Tests whether header with given name is present. */

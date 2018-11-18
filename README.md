@@ -246,7 +246,7 @@ implicit val textBodyParser = BodyParsers.text(maxLength = 1024)
 
 def printText(message: HttpMessage): Unit = {
   // Parse message body to String using textBodyParser implicitly
-  val text = message.parse[String]
+  val text = message.as[String]
 
   println(text)
 }
@@ -277,7 +277,7 @@ implicit object UserBodyParser extends BodyParser[User] {
 
 def printUser(message: HttpMessage): Unit = {
   // Parse message body to User using UserBodyParser implicitly
-  val user = message.parse[User]
+  val user = message.as[User]
 
   println(s"uid=${user.id}(${user.name})")
 }
@@ -327,7 +327,7 @@ def getMessageOfTheDay(): Either[Int, String] = {
 
   HttpClient.send(req) { res =>
     res.status.isSuccessful match {
-      case true  => Right(res.parse[String])
+      case true  => Right(res.as[String])
       case false => Left(res.status.code)
     }
   }

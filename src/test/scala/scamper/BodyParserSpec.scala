@@ -35,7 +35,7 @@ class BodyParserSpec extends FlatSpec {
     assert(message.contentType.isText)
     assert(message.contentType.mainType == "text")
     assert(message.contentType.subtype == "plain")
-    assert(message.parse[String] == "Hello, world!")
+    assert(message.as[String] == "Hello, world!")
   }
 
   it should "parse response with chunked text body" in {
@@ -43,20 +43,20 @@ class BodyParserSpec extends FlatSpec {
     val body = Entity("7\r\nHello, \r\n6\r\nworld!\r\n0\r\n")
     val message = Ok(body).withContentType("text/plain; charset=utf8").withTransferEncoding("chunked")
 
-    assert(message.parse[String] == "Hello, world!")
+    assert(message.as[String] == "Hello, world!")
   }
 
   it should "detect truncation in chunked text body" in {
     implicit val bodyParser = BodyParsers.text()
     val message = Ok(Entity("100\r\nHello, world!")).withContentType("text/plain; charset=utf8").withTransferEncoding("chunked")
-    assertThrows[EOFException](message.parse[String])
+    assertThrows[EOFException](message.as[String])
   }
 
   it should "parse request with form body" in {
     implicit val bodyParser = BodyParsers.form()
     val body = Entity("id=0&name=root")
     val request = POST("users").withBody(body).withContentLength(body.length.get)
-    val form: Map[String, Seq[String]] = request.parse
+    val form = request.as[Map[String, Seq[String]]]
 
     assert(form("id").head == "0")
     assert(form("name").head == "root")
@@ -67,6 +67,6 @@ class BodyParserSpec extends FlatSpec {
     val body = Entity("Hello, world!")
     val message = Ok(body).withContentType("text/plain").withContentLength(body.length.get)
 
-    assertThrows[HttpException](message.parse[String])
+    assertThrows[HttpException](message.as[String])
   }
 }
