@@ -69,7 +69,7 @@ For example, `ContentType` includes the following methods:
 
 ```scala
 /** Tests whether Content-Type header is present. */
-def hasContentType: MediaType
+def hasContentType: Boolean
 
 /** Gets Content-Type header value if present. */
 def getContentType: Option[MediaType]
@@ -135,7 +135,7 @@ val req = GET("https://localhost:8080/motd")
 // Print name and value of both cookies
 req.cookies.foreach(cookie => println(s"${cookie.name}=${cookie.value}"))
 
-// Get cookie by name
+// Get cookies by name
 val id: Option[PlainCookie] = req.getCookie("ID")
 val region: Option[PlainCookie] = req.getCookie("Region")
 
@@ -167,7 +167,7 @@ val res = Ok("There is an answer.").withCookies(
   SetCookie("Region", "SE-US")
 )
 
-// Print all cookies
+// Print both cookies
 res.cookies.foreach(println)
 
 // Get cookies by name
