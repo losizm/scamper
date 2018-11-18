@@ -12,8 +12,8 @@ message types.
 
 ### Building Requests
 An `HttpRequest` can be created using one of the factory methods defined in its
-companion object. Or you can start with a `RequestMethod` and build the request
-using [implicit headers and type converters](#implicit-headers-and-type-converters).
+companion object. Or you can start with a `RequestMethod` and use builder
+methods to further define the request.
 
 ```scala
 import scamper.ImplicitConverters.stringToURI
@@ -21,16 +21,16 @@ import scamper.RequestMethods.GET
 import scamper.headers.{ Accept, Host, UserAgent }
 import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToProductType }
 
-val request = GET("/index.html")
+val request = GET("/motd")
   .withHost("localhost:8080")
   .withUserAgent("Scamper/2.0")
-  .withAccept("text/html", "*/*; q=0.5")
+  .withAccept("text/plain", "*/*; q=0.5")
 ```
 
 ### Building Responses
 An `HttpResponse` can be created using one of the factory methods defined in its
-companion object. Or you can start with a `ResponseStatus` and build the
-response using [implicit headers and type converters](#implicit-headers-and-type-converters).
+companion object. Or you can start with a `ResponseStatus` and use builder
+methods to further define the response.
 
 ```scala
 import scamper.ImplicitConverters.stringToEntity
@@ -38,34 +38,53 @@ import scamper.ResponseStatuses.Ok
 import scamper.headers.{ Connection, ContentType, Server }
 import scamper.types.ImplicitConverters.{ stringToMediaType, stringToProductType }
 
-val response = Ok("Hello, world!")
+val response = Ok("There is an answer.")
   .withContentType("text/plain")
   .withServer("Scamper/2.0")
   .withConnection("close")
 ```
 
-## Implicit Headers and Type Converters
-The implicit headers and type converters are defined in `scamper.headers`
-and `scamper.types.ImplicitConverters`. They allow type-safe access to message
-headers.
+## Generalized and Specialized Header Access
 
-For example, the `ContentType` header adds the following methods to `HttpMessage`:
+There are a set of methods in `HttpMessage` that provide generalized header
+access. You provide a `String` for the header field name, which is
+case-insensitive, and the header value is also a `String`.
 
 ```scala
-/** Gets Content-Type header value */
-def contentType: MediaType
+import scamper.ImplicitConverters.{ stringToURI, tupleToHeader }
+import scamper.RequestMethods.POST
 
-/** Gets Content-Type header value if present */
+val req = POST("/api/users").withHeader("Content-Type" -> "application/json")
+
+val contentType: Option[String] = req.getHeaderValue("Content-Type")
+```
+
+_But that's not all there is._
+
+The interface to `HttpMessage` can be extended to include specialized header
+acces. These extensions are provided by the many type classes defined in
+`scamper.headers`.
+
+For example, `ContentType` includes the following methods:
+
+```scala
+/** Tests whether Content-Type header is present. */
+def hasContentType: MediaType
+
+/** Gets Content-Type header value if present. */
 def getContentType: Option[MediaType]
 
-/** Creates message with Content-Type header */
+/** Gets Content-Type header value. */
+def contentType: MediaType
+
+/** Creates message with Content-Type header. */
 def withContentType(value: MediaType): HttpMessage
 
-/** Creates message without Content-Type header */
+/** Creates message without Content-Type header. */
 def removeContentType: HttpMessage
 ```
 
-So you can work with the message header in a type-safe manner.
+So you can work with the header in a type-safe manner.
 
 ```scala
 import scamper.ImplicitConverters.stringToURI
@@ -93,11 +112,11 @@ println(req.contentType.subtype) // json
 ```
 ## Message Body
 The message body is represented as an instance of `Entity`, which provides
-access to an input stream.
+access to a `java.io.InputStream`.
 
 ### Creating Message Body
-When building a message, you can use one of the `Entity` factory methods to
-create the message body. For example, you can create a text message body.
+When building a message, use one of the `Entity` factory methods to create the
+body. For example, you can create a text body.
 
 ```scala
 import scamper.Entity
@@ -119,7 +138,7 @@ val body = Entity("""
 val res = Ok(body).withContentType("text/html; charset=utf-8")
 ```
 
-Or you can create a message body from file content.
+Or create a message body from file content.
 
 ```scala
 import java.io.File
@@ -135,8 +154,8 @@ val res = Ok(body).withContentType("text/html; charset=utf-8")
 ### Parsing Message Body
 
 When handling an incoming message, use an appropriate `BodyParser` to parse the
-message body. There is a set of standard parsers in `BodyParsers`, such as the
-one used for parsing general text content.
+message body. There is a set of standard parsers available in `BodyParsers`,
+such as the one used for parsing text content.
 
 ```scala
 import scamper.{ BodyParsers, HttpMessage }
@@ -152,8 +171,8 @@ def printText(message: HttpMessage): Unit = {
 }
 ```
 
-You can also implement custom body parsers. Here's one that gets some help from
-[little-json](https://github.com/losizm/little-json):
+You can also implement custom body parsers. Here's one that exploits the power
+of [little-json](https://github.com/losizm/little-json):
 
 ```scala
 import javax.json.JsonObject
@@ -219,8 +238,8 @@ object UserAdminClient {
 
 ## API Documentation
 
-This is only a taste of what **Scamper** offers. See [scaladoc](https://losizm.github.io/scamper/latest/api/scamper/index.html) for
-additional details.
+See [scaladoc](https://losizm.github.io/scamper/latest/api/scamper/index.html)
+for additional details.
 
 ## License
 Scamper is licensed under the Apache license, version 2. See LICENSE file for

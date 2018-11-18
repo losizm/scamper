@@ -26,7 +26,7 @@ import scamper.types._
 package object headers {
   /** Provides standardized access to Accept header. */
   implicit class Accept(val request: HttpRequest) extends AnyVal {
-    /** Test whether Accept header is present. */
+    /** Tests whether Accept header is present. */
     def hasAccept: Boolean = request.hasHeader("Accept")
 
     /**
@@ -54,7 +54,7 @@ package object headers {
 
   /** Provides standardized access to Accept-Charset header. */
   implicit class AcceptCharset(val request: HttpRequest) extends AnyVal {
-    /** Test whether Accept-Charset header is present. */
+    /** Tests whether Accept-Charset header is present. */
     def hasAcceptCharset: Boolean = request.hasHeader("AcceptCharset")
 
     /**
@@ -82,7 +82,7 @@ package object headers {
 
   /** Provides standardized access to Accept-Encoding header. */
   implicit class AcceptEncoding(val request: HttpRequest) extends AnyVal {
-    /** Test whether Accept-Encoding header is present. */
+    /** Tests whether Accept-Encoding header is present. */
     def hasAcceptEncoding: Boolean = request.hasHeader("Accept-Encoding")
 
     /**
@@ -112,7 +112,7 @@ package object headers {
 
   /** Provides standardized access to Accept-Language header. */
   implicit class AcceptLanguage(val request: HttpRequest) extends AnyVal {
-    /** Test whether Accept-Language header is present. */
+    /** Tests whether Accept-Language header is present. */
     def hasAcceptLanguage: Boolean = request.hasHeader("Accept-Language")
 
     /**
@@ -142,7 +142,7 @@ package object headers {
 
   /** Provides standardized access to Accept-Patch header. */
   implicit class AcceptPatch(val response: HttpResponse) extends AnyVal {
-    /** Test whether Accept-Patch header is present. */
+    /** Tests whether Accept-Patch header is present. */
     def hasAcceptPatch: Boolean = response.hasHeader("Accept-Patch")
 
     /**
@@ -170,7 +170,7 @@ package object headers {
 
   /** Provides standardized access to Accept-Ranges header. */
   implicit class AcceptRanges(val response: HttpResponse) extends AnyVal {
-    /** Test whether Accept-Ranges header is present. */
+    /** Tests whether Accept-Ranges header is present. */
     def hasAcceptRanges: Boolean = response.hasHeader("Accept-Ranges")
 
     /**
@@ -196,7 +196,7 @@ package object headers {
 
   /** Provides standardized access to Age header. */
   implicit class Age(val response: HttpResponse) extends AnyVal {
-    /** Test whether Age header is present. */
+    /** Tests whether Age header is present. */
     def hasAge: Boolean = response.hasHeader("Age")
 
     /**
@@ -222,7 +222,7 @@ package object headers {
 
   /** Provides standardized access to Allow header. */
   implicit class Allow(val response: HttpResponse) extends AnyVal {
-    /** Test whether Allow header is present. */
+    /** Tests whether Allow header is present. */
     def hasAllow: Boolean = response.hasHeader("Allow")
 
     /**
@@ -250,7 +250,7 @@ package object headers {
 
   /** Provides standardized access to Authentication-Info header. */
   implicit class AuthenticationInfo(val response: HttpResponse) extends AnyVal {
-    /** Test whether Authentication-Info header is present. */
+    /** Tests whether Authentication-Info header is present. */
     def hasAuthenticationInfo: Boolean = response.hasHeader("Authentication-Info")
 
     /**
@@ -279,7 +279,7 @@ package object headers {
 
   /** Provides standardized access to Authorization header. */
   implicit class Authorization(val request: HttpRequest) extends AnyVal {
-    /** Test whether Authorization header is present. */
+    /** Tests whether Authorization header is present. */
     def hasAuthorization: Boolean = request.hasHeader("Authorization")
 
     /**
@@ -305,7 +305,7 @@ package object headers {
 
   /** Provides standardized access to Cache-Control header. */
   implicit class CacheControl[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
-    /** Test whether Cache-Control header is present. */
+    /** Tests whether Cache-Control header is present. */
     def hasCacheControl: Boolean = message.hasHeader("Cache-Control")
 
     /**
@@ -331,7 +331,7 @@ package object headers {
 
   /** Provides standardized access to Content-Disposition header. */
   implicit class ContentDisposition(val response: HttpResponse) extends AnyVal {
-    /** Test whether Content-Disposition header is present. */
+    /** Tests whether Content-Disposition header is present. */
     def hasContentDisposition: Boolean = response.hasHeader("Content-Disposition")
 
     /**
@@ -360,7 +360,7 @@ package object headers {
 
   /** Provides standardized access to Content-Encoding header. */
   implicit class ContentEncoding[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
-    /** Test whether Content-Encoding header is present. */
+    /** Tests whether Content-Encoding header is present. */
     def hasContentEncoding: Boolean = message.hasHeader("Content-Encoding")
 
     /**
@@ -390,7 +390,7 @@ package object headers {
 
   /** Provides standardized access to Content-Language header. */
   implicit class ContentLanguage[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
-    /** Test whether Content-Language header is present. */
+    /** Tests whether Content-Language header is present. */
     def hasContentLanguage: Boolean = message.hasHeader("Content-Language")
 
     /**
@@ -418,7 +418,7 @@ package object headers {
 
   /** Provides standardized access to Content-Length header. */
   implicit class ContentLength[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
-    /** Test whether Content-Length header is present. */
+    /** Tests whether Content-Length header is present. */
     def hasContentLength: Boolean = message.hasHeader("Content-Length")
 
     /**
@@ -444,7 +444,7 @@ package object headers {
 
   /** Provides standardized access to Content-Location header. */
   implicit class ContentLocation[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
-    /** Test whether Content-Location header is present. */
+    /** Tests whether Content-Location header is present. */
     def hasContentLocation: Boolean = message.hasHeader("Content-Location")
 
     /**
@@ -472,7 +472,7 @@ package object headers {
 
   /** Provides standardized access to Content-Range header. */
   implicit class ContentRange[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
-    /** Test whether Content-Range header is present. */
+    /** Tests whether Content-Range header is present. */
     def hasContentRange: Boolean = message.hasHeader("Content-Range")
 
     /**
@@ -498,7 +498,7 @@ package object headers {
 
   /** Provides standardized access to Content-Type header. */
   implicit class ContentType[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
-    /** Test whether Content-Type header is present. */
+    /** Tests whether Content-Type header is present. */
     def hasContentType: Boolean = message.hasHeader("Content-Type")
 
     /**
@@ -524,7 +524,7 @@ package object headers {
 
   /** Provides standardized access to Connection header. */
   implicit class Connection[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
-    /** Test whether Connection header is present. */
+    /** Tests whether Connection header is present. */
     def hasConnection: Boolean = message.hasHeader("Connection")
 
     /**
@@ -550,7 +550,7 @@ package object headers {
 
   /** Provides standardized access to Date header. */
   implicit class Date(val response: HttpResponse) extends AnyVal {
-    /** Test whether Date header is present. */
+    /** Tests whether Date header is present. */
     def hasDate: Boolean = response.hasHeader("Date")
 
     /**
@@ -576,7 +576,7 @@ package object headers {
 
   /** Provides standardized access to ETag header. */
   implicit class ETag(val response: HttpResponse) extends AnyVal {
-    /** Test whether ETag header is present. */
+    /** Tests whether ETag header is present. */
     def hasETag: Boolean = response.hasHeader("ETag")
 
     /**
@@ -602,7 +602,7 @@ package object headers {
 
   /** Provides standardized access to Expect header. */
   implicit class Expect(val request: HttpRequest) extends AnyVal {
-    /** Test whether Expect header is present. */
+    /** Tests whether Expect header is present. */
     def hasExpect: Boolean = request.hasHeader("Expect")
 
     /**
@@ -628,7 +628,7 @@ package object headers {
 
   /** Provides standardized access to Expires header. */
   implicit class Expires(val response: HttpResponse) extends AnyVal {
-    /** Test whether Expires header is present. */
+    /** Tests whether Expires header is present. */
     def hasExpires: Boolean = response.hasHeader("Expires")
 
     /**
@@ -654,7 +654,7 @@ package object headers {
 
   /** Provides standardized access to From header. */
   implicit class From(val request: HttpRequest) extends AnyVal {
-    /** Test whether From header is present. */
+    /** Tests whether From header is present. */
     def hasFrom: Boolean = request.hasHeader("From")
 
     /**
@@ -680,7 +680,7 @@ package object headers {
 
   /** Provides standardized access to Host header. */
   implicit class Host(val request: HttpRequest) extends AnyVal {
-    /** Test whether Host header is present. */
+    /** Tests whether Host header is present. */
     def hasHost: Boolean = request.hasHeader("Host")
 
     /**
@@ -706,7 +706,7 @@ package object headers {
 
   /** Provides standardized access to If-Match header. */
   implicit class IfMatch(val request: HttpRequest) extends AnyVal {
-    /** Test whether If-Match header is present. */
+    /** Tests whether If-Match header is present. */
     def hasIfMatch: Boolean = request.hasHeader("If-Match")
 
     /**
@@ -732,7 +732,7 @@ package object headers {
 
   /** Provides standardized access to If-Modified-Since header. */
   implicit class IfModifiedSince(val request: HttpRequest) extends AnyVal {
-    /** Test whether If-Modified-Since header is present. */
+    /** Tests whether If-Modified-Since header is present. */
     def hasIfModifiedSince: Boolean = request.hasHeader("If-Modified-Since")
 
     /**
@@ -758,7 +758,7 @@ package object headers {
 
   /** Provides standardized access to If-None-Match header. */
   implicit class IfNoneMatch(val request: HttpRequest) extends AnyVal {
-    /** Test whether If-None-Match header is present. */
+    /** Tests whether If-None-Match header is present. */
     def hasIfNoneMatch: Boolean = request.hasHeader("If-None-Match")
 
     /**
@@ -784,7 +784,7 @@ package object headers {
 
   /** Provides standardized access to If-Range header. */
   implicit class IfRange(val request: HttpRequest) extends AnyVal {
-    /** Test whether If-Range header is present. */
+    /** Tests whether If-Range header is present. */
     def hasIfRange: Boolean = request.hasHeader("If-Range")
 
     /**
@@ -824,7 +824,7 @@ package object headers {
 
   /** Provides standardized access to If-Unmodified-Since header. */
   implicit class IfUnmodifiedSince(val request: HttpRequest) extends AnyVal {
-    /** Test whether If-Unmodified-Since header is present. */
+    /** Tests whether If-Unmodified-Since header is present. */
     def hasIfUnmodifiedSince: Boolean = request.hasHeader("If-Unmodified-Since")
 
     /**
@@ -852,7 +852,7 @@ package object headers {
 
   /** Provides standardized access to Last-Modified header. */
   implicit class LastModified(val response: HttpResponse) extends AnyVal {
-    /** Test whether Last-Modified header is present. */
+    /** Tests whether Last-Modified header is present. */
     def hasLastModified: Boolean = response.hasHeader("Last-Modified")
 
     /**
@@ -878,7 +878,7 @@ package object headers {
 
   /** Provides standardized access to Link header. */
   implicit class Link(val response: HttpResponse) extends AnyVal {
-    /** Test whether Link header is present. */
+    /** Tests whether Link header is present. */
     def hasLink: Boolean = response.hasHeader("Link")
 
     /**
@@ -904,7 +904,7 @@ package object headers {
 
   /** Provides standardized access to Location header. */
   implicit class Location(val response: HttpResponse) extends AnyVal {
-    /** Test whether Location header is present. */
+    /** Tests whether Location header is present. */
     def hasLocation: Boolean = response.hasHeader("Location")
 
     /**
@@ -930,7 +930,7 @@ package object headers {
 
   /** Provides standardized access to Max-Forwards header. */
   implicit class MaxForwards(val request: HttpRequest) extends AnyVal {
-    /** Test whether Max-Forwards header is present. */
+    /** Tests whether Max-Forwards header is present. */
     def hasMaxForwards: Boolean = request.hasHeader("Max-Forwards")
 
     /**
@@ -956,7 +956,7 @@ package object headers {
 
   /** Provides standardized access to Pragma header. */
   implicit class Pragma(val request: HttpRequest) extends AnyVal {
-    /** Test whether Pragma header is present. */
+    /** Tests whether Pragma header is present. */
     def hasPragma: Boolean = request.hasHeader("Pragma")
 
     /**
@@ -982,7 +982,7 @@ package object headers {
 
   /** Provides standardized access to Proxy-Authenticate header. */
   implicit class ProxyAuthenticate(val response: HttpResponse) extends AnyVal {
-    /** Test whether Proxy-Authenticate header is present. */
+    /** Tests whether Proxy-Authenticate header is present. */
     def hasProxyAuthenticate: Boolean = response.hasHeader("Proxy-Authenticate")
 
     /**
@@ -1015,7 +1015,7 @@ package object headers {
 
   /** Provides standardized access to Proxy-Authentication-Info header. */
   implicit class ProxyAuthenticationInfo(val response: HttpResponse) extends AnyVal {
-    /** Test whether Proxy-Authentication-Info header is present. */
+    /** Tests whether Proxy-Authentication-Info header is present. */
     def hasProxyAuthenticationInfo: Boolean = response.hasHeader("Proxy-Authentication-Info")
 
     /**
@@ -1044,7 +1044,7 @@ package object headers {
 
   /** Provides standardized access to Proxy-Authorization header. */
   implicit class ProxyAuthorization(val request: HttpRequest) extends AnyVal {
-    /** Test whether Proxy-Authorization header is present. */
+    /** Tests whether Proxy-Authorization header is present. */
     def hasProxyAuthorization: Boolean = request.hasHeader("Proxy-Authorization")
 
     /**
@@ -1072,7 +1072,7 @@ package object headers {
 
   /** Provides standardized access to Range header. */
   implicit class Range(val request: HttpRequest) extends AnyVal {
-    /** Test whether Range header is present. */
+    /** Tests whether Range header is present. */
     def hasRange: Boolean = request.hasHeader("Range")
 
     /**
@@ -1098,7 +1098,7 @@ package object headers {
 
   /** Provides standardized access to Referer header. */
   implicit class Referer(val request: HttpRequest) extends AnyVal {
-    /** Test whether Referer header is present. */
+    /** Tests whether Referer header is present. */
     def hasReferer: Boolean = request.hasHeader("Referer")
 
     /**
@@ -1124,7 +1124,7 @@ package object headers {
 
   /** Provides standardized access to Retry-After header. */
   implicit class RetryAfter(val response: HttpResponse) extends AnyVal {
-    /** Test whether Retry-After header is present. */
+    /** Tests whether Retry-After header is present. */
     def hasRetryAfter: Boolean = response.hasHeader("Retry-After")
 
     /**
@@ -1150,7 +1150,7 @@ package object headers {
 
   /** Provides standardized access to Server header. */
   implicit class Server(val response: HttpResponse) extends AnyVal {
-    /** Test whether Server header is present. */
+    /** Tests whether Server header is present. */
     def hasServer: Boolean = response.hasHeader("Server")
 
     /**
@@ -1176,7 +1176,7 @@ package object headers {
 
   /** Provides standardized access to TE header. */
   implicit class TE(val request: HttpRequest) extends AnyVal {
-    /** Test whether TE header is present. */
+    /** Tests whether TE header is present. */
     def hasTE: Boolean = request.hasHeader("TE")
 
     /**
@@ -1204,7 +1204,7 @@ package object headers {
 
   /** Provides standardized access to Trailer header. */
   implicit class Trailer[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
-    /** Test whether Trailer header is present. */
+    /** Tests whether Trailer header is present. */
     def hasTrailer: Boolean = message.hasHeader("Trailer")
 
     /**
@@ -1230,7 +1230,7 @@ package object headers {
 
   /** Provides standardized access to Transfer-Encoding header. */
   implicit class TransferEncoding[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
-    /** Test whether Transfer-Encoding header is present. */
+    /** Tests whether Transfer-Encoding header is present. */
     def hasTransferEncoding: Boolean = message.hasHeader("Transfer-Encoding")
 
     /**
@@ -1260,7 +1260,7 @@ package object headers {
 
   /** Provides standardized access to Upgrade header. */
   implicit class Upgrade(val request: HttpRequest) extends AnyVal {
-    /** Test whether Upgrade header is present. */
+    /** Tests whether Upgrade header is present. */
     def hasUpgrade: Boolean = request.hasHeader("Upgrade")
 
     /**
@@ -1288,7 +1288,7 @@ package object headers {
 
   /** Provides standardized access to User-Agent header. */
   implicit class UserAgent(val request: HttpRequest) extends AnyVal {
-    /** Test whether User-Agent header is present. */
+    /** Tests whether User-Agent header is present. */
     def hasUserAgent: Boolean = request.hasHeader("User-Agent")
 
     /**
@@ -1314,7 +1314,7 @@ package object headers {
 
   /** Provides standardized access to Vary header. */
   implicit class Vary(val response: HttpResponse) extends AnyVal {
-    /** Test whether Vary header is present. */
+    /** Tests whether Vary header is present. */
     def hasVary: Boolean = response.hasHeader("Vary")
 
     /**
@@ -1340,7 +1340,7 @@ package object headers {
 
   /** Provides standardized access to Via header. */
   implicit class Via(val response: HttpResponse) extends AnyVal {
-    /** Test whether Via header is present. */
+    /** Tests whether Via header is present. */
     def hasVia: Boolean = response.hasHeader("Via")
 
     /**
@@ -1366,7 +1366,7 @@ package object headers {
 
   /** Provides standardized access to Warning header. */
   implicit class Warning(val response: HttpResponse) extends AnyVal {
-    /** Test whether Warning header is present. */
+    /** Tests whether Warning header is present. */
     def hasWarning: Boolean = response.hasHeader("Warning")
 
     /**
@@ -1392,7 +1392,7 @@ package object headers {
 
   /** Provides standardized access to WWW-Authenticate header. */
   implicit class WwwAuthenticate(val response: HttpResponse) extends AnyVal {
-    /** Test whether WWW-Authenticate header is present. */
+    /** Tests whether WWW-Authenticate header is present. */
     def hasWwwAuthenticate: Boolean = response.hasHeader("WWW-Authenticate")
 
     /**
