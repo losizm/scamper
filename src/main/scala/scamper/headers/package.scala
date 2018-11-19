@@ -193,7 +193,7 @@ package object headers {
 
     /** Gets Age header value if present. */
     def getAge: Option[Long] =
-      response.getHeaderValue("Age").map(_.toLong)
+      response.getHeader("Age").map(_.longValue)
 
     /** Tests whether Age header is present. */
     def hasAge: Boolean = response.hasHeader("Age")
@@ -401,7 +401,7 @@ package object headers {
 
     /** Gets Content-Length header value if present. */
     def getContentLength: Option[Long] =
-      message.getHeaderValue("Content-Length").map(_.toLong)
+      message.getHeader("Content-Length").map(_.longValue)
 
     /** Tests whether Content-Length header is present. */
     def hasContentLength: Boolean = message.hasHeader("Content-Length")
@@ -525,7 +525,7 @@ package object headers {
 
     /** Gets Date header value if present. */
     def getDate: Option[OffsetDateTime] =
-      response.getHeaderValue("Date").map(DateValue.parse)
+      response.getHeader("Date").map(_.dateValue)
 
     /** Tests whether Date header is present. */
     def hasDate: Boolean = response.hasHeader("Date")
@@ -597,7 +597,7 @@ package object headers {
 
     /** Gets Expires header value if present. */
     def getExpires: Option[OffsetDateTime] =
-      response.getHeaderValue("Expires").map(DateValue.parse)
+      response.getHeader("Expires").map(_.dateValue)
 
     /** Tests whether Expires header is present. */
     def hasExpires: Boolean = response.hasHeader("Expires")
@@ -694,7 +694,7 @@ package object headers {
 
     /** Gets If-Modified-Since header value if present. */
     def getIfModifiedSince: Option[OffsetDateTime] =
-      request.getHeaderValue("If-Modified-Since").map(DateValue.parse)
+      request.getHeader("If-Modified-Since").map(_.dateValue)
 
     /** Tests whether If-Modified-Since header is present. */
     def hasIfModifiedSince: Boolean = request.hasHeader("If-Modified-Since")
@@ -743,11 +743,11 @@ package object headers {
 
     /** Gets If-Range header value if present. */
     def getIfRange: Option[Either[EntityTag, OffsetDateTime]] =
-      request.getHeaderValue("If-Range").map { value =>
+      request.getHeader("If-Range").map { header =>
         Try {
-          Left(EntityTag.parse(value))
+          Left(EntityTag.parse(header.value))
         }.orElse {
-          Try(Right(DateValue.parse(value)))
+          Try(Right(header.dateValue))
         }.get
       }
 
@@ -756,7 +756,7 @@ package object headers {
 
     /** Creates new request setting If-Range header to supplied value. */
     def withIfRange(value: Either[EntityTag, OffsetDateTime]): HttpRequest =
-      request.withHeader(Header("If-Range", value.fold(_.toString, DateValue.format)))
+      value.fold(withIfRange, withIfRange)
 
     /** Creates new request setting If-Range header to supplied value. */
     def withIfRange(value: EntityTag): HttpRequest =
@@ -782,7 +782,7 @@ package object headers {
 
     /** Gets If-Unmodified-Since header value if present. */
     def getIfUnmodifiedSince: Option[OffsetDateTime] =
-      request.getHeaderValue("If-Unmodified-Since").map(DateValue.parse)
+      request.getHeader("If-Unmodified-Since").map(_.dateValue)
 
     /** Tests whether If-Unmodified-Since header is present. */
     def hasIfUnmodifiedSince: Boolean = request.hasHeader("If-Unmodified-Since")
@@ -809,7 +809,7 @@ package object headers {
 
     /** Gets Last-Modified header value if present. */
     def getLastModified: Option[OffsetDateTime] =
-      response.getHeaderValue("Last-Modified").map(DateValue.parse)
+      response.getHeader("Last-Modified").map(_.dateValue)
 
     /** Tests whether Last-Modified header is present. */
     def hasLastModified: Boolean = response.hasHeader("Last-Modified")
@@ -881,7 +881,7 @@ package object headers {
 
     /** Gets Max-Forwards header value if present. */
     def getMaxForwards: Option[Long] =
-      request.getHeaderValue("Max-Forwards").map(_.toLong)
+      request.getHeader("Max-Forwards").map(_.longValue)
 
     /** Tests whether Max-Forwards header is present. */
     def hasMaxForwards: Boolean = request.hasHeader("Max-Forwards")
@@ -1064,7 +1064,7 @@ package object headers {
 
     /** Gets Retry-After header value if present. */
     def getRetryAfter: Option[OffsetDateTime] =
-      response.getHeaderValue("Retry-After").map(DateValue.parse)
+      response.getHeader("Retry-After").map(_.dateValue)
 
     /** Tests whether Retry-After header is present. */
     def hasRetryAfter: Boolean = response.hasHeader("Retry-After")
