@@ -18,7 +18,7 @@ package scamper
 import java.io.{ InputStream, SequenceInputStream }
 import java.util.zip.{ GZIPInputStream, InflaterInputStream }
 
-/** A mixin that provides access to decoded message body. */
+/** A mixin providing access to decoded message body. */
 trait BodyParsing {
   /** Gets maximum body length. */
   def maxLength: Long
@@ -29,16 +29,19 @@ trait BodyParsing {
   /**
    * Provides input stream to decoded message body.
    *
-   * @param message HTTP message
-   * @param f input stream handler
+   * The decoded input stream is passed to supplied function.
    *
-   * @return value returned from handler
+   * @param message HTTP message
+   * @param f stream handler
+   *
+   * @return value of applied handler
    */
   def withInputStream[T](message: HttpMessage)(f: InputStream => T): T =
     message.body.withInputStream { in =>
-      val dechunked =
-        if (isChunked(message)) new ChunkedInputStream(in)
-        else new BoundedInputStream(in, getContentLength(message))
+      val dechunked = isChunked(message) match {
+        case true  => new ChunkedInputStream(in)
+        case false => new BoundedInputStream(in, getContentLength(message))
+      }
 
       getContentEncoding(message) match {
         case "gzip"     => f(new GZIPInputStream(dechunked))
@@ -48,12 +51,18 @@ trait BodyParsing {
       }
     }
 
+  private def isChunked(message: HttpMessage): Boolean =
+    message.hasHeader("Transfer-Encoding")
+
   private def getContentLength(message: HttpMessage): Long =
-    message.getHeaderValue("Content-Length").map(_.toLong).getOrElse(maxLength)
+    message.getHeaderValue("Content-Length")
+      .map(_.toLong)
+      .getOrElse(maxLength)
 
   private def getContentEncoding(message: HttpMessage): String =
-    message.getHeaderValue("Content-Encoding").map(ListParser.apply).flatMap(_.headOption).map(_.toLowerCase).getOrElse("identity")    
-
-  private def isChunked(message: HttpMessage): Boolean =
-    message.hasHeader("Transfer-Encoding") && ! message.getHeaderValue("X-Scamper-Transfer-Decoding").contains("chunked")
+    message.getHeaderValue("Content-Encoding")
+      .map(ListParser.apply)
+      .flatMap(_.headOption)
+      .map(_.toLowerCase)
+      .getOrElse("identity")
 }
