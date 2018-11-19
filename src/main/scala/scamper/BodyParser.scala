@@ -37,7 +37,7 @@ trait BodyParser[T] {
 /** Includes default body parser implementations. */
 object BodyParsers {
   /**
-   * Gets body parser to collect raw bytes of message body.
+   * Gets body parser for collecting raw bytes in message body.
    *
    * @param maxLength maximum length
    */
@@ -45,7 +45,7 @@ object BodyParsers {
     new ByteArrayBodyParser(maxLength.max(0))
 
   /**
-   * Gets body parser to collect text content.
+   * Gets body parser for collecting text in message body.
    *
    * @param maxLength maximum length in bytes
    */
@@ -53,7 +53,7 @@ object BodyParsers {
     new TextBodyParser(maxLength.max(0))
 
   /**
-   * Gets body parser to collect form data.
+   * Gets body parser for collecting form data in message body.
    *
    * @param maxLength maximum length in bytes
    */
@@ -61,9 +61,9 @@ object BodyParsers {
     new FormBodyParser(maxLength.max(0))
 
   /**
-   * Gets body parser to store message body to file.
+   * Gets body parser for storing message body to file.
    *
-   * If {@code dest} is a directory, then the parser creates a new file in the
+   * If `dest` is a directory, then the parser creates a new file in the
    * specified directory on each parsing invocation. Otherwise, the parser
    * overwrites the specified file on each invocation.
    *

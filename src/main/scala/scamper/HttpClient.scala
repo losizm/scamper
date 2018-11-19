@@ -41,7 +41,7 @@ object HttpClient {
    * @param bufferSize sets buffer size of client socket
    * @param handler response handler
    *
-   * @return value from supplied handler
+   * @return value from applied handler
    */
   def send[T](request: HttpRequest, secure: Boolean = false, timeout: Int = 30000, bufferSize: Int = 8192)(handler: HttpResponse => T): T = {
     val scheme = if (secure) "https" else "http"

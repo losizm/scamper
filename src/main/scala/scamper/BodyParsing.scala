@@ -34,7 +34,7 @@ trait BodyParsing {
    * @param message HTTP message
    * @param f stream handler
    *
-   * @return value of applied handler
+   * @return value from applied handler
    */
   def withInputStream[T](message: HttpMessage)(f: InputStream => T): T =
     message.body.withInputStream { in =>

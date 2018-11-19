@@ -19,12 +19,12 @@ import java.io.{ ByteArrayInputStream, File, FileInputStream, InputStream }
 import java.nio.file.Path
 import scala.util.Try
 
-/** HTTP entity */
+/** Representation of message body. */
 trait Entity {
   /** Gets length in bytes if known. */
   def length: Option[Long]
 
-  /** Tests whether entity is known to be empty. */
+  /** Tests whether entity is known empty. */
   def isKnownEmpty: Boolean =
     length.contains(0)
 
@@ -37,7 +37,9 @@ trait Entity {
    * Input stream is passed to supplied function and closed on function's
    * return.
    *
-   * @return result of supplied function
+   * @param f stream handler
+   *
+   * @return value from applied handler
    */
   def withInputStream[T](f: InputStream => T): T = {
     val in = getInputStream
