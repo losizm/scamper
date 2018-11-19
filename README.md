@@ -61,8 +61,8 @@ val contentType: Option[String] = req.getHeaderValue("Content-Type")
 
 _But that's not all there is._
 
-The interface to `HttpMessage` can be extended to include specialized header
-access. These extensions are provided by the many type classes defined in
+The interface to `HttpMessage` can be extended for specialized header access.
+The extension methods are provided by the many type classes defined in
 `scamper.headers`.
 
 For example, `ContentType` includes the following methods:
@@ -114,7 +114,7 @@ println(req.contentType.subtype) // json
 ## Specialized Cookie Access
 
 In much the same way specialized access to headers is available, so too is
-the case for cookies. Specialized access is provided by type classes in
+the case for cookies. Specialized access is provided by classes in
 `scamper.cookies`.
 
 ### Request Cookies
@@ -149,7 +149,7 @@ assert(req.getHeaderValue("Cookie").contains("ID=bG9zCg; Region=SE-US"))
 
 ### Response Cookies
 
-In `HttpResponse`, the cookies are collected from **Set-Cookie** header values.
+In `HttpResponse`, the cookies are a collection of **Set-Cookie** header values.
 Specialized access is provided by `ResponseCookies`, with each cookie
 represented as `SetCookie`.
 
