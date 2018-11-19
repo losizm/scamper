@@ -41,7 +41,7 @@ object BodyParsers {
    *
    * @param maxLength maximum length
    */
-  def bytes(maxLength: Int = 4 * 1024 * 1024): BodyParser[Array[Byte]] =
+  def bytes(maxLength: Int = 8 * 1024 * 1024): BodyParser[Array[Byte]] =
     new ByteArrayBodyParser(maxLength.max(0))
 
   /**
@@ -49,7 +49,7 @@ object BodyParsers {
    *
    * @param maxLength maximum length in bytes
    */
-  def text(maxLength: Int = 4 * 1024 * 1024): BodyParser[String] =
+  def text(maxLength: Int = 8 * 1024 * 1024): BodyParser[String] =
     new TextBodyParser(maxLength.max(0))
 
   /**
@@ -57,7 +57,7 @@ object BodyParsers {
    *
    * @param maxLength maximum length in bytes
    */
-  def form(maxLength: Int = 4 * 1024 * 1024): BodyParser[Map[String, Seq[String]]] =
+  def form(maxLength: Int = 8 * 1024 * 1024): BodyParser[Map[String, Seq[String]]] =
     new FormBodyParser(maxLength.max(0))
 
   /**
@@ -71,7 +71,7 @@ object BodyParsers {
    * @param maxLength maximum length in bytes
    * @param bufferSize buffer size in bytes
    */
-  def file(dest: File = new File(sys.props("java.io.tmpdir")), maxLength: Long = 4 * 1024 * 1024, bufferSize: Int = 8192): BodyParser[File] =
+  def file(dest: File = new File(sys.props("java.io.tmpdir")), maxLength: Long = 8 * 1024 * 1024, bufferSize: Int = 8192): BodyParser[File] =
     new FileBodyParser(dest, maxLength.max(0), bufferSize.max(8192))
 }
 
@@ -113,24 +113,24 @@ private class FormBodyParser(maxLength: Int) extends BodyParser[Map[String, Seq[
     QueryParams.parse(bodyParser.parse(message))
 }
 
-private class FileBodyParser(dest: File, val maxLength: Long, val bufferSize: Int) extends BodyParser[File] with BodyParsing {
+private class FileBodyParser(val dest: File, val maxLength: Long, val bufferSize: Int) extends BodyParser[File] with BodyParsing {
   def parse(message: HttpMessage): File =
     withInputStream(message) { in =>
       val destFile = getDestFile()
       val out = new FileOutputStream(destFile)
 
       try {
-        val buf = new Array[Byte](bufferSize)
-        var len = 0
-
-        while ({ len = in.read(buf); len != -1 })
-          out.write(buf, 0, len)
-
+        val buffer = new Array[Byte](bufferSize)
+        var length = 0
+        while ({ length = in.read(buffer); length != -1 })
+          out.write(buffer, 0, length)
         destFile
       } finally Try(out.close())
     }
 
   private def getDestFile(): File =
-    if (dest.isDirectory) File.createTempFile("scamper-dest-file-", ".tmp", dest)
-    else dest
+    dest.isDirectory match {
+      case true  => File.createTempFile("scamper-dest-file-", ".tmp", dest)
+      case false => dest
+    }
 }
