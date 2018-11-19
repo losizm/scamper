@@ -125,9 +125,9 @@ package object cookies {
     /** Parses formatted cookie. */
     def parse(cookie: String): SetCookie =
       cookie.split(";", 2) match {
-        case Array(pair, attribs) =>
+        case Array(pair, attrs) =>
           pair.split("=") match {
-            case Array(name, value) => SetCookieImpl(Name(name), Value(value), CookieAttributes(attribs))
+            case Array(name, value) => SetCookieImpl(Name(name), Value(value), CookieAttributes.parse(attrs))
           }
         case Array(pair) =>
           pair.split("=") match {
@@ -216,31 +216,31 @@ package object cookies {
 
   private case class PlainCookieImpl(name: String, value: String) extends PlainCookie
 
-  private case class SetCookieImpl(name: String, value: String, attribs: CookieAttributes) extends SetCookie {
-    def domain: Option[String] = attribs.domain
-    def path: Option[String] = attribs.path
-    def expires: Option[OffsetDateTime] = attribs.expires
-    def maxAge: Option[Long] = attribs.maxAge
-    def secure: Boolean = attribs.secure
-    def httpOnly: Boolean = attribs.httpOnly
+  private case class SetCookieImpl(name: String, value: String, attrs: CookieAttributes) extends SetCookie {
+    def domain: Option[String] = attrs.domain
+    def path: Option[String] = attrs.path
+    def expires: Option[OffsetDateTime] = attrs.expires
+    def maxAge: Option[Long] = attrs.maxAge
+    def secure: Boolean = attrs.secure
+    def httpOnly: Boolean = attrs.httpOnly
   }
 
   private case class CookieAttributes(domain: Option[String] = None, path: Option[String] = None, expires: Option[OffsetDateTime] = None,
       maxAge: Option[Long] = None, secure: Boolean = false, httpOnly: Boolean = false)
 
   private object CookieAttributes {
-    def apply(attribs: String): CookieAttributes =
-      attribs.split(";").map(_.split("=", 2).map(_.trim.toLowerCase)).foldRight(CookieAttributes())(append)
+    def parse(attrs: String): CookieAttributes =
+      attrs.split(";").map(_.split("=", 2).map(_.trim.toLowerCase)).foldRight(CookieAttributes())(append)
 
-    private def append(attrib: Array[String], attribs: CookieAttributes): CookieAttributes =
-      attrib match {
-        case Array(name, value) if name == "domain"   => attribs.copy(domain = Some(value))
-        case Array(name, value) if name == "path"     => attribs.copy(path = Some(value))
-        case Array(name, value) if name == "expires"  => attribs.copy(expires = toExpires(value))
-        case Array(name, value) if name == "max-age"  => attribs.copy(maxAge = toMaxAge(value))
-        case Array(name)        if name == "secure"   => attribs.copy(secure = true)
-        case Array(name)        if name == "httponly" => attribs.copy(httpOnly = true)
-        case _ => attribs
+    private def append(attr: Array[String], attrs: CookieAttributes): CookieAttributes =
+      attr match {
+        case Array(name, value) if name == "domain"   => attrs.copy(domain = Some(value))
+        case Array(name, value) if name == "path"     => attrs.copy(path = Some(value))
+        case Array(name, value) if name == "expires"  => attrs.copy(expires = toExpires(value))
+        case Array(name, value) if name == "max-age"  => attrs.copy(maxAge = toMaxAge(value))
+        case Array(name)        if name == "secure"   => attrs.copy(secure = true)
+        case Array(name)        if name == "httponly" => attrs.copy(httpOnly = true)
+        case _ => attrs
       }
 
     private def toMaxAge(value: String): Option[Long] =
