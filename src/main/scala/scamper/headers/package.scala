@@ -545,7 +545,7 @@ package object headers {
      *
      * @throws HeaderNotFound if ETag is not present
      */
-    def etag: EntityTag = getETag.getOrElse(throw HeaderNotFound("ETag"))
+    def eTag: EntityTag = getETag.getOrElse(throw HeaderNotFound("ETag"))
 
     /** Gets ETag header value if present. */
     def getETag: Option[EntityTag] =
