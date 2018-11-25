@@ -15,6 +15,8 @@
  */
 package scamper
 
+import java.net.InetAddress
+
 /** Includes server related items. */
 package object server {
   /** Provides utility for handling HTTP request. */
@@ -82,5 +84,27 @@ package object server {
         case Left(request) => throw RequestNotSatisfied(request)
       }
     }
+  }
+
+  /** HTTP Server */
+  trait HttpServer {
+    /** Gets host address. */
+    def host: InetAddress
+
+    /** Gets port number. */
+    def port: Int
+
+    /** Tests whether server is HTTPS. */
+    def isSecure: Boolean
+
+    /** Closes server. */
+    def close(): Unit
+
+    /**
+     * Tests whether server is closed.
+     *
+     * @return `true` if server is closed; `false` otherwise
+     */
+    def isClosed: Boolean
   }
 }
