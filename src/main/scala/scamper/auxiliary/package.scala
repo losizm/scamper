@@ -15,13 +15,81 @@
  */
 package scamper
 
+import java.io.{ InputStream, OutputStream }
 import java.net.{ Socket, URI, URLDecoder, URLEncoder }
 import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
 
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
 package object auxiliary {
   private val crlf = "\r\n".getBytes("UTF-8")
+
+  /** Adds extension methods to {@code java.io.InputStream}. */
+  implicit class InputStreamType(val in: InputStream) extends AnyVal {
+    /**
+     * Reads remaining bytes and returns them as byte array.
+     *
+     * @param bufferSize buffer size used to copy bytes
+     */
+    def getBytes(bufferSize: Int = 8192): Array[Byte] = {
+      val bytes = new ArrayBuffer[Byte]
+      val buffer = new Array[Byte](bufferSize.max(1024))
+      var len = 0
+
+      while ({ len = in.read(buffer); len != -1 })
+        bytes ++= buffer.take(len)
+
+      bytes.toArray
+    }
+
+    /**
+     * Reads remaining bytes and returns them as text using specified character
+     * encoding.
+     *
+     * @param charset character set
+     * @param bufferSize buffer size used to copy bytes of text
+     */
+    def getText(charset: String = "UTF-8", bufferSize: Int = 8192): String =
+      new String(getBytes(bufferSize), charset)
+
+    /**
+     * Reads line of text from input stream. The CRLF characters are removed
+     * before text is returned.
+     *
+     * @param buffer byte buffer for text
+     */
+    def readLine(buffer: Array[Byte]): String = {
+      var length = 0
+      var byte = -1
+
+      while ({ byte = in.read(); byte != '\n' && byte != -1}) {
+        buffer(length) = byte.toByte
+        length += 1
+      }
+
+      if (length > 0 && buffer(length - 1) == '\r')
+        length -= 1
+
+      new String(buffer, 0, length, "UTF-8")
+    }
+  }
+
+  /** Adds extension methods to {@code java.io.OutputStream}. */
+  implicit class OutputStreamType(val out: OutputStream) extends AnyVal {
+    /**
+     * Writes supplied text followed by CRLF characters to output stream.
+     *
+     * @param text text
+     */
+    def writeLine(text: String): Unit = {
+      out.write(text.getBytes("UTF-8"))
+      out.write(crlf)
+    }
+
+    /** Writes CRLF characters to output stream. */
+    def writeLine(): Unit = out.write(crlf)
+  }
 
   /** Adds extension methods to {@code java.net.Socket}. */
   implicit class SocketType(val socket: Socket) extends AnyVal {
@@ -61,20 +129,8 @@ package object auxiliary {
      *
      * @return line of text
      */
-    def readLine(buffer: Array[Byte]): String = {
-      var len = 0
-      var byte = -1
-
-      while ({ byte = read(); byte != '\n' && byte != -1}) {
-        buffer(len) = byte.toByte
-        len += 1
-      }
-
-      if (len > 0 && buffer(len - 1) == '\r')
-        len -= 1
-
-      new String(buffer, 0, len, "UTF-8")
-    }
+    def readLine(buffer: Array[Byte]): String =
+      socket.getInputStream().readLine(buffer)
 
     /**
      * Writes byte to socket output stream.
@@ -105,13 +161,10 @@ package object auxiliary {
      *
      * @param text text
      */
-    def writeLine(text: String): Unit = {
-      write(text.getBytes("UTF-8"))
-      write(crlf)
-    }
+    def writeLine(text: String): Unit = socket.getOutputStream().writeLine(text)
 
     /** Writes CRLF characters to output stream. */
-    def writeLine(): Unit = write(crlf)
+    def writeLine(): Unit = socket.getOutputStream().writeLine()
 
     /** Flushes socket output stream. */
     def flush(): Unit = socket.getOutputStream().flush()
