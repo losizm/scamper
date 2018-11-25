@@ -28,6 +28,36 @@ package object server {
     def apply(request: HttpRequest): Either[HttpRequest, HttpResponse]
   }
 
+  /** Provides utility for filtering HTTP request. */
+  trait RequestFilter extends RequestHandler {
+    /**
+     * Filters request.
+     *
+     * The filter can return the original request or an alternate one.
+     *
+     * @param request incoming request
+     */
+    def filter(request: HttpRequest): HttpRequest
+
+    def apply(request: HttpRequest): Either[HttpRequest, HttpResponse] =
+      Left(filter(request))
+  }
+
+  /** Provides utility for processing HTTP request. */
+  trait RequestProcessor extends RequestHandler {
+    /**
+     * Processes request.
+     *
+     * The processor returns a response that satisfies the request.
+     *
+     * @param request incoming request
+     */
+    def process(request: HttpRequest): HttpResponse
+
+    def apply(request: HttpRequest): Either[HttpRequest, HttpResponse] =
+      Right(process(request))
+  }
+
   /** Indicates no response was generated for given request. */
   case class RequestNotSatisfied(request: HttpRequest) extends HttpException
 
