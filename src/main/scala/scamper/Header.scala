@@ -15,7 +15,7 @@
  */
 package scamper
 
-import java.time.OffsetDateTime
+import java.time.Instant
 
 import HeaderHelper._
 
@@ -27,8 +27,8 @@ trait Header {
   /** Gets header value. */
   def value: String
 
-  /** Gets header value as `OffsetDateTime`. */
-  def dateValue: OffsetDateTime = DateValue.parse(value)
+  /** Gets header value as `Instant`. */
+  def dateValue: Instant = DateValue.parse(value)
 
   /** Gets header value as Long. */
   def longValue: Long = value.toLong
@@ -48,7 +48,7 @@ object Header {
     apply(name, value.toString)
 
   /** Creates `Header` using supplied name and value. */
-  def apply(name: String, value: OffsetDateTime): Header =
+  def apply(name: String, value: Instant): Header =
     apply(name, DateValue.format(value))
 
   /** Parses formatted header. */

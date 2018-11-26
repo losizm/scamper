@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-import java.time.OffsetDateTime
+import java.time.Instant
 
 import scamper.{ DateValue, ListParser }
 
@@ -35,7 +35,7 @@ trait WarningType {
   def text: String
 
   /** Gets warning date. */
-  def date: Option[OffsetDateTime]
+  def date: Option[Instant]
 
   /** Returns formatted warning. */
   override lazy val toString: String =
@@ -59,12 +59,12 @@ object WarningType {
     ListParser(warnings).map(parse)
 
   /** Creates WarningType with supplied values. */
-  def apply(code: Int, agent: String, text: String, date: Option[OffsetDateTime] = None): WarningType =
+  def apply(code: Int, agent: String, text: String, date: Option[Instant] = None): WarningType =
     WarningTypeImpl(code, agent, text, date)
 
   /** Destructures WarningType. */
-  def unapply(warning: WarningType): Option[(Int, String, String, Option[OffsetDateTime])] =
+  def unapply(warning: WarningType): Option[(Int, String, String, Option[Instant])] =
     Some((warning.code, warning.agent, warning.text, warning.date))
 }
 
-private case class WarningTypeImpl(code: Int, agent: String, text: String, date: Option[OffsetDateTime]) extends WarningType
+private case class WarningTypeImpl(code: Int, agent: String, text: String, date: Option[Instant]) extends WarningType

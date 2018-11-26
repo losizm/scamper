@@ -16,7 +16,7 @@
 package scamper.auxiliary
 
 import java.net.URI
-import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
+import java.time.{ Instant, LocalDate }
 
 import org.scalatest.FlatSpec
 
@@ -38,16 +38,8 @@ class AuxiliarySpec extends FlatSpec {
     assert(uriPath.withScheme("http").withAuthority("localhost:8080") == uri)
   }
 
-  "String" should "be converted to LocalDate" in {
-    assert("2006-02-14".toLocalDate == LocalDate.parse("2006-02-14"))
-  }
-
-  it should "be converted to LocalDateTime" in {
-    assert("2006-02-14T11:15:37".toLocalDateTime == LocalDateTime.parse("2006-02-14T11:15:37"))
-  }
-
-  it should "be converted to OffsetDateTime" in {
-    assert("2006-02-14T11:15:37-05:00".toOffsetDateTime == OffsetDateTime.parse("2006-02-14T11:15:37-05:00"))
-    assert("Tue, 14 Feb 2006 11:15:37 -0500".toOffsetDateTime == OffsetDateTime.parse("2006-02-14T11:15:37-05:00"))
+  "String" should "be converted to Instant" in {
+    assert("2006-02-15T04:15:37Z".toInstant == Instant.parse("2006-02-15T04:15:37Z"))
+    assert("Wed, 15 Feb 2006 04:15:37 GMT".toInstant == Instant.parse("2006-02-15T04:15:37Z"))
   }
 }

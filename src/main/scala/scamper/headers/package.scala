@@ -16,7 +16,7 @@
 package scamper
 
 import java.net.URI
-import java.time.OffsetDateTime
+import java.time.Instant
 
 import scala.util.Try
 
@@ -521,17 +521,17 @@ package object headers {
      *
      * @throws HeaderNotFound if Date is not present
      */
-    def date: OffsetDateTime = getDate.getOrElse(throw HeaderNotFound("Date"))
+    def date: Instant = getDate.getOrElse(throw HeaderNotFound("Date"))
 
     /** Gets Date header value if present. */
-    def getDate: Option[OffsetDateTime] =
+    def getDate: Option[Instant] =
       response.getHeader("Date").map(_.dateValue)
 
     /** Tests whether Date header is present. */
     def hasDate: Boolean = response.hasHeader("Date")
 
     /** Creates new response setting Date header to supplied value. */
-    def withDate(value: OffsetDateTime): HttpResponse =
+    def withDate(value: Instant): HttpResponse =
       response.withHeader(Header("Date", value))
 
     /** Creates new response removing Date header. */
@@ -593,17 +593,17 @@ package object headers {
      *
      * @throws HeaderNotFound if Expires is not present
      */
-    def expires: OffsetDateTime = getExpires.getOrElse(throw HeaderNotFound("Expires"))
+    def expires: Instant = getExpires.getOrElse(throw HeaderNotFound("Expires"))
 
     /** Gets Expires header value if present. */
-    def getExpires: Option[OffsetDateTime] =
+    def getExpires: Option[Instant] =
       response.getHeader("Expires").map(_.dateValue)
 
     /** Tests whether Expires header is present. */
     def hasExpires: Boolean = response.hasHeader("Expires")
 
     /** Creates new response setting Expires header to supplied value. */
-    def withExpires(value: OffsetDateTime): HttpResponse =
+    def withExpires(value: Instant): HttpResponse =
       response.withHeader(Header("Expires", value))
 
     /** Creates new response removing Expires header. */
@@ -689,18 +689,18 @@ package object headers {
      *
      * @throws HeaderNotFound if If-Modified-Since is not present
      */
-    def ifModifiedSince: OffsetDateTime =
+    def ifModifiedSince: Instant =
       getIfModifiedSince.getOrElse(throw HeaderNotFound("If-Modified-Since"))
 
     /** Gets If-Modified-Since header value if present. */
-    def getIfModifiedSince: Option[OffsetDateTime] =
+    def getIfModifiedSince: Option[Instant] =
       request.getHeader("If-Modified-Since").map(_.dateValue)
 
     /** Tests whether If-Modified-Since header is present. */
     def hasIfModifiedSince: Boolean = request.hasHeader("If-Modified-Since")
 
     /** Creates new request setting If-Modified-Since header to supplied value. */
-    def withIfModifiedSince(value: OffsetDateTime): HttpRequest =
+    def withIfModifiedSince(value: Instant): HttpRequest =
       request.withHeader(Header("If-Modified-Since", value))
 
     /** Creates new request removing If-Modified-Since header. */
@@ -738,11 +738,11 @@ package object headers {
      *
      * @throws HeaderNotFound if If-Range is not present
      */
-    def ifRange: Either[EntityTag, OffsetDateTime] =
+    def ifRange: Either[EntityTag, Instant] =
       getIfRange.getOrElse(throw HeaderNotFound("If-Range"))
 
     /** Gets If-Range header value if present. */
-    def getIfRange: Option[Either[EntityTag, OffsetDateTime]] =
+    def getIfRange: Option[Either[EntityTag, Instant]] =
       request.getHeader("If-Range").map { header =>
         Try {
           Left(EntityTag.parse(header.value))
@@ -755,7 +755,7 @@ package object headers {
     def hasIfRange: Boolean = request.hasHeader("If-Range")
 
     /** Creates new request setting If-Range header to supplied value. */
-    def withIfRange(value: Either[EntityTag, OffsetDateTime]): HttpRequest =
+    def withIfRange(value: Either[EntityTag, Instant]): HttpRequest =
       value.fold(withIfRange, withIfRange)
 
     /** Creates new request setting If-Range header to supplied value. */
@@ -763,7 +763,7 @@ package object headers {
       request.withHeader(Header("If-Range", value.toString))
 
     /** Creates new request setting If-Range header to supplied value. */
-    def withIfRange(value: OffsetDateTime): HttpRequest =
+    def withIfRange(value: Instant): HttpRequest =
       request.withHeader(Header("If-Range", value))
 
     /** Creates new request removing If-Range header. */
@@ -777,11 +777,11 @@ package object headers {
      *
      * @throws HeaderNotFound if If-Unmodified-Since is not present
      */
-    def ifUnmodifiedSince: OffsetDateTime =
+    def ifUnmodifiedSince: Instant =
       getIfUnmodifiedSince.getOrElse(throw HeaderNotFound("If-Unmodified-Since"))
 
     /** Gets If-Unmodified-Since header value if present. */
-    def getIfUnmodifiedSince: Option[OffsetDateTime] =
+    def getIfUnmodifiedSince: Option[Instant] =
       request.getHeader("If-Unmodified-Since").map(_.dateValue)
 
     /** Tests whether If-Unmodified-Since header is present. */
@@ -790,7 +790,7 @@ package object headers {
     /**
      * Creates new request setting If-Unmodified-Since header to supplied value.
      */
-    def withIfUnmodifiedSince(value: OffsetDateTime): HttpRequest =
+    def withIfUnmodifiedSince(value: Instant): HttpRequest =
       request.withHeader(Header("If-Unmodified-Since", value))
 
     /** Creates new request removing If-Unmodified-Since header. */
@@ -804,18 +804,18 @@ package object headers {
      *
      * @throws HeaderNotFound if Last-Modified is not present
      */
-    def lastModified: OffsetDateTime =
+    def lastModified: Instant =
       getLastModified.getOrElse(throw HeaderNotFound("Last-Modified"))
 
     /** Gets Last-Modified header value if present. */
-    def getLastModified: Option[OffsetDateTime] =
+    def getLastModified: Option[Instant] =
       response.getHeader("Last-Modified").map(_.dateValue)
 
     /** Tests whether Last-Modified header is present. */
     def hasLastModified: Boolean = response.hasHeader("Last-Modified")
 
     /** Creates new response setting Last-Modified header to supplied value. */
-    def withLastModified(value: OffsetDateTime): HttpResponse =
+    def withLastModified(value: Instant): HttpResponse =
       response.withHeader(Header("Last-Modified", value))
 
     /** Creates new response removing Last-Modified header. */
@@ -1060,17 +1060,17 @@ package object headers {
      *
      * @throws HeaderNotFound if Retry-After is not present
      */
-    def retryAfter: OffsetDateTime = getRetryAfter.getOrElse(throw HeaderNotFound("Retry-After"))
+    def retryAfter: Instant = getRetryAfter.getOrElse(throw HeaderNotFound("Retry-After"))
 
     /** Gets Retry-After header value if present. */
-    def getRetryAfter: Option[OffsetDateTime] =
+    def getRetryAfter: Option[Instant] =
       response.getHeader("Retry-After").map(_.dateValue)
 
     /** Tests whether Retry-After header is present. */
     def hasRetryAfter: Boolean = response.hasHeader("Retry-After")
 
     /** Creates new response setting Retry-After header to supplied value. */
-    def withRetryAfter(value: OffsetDateTime): HttpResponse =
+    def withRetryAfter(value: Instant): HttpResponse =
       response.withHeader(Header("Retry-After", value))
 
     /** Creates new response removing Retry-After header. */

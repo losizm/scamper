@@ -18,7 +18,7 @@ package scamper
 import java.io.{ File, InputStream, OutputStream }
 import java.net.{ Socket, URI, URLDecoder, URLEncoder }
 import java.nio.file.{ Paths, Path }
-import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
+import java.time.Instant
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
@@ -174,35 +174,17 @@ package object auxiliary {
   /** Adds extension methods to {@code String}. */
   implicit class StringType(val string: String) extends AnyVal {
     /**
-     * Converts to LocalDate.
-     *
-     * The date string must be in ISO-8601 extended local date format, such as
-     * {@code 2016-11-08}.
-     */
-    def toLocalDate: LocalDate = LocalDate.parse(string)
-
-    /**
-     * Converts to LocalDateTime.
-     *
-     * The date string must be in ISO-8601 extended local date-time format, such
-     * as {@code 2016-11-08T21:00:00}.
-     */
-    def toLocalDateTime: LocalDateTime = LocalDateTime.parse(string)
-
-    /**
-     * Converts to OffsetDateTime.
+     * Converts to Instant.
      *
      * The date string must be in either one of two formats:
      *
      * <ul>
-     *   <li>ISO-8601 extended offset date-time format, such as
-     *   {@code 2016-11-08T21:00:00-05:00}</li>
-     *   <li>RFC 1123 format, such as
-     *   {@code Tue, 8 Nov 2016 21:00:00 -0500}</li>
+     *   <li>ISO-8601 instant format, such as `2016-11-08T21:00:00Z`</li>
+     *   <li>RFC 1123 format, such as `Tue, 8 Nov 2016 21:00:00 GMT`</li>
      * </ul>
      */
-    def toOffsetDateTime: OffsetDateTime =
-      Try(OffsetDateTime.parse(string)).getOrElse(DateValue.parse(string))
+    def toInstant: Instant =
+      Try(Instant.parse(string)).getOrElse(DateValue.parse(string))
 
     /** Converts to File. */
     def toFile: File = new File(string)

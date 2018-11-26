@@ -17,7 +17,7 @@ package scamper
 
 import java.io.{ File, InputStream }
 import java.net.URI
-import java.time.OffsetDateTime
+import java.time.Instant
 
 /** Includes implicit converter functions. */
 object ImplicitConverters {
@@ -37,7 +37,7 @@ object ImplicitConverters {
   implicit val tupleToHeaderWithIntValue = (header: (String, Int)) => Header(header._1, header._2)
 
   /** Converts tuple to [[Header]] where tuple is name-value pair. */
-  implicit val tupleToHeaderWithDateValue = (header: (String, OffsetDateTime)) => Header(header._1, header._2)
+  implicit val tupleToHeaderWithDateValue = (header: (String, Instant)) => Header(header._1, header._2)
 
   /** Converts byte array to [[Entity]]. */
   implicit val bytesToEntity = (entity: Array[Byte]) => Entity(entity)

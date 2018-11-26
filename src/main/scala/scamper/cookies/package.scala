@@ -15,7 +15,7 @@
  */
 package scamper
 
-import java.time.OffsetDateTime
+import java.time.Instant
 import scala.util.Try
 
 package object cookies {
@@ -85,7 +85,7 @@ package object cookies {
     def path: Option[String]
 
     /** Gets maximum liftetime of cookie represented as time of expiry. */
-    def expires: Option[OffsetDateTime]
+    def expires: Option[Instant]
 
     /**
      * Gets maximum liftetime of cookie represented as number of seconds until
@@ -136,12 +136,12 @@ package object cookies {
       }
 
     /** Creates SetCookie with supplied name, value, and attributes. */
-    def apply(name: String, value: String, domain: Option[String] = None, path: Option[String] = None, expires: Option[OffsetDateTime] = None,
+    def apply(name: String, value: String, domain: Option[String] = None, path: Option[String] = None, expires: Option[Instant] = None,
         maxAge: Option[Long] = None, secure: Boolean = false, httpOnly: Boolean = false): SetCookie =
       SetCookieImpl(Name(name), Value(value), CookieAttributes(domain, path, expires, maxAge, secure, httpOnly))
 
     /** Destructures SetCookie. */
-    def unapply(cookie: SetCookie): Option[(String, String, Option[String], Option[String], Option[OffsetDateTime], Option[Long], Boolean, Boolean)] =
+    def unapply(cookie: SetCookie): Option[(String, String, Option[String], Option[String], Option[Instant], Option[Long], Boolean, Boolean)] =
       Some((cookie.name, cookie.value, cookie.domain, cookie.path, cookie.expires, cookie.maxAge, cookie.secure, cookie.httpOnly))
   }
 
@@ -219,13 +219,13 @@ package object cookies {
   private case class SetCookieImpl(name: String, value: String, attrs: CookieAttributes) extends SetCookie {
     def domain: Option[String] = attrs.domain
     def path: Option[String] = attrs.path
-    def expires: Option[OffsetDateTime] = attrs.expires
+    def expires: Option[Instant] = attrs.expires
     def maxAge: Option[Long] = attrs.maxAge
     def secure: Boolean = attrs.secure
     def httpOnly: Boolean = attrs.httpOnly
   }
 
-  private case class CookieAttributes(domain: Option[String] = None, path: Option[String] = None, expires: Option[OffsetDateTime] = None,
+  private case class CookieAttributes(domain: Option[String] = None, path: Option[String] = None, expires: Option[Instant] = None,
       maxAge: Option[Long] = None, secure: Boolean = false, httpOnly: Boolean = false)
 
   private object CookieAttributes {
@@ -246,7 +246,7 @@ package object cookies {
     private def toMaxAge(value: String): Option[Long] =
       Try(value.trim.toLong).toOption
 
-    private def toExpires(value: String): Option[OffsetDateTime] =
+    private def toExpires(value: String): Option[Instant] =
       Try(DateValue.parse(value.trim)).toOption
   }
 }
