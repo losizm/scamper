@@ -15,8 +15,9 @@
  */
 package scamper
 
-import java.io.{ InputStream, OutputStream }
+import java.io.{ File, InputStream, OutputStream }
 import java.net.{ Socket, URI, URLDecoder, URLEncoder }
+import java.nio.file.{ Paths, Path }
 import java.time.{ LocalDate, LocalDateTime, OffsetDateTime }
 
 import scala.collection.mutable.ArrayBuffer
@@ -202,6 +203,12 @@ package object auxiliary {
      */
     def toOffsetDateTime: OffsetDateTime =
       Try(OffsetDateTime.parse(string)).getOrElse(DateValue.parse(string))
+
+    /** Converts to File. */
+    def toFile: File = new File(string)
+
+    /** Converts to Path. */
+    def toPath: Path = Paths.get(string)
 
     /** Converts to URI. */
     def toURI: URI = new URI(string)
