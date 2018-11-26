@@ -29,7 +29,7 @@ class BodyParserSpec extends FlatSpec {
   "BodyParser" should "parse response with text body" in {
     implicit val bodyParser = BodyParsers.text()
     val body = Entity("Hello, world!")
-    val message = Ok(body).withContentType("text/plain").withContentLength(body.length.get)
+    val message = Ok(body).withContentType("text/plain").withContentLength(body.getLength.get)
 
     assert(message.status == Ok)
     assert(message.contentType.isText)
@@ -55,7 +55,7 @@ class BodyParserSpec extends FlatSpec {
   it should "parse request with form body" in {
     implicit val bodyParser = BodyParsers.form()
     val body = Entity("id=0&name=root")
-    val request = POST("users").withBody(body).withContentLength(body.length.get)
+    val request = POST("users").withBody(body).withContentLength(body.getLength.get)
     val form = request.as[Map[String, Seq[String]]]
 
     assert(form("id").head == "0")
@@ -65,7 +65,7 @@ class BodyParserSpec extends FlatSpec {
   it should "not parse response with large body" in {
     implicit val bodyParser = BodyParsers.text(8)
     val body = Entity("Hello, world!")
-    val message = Ok(body).withContentType("text/plain").withContentLength(body.length.get)
+    val message = Ok(body).withContentType("text/plain").withContentLength(body.getLength.get)
 
     assertThrows[HttpException](message.as[String])
   }

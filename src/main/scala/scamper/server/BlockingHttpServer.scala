@@ -204,7 +204,7 @@ private class BlockingHttpServer private(val id: Int, val host: InetAddress, val
       if (res.hasTransferEncoding || res.hasContentLength)
         res
       else
-        res.body.length match {
+        res.body.getLength match {
           case Some(0) => res.getContentType.map(_ => res.withContentLength(0)).getOrElse(res)
           case Some(n) => res.withContentLength(n)
           case None    => res.withTransferEncoding("chunked")

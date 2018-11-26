@@ -22,11 +22,11 @@ import scala.util.Try
 /** Representation of message body. */
 trait Entity {
   /** Gets length in bytes if known. */
-  def length: Option[Long]
+  def getLength(): Option[Long]
 
   /** Tests whether entity is known empty. */
-  def isKnownEmpty: Boolean =
-    length.contains(0)
+  def isKnownEmpty(): Boolean =
+    getLength().contains(0)
 
   /** Gets input stream to entity. */
   def getInputStream(): InputStream
@@ -89,15 +89,15 @@ object Entity {
 }
 
 private case class ByteArrayEntity(bytes: Array[Byte]) extends Entity {
-  val length = Some(bytes.length)
+  val getLength = Some(bytes.length.toLong)
   val getInputStream = new ByteArrayInputStream(bytes)
 }
 
 private case class FileEntity(file: File) extends Entity {
-  lazy val length = Some(file.length)
+  lazy val getLength = Some(file.length)
   lazy val getInputStream = new FileInputStream(file)
 }
 
 private case class InputStreamEntity(getInputStream: InputStream) extends Entity {
-  val length = None
+  val getLength = None
 }

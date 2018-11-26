@@ -105,7 +105,7 @@ object HttpClient {
     }.orElse {
       request.getTransferEncoding.map(_ => request)
     }.orElse {
-      request.body.length.collect {
+      request.body.getLength.collect {
         case 0          => request.withBody(Entity.empty).withContentLength(0)
         case n if n > 0 => request.withContentLength(n)
       }
