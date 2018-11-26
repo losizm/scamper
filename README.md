@@ -334,6 +334,98 @@ def getMessageOfTheDay(): Either[Int, String] = {
 }
 ```
 
+## HTTP Server
+
+A lightweight, extensible server framework is provided by elements in
+`scamper.server` package.
+
+Here's an example demonstrating how to configure and create a server instance.
+
+```scala
+import java.io.File
+import java.time.OffsetDateTime
+import scamper.ImplicitConverters.{ bytesToEntity, stringToURI, tupleToHeaderWithDateValue }
+import scamper.RequestMethods.{ GET, POST, PUT, DELETE }
+import scamper.ResponseStatuses.{ Created, MethodNotAllowed, NoContent, Ok }
+import scamper.headers.{ Allow, ETag, Location }
+import scamper.server.HttpServer
+
+// Start with default server configuration
+val config = HttpServer.configure()
+
+// Set a few performance-related options
+config.poolSize(10) // max concurrent request processors
+config.queueSize(25) // max processing backlog
+config.readTimeout(30000) // in milliseconds
+
+// Set location of server log
+config.log(new File("server.log"))
+
+// Add request handler to log all requests to console
+config.include { req =>
+  println(req.startLine)
+  req.headers.foreach(println)
+  println()
+
+  Left(req) // Return unmodified request
+}
+
+// Allow only certain request methods
+config.include { req =>
+  val allowed = Seq(GET, POST, PUT, DELETE)
+
+  if (allowed.contains(req.method))
+    Left(req)
+  else
+    Right(MethodNotAllowed().withAllow(allowed : _*))
+}
+
+// Add handler to inject Request-Time header
+config.include { req =>
+  Left(req.withHeader("Request-Time" -> OffsetDateTime.now()))
+}
+
+// Print Request-Time header added by previous handler
+config.include { req =>
+  req.getHeaderValue("Request-Time").foreach { time =>
+    println(s"Requested at $time")
+  }
+
+  // Remove header since we're done with it
+  Left(req.removeHeaders("Request-Time"))
+}
+
+// Add final handler to service request
+config.include { req =>
+  val path = req.target.getPath()
+
+  req.method match {
+    case GET =>
+      val data = getSomeData(path)
+      val hash = getHash(data)
+      Right(Ok(data).withETag(hash))
+
+    case POST =>
+      val hash = createSomeData(path, req.body)
+      Right(Created().withLocation(path).withETag(hash))
+
+    case PUT =>
+      val hash = updateSomeData(path, req.body)
+      Right(NoContent().withETag(hash))
+
+    case DELETE =>
+      deleteSomeData(path)
+      Right(NoContent())
+  }
+}
+
+// Configure server for HTTPS
+config.secure(new File("/path/to/private.key"), new File("/path/to/public.cert"))
+
+// Create and start server at given port
+val server = config.create(8080)
+```
+
 ## API Documentation
 
 See [scaladoc](https://losizm.github.io/scamper/latest/api/scamper/index.html)
