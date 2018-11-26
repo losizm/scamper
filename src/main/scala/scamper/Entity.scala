@@ -32,20 +32,14 @@ trait Entity {
   def getInputStream(): InputStream
 
   /**
-   * Provides access to input stream with automatic resource management.
-   *
-   * Input stream is passed to supplied function and closed on function's
-   * return.
+   * Gets input stream and passes it to supplied function.
    *
    * @param f stream handler
    *
    * @return value from applied handler
    */
-  def withInputStream[T](f: InputStream => T): T = {
-    val in = getInputStream
-    try f(in)
-    finally Try(in.close())
-  }
+  def withInputStream[T](f: InputStream => T): T =
+    f(getInputStream)
 }
 
 /** Provided factory for `Entity`. */
