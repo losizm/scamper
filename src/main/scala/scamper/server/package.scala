@@ -28,7 +28,7 @@ package object server {
      * Handles request.
      *
      * If handler satisfies request, then it returns a response. Otherwise, it
-     * returns a request, which can be original request or alternate one.
+     * returns a request, which may be the original request or an alternate one.
      */
     def apply(request: HttpRequest): Either[HttpRequest, HttpResponse]
   }
@@ -38,7 +38,7 @@ package object server {
     /**
      * Filters request.
      *
-     * The filter can return the original request or an alternate one.
+     * The filter may return the original request or an alternate one.
      *
      * @param request incoming request
      */
@@ -75,7 +75,7 @@ package object server {
     /** Gets port number. */
     def port: Int
 
-    /** Tests whether server is HTTPS. */
+    /** Tests whether server is secure. */
     def isSecure: Boolean
 
     /** Closes server. */
@@ -92,7 +92,7 @@ package object server {
   /** Provides factory for configuring and creating `HttpServer`. */
   object HttpServer {
     /** Gets default server configuration. */
-    def configure(): ServerConfiguration = new ServerConfiguration()
+    def config(): ServerConfiguration = new ServerConfiguration()
 
     /**
      * Creates `HttpServer` at given port with default configuration and
@@ -130,7 +130,7 @@ package object server {
      * @return server
      */
     def create(host: InetAddress, port: Int)(processor: RequestProcessor): HttpServer =
-      configure().include(processor).create(host, port)
+      config().include(processor).create(host, port)
   }
 
   /**
@@ -138,7 +138,7 @@ package object server {
    *
    * `ServerConfiguration` is a mutable, thread-safe structure. With each
    * requested change, the configuration is modified and returned. Changes
-   * applied after creating server are not effected in server.
+   * applied after creating a server are not effected in the server.
    *
    * @constructor Creates default server configuration.
    *
