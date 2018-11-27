@@ -15,6 +15,11 @@
  */
 package scamper.types
 
+import java.util.Properties
+
+import scala.collection.JavaConverters.propertiesAsScalaMap
+import scala.util.{ Success, Try }
+
 import MediaTypeHelper._
 
 /**
@@ -66,6 +71,24 @@ trait MediaType {
 
 /** MediaType factory */
 object MediaType {
+  private val mappings: Map[String, MediaType] = Try {
+    val props = new Properties()
+    val in = getClass.getResourceAsStream("mime-mappings.properties")
+
+    try props.load(in)
+    finally Try(in.close())
+
+    propertiesAsScalaMap(props).map {
+      case (key, value) => key.toLowerCase -> Try(parse(value))
+    }.collect {
+      case (key, Success(value)) => key -> value
+    }.toMap
+  }.getOrElse(Map.empty)
+
+  /** Gets MediaType for given file name extension. */
+  def get(extension: String): Option[MediaType] =
+    mappings.get(extension.toLowerCase)
+
   /** Parses formatted media type. */
   def parse(mediaType: String): MediaType =
     ParseMediaType(mediaType) match {
