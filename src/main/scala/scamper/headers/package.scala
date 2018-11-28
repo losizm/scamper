@@ -661,22 +661,24 @@ package object headers {
   /** Provides standardized access to If-Match header. */
   implicit class IfMatch(val request: HttpRequest) extends AnyVal {
     /**
-     * Gets If-Match header value.
+     * Gets If-Match header values.
      *
-     * @throws HeaderNotFound if If-Match is not present
+     * @return header values or empty sequence if If-Match is not present
      */
-    def ifMatch: EntityTag = getIfMatch.getOrElse(throw HeaderNotFound("If-Match"))
+    def ifMatch: Seq[EntityTag] = getIfMatch.getOrElse(Nil)
 
-    /** Gets If-Match header value if present. */
-    def getIfMatch: Option[EntityTag] =
-      request.getHeaderValue("If-Match").map(EntityTag.parse)
+    /** Gets If-Match header values if present. */
+    def getIfMatch: Option[Seq[EntityTag]] =
+      request.getHeaderValue("If-Match")
+        .map(ListParser.apply)
+        .map(_.map(EntityTag.parse))
 
     /** Tests whether If-Match header is present. */
     def hasIfMatch: Boolean = request.hasHeader("If-Match")
 
-    /** Creates new request setting If-Match header to supplied value. */
-    def withIfMatch(value: EntityTag): HttpRequest =
-      request.withHeader(Header("If-Match", value.toString))
+    /** Creates new request setting If-Match header to supplied values. */
+    def withIfMatch(values: EntityTag*): HttpRequest =
+      request.withHeader(Header("If-Match", values.mkString(", ")))
 
     /** Creates new request removing If-Match header. */
     def removeIfMatch: HttpRequest = request.removeHeaders("If-Match")
@@ -710,22 +712,24 @@ package object headers {
   /** Provides standardized access to If-None-Match header. */
   implicit class IfNoneMatch(val request: HttpRequest) extends AnyVal {
     /**
-     * Gets If-None-Match header value.
+     * Gets If-None-Match header values.
      *
-     * @throws HeaderNotFound if If-None-Match is not present
+     * @return header values or empty sequence if If-None-Match is not present
      */
-    def ifNoneMatch: EntityTag = getIfNoneMatch.getOrElse(throw HeaderNotFound("If-None-Match"))
+    def ifNoneMatch: Seq[EntityTag] = getIfNoneMatch.getOrElse(Nil)
 
-    /** Gets If-None-Match header value if present. */
-    def getIfNoneMatch: Option[EntityTag] =
-      request.getHeaderValue("If-None-Match").map(EntityTag.parse)
+    /** Gets If-None-Match header values if present. */
+    def getIfNoneMatch: Option[Seq[EntityTag]] =
+      request.getHeaderValue("If-None-Match")
+        .map(ListParser.apply)
+        .map(_.map(EntityTag.parse))
 
     /** Tests whether If-None-Match header is present. */
     def hasIfNoneMatch: Boolean = request.hasHeader("If-None-Match")
 
-    /** Creates new request setting If-None-Match header to supplied value. */
-    def withIfNoneMatch(value: EntityTag): HttpRequest =
-      request.withHeader(Header("If-None-Match", value.toString))
+    /** Creates new request setting If-None-Match header to supplied values. */
+    def withIfNoneMatch(values: EntityTag*): HttpRequest =
+      request.withHeader(Header("If-None-Match", values.mkString(", ")))
 
     /** Creates new request removing If-None-Match header. */
     def removeIfNoneMatch: HttpRequest = request.removeHeaders("If-None-Match")
