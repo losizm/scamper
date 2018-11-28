@@ -515,7 +515,7 @@ package object headers {
   }
 
   /** Provides standardized access to Date header. */
-  implicit class Date(val response: HttpResponse) extends AnyVal {
+  implicit class Date[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
     /**
      * Gets Date header value.
      *
@@ -525,17 +525,17 @@ package object headers {
 
     /** Gets Date header value if present. */
     def getDate: Option[Instant] =
-      response.getHeader("Date").map(_.dateValue)
+      message.getHeader("Date").map(_.dateValue)
 
     /** Tests whether Date header is present. */
-    def hasDate: Boolean = response.hasHeader("Date")
+    def hasDate: Boolean = message.hasHeader("Date")
 
-    /** Creates new response setting Date header to supplied value. */
-    def withDate(value: Instant): HttpResponse =
-      response.withHeader(Header("Date", value))
+    /** Creates new message setting Date header to supplied value. */
+    def withDate(value: Instant): T =
+      message.withHeader(Header("Date", value))
 
-    /** Creates new response removing Date header. */
-    def removeDate: HttpResponse = response.removeHeaders("Date")
+    /** Creates new message removing Date header. */
+    def removeDate: T = message.removeHeaders("Date")
   }
 
   /** Provides standardized access to ETag header. */
