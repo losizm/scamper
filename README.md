@@ -1,6 +1,7 @@
 # Scamper
-**Scamper** is an HTTP library for Scala. It defines an API for reading and writing
-HTTP messages.
+**Scamper** is an HTTP library for Scala. It defines an API for reading and
+writing HTTP messages, and it includes HTTP [client](#HTTP-Client)
+and [server](#HTTP-Server) implementations.
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_2.12.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_2.12%22)
 
@@ -336,94 +337,206 @@ def getMessageOfTheDay(): Either[Int, String] = {
 
 ## HTTP Server
 
-A lightweight, extensible server framework is provided by elements in
-`scamper.server` package.
+**Scamper** includes an extensible server framework.
 
-Here's an example demonstrating how to configure and create a server instance.
+To demonstrate, let's begin with a simple example.
 
 ```scala
-import java.io.File
-import java.time.OffsetDateTime
-import scamper.ImplicitConverters.{ bytesToEntity, stringToURI, tupleToHeaderWithDateValue }
-import scamper.RequestMethods.{ GET, POST, PUT, DELETE }
-import scamper.ResponseStatuses.{ Created, MethodNotAllowed, NoContent, Ok }
-import scamper.headers.{ Allow, ETag, Location }
+import scamper.ImplicitConverters.stringToEntity
+import scamper.ResponseStatuses.Ok
 import scamper.server.HttpServer
 
-// Start with default server configuration
-val config = HttpServer.configure()
+val server = HttpServer.create(8080) { req =>
+  Ok("Hello, world!")
+}
+```
 
-// Set a few performance-related options
-config.poolSize(10) // max concurrent request processors
-config.queueSize(25) // max processing backlog
-config.readTimeout(30000) // in milliseconds
+This is as bare-bones as it gets. We create a server at port 8080, and, on each
+incoming request, we send _Hello, world!_ back to the client. Although trite, it
+shows how easy it is to get going. What it doesn't show, however, are the pieces
+being put together to create the server. Here's the semantic equivalent in long
+form.
 
-// Set location of server log
-config.log(new File("server.log"))
+```scala
+val server = HttpServer.config().include(req => Ok("Hello, world!")).create(8080)
+```
 
-// Add request handler to log all requests to console
+We'll use the remainder of this documentation to explain what goes into creating
+more practical applications.
+
+### Server Configuration
+
+To build a server, you begin with `ServerConfiguration`. This is a mutable
+structure to which you apply changes to configure the server. Once the desired
+settings are applied, you invoke one of several methods to create the server.
+
+You can obtain an instance of `ServerConfiguration` from the `HttpServer`
+object.
+
+```scala
+val config = HttpServer.config()
+```
+
+This gives you the default configuration as a starting point. With this in hand,
+you can override the location of the server log.
+
+```scala
+config.log(new File("/tmp/server.log"))
+```
+
+And there are peformance-related settings that can be tweaked as well.
+
+```scala
+config.poolSize(10)
+config.queueSize(25)
+config.readTimeout(3000)
+```
+
+The **poolSize** specifies the maximum number of requests that are processed
+concurrently, and **queueSize** sets the number of requests that are permitted
+to wait for processing &mdash; _incoming requests that would exceed this limit
+are discarded_.
+
+Note **queueSize** is also used to configure server backlog (i.e., backlog of
+incoming connections), so technically there can be up to double **queueSize**
+waiting to be processed if both request queue and server backlog are filled.
+
+The **readTimeout** controls how long a read from a socket will block before it
+times out. At which point, the socket is closed, and its associated request is
+discarded.
+
+### Request Handlers
+
+You define application-specific logic in instances of `RequestHandler`, and add
+them to the server configuration.
+
+```scala
+// Add handler to log request line and headers to stdout
 config.include { req =>
   println(req.startLine)
   req.headers.foreach(println)
   println()
 
-  Left(req) // Return unmodified request
+  // Return request for next handler
+  Left(req)
 }
 
-// Allow only certain request methods
+// Add handler to allow GET and HEAD requests only
 config.include { req =>
-  val allowed = Seq(GET, POST, PUT, DELETE)
-
-  if (allowed.contains(req.method))
+  if (req.method == GET || req.method == HEAD)
+    // Return request for next handler
     Left(req)
   else
-    Right(MethodNotAllowed().withAllow(allowed : _*))
+    // Otherwise return response to end request chain
+    Right(MethodNotAllowed().withAllow(GET, HEAD))
 }
+```
 
-// Add handler to inject Request-Time header
+An `HttpRequest` is passed to the `RequestHandler`, and the handler returns
+`Either[HttpRequest, HttpResponse]`. If the handler is unable to satisfy the
+request, it returns an `HttpRequest` so that the next handler can have its
+chance. Otherwise, it returns an `HttpResponse`, and any remaining handlers are
+effectively ignored.
+
+Note the order in which handlers are applied matters. For instance, in the
+example above, you'd swap the order of handlers if you wanted to log GET and
+HEAD requests only, meaning all other requests would immediately be sent **405
+Method Not Allowed** and never make it to the handler that logs requests.
+
+Also note a request handler is not restricted to returning the same request it
+was passed.
+
+```scala
+// Translates message body from French (Oui, oui.)
 config.include { req =>
-  Left(req.withHeader("Request-Time" -> OffsetDateTime.now()))
+  val translator: BodyParser[String] = ... // implementation ellided
+
+  if (req.method == POST && req.contentLanguage.contains("fr"))
+    Left(req.withBody(translator.parse(req)))
+  else
+    Left(req)
 }
+```
 
-// Print Request-Time header added by previous handler
+### Filtering vs. Processing
+
+There are two subclasses of `RequestHandler` reserved for instances where it's
+known the handler always returns the same type: `RequestFilter` always returns
+an `HttpRequest`, and `RequestProcessor` always returns an `HttpResponse`. These
+are _filtering_ and _processing_, respectively.
+
+The request logger can be rewritten as a `RequestFilter`.
+
+```scala
 config.include { req =>
-  req.getHeaderValue("Request-Time").foreach { time =>
-    println(s"Requested at $time")
+  println(req.startLine)
+  req.headers.foreach(println)
+  println()
+
+  req // Not wrapped in Left
+}
+```
+
+And we used a `RequestProcessor` in our _"Hello World"_ server, but here's one
+that does something more meaningful.
+
+```scala
+config.include { req =>
+  def findFile(path: String): Option[File] = {
+    ...
   }
 
-  // Remove header since we're done with it
-  Left(req.removeHeaders("Request-Time"))
+  findFile(req.path).map(file => Ok(file)).getOrElse(NotFound())
 }
+```
 
-// Add final handler to service request
-config.include { req =>
-  val path = req.target.getPath()
+We ellided `findFile()`'s implementation, but the intent should be clear.
 
-  req.method match {
-    case GET =>
-      val data = getSomeData(path)
-      val hash = getHash(data)
-      Right(Ok(data).withETag(hash))
+### Securing the Server
 
-    case POST =>
-      val hash = createSomeData(path, req.body)
-      Right(Created().withLocation(path).withETag(hash))
+The last piece of configuration is whether to secure the server using SSL/TLS.
+To use a secure transport, you must supply an appropriate key and certificate.
 
-    case PUT =>
-      val hash = updateSomeData(path, req.body)
-      Right(NoContent().withETag(hash))
-
-    case DELETE =>
-      deleteSomeData(path)
-      Right(NoContent())
-  }
-}
-
-// Configure server for HTTPS
+```scala
 config.secure(new File("/path/to/private.key"), new File("/path/to/public.cert"))
+```
 
-// Create and start server at given port
+Or, if you have them tucked away in a key store, you can supply the location.
+
+```scala
+// Supply location, password, and store type (i.e., JKS, JCEKS, PCKS12)
+config.secure(new File("/path/to/keystore"), "s3cr3t", "pkcs12")
+```
+
+### Creating the Server
+
+At this point, you're ready to create the server.
+
+```scala
 val server = config.create(8080)
+```
+
+If the server must run from a particular host, you can provide the host name or
+IP address.
+
+```scala
+val server = config.create("192.168.0.2", 8080)
+```
+
+When created, an instance of `HttpServer` is returned, which can be used to
+query a few server details.
+
+```scala
+println(server.host) // java.net.InetAddress
+println(server.port)
+println(server.isSecure)
+println(server.isClosed)
+```
+
+And, ultimately, it is used to gracefully shut down the server.
+
+```scala
+server.close() // Good-bye, world.
 ```
 
 ## API Documentation
@@ -432,5 +545,5 @@ See [scaladoc](https://losizm.github.io/scamper/latest/api/scamper/index.html)
 for additional details.
 
 ## License
-Scamper is licensed under the Apache license, version 2. See LICENSE file for
-more information.
+**Scamper** is licensed under the Apache license, version 2. See LICENSE file
+for more information.
