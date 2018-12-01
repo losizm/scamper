@@ -354,8 +354,8 @@ val server = HttpServer.create(8080) { req =>
 This is as bare-bones as it gets. We create a server at port 8080, and, on each
 incoming request, we send _Hello, world!_ back to the client. Although trite, it
 shows how easy it is to get going. What it doesn't show, however, are the pieces
-being put together to create the server. Here's the semantic equivalent in long
-form.
+being put together to create the server. Minus imports, here's the semantic
+equivalent in long form.
 
 ```scala
 val server = HttpServer.config().include(req => Ok("Hello, world!")).create(8080)
@@ -411,6 +411,10 @@ You define application-specific logic in instances of `RequestHandler`, and add
 them to the server configuration.
 
 ```scala
+import scamper.RequestMethods.{ GET, HEAD }
+import scamper.ResponseStatuses.MethodNotAllowed
+import scamper.headers.Allow
+
 // Add handler to log request line and headers to stdout
 config.include { req =>
   println(req.startLine)
@@ -447,12 +451,19 @@ Also note a request handler is not restricted to returning the same request it
 was passed.
 
 ```scala
+import scamper.BodyParser
+import scamper.ImplicitConverters.stringToEntity
+import scamper.RequestMethods.POST
+import scamper.headers.ContentLanguage
+import scamper.types.LanguageTag
+import scamper.types.ImplicitConverters.stringToLanguageTag
+
 // Translates message body from French (Oui, oui.)
 config.include { req =>
-  val translator: BodyParser[String] = ... // implementation ellided
+  val translator: BodyParser[String] = ...
 
   if (req.method == POST && req.contentLanguage.contains("fr"))
-    Left(req.withBody(translator.parse(req)))
+    Left(req.withBody(translator.parse(req)).withContentLanguage("en"))
   else
     Left(req)
 }
@@ -478,9 +489,12 @@ config.include { req =>
 ```
 
 And we used a `RequestProcessor` in our _"Hello World"_ server, but here's one
-that does something more meaningful.
+that would do something more meaningful.
 
 ```scala
+import scamper.ImplicitConverters.fileToEntity
+import scamper.ResponseStatuses.{ NotFound, Ok }
+
 config.include { req =>
   def findFile(path: String): Option[File] = {
     ...
@@ -489,8 +503,6 @@ config.include { req =>
   findFile(req.path).map(file => Ok(file)).getOrElse(NotFound())
 }
 ```
-
-We ellided `findFile()`'s implementation, but the intent should be clear.
 
 ### Serving Static Files
 
