@@ -145,7 +145,9 @@ private class BlockingHttpServer private(val id: Int, val host: InetAddress, val
             case Left(req)  => NotFound()
           }
 
-          write(getEffectiveResponse(res))
+          try write(getEffectiveResponse(res))
+          finally Try(res.body.getInputStream.close())
+
           log(s"[info] Response sent to ${format(socket)}")
         } catch {
           case cause: Exception =>
