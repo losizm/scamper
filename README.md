@@ -492,6 +492,29 @@ config.include { req =>
 
 We ellided `findFile()`'s implementation, but the intent should be clear.
 
+### Serving Static Files
+
+There is an _include_ for adding a specialized request handler to serve static
+files.
+
+```scala
+// Serve static files from given directory
+config.include(new File("/path/to/public"))
+```
+
+This adds a request handler to serve files from the directory at _/path/to/public_.
+The files are mapped based on the request's target path. For example,
+_http://localhost:8080/images/logo.png_ would map to _/path/to/public/images/logo.png_.
+
+Or, you can map a path prefix to a directory.
+
+```scala
+config.include("/app/main", new File("/path/to/public"))
+```
+
+In this case, _http://localhost:8080/app/main/images/logo.png_ would map to
+_/path/to/public/images/logo.png_.
+
 ### Securing the Server
 
 The last piece of configuration is whether to secure the server using SSL/TLS.
