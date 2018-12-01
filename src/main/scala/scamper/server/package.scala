@@ -151,7 +151,7 @@ package object server {
    * |readTimeout  |`5000`|
    * |log          |`new File("server.log")`|
    * |secure       |<em>(non-secure)</em>|
-   * |include      |<em>(no handlers)</em>|
+   * |include      |<em>(empty)</em>|
    */
   class ServerConfiguration {
     private var config = BlockingHttpServer.Configuration()
@@ -276,6 +276,8 @@ package object server {
      *
      * The handler is appended to existing request handler chain.
      *
+     * @param handler request handler
+     *
      * @return this configuration
      */
     def include(handler: RequestHandler): this.type = synchronized {
@@ -287,6 +289,8 @@ package object server {
      * Includes supplied request filter.
      *
      * The filter is appended to existing request handler chain.
+     *
+     * @param filter request filter
      *
      * @return this configuration
      */
@@ -300,10 +304,89 @@ package object server {
      *
      * The processor is appended to existing request handler chain.
      *
+     * @param processor request processor
+     *
      * @return this configuration
      */
     def include(processor: RequestProcessor): this.type = synchronized {
       config = config.copy(handlers = config.handlers :+ processor)
+      this
+    }
+
+    /**
+     * Includes supplied processor for requests with given path.
+     *
+     * The processor is appended to existing request handler chain.
+     *
+     * @param path request path
+     * @param processor request processor
+     *
+     * @return this configuration
+     */
+    def include(path: String)(processor: RequestProcessor): this.type = synchronized {
+      config = config.copy(handlers = config.handlers :+ TargetedRequestHandler(processor, path, true, None))
+      this
+    }
+
+    /**
+     * Includes supplied processor for requests with given method and path.
+     *
+     * The processor is appended to existing request handler chain.
+     *
+     * @param method request method
+     * @param path request path
+     * @param processor request processor
+     *
+     * @return this configuration
+     */
+    def include(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
+      config = config.copy(handlers = config.handlers :+ TargetedRequestHandler(processor, path, true, Some(method)))
+      this
+    }
+
+    /**
+     * Includes request handler that serves static files from given directory.
+     *
+     * The directory files are mapped based on the request's target path.
+     *
+     * === Example Mappings ===
+     *
+     * |Base Directory|Request Target Path      |Maps to    |
+     * |--------------|-------------------------|-----------|
+     * |/tmp          |/images/logo.png         |/tmp/images/logo.png|
+     * |/tmp          |/images/icons/warning.png|/tmp/images/icons/warning.png|
+     * |/tmp          |/styles/main.css         |/tmp/styles/main.css|
+     *
+     * @param baseDirectory base directory from which files are served
+     *
+     * @return this configuration
+     */
+    def include(baseDirectory: File): this.type = synchronized {
+      config = config.copy(handlers = config.handlers :+ FileServer(baseDirectory, "/"))
+      this
+    }
+
+    /**
+     * Includes request handler that serves static files from given directory.
+     *
+     * The directory files are mapped based on the request's target path minus
+     * prefix.
+     *
+     * === Example Mappings ===
+     *
+     * |Path   |Base Directory|Request Target Path      |Maps to    |
+     * |-------|--------------|-------------------------|-----------|
+     * |/images|/tmp          |/images/logo.png         |/tmp/logo.png|
+     * |/images|/tmp          |/images/icons/warning.png|/tmp/icons/warning.png|
+     * |/images|/tmp          |/styles/main.css         |<em>Doesn't map to anything</em>|
+     *
+     * @param path request equest
+     * @param baseDirectory base directory from which files are served
+     *
+     * @return this configuration
+     */
+    def include(path: String, baseDirectory: File): this.type = synchronized {
+      config = config.copy(handlers = config.handlers :+ FileServer(baseDirectory, path))
       this
     }
 
