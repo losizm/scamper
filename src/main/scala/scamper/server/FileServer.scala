@@ -33,24 +33,29 @@ import scamper.types._
 import scamper.types._
 import scamper.types.ImplicitConverters._
 
-/**
- * Implementation of `RequestProcessor` that serves static files from
- * a base directory.
- */
-class FileServer private (val baseDirectory: Path) extends RequestProcessor {
+private class FileServer private (val baseDirectory: Path, val pathPrefix: Path) extends RequestHandler {
   private val `application/octet-stream` = MediaType("application", "octet-stream")
 
-  def process(req: HttpRequest): HttpResponse = {
-    val path = getEffectivePath(req.path)
+  def apply(req: HttpRequest): Either[HttpRequest, HttpResponse] = {
+    val path = Paths.get(req.path).normalize()
+
+    if (path.startsWith(pathPrefix))
+      handle(req)
+    else
+      Left(req)
+  }
+
+  private def handle(req: HttpRequest): Either[HttpRequest, HttpResponse] = {
+    val path = getRealPath(req.path)
 
     if (getExists(path))
       req.method match {
-        case GET  => getResponse(path, false, getIfModifiedSince(req))
-        case HEAD => getResponse(path, true, getIfModifiedSince(req))
-        case _    => MethodNotAllowed().withAllow(GET, HEAD)
+        case GET  => Right(getResponse(path, false, getIfModifiedSince(req)))
+        case HEAD => Right(getResponse(path, true, getIfModifiedSince(req)))
+        case _    => Right(MethodNotAllowed().withAllow(GET, HEAD))
       }
     else
-      NotFound()
+      Left(req)
   }
 
   private def getResponse(path: Path, headOnly: Boolean, ifModifiedSince: Instant): HttpResponse = {
@@ -84,7 +89,7 @@ class FileServer private (val baseDirectory: Path) extends RequestProcessor {
   private def getExists(path: Path): Boolean =
     path.startsWith(baseDirectory) && Files.isRegularFile(path) && !Files.isHidden(path)
 
-  private def getEffectivePath(path: String): Path = {
+  private def getRealPath(path: String): Path = {
     val realPath = getRealPath(Paths.get(path))
 
     if (Files.isDirectory(realPath))
@@ -94,10 +99,7 @@ class FileServer private (val baseDirectory: Path) extends RequestProcessor {
   }
 
   private def getRealPath(path: Path): Path =
-    path.getNameCount match {
-      case 0 => baseDirectory
-      case n => baseDirectory.resolve(path.subpath(0, n)).normalize()
-    }
+    baseDirectory.resolve(pathPrefix.relativize(path)).normalize()
 
   private def getFileNameExtension(path: Path): Option[String] = {
     val namePattern = ".+\\.(\\w+)".r
@@ -109,20 +111,20 @@ class FileServer private (val baseDirectory: Path) extends RequestProcessor {
   }
 }
 
-/** Provides factory for `FileServer`. */
-object FileServer {
-  /** Creates `FileServer` at given base directory. */
-  def apply(baseDirectory: String): FileServer =
-    apply(Paths.get(baseDirectory))
+private object FileServer {
+  def apply(baseDirectory: String, pathPrefix: String): FileServer =
+    apply(Paths.get(baseDirectory), Paths.get(pathPrefix))
 
-  /** Creates `FileServer` at given base directory. */
-  def apply(baseDirectory: File): FileServer =
-    apply(baseDirectory.toPath)
+  def apply(baseDirectory: File, pathPrefix: String): FileServer =
+    apply(baseDirectory.toPath, Paths.get(pathPrefix))
 
-  /** Creates `FileServer` at given base directory. */
-  def apply(baseDirectory: Path): FileServer =
-    Files.isDirectory(baseDirectory) match {
-      case true  => new FileServer(baseDirectory.toAbsolutePath().normalize())
-      case false => throw new IllegalArgumentException("Not a directory")
-    }
+  def apply(baseDirectory: Path, pathPrefix: Path): FileServer = {
+    if (!Files.isDirectory(baseDirectory))
+      throw new IllegalArgumentException("Not a directory")
+
+    if (!pathPrefix.startsWith("/"))
+      throw new IllegalArgumentException(s"Invalid path prefix: $pathPrefix")
+
+    new FileServer(baseDirectory.toAbsolutePath().normalize(), pathPrefix)
+  }
 }
