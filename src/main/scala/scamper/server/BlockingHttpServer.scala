@@ -26,7 +26,7 @@ import javax.net.ssl.{ SSLException, SSLServerSocketFactory }
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.Try
+import scala.util.{ Failure, Success, Try }
 
 import scamper.{ Header, HttpRequest, HttpResponse, RequestLine }
 import scamper.ImplicitConverters.{ inputStreamToEntity, stringToEntity }
@@ -44,7 +44,8 @@ private object BlockingHttpServer {
     readTimeout: Int = 5000,
     keepAliveSeconds: Int = 60,
     log: File = new File("server.log"),
-    handlers: Seq[RequestHandler] = Nil,
+    requestHandlers: Seq[RequestHandler] = Nil,
+    responseFilters: Seq[ResponseFilter] = Nil,
     factory: ServerSocketFactory = ServerSocketFactory.getDefault()
   )
 
@@ -58,7 +59,8 @@ private class BlockingHttpServer private(val id: Int, val host: InetAddress, val
   private val poolSize = config.poolSize
   private val queueSize = config.queueSize
   private val keepAliveSeconds = config.keepAliveSeconds
-  private val handlers = config.handlers
+  private val requestHandlers = config.requestHandlers
+  private val responseFilters = config.responseFilters
   private val logger = new PrintWriter(new FileWriter(config.log, true), true)
   private val serverSocket = config.factory.createServerSocket()
   private var closed = false
@@ -136,25 +138,28 @@ private class BlockingHttpServer private(val id: Int, val host: InetAddress, val
           log(s"[info] Servicing request from ${format(socket)}")
           socket.setSoTimeout(config.readTimeout)
 
-          val init: Either[HttpRequest, HttpResponse] = Left(read())
+          val req = read()
+          val res = handle(req)
 
-          val res = handlers.foldLeft(init) { (result, handler) =>
-            result.left.flatMap(req => handler(req))
-          } match {
-            case Right(res) => res
-            case Left(req)  => NotFound()
+          Try(filter(res)) match {
+            case Success(res) =>
+              write(res)
+              log(s"[info] Response sent to ${format(socket)}")
+              // Close body of filtered response
+              Try(res.body.getInputStream.close())
+
+            case Failure(cause) =>
+              log(s"[error] Error while filtering response to ${format(socket)}", Some(cause))
           }
 
-          try write(getEffectiveResponse(res))
-          finally Try(res.body.getInputStream.close())
-
-          log(s"[info] Response sent to ${format(socket)}")
+          // Close body of unfiltered response
+          Try(res.body.getInputStream.close())
         } catch {
           case cause: Exception =>
             log(s"[error] Error while servicing request from ${format(socket)}", Some(cause))
         } finally {
-            log(s"[info] Closing connection to ${format(socket)}")
-            Try(socket.close())
+          log(s"[info] Closing connection to ${format(socket)}")
+          Try(socket.close())
         }
       }
     }
@@ -202,7 +207,19 @@ private class BlockingHttpServer private(val id: Int, val host: InetAddress, val
       socket.flush()
     }
 
-    private def getEffectiveResponse(res: HttpResponse): HttpResponse = {
+    private def handle(req: HttpRequest): HttpResponse = {
+      val value: Either[HttpRequest, HttpResponse] = Left(req)
+
+      requestHandlers.foldLeft(value) { (value, handle) => value.left.flatMap(req => handle(req)) } match {
+        case Left(req)  => NotFound()
+        case Right(res) => res
+      }
+    }
+
+    private def filter(res: HttpResponse): HttpResponse =
+      responseFilters.foldLeft(prepare(res)) { (res, filter) => filter(res) }
+
+    private def prepare(res: HttpResponse): HttpResponse = {
       if (res.hasTransferEncoding || res.hasContentLength)
         res
       else

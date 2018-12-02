@@ -64,6 +64,21 @@ package object server {
   }
 
   /**
+   * Provides utility for filtering outgoing HTTP response. That is, it provides
+   * server-side response filtering.
+   */
+  trait ResponseFilter {
+    /**
+     * Filters response.
+     *
+     * The filter may return the original response or an alternate one.
+     *
+     * @param response outgoing response prior to filtering
+     */
+    def apply(response: HttpResponse): HttpResponse
+  }
+
+  /**
    * HTTP Server
    *
    * @see [[HttpServer$ HttpServer]], [[ServerConfiguration]]
@@ -281,7 +296,7 @@ package object server {
      * @return this configuration
      */
     def include(handler: RequestHandler): this.type = synchronized {
-      config = config.copy(handlers = config.handlers :+ handler)
+      config = config.copy(requestHandlers = config.requestHandlers :+ handler)
       this
     }
 
@@ -295,7 +310,7 @@ package object server {
      * @return this configuration
      */
     def include(filter: RequestFilter): this.type = synchronized {
-      config = config.copy(handlers = config.handlers :+ filter)
+      config = config.copy(requestHandlers = config.requestHandlers :+ filter)
       this
     }
 
@@ -309,7 +324,7 @@ package object server {
      * @return this configuration
      */
     def include(processor: RequestProcessor): this.type = synchronized {
-      config = config.copy(handlers = config.handlers :+ processor)
+      config = config.copy(requestHandlers = config.requestHandlers :+ processor)
       this
     }
 
@@ -324,7 +339,7 @@ package object server {
      * @return this configuration
      */
     def include(path: String)(processor: RequestProcessor): this.type = synchronized {
-      config = config.copy(handlers = config.handlers :+ TargetedRequestHandler(processor, path, true, None))
+      config = config.copy(requestHandlers = config.requestHandlers :+ TargetedRequestHandler(processor, path, true, None))
       this
     }
 
@@ -340,7 +355,7 @@ package object server {
      * @return this configuration
      */
     def include(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
-      config = config.copy(handlers = config.handlers :+ TargetedRequestHandler(processor, path, true, Some(method)))
+      config = config.copy(requestHandlers = config.requestHandlers :+ TargetedRequestHandler(processor, path, true, Some(method)))
       this
     }
 
@@ -362,7 +377,7 @@ package object server {
      * @return this configuration
      */
     def include(baseDirectory: File): this.type = synchronized {
-      config = config.copy(handlers = config.handlers :+ FileServer(baseDirectory, "/"))
+      config = config.copy(requestHandlers = config.requestHandlers :+ FileServer(baseDirectory, "/"))
       this
     }
 
@@ -386,7 +401,21 @@ package object server {
      * @return this configuration
      */
     def include(path: String, baseDirectory: File): this.type = synchronized {
-      config = config.copy(handlers = config.handlers :+ FileServer(baseDirectory, path))
+      config = config.copy(requestHandlers = config.requestHandlers :+ FileServer(baseDirectory, path))
+      this
+    }
+
+    /**
+     * Includes supplied response filter.
+     *
+     * The filter is appended to existing response filter chain.
+     *
+     * @param filter response filter
+     *
+     * @return this configuration
+     */
+    def include(filter: ResponseFilter): this.type = synchronized {
+      config = config.copy(responseFilters = config.responseFilters :+ filter)
       this
     }
 
