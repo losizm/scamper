@@ -1,5 +1,5 @@
 # Scamper
-**Scamper** is an HTTP library for Scala. It defines an API for reading and
+**Scamper** is the HTTP library for Scala. It defines an API for reading and
 writing HTTP messages, and it includes HTTP [client](#HTTP-Client)
 and [server](#HTTP-Server) implementations.
 
@@ -231,6 +231,19 @@ import scamper.types.ImplicitConverters.stringToMediaType
 
 val body = Entity(new File("./index.html"))
 val res = Ok(body).withContentType("text/html; charset=utf-8")
+```
+
+There are implicit converters available for common entity types, so you aren't
+always required to create them explicitly.
+
+```scala
+import java.io.File
+import scamper.ImplicitConverters.fileToEntity
+import scamper.ResponseStatuses.Ok
+import scamper.headers.ContentType
+import scamper.types.ImplicitConverters.stringToMediaType
+
+val res = Ok(new File("./index.html")).withContentType("text/html; charset=utf-8")
 ```
 
 ### Parsing Message Body
@@ -594,7 +607,7 @@ When created, an instance of `HttpServer` is returned, which can be used to
 query a few server details.
 
 ```scala
-println(server.host) // java.net.InetAddress
+println(server.host)
 println(server.port)
 println(server.isSecure)
 println(server.isClosed)
