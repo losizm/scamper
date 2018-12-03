@@ -101,10 +101,10 @@ private case class MediaRangeImpl(mainType: String, subtype: String, weight: Flo
   private val range = (regex(mainType) + "/" + regex(subtype)).r
 
   def matches(mediaType: MediaType): Boolean =
-    (mediaType.mainType + "/" + mediaType.subtype) match {
+    ((mediaType.mainType + "/" + mediaType.subtype) match {
       case range(_*) => params.forall { case (name, value) => exists(name, value, mediaType.params) }
       case _ => false
-    }
+    }) && weight > 0
 
   private def exists(name: String, value: String, ps: Map[String, String]): Boolean =
     ps.exists {

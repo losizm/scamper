@@ -76,5 +76,5 @@ object ContentCodingRange {
 
 private case class ContentCodingRangeImpl(name: String, weight: Float) extends ContentCodingRange {
   def matches(coding: ContentCoding): Boolean =
-    isWildcard || name.equalsIgnoreCase(coding.name)
+    (isWildcard || name.equalsIgnoreCase(coding.name)) && weight > 0
 }

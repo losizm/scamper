@@ -86,7 +86,7 @@ object TransferCodingRange {
 
 private case class TransferCodingRangeImpl(name: String, rank: Float, params: Map[String, String]) extends TransferCodingRange {
   def matches(coding: TransferCoding): Boolean =
-    name.equalsIgnoreCase(coding.name) && params.forall { case (name, value) => exists(name, value, coding.params) }
+    name.equalsIgnoreCase(coding.name) && params.forall { case (name, value) => exists(name, value, coding.params) } && rank > 0
 
   private def exists(name: String, value: String, ps: Map[String, String]): Boolean =
     ps.exists { case (n, v) => name.equalsIgnoreCase(n) && value.equalsIgnoreCase(v) }
