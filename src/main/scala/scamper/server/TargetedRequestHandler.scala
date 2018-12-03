@@ -18,6 +18,7 @@ package scamper.server
 import java.nio.file.{ Path, Paths }
 
 import scamper.{ HttpRequest, HttpResponse, RequestMethod }
+import scamper.auxiliary.StringType
 
 private class TargetedRequestHandler private (handler: RequestHandler, _path: Path, exact: Boolean, _method: Option[RequestMethod]) extends RequestHandler {
   def apply(req: HttpRequest): Either[HttpRequest, HttpResponse] =
@@ -27,7 +28,7 @@ private class TargetedRequestHandler private (handler: RequestHandler, _path: Pa
       Left(req)
 
   private def isTargeted(req: HttpRequest): Boolean =
-    isTargeted(req.method) && isTargeted(req.path)
+    isTargeted(req.method) && isTargeted(req.path.toURLDecoded("utf-8"))
 
   private def isTargeted(method: RequestMethod): Boolean =
     _method.map(_method => _method == method).getOrElse(true)
