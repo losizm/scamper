@@ -17,7 +17,7 @@ package scamper.server
 
 import java.io.{ File, FileWriter, PrintWriter }
 import java.net.{ InetAddress, InetSocketAddress, Socket }
-import java.time.OffsetDateTime
+import java.time.{ Instant, OffsetDateTime }
 import java.util.concurrent.{ ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadFactory, ThreadPoolExecutor }
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -32,7 +32,7 @@ import scamper.{ Header, HttpRequest, HttpResponse, RequestLine }
 import scamper.ImplicitConverters.{ inputStreamToEntity, stringToEntity }
 import scamper.ResponseStatuses.NotFound
 import scamper.auxiliary.SocketType
-import scamper.headers.{ Connection, ContentLength, ContentType, TransferEncoding }
+import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
 import scamper.types.ImplicitConverters.stringToTransferCoding
 
 private object BlockingHttpServer {
@@ -228,6 +228,6 @@ private class BlockingHttpServer private(val id: Int, val host: InetAddress, val
           case Some(n) => res.withContentLength(n)
           case None    => res.withTransferEncoding("chunked")
         }
-    }.withConnection("close")
+    }.withDate(Instant.now).withConnection("close")
   }
 }
