@@ -145,7 +145,7 @@ package object server {
      * @return server
      */
     def create(host: InetAddress, port: Int)(processor: RequestProcessor): HttpServer =
-      config().include(processor).create(host, port)
+      config().request(processor).create(host, port)
   }
 
   /**
@@ -159,14 +159,15 @@ package object server {
    *
    * === Default Configuration ===
    *
-   * |Key          |Value |
-   * |-------------|------|
-   * |poolSize     |`Runtime.getRuntime().availableProcessors()`|
-   * |queueSize    |`Runtime.getRuntime().availableProcessors() * 4`|
-   * |readTimeout  |`5000`|
-   * |log          |`new File("server.log")`|
-   * |secure       |<em>(non-secure)</em>|
-   * |include      |<em>(empty)</em>|
+   * |Key        |Value |
+   * |-----------|------|
+   * |poolSize   |`Runtime.getRuntime().availableProcessors()`|
+   * |queueSize  |`Runtime.getRuntime().availableProcessors() * 4`|
+   * |readTimeout|`5000`|
+   * |log        |`new File("server.log")`|
+   * |secure     |<em>(Not configured)</em>|
+   * |request    |<em>(Not configured)</em>|
+   * |response   |<em>(Not configured)</em>|
    */
   class ServerConfiguration {
     private var config = BlockingHttpServer.Configuration()
@@ -226,19 +227,7 @@ package object server {
     }
 
     /**
-     * Sets protocol to `http`.
-     *
-     * @return this configuration
-     */
-    def nonSecure(): this.type = synchronized {
-      config = config.copy(factory = ServerSocketFactory.getDefault())
-      this
-    }
-
-    /**
-     * Sets protocol to `https`.
-     *
-     * When server is created it will be configured to use supplied key store.
+     * Sets key store to be used for SSL/TLS.
      *
      * @param keyStore server key store
      * @param password key store password
@@ -252,9 +241,7 @@ package object server {
     }
 
     /**
-     * Sets protocol to `https`.
-     *
-     * When server is created it will be configured to use supplied key store.
+     * Sets key store to be used for SSL/TLS.
      *
      * <strong>Note:</strong> The password can be discarded after invoking this
      * method.
@@ -271,10 +258,7 @@ package object server {
     }
 
     /**
-     * Sets protocol to `https`.
-     *
-     * When server is created it will be configured to use supplied key and
-     * certificate.
+     * Sets key and certificate to be used for SSL/TLS.
      *
      * @param key private key
      * @param certificate public key certificate
@@ -295,7 +279,7 @@ package object server {
      *
      * @return this configuration
      */
-    def include(handler: RequestHandler): this.type = synchronized {
+    def request(handler: RequestHandler): this.type = synchronized {
       config = config.copy(requestHandlers = config.requestHandlers :+ handler)
       this
     }
@@ -309,7 +293,7 @@ package object server {
      *
      * @return this configuration
      */
-    def include(filter: RequestFilter): this.type = synchronized {
+    def request(filter: RequestFilter): this.type = synchronized {
       config = config.copy(requestHandlers = config.requestHandlers :+ filter)
       this
     }
@@ -323,7 +307,7 @@ package object server {
      *
      * @return this configuration
      */
-    def include(processor: RequestProcessor): this.type = synchronized {
+    def request(processor: RequestProcessor): this.type = synchronized {
       config = config.copy(requestHandlers = config.requestHandlers :+ processor)
       this
     }
@@ -338,7 +322,7 @@ package object server {
      *
      * @return this configuration
      */
-    def include(path: String)(processor: RequestProcessor): this.type = synchronized {
+    def request(path: String)(processor: RequestProcessor): this.type = synchronized {
       config = config.copy(requestHandlers = config.requestHandlers :+ TargetedRequestHandler(processor, path, true, None))
       this
     }
@@ -354,7 +338,7 @@ package object server {
      *
      * @return this configuration
      */
-    def include(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
+    def request(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
       config = config.copy(requestHandlers = config.requestHandlers :+ TargetedRequestHandler(processor, path, true, Some(method)))
       this
     }
@@ -376,7 +360,7 @@ package object server {
      *
      * @return this configuration
      */
-    def include(baseDirectory: File): this.type = synchronized {
+    def request(baseDirectory: File): this.type = synchronized {
       config = config.copy(requestHandlers = config.requestHandlers :+ FileServer(baseDirectory, "/"))
       this
     }
@@ -400,7 +384,7 @@ package object server {
      *
      * @return this configuration
      */
-    def include(path: String, baseDirectory: File): this.type = synchronized {
+    def request(path: String, baseDirectory: File): this.type = synchronized {
       config = config.copy(requestHandlers = config.requestHandlers :+ FileServer(baseDirectory, path))
       this
     }
@@ -414,7 +398,7 @@ package object server {
      *
      * @return this configuration
      */
-    def include(filter: ResponseFilter): this.type = synchronized {
+    def response(filter: ResponseFilter): this.type = synchronized {
       config = config.copy(responseFilters = config.responseFilters :+ filter)
       this
     }

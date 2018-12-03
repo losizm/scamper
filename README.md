@@ -358,7 +358,7 @@ being put together to create the server. Minus imports, here's the semantic
 equivalent in long form.
 
 ```scala
-val server = HttpServer.config().include(req => Ok("Hello, world!")).create(8080)
+val server = HttpServer.config().request(req => Ok("Hello, world!")).create(8080)
 ```
 
 We'll use the remainder of this documentation to explain what goes into creating
@@ -416,7 +416,7 @@ import scamper.ResponseStatuses.MethodNotAllowed
 import scamper.headers.Allow
 
 // Add handler to log request line and headers to stdout
-config.include { req =>
+config.request { req =>
   println(req.startLine)
   req.headers.foreach(println)
   println()
@@ -426,7 +426,7 @@ config.include { req =>
 }
 
 // Add handler to allow GET and HEAD requests only
-config.include { req =>
+config.request { req =>
   if (req.method == GET || req.method == HEAD)
     // Return request for next handler
     Left(req)
@@ -459,7 +459,7 @@ import scamper.types.LanguageTag
 import scamper.types.ImplicitConverters.stringToLanguageTag
 
 // Translates message body from French (Oui, oui.)
-config.include { req =>
+config.request { req =>
   val translator: BodyParser[String] = ...
 
   if (req.method == POST && req.contentLanguage.contains("fr"))
@@ -476,10 +476,10 @@ known the handler always returns the same type: `RequestFilter` always returns
 an `HttpRequest`, and `RequestProcessor` always returns an `HttpResponse`. These
 are _filtering_ and _processing_, respectively.
 
-The request logger can be rewritten as a `RequestFilter`.
+The request logger can be rewritten as `RequestFilter`.
 
 ```scala
-config.include { req =>
+config.request { req =>
   println(req.startLine)
   req.headers.foreach(println)
   println()
@@ -488,14 +488,14 @@ config.include { req =>
 }
 ```
 
-And we used a `RequestProcessor` in our _"Hello World"_ server, but here's one
+And we used `RequestProcessor` in our _"Hello World"_ server, but here's one
 that would do something more meaningful.
 
 ```scala
 import scamper.ImplicitConverters.fileToEntity
 import scamper.ResponseStatuses.{ NotFound, Ok }
 
-config.include { req =>
+config.request { req =>
   def findFile(path: String): Option[File] = {
     ...
   }
@@ -506,12 +506,11 @@ config.include { req =>
 
 ### Serving Static Files
 
-There is an _include_ for adding a specialized request handler to serve static
-files.
+You can include a specialized request handler to serve static files.
 
 ```scala
 // Serve static files from given directory
-config.include(new File("/path/to/public"))
+config.request(new File("/path/to/public"))
 ```
 
 This adds a request handler to serve files from the directory at _/path/to/public_.
@@ -521,11 +520,44 @@ _http://localhost:8080/images/logo.png_ would map to _/path/to/public/images/log
 Or, you can map a path prefix to a directory.
 
 ```scala
-config.include("/app/main", new File("/path/to/public"))
+config.request("/app/main", new File("/path/to/public"))
 ```
 
 In this case, _http://localhost:8080/app/main/images/logo.png_ would map to
 _/path/to/public/images/logo.png_.
+
+### Response Filters
+
+In much the same way requests can be filtered, so too can responses. Response
+filtering is performed by including instances of `ResponseFilter`. They are
+applied in order after one of the request handlers generates a response.
+
+```scala
+config.response { res =>
+  println(res.startLine)
+  res.headers.foreach(println)
+  println()
+
+  // Return response for next filter
+  res
+}
+```
+
+This is pretty much the same as the request logger from earlier, only instead of
+`HttpRequest`, it consumes and produces `HttpResponse`.
+
+And, similar to a request filter, a response filter is not restricted to
+returning the same response it consumed.
+
+```scala
+import scamper.headers.TransferEncoding
+import scamper.types.ImplicitConverters.stringToTransferCoding
+
+config.response { res =>
+  res.withBody(new DeflaterInputStream(res.body.getInputStream))
+    .withTransferEncoding("deflate", "chunked")
+}
+```
 
 ### Securing the Server
 
