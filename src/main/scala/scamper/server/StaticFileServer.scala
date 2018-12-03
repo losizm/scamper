@@ -33,8 +33,9 @@ import scamper.types._
 import scamper.types._
 import scamper.types.ImplicitConverters._
 
-private class FileServer private (val baseDirectory: Path, val pathPrefix: Path) extends RequestHandler {
+private class StaticFileServer private (val baseDirectory: Path, val pathPrefix: Path) extends RequestHandler {
   private val `application/octet-stream` = MediaType("application", "octet-stream")
+  private val `*/*` = MediaRange("*", "*")
 
   def apply(req: HttpRequest): Either[HttpRequest, HttpResponse] = {
     val path = Paths.get(req.path).normalize()
@@ -50,33 +51,46 @@ private class FileServer private (val baseDirectory: Path, val pathPrefix: Path)
 
     if (getExists(path))
       req.method match {
-        case GET  => Right(getResponse(path, false, getIfModifiedSince(req)))
-        case HEAD => Right(getResponse(path, true, getIfModifiedSince(req)))
+        case GET  => Right(getResponse(path, false, getAccept(req), getIfModifiedSince(req)))
+        case HEAD => Right(getResponse(path, true, getAccept(req), getIfModifiedSince(req)))
         case _    => Right(MethodNotAllowed().withAllow(GET, HEAD))
       }
     else
       Left(req)
   }
 
-  private def getResponse(path: Path, headOnly: Boolean, ifModifiedSince: Instant): HttpResponse = {
+  private def getResponse(path: Path, headOnly: Boolean, accept: Seq[MediaRange], ifModifiedSince: Instant): HttpResponse = {
     val attrs = Files.readAttributes(path, classOf[BasicFileAttributes])
+    val lastModified = attrs.lastModifiedTime.toInstant
+    val size = attrs.size
+    val mediaType = getMediaType(path)
 
-    ifModifiedSince.isBefore(attrs.lastModifiedTime.toInstant) match {
+    accept.exists(range => range.matches(mediaType)) match {
       case true =>
-        val res = Ok().withDate(Instant.now())
-          .withContentType(getMediaType(path))
-          .withContentLength(attrs.size)
-          .withLastModified(attrs.lastModifiedTime.toInstant)
+        ifModifiedSince.isBefore(lastModified) match {
+          case true =>
+            val res = Ok().withDate(Instant.now())
+              .withContentType(mediaType)
+              .withContentLength(size)
+              .withLastModified(lastModified)
 
-        headOnly match {
-          case true  => res
-          case false => res.withBody(path.toFile)
+            headOnly match {
+              case true  => res
+              case false => res.withBody(path.toFile)
+            }
+          case false =>
+            NotModified().withDate(Instant.now())
+              .withLastModified(lastModified)
         }
-      case false =>
-        NotModified().withDate(Instant.now())
-          .withLastModified(attrs.lastModifiedTime.toInstant)
+      case false => NotAcceptable().withDate(Instant.now())
     }
   }
+
+  private def getAccept(req: HttpRequest): Seq[MediaRange] =
+    Try(req.accept) match {
+      case Success(accept) if accept.nonEmpty => accept
+      case _ => Seq(`*/*`)
+    }
 
   private def getIfModifiedSince(req: HttpRequest): Instant =
     Try(req.ifModifiedSince).getOrElse(Instant.MIN)
@@ -111,20 +125,20 @@ private class FileServer private (val baseDirectory: Path, val pathPrefix: Path)
   }
 }
 
-private object FileServer {
-  def apply(baseDirectory: String, pathPrefix: String): FileServer =
+private object StaticFileServer {
+  def apply(baseDirectory: String, pathPrefix: String): StaticFileServer =
     apply(Paths.get(baseDirectory), Paths.get(pathPrefix))
 
-  def apply(baseDirectory: File, pathPrefix: String): FileServer =
+  def apply(baseDirectory: File, pathPrefix: String): StaticFileServer =
     apply(baseDirectory.toPath, Paths.get(pathPrefix))
 
-  def apply(baseDirectory: Path, pathPrefix: Path): FileServer = {
+  def apply(baseDirectory: Path, pathPrefix: Path): StaticFileServer = {
     if (!Files.isDirectory(baseDirectory))
-      throw new IllegalArgumentException("Not a directory")
+      throw new IllegalArgumentException(s"Not a directory ($baseDirectory)")
 
     if (!pathPrefix.startsWith("/"))
-      throw new IllegalArgumentException(s"Invalid path prefix: $pathPrefix")
+      throw new IllegalArgumentException(s"Invalid path prefix ($pathPrefix)")
 
-    new FileServer(baseDirectory.toAbsolutePath().normalize(), pathPrefix)
+    new StaticFileServer(baseDirectory.toAbsolutePath().normalize(), pathPrefix)
   }
 }

@@ -361,7 +361,7 @@ package object server {
      * @return this configuration
      */
     def request(baseDirectory: File): this.type = synchronized {
-      config = config.copy(requestHandlers = config.requestHandlers :+ FileServer(baseDirectory, "/"))
+      config = config.copy(requestHandlers = config.requestHandlers :+ StaticFileServer(baseDirectory, "/"))
       this
     }
 
@@ -385,7 +385,7 @@ package object server {
      * @return this configuration
      */
     def request(path: String, baseDirectory: File): this.type = synchronized {
-      config = config.copy(requestHandlers = config.requestHandlers :+ FileServer(baseDirectory, path))
+      config = config.copy(requestHandlers = config.requestHandlers :+ StaticFileServer(baseDirectory, path))
       this
     }
 
