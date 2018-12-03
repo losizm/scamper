@@ -73,7 +73,7 @@ trait MediaType {
 object MediaType {
   private val mappings: Map[String, MediaType] = Try {
     val props = new Properties()
-    val in = getClass.getResourceAsStream("mime-mappings.properties")
+    val in = getClass.getResourceAsStream("media-types.properties")
 
     try props.load(in)
     finally Try(in.close())
