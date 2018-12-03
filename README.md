@@ -49,7 +49,7 @@ val response = Ok("There is an answer.")
 
 There is a set of methods in `HttpMessage` that provides generalized header
 access. With these methods, the header field name is a `String`, which is
-case-insensitive, and the header value is also represented as `String`.
+case-insensitive, and the header value is also a `String`.
 
 ```scala
 import scamper.ImplicitConverters.{ stringToURI, tupleToHeader }
@@ -93,7 +93,7 @@ import scamper.RequestMethods.POST
 import scamper.headers.ContentType
 import scamper.types.MediaType
 
-val req = POST("/api/users").withContentType(MediaType.parse("application/json"))
+val req = POST("/api/users").withContentType(MediaType("application", "json"))
 println(req.contentType.mainType) // application
 println(req.contentType.subtype) // json
 ```
@@ -189,16 +189,16 @@ assert(res.getHeaderValues("Set-Cookie").size == 2)
 ```
 
 _**Note:** Each response cookie is presented in its own **Set-Cookie** header.
-`getHeaderValues()` collects all of the header values into `Seq[String]`;
-whereas, `getHeaderValue()` retrieves the first header value only._
+`getHeaderValues()` collects all header values into `Seq[String]`; whereas,
+`getHeaderValue()` retrieves first header value only._
 
 ## Message Body
-The message body is represented as an `Entity`, which provides access to a
+The message body is represented as `Entity`, which encapsulates its content as
 `java.io.InputStream`.
 
 ### Creating Message Body
 When building a message, use one of the `Entity` factory methods to create the
-body. For example, you can create a message body with text content.
+body. For example, you can create a message body using text content.
 
 ```scala
 import scamper.Entity
@@ -220,7 +220,7 @@ val body = Entity("""
 val res = Ok(body).withContentType("text/html; charset=utf-8")
 ```
 
-Or create a message body from file content.
+Or create a message body using file content.
 
 ```scala
 import java.io.File
@@ -234,7 +234,7 @@ val res = Ok(body).withContentType("text/html; charset=utf-8")
 ```
 
 There are implicit converters available for common entity types, so you aren't
-always required to create them explicitly.
+required to create them explicitly.
 
 ```scala
 import java.io.File
@@ -250,7 +250,7 @@ val res = Ok(new File("./index.html")).withContentType("text/html; charset=utf-8
 
 When handling an incoming message, use an appropriate `BodyParser` to parse the
 message body. There is a set of standard parsers available in `BodyParsers`,
-such as one used for parsing text content.
+such as the one used for parsing text content.
 
 ```scala
 import scamper.{ BodyParsers, HttpMessage }
@@ -298,8 +298,7 @@ def printUser(message: HttpMessage): Unit = {
 ```
 
 ## HTTP Client
-The `HttpClient` object can be used for sending a request and handling the
-response.
+The `HttpClient` object is used for sending a request and handling the response.
 
 ```scala
 import scamper.HttpClient
@@ -374,8 +373,8 @@ equivalent in long form.
 val server = HttpServer.config().request(req => Ok("Hello, world!")).create(8080)
 ```
 
-We'll use the remainder of this documentation to explain what goes into creating
-more practical applications.
+We'll use the remainder of this documentation to describe what goes into
+creating more practical applications.
 
 ### Server Configuration
 
@@ -451,8 +450,8 @@ config.request { req =>
 
 An `HttpRequest` is passed to the `RequestHandler`, and the handler returns
 `Either[HttpRequest, HttpResponse]`. If the handler is unable to satisfy the
-request, it returns an `HttpRequest` so that the next handler can have its
-chance. Otherwise, it returns an `HttpResponse`, and any remaining handlers are
+request, it returns an `HttpRequest` so that the next handler can have its turn.
+Otherwise, it returns an `HttpResponse`, and any remaining handlers are
 effectively ignored.
 
 Note the order in which handlers are applied matters. For instance, in the
@@ -513,7 +512,7 @@ config.request { req =>
     ...
   }
 
-  findFile(req.path).map(file => Ok(file)).getOrElse(NotFound())
+  findFile(req.path).map(Ok.apply).getOrElse(NotFound())
 }
 ```
 
@@ -527,7 +526,7 @@ config.request(new File("/path/to/public"))
 ```
 
 This adds a request handler to serve files from the directory at _/path/to/public_.
-The files are mapped based on the request's target path. For example,
+The files are mapped based on the request's path. For example,
 _http://localhost:8080/images/logo.png_ would map to _/path/to/public/images/logo.png_.
 
 Or, you can map a path prefix to a directory.
@@ -607,10 +606,10 @@ When created, an instance of `HttpServer` is returned, which can be used to
 query a few server details.
 
 ```scala
-println(server.host)
-println(server.port)
-println(server.isSecure)
-println(server.isClosed)
+println(s"Host: ${server.host}")
+println(s"Port: ${server.port}")
+println(s"Secure: ${server.isSecure}")
+println(s"Closed: ${server.isClosed}")
 ```
 
 And, ultimately, it is used to gracefully shut down the server.
