@@ -193,21 +193,21 @@ package object auxiliary {
     def toPath: Path = Paths.get(string)
 
     /** Converts to URI. */
-    def toURI: URI = new URI(string)
+    def toUri: URI = new URI(string)
 
     /**
      * Encodes to application/x-www-form-urlencoded using the given character encoding.
      *
      * @param encoding the character encoding
      */
-    def toURLEncoded(encoding: String): String = URLEncoder.encode(string, encoding)
+    def toUrlEncoded(encoding: String): String = URLEncoder.encode(string, encoding)
 
     /**
      * Decodes from application/x-www-form-urlencoded using the given character encoding.
      *
      * @param encoding the character encoding
      */
-    def toURLDecoded(encoding: String): String = URLDecoder.decode(string, encoding)
+    def toUrlDecoded(encoding: String): String = URLDecoder.decode(string, encoding)
   }
 
   /** Adds extension methods to {@code java.net.URI}. */
@@ -231,19 +231,19 @@ package object auxiliary {
 
     /** Creates new URI replacing scheme. */
     def withScheme(scheme: String): URI =
-      buildURI(scheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
+      buildUri(scheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
 
     /** Creates new URI replacing authority. */
     def withAuthority(authority: String): URI =
-      buildURI(uri.getScheme, authority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
+      buildUri(uri.getScheme, authority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
 
     /** Creates new URI replacing path. */
     def withPath(path: String): URI =
-      buildURI(uri.getScheme, uri.getRawAuthority, path, uri.getRawQuery, uri.getRawFragment)
+      buildUri(uri.getScheme, uri.getRawAuthority, path, uri.getRawQuery, uri.getRawFragment)
 
     /** Creates new URI replacing query. */
     def withQuery(query: String): URI =
-      buildURI(uri.getScheme, uri.getRawAuthority, uri.getRawPath, query, uri.getRawFragment)
+      buildUri(uri.getScheme, uri.getRawAuthority, uri.getRawPath, query, uri.getRawFragment)
 
     /** Creates new URI replacing query parameters. */
     def withQueryParams(params: Map[String, Seq[String]]): URI =
@@ -255,9 +255,9 @@ package object auxiliary {
 
     /** Creates new URI replacing fragment. */
     def withFragment(fragment: String): URI =
-      buildURI(uri.getScheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, fragment)
+      buildUri(uri.getScheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, fragment)
 
-    private def buildURI(scheme: String, authority: String, path: String, query: String, fragment: String): URI = {
+    private def buildUri(scheme: String, authority: String, path: String, query: String, fragment: String): URI = {
       val uri = new StringBuilder()
 
       if (scheme != null) uri.append(scheme).append(":")

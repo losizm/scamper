@@ -17,7 +17,7 @@ companion object. Or you can start with a `RequestMethod` and use builder
 methods to further define the request.
 
 ```scala
-import scamper.ImplicitConverters.stringToURI
+import scamper.ImplicitConverters.stringToUri
 import scamper.RequestMethods.GET
 import scamper.headers.{ Accept, Host, UserAgent }
 import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToProductType }
@@ -52,7 +52,7 @@ access. With these methods, the header field name is a `String`, which is
 case-insensitive, and the header value is also a `String`.
 
 ```scala
-import scamper.ImplicitConverters.{ stringToURI, tupleToHeader }
+import scamper.ImplicitConverters.{ stringToUri, tupleToHeader }
 import scamper.RequestMethods.POST
 
 val req = POST("/api/users").withHeader("Content-Type" -> "application/json")
@@ -88,7 +88,7 @@ def removeContentType: HttpMessage
 So you can work with the header in a type-safe manner.
 
 ```scala
-import scamper.ImplicitConverters.stringToURI
+import scamper.ImplicitConverters.stringToUri
 import scamper.RequestMethods.POST
 import scamper.headers.ContentType
 import scamper.types.MediaType
@@ -102,7 +102,7 @@ And with `stringToMediaType` in scope, you can implicitly convert `String` to
 `MediaType`.
 
 ```scala
-import scamper.ImplicitConverters.stringToURI
+import scamper.ImplicitConverters.stringToUri
 import scamper.RequestMethods.POST
 import scamper.headers.ContentType
 import scamper.types.ImplicitConverters.stringToMediaType
@@ -126,7 +126,7 @@ header access. Or you can access them using the extension methods provided by
 `RequestCookies`, with each cookie represented as `PlainCookie`.
 
 ```scala
-import scamper.ImplicitConverters.stringToURI
+import scamper.ImplicitConverters.stringToUri
 import scamper.RequestMethods.GET
 import scamper.cookies.{ PlainCookie, RequestCookies }
 
@@ -302,7 +302,7 @@ The `HttpClient` object is used for sending a request and handling the response.
 
 ```scala
 import scamper.HttpClient
-import scamper.ImplicitConverters.{ stringToEntity, stringToURI }
+import scamper.ImplicitConverters.{ stringToEntity, stringToUri }
 import scamper.RequestMethods.POST
 import scamper.ResponseFilters._
 import scamper.headers.{ ContentType, Host, Location }
@@ -329,7 +329,7 @@ So you can process the response and return whatever information warranted.
 
 ```scala
 import scamper.{ BodyParsers, HttpClient }
-import scamper.ImplicitConverters.stringToURI
+import scamper.ImplicitConverters.stringToUri
 import scamper.RequestMethods.GET
 import scamper.headers.Host
 

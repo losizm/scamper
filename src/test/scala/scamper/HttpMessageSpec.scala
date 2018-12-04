@@ -16,7 +16,7 @@
 package scamper
 
 import org.scalatest.FlatSpec
-import scamper.ImplicitConverters.stringToURI
+import scamper.ImplicitConverters.stringToUri
 import scamper.RequestMethods._
 import scamper.ResponseStatuses._
 import scamper.headers._

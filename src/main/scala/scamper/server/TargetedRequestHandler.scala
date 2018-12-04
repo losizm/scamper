@@ -28,7 +28,7 @@ private class TargetedRequestHandler private (handler: RequestHandler, _path: Pa
       Left(req)
 
   private def isTargeted(req: HttpRequest): Boolean =
-    isTargeted(req.method) && isTargeted(req.path.toURLDecoded("utf-8"))
+    isTargeted(req.method) && isTargeted(req.path.toUrlDecoded("utf-8"))
 
   private def isTargeted(method: RequestMethod): Boolean =
     _method.map(_method => _method == method).getOrElse(true)

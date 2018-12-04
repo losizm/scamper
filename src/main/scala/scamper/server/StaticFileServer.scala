@@ -38,7 +38,7 @@ private class StaticFileServer private (val baseDirectory: Path, val pathPrefix:
   private val `*/*` = MediaRange("*", "*")
 
   def apply(req: HttpRequest): Either[HttpRequest, HttpResponse] = {
-    val path = Paths.get(req.path.toURLDecoded("utf-8")).normalize()
+    val path = Paths.get(req.path.toUrlDecoded("utf-8")).normalize()
 
     if (path.startsWith(pathPrefix))
       handle(req)
@@ -47,7 +47,7 @@ private class StaticFileServer private (val baseDirectory: Path, val pathPrefix:
   }
 
   private def handle(req: HttpRequest): Either[HttpRequest, HttpResponse] = {
-    val path = getRealPath(req.path.toURLDecoded("utf-8"))
+    val path = getRealPath(req.path.toUrlDecoded("utf-8"))
 
     if (getExists(path))
       req.method match {
