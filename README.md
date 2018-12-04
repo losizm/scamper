@@ -580,7 +580,8 @@ To use a secure transport, you must supply an appropriate key and certificate.
 config.secure(new File("/path/to/private.key"), new File("/path/to/public.cert"))
 ```
 
-Or, if you have them tucked away in a key store, you can supply the location.
+Or, if you have them tucked away in a key store, you can supply the key store
+location.
 
 ```scala
 // Supply location, password, and store type (i.e., JKS, JCEKS, PCKS12)
@@ -606,10 +607,10 @@ When created, an instance of `HttpServer` is returned, which can be used to
 query a few server details.
 
 ```scala
-println(s"Host: ${server.host}")
-println(s"Port: ${server.port}")
-println(s"Secure: ${server.isSecure}")
-println(s"Closed: ${server.isClosed}")
+printf("Host: %s%n", server.host)
+printf("Port: %d%n", server.port)
+printf("Secure: %s%n", server.isSecure)
+printf("Closed: %s%n", server.isClosed)
 ```
 
 And, ultimately, it is used to gracefully shut down the server.
