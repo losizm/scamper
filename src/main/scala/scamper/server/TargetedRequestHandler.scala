@@ -17,37 +17,81 @@ package scamper.server
 
 import java.nio.file.{ Path, Paths }
 
+import scala.collection.JavaConverters.asScalaIterator
+import scala.util.matching.Regex
+
 import scamper.{ HttpRequest, HttpResponse, RequestMethod }
+import scamper.ImplicitConverters.tupleToHeader
 import scamper.auxiliary.StringType
 
-private class TargetedRequestHandler private (handler: RequestHandler, _path: Path, exact: Boolean, _method: Option[RequestMethod]) extends RequestHandler {
-  def apply(req: HttpRequest): Either[HttpRequest, HttpResponse] =
-    if (isTargeted(req))
-      handler(req)
+private class TargetedRequestHandler private (handler: RequestHandler, targetPath: Path, targetMethod: Option[RequestMethod]) extends RequestHandler {
+  private val target = new Target(targetPath)
+
+  def apply(req: HttpRequest): Either[HttpRequest, HttpResponse] = {
+    val path = Paths.get(req.path.toUrlDecoded("utf-8")).normalize()
+
+    if (isTargeted(req.method) && isTargeted(path))
+      handler(req.withHeader("X-Scamper-Request-Parameters" -> target.getParams(path)))
     else
       Left(req)
-
-  private def isTargeted(req: HttpRequest): Boolean =
-    isTargeted(req.method) && isTargeted(req.path.toUrlDecoded("utf-8"))
+  }
 
   private def isTargeted(method: RequestMethod): Boolean =
-    _method.map(_method => _method == method).getOrElse(true)
+    targetMethod.map(targetMethod => targetMethod == method).getOrElse(true)
 
-  private def isTargeted(path: String): Boolean =
-    if (exact)
-      _path == Paths.get(path).normalize()
-    else
-      Paths.get(path).normalize().startsWith(_path)
+  private def isTargeted(path: Path): Boolean =
+    target.matches(path)
 }
 
 private object TargetedRequestHandler {
-  def apply(handler: RequestHandler, path: String, exact: Boolean, method: Option[RequestMethod]): TargetedRequestHandler =
-    apply(handler, Paths.get(path), exact, method)
+  def apply(handler: RequestHandler, path: String, method: Option[RequestMethod]): TargetedRequestHandler =
+    apply(handler, Paths.get(path), method)
 
-  def apply(handler: RequestHandler, path: Path, exact: Boolean, method: Option[RequestMethod]): TargetedRequestHandler = {
+  def apply(handler: RequestHandler, path: Path, method: Option[RequestMethod]): TargetedRequestHandler = {
     if (!path.startsWith("/"))
       throw new IllegalArgumentException(s"Invalid target path: $path")
 
-    new TargetedRequestHandler(handler, path.normalize(), exact, method)
+    new TargetedRequestHandler(handler, path.normalize(), method)
   }
+}
+
+private class TargetedRequestParameters(params: String) extends RequestParameters {
+  private lazy val toMap: Map[String, String] = params.split("&").map(_.split("=")).collect {
+    case Array(name, value) => name -> value.toUrlDecoded("utf-8")
+  }.toMap
+
+  def getString(name: String): String = toMap(name)
+  def getInt(name: String): Int = toMap(name).toInt
+  def getLong(name: String): Long = toMap(name).toLong
+}
+
+private class Target(path: Path) {
+  path.toString match {
+    case path if path == "/" =>
+    case path if path.matches("""(/:\w+|/[^/:*]+)+""") =>
+    case path if path.matches("""(/:\w+|/[^/:*]+)*/\*\w+""") =>
+    case path => throw new IllegalArgumentException(s"Invalid target path: $path")
+  }
+
+  private val names = asScalaIterator(path.iterator).map(_.toString).toSeq
+
+  private val params: Map[String, (Path => String)] = names.zipWithIndex.collect {
+    case (name, index) if name.matches("(:\\w+)") =>
+      name.tail -> { (path: Path) => path.getName(index).toString }
+    case (name, index) if name.matches("(\\*\\w+)") =>
+      name.tail -> { (path: Path) => path.subpath(index, path.getNameCount).toString }
+  }.toMap
+
+  private val regex = "/" + names.map {
+    case name if name.matches("(:\\w+)")   => "[^/]+"
+    case name if name.matches("(\\*\\w+)") => ".+"
+    case name => Regex.quote(name)
+  }.mkString("/")
+
+  def getParams(path: Path): String =
+    params.map {
+      case (name, getValue) => name + "=" + getValue(path).toUrlEncoded("utf-8")
+    }.mkString("&")
+
+  def matches(path: Path): Boolean = path.toString.matches(regex)
 }

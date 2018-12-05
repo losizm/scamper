@@ -78,6 +78,38 @@ package object server {
     def apply(response: HttpResponse): HttpResponse
   }
 
+  /** Provides access to server-side parameters associated with request. */
+  trait RequestParameters {
+    /**
+     * Gets named parameter as `String`.
+     *
+     * @param name parameter name
+     *
+     * @throws NoSuchElementException if parameter not present
+     */
+    def getString(name: String): String
+
+    /**
+     * Gets named parameter as `Int`.
+     *
+     * @param name parameter name
+     *
+     * @throws NoSuchElementException if parameter not present
+     * @throws NumberFormatException if parameter cannot be converted to `Int`
+     */
+    def getInt(name: String): Int
+
+    /**
+     * Gets named parameter as `Long`.
+     *
+     * @param name parameter name
+     *
+     * @throws NoSuchElementException if parameter not present
+     * @throws NumberFormatException if parameter cannot be converted to `Long`
+     */
+    def getLong(name: String): Long
+  }
+
   /**
    * HTTP Server
    *
@@ -323,7 +355,7 @@ package object server {
      * @return this configuration
      */
     def request(path: String)(processor: RequestProcessor): this.type = synchronized {
-      config = config.copy(requestHandlers = config.requestHandlers :+ TargetedRequestHandler(processor, path, true, None))
+      config = config.copy(requestHandlers = config.requestHandlers :+ TargetedRequestHandler(processor, path, None))
       this
     }
 
@@ -339,7 +371,7 @@ package object server {
      * @return this configuration
      */
     def request(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
-      config = config.copy(requestHandlers = config.requestHandlers :+ TargetedRequestHandler(processor, path, true, Some(method)))
+      config = config.copy(requestHandlers = config.requestHandlers :+ TargetedRequestHandler(processor, path, Some(method)))
       this
     }
 
