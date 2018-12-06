@@ -422,6 +422,12 @@ discarded.
 You define application-specific logic in instances of `RequestHandler`, and add
 them to the server configuration.
 
+An `HttpRequest` is passed to the `RequestHandler`, and the handler returns
+`Either[HttpRequest, HttpResponse]`. If the handler is unable to satisfy the
+request, it returns an `HttpRequest` so that the next handler can have its turn.
+Otherwise, it returns an `HttpResponse`, and any remaining handlers are
+effectively ignored.
+
 ```scala
 import scamper.RequestMethods.{ GET, HEAD }
 import scamper.ResponseStatuses.MethodNotAllowed
@@ -447,12 +453,6 @@ config.request { req =>
     Right(MethodNotAllowed().withAllow(GET, HEAD))
 }
 ```
-
-An `HttpRequest` is passed to the `RequestHandler`, and the handler returns
-`Either[HttpRequest, HttpResponse]`. If the handler is unable to satisfy the
-request, it returns an `HttpRequest` so that the next handler can have its turn.
-Otherwise, it returns an `HttpResponse`, and any remaining handlers are
-effectively ignored.
 
 Note the order in which handlers are applied matters. For instance, in the
 example above, you'd swap the order of handlers if you wanted to log GET and
@@ -512,9 +512,97 @@ config.request { req =>
     ...
   }
 
-  findFile(req.path).map(Ok.apply).getOrElse(NotFound())
+  findFile(req.path).map(Ok(_)).getOrElse(NotFound())
 }
 ```
+
+### Targeted Request Processing
+
+A request processor can be included with a targeted path &ndash; with or without
+a targeted request method.
+
+```scala
+import scamper.ImplicitConverters.stringToEntity
+import scamper.RequestMethods.{ GET }
+import scamper.ResponseStatuses.{ Forbidden, Ok }
+
+// Match request method and exact path
+config.request(GET, "/about") { req =>
+  Ok("This server is powered by Scamper.")
+}
+
+// Match exact path and any method
+config.request("/private") { req =>
+  Forbidden()
+}
+```
+
+Parameters can be specified in the path and their resolved values made available
+to the processor. When a parameter is specified as __:param__, it matches a
+single path component; whereas, __*param__ matches the path component along with
+any remaining components including slashes (**/**).
+
+```scala
+import scamper.ImplicitConverters.fileToEntity
+import scamper.RequestMethods.DELETE
+import scamper.ResponseStatuses.{ Accepted, NotFound, Ok }
+import scamper.server.Implicits.HttpRequestType
+
+// Match request method and parameterized path
+config.request(DELETE, "/orders/:id") { req =>
+  def deleteOrder(id: Int): Boolean = {
+    ...
+  }
+
+  // Get resolved parameter
+  val params = req.getParams()
+  val id = params.getInt("id")
+
+  if (deleteOrder(id))
+    Accepted()
+  else
+    NotFound()
+}
+
+// Match prefixed path with any request method
+config.request("/archive/*file") { req =>
+  def findFile(path: String): Option[File] = {
+    ...
+  }
+
+  // Get resolved parameter
+  val params = req.getParams()
+  val file = params.getString("file")
+
+  findFile(req.path).map(Ok(_)).getOrElse(NotFound())
+}
+```
+
+There can be multiple __:param__ instances specified in the path.
+
+```scala
+import scamper.BodyParser
+import scamper.ImplicitConverters.stringToEntity
+import scamper.RequestMethods.POST
+import scamper.ResponseStatuses.Ok
+import scamper.server.Implicits.HttpRequestType
+
+// Match path with two parameters
+config.request(POST, "/translate/:in/to/:out") { req =>
+  def translator(from: String, to: String): BodyParser[String] = {
+    ...
+  }
+
+  val params = req.getParams()
+  val from = params.getString("in")
+  val to = params.getString("out")
+
+  Ok(translator(from, to).parse(req))
+}
+```
+
+Note there can be at most one __*param__, which must be specified as the the
+last component in the path.
 
 ### Serving Static Files
 
@@ -542,7 +630,7 @@ _/path/to/public/images/logo.png_.
 
 In much the same way requests can be filtered, so too can responses. Response
 filtering is performed by including instances of `ResponseFilter`. They are
-applied in order after one of the request handlers generates a response.
+applied, in order, after one of the request handlers generates a response.
 
 ```scala
 config.response { res =>
@@ -590,7 +678,7 @@ config.secure(new File("/path/to/keystore"), "s3cr3t", "pkcs12")
 
 ### Creating the Server
 
-At this point, you're ready to create the server.
+When the desired configuration is in place, you're ready to create the server.
 
 ```scala
 val server = config.create(8080)
