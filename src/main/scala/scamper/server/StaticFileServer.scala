@@ -86,6 +86,12 @@ private class StaticFileServer private (val baseDirectory: Path, val pathPrefix:
     }
   }
 
+  private def getRealPath(path: String): Path =
+    baseDirectory.resolve(pathPrefix.relativize(Paths.get(path))).normalize()
+
+  private def getExists(path: Path): Boolean =
+    path.startsWith(baseDirectory) && Files.isRegularFile(path) && !Files.isHidden(path)
+
   private def getAccept(req: HttpRequest): Seq[MediaRange] =
     Try(req.accept) match {
       case Success(accept) if accept.nonEmpty => accept
@@ -99,21 +105,6 @@ private class StaticFileServer private (val baseDirectory: Path, val pathPrefix:
     getFileNameExtension(path)
       .flatMap(MediaType.get)
       .getOrElse(`application/octet-stream`)
-
-  private def getExists(path: Path): Boolean =
-    path.startsWith(baseDirectory) && Files.isRegularFile(path) && !Files.isHidden(path)
-
-  private def getRealPath(path: String): Path = {
-    val realPath = getRealPath(Paths.get(path))
-
-    if (Files.isDirectory(realPath))
-      realPath.resolve("index.html")
-    else
-      realPath
-  }
-
-  private def getRealPath(path: Path): Path =
-    baseDirectory.resolve(pathPrefix.relativize(path)).normalize()
 
   private def getFileNameExtension(path: Path): Option[String] = {
     val namePattern = ".+\\.(\\w+)".r
