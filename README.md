@@ -555,8 +555,7 @@ config.request(DELETE, "/orders/:id") { req =>
   }
 
   // Get resolved parameter
-  val params = req.getParams()
-  val id = params.getInt("id")
+  val id = req.params.getInt("id")
 
   if (deleteOrder(id))
     Accepted()
@@ -571,8 +570,7 @@ config.request("/archive/*file") { req =>
   }
 
   // Get resolved parameter
-  val params = req.getParams()
-  val file = params.getString("file")
+  val file = req.params.getString("file")
 
   findFile(req.path).map(Ok(_)).getOrElse(NotFound())
 }
@@ -593,9 +591,8 @@ config.request(POST, "/translate/:in/to/:out") { req =>
     ...
   }
 
-  val params = req.getParams()
-  val from = params.getString("in")
-  val to = params.getString("out")
+  val from = req.params.getString("in")
+  val to = req.params.getString("out")
 
   Ok(translator(from, to).parse(req))
 }
