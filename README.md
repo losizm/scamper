@@ -523,7 +523,7 @@ targeted request method.
 
 ```scala
 import scamper.ImplicitConverters.stringToEntity
-import scamper.RequestMethods.{ GET }
+import scamper.RequestMethods.GET
 import scamper.ResponseStatuses.{ Forbidden, Ok }
 
 // Match request method and exact path
