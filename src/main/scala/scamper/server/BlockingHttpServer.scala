@@ -17,7 +17,7 @@ package scamper.server
 
 import java.io.{ File, FileWriter, PrintWriter }
 import java.net.{ InetAddress, InetSocketAddress, Socket }
-import java.time.{ Instant, OffsetDateTime }
+import java.time.Instant
 import java.util.concurrent.{ ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadFactory, ThreadPoolExecutor }
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -108,7 +108,7 @@ private class BlockingHttpServer private(val id: Int, val host: InetAddress, val
   }
 
   private def log(message: String, cause: Option[Throwable] = None): Unit = {
-    logger.printf("%s [%s]%s%n", OffsetDateTime.now(), authority, message)
+    logger.printf("%s [%s]%s%n", Instant.now(), authority, message)
     cause.foreach(_.printStackTrace(logger))
   }
 
