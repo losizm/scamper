@@ -18,8 +18,6 @@ package scamper
 import java.io.File
 import java.net.InetAddress
 
-import javax.net.ServerSocketFactory
-
 /** Includes server related items. */
 package object server {
   /** Provides utility for handling incoming request. */
@@ -199,11 +197,11 @@ package object server {
    * |response   |<em>(Not configured)</em>|
    */
   class ServerConfiguration {
-    private var config = BlockingHttpServer.Configuration()
+    private var config = DefaultHttpServer.Configuration()
 
     /** Resets configuration to default values. */
     def reset(): this.type = synchronized {
-      config = BlockingHttpServer.Configuration()
+      config = DefaultHttpServer.Configuration()
       this
     }
 
@@ -480,7 +478,7 @@ package object server {
      * @return new server
      */
     def create(host: InetAddress, port: Int): HttpServer = synchronized {
-      BlockingHttpServer(host, port, config)
+      DefaultHttpServer(host, port, config)
     }
   }
 

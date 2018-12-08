@@ -35,7 +35,7 @@ import scamper.auxiliary.SocketType
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
 import scamper.types.ImplicitConverters.stringToTransferCoding
 
-private object BlockingHttpServer {
+private object DefaultHttpServer {
   private val count = new AtomicInteger(0)
 
   case class Configuration(
@@ -50,10 +50,10 @@ private object BlockingHttpServer {
   )
 
   def apply(host: InetAddress, port: Int, config: Configuration) =
-    new BlockingHttpServer(count.incrementAndGet(), host, port, config)
+    new DefaultHttpServer(count.incrementAndGet(), host, port, config)
 }
 
-private class BlockingHttpServer private(val id: Int, val host: InetAddress, val port: Int, config: BlockingHttpServer.Configuration) extends HttpServer {
+private class DefaultHttpServer private(val id: Int, val host: InetAddress, val port: Int, config: DefaultHttpServer.Configuration) extends HttpServer {
   private val authority = s"${host.getCanonicalHostName}:$port"
   private val threadGroup = new ThreadGroup(s"httpserver-$id")
   private val poolSize = config.poolSize
