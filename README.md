@@ -66,7 +66,7 @@ The interface to `HttpMessage` can be extended for specialized header access.
 The extension methods are provided by the many type classes defined in
 `scamper.headers`.
 
-For example, `ContentType` includes the following methods:
+For example, `ContentType` adds the following methods:
 
 ```scala
 /** Tests whether Content-Type header is present. */
@@ -193,7 +193,7 @@ _**Note:** Each response cookie is presented in its own **Set-Cookie** header.
 `getHeaderValue()` retrieves first header value only._
 
 ## Message Body
-The message body is represented as `Entity`, which encapsulates its content as
+The message body is represented as `Entity`, which encapsulates content in
 `java.io.InputStream`.
 
 ### Creating Message Body
@@ -413,7 +413,7 @@ Note **queueSize** is also used to configure server backlog (i.e., backlog of
 incoming connections), so technically there can be up to double **queueSize**
 waiting to be processed if both request queue and server backlog are filled.
 
-The **readTimeout** controls how long a read from a socket will block before it
+The **readTimeout** controls how long a read from a socket blocks before it
 times out. At which point, the socket is closed, and its associated request is
 discarded.
 
@@ -518,8 +518,8 @@ config.request { req =>
 
 ### Targeted Request Processing
 
-A request processor can be included with a targeted path &ndash; with or without
-a targeted request method.
+A request processor can be included for a targeted path with or without a
+targeted request method.
 
 ```scala
 import scamper.ImplicitConverters.stringToEntity
@@ -540,7 +540,7 @@ config.request("/private") { req =>
 Parameters can be specified in the path and their resolved values made available
 to the processor. When a parameter is specified as __:param__, it matches a
 single path component; whereas, __*param__ matches the path component along with
-any remaining components including slashes (**/**).
+any remaining components including path separators (i.e., **/**).
 
 ```scala
 import scamper.ImplicitConverters.fileToEntity
@@ -611,7 +611,7 @@ config.request(new File("/path/to/public"))
 ```
 
 This adds a request handler to serve files from the directory at _/path/to/public_.
-The files are mapped based on the request's path. For example,
+The files are mapped based on the request path. For example,
 _http://localhost:8080/images/logo.png_ would map to _/path/to/public/images/logo.png_.
 
 Or, you can map a path prefix to a directory.
@@ -643,7 +643,7 @@ config.response { res =>
 This is pretty much the same as the request logger from earlier, only instead of
 `HttpRequest`, it consumes and produces `HttpResponse`.
 
-And, similar to a request filter, a response filter is not restricted to
+And, similar to a request filter, the response filter is not restricted to
 returning the same response it consumed.
 
 ```scala
@@ -681,7 +681,7 @@ When the desired configuration is in place, you're ready to create the server.
 val server = config.create(8080)
 ```
 
-If the server must run from a particular host, you can provide the host name or
+If the server must bind to a particular host, you can provide the host name or
 IP address.
 
 ```scala
