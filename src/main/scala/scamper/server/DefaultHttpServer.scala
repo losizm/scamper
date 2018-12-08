@@ -43,7 +43,7 @@ private object DefaultHttpServer {
     queueSize: Int = Runtime.getRuntime.availableProcessors() * 4,
     readTimeout: Int = 5000,
     keepAliveSeconds: Int = 60,
-    log: File = new File("server.log"),
+    log: File = new File("server.log").getCanonicalFile(),
     requestHandlers: Seq[RequestHandler] = Nil,
     responseFilters: Seq[ResponseFilter] = Nil,
     factory: ServerSocketFactory = ServerSocketFactory.getDefault()
@@ -54,10 +54,14 @@ private object DefaultHttpServer {
 }
 
 private class DefaultHttpServer private(val id: Int, val host: InetAddress, val port: Int, config: DefaultHttpServer.Configuration) extends HttpServer {
+  val readTimeout = config.readTimeout
+  val poolSize = config.poolSize
+  val queueSize = config.queueSize
+  val log = config.log
+
   private val authority = s"${host.getCanonicalHostName}:$port"
   private val threadGroup = new ThreadGroup(s"httpserver-$id")
-  private val poolSize = config.poolSize
-  private val queueSize = config.queueSize
+
   private val keepAliveSeconds = config.keepAliveSeconds
   private val requestHandlers = config.requestHandlers
   private val responseFilters = config.responseFilters

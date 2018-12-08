@@ -689,12 +689,16 @@ val server = config.create("192.168.0.2", 8080)
 ```
 
 When created, an instance of `HttpServer` is returned, which can be used to
-query a few server details.
+query server details.
 
 ```scala
 printf("Host: %s%n", server.host)
 printf("Port: %d%n", server.port)
 printf("Secure: %s%n", server.isSecure)
+printf("Log: %s%n", server.log)
+printf("Pool Size: %d%n", server.poolSize)
+printf("Queue Size: %d%n", server.queueSize)
+printf("Read Timeout: %d%n", server.readTimeout)
 printf("Closed: %s%n", server.isClosed)
 ```
 

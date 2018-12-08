@@ -117,6 +117,18 @@ package object server {
     /** Gets port number. */
     def port: Int
 
+    /** Gets log file. */
+    def log: File
+
+    /** Gets pool size. */
+    def poolSize: Int
+
+    /** Gets queue size. */
+    def queueSize: Int
+
+    /** Gets read timeout. */
+    def readTimeout: Int
+
     /** Tests whether server is secure. */
     def isSecure: Boolean
 
@@ -265,7 +277,7 @@ package object server {
      * @return this configuration
      */
     def log(file: File): this.type = synchronized {
-      config = config.copy(log = file)
+      config = config.copy(log = file.getCanonicalFile())
       this
     }
 
