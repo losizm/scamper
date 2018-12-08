@@ -101,8 +101,15 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
 
   try {
     log(s"[info] Starting server at $authority")
+    log(s"[info] Secure: $isSecure")
+    log(s"[info] Log: $log")
+    log(s"[info] Pool Size: $poolSize")
+    log(s"[info] Queue Size: $queueSize")
+    log(s"[info] Read Timeout: $readTimeout")
+
     serverSocket.bind(new InetSocketAddress(host, port), queueSize)
     Service.start()
+
     log(s"[info] Server running at $authority")
   } catch {
     case cause: Exception =>

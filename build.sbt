@@ -23,7 +23,7 @@ developers := List(
   )
 )
 
-description := "HTTP library for Scala"
+description := "The HTTP library for Scala"
 licenses := List("Apache License, Version 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 homepage := Some(url("https://github.com/losizm/scamper"))
 
