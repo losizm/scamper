@@ -22,7 +22,7 @@ import javax.net.ServerSocketFactory
 
 /** Includes server related items. */
 package object server {
-  /** Provides utility for handling HTTP request. */
+  /** Provides utility for handling incoming request. */
   trait RequestHandler {
     /**
      * Handles request.
@@ -33,7 +33,7 @@ package object server {
     def apply(request: HttpRequest): Either[HttpRequest, HttpResponse]
   }
 
-  /** Provides utility for filtering HTTP request. */
+  /** Provides utility for filtering incoming request. */
   trait RequestFilter extends RequestHandler {
     /**
      * Filters request.
@@ -48,7 +48,7 @@ package object server {
       Left(filter(request))
   }
 
-  /** Provides utility for processing HTTP request. */
+  /** Provides utility for processing incoming request. */
   trait RequestProcessor extends RequestHandler {
     /**
      * Processes request.
@@ -63,10 +63,7 @@ package object server {
       Right(process(request))
   }
 
-  /**
-   * Provides utility for filtering outgoing HTTP response. That is, it provides
-   * server-side response filtering.
-   */
+  /** Provides utility for filtering outgoing response. */
   trait ResponseFilter {
     /**
      * Filters response.
@@ -111,7 +108,7 @@ package object server {
   }
 
   /**
-   * HTTP Server
+   * Provides handle to server instance.
    *
    * @see [[HttpServer$ HttpServer]], [[ServerConfiguration]]
    */
@@ -183,9 +180,9 @@ package object server {
   /**
    * Used to configure and create `HttpServer`.
    *
-   * `ServerConfiguration` is a mutable, thread-safe structure. With each
-   * requested change, the configuration is modified and returned. Changes
-   * applied after creating a server are not effected in the server.
+   * `ServerConfiguration` is a mutable structure. With each applied change, the
+   * configuration is modified and returned. Changes applied after creating a
+   * server are not effected in the server.
    *
    * @constructor Creates default server configuration.
    *
@@ -213,6 +210,15 @@ package object server {
     /**
      * Sets queue size.
      *
+     * The `queueSize` sets the number of requests that are permitted to wait
+     * for processing. Incoming requests that would exceed this limit are
+     * discarded.
+     *
+     * <strong>Note:</strong> `queueSize` is also used to configure server
+     * backlog (i.e., backlog of incoming connections), so technically there can
+     * be up to double `queueSize` waiting to be processed if both request queue
+     * and server backlog are filled.
+     *
      * @param size queue size
      *
      * @return this configuration
@@ -224,6 +230,9 @@ package object server {
 
     /**
      * Sets pool size.
+     *
+     * The `poolSize` specifies the maximum number of requests that are
+     * processed concurrently.
      *
      * @param size pool size
      *
@@ -237,6 +246,10 @@ package object server {
     /**
      * Sets read timeout.
      *
+     * The `readTimeout` controls how long a read from a socket will block
+     * before it times out. At which point, the socket is closed, and its
+     * associated request is discarded.
+     *
      * @param timeout read timeout in milliseconds
      *
      * @return this configuration
@@ -247,7 +260,7 @@ package object server {
     }
 
     /**
-     * Sets log to given file.
+     * Sets location of server log file.
      *
      * @param file log file
      *
