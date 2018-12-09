@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper
+package scamper.client
 
 import java.io.Closeable
 import java.net.Socket
@@ -24,6 +24,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 import scala.util.control.NonFatal
 
+import scamper.{ Entity, Header, HttpRequest, HttpResponse, StatusLine }
 import scamper.auxiliary.SocketType
 import scamper.headers.TransferEncoding
 

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper
+package scamper.client
 
 import org.scalatest.FlatSpec
 
-import ResponseStatuses._
-import ResponseFilters._
+import scamper.ResponseStatuses._
+import ResponseFilter._
 
 class ResponseFilterSpec extends FlatSpec {
   "ResponseFilter" should "filter response based on status code" in {

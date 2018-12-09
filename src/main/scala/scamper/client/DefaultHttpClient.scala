@@ -13,37 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper
+package scamper.client
 
+import java.io.File
 import java.net.URI
 
 import scala.util.Try
 
-import types.TransferCoding
-
+import scamper.{ Entity, Header, HttpException, HttpRequest, RequestMethod }
+import scamper.RequestMethods._
 import scamper.auxiliary.UriType
+import scamper.cookies.{ PlainCookie, RequestCookies }
 import scamper.headers.{ ContentLength, Host, TransferEncoding }
-import RequestMethods._
+import scamper.types.TransferCoding
 
-/** HTTP client */
-object HttpClient {
-  /**
-   * Sends request and passes response to supplied handler.
-   *
-   * To make effective use of this method, either the Host header must be set,
-   * or the request target must be an absolute URI. Also note that if the
-   * request target is absolute, its scheme is overridden in accordance to
-   * {@code secure}.
-   *
-   * @param request HTTP request
-   * @param secure specifies whether to use HTTPS
-   * @param timeout sets read timeout (in milliseconds) of client socket
-   * @param bufferSize sets buffer size of client socket
-   * @param handler response handler
-   *
-   * @return value from applied handler
-   */
-  def send[T](request: HttpRequest, secure: Boolean = false, timeout: Int = 30000, bufferSize: Int = 8192)(handler: HttpResponse => T): T = {
+private class DefaultHttpClient(val bufferSize: Int, val readTimeout: Int) extends HttpClient {
+  def send[T](request: HttpRequest, secure: Boolean = false)(handler: ResponseHandler[T]): T = {
     val scheme = if (secure) "https" else "http"
     val host = getEffectiveHost(request.target, request.getHost)
     val target = request.target.withScheme(scheme).withAuthority(host)
@@ -77,12 +62,51 @@ object HttpClient {
         case port => port
       },
       secure,
-      timeout,
+      readTimeout,
       bufferSize
     )
 
     try handler(conn.send(effectiveRequest))
     finally Try(conn.close())
+  }
+
+  def get[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T =
+    send(GET, target, headers, cookies, Entity.empty())(handler)
+
+  def post[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())(handler: ResponseHandler[T]): T =
+    send(POST, target, headers, cookies, body)(handler)
+
+  def put[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())(handler: ResponseHandler[T]): T =
+    send(PUT, target, headers, cookies, body)(handler)
+
+  def patch[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())(handler: ResponseHandler[T]): T =
+    send(PATCH, target, headers, cookies, body)(handler)
+
+  def delete[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T =
+    send(DELETE, target, headers, cookies, Entity.empty())(handler)
+
+  def head[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T =
+    send(HEAD, target, headers, cookies, Entity.empty())(handler)
+
+  def options[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())(handler: ResponseHandler[T]): T =
+    send(OPTIONS, target, headers, cookies, body)(handler)
+
+  def trace[T](target: URI, headers: Seq[Header] = Nil)(handler: ResponseHandler[T]): T =
+    send(TRACE, target, headers, Nil, Entity.empty())(handler)
+
+  private def send[T](method: RequestMethod, target: URI, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T = {
+    if (!target.isAbsolute)
+      throw new IllegalArgumentException(s"Target is not absolute: $target")
+
+    if (target.getScheme != "http" && target.getScheme != "https")
+      throw new IllegalArgumentException(s"Invalid target scheme: ${target.getScheme}")
+
+    val req = cookies match {
+      case Nil => HttpRequest(method, target, headers, body)
+      case _   => HttpRequest(method, target, headers, body).withCookies(cookies : _*)
+    }
+
+    send(req, target.getScheme == "https")(handler)
   }
 
   private def getEffectiveHost(target: URI, default: => Option[String]): String =
