@@ -298,39 +298,44 @@ def printUser(message: HttpMessage): Unit = {
 ```
 
 ## HTTP Client
-The `HttpClient` object is used for sending a request and handling the response.
+
+**Scamper** includes `HttpClient`, which is used for sending requests and
+handling their responses.
+
+Here we create a POST request and send it over HTTPS (i.e., `secure = true`).
+The response handler prints a message based on the response status using the
+filters defined in `ResponseFilter`.
 
 ```scala
-import scamper.HttpClient
 import scamper.ImplicitConverters.{ stringToEntity, stringToUri }
 import scamper.RequestMethods.POST
-import scamper.ResponseFilters._
+import scamper.client.HttpClient
+import scamper.client.ResponseFilter._
 import scamper.headers.{ ContentType, Host, Location }
 import scamper.types.ImplicitConverters.stringToMediaType
 
-def createUser(id: Int, name: String): Unit = {
-  val req = POST("/users")
-    .withHost("localhost:9000")
-    .withContentType("application/json")
-    .withBody(s"""{"id":$id, "name":"$name"}""")
+val req = POST("/users")
+  .withHost("localhost:9000")
+  .withContentType("application/json")
+  .withBody(s"""{ "id": 500, "name": "guest" }""")
 
-  HttpClient.send(req, secure = true) {
-    case Successful(_)    => println("Successful")
-    case Redirection(res) => println(s"Redirection: ${res.location}")
-    case ClientError(res) => println(s"Client error: ${res.status}")
-    case ServerError(res) => println(s"Server error: ${res.status}")
-    case Informational(_) => println("Informational")
-  }
+HttpClient.send(req, secure = true) {
+  case Successful(_)    => println("Successful")
+  case Redirection(res) => println(s"Redirection: ${res.location}")
+  case ClientError(res) => println(s"Client error: ${res.status}")
+  case ServerError(res) => println(s"Server error: ${res.status}")
+  case Informational(_) => println("Informational")
 }
 ```
 
-In fact, `HttpClient.send()` returns the value returned by the response handler.
-So you can process the response and return whatever information warranted.
+`HttpClient.send()` returns the value returned by the response handler. So you
+can process the response and return whatever information warranted.
 
 ```scala
-import scamper.{ BodyParsers, HttpClient }
+import scamper.BodyParsers
 import scamper.ImplicitConverters.stringToUri
 import scamper.RequestMethods.GET
+import scamper.client.HttpClient
 import scamper.headers.Host
 
 implicit val bodyParser = BodyParsers.text()
@@ -344,6 +349,57 @@ def getMessageOfTheDay(): Either[Int, String] = {
       case false => Left(res.status.code)
     }
   }
+}
+```
+
+### Creating Client
+
+The examples in the previous section use the `HttpClient` object as the client.
+Behind the scenes, this actually creates an instance of `HttpClient` for
+one-time usage.
+
+If you plan to send multiple requests, it's better to create and maintain a
+reference to an instance, and use it as the client. With that, you also get
+access to methods corresponding to the standard HTTP request methods.
+
+```scala
+import scamper.BodyParsers
+import scamper.ImplicitConverters.stringToUri
+import scamper.client.HttpClient
+
+// Create HttpClient instance
+val client = HttpClient(bufferSize = 4096, timeout = 3000)
+
+implicit val bodyParser = BodyParsers.text()
+
+def getMessageOfTheDay(): Either[Int, String] = {
+  // Use saved reference to client
+  client.get("http://localhost:8080/motd") { res =>
+    res.status.isSuccessful match {
+      case true  => Right(res.as[String])
+      case false => Left(res.status.code)
+    }
+  }
+}
+```
+
+### Overriding Truststore
+
+When creating a client, you can supply the location of a truststore to override
+the default.
+
+```scala
+import scamper.ImplicitConverters.{ stringToEntity, stringToUri }
+import scamper.RequestMethods.GET
+import scamper.client.HttpClient
+import scamper.headers.Host
+
+// Create client that will use supplied truststore
+val client = HttpClient(trustStore = Some(new File("/path/to/truststore")))
+
+client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
+  if (!res.status.isSuccessful)
+    throw new Exception(s"Message not posted: ${res.status.code}")
 }
 ```
 
