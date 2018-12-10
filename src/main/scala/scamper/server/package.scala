@@ -108,7 +108,7 @@ package object server {
   /**
    * Provides handle to server instance.
    *
-   * @see [[HttpServer$ HttpServer]], [[ServerConfiguration]]
+   * @see [[HttpServer$ HttpServer]], [[ServerApplication]]
    */
   trait HttpServer {
     /** Gets host address. */
@@ -145,12 +145,12 @@ package object server {
 
   /** Provides factory for configuring and creating `HttpServer`. */
   object HttpServer {
-    /** Gets default server configuration. */
-    def config(): ServerConfiguration = new ServerConfiguration()
+    /** Gets default server application. */
+    def app(): ServerApplication = new ServerApplication()
 
     /**
-     * Creates `HttpServer` at given port with default configuration and
-     * supplied processor.
+     * Creates `HttpServer` at given port using default application and supplied
+     * processor.
      *
      * @param port port number
      * @param processor request processor
@@ -161,8 +161,8 @@ package object server {
       create(InetAddress.getLocalHost(), port)(processor)
 
     /**
-     * Creates `HttpServer` at given host and port with default configuration
-     * and supplied processor.
+     * Creates `HttpServer` at given host and port using default application and
+     * supplied processor.
      *
      * @param host host address
      * @param port port number
@@ -174,8 +174,8 @@ package object server {
       create(InetAddress.getByName(host), port)(processor)
 
     /**
-     * Creates `HttpServer` at given host and port with default configuration
-     * and supplied processor.
+     * Creates `HttpServer` at given host and port using default application and
+     * supplied processor.
      *
      * @param host host address
      * @param port port number
@@ -184,19 +184,19 @@ package object server {
      * @return server
      */
     def create(host: InetAddress, port: Int)(processor: RequestProcessor): HttpServer =
-      config().request(processor).create(host, port)
+      app().request(processor).create(host, port)
   }
 
   /**
    * Used to configure and create `HttpServer`.
    *
-   * `ServerConfiguration` is a mutable structure. With each applied change, the
-   * configuration is modified and returned. Changes applied after creating a
+   * `ServerApplication` is a mutable structure. With each applied change, the
+   * application is modified and returned. Changes applied after creating a
    * server are not effected in the server.
    *
-   * @constructor Creates default server configuration.
+   * @constructor Creates default server application.
    *
-   * === Default Configuration ===
+   * === Default Application ===
    *
    * |Key        |Value |
    * |-----------|------|
@@ -208,12 +208,12 @@ package object server {
    * |request    |<em>(Not configured)</em>|
    * |response   |<em>(Not configured)</em>|
    */
-  class ServerConfiguration {
-    private var config = DefaultHttpServer.Configuration()
+  class ServerApplication {
+    private var app = DefaultHttpServer.Application()
 
-    /** Resets configuration to default values. */
+    /** Resets application to default configuration. */
     def reset(): this.type = synchronized {
-      config = DefaultHttpServer.Configuration()
+      app = DefaultHttpServer.Application()
       this
     }
 
@@ -231,10 +231,10 @@ package object server {
      *
      * @param size queue size
      *
-     * @return this configuration
+     * @return this application
      */
     def queueSize(size: Int): this.type = synchronized {
-      config = config.copy(queueSize = size)
+      app = app.copy(queueSize = size)
       this
     }
 
@@ -246,10 +246,10 @@ package object server {
      *
      * @param size pool size
      *
-     * @return this configuration
+     * @return this application
      */
     def poolSize(size: Int): this.type = synchronized {
-      config = config.copy(poolSize = size)
+      app = app.copy(poolSize = size)
       this
     }
 
@@ -262,10 +262,10 @@ package object server {
      *
      * @param timeout read timeout in milliseconds
      *
-     * @return this configuration
+     * @return this application
      */
     def readTimeout(timeout: Int): this.type = synchronized {
-      config = config.copy(readTimeout = timeout)
+      app = app.copy(readTimeout = timeout)
       this
     }
 
@@ -274,10 +274,10 @@ package object server {
      *
      * @param file log file
      *
-     * @return this configuration
+     * @return this application
      */
     def log(file: File): this.type = synchronized {
-      config = config.copy(log = file.getCanonicalFile())
+      app = app.copy(log = file.getCanonicalFile())
       this
     }
 
@@ -288,10 +288,10 @@ package object server {
      * @param password key store password
      * @param storeType key store type (i.e., JKS, JCEKS, etc.)
      *
-     * @return this configuration
+     * @return this application
      */
     def secure(keyStore: File, password: String, storeType: String): this.type = synchronized {
-      config = config.copy(factory = SecureServerSocketFactory.create(keyStore, password.toCharArray, storeType))
+      app = app.copy(factory = SecureServerSocketFactory.create(keyStore, password.toCharArray, storeType))
       this
     }
 
@@ -305,10 +305,10 @@ package object server {
      * @param password key store password
      * @param storeType key store type (i.e., JKS, JCEKS, etc.)
      *
-     * @return this configuration
+     * @return this application
      */
     def secure(keyStore: File, password: Array[Char], storeType: String): this.type = synchronized {
-      config = config.copy(factory = SecureServerSocketFactory.create(keyStore, password, storeType))
+      app = app.copy(factory = SecureServerSocketFactory.create(keyStore, password, storeType))
       this
     }
 
@@ -318,10 +318,10 @@ package object server {
      * @param key private key
      * @param certificate public key certificate
      *
-     * @return this configuration
+     * @return this application
      */
     def secure(key: File, certificate: File): this.type = synchronized {
-      config = config.copy(factory = SecureServerSocketFactory.create(key, certificate))
+      app = app.copy(factory = SecureServerSocketFactory.create(key, certificate))
       this
     }
 
@@ -332,10 +332,10 @@ package object server {
      *
      * @param handler request handler
      *
-     * @return this configuration
+     * @return this application
      */
     def request(handler: RequestHandler): this.type = synchronized {
-      config = config.copy(requestHandlers = config.requestHandlers :+ handler)
+      app = app.copy(requestHandlers = app.requestHandlers :+ handler)
       this
     }
 
@@ -346,10 +346,10 @@ package object server {
      *
      * @param filter request filter
      *
-     * @return this configuration
+     * @return this application
      */
     def request(filter: RequestFilter): this.type = synchronized {
-      config = config.copy(requestHandlers = config.requestHandlers :+ filter)
+      app = app.copy(requestHandlers = app.requestHandlers :+ filter)
       this
     }
 
@@ -360,10 +360,10 @@ package object server {
      *
      * @param processor request processor
      *
-     * @return this configuration
+     * @return this application
      */
     def request(processor: RequestProcessor): this.type = synchronized {
-      config = config.copy(requestHandlers = config.requestHandlers :+ processor)
+      app = app.copy(requestHandlers = app.requestHandlers :+ processor)
       this
     }
 
@@ -375,10 +375,10 @@ package object server {
      * @param path request path
      * @param processor request processor
      *
-     * @return this configuration
+     * @return this application
      */
     def request(path: String)(processor: RequestProcessor): this.type = synchronized {
-      config = config.copy(requestHandlers = config.requestHandlers :+ TargetedRequestHandler(processor, path, None))
+      app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, None))
       this
     }
 
@@ -391,10 +391,10 @@ package object server {
      * @param path request path
      * @param processor request processor
      *
-     * @return this configuration
+     * @return this application
      */
     def request(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
-      config = config.copy(requestHandlers = config.requestHandlers :+ TargetedRequestHandler(processor, path, Some(method)))
+      app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(method)))
       this
     }
 
@@ -413,10 +413,10 @@ package object server {
      *
      * @param baseDirectory base directory from which files are served
      *
-     * @return this configuration
+     * @return this application
      */
     def request(baseDirectory: File): this.type = synchronized {
-      config = config.copy(requestHandlers = config.requestHandlers :+ StaticFileServer(baseDirectory, "/"))
+      app = app.copy(requestHandlers = app.requestHandlers :+ StaticFileServer(baseDirectory, "/"))
       this
     }
 
@@ -437,10 +437,10 @@ package object server {
      * @param path request equest
      * @param baseDirectory base directory from which files are served
      *
-     * @return this configuration
+     * @return this application
      */
     def request(path: String, baseDirectory: File): this.type = synchronized {
-      config = config.copy(requestHandlers = config.requestHandlers :+ StaticFileServer(baseDirectory, path))
+      app = app.copy(requestHandlers = app.requestHandlers :+ StaticFileServer(baseDirectory, path))
       this
     }
 
@@ -451,10 +451,10 @@ package object server {
      *
      * @param filter response filter
      *
-     * @return this configuration
+     * @return this application
      */
     def response(filter: ResponseFilter): this.type = synchronized {
-      config = config.copy(responseFilters = config.responseFilters :+ filter)
+      app = app.copy(responseFilters = app.responseFilters :+ filter)
       this
     }
 
@@ -490,13 +490,13 @@ package object server {
      * @return new server
      */
     def create(host: InetAddress, port: Int): HttpServer = synchronized {
-      DefaultHttpServer(host, port, config)
+      DefaultHttpServer(host, port, app)
     }
   }
 
-  /** Provides factory for `ServerConfiguration`. */
-  object ServerConfiguration {
-    /** Creates default `ServerConfiguration`. */
-    def apply(): ServerConfiguration = new ServerConfiguration()
+  /** Provides factory for `ServerApplication`. */
+  object ServerApplication {
+    /** Creates default `ServerApplication`. */
+    def apply(): ServerApplication = new ServerApplication()
   }
 }

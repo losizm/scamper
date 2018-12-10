@@ -425,38 +425,38 @@ being put together to create the server. Minus imports, here's the semantic
 equivalent in long form.
 
 ```scala
-val server = HttpServer.config().request(req => Ok("Hello, world!")).create(8080)
+val server = HttpServer.app().request(req => Ok("Hello, world!")).create(8080)
 ```
 
 We'll use the remainder of this documentation to describe what goes into
 creating more practical applications.
 
-### Server Configuration
+### Server Application
 
-To build a server, you begin with `ServerConfiguration`. This is a mutable
+To build a server, you begin with `ServerApplication`. This is a mutable
 structure to which you apply changes to configure the server. Once the desired
 settings are applied, you invoke one of several methods to create the server.
 
-You can obtain an instance of `ServerConfiguration` from the `HttpServer`
+You can obtain an instance of `ServerApplication` from the `HttpServer`
 object.
 
 ```scala
-val config = HttpServer.config()
+val app = HttpServer.app()
 ```
 
-This gives you the default configuration as a starting point. With this in hand,
-you can override the location of the server log.
+This gives you the default application as a starting point. With this in hand,
+you can change the location of the server log.
 
 ```scala
-config.log(new File("/tmp/server.log"))
+app.log(new File("/tmp/server.log"))
 ```
 
 And there are peformance-related settings that can be tweaked as well.
 
 ```scala
-config.poolSize(10)
-config.queueSize(25)
-config.readTimeout(3000)
+app.poolSize(10)
+app.queueSize(25)
+app.readTimeout(3000)
 ```
 
 The **poolSize** specifies the maximum number of requests that are processed
@@ -474,8 +474,8 @@ discarded.
 
 ### Request Handlers
 
-You define application-specific logic in instances of `RequestHandler`, and add
-them to the server configuration.
+You define application-specific logic in instances of `RequestHandler` and add
+them to the application.
 
 An `HttpRequest` is passed to the `RequestHandler`, and the handler returns
 `Either[HttpRequest, HttpResponse]`. If the handler is unable to satisfy the
@@ -489,7 +489,7 @@ import scamper.ResponseStatuses.MethodNotAllowed
 import scamper.headers.Allow
 
 // Add handler to log request line and headers to stdout
-config.request { req =>
+app.request { req =>
   println(req.startLine)
   req.headers.foreach(println)
   println()
@@ -499,7 +499,7 @@ config.request { req =>
 }
 
 // Add handler to allow GET and HEAD requests only
-config.request { req =>
+app.request { req =>
   if (req.method == GET || req.method == HEAD)
     // Return request for next handler
     Left(req)
@@ -526,7 +526,7 @@ import scamper.types.LanguageTag
 import scamper.types.ImplicitConverters.stringToLanguageTag
 
 // Translates message body from French (Oui, oui.)
-config.request { req =>
+app.request { req =>
   val translator: BodyParser[String] = ...
 
   if (req.method == POST && req.contentLanguage.contains("fr"))
@@ -546,7 +546,7 @@ are _filtering_ and _processing_, respectively.
 The request logger can be rewritten as `RequestFilter`.
 
 ```scala
-config.request { req =>
+app.request { req =>
   println(req.startLine)
   req.headers.foreach(println)
   println()
@@ -562,7 +562,7 @@ that would do something more meaningful.
 import scamper.ImplicitConverters.fileToEntity
 import scamper.ResponseStatuses.{ NotFound, Ok }
 
-config.request { req =>
+app.request { req =>
   def findFile(path: String): Option[File] = {
     ...
   }
@@ -582,12 +582,12 @@ import scamper.RequestMethods.GET
 import scamper.ResponseStatuses.{ Forbidden, Ok }
 
 // Match request method and exact path
-config.request(GET, "/about") { req =>
+app.request(GET, "/about") { req =>
   Ok("This server is powered by Scamper.")
 }
 
 // Match exact path and any method
-config.request("/private") { req =>
+app.request("/private") { req =>
   Forbidden()
 }
 ```
@@ -604,7 +604,7 @@ import scamper.ResponseStatuses.{ Accepted, NotFound, Ok }
 import scamper.server.Implicits.HttpRequestType
 
 // Match request method and parameterized path
-config.request(DELETE, "/orders/:id") { req =>
+app.request(DELETE, "/orders/:id") { req =>
   def deleteOrder(id: Int): Boolean = {
     ...
   }
@@ -619,7 +619,7 @@ config.request(DELETE, "/orders/:id") { req =>
 }
 
 // Match prefixed path with any request method
-config.request("/archive/*file") { req =>
+app.request("/archive/*file") { req =>
   def findFile(path: String): Option[File] = {
     ...
   }
@@ -643,7 +643,7 @@ import scamper.ResponseStatuses.Ok
 import scamper.server.Implicits.HttpRequestType
 
 // Match path with two parameters
-config.request(POST, "/translate/:in/to/:out") { req =>
+app.request(POST, "/translate/:in/to/:out") { req =>
   def translator(from: String, to: String): BodyParser[String] = {
     ...
   }
@@ -661,7 +661,7 @@ You can include a specialized request handler to serve static files.
 
 ```scala
 // Serve static files from given directory
-config.request(new File("/path/to/public"))
+app.request(new File("/path/to/public"))
 ```
 
 This adds a request handler to serve files from the directory at _/path/to/public_.
@@ -671,7 +671,7 @@ _http://localhost:8080/images/logo.png_ would map to _/path/to/public/images/log
 Or, you can map a path prefix to a directory.
 
 ```scala
-config.request("/app/main", new File("/path/to/public"))
+app.request("/app/main", new File("/path/to/public"))
 ```
 
 In this case, _http://localhost:8080/app/main/images/logo.png_ would map to
@@ -684,7 +684,7 @@ filtering is performed by including instances of `ResponseFilter`. They are
 applied, in order, after one of the request handlers generates a response.
 
 ```scala
-config.response { res =>
+app.response { res =>
   println(res.startLine)
   res.headers.foreach(println)
   println()
@@ -704,7 +704,7 @@ returning the same response it consumes.
 import scamper.headers.TransferEncoding
 import scamper.types.ImplicitConverters.stringToTransferCoding
 
-config.response { res =>
+app.response { res =>
   res.withBody(new DeflaterInputStream(res.body.getInputStream))
     .withTransferEncoding("deflate", "chunked")
 }
@@ -716,7 +716,7 @@ The last piece of configuration is whether to secure the server using SSL/TLS.
 To use a secure transport, you must supply an appropriate key and certificate.
 
 ```scala
-config.secure(new File("/path/to/private.key"), new File("/path/to/public.cert"))
+app.secure(new File("/path/to/private.key"), new File("/path/to/public.cert"))
 ```
 
 Or, if you have them tucked away in a keystore, you can supply the keystore
@@ -724,22 +724,23 @@ location.
 
 ```scala
 // Supply location, password, and store type (i.e., JKS, JCEKS, PCKS12)
-config.secure(new File("/path/to/keystore"), "s3cr3t", "pkcs12")
+app.secure(new File("/path/to/keystore"), "s3cr3t", "pkcs12")
 ```
 
 ### Creating the Server
 
-When the desired configuration is in place, you're ready to create the server.
+When the desired application has been configured, you're ready to create the
+server.
 
 ```scala
-val server = config.create(8080)
+val server = app.create(8080)
 ```
 
 If the server must bind to a particular host, you can provide the host name or
 IP address.
 
 ```scala
-val server = config.create("192.168.0.2", 8080)
+val server = app.create("192.168.0.2", 8080)
 ```
 
 When created, an instance of `HttpServer` is returned, which can be used to

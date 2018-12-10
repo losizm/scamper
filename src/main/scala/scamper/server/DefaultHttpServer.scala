@@ -38,7 +38,7 @@ import scamper.types.ImplicitConverters.stringToTransferCoding
 private object DefaultHttpServer {
   private val count = new AtomicInteger(0)
 
-  case class Configuration(
+  case class Application(
     poolSize: Int = Runtime.getRuntime.availableProcessors(),
     queueSize: Int = Runtime.getRuntime.availableProcessors() * 4,
     readTimeout: Int = 5000,
@@ -49,24 +49,24 @@ private object DefaultHttpServer {
     factory: ServerSocketFactory = ServerSocketFactory.getDefault()
   )
 
-  def apply(host: InetAddress, port: Int, config: Configuration) =
-    new DefaultHttpServer(count.incrementAndGet(), host, port, config)
+  def apply(host: InetAddress, port: Int, app: Application) =
+    new DefaultHttpServer(count.incrementAndGet(), host, port, app)
 }
 
-private class DefaultHttpServer private(val id: Int, val host: InetAddress, val port: Int, config: DefaultHttpServer.Configuration) extends HttpServer {
-  val readTimeout = config.readTimeout
-  val poolSize = config.poolSize
-  val queueSize = config.queueSize
-  val log = config.log
+private class DefaultHttpServer private(val id: Int, val host: InetAddress, val port: Int, app: DefaultHttpServer.Application) extends HttpServer {
+  val readTimeout = app.readTimeout
+  val poolSize = app.poolSize
+  val queueSize = app.queueSize
+  val log = app.log
 
   private val authority = s"${host.getCanonicalHostName}:$port"
   private val threadGroup = new ThreadGroup(s"httpserver-$id")
 
-  private val keepAliveSeconds = config.keepAliveSeconds
-  private val requestHandlers = config.requestHandlers
-  private val responseFilters = config.responseFilters
-  private val logger = new PrintWriter(new FileWriter(config.log, true), true)
-  private val serverSocket = config.factory.createServerSocket()
+  private val keepAliveSeconds = app.keepAliveSeconds
+  private val requestHandlers = app.requestHandlers
+  private val responseFilters = app.responseFilters
+  private val logger = new PrintWriter(new FileWriter(app.log, true), true)
+  private val serverSocket = app.factory.createServerSocket()
   private var closed = false
 
   private implicit val executor = ExecutionContext.fromExecutorService {
@@ -83,7 +83,7 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
     new ThreadPoolExecutor(poolSize, poolSize, keepAliveSeconds, TimeUnit.SECONDS, queue, ServiceThreadFactory, ServiceUnavailableHandler)
   }
 
-  val isSecure: Boolean = config.factory.isInstanceOf[SSLServerSocketFactory]
+  val isSecure: Boolean = app.factory.isInstanceOf[SSLServerSocketFactory]
 
   def isClosed: Boolean = synchronized(closed)
 
@@ -147,7 +147,7 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
       Future {
         try {
           log(s"[info] Servicing request from ${format(socket)}")
-          socket.setSoTimeout(config.readTimeout)
+          socket.setSoTimeout(readTimeout)
 
           val req = read()
           val res = handle(req)
