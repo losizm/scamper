@@ -390,7 +390,6 @@ the default.
 
 ```scala
 import scamper.ImplicitConverters.{ stringToEntity, stringToUri }
-import scamper.RequestMethods.GET
 import scamper.client.HttpClient
 import scamper.headers.Host
 
