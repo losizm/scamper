@@ -18,7 +18,7 @@ package scamper.client
 import java.io.Closeable
 import java.net.Socket
 
-import javax.net.ssl.SSLSocketFactory
+import javax.net.SocketFactory
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
@@ -28,7 +28,7 @@ import scamper.{ Entity, Header, HttpRequest, HttpResponse, StatusLine }
 import scamper.auxiliary.SocketType
 import scamper.headers.TransferEncoding
 
-private class HttpClientConnection private (socket: Socket) extends Closeable {
+private class HttpClientConnection(socket: Socket) extends Closeable {
   private val buffer = new Array[Byte](8192)
 
   def send(request: HttpRequest): HttpResponse = {
@@ -74,26 +74,5 @@ private class HttpClientConnection private (socket: Socket) extends Closeable {
       headers += Header.parse(line)
 
     HttpResponse(statusLine, headers.toSeq, Entity(socket.getInputStream))
-  }
-}
-
-private object HttpClientConnection {
-  private def createSslSocket(host: String, port: Int): Socket =
-    SSLSocketFactory.getDefault.createSocket(host, port)
-
-  def apply(host: String, port: Int, secure: Boolean, timeout: Int, bufferSize: Int): HttpClientConnection = {
-    val socket = if (secure) createSslSocket(host, port) else new Socket(host, port)
-
-    try {
-      socket.setSoTimeout(timeout)
-      socket.setSendBufferSize(bufferSize)
-      socket.setReceiveBufferSize(bufferSize)
-    } catch {
-      case NonFatal(cause) =>
-        Try(socket.close())
-        throw cause
-    }
-
-    new HttpClientConnection(socket)
   }
 }

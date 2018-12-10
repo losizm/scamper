@@ -36,7 +36,7 @@ package object client {
   }
 
   /** Provides utility for filtering HTTP response. */
-  trait ResponseFilter {
+  trait ResponseFilter extends ResponseHandler[Boolean] {
     /** Tests whether response matches filter condition. */
     def apply(response: HttpResponse): Boolean
 
@@ -96,18 +96,16 @@ package object client {
     /**
      * Gets buffer size.
      *
-     * The buffer size is used for setting the socket's send/receive buffer
-     * size.
+     * The buffer size is used for setting each socket's buffer size.
      */
     def bufferSize: Int
 
     /**
-     * Gets read timeout.
+     * Gets timeout.
      *
-     * The read timeout controls how long a socket blocks before it is
-     * interrupted.
+     * The timeout controls how long a socket blocks before it is interrupted.
      */
-    def readTimeout: Int
+    def timeout: Int
 
     /**
      * Sends request and passes response to supplied handler.
@@ -127,6 +125,9 @@ package object client {
     /**
      * Sends GET request and passes response to handler.
      *
+     * <strong>Note:</strong> `target` must be absolute with a scheme of either
+     * `http` or `https`.
+     *
      * @param target request target
      * @param header request headers
      * @param cookies request cookies
@@ -138,6 +139,9 @@ package object client {
 
     /**
      * Sends POST request and passes response to handler.
+     *
+     * <strong>Note:</strong> `target` must be absolute with a scheme of either
+     * `http` or `https`.
      *
      * @param target request target
      * @param header request headers
@@ -152,6 +156,9 @@ package object client {
     /**
      * Sends PUT request and passes response to handler.
      *
+     * <strong>Note:</strong> `target` must be absolute with a scheme of either
+     * `http` or `https`.
+     *
      * @param target request target
      * @param header request headers
      * @param cookies request cookies
@@ -164,6 +171,9 @@ package object client {
 
     /**
      * Sends PATCH request and passes response to handler.
+     *
+     * <strong>Note:</strong> `target` must be absolute with a scheme of either
+     * `http` or `https`.
      *
      * @param target request target
      * @param header request headers
@@ -178,6 +188,9 @@ package object client {
     /**
      * Sends DELETE request and passes response to handler.
      *
+     * <strong>Note:</strong> `target` must be absolute with a scheme of either
+     * `http` or `https`.
+     *
      * @param target request target
      * @param header request headers
      * @param cookies request cookies
@@ -189,6 +202,9 @@ package object client {
 
     /**
      * Sends HEAD request and passes response to handler.
+     *
+     * <strong>Note:</strong> `target` must be absolute with a scheme of either
+     * `http` or `https`.
      *
      * @param target request target
      * @param header request headers
@@ -202,6 +218,9 @@ package object client {
     /**
      * Sends OPTIONS request and passes response to handler.
      *
+     * <strong>Note:</strong> `target` must be absolute with a scheme of either
+     * `http` or `https`.
+     *
      * @param target request target
      * @param header request headers
      * @param cookies request cookies
@@ -214,6 +233,9 @@ package object client {
 
     /**
      * Sends TRACE request and passes response to handler.
+     *
+     * <strong>Note:</strong> `target` must be absolute with a scheme of either
+     * `http` or `https`.
      *
      * @param target request target
      * @param header request headers
@@ -230,10 +252,15 @@ package object client {
      * Creates `HttpClient` with supplied configuration.
      *
      * @param bufferSize socket buffer size
-     * @param readTimeout socket read timeout
+     * @param timeout socket timeout
+     * @param trustStore trust store used for SSL/TLS <em>(<strong>Note:</strong>
+     *   Type must be JKS.)</em>
      */
-    def apply(bufferSize: Int = 8192, readTimeout: Int = 5000): HttpClient =
-      new DefaultHttpClient(bufferSize, readTimeout)
+    def apply(bufferSize: Int = 8192, timeout: Int = 5000, trustStore: Option[File] = None): HttpClient =
+      trustStore match {
+        case Some(file) => DefaultHttpClient(bufferSize, timeout, file)
+        case None       => DefaultHttpClient(bufferSize, timeout)
+      }
 
     /**
      * Sends request and passes response to supplied handler.
@@ -245,12 +272,14 @@ package object client {
      * @param request HTTP request
      * @param secure specifies whether to use HTTPS
      * @param bufferSize socket buffer size
-     * @param readTimeout socket read timeout
+     * @param timeout socket timeout
+     * @param trustStore trust store used for SSL/TLS <em>(<strong>Note:</strong>
+     *   Type must be JKS.)</em>
      * @param handler response handler
      *
      * @return value from applied handler
      */
-    def send[T](request: HttpRequest, secure: Boolean = false, bufferSize: Int = 8192, readTimeout: Int = 5000)(handler: ResponseHandler[T]): T =
-      HttpClient(bufferSize, readTimeout).send(request, secure)(handler)
+    def send[T](request: HttpRequest, secure: Boolean = false, bufferSize: Int = 8192, timeout: Int = 5000, trustStore: Option[File] = None)(handler: ResponseHandler[T]): T =
+      HttpClient(bufferSize, timeout, trustStore).send(request, secure)(handler)
   }
 }

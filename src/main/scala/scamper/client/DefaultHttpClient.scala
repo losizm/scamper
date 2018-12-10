@@ -18,7 +18,11 @@ package scamper.client
 import java.io.File
 import java.net.URI
 
+import javax.net.SocketFactory
+import javax.net.ssl.SSLSocketFactory
+
 import scala.util.Try
+import scala.util.control.NonFatal
 
 import scamper.{ Entity, Header, HttpException, HttpRequest, RequestMethod }
 import scamper.RequestMethods._
@@ -27,7 +31,19 @@ import scamper.cookies.{ PlainCookie, RequestCookies }
 import scamper.headers.{ ContentLength, Host, TransferEncoding }
 import scamper.types.TransferCoding
 
-private class DefaultHttpClient(val bufferSize: Int, val readTimeout: Int) extends HttpClient {
+private object DefaultHttpClient {
+  def apply(bufferSize: Int, timeout: Int): DefaultHttpClient = {
+    implicit val factory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
+    new DefaultHttpClient(bufferSize, timeout)
+  }
+
+  def apply(bufferSize: Int, timeout: Int, trustStore: File): DefaultHttpClient = {
+    implicit val factory = SecureSocketFactory.create(trustStore)
+    new DefaultHttpClient(bufferSize, timeout)
+  }
+}
+
+private class DefaultHttpClient private (val bufferSize: Int, val timeout: Int)(implicit secureSocketFactory: SSLSocketFactory) extends HttpClient {
   def send[T](request: HttpRequest, secure: Boolean = false)(handler: ResponseHandler[T]): T = {
     val scheme = if (secure) "https" else "http"
     val host = getEffectiveHost(request.target, request.getHost)
@@ -52,47 +68,47 @@ private class DefaultHttpClient(val bufferSize: Int, val readTimeout: Int) exten
       effectiveRequest.headers.filterNot(header => header.name.matches("(?i)Host|User-Agent"))
     } : _*)
 
+    effectiveRequest = effectiveRequest.withTarget(new URI(target.toURL.getFile))
+
     if (! effectiveRequest.path.startsWith("/"))
       effectiveRequest = effectiveRequest.withPath("/" + effectiveRequest.path)
 
-    val conn = HttpClientConnection(
+    val conn = getConnection(
+      if (secure) secureSocketFactory else SocketFactory.getDefault(),
       target.getHost,
       target.getPort match {
         case -1   => if (secure) 443 else 80
         case port => port
-      },
-      secure,
-      readTimeout,
-      bufferSize
+      }
     )
 
     try handler(conn.send(effectiveRequest))
     finally Try(conn.close())
   }
 
-  def get[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T =
-    send(GET, target, headers, cookies, Entity.empty())(handler)
+  def get[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
+    (handler: ResponseHandler[T]): T = send(GET, target, headers, cookies, Entity.empty())(handler)
 
-  def post[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())(handler: ResponseHandler[T]): T =
-    send(POST, target, headers, cookies, body)(handler)
+  def post[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+    (handler: ResponseHandler[T]): T = send(POST, target, headers, cookies, body)(handler)
 
-  def put[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())(handler: ResponseHandler[T]): T =
-    send(PUT, target, headers, cookies, body)(handler)
+  def put[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+    (handler: ResponseHandler[T]): T = send(PUT, target, headers, cookies, body)(handler)
 
-  def patch[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())(handler: ResponseHandler[T]): T =
-    send(PATCH, target, headers, cookies, body)(handler)
+  def patch[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+    (handler: ResponseHandler[T]): T = send(PATCH, target, headers, cookies, body)(handler)
 
-  def delete[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T =
-    send(DELETE, target, headers, cookies, Entity.empty())(handler)
+  def delete[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
+    (handler: ResponseHandler[T]): T = send(DELETE, target, headers, cookies, Entity.empty())(handler)
 
-  def head[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T =
-    send(HEAD, target, headers, cookies, Entity.empty())(handler)
+  def head[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
+    (handler: ResponseHandler[T]): T = send(HEAD, target, headers, cookies, Entity.empty())(handler)
 
-  def options[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())(handler: ResponseHandler[T]): T =
-    send(OPTIONS, target, headers, cookies, body)(handler)
+  def options[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+    (handler: ResponseHandler[T]): T = send(OPTIONS, target, headers, cookies, body)(handler)
 
-  def trace[T](target: URI, headers: Seq[Header] = Nil)(handler: ResponseHandler[T]): T =
-    send(TRACE, target, headers, Nil, Entity.empty())(handler)
+  def trace[T](target: URI, headers: Seq[Header] = Nil)
+    (handler: ResponseHandler[T]): T = send(TRACE, target, headers, Nil, Entity.empty())(handler)
 
   private def send[T](method: RequestMethod, target: URI, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T = {
     if (!target.isAbsolute)
@@ -117,6 +133,22 @@ private class DefaultHttpClient(val bufferSize: Int, val readTimeout: Int) exten
         case port => s"$host:$port"
       }
     }
+
+  private def getConnection(factory: SocketFactory, host: String, port: Int): HttpClientConnection = {
+    val socket = factory.createSocket(host, port)
+
+    try {
+      socket.setSoTimeout(timeout)
+      socket.setSendBufferSize(bufferSize)
+      socket.setReceiveBufferSize(bufferSize)
+    } catch {
+      case NonFatal(cause) =>
+        Try(socket.close())
+        throw cause
+    }
+
+    new HttpClientConnection(socket)
+  }
 
   private def toBodilessRequest(request: HttpRequest): HttpRequest =
     request.withBody(Entity.empty).removeContentLength.removeTransferEncoding
