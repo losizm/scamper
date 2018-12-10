@@ -516,7 +516,7 @@ HEAD requests only, meaning all other requests would immediately be sent **405
 Method Not Allowed** and never make it to the handler that logs requests.
 
 Also note a request handler is not restricted to returning the same request it
-was passed.
+is passed.
 
 ```scala
 import scamper.BodyParser
@@ -632,7 +632,9 @@ config.request("/archive/*file") { req =>
 }
 ```
 
-There can be multiple __:param__ instances specified in the path.
+Note there can be at most one __*param__, which must be specified as the the
+last component in the path. However, there can be multiple __:param__ instances
+specified.
 
 ```scala
 import scamper.BodyParser
@@ -653,9 +655,6 @@ config.request(POST, "/translate/:in/to/:out") { req =>
   Ok(translator(from, to).parse(req))
 }
 ```
-
-Note there can be at most one __*param__, which must be specified as the the
-last component in the path.
 
 ### Serving Static Files
 
@@ -700,7 +699,7 @@ This is pretty much the same as the request logger from earlier, only instead of
 `HttpRequest`, it consumes and produces `HttpResponse`.
 
 And, similar to a request filter, the response filter is not restricted to
-returning the same response it consumed.
+returning the same response it consumes.
 
 ```scala
 import scamper.headers.TransferEncoding
@@ -721,7 +720,7 @@ To use a secure transport, you must supply an appropriate key and certificate.
 config.secure(new File("/path/to/private.key"), new File("/path/to/public.cert"))
 ```
 
-Or, if you have them tucked away in a key store, you can supply the key store
+Or, if you have them tucked away in a keystore, you can supply the keystore
 location.
 
 ```scala
