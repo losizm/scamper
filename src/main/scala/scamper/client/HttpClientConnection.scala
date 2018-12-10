@@ -15,10 +15,7 @@
  */
 package scamper.client
 
-import java.io.Closeable
 import java.net.Socket
-
-import javax.net.SocketFactory
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
@@ -28,7 +25,7 @@ import scamper.{ Entity, Header, HttpRequest, HttpResponse, StatusLine }
 import scamper.auxiliary.SocketType
 import scamper.headers.TransferEncoding
 
-private class HttpClientConnection(socket: Socket) extends Closeable {
+private class HttpClientConnection(socket: Socket) extends AutoCloseable {
   private val buffer = new Array[Byte](8192)
 
   def send(request: HttpRequest): HttpResponse = {
