@@ -592,6 +592,31 @@ app.request("/private") { req =>
 }
 ```
 
+There are also methods in `ServerApplication` corresponding to the standard HTTP
+request methods.
+
+```scala
+import scamper.BodyParsers
+import scamper.ResponseStatuses.{ Created, Ok }
+
+// Match GET requests to given path
+app.get("/about") { req =>
+  Ok("This server is powered by Scamper.")
+}
+
+// Match POST requests to given path
+app.post("/messages") { req =>
+  def post(message: String): Int = {
+    ...
+  }
+
+  implicit val parser = BodyParser.text()
+
+  val id = post(req.as[String])
+  Created().withLocation(s"/messages/$id")
+}
+```
+
 Parameters can be specified in the path and their resolved values made available
 to the processor. When a parameter is specified as __:param__, it matches a
 single path component; whereas, __*param__ matches the path component along with
@@ -599,12 +624,11 @@ any remaining components including path separators (i.e., **/**).
 
 ```scala
 import scamper.ImplicitConverters.fileToEntity
-import scamper.RequestMethods.DELETE
 import scamper.ResponseStatuses.{ Accepted, NotFound, Ok }
 import scamper.server.Implicits.HttpRequestType
 
 // Match request method and parameterized path
-app.request(DELETE, "/orders/:id") { req =>
+app.delete("/orders/:id") { req =>
   def deleteOrder(id: Int): Boolean = {
     ...
   }
@@ -619,7 +643,7 @@ app.request(DELETE, "/orders/:id") { req =>
 }
 
 // Match prefixed path with any request method
-app.request("/archive/*file") { req =>
+app.get("/archive/*file") { req =>
   def findFile(path: String): Option[File] = {
     ...
   }
@@ -638,12 +662,11 @@ specified.
 ```scala
 import scamper.BodyParser
 import scamper.ImplicitConverters.stringToEntity
-import scamper.RequestMethods.POST
 import scamper.ResponseStatuses.Ok
 import scamper.server.Implicits.HttpRequestType
 
 // Match path with two parameters
-app.request(POST, "/translate/:in/to/:out") { req =>
+app.post("/translate/:in/to/:out") { req =>
   def translator(from: String, to: String): BodyParser[String] = {
     ...
   }
@@ -661,7 +684,7 @@ You can include a specialized request handler to serve static files.
 
 ```scala
 // Serve static files from given directory
-app.request(new File("/path/to/public"))
+app.static(new File("/path/to/public"))
 ```
 
 This adds a request handler to serve files from the directory at _/path/to/public_.
@@ -671,7 +694,7 @@ _http://localhost:8080/images/logo.png_ would map to _/path/to/public/images/log
 Or, you can map a path prefix to a directory.
 
 ```scala
-app.request("/app/main", new File("/path/to/public"))
+app.static("/app/main", new File("/path/to/public"))
 ```
 
 In this case, _http://localhost:8080/app/main/images/logo.png_ would map to

@@ -18,6 +18,8 @@ package scamper
 import java.io.File
 import java.net.InetAddress
 
+import RequestMethods._
+
 /** Includes server related items. */
 package object server {
   /** Provides utility for handling incoming request. */
@@ -399,9 +401,129 @@ package object server {
     }
 
     /**
-     * Includes request handler that serves static files from given directory.
+     * Includes supplied processor for GET requests to given path.
      *
-     * The directory files are mapped based on the request's target path.
+     * The processor is appended to existing request handler chain.
+     *
+     * @param path request path
+     * @param processor request processor
+     *
+     * @return this application
+     */
+    def get(path: String)(processor: RequestProcessor): this.type = synchronized {
+      app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(GET)))
+      this
+    }
+
+    /**
+     * Includes supplied processor for POST requests to given path.
+     *
+     * The processor is appended to existing request handler chain.
+     *
+     * @param path request path
+     * @param processor request processor
+     *
+     * @return this application
+     */
+    def post(path: String)(processor: RequestProcessor): this.type = synchronized {
+      app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(POST)))
+      this
+    }
+
+    /**
+     * Includes supplied processor for PUT requests to given path.
+     *
+     * The processor is appended to existing request handler chain.
+     *
+     * @param path request path
+     * @param processor request processor
+     *
+     * @return this application
+     */
+    def put(path: String)(processor: RequestProcessor): this.type = synchronized {
+      app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(PUT)))
+      this
+    }
+
+    /**
+     * Includes supplied processor for PATCH requests to given path.
+     *
+     * The processor is appended to existing request handler chain.
+     *
+     * @param path request path
+     * @param processor request processor
+     *
+     * @return this application
+     */
+    def patch(path: String)(processor: RequestProcessor): this.type = synchronized {
+      app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(PATCH)))
+      this
+    }
+
+    /**
+     * Includes supplied processor for DELETE requests to given path.
+     *
+     * The processor is appended to existing request handler chain.
+     *
+     * @param path request path
+     * @param processor request processor
+     *
+     * @return this application
+     */
+    def delete(path: String)(processor: RequestProcessor): this.type = synchronized {
+      app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(DELETE)))
+      this
+    }
+
+    /**
+     * Includes supplied processor for HEAD requests to given path.
+     *
+     * The processor is appended to existing request handler chain.
+     *
+     * @param path request path
+     * @param processor request processor
+     *
+     * @return this application
+     */
+    def head(path: String)(processor: RequestProcessor): this.type = synchronized {
+      app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(HEAD)))
+      this
+    }
+
+    /**
+     * Includes supplied processor for OPTIONS requests to given path.
+     *
+     * The processor is appended to existing request handler chain.
+     *
+     * @param path request path
+     * @param processor request processor
+     *
+     * @return this application
+     */
+    def options(path: String)(processor: RequestProcessor): this.type = synchronized {
+      app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(OPTIONS)))
+      this
+    }
+
+    /**
+     * Includes supplied processor for TRACE requests to given path.
+     *
+     * The processor is appended to existing request handler chain.
+     *
+     * @param path request path
+     * @param processor request processor
+     *
+     * @return this application
+     */
+    def trace(path: String)(processor: RequestProcessor): this.type = synchronized {
+      app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(TRACE)))
+      this
+    }
+
+    /**
+     * Includes request handler to serve static files from given directory.
+     *
+     * The directory files are mapped based on the request target path.
      *
      * === Example Mappings ===
      *
@@ -415,15 +537,15 @@ package object server {
      *
      * @return this application
      */
-    def request(baseDirectory: File): this.type = synchronized {
+    def static(baseDirectory: File): this.type = synchronized {
       app = app.copy(requestHandlers = app.requestHandlers :+ StaticFileServer(baseDirectory, "/"))
       this
     }
 
     /**
-     * Includes request handler that serves static files from given directory.
+     * Includes request handler to serve static files from given directory.
      *
-     * The directory files are mapped based on the request's target path minus
+     * The directory files are mapped based on the request target path minus
      * prefix.
      *
      * === Example Mappings ===
@@ -439,7 +561,7 @@ package object server {
      *
      * @return this application
      */
-    def request(path: String, baseDirectory: File): this.type = synchronized {
+    def static(path: String, baseDirectory: File): this.type = synchronized {
       app = app.copy(requestHandlers = app.requestHandlers :+ StaticFileServer(baseDirectory, path))
       this
     }
