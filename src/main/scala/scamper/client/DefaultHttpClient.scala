@@ -112,10 +112,10 @@ private class DefaultHttpClient private (val bufferSize: Int, val timeout: Int)(
 
   private def send[T](method: RequestMethod, target: URI, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T = {
     if (!target.isAbsolute)
-      throw new IllegalArgumentException(s"Target is not absolute: $target")
+      throw RequestAborted(s"Target is not absolute: $target")
 
     if (target.getScheme != "http" && target.getScheme != "https")
-      throw new IllegalArgumentException(s"Invalid target scheme: ${target.getScheme}")
+      throw RequestAborted(s"Invalid target scheme: ${target.getScheme}")
 
     val req = cookies match {
       case Nil => HttpRequest(method, target, headers, body)
@@ -127,7 +127,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val timeout: Int)(
 
   private def getEffectiveHost(target: URI, default: => Option[String]): String =
     target.getHost match {
-      case null => default.getOrElse(throw new HttpException("Cannot determine host"))
+      case null => default.getOrElse(throw RequestAborted("Cannot determine host"))
       case host => target.getPort match {
         case -1   => host
         case port => s"$host:$port"
@@ -157,7 +157,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val timeout: Int)(
     request.getContentLength.map {
       case 0          => request.withBody(Entity.empty).removeTransferEncoding
       case n if n > 0 => request.removeTransferEncoding
-      case length     => throw new HttpException(s"Invalid Content-Length: $length")
+      case length     => throw RequestAborted(s"Invalid Content-Length: $length")
     }.orElse {
       request.getTransferEncoding.map(_ => request)
     }.orElse {

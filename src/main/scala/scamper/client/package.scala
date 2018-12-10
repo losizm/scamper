@@ -25,6 +25,9 @@ import RequestMethods._
 
 /** Includes client related items. */
 package object client {
+  /** Indicates request was aborted. */
+  case class RequestAborted(message: String) extends HttpException(message)
+
   /** Provides utility for handling response. */
   trait ResponseHandler[T] {
     /**
