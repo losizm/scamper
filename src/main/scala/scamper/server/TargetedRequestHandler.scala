@@ -18,6 +18,7 @@ package scamper.server
 import java.nio.file.{ Path, Paths }
 
 import scala.collection.JavaConverters.asScalaIterator
+import scala.util.Try
 import scala.util.matching.Regex
 
 import scamper.{ HttpRequest, HttpResponse, RequestMethod }
@@ -60,9 +61,17 @@ private class TargetedRequestParameters(params: String) extends RequestParameter
     case Array(name, value) => name -> value.toUrlDecoded("utf-8")
   }.toMap
 
-  def getString(name: String): String = toMap(name)
-  def getInt(name: String): Int = toMap(name).toInt
-  def getLong(name: String): Long = toMap(name).toLong
+  def getString(name: String): String = toMap.getOrElse(name, throw ParameterNotFound(name))
+
+  def getInt(name: String): Int = {
+    val value = getString(name)
+    Try(value.toInt).getOrElse(throw ParameterNotConvertible(name, value))
+  }
+
+  def getLong(name: String): Long = {
+    val value = getString(name)
+    Try(value.toLong).getOrElse(throw ParameterNotConvertible(name, value))
+  }
 }
 
 private class Target(path: Path) {

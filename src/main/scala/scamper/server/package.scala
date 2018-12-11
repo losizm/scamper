@@ -75,6 +75,12 @@ package object server {
     def apply(response: HttpResponse): HttpResponse
   }
 
+  /** Indicates parameter does not exist. */
+  case class ParameterNotFound(name: String) extends HttpException(name)
+
+  /** Indicates parameter cannot be converted. */
+  case class ParameterNotConvertible(name: String, value: String) extends HttpException(s"$name=$value")
+
   /** Provides access to server-side parameters associated with request. */
   trait RequestParameters {
     /**
@@ -82,7 +88,7 @@ package object server {
      *
      * @param name parameter name
      *
-     * @throws NoSuchElementException if parameter not present
+     * @throws ParameterNotFound if parameter does not exist
      */
     def getString(name: String): String
 
@@ -91,8 +97,8 @@ package object server {
      *
      * @param name parameter name
      *
-     * @throws NoSuchElementException if parameter not present
-     * @throws NumberFormatException if parameter cannot be converted to `Int`
+     * @throws ParameterNotFound if parameter does not exist
+     * @throws ParameterNotConvertible if parameter cannot be converted
      */
     def getInt(name: String): Int
 
@@ -101,8 +107,8 @@ package object server {
      *
      * @param name parameter name
      *
-     * @throws NoSuchElementException if parameter not present
-     * @throws NumberFormatException if parameter cannot be converted to `Long`
+     * @throws ParameterNotFound if parameter does not exist
+     * @throws ParameterNotConvertible if parameter cannot be converted
      */
     def getLong(name: String): Long
   }
