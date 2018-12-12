@@ -75,12 +75,8 @@ private class TargetedRequestParameters(params: String) extends RequestParameter
 }
 
 private class Target(path: Path) {
-  path.toString match {
-    case path if path == "/" =>
-    case path if path.matches("""(/:\w+|/[^/:*]+)+""") =>
-    case path if path.matches("""(/:\w+|/[^/:*]+)*/\*\w+""") =>
-    case path => throw new IllegalArgumentException(s"Invalid target path: $path")
-  }
+  if (!path.toString.matchesAny("/", """(/:\w+|/[^/:*]+)+""", """(/:\w+|/[^/:*]+)*/\*\w+"""))
+    throw new IllegalArgumentException(s"Invalid target path: $path")
 
   private val names = asScalaIterator(path.iterator).map(_.toString).toSeq
 

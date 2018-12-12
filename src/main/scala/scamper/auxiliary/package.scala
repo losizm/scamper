@@ -174,6 +174,16 @@ package object auxiliary {
   /** Adds extension methods to {@code String}. */
   implicit class StringType(val string: String) extends AnyVal {
     /**
+     * Tests whether string matches any of supplied regular expressions.
+     *
+     * <strong>Note:</strong> If `regexes` is empty, then `false` is returned.
+     *
+     * @return `true` if string matches at least one regular expression, `false`
+     *  otherwise
+     */
+    def matchesAny(regexes: String*): Boolean = regexes.exists(string.matches)
+
+    /**
      * Converts to Instant.
      *
      * The date string must be in either one of two formats:

@@ -42,4 +42,18 @@ class AuxiliarySpec extends FlatSpec {
     assert("2006-02-15T04:15:37Z".toInstant == Instant.parse("2006-02-15T04:15:37Z"))
     assert("Wed, 15 Feb 2006 04:15:37 GMT".toInstant == Instant.parse("2006-02-15T04:15:37Z"))
   }
+
+  it should "match at least one regular expression" in {
+    assert("abc".matchesAny("a.c", "123", "xyz"))
+    assert("abc".matchesAny("123", "a.c", "xyz"))
+    assert("abc".matchesAny("123", "a.*", "xyz"))
+    assert("abc".matchesAny("a.c"))
+  }
+
+  it should "not match any regular expression" in {
+    assert(!"XYZ".matchesAny("a.c", "123", "xyz"))
+    assert(!"XYZ".matchesAny("123", "a.c", "xyz"))
+    assert(!"XYZ".matchesAny("123", "a.*", "xyz"))
+    assert(!"XYZ".matchesAny())
+  }
 }
