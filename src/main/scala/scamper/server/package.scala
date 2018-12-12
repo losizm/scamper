@@ -25,18 +25,40 @@ package object server {
   /** Provides utility for handling incoming request. */
   trait RequestHandler {
     /**
-     * Handles request.
+     * Handles incoming request.
      *
      * If handler satisfies request, then it returns a response. Otherwise, it
      * returns a request, which may be the original request or an alternate one.
      */
     def apply(request: HttpRequest): Either[HttpRequest, HttpResponse]
+
+    /**
+     * Composes this handler with other, using this as a fallback.
+     *
+     * If `other` returns a request, then the request is passed to `this`.
+     * Otherwise, if `other` returns a response, then `this` is not invoked.
+     *
+     * @param other initial handler
+     */
+    def compose(other: RequestHandler): RequestHandler =
+      req => other(req).left.flatMap(req => apply(req))
+
+    /**
+     * Composes this handler with other, using other as a fallback.
+     *
+     * If `this` returns a request, then the request is passed to `other`.
+     * Otherwise, if `this` returns a response, then `other` is not invoked.
+     *
+     * @param other fallback handler
+     */
+    def orElse(other: RequestHandler): RequestHandler =
+      req => apply(req).left.flatMap(req => other(req))
   }
 
   /** Provides utility for filtering incoming request. */
   trait RequestFilter extends RequestHandler {
     /**
-     * Filters request.
+     * Filters incoming request.
      *
      * The filter may return the original request or an alternate one.
      *
@@ -51,7 +73,7 @@ package object server {
   /** Provides utility for processing incoming request. */
   trait RequestProcessor extends RequestHandler {
     /**
-     * Processes request.
+     * Processes incoming request.
      *
      * The processor returns a response that satisfies the request.
      *
@@ -66,11 +88,11 @@ package object server {
   /** Provides utility for filtering outgoing response. */
   trait ResponseFilter {
     /**
-     * Filters response.
+     * Filters outgoing response.
      *
      * The filter may return the original response or an alternate one.
      *
-     * @param response outgoing response prior to filtering
+     * @param response outgoing response
      */
     def apply(response: HttpResponse): HttpResponse
   }

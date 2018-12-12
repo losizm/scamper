@@ -218,14 +218,10 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
       socket.flush()
     }
 
-    private def handle(req: HttpRequest): HttpResponse = {
-      val value: Either[HttpRequest, HttpResponse] = Left(req)
-
-      requestHandlers.foldLeft(value) { (value, handle) => value.left.flatMap(req => handle(req)) } match {
-        case Left(req)  => NotFound()
-        case Right(res) => res
-      }
-    }
+    private def handle(req: HttpRequest): HttpResponse =
+      requestHandlers.reduceLeftOption(_ orElse _)
+        .flatMap(_(req).toOption)
+        .getOrElse(NotFound())
 
     private def filter(res: HttpResponse): HttpResponse =
       responseFilters.foldLeft(prepare(res)) { (res, filter) => filter(res) }
