@@ -286,9 +286,9 @@ package object server {
     /**
      * Sets read timeout.
      *
-     * The `readTimeout` controls how long a read from a socket will block
-     * before it times out. At which point, the socket is closed, and its
-     * associated request is discarded.
+     * The `readTimeout` controls how long a read from a socket blocks before it
+     * times out. At which point, the socket is closed, and its associated
+     * request is discarded.
      *
      * @param timeout read timeout in milliseconds
      *
@@ -356,7 +356,7 @@ package object server {
     }
 
     /**
-     * Includes supplied request handler.
+     * Adds supplied request handler.
      *
      * The handler is appended to existing request handler chain.
      *
@@ -370,7 +370,7 @@ package object server {
     }
 
     /**
-     * Includes supplied request filter.
+     * Adds supplied request filter.
      *
      * The filter is appended to existing request handler chain.
      *
@@ -384,7 +384,7 @@ package object server {
     }
 
     /**
-     * Includes supplied request processor.
+     * Adds supplied request processor.
      *
      * The processor is appended to existing request handler chain.
      *
@@ -398,7 +398,7 @@ package object server {
     }
 
     /**
-     * Includes supplied processor for requests with given path.
+     * Adds supplied processor for requests with given path.
      *
      * The processor is appended to existing request handler chain.
      *
@@ -413,7 +413,7 @@ package object server {
     }
 
     /**
-     * Includes supplied processor for requests with given method and path.
+     * Adds supplied processor for requests with given method and path.
      *
      * The processor is appended to existing request handler chain.
      *
@@ -429,7 +429,7 @@ package object server {
     }
 
     /**
-     * Includes supplied processor for GET requests to given path.
+     * Adds supplied processor for GET requests to given path.
      *
      * The processor is appended to existing request handler chain.
      *
@@ -444,7 +444,7 @@ package object server {
     }
 
     /**
-     * Includes supplied processor for POST requests to given path.
+     * Adds supplied processor for POST requests to given path.
      *
      * The processor is appended to existing request handler chain.
      *
@@ -459,7 +459,7 @@ package object server {
     }
 
     /**
-     * Includes supplied processor for PUT requests to given path.
+     * Adds supplied processor for PUT requests to given path.
      *
      * The processor is appended to existing request handler chain.
      *
@@ -474,7 +474,7 @@ package object server {
     }
 
     /**
-     * Includes supplied processor for PATCH requests to given path.
+     * Adds supplied processor for PATCH requests to given path.
      *
      * The processor is appended to existing request handler chain.
      *
@@ -489,7 +489,7 @@ package object server {
     }
 
     /**
-     * Includes supplied processor for DELETE requests to given path.
+     * Adds supplied processor for DELETE requests to given path.
      *
      * The processor is appended to existing request handler chain.
      *
@@ -504,7 +504,7 @@ package object server {
     }
 
     /**
-     * Includes supplied processor for HEAD requests to given path.
+     * Adds supplied processor for HEAD requests to given path.
      *
      * The processor is appended to existing request handler chain.
      *
@@ -519,7 +519,7 @@ package object server {
     }
 
     /**
-     * Includes supplied processor for OPTIONS requests to given path.
+     * Adds supplied processor for OPTIONS requests to given path.
      *
      * The processor is appended to existing request handler chain.
      *
@@ -534,7 +534,7 @@ package object server {
     }
 
     /**
-     * Includes supplied processor for TRACE requests to given path.
+     * Adds supplied processor for TRACE requests to given path.
      *
      * The processor is appended to existing request handler chain.
      *
@@ -549,7 +549,7 @@ package object server {
     }
 
     /**
-     * Includes request handler to serve static files from given directory.
+     * Adds request handler to serve static files from given directory.
      *
      * The directory files are mapped based on the request target path.
      *
@@ -571,7 +571,7 @@ package object server {
     }
 
     /**
-     * Includes request handler to serve static files from given directory.
+     * Adds request handler to serve static files from given directory.
      *
      * The directory files are mapped based on the request target path minus
      * prefix.
@@ -595,7 +595,7 @@ package object server {
     }
 
     /**
-     * Includes supplied response filter.
+     * Adds supplied response filter.
      *
      * The filter is appended to existing response filter chain.
      *
