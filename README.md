@@ -49,7 +49,7 @@ val response = Ok("There is an answer.")
 
 There is a set of methods in `HttpMessage` that provides generalized header
 access. With these methods, the header field name is a `String`, which is
-case-insensitive, and the header value is also a `String`.
+case-insensitive, and the header value is a `String`.
 
 ```scala
 import scamper.ImplicitConverters.{ stringToUri, tupleToHeader }
@@ -60,11 +60,9 @@ val req = POST("/api/users").withHeader("Content-Type" -> "application/json")
 val contentType: Option[String] = req.getHeaderValue("Content-Type")
 ```
 
-_But that's not all there is._
-
-The interface to `HttpMessage` can be extended for specialized header access.
-The extension methods are provided by the many type classes defined in
-`scamper.headers`.
+This gets the job done in many cases; however, `HttpMessage` can be extended for
+specialized header access. There extension methods provided by the many type
+classes defined in `scamper.headers`.
 
 For example, `ContentType` adds the following methods:
 
@@ -404,9 +402,8 @@ client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
 
 ## HTTP Server
 
-**Scamper** includes an extensible server framework.
-
-To demonstrate, let's begin with a simple example.
+**Scamper** includes an extensible server framework. To demonstrate, let's begin
+with a simple example.
 
 ```scala
 import scamper.ImplicitConverters.stringToEntity
@@ -422,7 +419,7 @@ This is as bare-bones as it gets. We create a server at port 8080, and, on each
 incoming request, we send _Hello, world!_ back to the client. Although trite, it
 shows how easy it is to get going. What it doesn't show, however, are the pieces
 being put together to create the server. Minus imports, here's the semantic
-equivalent in long form.
+equivalent in long form:
 
 ```scala
 val server = HttpServer.app().request(req => Ok("Hello, world!")).create(8080)
@@ -475,12 +472,10 @@ discarded.
 ### Request Handlers
 
 You define application-specific logic in instances of `RequestHandler` and add
-them to the application.
-
-An `HttpRequest` is passed to the `RequestHandler`, and the handler returns
-`Either[HttpRequest, HttpResponse]`. If the handler is unable to satisfy the
-request, it returns an `HttpRequest` so that the next handler can have its turn.
-Otherwise, it returns an `HttpResponse`, and any remaining handlers are
+them to the application. The request handler accepts an `HttpRequest` and
+returns `Either[HttpRequest, HttpResponse]`. If the handler is unable to satisfy
+the request, it returns an `HttpRequest` so that the next handler has its turn.
+Otherwise, if it returns an `HttpResponse`, any remaining handlers are
 effectively ignored.
 
 ```scala
@@ -556,7 +551,7 @@ app.request { req =>
 ```
 
 And we used `RequestProcessor` in our _"Hello World"_ server, but here's one
-that would do something more meaningful.
+that would do something more meaningful:
 
 ```scala
 import scamper.ImplicitConverters.fileToEntity
@@ -573,8 +568,8 @@ app.request { req =>
 
 ### Targeted Request Processing
 
-A request processor can be included for a targeted path with or without a
-targeted request method.
+A request processor can be added to a targeted path with or without a targeted
+request method.
 
 ```scala
 import scamper.ImplicitConverters.stringToEntity
@@ -592,8 +587,8 @@ app.request("/private") { req =>
 }
 ```
 
-There are also methods in `ServerApplication` corresponding to the standard HTTP
-request methods.
+If targeting is to a request method, you can make use of the corresponding
+methods in `ServerApplication`.
 
 ```scala
 import scamper.BodyParsers
@@ -617,10 +612,12 @@ app.post("/messages") { req =>
 }
 ```
 
+### Path Parameters
+
 Parameters can be specified in the path and their resolved values made available
 to the processor. When a parameter is specified as __:param__, it matches a
 single path component; whereas, __*param__ matches the path component along with
-any remaining components including path separators (i.e., **/**).
+any remaining components, including intervening path separators (i.e., **/**).
 
 ```scala
 import scamper.ImplicitConverters.fileToEntity
@@ -680,15 +677,15 @@ app.post("/translate/:in/to/:out") { req =>
 
 ### Serving Static Files
 
-You can include a specialized request handler to serve static files.
+You can add a specialized request handler to serve static files.
 
 ```scala
 // Serve static files from given directory
 app.static(new File("/path/to/public"))
 ```
 
-This adds a request handler to serve files from the directory at _/path/to/public_.
-The files are mapped based on the request path. For example,
+This adds a handler to serve files from the directory at _/path/to/public_. The
+files are mapped based on the request path. For example,
 _http://localhost:8080/images/logo.png_ would map to _/path/to/public/images/logo.png_.
 
 Or, you can map a path prefix to a directory.
@@ -703,7 +700,7 @@ _/path/to/public/images/logo.png_.
 ### Response Filters
 
 In much the same way requests can be filtered, so too can responses. Response
-filtering is performed by including instances of `ResponseFilter`. They are
+filtering is performed by adding instances of `ResponseFilter`. They are
 applied, in order, after one of the request handlers generates a response.
 
 ```scala
