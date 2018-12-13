@@ -24,7 +24,7 @@ import scamper.ResponseStatuses.Ok
 import Implicits.HttpRequestType
 
 class TargetedRequestHandlerSpec extends FlatSpec {
-  "RequestHandler" should "respond to request" in {
+  "TargetedRequestHandler" should "respond to request" in {
     val handler = TargetedRequestHandler(req => Right(Ok()), "/", None)
     assert(handler(GET("/")).exists(_.status == Ok))
     assert(handler(POST("/")).exists(_.status == Ok))
@@ -96,6 +96,24 @@ class TargetedRequestHandlerSpec extends FlatSpec {
     assert(h2(POST("/A/b/C/One/200/3000/d")).isLeft)
     assert(h2(PUT("/A/B/c/One/200/3000/d")).isLeft)
     assert(h2(DELETE("/a/b/c/One/200/3000/d")).isLeft)
+  }
+
+  it should "not have access to non-convertible parameter" in {
+    val h1 = TargetedRequestHandler({ req => req.params.getInt("id"); Right(Ok()) }, "/:id", None)
+    val h2 = TargetedRequestHandler({ req => req.params.getLong("id"); Right(Ok()) }, "/:id", None)
+
+    assertThrows[ParameterNotConvertible](h1(GET("/a")))
+    assertThrows[ParameterNotConvertible](h2(GET("/a")))
+  }
+
+  it should "not have access to missing parameter" in {
+    val h1 = TargetedRequestHandler({ req => req.params.getString("id"); Right(Ok()) }, "/:identifier", None)
+    val h2 = TargetedRequestHandler({ req => req.params.getInt("id"); Right(Ok()) }, "/:identifier", None)
+    val h3 = TargetedRequestHandler({ req => req.params.getLong("id"); Right(Ok()) }, "/:identifier", None)
+
+    assertThrows[ParameterNotFound](h1(GET("/a")))
+    assertThrows[ParameterNotFound](h2(GET("/a")))
+    assertThrows[ParameterNotFound](h3(GET("/a")))
   }
 
   it should "have invalid path" in {
