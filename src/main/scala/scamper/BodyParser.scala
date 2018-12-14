@@ -28,10 +28,8 @@ import scamper.types._
  * @see [[BodyParsers]]
  */
 trait BodyParser[T] {
-  /**
-   * Parses body of supplied HTTP message and returns instance of defined type.
-   */
-  def parse(message: HttpMessage): T
+  /** Parses body of supplied message and returns instance of defined type. */
+  def apply(message: HttpMessage): T
 }
 
 /** Includes default body parser implementations. */
@@ -78,7 +76,7 @@ object BodyParsers {
 private class ByteArrayBodyParser(val maxLength: Long) extends BodyParser[Array[Byte]] with BodyParsing {
   val bufferSize = maxLength.min(8192).toInt
 
-  def parse(message: HttpMessage): Array[Byte] =
+  def apply(message: HttpMessage): Array[Byte] =
     withInputStream(message) { in =>
       val out = new ArrayBuffer[Byte](bufferSize)
       val buf = new Array[Byte](bufferSize)
@@ -96,25 +94,25 @@ private class ByteArrayBodyParser(val maxLength: Long) extends BodyParser[Array[
 }
 
 private class TextBodyParser(maxLength: Int) extends BodyParser[String] {
-  private val bodyParser = new ByteArrayBodyParser(maxLength)
+  private val parser = new ByteArrayBodyParser(maxLength)
 
-  def parse(message: HttpMessage): String =
+  def apply(message: HttpMessage): String =
     message.getHeaderValue("Content-Type")
       .map(MediaType.parse)
       .flatMap(_.params.get("charset"))
       .orElse(Some("UTF-8"))
-      .map(charset => new String(bodyParser.parse(message), charset)).get
+      .map(charset => new String(parser(message), charset)).get
 }
 
 private class FormBodyParser(maxLength: Int) extends BodyParser[Map[String, Seq[String]]] {
-  private val bodyParser = new TextBodyParser(maxLength)
+  private val parser = new TextBodyParser(maxLength)
 
-  def parse(message: HttpMessage): Map[String, Seq[String]] =
-    QueryParams.parse(bodyParser.parse(message))
+  def apply(message: HttpMessage): Map[String, Seq[String]] =
+    QueryParams.parse(parser(message))
 }
 
 private class FileBodyParser(val dest: File, val maxLength: Long, val bufferSize: Int) extends BodyParser[File] with BodyParsing {
-  def parse(message: HttpMessage): File =
+  def apply(message: HttpMessage): File =
     withInputStream(message) { in =>
       val destFile = getDestFile()
       val out = new FileOutputStream(destFile)

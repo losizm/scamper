@@ -254,10 +254,10 @@ such as the one used for parsing text content.
 import scamper.{ BodyParsers, HttpMessage }
 
 // Create text body parser
-implicit val textBodyParser = BodyParsers.text(maxLength = 1024)
+implicit val parser = BodyParsers.text(maxLength = 1024)
 
 def printText(message: HttpMessage): Unit = {
-  // Parse message body to String using textBodyParser implicitly
+  // Parse message body to String using implicit parser
   val text = message.as[String]
 
   println(text)
@@ -283,7 +283,7 @@ implicit object UserBodyParser extends BodyParser[User] {
   }
 
   // Parses JSON message body to User
-  def parse(message: HttpMessage): User =
+  def apply(message: HttpMessage): User =
     Json.parse(message.body.getInputStream).as[User]
 }
 
@@ -336,7 +336,7 @@ import scamper.RequestMethods.GET
 import scamper.client.HttpClient
 import scamper.headers.Host
 
-implicit val bodyParser = BodyParsers.text()
+implicit val parser = BodyParsers.text()
 
 def getMessageOfTheDay(): Either[Int, String] = {
   val req = GET("/motd").withHost("localhost:8080")
@@ -368,7 +368,7 @@ import scamper.client.HttpClient
 // Create HttpClient instance
 val client = HttpClient(bufferSize = 4096, timeout = 3000)
 
-implicit val bodyParser = BodyParsers.text()
+implicit val parser = BodyParsers.text()
 
 def getMessageOfTheDay(): Either[Int, String] = {
   // Use saved reference to client
@@ -525,7 +525,7 @@ app.request { req =>
   val translator: BodyParser[String] = ...
 
   if (req.method == POST && req.contentLanguage.contains("fr"))
-    Left(req.withBody(translator.parse(req)).withContentLanguage("en"))
+    Left(req.withBody(translator(req)).withContentLanguage("en"))
   else
     Left(req)
 }
@@ -671,7 +671,7 @@ app.post("/translate/:in/to/:out") { req =>
   val from = req.params.getString("in")
   val to = req.params.getString("out")
 
-  Ok(translator(from, to).parse(req))
+  Ok(translator(from, to)(req))
 }
 ```
 
