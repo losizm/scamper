@@ -205,17 +205,23 @@ package object auxiliary {
     /** Converts to URI. */
     def toUri: URI = new URI(string)
 
+    /** Encodes to application/x-www-form-urlencoded using UTF-8 character encoding. */
+    def toUrlEncoded: String = URLEncoder.encode(string, "UTF-8")
+
     /**
-     * Encodes to application/x-www-form-urlencoded using the given character encoding.
+     * Encodes to application/x-www-form-urlencoded using given character encoding.
      *
-     * @param encoding the character encoding
+     * @param encoding character encoding
      */
     def toUrlEncoded(encoding: String): String = URLEncoder.encode(string, encoding)
 
+    /** Decodes from application/x-www-form-urlencoded using UTF-8 character encoding. */
+    def toUrlDecoded: String = URLDecoder.decode(string, "UTF-8")
+
     /**
-     * Decodes from application/x-www-form-urlencoded using the given character encoding.
+     * Decodes from application/x-www-form-urlencoded using given character encoding.
      *
-     * @param encoding the character encoding
+     * @param encoding character encoding
      */
     def toUrlDecoded(encoding: String): String = URLDecoder.decode(string, encoding)
   }
