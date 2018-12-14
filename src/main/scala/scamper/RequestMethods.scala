@@ -40,7 +40,4 @@ object RequestMethods {
 
   /** TRACE request method */
   val TRACE: RequestMethod = RequestMethodImpl("TRACE")
-
-  /** CONNECT request method */
-  val CONNECT: RequestMethod = RequestMethodImpl("CONNECT")
 }

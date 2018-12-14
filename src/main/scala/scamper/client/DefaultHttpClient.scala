@@ -59,7 +59,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val timeout: Int)(
       case HEAD    => toBodilessRequest(request)
       case TRACE   => toBodilessRequest(request)
       case OPTIONS => toBodyRequest(request)
-      case CONNECT => toBodilessRequest(request)
+      case _       => request
     }
 
     effectiveRequest = effectiveRequest.withHeaders({

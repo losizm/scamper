@@ -53,7 +53,6 @@ object RequestMethod {
       case "DELETE"  => DELETE
       case "OPTIONS" => OPTIONS
       case "TRACE"   => TRACE
-      case "CONNECT" => CONNECT
       case _         => Grammar.Token(name).map(RequestMethodImpl).getOrElse {
         throw new IllegalArgumentException(s"Invalid request method name: $name")
       }
