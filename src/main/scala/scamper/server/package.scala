@@ -248,10 +248,25 @@ package object server {
     }
 
     /**
+     * Sets pool size.
+     *
+     * The `poolSize` specifies the maximum number of requests processed
+     * concurrently.
+     *
+     * @param size pool size
+     *
+     * @return this application
+     */
+    def poolSize(size: Int): this.type = synchronized {
+      app = app.copy(poolSize = size)
+      this
+    }
+
+    /**
      * Sets queue size.
      *
-     * The `queueSize` sets the number of requests that are permitted to wait
-     * for processing. Incoming requests that would exceed this limit are
+     * The `queueSize` specifies the maximum number of requests permitted to
+     * wait for processing. Incoming requests that would exceed this limit are
      * discarded.
      *
      * <strong>Note:</strong> `queueSize` is also used to configure server
@@ -265,21 +280,6 @@ package object server {
      */
     def queueSize(size: Int): this.type = synchronized {
       app = app.copy(queueSize = size)
-      this
-    }
-
-    /**
-     * Sets pool size.
-     *
-     * The `poolSize` specifies the maximum number of requests that are
-     * processed concurrently.
-     *
-     * @param size pool size
-     *
-     * @return this application
-     */
-    def poolSize(size: Int): this.type = synchronized {
-      app = app.copy(poolSize = size)
       this
     }
 
