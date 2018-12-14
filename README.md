@@ -381,10 +381,10 @@ def getMessageOfTheDay(): Either[Int, String] = {
 }
 ```
 
-### Overriding Truststore
+### Providing Truststore
 
-When creating a client, you can supply the location of a truststore to override
-the default.
+When creating a client, you can supply the effective truststore used for all
+requests made via HTTPS.
 
 ```scala
 import scamper.ImplicitConverters.{ stringToEntity, stringToUri }
@@ -456,10 +456,10 @@ app.queueSize(25)
 app.readTimeout(3000)
 ```
 
-The **poolSize** specifies the maximum number of requests that are processed
-concurrently, and **queueSize** sets the number of requests that are permitted
-to wait for processing &mdash; _incoming requests that would exceed this limit
-are discarded_.
+The **poolSize** specifies the maximum number of requests processed
+concurrently, and **queueSize** specifies the maximum number of requests
+permitted to wait for processing &mdash; _incoming requests that would exceed
+this limit are discarded_.
 
 Note **queueSize** is also used to configure server backlog (i.e., backlog of
 incoming connections), so technically there can be up to double **queueSize**
@@ -533,9 +533,9 @@ app.request { req =>
 
 ### Filtering vs. Processing
 
-There are two subclasses of `RequestHandler` reserved for instances where it's
-known the handler always returns the same type: `RequestFilter` always returns
-an `HttpRequest`, and `RequestProcessor` always returns an `HttpResponse`. These
+There are two subclasses of `RequestHandler` reserved for instances where the
+handler always returns the same type: `RequestFilter` always returns an
+`HttpRequest`, and `RequestProcessor` always returns an `HttpResponse`. These
 are _filtering_ and _processing_, respectively.
 
 The request logger can be rewritten as `RequestFilter`.
@@ -587,8 +587,9 @@ app.request("/private") { req =>
 }
 ```
 
-If targeting is to a request method, you can make use of the corresponding
-methods in `ServerApplication`.
+As added convenience, there are methods in `ServerApplication` corresponding to
+the standard HTTP request methods, and targeted processors can be added using
+any one of these.
 
 ```scala
 import scamper.BodyParsers
@@ -763,8 +764,8 @@ IP address.
 val server = app.create("192.168.0.2", 8080)
 ```
 
-When created, an instance of `HttpServer` is returned, which can be used to
-query server details.
+An instance of `HttpServer` is returned, which can be used to query server
+details.
 
 ```scala
 printf("Host: %s%n", server.host)
