@@ -55,6 +55,24 @@ package object server {
       req => apply(req).left.flatMap(req => other(req))
   }
 
+  /** Provides `RequestHandler` utilities. */
+  object RequestHandler {
+    /**
+     * Composes head handler with tail handlers, using tail handlers as
+     * fallbacks.
+     *
+     * <strong>Note:</strong> If `handlers` is empty, a request handler is
+     * created that returns the request it receives.
+     *
+     * @param handlers request handlers
+     */
+    def coalesce(handlers: RequestHandler*): RequestHandler =
+      if (handlers.isEmpty)
+        req => Left(req)
+      else
+        handlers.reduceLeft(_ orElse _)
+  }
+
   /** Provides utility for filtering incoming request. */
   trait RequestFilter extends RequestHandler {
     /**
@@ -95,6 +113,40 @@ package object server {
      * @param response outgoing response
      */
     def apply(response: HttpResponse): HttpResponse
+
+    /**
+     * Composes this filter and other, with other applied first.
+     *
+     * @param other other filter
+     */
+    def compose(other: ResponseFilter): ResponseFilter =
+      req => apply(other(req))
+
+    /**
+     * Composes this filter and other, with this applied first.
+     *
+     * @param other other filter
+     */
+    def andThen(other: ResponseFilter): ResponseFilter =
+      req => other(apply(req))
+  }
+
+  /** Provides `ResponseFilter` utilities. */
+  object ResponseFilter {
+    /**
+     * Composes chain of response filters, with response of preceding filter
+     * passed to its successor.
+     *
+     * <strong>Note:</strong> If `filters` is empty, a response filter is
+     * created that returns the response it receives.
+     *
+     * @param filters response filters
+     */
+    def chain(filters: ResponseFilter*): ResponseFilter =
+      if (filters.isEmpty)
+        identity
+      else
+        filters.reduceLeft(_ andThen _)
   }
 
   /** Indicates parameter does not exist. */
@@ -287,8 +339,8 @@ package object server {
      * Sets read timeout.
      *
      * The `readTimeout` controls how long a read from a socket blocks before it
-     * times out. At which point, the socket is closed, and its associated
-     * request is discarded.
+     * times out, whereafter <strong>408 Request Timeout</strong> is sent to
+     * client.
      *
      * @param timeout read timeout in milliseconds
      *

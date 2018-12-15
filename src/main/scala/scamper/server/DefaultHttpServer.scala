@@ -16,21 +16,21 @@
 package scamper.server
 
 import java.io.{ File, FileWriter, PrintWriter }
-import java.net.{ InetAddress, InetSocketAddress, Socket }
+import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException }
 import java.time.Instant
 import java.util.concurrent.{ ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadFactory, ThreadPoolExecutor }
 import java.util.concurrent.atomic.AtomicInteger
 
 import javax.net.ServerSocketFactory
-import javax.net.ssl.{ SSLException, SSLServerSocketFactory }
+import javax.net.ssl.SSLServerSocketFactory
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success, Try }
+import scala.util.Try
 
 import scamper.{ Header, HttpRequest, HttpResponse, RequestLine }
-import scamper.ImplicitConverters.{ inputStreamToEntity, stringToEntity }
-import scamper.ResponseStatuses.NotFound
+import scamper.ImplicitConverters.inputStreamToEntity
+import scamper.ResponseStatuses.{ NotFound, RequestTimeout }
 import scamper.auxiliary.SocketType
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
 import scamper.types.ImplicitConverters.stringToTransferCoding
@@ -63,8 +63,8 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
   private val threadGroup = new ThreadGroup(s"httpserver-$id")
 
   private val keepAliveSeconds = app.keepAliveSeconds
-  private val requestHandlers = app.requestHandlers
-  private val responseFilters = app.responseFilters
+  private val requestHandler = RequestHandler.coalesce(app.requestHandlers : _*)
+  private val responseFilter = ResponseFilter.chain(app.responseFilters : _*)
   private val logger = new PrintWriter(new FileWriter(app.log, true), true)
   private val serverSocket = app.factory.createServerSocket()
   private var closed = false
@@ -112,71 +112,56 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
 
     log(s"[info] Server running at $authority")
   } catch {
-    case cause: Exception =>
-      log(s"[error] Failed to start server at $authority", Some(cause))
+    case e: Exception =>
+      log(s"[error] Failed to start server at $authority", Some(e))
       close()
-      throw cause
+      throw e
   }
 
-  private def log(message: String, cause: Option[Throwable] = None): Unit = {
+  private def log(message: String, error: Option[Throwable] = None): Unit = {
     logger.printf("%s [%s]%s%n", Instant.now(), authority, message)
-    cause.foreach(_.printStackTrace(logger))
+    error.foreach(_.printStackTrace(logger))
   }
 
   private object Service extends Thread(threadGroup, s"httpserver-$id-service") {
-    override def run(): Unit = {
+    override def run(): Unit =
       while (!isClosed)
         try
           service(serverSocket.accept())
         catch {
-          case _ if !isClosed => // Ignore if server is closed
-
-          case cause: Exception =>
-            if (serverSocket.isClosed) {
-              log(s"[error] Error while waiting for connection: $cause", Some(cause))
-              Try(close())
-            } else {
-              log(s"[warning] Error while waiting for connection: $cause", Some(cause))
-            }
+          case e: Exception if serverSocket.isClosed => close() // Ensure server is closed
+          case e: Exception => log(s"[warning] Error while waiting for connection: $e", Some(e))
         }
-    }
 
     private def service(implicit socket: Socket): Unit = {
-      log(s"[info] Connection received from ${format(socket)}")
+      val connection = socket.getInetAddress.getHostAddress + ":" + socket.getPort
+      log(s"[info] Connection received from $connection")
 
       Future {
         try {
-          log(s"[info] Servicing request from ${format(socket)}")
+          log(s"[info] Servicing request from $connection")
           socket.setSoTimeout(readTimeout)
 
           val req = read()
           val res = handle(req)
 
-          Try(filter(res)) match {
-            case Success(res) =>
-              write(res)
-              log(s"[info] Response sent to ${format(socket)}")
-              // Close body of filtered response
-              Try(res.body.getInputStream.close())
-
-            case Failure(cause) =>
-              log(s"[error] Error while filtering response to ${format(socket)}", Some(cause))
+          Try(filter(res)).map { res =>
+            write(res)
+            log(s"[info] Response sent to $connection")
+            Try(res.body.getInputStream.close()) // Close filtered response body
+          }.recover {
+            case e => log(s"[error] Error while filtering response to $connection", Some(e))
           }
 
-          // Close body of unfiltered response
-          Try(res.body.getInputStream.close())
+          Try(res.body.getInputStream.close()) // Close unfiltered response body
         } catch {
-          case cause: Exception =>
-            log(s"[error] Error while servicing request from ${format(socket)}", Some(cause))
+          case e: Exception => log(s"[error] Error while servicing request from $connection", Some(e))
         } finally {
-          log(s"[info] Closing connection to ${format(socket)}")
+          log(s"[info] Closing connection to $connection")
           Try(socket.close())
         }
       }
     }
-
-    private def format(socket: Socket): String =
-      socket.getInetAddress.getHostAddress + ":" + socket.getPort
 
     private def read()(implicit socket: Socket): HttpRequest = {
       val buffer = new Array[Byte](8192)
@@ -219,12 +204,14 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
     }
 
     private def handle(req: HttpRequest): HttpResponse =
-      requestHandlers.reduceLeftOption(_ orElse _)
-        .flatMap(_(req).toOption)
-        .getOrElse(NotFound())
+      try
+        requestHandler(req).getOrElse(NotFound())
+      catch {
+        case _: SocketTimeoutException => RequestTimeout()
+      }
 
     private def filter(res: HttpResponse): HttpResponse =
-      responseFilters.foldLeft(prepare(res)) { (res, filter) => filter(res) }
+      responseFilter(prepare(res))
 
     private def prepare(res: HttpResponse): HttpResponse = {
       if (res.hasTransferEncoding || res.hasContentLength)
