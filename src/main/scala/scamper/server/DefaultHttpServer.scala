@@ -15,22 +15,22 @@
  */
 package scamper.server
 
-import java.io.{ File, FileWriter, PrintWriter }
+import java.io.{ File, FileWriter, IOException, PrintWriter }
 import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException }
 import java.time.Instant
 import java.util.concurrent.{ ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadFactory, ThreadPoolExecutor }
 import java.util.concurrent.atomic.AtomicInteger
 
 import javax.net.ServerSocketFactory
-import javax.net.ssl.SSLServerSocketFactory
+import javax.net.ssl.{ SSLException, SSLServerSocketFactory }
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.Try
+import scala.util.{ Failure, Success, Try }
 
 import scamper.{ Header, HttpRequest, HttpResponse, RequestLine }
 import scamper.ImplicitConverters.inputStreamToEntity
-import scamper.ResponseStatuses.{ NotFound, RequestTimeout }
+import scamper.ResponseStatuses.{ BadRequest, InternalServerError, NotFound, RequestTimeout }
 import scamper.auxiliary.SocketType
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
 import scamper.types.ImplicitConverters.stringToTransferCoding
@@ -137,25 +137,34 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
       val connection = socket.getInetAddress.getHostAddress + ":" + socket.getPort
       log(s"[info] Connection received from $connection")
 
+      def intercept: PartialFunction[Throwable, HttpResponse] = {
+        case err: ArrayIndexOutOfBoundsException => BadRequest()
+        case err: SocketTimeoutException => RequestTimeout()
+        case err: IOException => throw err
+        case err =>
+          log(s"[error] Error while servicing request from $connection", Some(err))
+          InternalServerError()
+      }
+
       Future {
         try {
           log(s"[info] Servicing request from $connection")
           socket.setSoTimeout(readTimeout)
 
-          val req = read()
-          val res = handle(req)
+          Try(read()).fold(err => Try(intercept(err)), req => Try(handle(req))) match {
+            case Success(res) =>
+              Try(filter(res)).map { res =>
+                write(res)
+                log(s"[info] Response sent to $connection")
+                Try(res.body.getInputStream.close()) // Close filtered response body
+              }.recover {
+                case err => log(s"[error] Error while filtering response to $connection", Some(err))
+              }
 
-          Try(filter(res)).map { res =>
-            write(res)
-            log(s"[info] Response sent to $connection")
-            Try(res.body.getInputStream.close()) // Close filtered response body
-          }.recover {
-            case e => log(s"[error] Error while filtering response to $connection", Some(e))
+              Try(res.body.getInputStream.close()) // Close unfiltered response body
+
+            case Failure(err) => log(s"[error] Error while servicing request from $connection", Some(err))
           }
-
-          Try(res.body.getInputStream.close()) // Close unfiltered response body
-        } catch {
-          case e: Exception => log(s"[error] Error while servicing request from $connection", Some(e))
         } finally {
           log(s"[info] Closing connection to $connection")
           Try(socket.close())
@@ -204,11 +213,7 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
     }
 
     private def handle(req: HttpRequest): HttpResponse =
-      try
-        requestHandler(req).getOrElse(NotFound())
-      catch {
-        case _: SocketTimeoutException => RequestTimeout()
-      }
+      requestHandler(req).getOrElse(NotFound())
 
     private def filter(res: HttpResponse): HttpResponse =
       responseFilter(prepare(res))
