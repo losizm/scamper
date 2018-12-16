@@ -15,8 +15,8 @@
  */
 package scamper.server
 
-import java.io.{ File, FileWriter, IOException, PrintWriter }
-import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException }
+import java.io.{ File, FileWriter, PrintWriter }
+import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException, URI, URISyntaxException }
 import java.time.Instant
 import java.util.concurrent.{ ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadFactory, ThreadPoolExecutor }
 import java.util.concurrent.atomic.AtomicInteger
@@ -28,9 +28,9 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
-import scamper.{ Header, HttpRequest, HttpResponse, RequestLine }
+import scamper.{ Header, HttpException, HttpRequest, HttpResponse, HttpVersion, RequestLine, RequestMethod, ResponseStatus }
 import scamper.ImplicitConverters.inputStreamToEntity
-import scamper.ResponseStatuses.{ BadRequest, InternalServerError, NotFound, RequestTimeout }
+import scamper.ResponseStatuses.{ BadRequest, InternalServerError, NotFound, RequestTimeout, UriTooLong }
 import scamper.auxiliary.SocketType
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
 import scamper.types.ImplicitConverters.stringToTransferCoding
@@ -118,6 +118,8 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
       throw e
   }
 
+  private case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
+
   private def log(message: String, error: Option[Throwable] = None): Unit = {
     logger.printf("%s [%s]%s%n", Instant.now(), authority, message)
     error.foreach(_.printStackTrace(logger))
@@ -137,12 +139,22 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
       val connection = socket.getInetAddress.getHostAddress + ":" + socket.getPort
       log(s"[info] Connection received from $connection")
 
-      def intercept: PartialFunction[Throwable, HttpResponse] = {
-        case err: ArrayIndexOutOfBoundsException => BadRequest()
-        case err: SocketTimeoutException => RequestTimeout()
-        case err: IOException => throw err
+      def onReadError: PartialFunction[Throwable, HttpResponse] = {
+        case ReadError(status) => status()
+        case err: IllegalArgumentException  => BadRequest()
+        case err: IndexOutOfBoundsException => BadRequest()
+        case err: SocketTimeoutException    => RequestTimeout()
+        case err: SSLException              => throw err
         case err =>
-          log(s"[error] Error while servicing request from $connection", Some(err))
+          log(s"[error] Error while reading request from $connection", Some(err))
+          InternalServerError()
+      }
+
+      def onHandleError: PartialFunction[Throwable, HttpResponse] = {
+        case err: SocketTimeoutException => RequestTimeout()
+        case err: SSLException           => throw err
+        case err =>
+          log(s"[error] Error while handling request from $connection", Some(err))
           InternalServerError()
       }
 
@@ -151,20 +163,28 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
           log(s"[info] Servicing request from $connection")
           socket.setSoTimeout(readTimeout)
 
-          Try(read()).fold(err => Try(intercept(err)), req => Try(handle(req))) match {
-            case Success(res) =>
-              Try(filter(res)).map { res =>
-                write(res)
-                log(s"[info] Response sent to $connection")
-                Try(res.body.getInputStream.close()) // Close filtered response body
-              }.recover {
-                case err => log(s"[error] Error while filtering response to $connection", Some(err))
-              }
+          Try(read())
+            .fold(err => Try(onReadError(err)), req => Try(handle(req)))
+            .recover(onHandleError)
+            .map { res =>
+              Try(filter(res))
+                .map { res =>
+                  write(res)
+                  log(s"[info] Response sent to $connection")
+                  Try(res.body.getInputStream.close()) // Close filtered response body
+                }.recover {
+                  case err => log(s"[error] Error while filtering response to $connection", Some(err))
+                }
 
               Try(res.body.getInputStream.close()) // Close unfiltered response body
+            }.get
+        } catch {
+          case err: SSLException =>
+            log(s"[error] SSL error while servicing request from $connection", Some(err))
 
-            case Failure(err) => log(s"[error] Error while servicing request from $connection", Some(err))
-          }
+          case err: Throwable =>
+            log(s"[error] Fatal error while servicing request from $connection", Some(err))
+            throw err
         } finally {
           log(s"[info] Closing connection to $connection")
           Try(socket.close())
@@ -174,7 +194,10 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
 
     private def read()(implicit socket: Socket): HttpRequest = {
       val buffer = new Array[Byte](8192)
-      val startLine = RequestLine.parse(socket.readLine(buffer))
+      val method = readMethod(buffer)
+      val uri = readUri(buffer)
+      val version = readVersion(buffer)
+      val startLine = RequestLine(method, uri, version)
       val headers = new ArrayBuffer[Header](8)
       var line = ""
 
@@ -182,6 +205,26 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
         headers += Header.parse(line)
 
       HttpRequest(startLine, headers.toSeq, socket.getInputStream)
+    }
+
+    private def readMethod(buffer: Array[Byte])(implicit socket: Socket): RequestMethod =
+      RequestMethod(socket.readToken(" ", buffer))
+
+    private def readUri(buffer: Array[Byte])(implicit socket: Socket): URI =
+      try
+        new URI(socket.readToken(" ", buffer))
+      catch {
+        case _: IndexOutOfBoundsException => throw ReadError(UriTooLong)
+        case _: URISyntaxException        => throw ReadError(BadRequest)
+      }
+
+    private def readVersion(buffer: Array[Byte])(implicit socket: Socket): HttpVersion = {
+      val regex = "HTTP/(.+)".r
+
+      socket.readLine(buffer) match {
+        case regex(version) => HttpVersion.parse(version)
+        case _ => throw ReadError(BadRequest)
+      }
     }
 
     private def write(res: HttpResponse)(implicit socket: Socket): Unit = {
@@ -216,9 +259,9 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
       requestHandler(req).getOrElse(NotFound())
 
     private def filter(res: HttpResponse): HttpResponse =
-      responseFilter(prepare(res))
+      responseFilter(prepare(res).withDate(Instant.now).withConnection("close"))
 
-    private def prepare(res: HttpResponse): HttpResponse = {
+    private def prepare(res: HttpResponse): HttpResponse =
       if (res.hasTransferEncoding || res.hasContentLength)
         res
       else
@@ -227,6 +270,5 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
           case Some(n) => res.withContentLength(n)
           case None    => res.withTransferEncoding("chunked")
         }
-    }.withDate(Instant.now).withConnection("close")
   }
 }

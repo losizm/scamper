@@ -55,10 +55,29 @@ package object auxiliary {
       new String(getBytes(bufferSize), charset)
 
     /**
+     * Reads token from input stream. The delimiter is removed before token is
+     * returned.
+     *
+     * @param delimiters token delimiters
+     * @param buffer token buffer
+     */
+    def readToken(delimiters: String, buffer: Array[Byte]): String = {
+      var length = 0
+      var byte = -1
+
+      while ({ byte = in.read(); !delimiters.contains(byte) && byte != -1}) {
+        buffer(length) = byte.toByte
+        length += 1
+      }
+
+      new String(buffer, 0, length, "UTF-8")
+    }
+
+    /**
      * Reads line of text from input stream. The CRLF characters are removed
      * before text is returned.
      *
-     * @param buffer byte buffer for text
+     * @param buffer text buffer
      */
     def readLine(buffer: Array[Byte]): String = {
       var length = 0
@@ -126,12 +145,22 @@ package object auxiliary {
      * Reads line of text from socket input stream. The CRLF characters are
      * removed before value is returned.
      *
-     * @param buffer byte buffer for text
+     * @param buffer text buffer
      *
      * @return line of text
      */
     def readLine(buffer: Array[Byte]): String =
       socket.getInputStream().readLine(buffer)
+
+    /**
+     * Reads token from socket input stream. The delimiter is removed before
+     * token is returned.
+     *
+     * @param delimiters token delimiters
+     * @param buffer token buffer
+     */
+    def readToken(delimiters: String, buffer: Array[Byte]): String =
+      socket.getInputStream().readToken(delimiters, buffer)
 
     /**
      * Writes byte to socket output stream.
