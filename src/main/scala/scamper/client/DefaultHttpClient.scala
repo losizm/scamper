@@ -24,7 +24,7 @@ import javax.net.ssl.SSLSocketFactory
 import scala.util.Try
 import scala.util.control.NonFatal
 
-import scamper.{ Entity, Header, HttpException, HttpRequest, RequestMethod }
+import scamper.{ Entity, Header, HttpRequest, RequestMethod }
 import scamper.RequestMethods._
 import scamper.auxiliary.UriType
 import scamper.cookies.{ PlainCookie, RequestCookies }

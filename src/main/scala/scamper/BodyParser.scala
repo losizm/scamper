@@ -15,12 +15,12 @@
  */
 package scamper
 
-import java.io.{ File, FileOutputStream, InputStream }
+import java.io.{ File, FileOutputStream }
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
-import scamper.types._
+import scamper.types.MediaType
 
 /**
  * Provides utility for parsing HTTP message body.

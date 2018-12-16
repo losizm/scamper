@@ -22,16 +22,13 @@ import java.time.Instant
 
 import scala.util.{ Failure, Success, Try }
 
-import scamper._
+import scamper.{ HttpRequest, HttpResponse }
 import scamper.ImplicitConverters._
-import scamper.RequestMethods._
-import scamper.ResponseStatuses._
-import scamper.auxiliary._
-import scamper.cookies._
-import scamper.headers._
-import scamper.types._
-import scamper.types._
-import scamper.types.ImplicitConverters._
+import scamper.RequestMethods.{ GET, HEAD }
+import scamper.ResponseStatuses.{ MethodNotAllowed, NotAcceptable, NotModified, Ok }
+import scamper.auxiliary.StringType
+import scamper.headers.{ Accept, Allow, ContentLength, ContentType, Date, IfModifiedSince, LastModified }
+import scamper.types.{ MediaRange, MediaType }
 
 private class StaticFileServer private (val baseDirectory: Path, val pathPrefix: Path) extends RequestHandler {
   private val `application/octet-stream` = MediaType("application", "octet-stream")

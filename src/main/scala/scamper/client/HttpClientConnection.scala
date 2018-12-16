@@ -18,8 +18,6 @@ package scamper.client
 import java.net.Socket
 
 import scala.collection.mutable.ArrayBuffer
-import scala.util.Try
-import scala.util.control.NonFatal
 
 import scamper.{ Entity, Header, HttpRequest, HttpResponse, StatusLine }
 import scamper.auxiliary.SocketType

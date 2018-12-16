@@ -15,7 +15,7 @@
  */
 package scamper
 
-import java.io.{ InputStream, SequenceInputStream }
+import java.io.InputStream
 import java.util.zip.{ GZIPInputStream, InflaterInputStream }
 
 /** A mixin providing access to decoded message body. */

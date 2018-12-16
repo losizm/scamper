@@ -17,7 +17,6 @@ package scamper
 
 import java.io.{ ByteArrayInputStream, File, FileInputStream, InputStream }
 import java.nio.file.Path
-import scala.util.Try
 
 /** Representation of message body. */
 trait Entity {

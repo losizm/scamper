@@ -15,7 +15,6 @@
  */
 package scamper.types
 
-import scala.annotation.tailrec
 import scamper.Grammar._
 import scamper.ListParser
 
