@@ -149,6 +149,14 @@ package object server {
         filters.reduceLeft(_ andThen _)
   }
 
+  /**
+   * Indicates response was aborted.
+   *
+   * A `RequestHandler` throws `ResponseAborted` if no response should be sent
+   * for the handled request.
+   */
+  case class ResponseAborted(message: String) extends HttpException(message)
+
   /** Indicates parameter does not exist. */
   case class ParameterNotFound(name: String) extends HttpException(name)
 

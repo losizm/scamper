@@ -140,10 +140,11 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
       log(s"[info] Connection received from $connection")
 
       def onReadError: PartialFunction[Throwable, HttpResponse] = {
-        case ReadError(status) => status()
+        case ReadError(status)              => status()
         case err: IllegalArgumentException  => BadRequest()
         case err: IndexOutOfBoundsException => BadRequest()
         case err: SocketTimeoutException    => RequestTimeout()
+        case err: ResponseAborted           => throw err
         case err: SSLException              => throw err
         case err =>
           log(s"[error] Error while reading request from $connection", Some(err))
@@ -152,6 +153,7 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
 
       def onHandleError: PartialFunction[Throwable, HttpResponse] = {
         case err: SocketTimeoutException => RequestTimeout()
+        case err: ResponseAborted        => throw err
         case err: SSLException           => throw err
         case err =>
           log(s"[error] Error while handling request from $connection", Some(err))
@@ -179,8 +181,11 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
               Try(res.body.getInputStream.close()) // Close unfiltered response body
             }.get
         } catch {
+          case err: ResponseAborted =>
+            log(s"[warn] Response aborted while servicing request from $connection", Some(err))
+
           case err: SSLException =>
-            log(s"[error] SSL error while servicing request from $connection", Some(err))
+            log(s"[warn] SSL error while servicing request from $connection", Some(err))
 
           case err: Throwable =>
             log(s"[error] Fatal error while servicing request from $connection", Some(err))

@@ -698,6 +698,23 @@ app.static("/app/main", new File("/path/to/public"))
 In this case, _http://localhost:8080/app/main/images/logo.png_ would map to
 _/path/to/public/images/logo.png_.
 
+### Aborting Response
+
+At times, you may wish to omit a response for a particular request. On such
+occassions, you'd throw `ResponseAborted` from within the request handler.
+
+```scala
+import scamper.headers.Referer
+import scamper.server.ResponseAborted
+
+// Ignore requests originating from evil site
+app.request { req =>
+  if (req.referer.getHost == "www.phishing.com")
+    throw ResponseAborted("Not trusted")
+  req
+}
+```
+
 ### Response Filters
 
 In much the same way requests can be filtered, so too can responses. Response
