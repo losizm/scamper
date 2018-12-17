@@ -61,7 +61,7 @@ val contentType: Option[String] = req.getHeaderValue("Content-Type")
 ```
 
 This gets the job done in many cases; however, `HttpMessage` can be extended for
-specialized header access. There extension methods provided by the many type
+specialized header access. There are extension methods provided by the many type
 classes defined in `scamper.headers`.
 
 For example, `ContentType` adds the following methods:
@@ -153,7 +153,7 @@ Specialized access is provided by `ResponseCookies`, with each cookie
 represented as `SetCookie`.
 
 Along with name and value, `SetCookie` provides additional attributes, such as
-the path for which the cookie is valid, when the cookie expires, whether the
+the path to which the cookie is valid, when the cookie expires, whether the
 cookie should be sent over secure channels only, and a few others.
 
 ```scala
@@ -356,9 +356,9 @@ The examples in the previous section use the `HttpClient` object as the client.
 Behind the scenes, this actually creates an instance of `HttpClient` for
 one-time usage.
 
-If you plan to send multiple requests, it's better to create and maintain a
-reference to an instance, and use it as the client. With that, you also get
-access to methods corresponding to the standard HTTP request methods.
+If you plan to send multiple requests, you can create and maintain a reference
+to an instance, and use it as the client. With that, you also get access to
+methods corresponding to the standard HTTP request methods.
 
 ```scala
 import scamper.BodyParsers
@@ -383,8 +383,8 @@ def getMessageOfTheDay(): Either[Int, String] = {
 
 ### Providing Truststore
 
-When creating a client, you can supply the effective truststore used for all
-requests made via HTTPS.
+When creating a client, you can supply the truststore used for all requests made
+via HTTPS.
 
 ```scala
 import scamper.ImplicitConverters.{ stringToEntity, stringToUri }
