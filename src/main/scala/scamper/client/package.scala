@@ -154,7 +154,8 @@ package object client {
      *
      * @return value from response handler
      */
-    def post[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())(handler: ResponseHandler[T]): T
+    def post[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+      (handler: ResponseHandler[T]): T
 
     /**
      * Sends PUT request and passes response to handler.
@@ -170,7 +171,8 @@ package object client {
      *
      * @return value from response handler
      */
-    def put[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())(handler: ResponseHandler[T]): T
+    def put[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+      (handler: ResponseHandler[T]): T
 
     /**
      * Sends PATCH request and passes response to handler.
@@ -186,7 +188,8 @@ package object client {
      *
      * @return value from response handler
      */
-    def patch[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())(handler: ResponseHandler[T]): T
+    def patch[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+      (handler: ResponseHandler[T]): T
 
     /**
      * Sends DELETE request and passes response to handler.
@@ -232,7 +235,8 @@ package object client {
      *
      * @return value from response handler
      */
-    def options[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())(handler: ResponseHandler[T]): T
+    def options[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+      (handler: ResponseHandler[T]): T
 
     /**
      * Sends TRACE request and passes response to handler.
@@ -282,7 +286,7 @@ package object client {
      *
      * @return value from applied handler
      */
-    def send[T](request: HttpRequest, secure: Boolean = false, bufferSize: Int = 8192, timeout: Int = 5000, trustStore: Option[File] = None)(handler: ResponseHandler[T]): T =
-      HttpClient(bufferSize, timeout, trustStore).send(request, secure)(handler)
+    def send[T](request: HttpRequest, secure: Boolean = false, bufferSize: Int = 8192, timeout: Int = 5000, trustStore: Option[File] = None)
+      (handler: ResponseHandler[T]): T = HttpClient(bufferSize, timeout, trustStore).send(request, secure)(handler)
   }
 }

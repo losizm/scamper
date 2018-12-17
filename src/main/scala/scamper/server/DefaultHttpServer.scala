@@ -49,14 +49,14 @@ private object DefaultHttpServer {
     factory: ServerSocketFactory = ServerSocketFactory.getDefault()
   )
 
-  def apply(host: InetAddress, port: Int, app: Application) =
-    new DefaultHttpServer(count.incrementAndGet(), host, port, app)
+  def apply(app: Application, host: InetAddress, port: Int) =
+    new DefaultHttpServer(count.incrementAndGet(), app)(host, port)
 }
 
-private class DefaultHttpServer private(val id: Int, val host: InetAddress, val port: Int, app: DefaultHttpServer.Application) extends HttpServer {
-  val readTimeout = app.readTimeout
+private class DefaultHttpServer private (id: Int, app: DefaultHttpServer.Application)(val host: InetAddress, val port: Int) extends HttpServer {
   val poolSize = app.poolSize
   val queueSize = app.queueSize
+  val readTimeout = app.readTimeout
   val log = app.log
 
   private val authority = s"${host.getCanonicalHostName}:$port"
@@ -78,8 +78,15 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
       def newThread(task: Runnable) = new Thread(threadGroup, task, s"httpserver-$id-service-${count.incrementAndGet()}")
     }
 
-    val queue = new ArrayBlockingQueue[Runnable](queueSize)
-    new ThreadPoolExecutor(poolSize, poolSize, keepAliveSeconds, TimeUnit.SECONDS, queue, ServiceThreadFactory, ServiceUnavailableHandler)
+    new ThreadPoolExecutor(
+      poolSize,
+      poolSize,
+      keepAliveSeconds,
+      TimeUnit.SECONDS,
+      new ArrayBlockingQueue[Runnable](queueSize),
+      ServiceThreadFactory,
+      ServiceUnavailableHandler
+    )
   }
 
   val isSecure: Boolean = app.factory.isInstanceOf[SSLServerSocketFactory]
@@ -117,12 +124,12 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
       throw e
   }
 
-  private case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
-
   private def log(message: String, error: Option[Throwable] = None): Unit = {
     logger.printf("%s [%s]%s%n", Instant.now(), authority, message)
     error.foreach(_.printStackTrace(logger))
   }
+
+  private case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
 
   private object Service extends Thread(threadGroup, s"httpserver-$id-service") {
     override def run(): Unit =

@@ -51,7 +51,7 @@ private object SecureServerSocketFactory {
   def create(key: PrivateKey, cert: Certificate):  SSLServerSocketFactory = {
     val password = Passwords.create()
 
-    val keyStore = KeyStore.getInstance("pkcs12")
+    val keyStore = KeyStore.getInstance("PKCS12")
     keyStore.load(null, password)
     keyStore.setKeyEntry("server", key, password, Array(cert))
 
