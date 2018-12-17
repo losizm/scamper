@@ -61,7 +61,6 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
 
   private val authority = s"${host.getCanonicalHostName}:$port"
   private val threadGroup = new ThreadGroup(s"httpserver-$id")
-
   private val keepAliveSeconds = app.keepAliveSeconds
   private val requestHandler = RequestHandler.coalesce(app.requestHandlers : _*)
   private val responseFilter = ResponseFilter.chain(app.responseFilters : _*)
@@ -200,9 +199,9 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
     private def read()(implicit socket: Socket): HttpRequest = {
       val buffer = new Array[Byte](8192)
       val method = readMethod(buffer)
-      val uri = readUri(buffer)
+      val target = readTarget(buffer)
       val version = readVersion(buffer)
-      val startLine = RequestLine(method, uri, version)
+      val startLine = RequestLine(method, target, version)
       val headers = new ArrayBuffer[Header](8)
       var line = ""
 
@@ -215,7 +214,7 @@ private class DefaultHttpServer private(val id: Int, val host: InetAddress, val 
     private def readMethod(buffer: Array[Byte])(implicit socket: Socket): RequestMethod =
       RequestMethod(socket.readToken(" ", buffer))
 
-    private def readUri(buffer: Array[Byte])(implicit socket: Socket): URI =
+    private def readTarget(buffer: Array[Byte])(implicit socket: Socket): URI =
       try
         new URI(socket.readToken(" ", buffer))
       catch {
