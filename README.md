@@ -5,6 +5,34 @@ and [server](#HTTP-Server) implementations.
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_2.12.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_2.12%22)
 
+## Table of Contents
+- [HTTP Messages](#HTTP-Messages)
+  - [Building Requests](#Building-Requests)
+  - [Building Responses](#Building-Responses)
+- [Specialized Header Access](#Specialized-Header-Access)
+- [Specialized Cookie Access](#Specialized-Cookie-Access)
+  - [Request Cookies](#Request-Cookies)
+  - [Response Cookies](#Response-Cookies)
+- [Message Body](#Message-Body)
+  - [Creating Body](#Creating-Body)
+  - [Parsing Body](#Parsing-Body)
+- [HTTP Client](#HTTP-Client)
+  - [Creating Client](#Creating-Client)
+  - [Providing Truststore](#Providing-Truststore)
+- [HTTP Server](#HTTP-Server)
+  - [Server Application](#Server-Application)
+  - [Request Handlers](#Request-Handlers)
+    - [Filtering vs. Processing](#Filtering-vs-Processing)
+    - [Targeted Processing](#Targeted-Processing)
+    - [Path Parameters](#Path-Parameters)
+    - [Serving Static Files](#Serving-Static-Files)
+    - [Aborting Response](#Aborting-Response)
+  - [Response Filters](#Response-Filters)
+  - [Securing Server](#Securing-Server)
+  - [Creating Server](#Creating-Server)
+- [API Documentation](#API-Documentation)
+- [License](#License)
+
 ## HTTP Messages
 At the core of **Scamper** is `HttpMessage`, which is a trait that defines the
 fundamental characteristics of an HTTP message. `HttpRequest` and `HttpResponse`
@@ -194,7 +222,7 @@ _**Note:** Each response cookie is presented in its own **Set-Cookie** header.
 The message body is represented as `Entity`, which encapsulates content in
 `java.io.InputStream`.
 
-### Creating Message Body
+### Creating Body
 When building a message, use one of the `Entity` factory methods to create the
 body. For example, you can create a message body using text content.
 
@@ -244,7 +272,7 @@ import scamper.types.ImplicitConverters.stringToMediaType
 val res = Ok(new File("./index.html")).withContentType("text/html; charset=utf-8")
 ```
 
-### Parsing Message Body
+### Parsing Body
 
 When handling an incoming message, use an appropriate `BodyParser` to parse the
 message body. There is a set of standard parsers available in `BodyParsers`,
@@ -531,7 +559,7 @@ app.request { req =>
 }
 ```
 
-### Filtering vs. Processing
+#### Filtering vs. Processing
 
 There are two subclasses of `RequestHandler` reserved for instances where the
 handler always returns the same type: `RequestFilter` always returns an
@@ -566,7 +594,7 @@ app.request { req =>
 }
 ```
 
-### Targeted Request Processing
+#### Targeted Processing
 
 A request processor can be added to a targeted path with or without a targeted
 request method.
@@ -613,7 +641,7 @@ app.post("/messages") { req =>
 }
 ```
 
-### Path Parameters
+#### Path Parameters
 
 Parameters can be specified in the path and their resolved values made available
 to the processor. When a parameter is specified as __:param__, it matches a
@@ -676,7 +704,7 @@ app.post("/translate/:in/to/:out") { req =>
 }
 ```
 
-### Serving Static Files
+#### Serving Static Files
 
 You can add a specialized request handler to serve static files.
 
@@ -698,7 +726,7 @@ app.static("/app/main", new File("/path/to/public"))
 In this case, _http://localhost:8080/app/main/images/logo.png_ would map to
 _/path/to/public/images/logo.png_.
 
-### Aborting Response
+#### Aborting Response
 
 At times, you may wish to omit a response for a particular request. On such
 occassions, you'd throw `ResponseAborted` from within the request handler.
@@ -748,7 +776,7 @@ app.response { res =>
 }
 ```
 
-### Securing the Server
+### Securing Server
 
 The last piece of configuration is whether to secure the server using SSL/TLS.
 To use a secure transport, you must supply an appropriate key and certificate.
@@ -765,7 +793,7 @@ location.
 app.secure(new File("/path/to/keystore"), "s3cr3t", "pkcs12")
 ```
 
-### Creating the Server
+### Creating Server
 
 When the desired application has been configured, you're ready to create the
 server.
