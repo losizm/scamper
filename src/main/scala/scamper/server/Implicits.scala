@@ -21,7 +21,7 @@ import scamper.HttpRequest
 object Implicits {
   /** Adds extension methods to `HttpRequest`. */
   implicit class HttpRequestType(val req: HttpRequest) extends AnyVal {
-    /** Gets server-side parameters associated with request. */
+    /** Gets server-side request parameters. */
     def params(): RequestParameters =
       new TargetedRequestParameters(req.getHeaderValueOrElse("X-Scamper-Request-Parameters", ""))
   }

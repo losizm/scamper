@@ -157,13 +157,13 @@ package object server {
    */
   case class ResponseAborted(message: String) extends HttpException(message)
 
-  /** Indicates parameter does not exist. */
+  /** Indicates parameter is not found. */
   case class ParameterNotFound(name: String) extends HttpException(name)
 
   /** Indicates parameter cannot be converted. */
   case class ParameterNotConvertible(name: String, value: String) extends HttpException(s"$name=$value")
 
-  /** Provides access to server-side parameters associated with request. */
+  /** Provides access to server-side request parameters. */
   trait RequestParameters {
     /**
      * Gets named parameter as `String`.
