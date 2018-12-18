@@ -494,8 +494,7 @@ incoming connections), so technically there can be up to double **queueSize**
 waiting to be processed if both request queue and server backlog are filled.
 
 The **readTimeout** controls how long a read from a socket blocks before it
-times out. At which point, the socket is closed, and its associated request is
-discarded.
+times out, whereafter **408 Request Timeout** is sent to client.
 
 ### Request Handlers
 
