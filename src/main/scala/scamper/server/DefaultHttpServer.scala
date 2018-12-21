@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import javax.net.ServerSocketFactory
 import javax.net.ssl.{ SSLException, SSLServerSocketFactory }
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.ArrayStack
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
@@ -209,13 +209,20 @@ private class DefaultHttpServer private (id: Int, app: DefaultHttpServer.Applica
       val target = readTarget(buffer)
       val version = readVersion(buffer)
       val startLine = RequestLine(method, target, version)
-      val headers = new ArrayBuffer[Header](8)
+      val headers = new ArrayStack[Header]
       var line = ""
 
       while ({ line = socket.readLine(buffer); line != "" })
-        headers += Header.parse(line)
+        line.matches("[ \t]+.*") match {
+          case true =>
+            if (headers.isEmpty) throw ReadError(BadRequest)
+            val last = headers.pop()
+            headers += Header(last.name, last.value + " " + line.trim())
+          case false =>
+            headers += Header.parse(line)
+        }
 
-      HttpRequest(startLine, headers.toSeq, socket.getInputStream)
+      HttpRequest(startLine, headers.reverse.toSeq, socket.getInputStream)
     }
 
     private def readMethod(buffer: Array[Byte])(implicit socket: Socket): RequestMethod =

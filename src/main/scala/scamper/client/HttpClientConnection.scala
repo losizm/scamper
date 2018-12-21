@@ -17,9 +17,9 @@ package scamper.client
 
 import java.net.Socket
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.ArrayStack
 
-import scamper.{ Entity, Header, HttpRequest, HttpResponse, StatusLine }
+import scamper.{ Entity, Header, HttpException, HttpRequest, HttpResponse, StatusLine }
 import scamper.auxiliary.SocketType
 import scamper.headers.TransferEncoding
 
@@ -62,12 +62,19 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
 
   private def getResponse(): HttpResponse = {
     val statusLine = StatusLine.parse(socket.readLine(buffer))
-    val headers = new ArrayBuffer[Header](8)
+    val headers = new ArrayStack[Header]
     var line = ""
 
     while ({ line = socket.readLine(buffer); line != "" })
-      headers += Header.parse(line)
+      line.matches("[ \t]+.*") match {
+        case true =>
+          if (headers.isEmpty) throw new HttpException("Cannot parse response headers")
+          val last = headers.pop()
+          headers += Header(last.name, last.value + " " + line.trim())
+        case false =>
+          headers += Header.parse(line)
+      }
 
-    HttpResponse(statusLine, headers.toSeq, Entity(socket.getInputStream))
+    HttpResponse(statusLine, headers.reverse.toSeq, Entity(socket.getInputStream))
   }
 }
