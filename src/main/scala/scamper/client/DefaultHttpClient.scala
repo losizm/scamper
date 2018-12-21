@@ -65,7 +65,8 @@ private class DefaultHttpClient private (val bufferSize: Int, val timeout: Int)(
     effectiveRequest = effectiveRequest.withHeaders({
       Header("Host", host) +:
       Header("User-Agent", userAgent) +:
-      effectiveRequest.headers.filterNot(header => header.name.matches("(?i)Host|User-Agent"))
+      effectiveRequest.headers.filterNot(header => header.name.matches("(?i)Host|User-Agent|Connection")) :+
+      Header("Connection", "close")
     } : _*)
 
     effectiveRequest = effectiveRequest.withTarget(new URI(target.toURL.getFile))
