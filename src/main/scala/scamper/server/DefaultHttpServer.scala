@@ -24,12 +24,11 @@ import java.util.concurrent.atomic.AtomicInteger
 import javax.net.ServerSocketFactory
 import javax.net.ssl.{ SSLException, SSLServerSocketFactory }
 
-import scala.collection.mutable.ArrayStack
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
-import scamper.{ Header, HttpException, HttpRequest, HttpResponse, HttpVersion, RequestLine, RequestMethod, ResponseStatus }
-import scamper.ImplicitConverters.inputStreamToEntity
+import scamper.{ Entity, Header, HttpException, HttpRequest, HttpResponse, HttpVersion, RequestLine, RequestMethod, ResponseStatus }
 import scamper.ResponseStatuses.{ BadRequest, InternalServerError, NotFound, RequestTimeout, UriTooLong }
 import scamper.auxiliary.SocketType
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
@@ -209,20 +208,20 @@ private class DefaultHttpServer private (id: Int, app: DefaultHttpServer.Applica
       val target = readTarget(buffer)
       val version = readVersion(buffer)
       val startLine = RequestLine(method, target, version)
-      val headers = new ArrayStack[Header]
+      val headers = new ArrayBuffer[Header]
       var line = ""
 
       while ({ line = socket.readLine(buffer); line != "" })
         line.matches("[ \t]+.*") match {
           case true =>
             if (headers.isEmpty) throw ReadError(BadRequest)
-            val last = headers.pop()
-            headers += Header(last.name, last.value + " " + line.trim())
+            val last = headers.last
+            headers.update(headers.length - 1, Header(last.name, last.value + " " + line.trim()))
           case false =>
             headers += Header.parse(line)
         }
 
-      HttpRequest(startLine, headers.reverse.toSeq, socket.getInputStream)
+      HttpRequest(startLine, headers.toSeq, Entity(socket.getInputStream))
     }
 
     private def readMethod(buffer: Array[Byte])(implicit socket: Socket): RequestMethod =
