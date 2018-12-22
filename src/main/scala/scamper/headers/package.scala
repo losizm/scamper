@@ -493,22 +493,22 @@ package object headers {
   /** Provides standardized access to Connection header. */
   implicit class Connection[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
     /**
-     * Gets Connection header value.
+     * Gets Connection header values.
      *
-     * @throws HeaderNotFound if Connection is not present
+     * @return header values or empty sequence if Connection is not present
      */
-    def connection: String = getConnection.getOrElse(throw HeaderNotFound("Connection"))
+    def connection: Seq[String] = getConnection.getOrElse(Nil)
 
-    /** Gets Connection header value if present. */
-    def getConnection: Option[String] =
-      message.getHeaderValue("Connection")
+    /** Gets Connection header values if present. */
+    def getConnection: Option[Seq[String]] =
+      message.getHeaderValue("Connection").map(ListParser.apply)
 
     /** Tests whether Connection header is present. */
     def hasConnection: Boolean = message.hasHeader("Connection")
 
-    /** Creates new message setting Connection header to supplied value. */
-    def withConnection(value: String): T =
-      message.withHeader(Header("Connection", value))
+    /** Creates new message setting Connection header to supplied values. */
+    def withConnection(values: String*): T =
+      message.withHeader(Header("Connection", values.mkString(", ")))
 
     /** Creates new message removing Connection header. */
     def removeConnection: T = message.removeHeaders("Connection")
