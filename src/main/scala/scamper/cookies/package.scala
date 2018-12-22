@@ -176,7 +176,8 @@ package object cookies {
      * @param cookies new set of cookies
      */
     def withCookies(cookies: PlainCookie*): HttpRequest =
-      request.withHeaders({
+      if (cookies.isEmpty) request.removeHeaders("Cookie")
+      else request.withHeaders({
         request.headers.filterNot(_.name.equalsIgnoreCase("Cookie")) :+ Header("Cookie", cookies.mkString("; "))
       } : _*)
   }
