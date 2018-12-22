@@ -24,11 +24,11 @@ import javax.net.ssl.SSLSocketFactory
 import scala.util.Try
 import scala.util.control.NonFatal
 
-import scamper.{ Entity, Header, HttpRequest, RequestMethod }
+import scamper.{ Entity, Header, HttpRequest, ListParser, RequestMethod }
 import scamper.RequestMethods._
 import scamper.auxiliary.UriType
 import scamper.cookies.{ PlainCookie, RequestCookies }
-import scamper.headers.{ ContentLength, Host, TransferEncoding }
+import scamper.headers.{ ContentLength, Host, TE, TransferEncoding }
 import scamper.types.TransferCoding
 
 private object DefaultHttpClient {
@@ -49,6 +49,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val timeout: Int)(
     val host = getEffectiveHost(request.target, request.getHost)
     val target = request.target.withScheme(scheme).withAuthority(host)
     val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/2.0")
+    val connection = getEffectiveConnection(request)
 
     var effectiveRequest = request.method match {
       case GET     => toBodilessRequest(request)
@@ -66,7 +67,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val timeout: Int)(
       Header("Host", host) +:
       Header("User-Agent", userAgent) +:
       effectiveRequest.headers.filterNot(header => header.name.matches("(?i)Host|User-Agent|Connection")) :+
-      Header("Connection", "close")
+      Header("Connection", connection)
     } : _*)
 
     effectiveRequest = effectiveRequest.withTarget(new URI(target.toURL.getFile))
@@ -74,7 +75,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val timeout: Int)(
     if (! effectiveRequest.path.startsWith("/"))
       effectiveRequest = effectiveRequest.withPath("/" + effectiveRequest.path)
 
-    val conn = getConnection(
+    val conn = getClientConnection(
       if (secure) secureSocketFactory else SocketFactory.getDefault(),
       target.getHost,
       target.getPort match {
@@ -135,7 +136,17 @@ private class DefaultHttpClient private (val bufferSize: Int, val timeout: Int)(
       }
     }
 
-  private def getConnection(factory: SocketFactory, host: String, port: Int): HttpClientConnection = {
+  private def getEffectiveConnection(request: HttpRequest): String =
+    request.getHeaderValue("Connection")
+      .orElse(Some(""))
+      .map(ListParser.apply)
+      .map { values => values.filterNot(_.matches("(?i)close|keep-alive|TE")) }
+      .map { values => if (request.hasTE) values :+ "TE" else values }
+      .map(_ :+ "close")
+      .map(_.mkString(", "))
+      .get
+
+  private def getClientConnection(factory: SocketFactory, host: String, port: Int): HttpClientConnection = {
     val socket = factory.createSocket(host, port)
 
     try {
