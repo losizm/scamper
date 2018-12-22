@@ -104,7 +104,10 @@ object HttpRequest {
 }
 
 private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header], body: Entity) extends HttpRequest {
-  lazy val path: String = target.getRawPath
+  lazy val path: String = target.getRawPath match {
+    case ""   => "/"
+    case path => path
+  }
 
   lazy val queryParams: Map[String, Seq[String]] =
     target.getRawQuery match {

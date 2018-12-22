@@ -31,6 +31,12 @@ class HttpMessageSpec extends FlatSpec {
     assert(req.getQueryParamValue("group").contains("wheel"))
   }
 
+  it should "be created with empty path" in {
+    assert(GET("").path == "/")
+    assert(GET("http://localhost:8080").path == "/")
+    assert(GET("http://localhost:8080/index.html").withPath("").path == "/")
+  }
+
   it should "be created with query parameters" in {
     val req = GET("/find").withQueryParams("user" -> "root", "group" -> "wheel")
     assert(req.method.name == "GET")
