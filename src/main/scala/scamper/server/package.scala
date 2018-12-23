@@ -609,13 +609,13 @@ package object server {
     }
 
     /**
-     * Adds request handler to serve static files from given directory.
+     * Adds request handler to serve static files from given base directory.
      *
-     * The directory files are mapped based on the request target path.
+     * Files are mapped from base directory to request path.
      *
      * === Example Mappings ===
      *
-     * |Base Directory|Request Target Path      |Maps to    |
+     * |Base Directory|Request Path             |Maps to    |
      * |--------------|-------------------------|-----------|
      * |/tmp          |/images/logo.png         |/tmp/images/logo.png|
      * |/tmp          |/images/icons/warning.png|/tmp/images/icons/warning.png|
@@ -625,32 +625,78 @@ package object server {
      *
      * @return this application
      */
-    def static(baseDirectory: File): this.type = synchronized {
+    def files(baseDirectory: File): this.type = synchronized {
       app = app.copy(requestHandlers = app.requestHandlers :+ StaticFileServer(baseDirectory, "/"))
       this
     }
 
     /**
-     * Adds request handler to serve static files from given directory.
+     * Adds request handler to serve static files from given base directory.
      *
-     * The directory files are mapped based on the request target path minus
+     * Files are mapped from base directory to request path excluding path
      * prefix.
      *
      * === Example Mappings ===
      *
-     * |Path   |Base Directory|Request Target Path      |Maps to    |
-     * |-------|--------------|-------------------------|-----------|
-     * |/images|/tmp          |/images/logo.png         |/tmp/logo.png|
-     * |/images|/tmp          |/images/icons/warning.png|/tmp/icons/warning.png|
-     * |/images|/tmp          |/styles/main.css         |<em>Doesn't map to anything</em>|
+     * |Path Prefix|Base Directory|Request Path             |Maps to    |
+     * |-----------|--------------|-------------------------|-----------|
+     * |/images    |/tmp          |/images/logo.png         |/tmp/logo.png|
+     * |/images    |/tmp          |/images/icons/warning.png|/tmp/icons/warning.png|
+     * |/images    |/tmp          |/styles/main.css         |<em>Doesn't map to anything</em>|
      *
-     * @param path request equest
+     * @param pathPrefix request path prefix
      * @param baseDirectory base directory from which files are served
      *
      * @return this application
      */
-    def static(path: String, baseDirectory: File): this.type = synchronized {
-      app = app.copy(requestHandlers = app.requestHandlers :+ StaticFileServer(baseDirectory, path))
+    def files(pathPrefix: String, baseDirectory: File): this.type = synchronized {
+      app = app.copy(requestHandlers = app.requestHandlers :+ StaticFileServer(baseDirectory, pathPrefix))
+      this
+    }
+
+    /**
+     * Adds request handler to serve static resources from given base name.
+     *
+     * Resources are mapped from base name to request path.
+     *
+     * === Example Mappings ===
+     *
+     * |Base Name|Request Path             |Maps to    |
+     * |---------|-------------------------|-----------|
+     * |/assets  |/images/logo.png         |/assets/images/logo.png|
+     * |/assets  |/images/icons/warning.png|/assets/images/icons/warning.png|
+     * |/assets  |/styles/main.css         |/assets/styles/main.css|
+     *
+     * @param baseName base name from which resources are served
+     *
+     * @return this application
+     */
+    def resources(baseName: String): this.type = synchronized {
+      app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(baseName, "/"))
+      this
+    }
+
+    /**
+     * Adds request handler to serve static resources from given base name.
+     *
+     * Resources are mapped from base name to request path excluding path
+     * prefix.
+     *
+     * === Example Mappings ===
+     *
+     * |Path Prefix|Base Name|Request Path             |Maps to    |
+     * |-----------|---------|-------------------------|-----------|
+     * |/images    |/assets  |/images/logo.png         |/assets/logo.png|
+     * |/images    |/assets  |/images/icons/warning.png|/assets/icons/warning.png|
+     * |/images    |/assets  |/styles/main.css         |<em>Doesn't map to anything</em>|
+     *
+     * @param pathPrefix request path prefix
+     * @param baseName base name from which resources are served
+     *
+     * @return this application
+     */
+    def resources(path: String, baseName: String): this.type = synchronized {
+      app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(baseName, path))
       this
     }
 

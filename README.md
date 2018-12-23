@@ -26,6 +26,7 @@ and [server](#HTTP-Server) implementations.
     - [Targeted Processing](#Targeted-Processing)
     - [Path Parameters](#Path-Parameters)
     - [Serving Static Files](#Serving-Static-Files)
+    - [Serving Static Resources](#Serving-Static-Resources)
     - [Aborting Response](#Aborting-Response)
   - [Response Filters](#Response-Filters)
   - [Securing Server](#Securing-Server)
@@ -709,7 +710,7 @@ You can add a specialized request handler to serve static files.
 
 ```scala
 // Serve static files from given directory
-app.static(new File("/path/to/public"))
+app.files(new File("/path/to/public"))
 ```
 
 This adds a handler to serve files from the directory at _/path/to/public_. The
@@ -719,11 +720,24 @@ _http://localhost:8080/images/logo.png_ would map to _/path/to/public/images/log
 Or, you can map a path prefix to a directory.
 
 ```scala
-app.static("/app/main", new File("/path/to/public"))
+app.files("/app/main", new File("/path/to/public"))
 ```
 
 In this case, _http://localhost:8080/app/main/images/logo.png_ would map to
 _/path/to/public/images/logo.png_.
+
+#### Serving Static Resources
+
+If your web assets are bundled in a jar file, just drop the jar on the
+classpath, and you can configure the application to serve its contents.
+
+```scala
+app.resources("/app/main", "/assets")
+```
+
+In the above configuration, requests prefixed with _/app/main_ are served
+resources from _/assets_. This mapping works similiar to static files, only the
+resources are located using the class loader.
 
 #### Aborting Response
 
