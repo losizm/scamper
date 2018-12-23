@@ -57,13 +57,14 @@ private class StaticFileServer private (val baseDirectory: Path, val pathPrefix:
   }
 
   private def getResponse(path: Path, headOnly: Boolean, accept: Seq[MediaRange], ifModifiedSince: Instant): HttpResponse = {
-    val attrs = Files.readAttributes(path, classOf[BasicFileAttributes])
-    val lastModified = attrs.lastModifiedTime.toInstant
-    val size = attrs.size
     val mediaType = getMediaType(path)
 
     accept.exists(range => range.matches(mediaType)) match {
       case true =>
+        val attrs = Files.readAttributes(path, classOf[BasicFileAttributes])
+        val lastModified = attrs.lastModifiedTime.toInstant
+        val size = attrs.size
+
         ifModifiedSince.isBefore(lastModified) match {
           case true =>
             val res = Ok().withDate(Instant.now())
