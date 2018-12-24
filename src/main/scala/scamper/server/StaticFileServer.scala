@@ -30,7 +30,7 @@ import scamper.auxiliary.StringType
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, Date, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 
-private class StaticFileServer private (val baseDirectory: Path, val pathPrefix: Path) extends RequestHandler {
+private class StaticFileServer private (baseDirectory: Path, pathPrefix: Path) extends RequestHandler {
   private val `application/octet-stream` = MediaType("application", "octet-stream")
   private val `*/*` = MediaRange("*", "*")
 
