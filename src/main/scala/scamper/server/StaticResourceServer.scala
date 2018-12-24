@@ -79,9 +79,13 @@ private class StaticResourceServer private (baseName: Path, pathPrefix: Path, lo
 
   private def getExists(path: Path): Boolean =
     path.startsWith(baseName) &&
-      path != Paths.get("/") &&
-      loader.getResource(path.toString) != null &&
-      loader.getResource(path.toString + "/") == null
+      path != Paths.get("") && {
+        loader.getResource(path.toString) match {
+          case null => false
+          case url if url.getProtocol == "file" => new File(url.toString.stripPrefix("file:")).isFile
+          case url => loader.getResource(path.toString + "/") == null
+        }
+      }
 
   private def getAccept(req: HttpRequest): Seq[MediaRange] =
     Try(req.accept) match {
