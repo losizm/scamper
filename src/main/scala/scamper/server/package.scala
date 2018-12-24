@@ -278,7 +278,7 @@ package object server {
   }
 
   /**
-   * Used to configure and create `HttpServer`.
+   * Configures and creates `HttpServer`.
    *
    * `ServerApplication` is a mutable structure. With each applied change, the
    * application is modified and returned. Changes applied after creating a
@@ -288,15 +288,16 @@ package object server {
    *
    * === Default Application ===
    *
-   * |Key        |Value |
-   * |-----------|------|
-   * |poolSize   |`Runtime.getRuntime().availableProcessors()`|
-   * |queueSize  |`Runtime.getRuntime().availableProcessors() * 4`|
-   * |readTimeout|`5000`|
-   * |log        |`new File("server.log")`|
-   * |secure     |<em>(Not configured)</em>|
-   * |request    |<em>(Not configured)</em>|
-   * |response   |<em>(Not configured)</em>|
+   * | Key         | Value |
+   * | ---------   | ----- |
+   * | poolSize    | `Runtime.getRuntime().availableProcessors()` |
+   * | queueSize   | `Runtime.getRuntime().availableProcessors() * 4` |
+   * | readTimeout | `5000` |
+   * | log         | `new File("server.log")` |
+   * | secure      | <em>(Not configured)</em> |
+   * | request     | <em>(Not configured)</em> |
+   * | response    | <em>(Not configured)</em> |
+   * <br>
    */
   class ServerApplication {
     private var app = DefaultHttpServer.Application()
@@ -613,13 +614,13 @@ package object server {
      *
      * Files are mapped from base directory to request path.
      *
-     * === Example Mappings ===
+     * === File Mapping Examples ===
      *
-     * |Base Directory|Request Path             |Maps to    |
-     * |--------------|-------------------------|-----------|
-     * |/tmp          |/images/logo.png         |/tmp/images/logo.png|
-     * |/tmp          |/images/icons/warning.png|/tmp/images/icons/warning.png|
-     * |/tmp          |/styles/main.css         |/tmp/styles/main.css|
+     * | Base Directory | Request Path              | Maps to |
+     * | -------------- | ------------------------- | ------- |
+     * | /tmp           | /images/logo.png          | /tmp/images/logo.png |
+     * | /tmp           | /images/icons/warning.png | /tmp/images/icons/warning.png |
+     * | /tmp           | /styles/main.css          | /tmp/styles/main.css |
      *
      * @param baseDirectory base directory from which files are served
      *
@@ -636,13 +637,13 @@ package object server {
      * Files are mapped from base directory to request path excluding path
      * prefix.
      *
-     * === Example Mappings ===
+     * === File Mapping Examples ===
      *
-     * |Path Prefix|Base Directory|Request Path             |Maps to    |
-     * |-----------|--------------|-------------------------|-----------|
-     * |/images    |/tmp          |/images/logo.png         |/tmp/logo.png|
-     * |/images    |/tmp          |/images/icons/warning.png|/tmp/icons/warning.png|
-     * |/images    |/tmp          |/styles/main.css         |<em>Doesn't map to anything</em>|
+     * | Path Prefix | Base Directory | Request Path              | Maps to |
+     * | ----------- | -------------- | ------------------------- | ------- |
+     * | /images     | /tmp           | /images/logo.png          | /tmp/logo.png |
+     * | /images     | /tmp           | /images/icons/warning.png | /tmp/icons/warning.png |
+     * | /images     | /tmp           | /styles/main.css          | <em>Doesn't map to anything</em> |
      *
      * @param pathPrefix request path prefix
      * @param baseDirectory base directory from which files are served
@@ -659,13 +660,13 @@ package object server {
      *
      * Resources are mapped from base name to request path.
      *
-     * === Example Mappings ===
+     * === Resource Mapping Examples ===
      *
-     * |Base Name|Request Path             |Maps to    |
-     * |---------|-------------------------|-----------|
-     * |/assets  |/images/logo.png         |/assets/images/logo.png|
-     * |/assets  |/images/icons/warning.png|/assets/images/icons/warning.png|
-     * |/assets  |/styles/main.css         |/assets/styles/main.css|
+     * | Base Name | Request Path              | Maps to |
+     * | --------- | ------------------------- | ------- |
+     * | /assets   | /images/logo.png          | /assets/images/logo.png |
+     * | /assets   | /images/icons/warning.png | /assets/images/icons/warning.png |
+     * | /assets   | /styles/main.css          | /assets/styles/main.css |
      *
      * @param baseName base name from which resources are served
      *
@@ -682,21 +683,21 @@ package object server {
      * Resources are mapped from base name to request path excluding path
      * prefix.
      *
-     * === Example Mappings ===
+     * === Resource Mapping Examples ===
      *
-     * |Path Prefix|Base Name|Request Path             |Maps to    |
-     * |-----------|---------|-------------------------|-----------|
-     * |/images    |/assets  |/images/logo.png         |/assets/logo.png|
-     * |/images    |/assets  |/images/icons/warning.png|/assets/icons/warning.png|
-     * |/images    |/assets  |/styles/main.css         |<em>Doesn't map to anything</em>|
+     * | Path Prefix | Base Name | Request Path              | Maps to |
+     * | ----------- | --------- | ------------------------- | ------- |
+     * | /images     | /assets   | /images/logo.png          | /assets/logo.png |
+     * | /images     | /assets   | /images/icons/warning.png | /assets/icons/warning.png |
+     * | /images     | /assets   | /styles/main.css          | <em>Doesn't map to anything</em> |
      *
      * @param pathPrefix request path prefix
      * @param baseName base name from which resources are served
      *
      * @return this application
      */
-    def resources(path: String, baseName: String): this.type = synchronized {
-      app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(baseName, path))
+    def resources(pathPrefix: String, baseName: String): this.type = synchronized {
+      app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(baseName, pathPrefix))
       this
     }
 
