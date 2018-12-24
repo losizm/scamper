@@ -30,7 +30,7 @@ import scamper.auxiliary.{ InputStreamType, StringType }
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, Date, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 
-private class StaticResourceServer private (val baseName: Path, val pathPrefix: Path) extends RequestHandler {
+private class StaticResourceServer private (baseName: Path, pathPrefix: Path, loader: ClassLoader) extends RequestHandler {
   private val `application/octet-stream` = MediaType("application", "octet-stream")
   private val `*/*` = MediaRange("*", "*")
 
@@ -80,8 +80,8 @@ private class StaticResourceServer private (val baseName: Path, val pathPrefix: 
   private def getExists(path: Path): Boolean =
     path.startsWith(baseName) &&
       path != Paths.get("/") &&
-      getClass.getResource(path.toString) != null &&
-      getClass.getResource(path.toString + "/") == null
+      loader.getResource(path.toString) != null &&
+      loader.getResource(path.toString + "/") == null
 
   private def getAccept(req: HttpRequest): Seq[MediaRange] =
     Try(req.accept) match {
@@ -93,7 +93,7 @@ private class StaticResourceServer private (val baseName: Path, val pathPrefix: 
     Try(req.ifModifiedSince).getOrElse(Instant.MIN)
 
   private def getResource(path: Path): Array[Byte] = {
-    val in = getClass.getResourceAsStream(path.toString)
+    val in = loader.getResourceAsStream(path.toString)
     try in.getBytes()
     finally Try(in.close())
   }
@@ -114,19 +114,15 @@ private class StaticResourceServer private (val baseName: Path, val pathPrefix: 
 }
 
 private object StaticResourceServer {
-  def apply(baseName: String, pathPrefix: String): StaticResourceServer =
-    apply(Paths.get(baseName), Paths.get(pathPrefix))
+  def apply(baseName: String, pathPrefix: String, loader: ClassLoader): StaticResourceServer = {
+    val normBaseName = Paths.get(baseName).normalize()
+    val normPathPrefix = Paths.get(pathPrefix).normalize()
 
-  def apply(baseName: Path, pathPrefix: Path): StaticResourceServer = {
-    require(baseName.startsWith("/"), s"Invalid base name: $baseName")
+    if (normBaseName != Paths.get(""))
+      require(loader.getResource(normBaseName + "/") != null, s"Invalid base name: $baseName")
+
     require(pathPrefix.startsWith("/"), s"Invalid path prefix: $pathPrefix")
 
-    val normBaseName = baseName.normalize()
-    val normPathPrefix = pathPrefix.normalize()
-
-    if (normBaseName != Paths.get("/"))
-      require(getClass.getResource(normBaseName + "/") != null)
-
-    new StaticResourceServer(normBaseName, normPathPrefix)
+    new StaticResourceServer(normBaseName, normPathPrefix, loader)
   }
 }

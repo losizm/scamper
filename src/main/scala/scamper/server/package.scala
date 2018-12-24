@@ -612,28 +612,6 @@ package object server {
     /**
      * Adds request handler to serve static files from given base directory.
      *
-     * Files are mapped from base directory to request path.
-     *
-     * === File Mapping Examples ===
-     *
-     * | Base Directory | Request Path              | Maps to |
-     * | -------------- | ------------------------- | ------- |
-     * | /tmp           | /images/logo.png          | /tmp/images/logo.png |
-     * | /tmp           | /images/icons/warning.png | /tmp/images/icons/warning.png |
-     * | /tmp           | /styles/main.css          | /tmp/styles/main.css |
-     *
-     * @param baseDirectory base directory from which files are served
-     *
-     * @return this application
-     */
-    def files(baseDirectory: File): this.type = synchronized {
-      app = app.copy(requestHandlers = app.requestHandlers :+ StaticFileServer(baseDirectory, "/"))
-      this
-    }
-
-    /**
-     * Adds request handler to serve static files from given base directory.
-     *
      * Files are mapped from base directory to request path excluding path
      * prefix.
      *
@@ -658,46 +636,29 @@ package object server {
     /**
      * Adds request handler to serve static resources from given base name.
      *
-     * Resources are mapped from base name to request path.
-     *
-     * === Resource Mapping Examples ===
-     *
-     * | Base Name | Request Path              | Maps to |
-     * | --------- | ------------------------- | ------- |
-     * | /assets   | /images/logo.png          | /assets/images/logo.png |
-     * | /assets   | /images/icons/warning.png | /assets/images/icons/warning.png |
-     * | /assets   | /styles/main.css          | /assets/styles/main.css |
-     *
-     * @param baseName base name from which resources are served
-     *
-     * @return this application
-     */
-    def resources(baseName: String): this.type = synchronized {
-      app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(baseName, "/"))
-      this
-    }
-
-    /**
-     * Adds request handler to serve static resources from given base name.
-     *
      * Resources are mapped from base name to request path excluding path
      * prefix.
+     *
+     * <strong>Note:</strong> If `loader` is not supplied, then the current
+     * thread's context class loader is used.
      *
      * === Resource Mapping Examples ===
      *
      * | Path Prefix | Base Name | Request Path              | Maps to |
      * | ----------- | --------- | ------------------------- | ------- |
-     * | /images     | /assets   | /images/logo.png          | /assets/logo.png |
-     * | /images     | /assets   | /images/icons/warning.png | /assets/icons/warning.png |
-     * | /images     | /assets   | /styles/main.css          | <em>Doesn't map to anything</em> |
+     * | /images     | assets    | /images/logo.png          | assets/logo.png |
+     * | /images     | assets    | /images/icons/warning.png | assets/icons/warning.png |
+     * | /images     | assets    | /styles/main.css          | <em>Doesn't map to anything</em> |
      *
      * @param pathPrefix request path prefix
      * @param baseName base name from which resources are served
+     * @param loader class loader from which resources are loaded
      *
      * @return this application
      */
-    def resources(pathPrefix: String, baseName: String): this.type = synchronized {
-      app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(baseName, pathPrefix))
+    def resources(pathPrefix: String, baseName: String, loader: Option[ClassLoader] = None): this.type = synchronized {
+      val effectiveLoader = loader.getOrElse(Thread.currentThread.getContextClassLoader)
+      app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(baseName, pathPrefix, effectiveLoader))
       this
     }
 

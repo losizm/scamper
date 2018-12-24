@@ -706,24 +706,16 @@ app.post("/translate/:in/to/:out") { req =>
 
 #### Serving Static Files
 
-You can add a specialized request handler to serve static files.
-
-```scala
-// Serve static files from given directory
-app.files(new File("/path/to/public"))
-```
-
-This adds a handler to serve files from the directory at _/path/to/public_. The
-files are mapped based on the request path. For example,
-_http://localhost:8080/images/logo.png_ would map to _/path/to/public/images/logo.png_.
-
-Or, you can map a path prefix to a directory.
+You can add a specialized request handler to serve static files from a base
+directory.
 
 ```scala
 app.files("/app/main", new File("/path/to/public"))
 ```
 
-In this case, _http://localhost:8080/app/main/images/logo.png_ would map to
+This adds a handler to serve files from the directory at _/path/to/public_. The
+files are mapped based on the request path excluding path prefix. For example,
+_http://localhost:8080/app/main/images/logo.png_ would map to
 _/path/to/public/images/logo.png_.
 
 #### Serving Static Resources
@@ -732,12 +724,14 @@ If your web assets are bundled in a jar file, just drop the jar on the
 classpath, and you can configure the application to serve its contents.
 
 ```scala
-app.resources("/app/main", "/assets")
+app.resources("/app/main", "assets")
 ```
 
 In the above configuration, requests prefixed with _/app/main_ are served
-resources from _/assets_. This mapping works similiar to static files, only the
-resources are located using the class loader.
+resources from _assets_, which is the base resource name. The mapping works
+similiar to static files, only the resources are located using the class loader.
+_(See [ServerApplication.resources()](https://losizm.github.io/scamper/latest/api/scamper/server/package$$ServerApplication.html#resources)
+in scaladoc for additional details.)_
 
 #### Aborting Response
 
