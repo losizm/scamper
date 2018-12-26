@@ -30,13 +30,13 @@ import scamper.auxiliary.StringType
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 
-private class StaticFileServer private (baseDirectory: Path, pathPrefix: Path) extends RequestHandler {
+private class StaticFileServer(baseDirectory: Path, pathPrefix: Path) extends RequestHandler {
   private val `application/octet-stream` = MediaType("application", "octet-stream")
   private val `*/*` = MediaRange("*", "*")
 
   def apply(req: HttpRequest): Either[HttpRequest, HttpResponse] =
     getRealPath(req.path)
-      .filter(getExists)
+      .filter(exists)
       .map { path =>
         req.method match {
           case method @ (GET | HEAD) =>
@@ -50,7 +50,10 @@ private class StaticFileServer private (baseDirectory: Path, pathPrefix: Path) e
         }
       }.map(Right(_)).getOrElse(Left(req))
 
-  private def getResponse(path: Path, mediaType: MediaType, ifModifiedSince: Instant, headOnly: Boolean): HttpResponse = {
+  protected def exists(path: Path): Boolean =
+    path.startsWith(baseDirectory) && Files.isRegularFile(path) && !Files.isHidden(path)
+
+  protected def getResponse(path: Path, mediaType: MediaType, ifModifiedSince: Instant, headOnly: Boolean): HttpResponse = {
     val attrs = Files.readAttributes(path, classOf[BasicFileAttributes])
     val lastModified = attrs.lastModifiedTime.toInstant
     val size = attrs.size
@@ -77,9 +80,6 @@ private class StaticFileServer private (baseDirectory: Path, pathPrefix: Path) e
       case false => None
     }
   }
-
-  private def getExists(path: Path): Boolean =
-    path.startsWith(baseDirectory) && Files.isRegularFile(path) && !Files.isHidden(path)
 
   private def getAccept(req: HttpRequest): Seq[MediaRange] =
     Try(req.accept) match {
