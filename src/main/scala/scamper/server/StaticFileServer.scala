@@ -20,72 +20,63 @@ import java.nio.file.{ Files, Path, Paths }
 import java.nio.file.attribute.BasicFileAttributes
 import java.time.Instant
 
-import scala.util.{ Failure, Success, Try }
+import scala.util.{ Success, Try }
 
 import scamper.{ HttpRequest, HttpResponse }
-import scamper.ImplicitConverters._
+import scamper.ImplicitConverters.fileToEntity
 import scamper.RequestMethods.{ GET, HEAD }
 import scamper.ResponseStatuses.{ MethodNotAllowed, NotAcceptable, NotModified, Ok }
 import scamper.auxiliary.StringType
-import scamper.headers.{ Accept, Allow, ContentLength, ContentType, Date, IfModifiedSince, LastModified }
+import scamper.headers.{ Accept, Allow, ContentLength, ContentType, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 
 private class StaticFileServer private (baseDirectory: Path, pathPrefix: Path) extends RequestHandler {
   private val `application/octet-stream` = MediaType("application", "octet-stream")
   private val `*/*` = MediaRange("*", "*")
 
-  def apply(req: HttpRequest): Either[HttpRequest, HttpResponse] = {
-    val path = Paths.get(req.path.toUrlDecoded("utf-8")).normalize()
+  def apply(req: HttpRequest): Either[HttpRequest, HttpResponse] =
+    getRealPath(req.path)
+      .filter(getExists)
+      .map { path =>
+        req.method match {
+          case method @ (GET | HEAD) =>
+            val mediaType = getMediaType(path)
 
-    if (path.startsWith(pathPrefix))
-      handle(req)
-    else
-      Left(req)
-  }
-
-  private def handle(req: HttpRequest): Either[HttpRequest, HttpResponse] = {
-    val path = getRealPath(req.path.toUrlDecoded("utf-8"))
-
-    if (getExists(path))
-      req.method match {
-        case GET  => Right(getResponse(path, false, getAccept(req), getIfModifiedSince(req)))
-        case HEAD => Right(getResponse(path, true, getAccept(req), getIfModifiedSince(req)))
-        case _    => Right(MethodNotAllowed().withAllow(GET, HEAD))
-      }
-    else
-      Left(req)
-  }
-
-  private def getResponse(path: Path, headOnly: Boolean, accept: Seq[MediaRange], ifModifiedSince: Instant): HttpResponse = {
-    val mediaType = getMediaType(path)
-
-    accept.exists(range => range.matches(mediaType)) match {
-      case true =>
-        val attrs = Files.readAttributes(path, classOf[BasicFileAttributes])
-        val lastModified = attrs.lastModifiedTime.toInstant
-        val size = attrs.size
-
-        ifModifiedSince.isBefore(lastModified) match {
-          case true =>
-            val res = Ok().withDate(Instant.now())
-              .withContentType(mediaType)
-              .withContentLength(size)
-              .withLastModified(lastModified)
-
-            headOnly match {
-              case true  => res
-              case false => res.withBody(path.toFile)
-            }
-          case false =>
-            NotModified().withDate(Instant.now())
-              .withLastModified(lastModified)
+            if (getAccept(req).exists { range => range.matches(mediaType) })
+              getResponse(path, mediaType, getIfModifiedSince(req), method == HEAD)
+            else
+              NotAcceptable()
+          case _ => MethodNotAllowed().withAllow(GET, HEAD)
         }
-      case false => NotAcceptable().withDate(Instant.now())
+      }.map(Right(_)).getOrElse(Left(req))
+
+  private def getResponse(path: Path, mediaType: MediaType, ifModifiedSince: Instant, headOnly: Boolean): HttpResponse = {
+    val attrs = Files.readAttributes(path, classOf[BasicFileAttributes])
+    val lastModified = attrs.lastModifiedTime.toInstant
+    val size = attrs.size
+
+    ifModifiedSince.isBefore(lastModified) match {
+      case true =>
+        val res = Ok().withContentType(mediaType)
+          .withContentLength(size)
+          .withLastModified(lastModified)
+
+        headOnly match {
+          case true  => res
+          case false => res.withBody(path.toFile)
+        }
+      case false => NotModified().withLastModified(lastModified)
     }
   }
 
-  private def getRealPath(path: String): Path =
-    baseDirectory.resolve(pathPrefix.relativize(Paths.get(path))).normalize()
+  private def getRealPath(path: String): Option[Path] = {
+    val toPath = Paths.get(path.toUrlDecoded("utf-8")).normalize()
+
+    toPath.startsWith(pathPrefix) match {
+      case true  => Some(baseDirectory.resolve(pathPrefix.relativize(toPath)))
+      case false => None
+    }
+  }
 
   private def getExists(path: Path): Boolean =
     path.startsWith(baseDirectory) && Files.isRegularFile(path) && !Files.isHidden(path)
@@ -115,19 +106,13 @@ private class StaticFileServer private (baseDirectory: Path, pathPrefix: Path) e
 }
 
 private object StaticFileServer {
-  def apply(baseDirectory: String, pathPrefix: String): StaticFileServer =
-    apply(Paths.get(baseDirectory), Paths.get(pathPrefix))
+  def apply(baseDirectory: File, pathPrefix: String): StaticFileServer = {
+    val normBaseDirectory = baseDirectory.toPath.toAbsolutePath.normalize()
+    val normPathPrefix = Paths.get(pathPrefix).normalize()
 
-  def apply(baseDirectory: File, pathPrefix: String): StaticFileServer =
-    apply(baseDirectory.toPath, Paths.get(pathPrefix))
+    require(Files.isDirectory(normBaseDirectory), s"Not a directory ($normBaseDirectory)")
+    require(normPathPrefix.startsWith("/"), s"Invalid path prefix ($normPathPrefix)")
 
-  def apply(baseDirectory: Path, pathPrefix: Path): StaticFileServer = {
-    if (!Files.isDirectory(baseDirectory))
-      throw new IllegalArgumentException(s"Not a directory ($baseDirectory)")
-
-    if (!pathPrefix.startsWith("/"))
-      throw new IllegalArgumentException(s"Invalid path prefix ($pathPrefix)")
-
-    new StaticFileServer(baseDirectory.toAbsolutePath().normalize(), pathPrefix)
+    new StaticFileServer(normBaseDirectory, normPathPrefix)
   }
 }
