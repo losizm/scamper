@@ -53,7 +53,7 @@ import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToProductTyp
 
 val request = GET("/motd")
   .withHost("localhost:8080")
-  .withUserAgent("Scamper/2.0")
+  .withUserAgent("Scamper/3.0")
   .withAccept("text/plain", "*/*; q=0.5")
 ```
 
@@ -70,7 +70,7 @@ import scamper.types.ImplicitConverters.{ stringToMediaType, stringToProductType
 
 val response = Ok("There is an answer.")
   .withContentType("text/plain")
-  .withServer("Scamper/2.0")
+  .withServer("Scamper/3.0")
   .withConnection("close")
 ```
 
