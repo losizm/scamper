@@ -77,7 +77,7 @@ package object headers {
   }
 
   /** Provides standardized access to Accept-Encoding header. */
-  implicit class AcceptEncoding(val request: HttpRequest) extends AnyVal {
+  implicit class AcceptEncoding[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
     /**
      * Gets Accept-Encoding header values.
      *
@@ -87,21 +87,21 @@ package object headers {
 
     /** Gets Accept-Encoding header values if present. */
     def getAcceptEncoding: Option[Seq[ContentCodingRange]] =
-      request.getHeaderValue("Accept-Encoding")
+      message.getHeaderValue("Accept-Encoding")
         .map(ListParser.apply)
         .map(_.map(ContentCodingRange.parse))
 
     /** Tests whether Accept-Encoding header is present. */
-    def hasAcceptEncoding: Boolean = request.hasHeader("Accept-Encoding")
+    def hasAcceptEncoding: Boolean = message.hasHeader("Accept-Encoding")
 
     /**
-     * Creates new request setting Accept-Encoding header to supplied values.
+     * Creates new message setting Accept-Encoding header to supplied values.
      */
-    def withAcceptEncoding(values: ContentCodingRange*): HttpRequest =
-      request.withHeader(Header("Accept-Encoding", values.mkString(", ")))
+    def withAcceptEncoding(values: ContentCodingRange*): HttpMessage =
+      message.withHeader(Header("Accept-Encoding", values.mkString(", ")))
 
-    /** Creates new request removing Accept-Encoding header. */
-    def removeAcceptEncoding: HttpRequest = request.removeHeaders("Accept-Encoding")
+    /** Creates new message removing Accept-Encoding header. */
+    def removeAcceptEncoding: HttpMessage = message.removeHeaders("Accept-Encoding")
   }
 
   /** Provides standardized access to Accept-Language header. */
