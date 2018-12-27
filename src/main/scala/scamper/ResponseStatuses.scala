@@ -128,6 +128,9 @@ object ResponseStatuses {
   /** 422 Unprocessable Entity */
   val UnprocessableEntity = ResponseStatus(422)
 
+  /** 425 Too Early */
+  val TooEarly = ResponseStatus(425)
+
   /** 426 Upgrade Required */
   val UpgradeRequired = ResponseStatus(426)
 

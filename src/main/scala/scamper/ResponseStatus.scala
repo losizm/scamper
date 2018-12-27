@@ -121,6 +121,7 @@ object ResponseStatus {
   add(416, "Range Not Satisfiable")
   add(417, "Expectation Failed")
   add(422, "Unprocessable Entity")
+  add(425, "Too Early")
   add(426, "Upgrade Required")
   add(428, "Precondition Required")
   add(429, "Too Many Requests")

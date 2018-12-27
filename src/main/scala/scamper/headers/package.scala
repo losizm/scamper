@@ -562,6 +562,30 @@ package object headers {
     def removeETag: HttpResponse = response.removeHeaders("ETag")
   }
 
+  /** Provides standardized access to Early-Data header. */
+  implicit class EarlyData(val request: HttpRequest) extends AnyVal {
+    /**
+     * Gets Early-Data header value.
+     *
+     * @throws HeaderNotFound if Early-Data is not present
+     */
+    def earlyData: Int = getEarlyData.getOrElse(throw HeaderNotFound("Early-Data"))
+
+    /** Gets Early-Data header value if present. */
+    def getEarlyData: Option[Int] =
+      request.getHeaderValue("Early-Data").map(_.toInt)
+
+    /** Tests whether Early-Data header is present. */
+    def hasEarlyData: Boolean = request.hasHeader("Early-Data")
+
+    /** Creates new request setting Early-Data header to supplied value. */
+    def withEarlyData(value: Int): HttpRequest =
+      request.withHeader(Header("Early-Data", value))
+
+    /** Creates new request removing Early-Data header. */
+    def removeEarlyData: HttpRequest = request.removeHeaders("Early-Data")
+  }
+
   /** Provides standardized access to Expect header. */
   implicit class Expect(val request: HttpRequest) extends AnyVal {
     /**
