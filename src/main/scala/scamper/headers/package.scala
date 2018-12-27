@@ -922,6 +922,60 @@ package object headers {
     def removePragma: HttpRequest = request.removeHeaders("Pragma")
   }
 
+  /** Provides standardized access to Prefer header. */
+  implicit class Prefer(val request: HttpRequest) extends AnyVal {
+    /**
+     * Gets Prefer header values.
+     *
+     * @return header values or empty sequence if Prefer is not present
+     */
+    def prefer: Seq[Preference] = getPrefer.getOrElse(Nil)
+
+    /** Gets Prefer header values if present. */
+    def getPrefer: Option[Seq[Preference]] =
+      request.getHeaderValues("Prefer")
+        .flatMap(Preference.parseAll) match {
+          case Nil => None
+          case seq => Some(seq)
+        }
+
+    /** Tests whether Prefer header is present. */
+    def hasPrefer: Boolean = request.hasHeader("Prefer")
+
+    /** Creates new request setting Prefer header to supplied values. */
+    def withPrefer(values: Preference*): HttpRequest =
+      request.withHeader(Header("Prefer", values.mkString(", ")))
+
+    /** Creates new request removing Prefer header. */
+    def removePrefer: HttpRequest = request.removeHeaders("Prefer")
+  }
+
+  /** Provides standardized access to Preference-Applied header. */
+  implicit class PreferenceApplied(val response: HttpResponse) extends AnyVal {
+    /**
+     * Gets Preference-Applied header values.
+     *
+     * @return header values or empty sequence if Preference-Applied is not present
+     */
+    def preferenceApplied: Seq[Preference] = getPreferenceApplied.getOrElse(Nil)
+
+    /** Gets Preference-Applied header values if present. */
+    def getPreferenceApplied: Option[Seq[Preference]] =
+      response.getHeaderValue("Preference-Applied")
+        .map(ListParser.apply)
+        .map(_.map(Preference.apply))
+
+    /** Tests whether Preference-Applied header is present. */
+    def hasPreferenceApplied: Boolean = response.hasHeader("Preference-Applied")
+
+    /** Creates new response setting Preference-Applied header to supplied values. */
+    def withPreferenceApplied(values: Preference*): HttpResponse =
+      response.withHeader(Header("Preference-Applied", values.mkString(", ")))
+
+    /** Creates new response removing Preference-Applied header. */
+    def removePreferenceApplied: HttpResponse = response.removeHeaders("Preference-Applied")
+  }
+
   /** Provides standardized access to Proxy-Authenticate header. */
   implicit class ProxyAuthenticate(val response: HttpResponse) extends AnyVal {
     /**
@@ -949,7 +1003,7 @@ package object headers {
     def withProxyAuthenticate(values: Challenge*): HttpResponse =
       response.withHeader(Header("Proxy-Authenticate", values.mkString(", ")))
 
-    /** Creates new response removing Date header. */
+    /** Creates new response removing Proxy-Authenticate header. */
     def removeProxyAuthenticate: HttpResponse = response.removeHeaders("Proxy-Authenticate")
   }
 
@@ -977,7 +1031,7 @@ package object headers {
     def withProxyAuthenticationInfo(values: (String, String)*): HttpResponse =
       response.withHeader(Header("Proxy-Authentication-Info", AuthParams.format(values.toMap).trim))
 
-    /** Creates new response removing Date header. */
+    /** Creates new response removing Proxy-Authentication-Info header. */
     def removeProxyAuthenticationInfo: HttpResponse =
       response.removeHeaders("Proxy-Authentication-Info")
   }

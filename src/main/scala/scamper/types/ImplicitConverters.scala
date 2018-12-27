@@ -65,6 +65,9 @@ object ImplicitConverters {
   /** Converts string to [[PragmaDirective]]. */
   implicit val stringToPragmaDirective = (directive: String) => PragmaDirective.parse(directive)
 
+  /** Converts string to [[Preference]]. */
+  implicit val stringToPreference = (preference: String) => Preference.parse(preference)
+
   /** Converts string to [[ProductType]]. */
   implicit val stringToProductType = (product: String) => ProductType.parse(product)
 
