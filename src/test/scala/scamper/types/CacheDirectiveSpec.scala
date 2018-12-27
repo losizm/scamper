@@ -44,6 +44,16 @@ class CacheDirectiveSpec extends FlatSpec {
     assert(ext.value.contains("In Library"))
     assert(ext.toString == "community=\"In Library\"")
     assert(ext == CacheDirective("Community", Some("In Library")))
+
+    assert(CacheDirective("Immutable") == `immutable`)
+    assert(CacheDirective("MUST-REVALIDATE") == `must-revalidate`)
+    assert(CacheDirective("no-cache") == `no-cache`)
+    assert(CacheDirective("NO-store") == `no-store`)
+    assert(CacheDirective("no-TRANSFORM") == `no-transform`)
+    assert(CacheDirective("only-IF-cached") == `only-if-cached`)
+    assert(CacheDirective("PrIvaTe") == `private`)
+    assert(CacheDirective("Proxy-revalidate") == `proxy-revalidate`)
+    assert(CacheDirective("public") == `public`)
   }
 
   it should "be parsed" in {

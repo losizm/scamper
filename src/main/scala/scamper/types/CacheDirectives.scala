@@ -17,6 +17,12 @@ package scamper.types
 
 /** Registered cache directives */
 case object CacheDirectives {
+  /** Cache directive for immutable */
+  case object `immutable` extends CacheDirective {
+    val name: String = "immutable"
+    val value: Option[String] = None
+  }
+
   /** Cache directive for max-age */
   final case class `max-age`(deltaSeconds: Long) extends CacheDirective {
     val name: String = "max-age"

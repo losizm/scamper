@@ -59,6 +59,7 @@ object CacheDirective {
   /** Creates CacheDirective with supplied name and value. */
   def apply(name: String, value: Option[String] = None): CacheDirective =
     Token(name.toLowerCase) map {
+      case "immutable"              => `immutable`
       case "max-age"                => `max-age`(value.getOrElse("0").toLong)
       case "max-stale"              => `max-stale`(value.getOrElse("0").toLong)
       case "min-fresh"              => `min-fresh`(value.getOrElse("0").toLong)
