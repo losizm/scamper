@@ -29,7 +29,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
 import scamper.{ Entity, Header, HttpException, HttpRequest, HttpResponse, HttpVersion, RequestLine, RequestMethod, ResponseStatus }
-import scamper.ResponseStatuses.{ BadRequest, InternalServerError, NotFound, RequestTimeout, UriTooLong }
+import scamper.ResponseStatuses.{ BadRequest, InternalServerError, NotFound, RequestTimeout, UriTooLong, RequestHeaderFieldsTooLarge }
 import scamper.auxiliary.SocketType
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
 import scamper.types.ImplicitConverters.stringToTransferCoding
@@ -40,8 +40,10 @@ private object DefaultHttpServer {
   case class Application(
     poolSize: Int = Runtime.getRuntime.availableProcessors(),
     queueSize: Int = Runtime.getRuntime.availableProcessors() * 4,
+    bufferSize: Int = Try(sys.props("scamper.server.bufferSize").toInt).getOrElse(8192),
+    headerSize: Int = Try(sys.props("scamper.server.headerSize").toInt).getOrElse(1024),
     readTimeout: Int = 5000,
-    keepAliveSeconds: Int = 60,
+    keepAliveSeconds: Int = Try(sys.props("scamper.server.keepAliveSeconds").toInt).getOrElse(60),
     log: File = new File("server.log").getCanonicalFile(),
     requestHandlers: Seq[RequestHandler] = Nil,
     responseFilters: Seq[ResponseFilter] = Nil,
@@ -55,12 +57,14 @@ private object DefaultHttpServer {
 private class DefaultHttpServer private (id: Int, app: DefaultHttpServer.Application)(val host: InetAddress, val port: Int) extends HttpServer {
   val poolSize = app.poolSize
   val queueSize = app.queueSize
+  val headerSize = app.headerSize
+  val bufferSize = app.bufferSize
   val readTimeout = app.readTimeout
+  val keepAliveSeconds = app.keepAliveSeconds
   val log = app.log
 
   private val authority = s"${host.getCanonicalHostName}:$port"
   private val threadGroup = new ThreadGroup(s"httpserver-$id")
-  private val keepAliveSeconds = app.keepAliveSeconds
   private val requestHandler = RequestHandler.coalesce(app.requestHandlers : _*)
   private val responseFilter = ResponseFilter.chain(app.responseFilters : _*)
   private val logger = new PrintWriter(new FileWriter(app.log, true), true)
@@ -203,25 +207,14 @@ private class DefaultHttpServer private (id: Int, app: DefaultHttpServer.Applica
     }
 
     private def read()(implicit socket: Socket): HttpRequest = {
-      val buffer = new Array[Byte](8192)
+      val buffer = new Array[Byte](bufferSize)
       val method = readMethod(buffer)
       val target = readTarget(buffer)
       val version = readVersion(buffer)
       val startLine = RequestLine(method, target, version)
-      val headers = new ArrayBuffer[Header]
-      var line = ""
+      val headers = readHeaders(buffer)
 
-      while ({ line = socket.readLine(buffer); line != "" })
-        line.matches("[ \t]+.*") match {
-          case true =>
-            if (headers.isEmpty) throw ReadError(BadRequest)
-            val last = headers.last
-            headers.update(headers.length - 1, Header(last.name, last.value + " " + line.trim()))
-          case false =>
-            headers += Header.parse(line)
-        }
-
-      HttpRequest(startLine, headers.toSeq, Entity(socket.getInputStream))
+      HttpRequest(startLine, headers, Entity(socket.getInputStream))
     }
 
     private def readMethod(buffer: Array[Byte])(implicit socket: Socket): RequestMethod =
@@ -244,6 +237,38 @@ private class DefaultHttpServer private (id: Int, app: DefaultHttpServer.Applica
       }
     }
 
+    private def readHeaders(buffer: Array[Byte])(implicit socket: Socket): Seq[Header] = {
+      val headers = new ArrayBuffer[Header]
+      val readLimit = headerSize * bufferSize
+      var readSize = 0
+      var line = ""
+
+      try {
+        while ({ line = socket.readLine(buffer); line != "" }) {
+          readSize += line.size
+
+          if (readSize <= readLimit)
+            line.matches("[ \t]+.*") match {
+              case true =>
+                if (headers.isEmpty) throw ReadError(BadRequest)
+                val last = headers.last
+                headers.update(headers.size - 1, Header(last.name, last.value + " " + line.trim()))
+              case false =>
+                if (headers.size < headerSize)
+                  headers += Header.parse(line)
+                else
+                  throw ReadError(RequestHeaderFieldsTooLarge)
+            }
+          else
+            throw ReadError(RequestHeaderFieldsTooLarge)
+        }
+      } catch {
+        case _: IndexOutOfBoundsException => throw ReadError(RequestHeaderFieldsTooLarge)
+      }
+
+      headers.toSeq
+    }
+
     private def write(res: HttpResponse)(implicit socket: Socket): Unit = {
       socket.writeLine(res.startLine.toString)
       res.headers.map(_.toString).foreach(socket.writeLine)
@@ -251,7 +276,7 @@ private class DefaultHttpServer private (id: Int, app: DefaultHttpServer.Applica
 
       if (!res.body.isKnownEmpty) {
         val in = res.body.getInputStream
-        val buffer = new Array[Byte](8192)
+        val buffer = new Array[Byte](bufferSize)
         var length = 0
 
         res.getTransferEncoding.map { _ =>
