@@ -1,7 +1,7 @@
 # Scamper
-**Scamper** is the HTTP library for Scala. It defines an API for reading and
-writing HTTP messages, and it includes HTTP [client](#HTTP-Client)
-and [server](#HTTP-Server) implementations.
+**Scamper** is the HTTP library for Scala. It defines the API for reading and
+writing HTTP messages, and it includes [client](#HTTP-Client) and
+[server](#HTTP-Server) implementations.
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_2.12.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_2.12%22)
 
@@ -48,12 +48,11 @@ methods to further define the request.
 ```scala
 import scamper.ImplicitConverters.stringToUri
 import scamper.RequestMethods.GET
-import scamper.headers.{ Accept, Host, UserAgent }
-import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToProductType }
+import scamper.headers.{ Accept, Host}
+import scamper.types.ImplicitConverters.stringToMediaRange
 
 val request = GET("/motd")
   .withHost("localhost:8080")
-  .withUserAgent("Scamper/3.0")
   .withAccept("text/plain", "*/*; q=0.5")
 ```
 
@@ -65,12 +64,11 @@ methods to further define the response.
 ```scala
 import scamper.ImplicitConverters.stringToEntity
 import scamper.ResponseStatuses.Ok
-import scamper.headers.{ Connection, ContentType, Server }
-import scamper.types.ImplicitConverters.{ stringToMediaType, stringToProductType }
+import scamper.headers.{ Connection, ContentType }
+import scamper.types.ImplicitConverters.stringToMediaType
 
 val response = Ok("There is an answer.")
   .withContentType("text/plain")
-  .withServer("Scamper/3.0")
   .withConnection("close")
 ```
 
@@ -394,10 +392,10 @@ import scamper.BodyParsers
 import scamper.ImplicitConverters.stringToUri
 import scamper.client.HttpClient
 
-// Create HttpClient instance
-val client = HttpClient(bufferSize = 4096, timeout = 3000)
-
 implicit val parser = BodyParsers.text()
+
+// Create HttpClient instance
+val client = HttpClient(bufferSize = 4096, readTimeout = 3000)
 
 def getMessageOfTheDay(): Either[Int, String] = {
   // Use saved reference to client
@@ -634,7 +632,7 @@ app.post("/messages") { req =>
     ...
   }
 
-  implicit val parser = BodyParser.text()
+  implicit val parser = BodyParsers.text()
 
   val id = post(req.as[String])
   Created().withLocation(s"/messages/$id")
