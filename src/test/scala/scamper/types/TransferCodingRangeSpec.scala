@@ -22,14 +22,14 @@ class TransferCodingRangeSpec extends FlatSpec {
     var range = TransferCodingRange.parse("CHUNKED; q=1.0")
     assert(range.name == "chunked")
     assert(range.isChunked)
-    assert(range.rank == 1.0f)
+    assert(range.weight == 1.0f)
     assert(range.params.isEmpty)
     assert(range.toString == "chunked")
 
     range = TransferCodingRange.parse("X-GZIP; q=0.7")
     assert(range.name == "gzip")
     assert(range.isGzip)
-    assert(range.rank == 0.7f)
+    assert(range.weight == 0.7f)
     assert(range.params.isEmpty)
     assert(range.toString == "gzip; q=0.7")
   }
@@ -38,14 +38,14 @@ class TransferCodingRangeSpec extends FlatSpec {
     var range = TransferCodingRange.parse("CHUNKED; x=abc")
     assert(range.name == "chunked")
     assert(range.isChunked)
-    assert(range.rank == 1.0f)
+    assert(range.weight == 1.0f)
     assert(range.params("x") == "abc")
     assert(range.toString == "chunked; x=abc")
 
     range = TransferCodingRange.parse("""GZIP; q=0.1; level="1 2 3" """)
     assert(range.name == "gzip")
     assert(range.isGzip)
-    assert(range.rank == 0.1f)
+    assert(range.weight == 0.1f)
     assert(range.params("level") == "1 2 3")
     assert(range.toString == "gzip; q=0.1; level=\"1 2 3\"")
   }
@@ -68,9 +68,9 @@ class TransferCodingRangeSpec extends FlatSpec {
     val range = TransferCodingRange.parse("""Deflate; a=1; b=two; c="x y z" """)
 
     range match {
-      case TransferCodingRange(name, rank, params) =>
+      case TransferCodingRange(name, weight, params) =>
         assert(name == range.name)
-        assert(rank == range.rank)
+        assert(weight == range.weight)
         assert(params == range.params)
     }
   }

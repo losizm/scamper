@@ -26,8 +26,8 @@ trait TransferCodingRange {
   /** Gets coding name. */
   def name: String
 
-  /** Gets coding rank. */
-  def rank: Float
+  /** Gets coding weight. */
+  def weight: Float
 
   /** Gets coding parameters. */
   def params: Map[String, String]
@@ -54,7 +54,7 @@ trait TransferCodingRange {
   override lazy val toString: String = {
     val range = new StringBuilder
     range.append(name)
-    if (!isTrailers && rank != 1.0f) range.append("; q=").append(rank)
+    if (!isTrailers && weight != 1.0f) range.append("; q=").append(weight)
     if (params.nonEmpty) range.append(FormatParams(params))
     range.toString
   }
@@ -69,24 +69,24 @@ object TransferCodingRange {
         params.collectFirst {
           case (QValue.key(key), QValue.value(value)) => (value.toFloat, (params - key))
         } map {
-          case (rank, params) => TransferCodingRangeImpl(Name(name), QValue(rank), Params(params))
+          case (weight, params) => TransferCodingRangeImpl(Name(name), QValue(weight), Params(params))
         } getOrElse {
           TransferCodingRangeImpl(Name(name), 1.0f, Params(params))
         }
     }
 
   /** Creates TransferCodingRange with supplied values. */
-  def apply(name: String, rank: Float = 1.0f, params: Map[String, String] = Map.empty): TransferCodingRange =
-    TransferCodingRangeImpl(Name(name), QValue(rank), Params(params))
+  def apply(name: String, weight: Float = 1.0f, params: Map[String, String] = Map.empty): TransferCodingRange =
+    TransferCodingRangeImpl(Name(name), QValue(weight), Params(params))
 
   /** Destructures TransferCodingRange. */
   def unapply(range: TransferCodingRange): Option[(String, Float, Map[String, String])] =
-    Some((range.name, range.rank, range.params))
+    Some((range.name, range.weight, range.params))
 }
 
-private case class TransferCodingRangeImpl(name: String, rank: Float, params: Map[String, String]) extends TransferCodingRange {
+private case class TransferCodingRangeImpl(name: String, weight: Float, params: Map[String, String]) extends TransferCodingRange {
   def matches(coding: TransferCoding): Boolean =
-    name.equalsIgnoreCase(coding.name) && params.forall { case (name, value) => exists(name, value, coding.params) } && rank > 0
+    name.equalsIgnoreCase(coding.name) && params.forall { case (name, value) => exists(name, value, coding.params) } && weight > 0
 
   private def exists(name: String, value: String, ps: Map[String, String]): Boolean =
     ps.exists { case (n, v) => name.equalsIgnoreCase(n) && value.equalsIgnoreCase(v) }

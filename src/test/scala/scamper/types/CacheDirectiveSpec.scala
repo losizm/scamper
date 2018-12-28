@@ -35,7 +35,7 @@ class CacheDirectiveSpec extends FlatSpec {
     val maxAge = `max-age`(3000)
     assert(maxAge.name == "max-age")
     assert(maxAge.value.contains("3000"))
-    assert(maxAge.deltaSeconds == 3000)
+    assert(maxAge.seconds == 3000)
     assert(maxAge.toString == "max-age=3000")
     assert(maxAge == CacheDirective("max-age", Some("3000")))
 

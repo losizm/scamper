@@ -24,21 +24,21 @@ case object CacheDirectives {
   }
 
   /** Cache directive for max-age */
-  final case class `max-age`(deltaSeconds: Long) extends CacheDirective {
+  final case class `max-age`(seconds: Long) extends CacheDirective {
     val name: String = "max-age"
-    val value: Option[String] = Some(deltaSeconds.toString)
+    val value: Option[String] = Some(seconds.toString)
   }
 
   /** Cache directive for max-stale */
-  final case class `max-stale`(deltaSeconds: Long) extends CacheDirective {
+  final case class `max-stale`(seconds: Long) extends CacheDirective {
     val name: String = "max-stale"
-    val value: Option[String] = Some(deltaSeconds.toString)
+    val value: Option[String] = Some(seconds.toString)
   }
 
   /** Cache directive for min-fresh */
-  final case class `min-fresh`(deltaSeconds: Long) extends CacheDirective {
+  final case class `min-fresh`(seconds: Long) extends CacheDirective {
     val name: String = "min-fresh"
-    val value: Option[String] = Some(deltaSeconds.toString)
+    val value: Option[String] = Some(seconds.toString)
   }
 
   /** Cache directive for must-revalidate */
@@ -90,20 +90,20 @@ case object CacheDirectives {
   }
 
   /** Cache directive for s-maxage */
-  final case class `s-maxage`(deltaSeconds: Long) extends CacheDirective {
+  final case class `s-maxage`(seconds: Long) extends CacheDirective {
     val name: String = "s-maxage"
-    val value: Option[String] = Some(deltaSeconds.toString)
+    val value: Option[String] = Some(seconds.toString)
   }
 
   /** Cache directive for stale-if-error */
-  final case class `stale-if-error`(deltaSeconds: Long) extends CacheDirective {
+  final case class `stale-if-error`(seconds: Long) extends CacheDirective {
     val name: String = "stale-if-error"
-    val value: Option[String] = Some(deltaSeconds.toString)
+    val value: Option[String] = Some(seconds.toString)
   }
 
   /** Cache directive for stale-while-revalidate */
-  final case class `stale-while-revalidate`(deltaSeconds: Long) extends CacheDirective {
+  final case class `stale-while-revalidate`(seconds: Long) extends CacheDirective {
     val name: String = "stale-while-revalidate"
-    val value: Option[String] = Some(deltaSeconds.toString)
+    val value: Option[String] = Some(seconds.toString)
   }
 }

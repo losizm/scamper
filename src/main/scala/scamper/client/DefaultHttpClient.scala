@@ -32,18 +32,18 @@ import scamper.headers.{ Connection, ContentLength, Host, TE, TransferEncoding }
 import scamper.types.TransferCoding
 
 private object DefaultHttpClient {
-  def apply(bufferSize: Int, timeout: Int): DefaultHttpClient = {
+  def apply(bufferSize: Int, readTimeout: Int): DefaultHttpClient = {
     implicit val factory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
-    new DefaultHttpClient(bufferSize, timeout)
+    new DefaultHttpClient(bufferSize, readTimeout)
   }
 
-  def apply(bufferSize: Int, timeout: Int, trustStore: File): DefaultHttpClient = {
+  def apply(bufferSize: Int, readTimeout: Int, trustStore: File): DefaultHttpClient = {
     implicit val factory = SecureSocketFactory.create(trustStore)
-    new DefaultHttpClient(bufferSize, timeout)
+    new DefaultHttpClient(bufferSize, readTimeout)
   }
 }
 
-private class DefaultHttpClient private (val bufferSize: Int, val timeout: Int)(implicit secureSocketFactory: SSLSocketFactory) extends HttpClient {
+private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: Int)(implicit secureSocketFactory: SSLSocketFactory) extends HttpClient {
   def send[T](request: HttpRequest, secure: Boolean = false)(handler: ResponseHandler[T]): T = {
     val scheme = if (secure) "https" else "http"
     val host = getEffectiveHost(request.target, request.getHost)
@@ -149,7 +149,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val timeout: Int)(
     val socket = factory.createSocket(host, port)
 
     try {
-      socket.setSoTimeout(timeout)
+      socket.setSoTimeout(readTimeout)
       socket.setSendBufferSize(bufferSize)
       socket.setReceiveBufferSize(bufferSize)
     } catch {
