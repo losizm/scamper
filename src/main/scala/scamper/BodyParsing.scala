@@ -57,6 +57,7 @@ trait BodyParsing {
   private def getContentLength(message: HttpMessage): Long =
     message.getHeaderValue("Content-Length")
       .map(_.toLong)
+      .orElse(message.body.getLength)
       .getOrElse(0)
 
   private def getContentEncoding(message: HttpMessage): String =
