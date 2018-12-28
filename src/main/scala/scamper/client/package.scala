@@ -23,7 +23,66 @@ import cookies.{ PlainCookie, RequestCookies }
 
 import RequestMethods._
 
-/** Includes client related items. */
+/**
+ * Provides HTTP client implementation.
+ *
+ * === Using HTTP Client ===
+ *
+ * The `HttpClient` object can be used to send requests and handle the
+ * responses.
+ *
+ * {{{
+ * import scamper.BodyParsers
+ * import scamper.ImplicitConverters.stringToUri
+ * import scamper.RequestMethods.GET
+ * import scamper.client.HttpClient
+ * import scamper.headers.Host
+ *
+ * implicit val parser = BodyParsers.text()
+ *
+ * def getMessageOfTheDay(): Either[Int, String] = {
+ *   val req = GET("/motd").withHost("localhost:8080")
+ *
+ *   // Send request and handle response
+ *   HttpClient.send(req) { res =>
+ *     res.status.isSuccessful match {
+ *       case true  => Right(res.as[String])
+ *       case false => Left(res.status.code)
+ *     }
+ *   }
+ * }
+ * }}}
+ *
+ * === Creating HTTP Client ===
+ *
+ * The previous example uses the `HttpClient` object as the client. Behind the
+ * scenes, this actually creates an instance of `HttpClient` for one-time usage.
+ *
+ * If you plan to send multiple requests, you can create and maintain a reference
+ * to an instance, and use it as the client. With that, you also get access to
+ * methods corresponding to the standard HTTP request methods.
+ *
+ * {{{
+ * import scamper.BodyParsers
+ * import scamper.ImplicitConverters.stringToUri
+ * import scamper.client.HttpClient
+ *
+ * implicit val parser = BodyParsers.text()
+ *
+ * // Create HttpClient instance
+ * val client = HttpClient(bufferSize = 4096, timeout = 3000)
+ *
+ * def getMessageOfTheDay(): Either[Int, String] = {
+ *   // Use saved reference to client
+ *   client.get("http://localhost:8080/motd") { res =>
+ *     res.status.isSuccessful match {
+ *       case true  => Right(res.as[String])
+ *       case false => Left(res.status.code)
+ *     }
+ *   }
+ * }
+ * }}}
+ */
 package object client {
   /** Indicates request was aborted. */
   case class RequestAborted(message: String) extends HttpException(message)

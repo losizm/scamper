@@ -22,7 +22,33 @@ import scala.util.Try
 
 import scamper.types._
 
-/** Includes type classes for standardized access to message headers. */
+/**
+ * Provides specialized access to message headers.
+ *
+ * === Using Header Classes ===
+ *
+ * Some headers are available to both requests and responses, and others are
+ * available only to a specific message type. This behavior is driven by the
+ * HTTP specification.
+ *
+ * {{{
+ * import scamper.ImplicitConverters.stringToUri
+ * import scamper.RequestMethods.GET
+ * import scamper.headers.{ Accept, ContentLength, Host }
+ * import scamper.types.ImplicitConverters.stringToMediaRange
+ *
+ * // Build request using 'Host' and 'Accept' headers
+ * val req = GET("/motd").withHost("localhost:8080").withAccept("text/plain")
+ *
+ * // Access and print header values
+ * printf("Host: %s%n", req.host)
+ * printf("Accept: %s%n", req.accept.head)
+ *
+ * println(req.hasHost) // true
+ * println(req.hasAccept) // true
+ * println(req.hasContentLength) // false
+ * }}}
+ */
 package object headers {
   /** Provides standardized access to Accept header. */
   implicit class Accept(val request: HttpRequest) extends AnyVal {

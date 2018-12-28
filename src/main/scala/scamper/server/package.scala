@@ -20,7 +20,74 @@ import java.net.InetAddress
 
 import RequestMethods._
 
-/** Includes server related items. */
+/**
+ * Provides HTTP server implementation.
+ *
+ * === Building HTTP Server ===
+ *
+ * To build a server, you begin with `ServerApplication`. This is a mutable
+ * structure to which you apply changes to configure the server. Once the desired
+ * settings are applied, you invoke one of several methods to create the server.
+ *
+ * {{{
+ * import java.io.File
+ * import java.util.zip.DeflaterInputStream
+ * import scamper.BodyParsers
+ * import scamper.ImplicitConverters.{ stringToEntity, inputStreamToEntity }
+ * import scamper.ResponseStatuses.{ NotFound, Ok }
+ * import scamper.headers.TransferEncoding
+ * import scamper.server.HttpServer
+ * import scamper.server.Implicits.HttpRequestType
+ * import scamper.types.ImplicitConverters.stringToTransferCoding
+ *
+ * // Get server application
+ * val app = HttpServer.app()
+ *
+ * // Add request handler to log all requests
+ * app.request { req =>
+ *   println(req.startLine)
+ *   req
+ * }
+ *
+ * // Add request handler to specific request method and path
+ * app.get("/about") { req => Ok("This server is powered by Scamper.") }
+ *
+ * // Add request handler using path parameter
+ * app.put("/data/:id") { req =>
+ *   def update(id: Int, data: String): Boolean = ...
+ *
+ *   implicit val parser = BodyParsers.text()
+ *
+ *   // Get path parameter
+ *   val id = req.params.getInt("id")
+ *
+ *   update(id, req.as[String]) match {
+ *     case true  => Ok()
+ *     case false => NotFound()
+ *   }
+ * }
+ *
+ * // Serve static files
+ * app.files("/main", new File("/path/to/public"))
+ *
+ * // Add response filter to deflate response
+ * app.response { res =>
+ *   res.withBody(new DeflaterInputStream(res.body.getInputStream))
+ *     .withTransferEncoding("deflate", "chunked")
+ * }
+ *
+ * // Create server
+ * val server = app.create(8080)
+ *
+ * printf("Host: %s%n", server.host)
+ * printf("Port: %d%n", server.port)
+ *
+ * Thread.sleep(60 * 1000)
+ *
+ * // Close server when done
+ * server.close()
+ * }}}
+ */
 package object server {
   /** Provides utility for handling incoming request. */
   trait RequestHandler {

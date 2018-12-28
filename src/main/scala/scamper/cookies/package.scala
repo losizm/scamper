@@ -18,6 +18,69 @@ package scamper
 import java.time.Instant
 import scala.util.Try
 
+/**
+ * Provides specialized access to message cookies.
+ *
+ * === Request Cookies ===
+ *
+ * In [[HttpRequest]], cookies are stringed together in the <strong>Cookie</strong>
+ * header. You can access them using the extension methods provided by
+ * [[RequestCookies]], with each cookie represented as [[PlainCookie]].
+ *
+ * {{{
+ * import scamper.ImplicitConverters.stringToUri
+ * import scamper.RequestMethods.GET
+ * import scamper.cookies.{ PlainCookie, RequestCookies }
+ *
+ * // Build request with cookies
+ * val req = GET("https://localhost:8080/motd")
+ *   .withCookies(PlainCookie("ID", "bG9zCg"), PlainCookie("Region", "SE-US"))
+ *
+ * // Access and print all cookies
+ * req.cookies.foreach(println)
+ *
+ * // Get cookies by name
+ * val id: Option[PlainCookie] = req.getCookie("ID")
+ * val region: Option[PlainCookie] = req.getCookie("Region")
+ *
+ * // Get cookie values by name
+ * assert(req.getCookieValue("ID").contains("bG9zCg"))
+ * assert(req.getCookieValue("Region").contains("SE-US"))
+ * }}}
+ *
+ * === Response Cookies ===
+ *
+ * In [[HttpResponse]], the cookies are a collection of <strong>Set-Cookie</strong>
+ * header values.  Specialized access is provided by [[ResponseCookies]], with
+ * each cookie represented as [[SetCookie]].
+ *
+ * {{{
+ * import scamper.ImplicitConverters.stringToEntity
+ * import scamper.ResponseStatuses.Ok
+ * import scamper.cookies.{ ResponseCookies, SetCookie }
+ *
+ * // Build response with cookies
+ * val res = Ok("There is an answer.").withCookies(
+ *   SetCookie("ID", "bG9zCg", path = Some("/motd"), secure = true),
+ *   SetCookie("Region", "SE-US")
+ * )
+ *
+ * // Access and print all cookies
+ * res.cookies.foreach(println)
+ *
+ * // Get cookies by name
+ * val id: Option[SetCookie] = res.getCookie("ID")
+ * val region: Option[SetCookie] = res.getCookie("Region")
+ *
+ * // Get attributes of ID cookie
+ * val path: String = id.flatMap(_.path).getOrElse("/")
+ * val secure: Boolean = id.map(_.secure).getOrElse(false)
+ *
+ * // Get cookie values by name
+ * assert(res.getCookieValue("ID").contains("bG9zCg"))
+ * assert(res.getCookieValue("Region").contains("SE-US"))
+ * }}}
+ */
 package object cookies {
   private object CookieHelper {
     private val CookieValue = new Grammar("([\\x21-\\x7E&&[^\",;\\\\]]*)".r)
