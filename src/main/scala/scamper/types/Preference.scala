@@ -48,42 +48,42 @@ trait Preference {
 
 /** Registered preferences */
 object Preferences {
-  /** <em>wait=seconds</em> preference */
+  /** Preference for `wait=duration`. */
   final case class `wait=duration`(seconds: Long) extends Preference {
     val name: String = "wait"
     val value: Option[String] = Some(seconds.toString)
     val params: Map[String, Option[String]] = Map.empty
   }
 
-  /** <em>handling=strict</em> preference */
+  /** Preference for `handling=strict`. */
   case object `handling=strict` extends Preference {
     val name: String = "handling"
     val value: Option[String] = Some("strict")
     val params: Map[String, Option[String]] = Map.empty
   }
 
-  /** <em>handling=lenient</em> preference */
+  /** Preference for `handling=lenient`. */
   case object `handling=lenient` extends Preference {
     val name: String = "handling"
     val value: Option[String] = Some("lenient")
     val params: Map[String, Option[String]] = Map.empty
   }
 
-  /** <em>return=representation</em> preference */
+  /** Preference for `return=representation`. */
   case object `return=representation` extends Preference {
     val name: String = "return"
     val value: Option[String] = Some("representation")
     val params: Map[String, Option[String]] = Map.empty
   }
 
-  /** <em>return=minimal</em> preference */
+  /** Preference for `return=minimal`. */
   case object `return=minimal` extends Preference {
     val name: String = "return"
     val value: Option[String] = Some("minimal")
     val params: Map[String, Option[String]] = Map.empty
   }
 
-  /** <em>respond-async</em> preference */
+  /** Preference for `respond-async`. */
   case object `respond-async` extends Preference {
     val name: String = "respond-async"
     val value: Option[String] = None
