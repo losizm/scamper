@@ -1,0 +1,1558 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+          <title></title>
+          <meta name="description" content="" />
+          <meta name="keywords" content="" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../lib/jquery.panzoom.min.js"></script>
+      <script type="text/javascript" src="../../lib/jquery.mousewheel.min.js"></script>
+      <script type="text/javascript" src="../../lib/index.js"></script>
+      <script type="text/javascript" src="../../index.js"></script>
+      <script type="text/javascript" src="../../lib/scheduler.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+        /* this variable can be used by the JS to determine the path to the root document */
+        var toRoot = '../../';
+      </script>
+    
+        </head>
+        <body>
+      <div id="search">
+        <span id="doc-title"><span id="doc-version"></span></span>
+        <span class="close-results"><span class="left">&lt;</span> Back</span>
+        <div id="textfilter">
+          <span class="input">
+            <input autocapitalize="none" placeholder="Search" id="index-input" type="text" accesskey="/" />
+            <i class="clear material-icons"></i>
+            <i id="search-icon" class="material-icons"></i>
+          </span>
+        </div>
+    </div>
+      <div id="search-results">
+        <div id="search-progress">
+          <div id="progress-fill"></div>
+        </div>
+        <div id="results-content">
+          <div id="entity-results"></div>
+          <div id="member-results"></div>
+        </div>
+      </div>
+      <div id="content-scroll-container" style="-webkit-overflow-scrolling: touch;">
+        <div id="content-container" style="-webkit-overflow-scrolling: touch;">
+          <div id="subpackage-spacer">
+            <div id="packages">
+              <h1>Packages</h1>
+              <ul>
+                <li name="_root_.root" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="_root_"></a><a id="root:_root_"></a>
+      <span class="permalink">
+      <a href="index.html#_root_" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="../../index.html"><span class="name">root</span></a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../index.html" class="extype" name="_root_">root</a></dd></dl></div>
+    </li><li name="_root_.scamper" visbl="pub" class="indented1 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="scamper"></a><a id="scamper:scamper"></a>
+      <span class="permalink">
+      <a href="index.html#scamper" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="At the core Scamper is HttpMessage, which is a trait that defines the fundamental characteristics of an HTTP message." href="../index.html"><span class="name">scamper</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">At the core <em>Scamper</em> is <a href="../HttpMessage.html" class="extype" name="scamper.HttpMessage">HttpMessage</a>, which is a trait that
+defines the fundamental characteristics of an HTTP message.</p><div class="fullcomment"><div class="comment cmt"><h5> HTTP Messages </h5><p>At the core <em>Scamper</em> is <a href="../HttpMessage.html" class="extype" name="scamper.HttpMessage">HttpMessage</a>, which is a trait that
+defines the fundamental characteristics of an HTTP message. <a href="../HttpRequest.html" class="extype" name="scamper.HttpRequest">HttpRequest</a>
+and <a href="../HttpResponse.html" class="extype" name="scamper.HttpResponse">HttpResponse</a> extend the specification to define characteristics
+specific to their respective message types.</p><p>An <a href="../HttpRequest.html" class="extype" name="scamper.HttpRequest">HttpRequest</a> can be created using one of the factory methods defined in
+its companion object. Or you can start with a <a href="../RequestMethod.html" class="extype" name="scamper.RequestMethod">RequestMethod</a> and use
+builder methods to further define the request.</p><pre><span class="kw">import</span> scamper.Header
+<span class="kw">import</span> scamper.ImplicitConverters.stringToUri
+<span class="kw">import</span> scamper.RequestMethods.GET
+
+<span class="kw">val</span> request = GET(<span class="lit">"/motd"</span>).withHeaders(
+  Header(<span class="lit">"Host"</span>, <span class="lit">"localhost:8080"</span>),
+  Header(<span class="lit">"Accept"</span>, <span class="lit">"text/plain"</span>)
+)
+
+printf(<span class="lit">"Request Method: %s%n"</span>, request.method)
+printf(<span class="lit">"Target URI: %s%n"</span>, request.target)
+
+request.headers.foreach(println)
+
+<span class="kw">val</span> host: <span class="std">Option</span>[<span class="std">String</span>] = request.getHeaderValue(<span class="lit">"Host"</span>)</pre><p>An <a href="../HttpResponse.html" class="extype" name="scamper.HttpResponse">HttpResponse</a> can be created using one of the factory methods defined
+in its companion object. Or you can start with a <a href="../ResponseStatus.html" class="extype" name="scamper.ResponseStatus">ResponseStatus</a> and use
+builder methods to further define the response.</p><pre><span class="kw">import</span> scamper.{ BodyParsers, Header }
+<span class="kw">import</span> scamper.ImplicitConverters.stringToEntity
+<span class="kw">import</span> scamper.ResponseStatuses.Ok
+
+<span class="kw">val</span> response = Ok(<span class="lit">"There is an answer."</span>).withHeaders(
+  Header(<span class="lit">"Content-Type"</span>, <span class="lit">"text/plain"</span>),
+  Header(<span class="lit">"Connection"</span>, <span class="lit">"close"</span>)
+)
+
+printf(<span class="lit">"Status Code: %s%n"</span>, response.status.code)
+printf(<span class="lit">"Reason Phrase: %s%n"</span>, response.status.reason)
+
+response.headers.foreach(println)
+
+<span class="kw">val</span> contentType: <span class="std">Option</span>[<span class="std">String</span>] = response.getHeaderValue(<span class="lit">"Content-Type"</span>)
+
+<span class="kw">implicit</span> <span class="kw">val</span> parser = BodyParsers.text()
+
+printf(<span class="lit">"Body: %s%n"</span>, response.as[<span class="std">String</span>])</pre></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../index.html" class="extype" name="_root_">root</a></dd></dl></div>
+    </li><li name="scamper.auxiliary" visbl="pub" class="indented2 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="auxiliary"></a><a id="auxiliary:auxiliary"></a>
+      <span class="permalink">
+      <a href="../scamper/index.html#auxiliary" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="../auxiliary/index.html"><span class="name">auxiliary</span></a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="scamper">scamper</a></dd></dl></div>
+    </li><li name="scamper.client" visbl="pub" class="indented2 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="client"></a><a id="client:client"></a>
+      <span class="permalink">
+      <a href="../scamper/index.html#client" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="Provides HTTP client implementation." href="../client/index.html"><span class="name">client</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">Provides HTTP client implementation.</p><div class="fullcomment"><div class="comment cmt"><p>Provides HTTP client implementation.</p><h5> Using HTTP Client </h5><p>The <code>HttpClient</code> object can be used to send requests and handle the
+responses.</p><pre><span class="kw">import</span> scamper.BodyParsers
+<span class="kw">import</span> scamper.ImplicitConverters.stringToUri
+<span class="kw">import</span> scamper.RequestMethods.GET
+<span class="kw">import</span> scamper.client.HttpClient
+<span class="kw">import</span> scamper.headers.Host
+
+<span class="kw">implicit</span> <span class="kw">val</span> parser = BodyParsers.text()
+
+<span class="kw">def</span> getMessageOfTheDay(): Either[<span class="std">Int</span>, <span class="std">String</span>] = {
+  <span class="kw">val</span> req = GET(<span class="lit">"/motd"</span>).withHost(<span class="lit">"localhost:8080"</span>)
+
+  <span class="cmt">// Send request and handle response</span>
+  HttpClient.send(req) { res <span class="kw">=&gt;</span>
+    res.status.isSuccessful <span class="kw">match</span> {
+      <span class="kw">case</span> <span class="kw">true</span>  <span class="kw">=&gt;</span> Right(res.as[<span class="std">String</span>])
+      <span class="kw">case</span> <span class="kw">false</span> <span class="kw">=&gt;</span> Left(res.status.code)
+    }
+  }
+}</pre><h5> Creating HTTP Client </h5><p>The previous example uses the <code>HttpClient</code> object as the client. Behind the
+scenes, this actually creates an instance of <code>HttpClient</code> for one-time usage.</p><p>If you plan to send multiple requests, you can create and maintain a reference
+to an instance, and use it as the client. With that, you also get access to
+methods corresponding to the standard HTTP request methods.</p><pre><span class="kw">import</span> scamper.BodyParsers
+<span class="kw">import</span> scamper.ImplicitConverters.stringToUri
+<span class="kw">import</span> scamper.client.HttpClient
+
+<span class="kw">implicit</span> <span class="kw">val</span> parser = BodyParsers.text()
+
+<span class="cmt">// Create HttpClient instance</span>
+<span class="kw">val</span> client = HttpClient(bufferSize = <span class="num">4096</span>, readTimeout = <span class="num">3000</span>)
+
+<span class="kw">def</span> getMessageOfTheDay(): Either[<span class="std">Int</span>, <span class="std">String</span>] = {
+  <span class="cmt">// Use saved reference to client</span>
+  client.get(<span class="lit">"http://localhost:8080/motd"</span>) { res <span class="kw">=&gt;</span>
+    res.status.isSuccessful <span class="kw">match</span> {
+      <span class="kw">case</span> <span class="kw">true</span>  <span class="kw">=&gt;</span> Right(res.as[<span class="std">String</span>])
+      <span class="kw">case</span> <span class="kw">false</span> <span class="kw">=&gt;</span> Left(res.status.code)
+    }
+  }
+}</pre></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="scamper">scamper</a></dd></dl></div>
+    </li><li name="scamper.cookies" visbl="pub" class="indented2 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cookies"></a><a id="cookies:cookies"></a>
+      <span class="permalink">
+      <a href="../scamper/index.html#cookies" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="Provides specialized access to message cookies." href="../cookies/index.html"><span class="name">cookies</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">Provides specialized access to message cookies.</p><div class="fullcomment"><div class="comment cmt"><p>Provides specialized access to message cookies.</p><h5> Request Cookies </h5><p>In <a href="../HttpRequest.html" class="extype" name="scamper.HttpRequest">HttpRequest</a>, cookies are stringed together in the <strong>Cookie</strong>
+header. You can access them using the extension methods provided by
+<a href="../cookies/package$$RequestCookies.html" class="extype" name="scamper.cookies.RequestCookies">RequestCookies</a>, with each cookie represented as <a href="../cookies/package$$PlainCookie.html" class="extype" name="scamper.cookies.PlainCookie">PlainCookie</a>.</p><pre><span class="kw">import</span> scamper.ImplicitConverters.stringToUri
+<span class="kw">import</span> scamper.RequestMethods.GET
+<span class="kw">import</span> scamper.cookies.{ PlainCookie, RequestCookies }
+
+<span class="cmt">// Build request with cookies</span>
+<span class="kw">val</span> req = GET(<span class="lit">"https://localhost:8080/motd"</span>)
+  .withCookies(PlainCookie(<span class="lit">"ID"</span>, <span class="lit">"bG9zCg"</span>), PlainCookie(<span class="lit">"Region"</span>, <span class="lit">"SE-US"</span>))
+
+<span class="cmt">// Access and print all cookies</span>
+req.cookies.foreach(println)
+
+<span class="cmt">// Get cookies by name</span>
+<span class="kw">val</span> id: <span class="std">Option</span>[PlainCookie] = req.getCookie(<span class="lit">"ID"</span>)
+<span class="kw">val</span> region: <span class="std">Option</span>[PlainCookie] = req.getCookie(<span class="lit">"Region"</span>)
+
+<span class="cmt">// Get cookie values by name</span>
+assert(req.getCookieValue(<span class="lit">"ID"</span>).contains(<span class="lit">"bG9zCg"</span>))
+assert(req.getCookieValue(<span class="lit">"Region"</span>).contains(<span class="lit">"SE-US"</span>))</pre><h5> Response Cookies </h5><p>In <a href="../HttpResponse.html" class="extype" name="scamper.HttpResponse">HttpResponse</a>, the cookies are a collection of <strong>Set-Cookie</strong>
+header values.  Specialized access is provided by <a href="../cookies/package$$ResponseCookies.html" class="extype" name="scamper.cookies.ResponseCookies">ResponseCookies</a>, with
+each cookie represented as <a href="../cookies/package$$SetCookie.html" class="extype" name="scamper.cookies.SetCookie">SetCookie</a>.</p><pre><span class="kw">import</span> scamper.ImplicitConverters.stringToEntity
+<span class="kw">import</span> scamper.ResponseStatuses.Ok
+<span class="kw">import</span> scamper.cookies.{ ResponseCookies, SetCookie }
+
+<span class="cmt">// Build response with cookies</span>
+<span class="kw">val</span> res = Ok(<span class="lit">"There is an answer."</span>).withCookies(
+  SetCookie(<span class="lit">"ID"</span>, <span class="lit">"bG9zCg"</span>, path = <span class="std">Some</span>(<span class="lit">"/motd"</span>), secure = <span class="kw">true</span>),
+  SetCookie(<span class="lit">"Region"</span>, <span class="lit">"SE-US"</span>)
+)
+
+<span class="cmt">// Access and print all cookies</span>
+res.cookies.foreach(println)
+
+<span class="cmt">// Get cookies by name</span>
+<span class="kw">val</span> id: <span class="std">Option</span>[SetCookie] = res.getCookie(<span class="lit">"ID"</span>)
+<span class="kw">val</span> region: <span class="std">Option</span>[SetCookie] = res.getCookie(<span class="lit">"Region"</span>)
+
+<span class="cmt">// Get attributes of ID cookie</span>
+<span class="kw">val</span> path: <span class="std">String</span> = id.flatMap(_.path).getOrElse(<span class="lit">"/"</span>)
+<span class="kw">val</span> secure: <span class="std">Boolean</span> = id.map(_.secure).getOrElse(<span class="kw">false</span>)
+
+<span class="cmt">// Get cookie values by name</span>
+assert(res.getCookieValue(<span class="lit">"ID"</span>).contains(<span class="lit">"bG9zCg"</span>))
+assert(res.getCookieValue(<span class="lit">"Region"</span>).contains(<span class="lit">"SE-US"</span>))</pre></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="scamper">scamper</a></dd></dl></div>
+    </li><li name="scamper.headers" visbl="pub" class="indented2 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="headers"></a><a id="headers:headers"></a>
+      <span class="permalink">
+      <a href="../scamper/index.html#headers" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="Provides specialized access to message headers." href="../headers/index.html"><span class="name">headers</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">Provides specialized access to message headers.</p><div class="fullcomment"><div class="comment cmt"><p>Provides specialized access to message headers.</p><h5> Using Header Classes </h5><p>Some headers are available to both requests and responses, and others are
+available only to a specific message type. This behavior is driven by the
+HTTP specification.</p><pre><span class="kw">import</span> scamper.ImplicitConverters.stringToUri
+<span class="kw">import</span> scamper.RequestMethods.GET
+<span class="kw">import</span> scamper.headers.{ Accept, ContentLength, Host }
+<span class="kw">import</span> scamper.types.ImplicitConverters.stringToMediaRange
+
+<span class="cmt">// Build request using 'Host' and 'Accept' headers</span>
+<span class="kw">val</span> req = GET(<span class="lit">"/motd"</span>).withHost(<span class="lit">"localhost:8080"</span>).withAccept(<span class="lit">"text/plain"</span>)
+
+<span class="cmt">// Access and print header values</span>
+printf(<span class="lit">"Host: %s%n"</span>, req.host)
+printf(<span class="lit">"Accept: %s%n"</span>, req.accept.head)
+
+println(req.hasHost) <span class="cmt">// true</span>
+println(req.hasAccept) <span class="cmt">// true</span>
+println(req.hasContentLength) <span class="cmt">// false</span></pre></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="scamper">scamper</a></dd></dl></div>
+    </li><li name="scamper.server" visbl="pub" class="indented2 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="server"></a><a id="server:server"></a>
+      <span class="permalink">
+      <a href="../scamper/index.html#server" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="Provides HTTP server implementation." href="../server/index.html"><span class="name">server</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">Provides HTTP server implementation.</p><div class="fullcomment"><div class="comment cmt"><p>Provides HTTP server implementation.</p><h5> Building HTTP Server </h5><p>To build a server, you begin with <code>ServerApplication</code>. This is a mutable
+structure to which you apply changes to configure the server. Once the desired
+settings are applied, you invoke one of several methods to create the server.</p><pre><span class="kw">import</span> java.io.File
+<span class="kw">import</span> java.util.zip.DeflaterInputStream
+<span class="kw">import</span> scamper.BodyParsers
+<span class="kw">import</span> scamper.ImplicitConverters.{ stringToEntity, inputStreamToEntity }
+<span class="kw">import</span> scamper.ResponseStatuses.{ NotFound, Ok }
+<span class="kw">import</span> scamper.headers.TransferEncoding
+<span class="kw">import</span> scamper.server.HttpServer
+<span class="kw">import</span> scamper.server.Implicits.HttpRequestType
+<span class="kw">import</span> scamper.types.ImplicitConverters.stringToTransferCoding
+
+<span class="cmt">// Get server application</span>
+<span class="kw">val</span> app = HttpServer.app()
+
+<span class="cmt">// Add request handler to log all requests</span>
+app.request { req <span class="kw">=&gt;</span>
+  println(req.startLine)
+  req
+}
+
+<span class="cmt">// Add request handler to specific request method and path</span>
+app.get(<span class="lit">"/about"</span>) { req <span class="kw">=&gt;</span> Ok(<span class="lit">"This server is powered by Scamper."</span>) }
+
+<span class="cmt">// Add request handler using path parameter</span>
+app.put(<span class="lit">"/data/:id"</span>) { req <span class="kw">=&gt;</span>
+  <span class="kw">def</span> update(id: <span class="std">Int</span>, data: <span class="std">String</span>): <span class="std">Boolean</span> = ...
+
+  <span class="kw">implicit</span> <span class="kw">val</span> parser = BodyParsers.text()
+
+  <span class="cmt">// Get path parameter</span>
+  <span class="kw">val</span> id = req.params.getInt(<span class="lit">"id"</span>)
+
+  update(id, req.as[<span class="std">String</span>]) <span class="kw">match</span> {
+    <span class="kw">case</span> <span class="kw">true</span>  <span class="kw">=&gt;</span> Ok()
+    <span class="kw">case</span> <span class="kw">false</span> <span class="kw">=&gt;</span> NotFound()
+  }
+}
+
+<span class="cmt">// Serve static files</span>
+app.files(<span class="lit">"/main"</span>, <span class="kw">new</span> File(<span class="lit">"/path/to/public"</span>))
+
+<span class="cmt">// Add response filter to deflate response</span>
+app.response { res <span class="kw">=&gt;</span>
+  res.withBody(<span class="kw">new</span> DeflaterInputStream(res.body.getInputStream))
+    .withTransferEncoding(<span class="lit">"deflate"</span>, <span class="lit">"chunked"</span>)
+}
+
+<span class="cmt">// Create server</span>
+<span class="kw">val</span> server = app.create(<span class="num">8080</span>)
+
+printf(<span class="lit">"Host: %s%n"</span>, server.host)
+printf(<span class="lit">"Port: %d%n"</span>, server.port)
+
+Thread.sleep(<span class="num">60</span> * <span class="num">1000</span>)
+
+<span class="cmt">// Close server when done</span>
+server.close()</pre></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="scamper">scamper</a></dd></dl></div>
+    </li><li name="scamper.types" visbl="pub" class="indented2 current" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="types"></a><a id="types:types"></a>
+      <span class="permalink">
+      <a href="../scamper/index.html#types" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">types</span>
+      </span>
+      
+      <p class="shortcomment cmt">Defines standardized types for header classes in <a href="../headers/index.html" class="extype" name="scamper.headers">scamper.headers</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Defines standardized types for header classes in <a href="../headers/index.html" class="extype" name="scamper.headers">scamper.headers</a>.</p><pre><span class="kw">import</span> scamper.ImplicitConverters.{ stringToEntity, stringToUri }
+<span class="kw">import</span> scamper.RequestMethods.GET
+<span class="kw">import</span> scamper.ResponseStatuses.Ok
+<span class="kw">import</span> scamper.headers.{ Accept, ContentType, TransferEncoding }
+<span class="kw">import</span> scamper.types.{ MediaRange, MediaType, TransferCoding }
+
+<span class="kw">val</span> json = MediaRange(<span class="lit">"application"</span>, <span class="lit">"json"</span>, <span class="num">0.9</span>f)
+<span class="kw">val</span> html = MediaRange.parse(<span class="lit">"text/html; q=0.1"</span>)
+
+<span class="kw">val</span> req = GET(<span class="lit">"/motd"</span>).withAccept(json, html)
+
+<span class="kw">val</span> text = MediaType.parse(<span class="lit">"text/plain"</span>)
+<span class="kw">val</span> gzip = TransferCoding(<span class="lit">"gzip"</span>)
+
+<span class="kw">val</span> res = Ok(<span class="lit">"There is an answer."</span>)
+  .withContentType(text)
+  .withTransferEncoding(gzip)</pre><p>With <a href="ImplicitConverters$.html" class="extype" name="scamper.types.ImplicitConverters">ImplicitConverters</a>, the types can be converted from properly
+formatted string values.</p><pre><span class="kw">import</span> scamper.ImplicitConverters.{ stringToEntity, stringToUri }
+<span class="kw">import</span> scamper.RequestMethods.GET
+<span class="kw">import</span> scamper.ResponseStatuses.Ok
+<span class="kw">import</span> scamper.headers.{ Accept, ContentType, TransferEncoding }
+<span class="kw">import</span> scamper.types.ImplicitConverters._
+
+<span class="kw">val</span> req = GET(<span class="lit">"/motd"</span>).withAccept(
+ <span class="lit">"application/json; q=0.9"</span>,
+ <span class="lit">"text/html; q=0.1"</span>
+)
+
+<span class="kw">val</span> res = Ok(<span class="lit">"There is an answer."</span>)
+  .withContentType(<span class="lit">"text/plain"</span>)
+  .withTransferEncoding(<span class="lit">"gzip"</span>)</pre></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="scamper">scamper</a></dd></dl></div>
+    </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="trait" href="AuthType.html" title="Base type for authentication header types."></a>
+                        <a href="AuthType.html" title="Base type for authentication header types.">AuthType</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="ByteContentRange$.html" title="ByteContentRange factory"></a>
+                        <a class="trait" href="ByteContentRange.html" title="Standardized type for Content-Range header value."></a>
+                        <a href="ByteContentRange.html" title="Standardized type for Content-Range header value.">ByteContentRange</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="ByteRange$.html" title="ByteRange factory"></a>
+                        <a class="trait" href="ByteRange.html" title="Standardized type for Range header value."></a>
+                        <a href="ByteRange.html" title="Standardized type for Range header value.">ByteRange</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="CacheDirective$.html" title="CacheDirective factory"></a>
+                        <a class="trait" href="CacheDirective.html" title="Standardized type for Cache-Control header value."></a>
+                        <a href="CacheDirective.html" title="Standardized type for Cache-Control header value.">CacheDirective</a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="object" href="CacheDirectives$.html" title="Registered cache directives"></a>
+                        <a href="CacheDirectives$.html" title="Registered cache directives">CacheDirectives</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="Challenge$.html" title="Challenge factory"></a>
+                        <a class="trait" href="Challenge.html" title="Standardized type for WWW-Authenticate and Proxy-Authenticate header value."></a>
+                        <a href="Challenge.html" title="Standardized type for WWW-Authenticate and Proxy-Authenticate header value.">Challenge</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="CharsetRange$.html" title="CharsetRange factory"></a>
+                        <a class="trait" href="CharsetRange.html" title="Standardized type for Accept-Charset header value."></a>
+                        <a href="CharsetRange.html" title="Standardized type for Accept-Charset header value.">CharsetRange</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="ContentCoding$.html" title="ContentCoding factory"></a>
+                        <a class="trait" href="ContentCoding.html" title="Standardized type for Content-Encoding header value."></a>
+                        <a href="ContentCoding.html" title="Standardized type for Content-Encoding header value.">ContentCoding</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="ContentCodingRange$.html" title="ContentCodingRange factory"></a>
+                        <a class="trait" href="ContentCodingRange.html" title="Standardized type for Accept-Encoding header value."></a>
+                        <a href="ContentCodingRange.html" title="Standardized type for Accept-Encoding header value.">ContentCodingRange</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="ContentDispositionType$.html" title="ContentDispositionType factory"></a>
+                        <a class="trait" href="ContentDispositionType.html" title="Standardized type for Content-Disposition header value."></a>
+                        <a href="ContentDispositionType.html" title="Standardized type for Content-Disposition header value.">ContentDispositionType</a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="trait" href="ContentRangeType.html" title="Standardized type for Content-Range header value."></a>
+                        <a href="ContentRangeType.html" title="Standardized type for Content-Range header value.">ContentRangeType</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="Credentials$.html" title="Credentials factory"></a>
+                        <a class="trait" href="Credentials.html" title="Standardized type for Authorization and Proxy-Authorization header value."></a>
+                        <a href="Credentials.html" title="Standardized type for Authorization and Proxy-Authorization header value.">Credentials</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="EntityTag$.html" title="EntityTag factory"></a>
+                        <a class="trait" href="EntityTag.html" title="Standardized type for ETag, If-Match, If-None-Match, and If-Range header value."></a>
+                        <a href="EntityTag.html" title="Standardized type for ETag, If-Match, If-None-Match, and If-Range header value.">EntityTag</a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="object" href="ImplicitConverters$.html" title="Contains implicit converter functions."></a>
+                        <a href="ImplicitConverters$.html" title="Contains implicit converter functions.">ImplicitConverters</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="LanguageRange$.html" title="LanguageRange factory"></a>
+                        <a class="trait" href="LanguageRange.html" title="Standardized type for Accept-Language header value."></a>
+                        <a href="LanguageRange.html" title="Standardized type for Accept-Language header value.">LanguageRange</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="LanguageTag$.html" title="LanguageTag factory"></a>
+                        <a class="trait" href="LanguageTag.html" title="Standardized type for Content-Language header value."></a>
+                        <a href="LanguageTag.html" title="Standardized type for Content-Language header value.">LanguageTag</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="LinkValue$.html" title="LinkValue factory"></a>
+                        <a class="trait" href="LinkValue.html" title="Standardized type for Link header value."></a>
+                        <a href="LinkValue.html" title="Standardized type for Link header value.">LinkValue</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="MediaRange$.html" title="MediaRange factory"></a>
+                        <a class="trait" href="MediaRange.html" title="Standardized type for Accept header value."></a>
+                        <a href="MediaRange.html" title="Standardized type for Accept header value.">MediaRange</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="MediaType$.html" title="MediaType factory"></a>
+                        <a class="trait" href="MediaType.html" title="Standardized type for Content-Type header value."></a>
+                        <a href="MediaType.html" title="Standardized type for Content-Type header value.">MediaType</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="PragmaDirective$.html" title="PragmaDirective factory"></a>
+                        <a class="trait" href="PragmaDirective.html" title="Standardized type for Pragma header value."></a>
+                        <a href="PragmaDirective.html" title="Standardized type for Pragma header value.">PragmaDirective</a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="object" href="PragmaDirectives$.html" title="Registered pragma directives"></a>
+                        <a href="PragmaDirectives$.html" title="Registered pragma directives">PragmaDirectives</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="Preference$.html" title="Preference factory"></a>
+                        <a class="trait" href="Preference.html" title="Standardized type for Prefer and Preference-Applied header values."></a>
+                        <a href="Preference.html" title="Standardized type for Prefer and Preference-Applied header values.">Preference</a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="object" href="Preferences$.html" title="Registered preferences"></a>
+                        <a href="Preferences$.html" title="Registered preferences">Preferences</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="ProductType$.html" title="ProductType factory"></a>
+                        <a class="trait" href="ProductType.html" title="Standardized type for User-Agent and Server header value."></a>
+                        <a href="ProductType.html" title="Standardized type for User-Agent and Server header value.">ProductType</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="Protocol$.html" title="Protocol factory"></a>
+                        <a class="trait" href="Protocol.html" title="Standardized type for Upgrade header value."></a>
+                        <a href="Protocol.html" title="Standardized type for Upgrade header value.">Protocol</a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="trait" href="RangeType.html" title="Standardized type for Range header value."></a>
+                        <a href="RangeType.html" title="Standardized type for Range header value.">RangeType</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="TransferCoding$.html" title="TransferCoding factory"></a>
+                        <a class="trait" href="TransferCoding.html" title="Standardized type for Transfer-Encoding header value."></a>
+                        <a href="TransferCoding.html" title="Standardized type for Transfer-Encoding header value.">TransferCoding</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="TransferCodingRange$.html" title="TransferCodingRange factory"></a>
+                        <a class="trait" href="TransferCodingRange.html" title="Standardized type for TE header value."></a>
+                        <a href="TransferCodingRange.html" title="Standardized type for TE header value.">TransferCodingRange</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="ViaType$.html" title="ViaType factory"></a>
+                        <a class="trait" href="ViaType.html" title="Standardized type for Via header value."></a>
+                        <a href="ViaType.html" title="Standardized type for Via header value.">ViaType</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="WarningType$.html" title="WarningType factory"></a>
+                        <a class="trait" href="WarningType.html" title="Standardized type for Warning header value."></a>
+                        <a href="WarningType.html" title="Standardized type for Warning header value.">WarningType</a>
+                      </li>
+              </ul>
+            </div>
+          </div>
+          <div id="content">
+            <body class="package value">
+      <div id="definition">
+        <div class="big-circle package">p</div>
+        <p id="owner"><a href="../index.html" class="extype" name="scamper">scamper</a></p>
+        <h1>types<span class="permalink">
+      <a href="../../scamper/types/index.html" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span></h1>
+        
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">types</span>
+      </span>
+      </h4>
+
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Defines standardized types for header classes in <a href="../headers/index.html" class="extype" name="scamper.headers">scamper.headers</a>.</p><pre><span class="kw">import</span> scamper.ImplicitConverters.{ stringToEntity, stringToUri }
+<span class="kw">import</span> scamper.RequestMethods.GET
+<span class="kw">import</span> scamper.ResponseStatuses.Ok
+<span class="kw">import</span> scamper.headers.{ Accept, ContentType, TransferEncoding }
+<span class="kw">import</span> scamper.types.{ MediaRange, MediaType, TransferCoding }
+
+<span class="kw">val</span> json = MediaRange(<span class="lit">"application"</span>, <span class="lit">"json"</span>, <span class="num">0.9</span>f)
+<span class="kw">val</span> html = MediaRange.parse(<span class="lit">"text/html; q=0.1"</span>)
+
+<span class="kw">val</span> req = GET(<span class="lit">"/motd"</span>).withAccept(json, html)
+
+<span class="kw">val</span> text = MediaType.parse(<span class="lit">"text/plain"</span>)
+<span class="kw">val</span> gzip = TransferCoding(<span class="lit">"gzip"</span>)
+
+<span class="kw">val</span> res = Ok(<span class="lit">"There is an answer."</span>)
+  .withContentType(text)
+  .withTransferEncoding(gzip)</pre><p>With <a href="ImplicitConverters$.html" class="extype" name="scamper.types.ImplicitConverters">ImplicitConverters</a>, the types can be converted from properly
+formatted string values.</p><pre><span class="kw">import</span> scamper.ImplicitConverters.{ stringToEntity, stringToUri }
+<span class="kw">import</span> scamper.RequestMethods.GET
+<span class="kw">import</span> scamper.ResponseStatuses.Ok
+<span class="kw">import</span> scamper.headers.{ Accept, ContentType, TransferEncoding }
+<span class="kw">import</span> scamper.types.ImplicitConverters._
+
+<span class="kw">val</span> req = GET(<span class="lit">"/motd"</span>).withAccept(
+ <span class="lit">"application/json; q=0.9"</span>,
+ <span class="lit">"text/html; q=0.1"</span>
+)
+
+<span class="kw">val</span> res = Ok(<span class="lit">"There is an answer."</span>)
+  .withContentType(<span class="lit">"text/plain"</span>)
+  .withTransferEncoding(<span class="lit">"gzip"</span>)</pre></div><div class="toggleContainer block">
+          <span class="toggle">
+            Linear Supertypes
+          </span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div class="toggle"></div>
+        <div id="memberfilter">
+          <i class="material-icons arrow"></i>
+          <span class="input">
+            <input id="mbrsel-input" placeholder="Filter all members" type="text" accesskey="/" />
+          </span>
+          <i class="clear material-icons"></i>
+        </div>
+        <div id="filterby">
+          <div id="order">
+            <span class="filtertype">Ordering</span>
+            <ol>
+              
+              <li class="alpha in"><span>Alphabetic</span></li>
+              <li class="inherit out"><span>By Inheritance</span></li>
+            </ol>
+          </div>
+          <div class="ancestors">
+                  <span class="filtertype">Inherited<br />
+                  </span>
+                  <ol id="linearization">
+                    <li class="in" name="scamper.types"><span>types</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  </ol>
+                </div><div class="ancestors">
+              <span class="filtertype"></span>
+              <ol>
+                <li class="hideall out"><span>Hide All</span></li>
+                <li class="showall in"><span>Show All</span></li>
+              </ol>
+            </div>
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+            </div>
+        </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scamper.types.AuthType" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="AuthTypeextendsAnyRef"></a><a id="AuthType:AuthType"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#AuthTypeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Base type for authentication header types." href="AuthType.html"><span class="name">AuthType</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Base type for authentication header types.</p>
+    </li><li name="scamper.types.ByteContentRange" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ByteContentRangeextendsContentRangeType"></a><a id="ByteContentRange:ByteContentRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ByteContentRangeextendsContentRangeType" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Content-Range header value." href="ByteContentRange.html"><span class="name">ByteContentRange</span></a><span class="result"> extends <a href="ContentRangeType.html" class="extype" name="scamper.types.ContentRangeType">ContentRangeType</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Content-Range header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Content-Range header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$ContentRange.html" class="extype" name="scamper.headers.ContentRange">scamper.headers.ContentRange</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.ByteRange" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ByteRangeextendsRangeType"></a><a id="ByteRange:ByteRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ByteRangeextendsRangeType" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Range header value." href="ByteRange.html"><span class="name">ByteRange</span></a><span class="result"> extends <a href="RangeType.html" class="extype" name="scamper.types.RangeType">RangeType</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Range header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Range header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$Range.html" class="extype" name="scamper.headers.Range">scamper.headers.Range</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.CacheDirective" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="CacheDirectiveextendsAnyRef"></a><a id="CacheDirective:CacheDirective"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#CacheDirectiveextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Cache-Control header value." href="CacheDirective.html"><span class="name">CacheDirective</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Cache-Control header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Cache-Control header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$CacheControl.html" class="extype" name="scamper.headers.CacheControl">scamper.headers.CacheControl</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.Challenge" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ChallengeextendsAuthType"></a><a id="Challenge:Challenge"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ChallengeextendsAuthType" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for WWW-Authenticate and Proxy-Authenticate header value." href="Challenge.html"><span class="name">Challenge</span></a><span class="result"> extends <a href="AuthType.html" class="extype" name="scamper.types.AuthType">AuthType</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for WWW-Authenticate and Proxy-Authenticate header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for WWW-Authenticate and Proxy-Authenticate header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$WwwAuthenticate.html" class="extype" name="scamper.headers.WwwAuthenticate">scamper.headers.WwwAuthenticate</a></p></span><span class="cmt"><p><a href="../headers/package$$ProxyAuthenticate.html" class="extype" name="scamper.headers.ProxyAuthenticate">scamper.headers.ProxyAuthenticate</a></p></span><span class="cmt"><p><a href="Credentials.html" class="extype" name="scamper.types.Credentials">Credentials</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.CharsetRange" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="CharsetRangeextendsAnyRef"></a><a id="CharsetRange:CharsetRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#CharsetRangeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Accept-Charset header value." href="CharsetRange.html"><span class="name">CharsetRange</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Accept-Charset header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Accept-Charset header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$AcceptCharset.html" class="extype" name="scamper.headers.AcceptCharset">scamper.headers.AcceptCharset</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.ContentCoding" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ContentCodingextendsAnyRef"></a><a id="ContentCoding:ContentCoding"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ContentCodingextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Content-Encoding header value." href="ContentCoding.html"><span class="name">ContentCoding</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Content-Encoding header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Content-Encoding header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$ContentEncoding.html" class="extype" name="scamper.headers.ContentEncoding">scamper.headers.ContentEncoding</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.ContentCodingRange" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ContentCodingRangeextendsAnyRef"></a><a id="ContentCodingRange:ContentCodingRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ContentCodingRangeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Accept-Encoding header value." href="ContentCodingRange.html"><span class="name">ContentCodingRange</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Accept-Encoding header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Accept-Encoding header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$AcceptEncoding.html" class="extype" name="scamper.headers.AcceptEncoding">scamper.headers.AcceptEncoding</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.ContentDispositionType" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ContentDispositionTypeextendsAnyRef"></a><a id="ContentDispositionType:ContentDispositionType"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ContentDispositionTypeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Content-Disposition header value." href="ContentDispositionType.html"><span class="name">ContentDispositionType</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Content-Disposition header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Content-Disposition header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$ContentDisposition.html" class="extype" name="scamper.headers.ContentDisposition">scamper.headers.ContentDisposition</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.ContentRangeType" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ContentRangeTypeextendsAnyRef"></a><a id="ContentRangeType:ContentRangeType"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ContentRangeTypeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Content-Range header value." href="ContentRangeType.html"><span class="name">ContentRangeType</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Content-Range header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Content-Range header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$ContentRange.html" class="extype" name="scamper.headers.ContentRange">scamper.headers.ContentRange</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.Credentials" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="CredentialsextendsAuthType"></a><a id="Credentials:Credentials"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#CredentialsextendsAuthType" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Authorization and Proxy-Authorization header value." href="Credentials.html"><span class="name">Credentials</span></a><span class="result"> extends <a href="AuthType.html" class="extype" name="scamper.types.AuthType">AuthType</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Authorization and Proxy-Authorization header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Authorization and Proxy-Authorization header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$Authorization.html" class="extype" name="scamper.headers.Authorization">scamper.headers.Authorization</a></p></span><span class="cmt"><p><a href="../headers/package$$ProxyAuthorization.html" class="extype" name="scamper.headers.ProxyAuthorization">scamper.headers.ProxyAuthorization</a></p></span><span class="cmt"><p><a href="Challenge.html" class="extype" name="scamper.types.Challenge">Challenge</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.EntityTag" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="EntityTagextendsAnyRef"></a><a id="EntityTag:EntityTag"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#EntityTagextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for ETag, If-Match, If-None-Match, and If-Range header value." href="EntityTag.html"><span class="name">EntityTag</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for ETag, If-Match, If-None-Match, and If-Range header
+value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for ETag, If-Match, If-None-Match, and If-Range header
+value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$ETag.html" class="extype" name="scamper.headers.ETag">scamper.headers.ETag</a></p></span><span class="cmt"><p><a href="../headers/package$$IfMatch.html" class="extype" name="scamper.headers.IfMatch">scamper.headers.IfMatch</a></p></span><span class="cmt"><p><a href="../headers/package$$IfNoneMatch.html" class="extype" name="scamper.headers.IfNoneMatch">scamper.headers.IfNoneMatch</a></p></span><span class="cmt"><p><a href="../headers/package$$IfRange.html" class="extype" name="scamper.headers.IfRange">scamper.headers.IfRange</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.LanguageRange" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="LanguageRangeextendsAnyRef"></a><a id="LanguageRange:LanguageRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#LanguageRangeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Accept-Language header value." href="LanguageRange.html"><span class="name">LanguageRange</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Accept-Language header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Accept-Language header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$AcceptLanguage.html" class="extype" name="scamper.headers.AcceptLanguage">scamper.headers.AcceptLanguage</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.LanguageTag" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="LanguageTagextendsAnyRef"></a><a id="LanguageTag:LanguageTag"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#LanguageTagextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Content-Language header value." href="LanguageTag.html"><span class="name">LanguageTag</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Content-Language header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Content-Language header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$ContentLanguage.html" class="extype" name="scamper.headers.ContentLanguage">scamper.headers.ContentLanguage</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.LinkValue" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="LinkValueextendsAnyRef"></a><a id="LinkValue:LinkValue"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#LinkValueextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Link header value." href="LinkValue.html"><span class="name">LinkValue</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Link header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Link header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$Link.html" class="extype" name="scamper.headers.Link">scamper.headers.Link</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.MediaRange" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="MediaRangeextendsAnyRef"></a><a id="MediaRange:MediaRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#MediaRangeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Accept header value." href="MediaRange.html"><span class="name">MediaRange</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Accept header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Accept header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$Accept.html" class="extype" name="scamper.headers.Accept">scamper.headers.Accept</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.MediaType" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="MediaTypeextendsAnyRef"></a><a id="MediaType:MediaType"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#MediaTypeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Content-Type header value." href="MediaType.html"><span class="name">MediaType</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Content-Type header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Content-Type header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$ContentType.html" class="extype" name="scamper.headers.ContentType">scamper.headers.ContentType</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.PragmaDirective" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="PragmaDirectiveextendsAnyRef"></a><a id="PragmaDirective:PragmaDirective"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#PragmaDirectiveextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Pragma header value." href="PragmaDirective.html"><span class="name">PragmaDirective</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Pragma header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Pragma header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$Pragma.html" class="extype" name="scamper.headers.Pragma">scamper.headers.Pragma</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.Preference" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="PreferenceextendsAnyRef"></a><a id="Preference:Preference"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#PreferenceextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Prefer and Preference-Applied header values." href="Preference.html"><span class="name">Preference</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Prefer and Preference-Applied header values.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Prefer and Preference-Applied header values.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$Prefer.html" class="extype" name="scamper.headers.Prefer">scamper.headers.Prefer</a></p></span><span class="cmt"><p><a href="../headers/package$$PreferenceApplied.html" class="extype" name="scamper.headers.PreferenceApplied">scamper.headers.PreferenceApplied</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.ProductType" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ProductTypeextendsAnyRef"></a><a id="ProductType:ProductType"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ProductTypeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for User-Agent and Server header value." href="ProductType.html"><span class="name">ProductType</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for User-Agent and Server header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for User-Agent and Server header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$UserAgent.html" class="extype" name="scamper.headers.UserAgent">scamper.headers.UserAgent</a></p></span><span class="cmt"><p><a href="../headers/package$$Server.html" class="extype" name="scamper.headers.Server">scamper.headers.Server</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.Protocol" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ProtocolextendsAnyRef"></a><a id="Protocol:Protocol"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ProtocolextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Upgrade header value." href="Protocol.html"><span class="name">Protocol</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Upgrade header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Upgrade header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$Upgrade.html" class="extype" name="scamper.headers.Upgrade">scamper.headers.Upgrade</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.RangeType" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="RangeTypeextendsAnyRef"></a><a id="RangeType:RangeType"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#RangeTypeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Range header value." href="RangeType.html"><span class="name">RangeType</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Range header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Range header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$Range.html" class="extype" name="scamper.headers.Range">scamper.headers.Range</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.TransferCoding" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="TransferCodingextendsAnyRef"></a><a id="TransferCoding:TransferCoding"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#TransferCodingextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Transfer-Encoding header value." href="TransferCoding.html"><span class="name">TransferCoding</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Transfer-Encoding header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Transfer-Encoding header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$TransferEncoding.html" class="extype" name="scamper.headers.TransferEncoding">scamper.headers.TransferEncoding</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.TransferCodingRange" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="TransferCodingRangeextendsAnyRef"></a><a id="TransferCodingRange:TransferCodingRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#TransferCodingRangeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for TE header value." href="TransferCodingRange.html"><span class="name">TransferCodingRange</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for TE header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for TE header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$TE.html" class="extype" name="scamper.headers.TE">scamper.headers.TE</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.ViaType" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ViaTypeextendsAnyRef"></a><a id="ViaType:ViaType"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ViaTypeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Via header value." href="ViaType.html"><span class="name">ViaType</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Via header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Via header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$Via.html" class="extype" name="scamper.headers.Via">scamper.headers.Via</a></p></span></dd></dl></div>
+    </li><li name="scamper.types.WarningType" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="WarningTypeextendsAnyRef"></a><a id="WarningType:WarningType"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#WarningTypeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Standardized type for Warning header value." href="WarningType.html"><span class="name">WarningType</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Standardized type for Warning header value.</p><div class="fullcomment"><div class="comment cmt"><p>Standardized type for Warning header value.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../headers/package$$Warning.html" class="extype" name="scamper.headers.Warning">scamper.headers.Warning</a></p></span></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol>
+                <li name="scamper.types.ByteContentRange" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ByteContentRange"></a><a id="ByteContentRange:ByteContentRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ByteContentRange" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="ByteContentRange factory" href="ByteContentRange$.html"><span class="name">ByteContentRange</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">ByteContentRange factory</p>
+    </li><li name="scamper.types.ByteRange" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ByteRange"></a><a id="ByteRange:ByteRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ByteRange" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="ByteRange factory" href="ByteRange$.html"><span class="name">ByteRange</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">ByteRange factory</p>
+    </li><li name="scamper.types.CacheDirective" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CacheDirective"></a><a id="CacheDirective:CacheDirective"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#CacheDirective" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="CacheDirective factory" href="CacheDirective$.html"><span class="name">CacheDirective</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">CacheDirective factory</p>
+    </li><li name="scamper.types.CacheDirectives" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CacheDirectives"></a><a id="CacheDirectives:CacheDirectives"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#CacheDirectives" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="Registered cache directives" href="CacheDirectives$.html"><span class="name">CacheDirectives</span></a><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Registered cache directives</p>
+    </li><li name="scamper.types.Challenge" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Challenge"></a><a id="Challenge:Challenge"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#Challenge" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="Challenge factory" href="Challenge$.html"><span class="name">Challenge</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">Challenge factory</p>
+    </li><li name="scamper.types.CharsetRange" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CharsetRange"></a><a id="CharsetRange:CharsetRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#CharsetRange" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="CharsetRange factory" href="CharsetRange$.html"><span class="name">CharsetRange</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">CharsetRange factory</p>
+    </li><li name="scamper.types.ContentCoding" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ContentCoding"></a><a id="ContentCoding:ContentCoding"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ContentCoding" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="ContentCoding factory" href="ContentCoding$.html"><span class="name">ContentCoding</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">ContentCoding factory</p>
+    </li><li name="scamper.types.ContentCodingRange" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ContentCodingRange"></a><a id="ContentCodingRange:ContentCodingRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ContentCodingRange" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="ContentCodingRange factory" href="ContentCodingRange$.html"><span class="name">ContentCodingRange</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">ContentCodingRange factory</p>
+    </li><li name="scamper.types.ContentDispositionType" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ContentDispositionType"></a><a id="ContentDispositionType:ContentDispositionType"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ContentDispositionType" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="ContentDispositionType factory" href="ContentDispositionType$.html"><span class="name">ContentDispositionType</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">ContentDispositionType factory</p>
+    </li><li name="scamper.types.Credentials" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Credentials"></a><a id="Credentials:Credentials"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#Credentials" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="Credentials factory" href="Credentials$.html"><span class="name">Credentials</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">Credentials factory</p>
+    </li><li name="scamper.types.EntityTag" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="EntityTag"></a><a id="EntityTag:EntityTag"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#EntityTag" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="EntityTag factory" href="EntityTag$.html"><span class="name">EntityTag</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">EntityTag factory</p>
+    </li><li name="scamper.types.ImplicitConverters" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ImplicitConverters"></a><a id="ImplicitConverters:ImplicitConverters"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ImplicitConverters" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="Contains implicit converter functions." href="ImplicitConverters$.html"><span class="name">ImplicitConverters</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">Contains implicit converter functions.</p>
+    </li><li name="scamper.types.LanguageRange" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="LanguageRange"></a><a id="LanguageRange:LanguageRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#LanguageRange" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="LanguageRange factory" href="LanguageRange$.html"><span class="name">LanguageRange</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">LanguageRange factory</p>
+    </li><li name="scamper.types.LanguageTag" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="LanguageTag"></a><a id="LanguageTag:LanguageTag"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#LanguageTag" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="LanguageTag factory" href="LanguageTag$.html"><span class="name">LanguageTag</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">LanguageTag factory</p>
+    </li><li name="scamper.types.LinkValue" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="LinkValue"></a><a id="LinkValue:LinkValue"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#LinkValue" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="LinkValue factory" href="LinkValue$.html"><span class="name">LinkValue</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">LinkValue factory</p>
+    </li><li name="scamper.types.MediaRange" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MediaRange"></a><a id="MediaRange:MediaRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#MediaRange" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="MediaRange factory" href="MediaRange$.html"><span class="name">MediaRange</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">MediaRange factory</p>
+    </li><li name="scamper.types.MediaType" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MediaType"></a><a id="MediaType:MediaType"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#MediaType" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="MediaType factory" href="MediaType$.html"><span class="name">MediaType</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">MediaType factory</p>
+    </li><li name="scamper.types.PragmaDirective" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PragmaDirective"></a><a id="PragmaDirective:PragmaDirective"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#PragmaDirective" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="PragmaDirective factory" href="PragmaDirective$.html"><span class="name">PragmaDirective</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">PragmaDirective factory</p>
+    </li><li name="scamper.types.PragmaDirectives" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PragmaDirectives"></a><a id="PragmaDirectives:PragmaDirectives"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#PragmaDirectives" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="Registered pragma directives" href="PragmaDirectives$.html"><span class="name">PragmaDirectives</span></a><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Registered pragma directives</p>
+    </li><li name="scamper.types.Preference" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Preference"></a><a id="Preference:Preference"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#Preference" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="Preference factory" href="Preference$.html"><span class="name">Preference</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">Preference factory</p>
+    </li><li name="scamper.types.Preferences" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Preferences"></a><a id="Preferences:Preferences"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#Preferences" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="Registered preferences" href="Preferences$.html"><span class="name">Preferences</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">Registered preferences</p>
+    </li><li name="scamper.types.ProductType" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ProductType"></a><a id="ProductType:ProductType"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ProductType" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="ProductType factory" href="ProductType$.html"><span class="name">ProductType</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">ProductType factory</p>
+    </li><li name="scamper.types.Protocol" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Protocol"></a><a id="Protocol:Protocol"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#Protocol" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="Protocol factory" href="Protocol$.html"><span class="name">Protocol</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">Protocol factory</p>
+    </li><li name="scamper.types.TransferCoding" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TransferCoding"></a><a id="TransferCoding:TransferCoding"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#TransferCoding" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="TransferCoding factory" href="TransferCoding$.html"><span class="name">TransferCoding</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">TransferCoding factory</p>
+    </li><li name="scamper.types.TransferCodingRange" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TransferCodingRange"></a><a id="TransferCodingRange:TransferCodingRange"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#TransferCodingRange" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="TransferCodingRange factory" href="TransferCodingRange$.html"><span class="name">TransferCodingRange</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">TransferCodingRange factory</p>
+    </li><li name="scamper.types.ViaType" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ViaType"></a><a id="ViaType:ViaType"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#ViaType" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="ViaType factory" href="ViaType$.html"><span class="name">ViaType</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">ViaType factory</p>
+    </li><li name="scamper.types.WarningType" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="WarningType"></a><a id="WarningType:WarningType"></a>
+      <span class="permalink">
+      <a href="../../scamper/types/index.html#WarningType" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="WarningType factory" href="WarningType$.html"><span class="name">WarningType</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">WarningType factory</p>
+    </li>
+              </ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+    </body>
+          </div>
+        </div>
+      </div>
+    </body>
+      </html>
