@@ -48,7 +48,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
     val scheme = if (secure) "https" else "http"
     val host = getEffectiveHost(request.target, request.getHost)
     val target = request.target.withScheme(scheme).withAuthority(host)
-    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/3.0")
+    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/3.1")
     val connection = getEffectiveConnection(request)
 
     var effectiveRequest = request.method match {
