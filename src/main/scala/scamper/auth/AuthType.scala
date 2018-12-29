@@ -86,15 +86,19 @@ object Challenge {
 
   /** Creates Challenge with supplied auth scheme and parameters. */
   def apply(scheme: String, params: (String, String)*): Challenge =
-    apply(scheme, None, params.toMap)
+    apply(scheme, None, Params(params.toMap))
 
   private def apply(scheme: String, token: Option[String], params: Map[String, String]): Challenge =
-    if (scheme.equalsIgnoreCase("basic"))
+    if (scheme.equalsIgnoreCase("basic")) {
+      require(token.isEmpty, s"Invalid basic challenge: token not allowed")
       params.get("realm")
         .map(BasicChallenge(_, params.toSeq : _*))
-        .getOrElse(throw new IllegalArgumentException("Invalid Basic authentication: missing realm"))
-    else
+        .getOrElse(throw new IllegalArgumentException("Invalid basic challenge: missing realm"))
+    } else {
+      require(token.nonEmpty || params.nonEmpty, "Invalid challenge: either token or params required")
+      require(token.isEmpty || params.isEmpty, "Invalid challenge: cannot provide both token and params")
       DefaultChallenge(scheme, token, params)
+    }
 
   /** Destructures Challenge. */
   def unapply(challenge: Challenge): Option[(String, Option[String], Map[String, String])] =
@@ -170,14 +174,18 @@ object Credentials {
 
   /** Creates Credentials with supplied auth scheme and parameters. */
   def apply(scheme: String, params: (String, String)*): Credentials =
-    apply(scheme, None, params.toMap)
+    apply(scheme, None, Params(params.toMap))
 
   private def apply(scheme: String, token: Option[String], params: Map[String, String]): Credentials =
-    if (scheme.equalsIgnoreCase("basic"))
+    if (scheme.equalsIgnoreCase("basic")) {
+      require(params.isEmpty, "Invalid basic credentials: params not allowed")
       token.map(BasicCredentials.apply)
         .getOrElse(throw new IllegalArgumentException("Token required for Basic authorization"))
-    else
+    } else {
+      require(token.nonEmpty || params.nonEmpty, "Invalid credentials: either token or params required")
+      require(token.isEmpty || params.isEmpty, "Invalid credentials: cannot provide both token and params")
       DefaultCredentials(scheme, token, params)
+    }
 
   /** Destructures Credentials. */
   def unapply(credentials: Credentials): Option[(String, Option[String], Map[String, String])] =

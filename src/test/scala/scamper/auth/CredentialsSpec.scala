@@ -22,7 +22,7 @@ import scamper.Base64
 class CredentialsSpec extends FlatSpec {
   private val token = Base64.encodeToString("guest:letmein")
 
-  "Credentials" should "be created with Basic authorization" in {
+  "Credentials" should "be created with basic scheme" in {
     val credentials = Credentials.parse(s"Basic $token")
     assert(credentials.scheme == "Basic")
     assert(credentials.token.contains(token))
@@ -77,10 +77,12 @@ class CredentialsSpec extends FlatSpec {
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](Challenge.parse("Basic"))
-    assertThrows[IllegalArgumentException](Challenge.parse("Basic realm"))
-    assertThrows[IllegalArgumentException](Challenge.parse("Basic description=none"))
-    assertThrows[IllegalArgumentException](Challenge.parse("Bearer scope=openid profile email"))
-    assertThrows[IllegalArgumentException](Challenge.parse("Insecure issa:rae"))
+    assertThrows[IllegalArgumentException](Credentials.parse("Basic"))
+    assertThrows[IllegalArgumentException](Credentials.parse("Basic realm"))
+    assertThrows[IllegalArgumentException](Credentials.parse("Basic aXNzYTpyYWUK realm=Insecure"))
+    assertThrows[IllegalArgumentException](Credentials.parse("Basic description=none"))
+    assertThrows[IllegalArgumentException](Credentials.parse("Bearer scope=openid profile email"))
+    assertThrows[IllegalArgumentException](Credentials.parse("Insecure issa:rae"))
+    assertThrows[IllegalArgumentException](Credentials.parse("Insecure aXNzYTpyYWUK realm=Insecure"))
   }
 }

@@ -20,7 +20,7 @@ import org.scalatest.FlatSpec
 import scamper.Base64
 
 class ChallengeSpec extends FlatSpec {
-  "Challenge" should "be created with Basic authentication" in {
+  "Challenge" should "be created with basic scheme" in {
     val challenge = Challenge.parse("Basic realm=\"Admin Console\", charset=utf-8")
     assert(challenge.scheme == "Basic")
     assert(!challenge.token.isDefined)
@@ -77,8 +77,10 @@ class ChallengeSpec extends FlatSpec {
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](Challenge.parse("Basic"))
     assertThrows[IllegalArgumentException](Challenge.parse("Basic realm"))
+    assertThrows[IllegalArgumentException](Challenge.parse("Basic aXNzYTpyYWUK realm=Insecure"))
     assertThrows[IllegalArgumentException](Challenge.parse("Basic description=none"))
-    assertThrows[IllegalArgumentException](Challenge.parse("Bearer user=guest&password=letmein"))
+    assertThrows[IllegalArgumentException](Challenge.parse("Bearer scope=openid profile email"))
     assertThrows[IllegalArgumentException](Challenge.parse("Insecure issa:rae"))
+    assertThrows[IllegalArgumentException](Challenge.parse("Insecure aXNzYTpyYWUK realm=Insecure"))
   }
 }
