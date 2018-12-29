@@ -17,6 +17,68 @@ package scamper
 
 /**
  * Provides access to authethentication related types and headers.
+ *
+ * === Challenges and Credentials ===
+ *
+ * You build a response with a `Challenge` and build a request with
+ * `Credentials`.
+ *
+ * {{{
+ * import scamper.ImplicitConverters.stringToUri
+ * import scamper.RequestMethods.GET
+ * import scamper.ResponseStatuses.Unauthorized
+ * import scamper.auth.{ Authorization, Challenge, Credentials, WwwAuthenticate }
+ *
+ * // Present response challenge (scheme and parameters)
+ * val challenge = Challenge("Bearer", "realm" -> "developer")
+ * val res = Unauthorized().withWwwAuthenticate(challenge)
+ *
+ * // Present request credentials (scheme and token)
+ * val credentials = Credentials("Bearer", "QWxsIEFjY2VzcyEhIQo=")
+ * val req = GET("/dev/projects").withAuthorization(credentials)
+ * }}}
+ *
+ * === Basic Authentication Scheme ===
+ *
+ * There are subclasses for the Basic authentication scheme: `BasicAuthentication`
+ * extends `Challenge`, and `BasicAuthorization` extends `Credentials`.
+ *
+ * {{{
+ * import scamper.ImplicitConverters.stringToUri
+ * import scamper.RequestMethods.GET
+ * import scamper.ResponseStatuses.Unauthorized
+ * import scamper.auth.{ Authorization, BasicAuthentication, BasicAuthorization, WwwAuthenticate }
+ *
+ * // Provide realm and optional parameters
+ * val challenge = BasicAuthentication("admin", "title" -> "Admin Console")
+ * val res = Unauthorized().withWwwAuthenticate(challenge)
+ *
+ * // Provide user and password
+ * val credentials = BasicAuthorization("sa", "l3tm31n")
+ * val req = GET("/admin/users").withAuthorization(credentials)
+ * }}}
+ *
+ * In addition, there are convenient methods for Basic.
+ *
+ * {{{
+ * import scamper.ImplicitConverters.stringToUri
+ * import scamper.RequestMethods.GET
+ * import scamper.ResponseStatuses.Unauthorized
+ * import scamper.auth.{ Authorization, WwwAuthenticate }
+ *
+ * // Provide realm and optional parameters
+ * val res = Unauthorized().withBasic("admin", "title" -> "Admin Console")
+ *
+ * // Access basic auth in response
+ * printf(s"Realm: %s%n", res.basic.realm)
+ *
+ * // Provide user and password
+ * val req = GET("/admin/users").withBasic("sa", "l3tm3m1n")
+ *
+ * // Access basic auth in request
+ * printf(s"User: %s%n", req.basic.user)
+ * printf(s"Password: %s%n", req.basic.password)
+ * }}}
  */
 package object auth {
   /** Converts string to [[Challenge]]. */
@@ -92,7 +154,7 @@ package object auth {
     def hasBasic: Boolean = getBasic.isDefined
 
     /** Creates new request with basic authorization. */
-    def withBasic(token: String): HttpRequest = 
+    def withBasic(token: String): HttpRequest =
       withBasic(BasicAuthorization(token))
 
     /** Creates new request with basic authorization. */
