@@ -55,16 +55,16 @@ class CredentialsSpec extends FlatSpec {
 
   it should "be destructured" in {
     Credentials.parse(s"Basic $token") match {
-      case Credentials(scheme, token, params) =>
-        assert(scheme == "Basic")
-        assert(token.isDefined)
-        assert(params.isEmpty)
-    }
-
-    Credentials.parse(s"Basic $token") match {
       case BasicAuthorization(user, password) =>
         assert(user == "guest")
         assert(password == "letmein")
+    }
+
+    Credentials.parse(s"Bearer $token") match {
+      case Credentials(scheme, token, params) =>
+        assert(scheme == "Bearer")
+        assert(token.isDefined)
+        assert(params.isEmpty)
     }
 
     Credentials.parse("Insecure user=issa, password=\"secr,t\"") match {
@@ -77,11 +77,10 @@ class CredentialsSpec extends FlatSpec {
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](Credentials.parse("Basic"))
-    assertThrows[IllegalArgumentException](Credentials.parse("Basic guest:letmein"))
-    assertThrows[IllegalArgumentException](Credentials.parse("Basic realm=Public"))
-    assertThrows[IllegalArgumentException](Credentials.parse("Bearer /"))
-    assertThrows[IllegalArgumentException](Credentials.parse("Insecure ="))
-    assertThrows[IllegalArgumentException](Credentials.parse("Insecure =secret"))
+    assertThrows[IllegalArgumentException](Challenge.parse("Basic"))
+    assertThrows[IllegalArgumentException](Challenge.parse("Basic realm"))
+    assertThrows[IllegalArgumentException](Challenge.parse("Basic description=none"))
+    assertThrows[IllegalArgumentException](Challenge.parse("Bearer scope=openid profile email"))
+    assertThrows[IllegalArgumentException](Challenge.parse("Insecure issa:rae"))
   }
 }

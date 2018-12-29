@@ -21,62 +21,64 @@ import scamper.Base64
 
 class ChallengeSpec extends FlatSpec {
   "Challenge" should "be created with Basic authentication" in {
-    val challenge = Challenge.parse("Basic realm=\"User Workshop\", charset=utf-8")
+    val challenge = Challenge.parse("Basic realm=\"Admin Console\", charset=utf-8")
     assert(challenge.scheme == "Basic")
     assert(!challenge.token.isDefined)
-    assert(challenge.params("realm") == "User Workshop")
+    assert(challenge.params("realm") == "Admin Console")
     assert(challenge.params("charset") == "utf-8")
-    assert(challenge.toString == "Basic realm=\"User Workshop\", charset=utf-8")
+    assert(challenge.toString == "Basic realm=\"Admin Console\", charset=utf-8")
     assert(challenge.isInstanceOf[BasicAuthentication])
 
     val auth = challenge.asInstanceOf[BasicAuthentication]
-    assert(auth.realm == "User Workshop")
+    assert(auth.realm == "Admin Console")
   }
 
   it should "be created with token" in {
-    val challenge = Challenge.parse(s"Insecure user-workshop")
+    val challenge = Challenge.parse(s"Insecure aXNzYTpyYWUK")
     assert(challenge.scheme == "Insecure")
-    assert(challenge.token.contains("user-workshop"))
+    assert(challenge.token.contains("aXNzYTpyYWUK"))
     assert(challenge.params.isEmpty)
-    assert(challenge.toString == s"Insecure user-workshop")
+    assert(challenge.toString == s"Insecure aXNzYTpyYWUK")
   }
 
   it should "be created with parameters" in {
-    val challenge = Challenge.parse("Insecure realm=\"Admin Console\", description=none")
-    assert(challenge.scheme == "Insecure")
+    val challenge = Challenge.parse("Bearer realm=\"example\", error=invalid_token")
+    assert(challenge.scheme == "Bearer")
     assert(!challenge.token.isDefined)
-    assert(challenge.params("realm") == "Admin Console")
-    assert(challenge.params("description") == "none")
-    assert(challenge.toString == "Insecure realm=\"Admin Console\", description=none")
+    assert(challenge.params("realm") == "example")
+    assert(challenge.params("error") == "invalid_token")
+    assert(challenge.toString == "Bearer realm=example, error=invalid_token")
   }
 
   it should "be destructured" in {
-    Challenge.parse("Basic realm=Workshop, charset=utf-8") match {
+    Challenge.parse("Basic realm=Console, charset=utf-8") match {
       case BasicAuthentication(realm, params) =>
-        assert(realm == "Workshop")
-        assert(params("realm") == "Workshop")
+        assert(realm == "Console")
+        assert(params("realm") == "Console")
         assert(params("charset") == "utf-8")
     }
 
-    Challenge.parse("Insecure realm=\"Admin Console\", description=none") match {
-      case Challenge(scheme, token, params) =>
-        assert(scheme == "Insecure")
-        assert(!token.isDefined)
-        assert(params("realm") == "Admin Console")
-        assert(params("description") == "none")
-    }
-
-    Challenge.parse(s"Insecure user-workshop") match {
+    Challenge.parse(s"Insecure aXNzYTpyYWUK") match {
       case Challenge(scheme, Some(token), params) =>
         assert(scheme == "Insecure")
-        assert(token.contains("user-workshop"))
+        assert(token.contains("aXNzYTpyYWUK"))
         assert(params.isEmpty)
+    }
+
+    Challenge.parse("Bearer realm=\"example\", error=invalid_token") match {
+      case Challenge(scheme, token, params) =>
+        assert(scheme == "Bearer")
+        assert(!token.isDefined)
+        assert(params("realm") == "example")
+        assert(params("error") == "invalid_token")
     }
   }
 
   it should "not be created with malformed value" in {
+    assertThrows[IllegalArgumentException](Challenge.parse("Basic"))
     assertThrows[IllegalArgumentException](Challenge.parse("Basic realm"))
     assertThrows[IllegalArgumentException](Challenge.parse("Basic description=none"))
-    assertThrows[IllegalArgumentException](Challenge.parse("Insecure ="))
+    assertThrows[IllegalArgumentException](Challenge.parse("Bearer user=guest&password=letmein"))
+    assertThrows[IllegalArgumentException](Challenge.parse("Insecure issa:rae"))
   }
 }

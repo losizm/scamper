@@ -82,7 +82,7 @@ object Challenge {
 
   /** Creates Challenge with supplied auth scheme and token. */
   def apply(scheme: String, token: String): Challenge =
-    apply(scheme, Some(token), Map.empty)
+    apply(scheme, Some(Token(token)), Map.empty)
 
   /** Creates Challenge with supplied auth scheme and parameters. */
   def apply(scheme: String, params: Map[String, String]): Challenge =
@@ -166,7 +166,7 @@ object Credentials {
 
   /** Creates Credentials with supplied auth scheme and token. */
   def apply(scheme: String, token: String): Credentials =
-    apply(scheme, Some(token), Map.empty)
+    apply(scheme, Some(Token(token)), Map.empty)
 
   /** Creates Credentials with supplied auth scheme and parameters. */
   def apply(scheme: String, params: Map[String, String]): Credentials =
