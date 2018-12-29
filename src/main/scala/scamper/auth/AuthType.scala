@@ -82,11 +82,11 @@ object Challenge {
 
   /** Creates Challenge with supplied auth scheme and token. */
   def apply(scheme: String, token: String): Challenge =
-    apply(scheme, Some(Token(token)), Map.empty)
+    apply(scheme, Some(Token(token)), Map.empty[String, String])
 
   /** Creates Challenge with supplied auth scheme and parameters. */
-  def apply(scheme: String, params: Map[String, String]): Challenge =
-    apply(scheme, None, params)
+  def apply(scheme: String, params: (String, String)*): Challenge =
+    apply(scheme, None, params.toMap)
 
   private def apply(scheme: String, token: Option[String], params: Map[String, String]): Challenge =
     if (scheme.equalsIgnoreCase("basic"))
@@ -166,11 +166,11 @@ object Credentials {
 
   /** Creates Credentials with supplied auth scheme and token. */
   def apply(scheme: String, token: String): Credentials =
-    apply(scheme, Some(Token(token)), Map.empty)
+    apply(scheme, Some(Token(token)), Map.empty[String, String])
 
   /** Creates Credentials with supplied auth scheme and parameters. */
-  def apply(scheme: String, params: Map[String, String]): Credentials =
-    apply(scheme, None, params)
+  def apply(scheme: String, params: (String, String)*): Credentials =
+    apply(scheme, None, params.toMap)
 
   private def apply(scheme: String, token: Option[String], params: Map[String, String]): Credentials =
     if (scheme.equalsIgnoreCase("basic"))
