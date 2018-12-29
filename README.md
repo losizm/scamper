@@ -323,6 +323,81 @@ def printUser(message: HttpMessage): Unit = {
 }
 ```
 
+## HTTP Authentication
+
+**Scamper** includes a separate package (i.e., `scamper.auth`) for working with
+the authentication types and headers.
+
+### Challenges and Credentials
+
+When working with authentication, you present a `Challenge` in the response and
+`Credentials` in the request. Each of these has an assigned scheme and either a
+token or a set of parameters.
+
+```scala
+import scamper.ImplicitConverters.stringToUri
+import scamper.RequestMethods.GET
+import scamper.ResponseStatuses.Unauthorized
+import scamper.auth.{ Authorization, Challenge, Credentials, WwwAuthenticate }
+
+// Present response challenge (scheme and parameters)
+val challenge = Challenge("Bearer", "realm" -> "developer")
+val res = Unauthorized().withWwwAuthenticate(challenge)
+
+// Present request credentials (scheme and token)
+val credentials = Credentials("Bearer", "QWxsIEFjY2VzcyEhIQo=")
+val req = GET("/dev/projects").withAuthorization(credentials)
+```
+
+_**Note:** The `Authorization` and `WwwAuthenticate` header classes are for
+authentication between the user agent and origin server. There are other header
+classes available for proxy authentication &ndash; see
+[scaladoc](https://losizm.github.io/scamper/latest/api/scamper/index.html) for
+details._
+
+
+### Basic Authentication Scheme
+
+There are subclasses defined for the Basic scheme: `BasicChallenge` and
+`BasicCredentials`.
+
+```scala
+import scamper.ImplicitConverters.stringToUri
+import scamper.RequestMethods.GET
+import scamper.ResponseStatuses.Unauthorized
+import scamper.auth.{ Authorization, BasicChallenge, BasicCredentials, WwwAuthenticate }
+
+// Provide realm and optional parameters
+val challenge = BasicChallenge("admin", "title" -> "Admin Console")
+val res = Unauthorized().withWwwAuthenticate(challenge)
+
+// Provide user and password
+val credentials = BasicCredentials("sa", "l3tm31n")
+val req = GET("/admin/users").withAuthorization(credentials)
+```
+
+In addition, there are convenience methods available for the Basic scheme.
+
+```scala
+import scamper.ImplicitConverters.stringToUri
+import scamper.RequestMethods.GET
+import scamper.ResponseStatuses.Unauthorized
+import scamper.auth.{ Authorization, WwwAuthenticate }
+
+// Provide realm and optional parameters
+val res = Unauthorized().withBasic("admin", "title" -> "Admin Console")
+
+// Access basic auth in response
+printf(s"Realm: %s%n", res.basic.realm)
+
+// Provide user and password
+val req = GET("/admin/users").withBasic("sa", "l3tm3m1n")
+
+// Access basic auth in request
+printf(s"User: %s%n", req.basic.user)
+printf(s"Password: %s%n", req.basic.password)
+```
+
 ## HTTP Client
 
 **Scamper** includes `HttpClient`, which is used for sending requests and
