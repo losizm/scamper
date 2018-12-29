@@ -31,7 +31,11 @@ private object AuthParams {
 
   def format(params: Map[String, String]): String =
     if (params.isEmpty) ""
-    else params.map { case (name, value) => s"$name=${formatParamValue(value)}" }.mkString(" ", ", ", "")
+    else
+      params.map { case (name, value) => s"$name=${formatParamValue(value)}" }
+        .toSeq
+        .sortBy { format => if (format.startsWith("realm")) 0 else 1 }
+        .mkString(" ", ", ", "")
 
   private def formatParamValue(value: String): String = Token(value).getOrElse('"' + value + '"')
 }
