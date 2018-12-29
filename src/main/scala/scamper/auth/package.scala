@@ -16,12 +16,13 @@
 package scamper
 
 /**
- * Provides access to authethentication related types and headers.
+ * Provides access to authethentication types and headers.
  *
  * === Challenges and Credentials ===
  *
- * You build a response with a `Challenge` and build a request with
- * `Credentials`.
+ * When working with authentication, you present a `Challenge` in the response
+ * and `Credentials` in the request. Each of these has an assigned scheme and
+ * either a token or a set of parameters.
  *
  * {{{
  * import scamper.ImplicitConverters.stringToUri
@@ -40,25 +41,25 @@ package scamper
  *
  * === Basic Authentication Scheme ===
  *
- * There are subclasses for the Basic authentication scheme: `BasicAuthentication`
- * extends `Challenge`, and `BasicAuthorization` extends `Credentials`.
+ * There are subclasses defined for the Basic scheme: `BasicChallenge` and
+ * `BasicCredentials`.
  *
  * {{{
  * import scamper.ImplicitConverters.stringToUri
  * import scamper.RequestMethods.GET
  * import scamper.ResponseStatuses.Unauthorized
- * import scamper.auth.{ Authorization, BasicAuthentication, BasicAuthorization, WwwAuthenticate }
+ * import scamper.auth.{ Authorization, BasicChallenge, BasicCredentials, WwwAuthenticate }
  *
  * // Provide realm and optional parameters
- * val challenge = BasicAuthentication("admin", "title" -> "Admin Console")
+ * val challenge = BasicChallenge("admin", "title" -> "Admin Console")
  * val res = Unauthorized().withWwwAuthenticate(challenge)
  *
  * // Provide user and password
- * val credentials = BasicAuthorization("sa", "l3tm31n")
+ * val credentials = BasicCredentials("sa", "l3tm31n")
  * val req = GET("/admin/users").withAuthorization(credentials)
  * }}}
  *
- * In addition, there are convenient methods for Basic.
+ * In addition, there are convenience methods available for the Basic scheme.
  *
  * {{{
  * import scamper.ImplicitConverters.stringToUri
@@ -143,26 +144,26 @@ package object auth {
      *
      * @throws HttpException if basic authorization is not present
      */
-    def basic: BasicAuthorization =
+    def basic: BasicCredentials =
       getBasic.getOrElse(throw new HttpException("Basic authorization not found"))
 
     /** Gets basic authorization if present. */
-    def getBasic: Option[BasicAuthorization] =
-      getAuthorization.collect { case challenge: BasicAuthorization => challenge }
+    def getBasic: Option[BasicCredentials] =
+      getAuthorization.collect { case challenge: BasicCredentials => challenge }
 
     /** Tests whether basic authorization is present. */
     def hasBasic: Boolean = getBasic.isDefined
 
     /** Creates new request with basic authorization. */
     def withBasic(token: String): HttpRequest =
-      withBasic(BasicAuthorization(token))
+      withBasic(BasicCredentials(token))
 
     /** Creates new request with basic authorization. */
     def withBasic(user: String, password: String): HttpRequest =
-      withBasic(BasicAuthorization(user, password))
+      withBasic(BasicCredentials(user, password))
 
     /** Creates new request with basic authorization. */
-    def withBasic(credentials: BasicAuthorization): HttpRequest =
+    def withBasic(credentials: BasicCredentials): HttpRequest =
       withAuthorization(credentials)
   }
 
@@ -287,22 +288,22 @@ package object auth {
      *
      * @throws HttpException if basic authentication is not present
      */
-    def basic: BasicAuthentication =
+    def basic: BasicChallenge =
       getBasic.getOrElse(throw new HttpException("Basic authentication not found"))
 
     /** Gets basic authentication if present. */
-    def getBasic: Option[BasicAuthentication] =
-      wwwAuthenticate.collectFirst { case challenge: BasicAuthentication => challenge }
+    def getBasic: Option[BasicChallenge] =
+      wwwAuthenticate.collectFirst { case challenge: BasicChallenge => challenge }
 
     /** Tests whether basic authentication is present. */
     def hasBasic: Boolean = getBasic.isDefined
 
     /** Creates new response with basic authentication. */
     def withBasic(realm: String, params: (String, String)*): HttpResponse =
-      withBasic(BasicAuthentication(realm, params : _*))
+      withBasic(BasicChallenge(realm, params : _*))
 
     /** Creates new response with basic authentication. */
-    def withBasic(challenge: BasicAuthentication): HttpResponse =
+    def withBasic(challenge: BasicChallenge): HttpResponse =
       withWwwAuthenticate(challenge)
   }
 }

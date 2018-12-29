@@ -28,9 +28,9 @@ class CredentialsSpec extends FlatSpec {
     assert(credentials.token.contains(token))
     assert(credentials.params.isEmpty)
     assert(credentials.toString == s"Basic $token")
-    assert(credentials.isInstanceOf[BasicAuthorization])
+    assert(credentials.isInstanceOf[BasicCredentials])
 
-    val auth = credentials.asInstanceOf[BasicAuthorization]
+    val auth = credentials.asInstanceOf[BasicCredentials]
     assert(auth.user == "guest")
     assert(auth.password == "letmein")
   }
@@ -41,7 +41,7 @@ class CredentialsSpec extends FlatSpec {
     assert(credentials.token.contains(token))
     assert(credentials.params.isEmpty)
     assert(credentials.toString == s"Bearer $token")
-    assert(!credentials.isInstanceOf[BasicAuthorization])
+    assert(!credentials.isInstanceOf[BasicCredentials])
   }
 
   it should "be created with parameters" in {
@@ -55,7 +55,7 @@ class CredentialsSpec extends FlatSpec {
 
   it should "be destructured" in {
     Credentials.parse(s"Basic $token") match {
-      case BasicAuthorization(user, password) =>
+      case BasicCredentials(user, password) =>
         assert(user == "guest")
         assert(password == "letmein")
     }

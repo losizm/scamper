@@ -46,25 +46,25 @@ trait AuthType {
 trait Challenge extends AuthType
 
 /** Challenge for Basic authentication. */
-trait BasicAuthentication extends Challenge {
+trait BasicChallenge extends Challenge {
   val scheme: String = "Basic"
 
   /** Gets realm. */
   def realm: String
 }
 
-/** Factory for BasicAuthentication. */
-object BasicAuthentication {
-  /** Creates BasicAuthentication with supplied credentials. */
-  def apply(realm: String, params: (String, String)*): BasicAuthentication =
-    BasicAuthenticationImpl(realm, (params :+ ("realm" -> realm)).toMap)
+/** Factory for BasicChallenge. */
+object BasicChallenge {
+  /** Creates BasicChallenge with supplied credentials. */
+  def apply(realm: String, params: (String, String)*): BasicChallenge =
+    BasicChallengeImpl(realm, (params :+ ("realm" -> realm)).toMap)
 
-  /** Destructures BasicAuthentication. */
-  def unapply(auth: BasicAuthentication): Option[(String, Map[String, String])] =
+  /** Destructures BasicChallenge. */
+  def unapply(auth: BasicChallenge): Option[(String, Map[String, String])] =
     Some(auth.realm -> auth.params)
 }
 
-private case class BasicAuthenticationImpl(realm: String, params: Map[String, String]) extends BasicAuthentication {
+private case class BasicChallengeImpl(realm: String, params: Map[String, String]) extends BasicChallenge {
   val token: Option[String] = None
 }
 
@@ -91,7 +91,7 @@ object Challenge {
   private def apply(scheme: String, token: Option[String], params: Map[String, String]): Challenge =
     if (scheme.equalsIgnoreCase("basic"))
       params.get("realm")
-        .map(BasicAuthentication(_, params.toSeq : _*))
+        .map(BasicChallenge(_, params.toSeq : _*))
         .getOrElse(throw new IllegalArgumentException("Invalid Basic authentication: missing realm"))
     else
       DefaultChallenge(scheme, token, params)
@@ -113,7 +113,7 @@ private case class DefaultChallenge(scheme: String, token: Option[String], param
 trait Credentials extends AuthType
 
 /** Credentials for Basic authorization. */
-trait BasicAuthorization extends Credentials {
+trait BasicCredentials extends Credentials {
   val scheme: String = "Basic"
 
   /** Gets user. */
@@ -123,27 +123,27 @@ trait BasicAuthorization extends Credentials {
   def password: String
 }
 
-/** Factory for BasicAuthorization. */
-object BasicAuthorization {
-  /** Creates BasicAuthorization with supplied credentials. */
-  def apply(token: String): BasicAuthorization = {
+/** Factory for BasicCredentials. */
+object BasicCredentials {
+  /** Creates BasicCredentials with supplied credentials. */
+  def apply(token: String): BasicCredentials = {
     val valid = "(.+):(.*)".r
 
     Try(Base64.decodeToString(token))
-      .collect { case valid(_, _) => BasicAuthorizationImpl(Some(token)) }
+      .collect { case valid(_, _) => BasicCredentialsImpl(Some(token)) }
       .getOrElse { throw new IllegalArgumentException(s"Invalid token: $token") }
   }
 
-  /** Creates BasicAuthorization with supplied credentials. */
-  def apply(user: String, password: String): BasicAuthorization =
-    BasicAuthorizationImpl(Some(Base64.encodeToString(user + ":" + password)))
+  /** Creates BasicCredentials with supplied credentials. */
+  def apply(user: String, password: String): BasicCredentials =
+    BasicCredentialsImpl(Some(Base64.encodeToString(user + ":" + password)))
 
-  /** Destructures BasicAuthorization. */
-  def unapply(auth: BasicAuthorization): Option[(String, String)] =
+  /** Destructures BasicCredentials. */
+  def unapply(auth: BasicCredentials): Option[(String, String)] =
     Some(auth.user -> auth.password)
 }
 
-private case class BasicAuthorizationImpl(token: Option[String]) extends BasicAuthorization {
+private case class BasicCredentialsImpl(token: Option[String]) extends BasicCredentials {
   val params: Map[String, String] = Map.empty
 
   def user: String = detoken(0)
@@ -174,7 +174,7 @@ object Credentials {
 
   private def apply(scheme: String, token: Option[String], params: Map[String, String]): Credentials =
     if (scheme.equalsIgnoreCase("basic"))
-      token.map(BasicAuthorization.apply)
+      token.map(BasicCredentials.apply)
         .getOrElse(throw new IllegalArgumentException("Token required for Basic authorization"))
     else
       DefaultCredentials(scheme, token, params)

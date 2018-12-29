@@ -27,9 +27,9 @@ class ChallengeSpec extends FlatSpec {
     assert(challenge.params("realm") == "Admin Console")
     assert(challenge.params("charset") == "utf-8")
     assert(challenge.toString == "Basic realm=\"Admin Console\", charset=utf-8")
-    assert(challenge.isInstanceOf[BasicAuthentication])
+    assert(challenge.isInstanceOf[BasicChallenge])
 
-    val auth = challenge.asInstanceOf[BasicAuthentication]
+    val auth = challenge.asInstanceOf[BasicChallenge]
     assert(auth.realm == "Admin Console")
   }
 
@@ -52,7 +52,7 @@ class ChallengeSpec extends FlatSpec {
 
   it should "be destructured" in {
     Challenge.parse("Basic realm=Console, charset=utf-8") match {
-      case BasicAuthentication(realm, params) =>
+      case BasicChallenge(realm, params) =>
         assert(realm == "Console")
         assert(params("realm") == "Console")
         assert(params("charset") == "utf-8")
