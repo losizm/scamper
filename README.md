@@ -16,6 +16,8 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 - [Message Body](#Message-Body)
   - [Creating Body](#Creating-Body)
   - [Parsing Body](#Parsing-Body)
+- [HTTP Authentication](#HTTP-Authentication)
+  - [Basic Authentication Scheme](#Basic-Authentication-Scheme)
 - [HTTP Client](#HTTP-Client)
   - [Creating Client](#Creating-Client)
   - [Providing Truststore](#Providing-Truststore)
