@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper.types
+package scamper.auth
 
 import scala.util.Try
 
-import scamper.{ AuthParams, Base64 }
+import scamper.Base64
 import AuthTypeHelper._
 
 /** Base type for authentication header types. */
@@ -39,8 +39,8 @@ trait AuthType {
 /**
  * Standardized type for WWW-Authenticate and Proxy-Authenticate header value.
  *
- * @see [[scamper.headers.WwwAuthenticate]]
- * @see [[scamper.headers.ProxyAuthenticate]]
+ * @see [[WwwAuthenticate]]
+ * @see [[ProxyAuthenticate]]
  * @see [[Credentials]]
  */
 trait Challenge extends AuthType
@@ -106,8 +106,8 @@ private case class DefaultChallenge(scheme: String, token: Option[String], param
 /**
  * Standardized type for Authorization and Proxy-Authorization header value.
  *
- * @see [[scamper.headers.Authorization]]
- * @see [[scamper.headers.ProxyAuthorization]]
+ * @see [[Authorization]]
+ * @see [[ProxyAuthorization]]
  * @see [[Challenge]]
  */
 trait Credentials extends AuthType
@@ -172,8 +172,7 @@ object Credentials {
   def apply(scheme: String, params: Map[String, String]): Credentials =
     apply(scheme, None, params)
 
-  /** Creates Credentials with supplied auth scheme and parameters. */
-  def apply(scheme: String, token: Option[String], params: Map[String, String]): Credentials =
+  private def apply(scheme: String, token: Option[String], params: Map[String, String]): Credentials =
     if (scheme.equalsIgnoreCase("basic"))
       token.map(BasicAuthorization.apply)
         .getOrElse(throw new IllegalArgumentException("Token required for Basic authorization"))

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper.types
+package scamper.auth
 
 import scamper.Grammar.{ QuotableString, Token => StandardToken, Token68 }
-import scamper.{ AuthParams, ListParser }
+import scamper.ListParser
 
 private object AuthTypeHelper {
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)(?:\s+(?:([\w!#$%&'*+.^`|~-]+=*)|([\w.~+/-]+\s*=\s*[^ =].*)))?\s*""".r

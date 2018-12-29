@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper
+package scamper.auth
 
-import Grammar._
+import scamper.Grammar._
+import scamper.ListParser
 
 private object AuthParams {
   private val TokenParam = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
