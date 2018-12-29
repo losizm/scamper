@@ -15,63 +15,73 @@
  */
 package scamper.types
 
-import java.util.Base64
 import org.scalatest.FlatSpec
 
-class CredentialsSpec extends FlatSpec {
-  "Credentials" should "be created without token and params" in {
-    val credentials = Credentials.parse("Basic")
-    assert(credentials.scheme == "Basic")
-    assert(!credentials.token.isDefined)
-    assert(credentials.params.isEmpty)
-    assert(credentials.toString == "Basic")
-  }
+import scamper.Base64
 
-  it should "be created with token and no params" in {
-    val token = Base64.getEncoder().encodeToString("admin:secr,t".getBytes)
+class CredentialsSpec extends FlatSpec {
+  private val token = Base64.encodeToString("guest:letmein")
+
+  "Credentials" should "be created with Basic authorization" in {
     val credentials = Credentials.parse(s"Basic $token")
     assert(credentials.scheme == "Basic")
     assert(credentials.token.contains(token))
     assert(credentials.params.isEmpty)
     assert(credentials.toString == s"Basic $token")
+    assert(credentials.isInstanceOf[BasicAuthorization])
+
+    val auth = credentials.asInstanceOf[BasicAuthorization]
+    assert(auth.user == "guest")
+    assert(auth.password == "letmein")
   }
 
-  it should "be created with params and no token" in {
-    val credentials = Credentials.parse("Basic user=admin, password=\"secr,t\"")
-    assert(credentials.scheme == "Basic")
+  it should "be created with token" in {
+    val credentials = Credentials.parse(s"Bearer $token")
+    assert(credentials.scheme == "Bearer")
+    assert(credentials.token.contains(token))
+    assert(credentials.params.isEmpty)
+    assert(credentials.toString == s"Bearer $token")
+    assert(!credentials.isInstanceOf[BasicAuthorization])
+  }
+
+  it should "be created with parameters" in {
+    val credentials = Credentials.parse("Insecure user=issa, password=\"secr,t\"")
+    assert(credentials.scheme == "Insecure")
     assert(!credentials.token.isDefined)
-    assert(credentials.params("user") == "admin")
+    assert(credentials.params("user") == "issa")
     assert(credentials.params("password") == "secr,t")
-    assert(credentials.toString == "Basic user=admin, password=\"secr,t\"")
+    assert(credentials.toString == "Insecure user=issa, password=\"secr,t\"")
   }
 
   it should "be destructured" in {
-    Credentials.parse("Basic") match {
+    Credentials.parse(s"Basic $token") match {
       case Credentials(scheme, token, params) =>
         assert(scheme == "Basic")
-        assert(!token.isDefined)
+        assert(token.isDefined)
         assert(params.isEmpty)
     }
 
-    Credentials.parse("Basic admin$secret") match {
-      case Credentials(scheme, Some(token), params) =>
-        assert(scheme == "Basic")
-        assert(token.contains("admin$secret"))
-        assert(params.isEmpty)
+    Credentials.parse(s"Basic $token") match {
+      case BasicAuthorization(user, password) =>
+        assert(user == "guest")
+        assert(password == "letmein")
     }
 
-    Credentials.parse("Basic user=admin, password=\"secr,t\"") match {
+    Credentials.parse("Insecure user=issa, password=\"secr,t\"") match {
       case Credentials(scheme, token, params) =>
-        assert(scheme == "Basic")
+        assert(scheme == "Insecure")
         assert(!token.isDefined)
-        assert(params("user") == "admin")
+        assert(params("user") == "issa")
         assert(params("password") == "secr,t")
     }
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](Credentials.parse("Basic /"))
-    assertThrows[IllegalArgumentException](Credentials.parse("Basic ="))
-    assertThrows[IllegalArgumentException](Credentials.parse("Basic =secret"))
+    assertThrows[IllegalArgumentException](Credentials.parse("Basic"))
+    assertThrows[IllegalArgumentException](Credentials.parse("Basic guest:letmein"))
+    assertThrows[IllegalArgumentException](Credentials.parse("Basic realm=Public"))
+    assertThrows[IllegalArgumentException](Credentials.parse("Bearer /"))
+    assertThrows[IllegalArgumentException](Credentials.parse("Insecure ="))
+    assertThrows[IllegalArgumentException](Credentials.parse("Insecure =secret"))
   }
 }

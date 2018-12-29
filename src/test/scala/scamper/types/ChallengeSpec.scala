@@ -15,63 +15,68 @@
  */
 package scamper.types
 
-import java.util.Base64
 import org.scalatest.FlatSpec
 
+import scamper.Base64
+
 class ChallengeSpec extends FlatSpec {
-  "Challenge" should "be created without token and params" in {
-    val challenge = Challenge.parse("Basic")
+  "Challenge" should "be created with Basic authentication" in {
+    val challenge = Challenge.parse("Basic realm=\"User Workshop\", charset=utf-8")
     assert(challenge.scheme == "Basic")
     assert(!challenge.token.isDefined)
-    assert(challenge.params.isEmpty)
-    assert(challenge.toString == "Basic")
+    assert(challenge.params("realm") == "User Workshop")
+    assert(challenge.params("charset") == "utf-8")
+    assert(challenge.toString == "Basic realm=\"User Workshop\", charset=utf-8")
+    assert(challenge.isInstanceOf[BasicAuthentication])
+
+    val auth = challenge.asInstanceOf[BasicAuthentication]
+    assert(auth.realm == "User Workshop")
   }
 
-  it should "be created with token and no params" in {
-    val token = Base64.getEncoder().encodeToString("realm=xyz".getBytes)
-    val challenge = Challenge.parse(s"Basic $token")
-    assert(challenge.scheme == "Basic")
-    assert(challenge.token.contains(token))
+  it should "be created with token" in {
+    val challenge = Challenge.parse(s"Insecure user-workshop")
+    assert(challenge.scheme == "Insecure")
+    assert(challenge.token.contains("user-workshop"))
     assert(challenge.params.isEmpty)
-    assert(challenge.toString == s"Basic $token")
+    assert(challenge.toString == s"Insecure user-workshop")
   }
 
-  it should "be created with params and no token" in {
-    val challenge = Challenge.parse("Basic realm=\"Admin Console\", description=none")
-    assert(challenge.scheme == "Basic")
+  it should "be created with parameters" in {
+    val challenge = Challenge.parse("Insecure realm=\"Admin Console\", description=none")
+    assert(challenge.scheme == "Insecure")
     assert(!challenge.token.isDefined)
     assert(challenge.params("realm") == "Admin Console")
     assert(challenge.params("description") == "none")
-    assert(challenge.toString == "Basic realm=\"Admin Console\", description=none")
+    assert(challenge.toString == "Insecure realm=\"Admin Console\", description=none")
   }
 
   it should "be destructured" in {
-    Challenge.parse("Basic") match {
-      case Challenge(scheme, token, params) =>
-        assert(scheme == "Basic")
-        assert(!token.isDefined)
-        assert(params.isEmpty)
+    Challenge.parse("Basic realm=Workshop, charset=utf-8") match {
+      case BasicAuthentication(realm, params) =>
+        assert(realm == "Workshop")
+        assert(params("realm") == "Workshop")
+        assert(params("charset") == "utf-8")
     }
 
-    Challenge.parse("Basic realm=\"Admin Console\", description=none") match {
+    Challenge.parse("Insecure realm=\"Admin Console\", description=none") match {
       case Challenge(scheme, token, params) =>
-        assert(scheme == "Basic")
+        assert(scheme == "Insecure")
         assert(!token.isDefined)
         assert(params("realm") == "Admin Console")
         assert(params("description") == "none")
     }
 
-    Challenge.parse("Basic admin$secret") match {
+    Challenge.parse(s"Insecure user-workshop") match {
       case Challenge(scheme, Some(token), params) =>
-        assert(scheme == "Basic")
-        assert(token.contains("admin$secret"))
+        assert(scheme == "Insecure")
+        assert(token.contains("user-workshop"))
         assert(params.isEmpty)
     }
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](Challenge.parse("Basic /"))
-    assertThrows[IllegalArgumentException](Challenge.parse("Basic ="))
-    assertThrows[IllegalArgumentException](Challenge.parse("Basic =secret"))
+    assertThrows[IllegalArgumentException](Challenge.parse("Basic realm"))
+    assertThrows[IllegalArgumentException](Challenge.parse("Basic description=none"))
+    assertThrows[IllegalArgumentException](Challenge.parse("Insecure ="))
   }
 }
