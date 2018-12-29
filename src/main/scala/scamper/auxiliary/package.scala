@@ -23,13 +23,14 @@ import java.time.Instant
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
+/** Provides auxiliary type classes. */
 package object auxiliary {
   private val crlf = "\r\n".getBytes("UTF-8")
 
   /** Adds extension methods to {@code java.io.InputStream}. */
   implicit class InputStreamType(val in: InputStream) extends AnyVal {
     /**
-     * Reads remaining bytes and returns them as byte array.
+     * Reads remaining bytes into byte array.
      *
      * @param bufferSize buffer size used to copy bytes
      */
@@ -45,14 +46,12 @@ package object auxiliary {
     }
 
     /**
-     * Reads remaining bytes and returns them as text using specified character
-     * encoding.
+     * Reads remaining bytes as text.
      *
-     * @param charset character set
-     * @param bufferSize buffer size used to copy bytes of text
+     * @param bufferSize buffer size used to copy bytes
      */
-    def getText(charset: String = "UTF-8", bufferSize: Int = 8192): String =
-      new String(getBytes(bufferSize), charset)
+    def getText(bufferSize: Int = 8192): String =
+      new String(getBytes(bufferSize), "UTF-8")
 
     /**
      * Reads token from input stream. The delimiter is removed before token is
