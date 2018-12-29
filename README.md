@@ -51,7 +51,7 @@ import scamper.RequestMethods.GET
 import scamper.headers.{ Accept, Host}
 import scamper.types.ImplicitConverters.stringToMediaRange
 
-val request = GET("/motd")
+val req = GET("/motd")
   .withHost("localhost:8080")
   .withAccept("text/plain", "*/*; q=0.5")
 ```
@@ -67,7 +67,7 @@ import scamper.ResponseStatuses.Ok
 import scamper.headers.{ Connection, ContentType }
 import scamper.types.ImplicitConverters.stringToMediaType
 
-val response = Ok("There is an answer.")
+val res = Ok("There is an answer.")
   .withContentType("text/plain")
   .withConnection("close")
 ```
@@ -155,8 +155,9 @@ import scamper.ImplicitConverters.stringToUri
 import scamper.RequestMethods.GET
 import scamper.cookies.{ PlainCookie, RequestCookies }
 
-val req = GET("https://localhost:8080/motd")
-  .withCookies(PlainCookie("ID", "bG9zCg"), PlainCookie("Region", "SE-US"))
+val req = GET("https://localhost:8080/motd").withCookies(
+  PlainCookie("ID", "bG9zCg"), PlainCookie("Region", "SE-US")
+)
 
 // Print name and value of both cookies
 req.cookies.foreach(cookie => println(s"${cookie.name}=${cookie.value}"))
@@ -398,7 +399,7 @@ implicit val parser = BodyParsers.text()
 val client = HttpClient(bufferSize = 4096, readTimeout = 3000)
 
 def getMessageOfTheDay(): Either[Int, String] = {
-  // Use saved reference to client
+  // Use client instance
   client.get("http://localhost:8080/motd") { res =>
     res.status.isSuccessful match {
       case true  => Right(res.as[String])

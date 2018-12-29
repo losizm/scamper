@@ -33,13 +33,11 @@ package scamper
  * val text = MediaType.parse("text/plain")
  * val gzip = TransferCoding("gzip")
  *
- * val res = Ok("There is an answer.")
- *   .withContentType(text)
- *   .withTransferEncoding(gzip)
+ * val res = Ok("There is an answer.").withContentType(text).withTransferEncoding(gzip)
  * }}}
  *
- * With [[ImplicitConverters]], the types can be converted from properly
- * formatted string values.
+ * Using values defined in [[ImplicitConverters]], properly formatted strings
+ * can be implicitly converted to standardized types.
  *
  * {{{
  * import scamper.ImplicitConverters.{ stringToEntity, stringToUri }
@@ -48,14 +46,9 @@ package scamper
  * import scamper.headers.{ Accept, ContentType, TransferEncoding }
  * import scamper.types.ImplicitConverters._
  *
- * val req = GET("/motd").withAccept(
- *  "application/json; q=0.9",
- *  "text/html; q=0.1"
- * )
+ * val req = GET("/motd").withAccept("application/json; q=0.9", "text/html; q=0.1")
  *
- * val res = Ok("There is an answer.")
- *   .withContentType("text/plain")
- *   .withTransferEncoding("gzip")
+ * val res = Ok("There is an answer.").withContentType("text/plain").withTransferEncoding("gzip")
  * }}}
  */
 package object types

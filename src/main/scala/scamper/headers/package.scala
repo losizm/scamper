@@ -27,14 +27,14 @@ import scamper.types._
  *
  * === Using Header Classes ===
  *
- * Some headers are available to both requests and responses, and others are
- * available only to a specific message type. This behavior is driven by the
- * HTTP specification.
+ * Specialized header access is provided by type classes. Some headers are
+ * available to both requests and responses, and others are available only to a
+ * specific message type. This behavior is driven by the HTTP specification.
  *
  * {{{
  * import scamper.ImplicitConverters.stringToUri
  * import scamper.RequestMethods.GET
- * import scamper.headers.{ Accept, ContentLength, Host }
+ * import scamper.headers.{ Accept, Host }
  * import scamper.types.ImplicitConverters.stringToMediaRange
  *
  * // Build request using 'Host' and 'Accept' headers
@@ -43,10 +43,6 @@ import scamper.types._
  * // Access and print header values
  * printf("Host: %s%n", req.host)
  * printf("Accept: %s%n", req.accept.head)
- *
- * println(req.hasHost) // true
- * println(req.hasAccept) // true
- * println(req.hasContentLength) // false
  * }}}
  */
 package object headers {

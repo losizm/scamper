@@ -81,7 +81,7 @@ trait HttpMessage {
   def getHeaders(name: String): Seq[Header] =
     headers.filter(_.name.equalsIgnoreCase(name))
 
-  /** Gets all values of headers with given name. */
+  /** Gets value of all headers with given name. */
   def getHeaderValues(name: String): Seq[String] =
     getHeaders(name).map(_.value)
 }

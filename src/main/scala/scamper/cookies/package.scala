@@ -33,8 +33,9 @@ import scala.util.Try
  * import scamper.cookies.{ PlainCookie, RequestCookies }
  *
  * // Build request with cookies
- * val req = GET("https://localhost:8080/motd")
- *   .withCookies(PlainCookie("ID", "bG9zCg"), PlainCookie("Region", "SE-US"))
+ * val req = GET("https://localhost:8080/motd").withCookies(
+ *   PlainCookie("ID", "bG9zCg"), PlainCookie("Region", "SE-US")
+ * )
  *
  * // Access and print all cookies
  * req.cookies.foreach(println)

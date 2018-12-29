@@ -28,8 +28,8 @@ import RequestMethods._
  *
  * === Using HTTP Client ===
  *
- * The `HttpClient` object can be used to send requests and handle the
- * responses.
+ * The `HttpClient` object can be used to send a request and handle the
+ * response.
  *
  * {{{
  * import scamper.BodyParsers
@@ -55,12 +55,11 @@ import RequestMethods._
  *
  * === Creating HTTP Client ===
  *
- * The previous example uses the `HttpClient` object as the client. Behind the
- * scenes, this actually creates an instance of `HttpClient` for one-time usage.
- *
- * If you plan to send multiple requests, you can create and maintain a reference
- * to an instance, and use it as the client. With that, you also get access to
- * methods corresponding to the standard HTTP request methods.
+ * When using the `HttpClient` object as the client, it actually creates an
+ * instance of `HttpClient` for one-time usage. If you plan to send multiple
+ * requests, you can create and maintain a reference to an instance, and use it
+ * as the client. With that, you also get access to methods corresponding to the
+ * standard HTTP request methods.
  *
  * {{{
  * import scamper.BodyParsers
@@ -73,7 +72,7 @@ import RequestMethods._
  * val client = HttpClient(bufferSize = 4096, readTimeout = 3000)
  *
  * def getMessageOfTheDay(): Either[Int, String] = {
- *   // Use saved reference to client
+ *   // Use client instance
  *   client.get("http://localhost:8080/motd") { res =>
  *     res.status.isSuccessful match {
  *       case true  => Right(res.as[String])
