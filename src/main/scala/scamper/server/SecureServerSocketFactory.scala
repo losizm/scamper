@@ -23,7 +23,7 @@ import javax.net.ssl.{ KeyManagerFactory, SSLContext, SSLServerSocketFactory }
 
 import scala.util.Try
 
-import scamper.auxiliary.InputStreamType
+import scamper.aux.InputStreamType
 
 private object SecureServerSocketFactory {
   def create(keyStore: KeyStore, password: Array[Char]): SSLServerSocketFactory = {

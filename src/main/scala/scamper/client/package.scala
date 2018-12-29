@@ -18,7 +18,7 @@ package scamper
 import java.io.File
 import java.net.URI
 
-import auxiliary.UriType
+import aux.UriType
 import cookies.{ PlainCookie, RequestCookies }
 
 import RequestMethods._

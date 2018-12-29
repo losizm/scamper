@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper.auxiliary
+package scamper.aux
 
 import java.net.URI
 import java.time.{ Instant, LocalDate }

@@ -26,7 +26,7 @@ import scamper.{ HttpRequest, HttpResponse }
 import scamper.ImplicitConverters._
 import scamper.RequestMethods.{ GET, HEAD }
 import scamper.ResponseStatuses.{ MethodNotAllowed, NotAcceptable, NotModified, Ok }
-import scamper.auxiliary.{ InputStreamType, StringType }
+import scamper.aux.{ InputStreamType, StringType }
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, Date, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 

@@ -20,7 +20,7 @@ import java.net.Socket
 import scala.collection.mutable.ArrayBuffer
 
 import scamper.{ Entity, Header, HttpException, HttpRequest, HttpResponse, StatusLine }
-import scamper.auxiliary.SocketType
+import scamper.aux.SocketType
 import scamper.headers.TransferEncoding
 
 private class HttpClientConnection(socket: Socket) extends AutoCloseable {
