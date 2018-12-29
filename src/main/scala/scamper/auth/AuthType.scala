@@ -15,6 +15,8 @@
  */
 package scamper.auth
 
+import java.net.URI
+
 import scala.util.Try
 
 import scamper.Base64
@@ -57,7 +59,7 @@ trait BasicChallenge extends Challenge {
 object BasicChallenge {
   /** Creates BasicChallenge with supplied credentials. */
   def apply(realm: String, params: (String, String)*): BasicChallenge =
-    BasicChallengeImpl(realm, (params :+ ("realm" -> realm)).toMap)
+    BasicChallengeImpl(realm, Params((params :+ ("realm" -> realm)).toMap))
 
   /** Destructures BasicChallenge. */
   def unapply(auth: BasicChallenge): Option[(String, Map[String, String])] =
@@ -66,6 +68,63 @@ object BasicChallenge {
 
 private case class BasicChallengeImpl(realm: String, params: Map[String, String]) extends BasicChallenge {
   val token: Option[String] = None
+}
+
+/** Challenge for Bearer authentication. */
+trait BearerChallenge extends Challenge {
+  val scheme: String = "Bearer"
+
+  /** Gets realm. */
+  def realm: Option[String]
+
+  /** Gets scope. */
+  def scope: Seq[String]
+
+  /** Gets `error` parameter. */
+  def error: Option[String]
+
+  /** Gets `error_description` parameter. */
+  def errorDescription: Option[String]
+
+  /** Gets `error_uri` parameter. */
+  def errorUri: Option[URI]
+
+  /** Tests whether `invalid_request` error. */
+  def isInvalidRequest: Boolean
+
+  /** Tests whether `invalid_token` error. */
+  def isInvalidToken: Boolean
+
+  /** Test whether `insufficient_scope` error. */
+  def isInsufficientScope: Boolean
+}
+
+/** Factory for BearerChallenge. */
+object BearerChallenge {
+  /** Creates BearerChallenge with supplied credentials. */
+  def apply(params: (String, String)*): BearerChallenge =
+    BearerChallengeImpl(Params(params.toMap))
+
+  /** Destructures BearerChallenge. */
+  def unapply(auth: BearerChallenge): Option[Map[String, String]] =
+    Some(auth.params)
+}
+
+private case class BearerChallengeImpl(params: Map[String, String]) extends BearerChallenge {
+  val token: Option[String] = None
+  lazy val realm: Option[String] = params.get("realm")
+  lazy val scope: Seq[String] = params.get("scope")
+    .map(_ split " ")
+    .map(_.map(_.trim).toSeq)
+    .map(_.filterNot(_.isEmpty))
+    .getOrElse(Nil)
+
+  lazy val error: Option[String] = params.get("error")
+  lazy val errorDescription: Option[String] = params.get("error_description")
+  lazy val errorUri: Option[URI] = params.get("error_uri").map(new URI(_))
+  lazy val isInvalidRequest: Boolean = error.contains("invalid_request")
+  lazy val isInvalidToken: Boolean = error.contains("invalid_token")
+  lazy val isInsufficientScope: Boolean = error.contains("insufficient_scope")
 }
 
 /** Challenge factory */
@@ -89,15 +148,19 @@ object Challenge {
     apply(scheme, None, Params(params.toMap))
 
   private def apply(scheme: String, token: Option[String], params: Map[String, String]): Challenge =
-    if (scheme.equalsIgnoreCase("basic")) {
-      require(token.isEmpty, s"Invalid basic challenge: token not allowed")
-      params.get("realm")
-        .map(BasicChallenge(_, params.toSeq : _*))
-        .getOrElse(throw new IllegalArgumentException("Invalid basic challenge: missing realm"))
-    } else {
-      require(token.nonEmpty || params.nonEmpty, "Invalid challenge: either token or params required")
-      require(token.isEmpty || params.isEmpty, "Invalid challenge: cannot provide both token and params")
-      DefaultChallenge(scheme, token, params)
+    scheme.toLowerCase match {
+      case "basic" =>
+        require(token.isEmpty, s"Invalid basic challenge: token not allowed")
+        params.get("realm")
+          .map(BasicChallenge(_, params.toSeq : _*))
+          .getOrElse(throw new IllegalArgumentException("Invalid basic challenge: missing realm"))
+      case "bearer" =>
+        require(token.isEmpty, s"Invalid bearer challenge: token not allowed")
+        BearerChallenge(params.toSeq : _*)
+      case _ =>
+        require(token.nonEmpty || params.nonEmpty, "Invalid challenge: either token or params required")
+        require(token.isEmpty || params.isEmpty, "Invalid challenge: cannot provide both token and params")
+        DefaultChallenge(scheme, token, params)
     }
 
   /** Destructures Challenge. */
@@ -160,6 +223,26 @@ private case class BasicCredentialsImpl(token: Option[String]) extends BasicCred
       .get
 }
 
+/** Credentials for Bearer authorization. */
+trait BearerCredentials extends Credentials {
+  val scheme: String = "Bearer"
+}
+
+/** Factory for BearerCredentials. */
+object BearerCredentials {
+  /** Creates BearerCredentials with supplied credentials. */
+  def apply(token: String): BearerCredentials =
+    BearerCredentialsImpl(Some(Token(token)))
+
+  /** Destructures BearerCredentials. */
+  def unapply(auth: BearerCredentials): Option[String] =
+    Some(auth.token.get)
+}
+
+private case class BearerCredentialsImpl(token: Option[String]) extends BearerCredentials {
+  val params: Map[String, String] = Map.empty
+}
+
 /** Credentials factory */
 object Credentials {
   /** Parses formatted credentials. */
@@ -177,14 +260,19 @@ object Credentials {
     apply(scheme, None, Params(params.toMap))
 
   private def apply(scheme: String, token: Option[String], params: Map[String, String]): Credentials =
-    if (scheme.equalsIgnoreCase("basic")) {
-      require(params.isEmpty, "Invalid basic credentials: params not allowed")
-      token.map(BasicCredentials.apply)
-        .getOrElse(throw new IllegalArgumentException("Token required for Basic authorization"))
-    } else {
-      require(token.nonEmpty || params.nonEmpty, "Invalid credentials: either token or params required")
-      require(token.isEmpty || params.isEmpty, "Invalid credentials: cannot provide both token and params")
-      DefaultCredentials(scheme, token, params)
+    scheme.toLowerCase match {
+      case "basic" =>
+        require(params.isEmpty, "Invalid basic credentials: params not allowed")
+        token.map(BasicCredentials.apply)
+          .getOrElse(throw new IllegalArgumentException("Token required for basic credentials"))
+      case "bearer" =>
+        require(params.isEmpty, "Invalid bearer credentials: params not allowed")
+        token.map(BearerCredentials.apply)
+          .getOrElse(throw new IllegalArgumentException("Token required for bearer credentials"))
+      case _ =>
+        require(token.nonEmpty || params.nonEmpty, "Invalid credentials: either token or params required")
+        require(token.isEmpty || params.isEmpty, "Invalid credentials: cannot provide both token and params")
+        DefaultCredentials(scheme, token, params)
     }
 
   /** Destructures Credentials. */
