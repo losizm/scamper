@@ -39,9 +39,9 @@ package scamper
  * val req = GET("/dev/projects").withAuthorization(credentials)
  * }}}
  *
- * === Basic Authentication Scheme ===
+ * === Basic Authentication ===
  *
- * There are subclasses defined for the Basic scheme: `BasicChallenge` and
+ * There are subclasses defined for Basic authentication: `BasicChallenge` and
  * `BasicCredentials`.
  *
  * {{{
@@ -79,6 +79,46 @@ package scamper
  * // Access basic auth in request
  * printf(s"User: %s%n", req.basic.user)
  * printf(s"Password: %s%n", req.basic.password)
+ * }}}
+ *
+ * === Bearer Authentication ===
+ *
+ * The same applies to Bearer authentication. `BearerChallenge` and
+ * `BearerCredentials` are available, along with convenience methods.
+ *
+ * {{{
+ * import scamper.ImplicitConverters.stringToUri
+ * import scamper.RequestMethods.GET
+ * import scamper.ResponseStatuses.Unauthorized
+ * import scamper.auth.{ Authorization, BearerChallenge, WwwAuthenticate }
+ *
+ * // Provide parameters
+ * val challenge = BearerChallenge(
+ *   "scope" -> "user profile",
+ *   "error" -> "invalid_token",
+ *   "error_description" -> "Expired access token"
+ * )
+ * val res = Unauthorized().withWwwAuthenticate(challenge)
+ *
+ * // Print optional realm parameter
+ * res.bearer.realm.foreach(println)
+ *
+ * // Print scope from space-delimited parameter
+ * res.bearer.scope.foreach(println)
+ *
+ * // Print error parameters
+ * res.bearer.realm.foreach(println)
+ * res.bearer.error.foreach(println)
+ * res.bearer.errorDescription.foreach(println)
+ * res.bearer.errorUri.foreach(println)
+ *
+ * // Test for error conditions
+ * println(res.bearer.isInvalidToken)
+ * println(res.bearer.isInvalidRequest)
+ * println(res.bearer.isInsufficientScope)
+ *
+ * // Create request with Bearer token
+ * val req = GET("/users").withBearer("R290IDUgb24gaXQhCg==")
  * }}}
  */
 package object auth {
