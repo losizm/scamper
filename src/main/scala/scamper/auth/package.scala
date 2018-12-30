@@ -165,6 +165,29 @@ package object auth {
     /** Creates new request with basic authorization. */
     def withBasic(credentials: BasicCredentials): HttpRequest =
       withAuthorization(credentials)
+
+    /**
+     * Gets bearer authorization.
+     *
+     * @throws HttpException if bearer authorization is not present
+     */
+    def bearer: BearerCredentials =
+      getBearer.getOrElse(throw new HttpException("Bearer authorization not found"))
+
+    /** Gets bearer authorization if present. */
+    def getBearer: Option[BearerCredentials] =
+      getAuthorization.collect { case challenge: BearerCredentials => challenge }
+
+    /** Tests whether bearer authorization is present. */
+    def hasBearer: Boolean = getBearer.isDefined
+
+    /** Creates new request with bearer authorization. */
+    def withBearer(token: String): HttpRequest =
+      withBearer(BearerCredentials(token))
+
+    /** Creates new request with bearer authorization. */
+    def withBearer(credentials: BearerCredentials): HttpRequest =
+      withAuthorization(credentials)
   }
 
   /** Provides standardized access to Proxy-Authenticate header. */
@@ -304,6 +327,29 @@ package object auth {
 
     /** Creates new response with basic authentication. */
     def withBasic(challenge: BasicChallenge): HttpResponse =
+      withWwwAuthenticate(challenge)
+
+    /**
+     * Gets bearer authentication.
+     *
+     * @throws HttpException if bearer authentication is not present
+     */
+    def bearer: BearerChallenge =
+      getBearer.getOrElse(throw new HttpException("Bearer authentication not found"))
+
+    /** Gets bearer authentication if present. */
+    def getBearer: Option[BearerChallenge] =
+      wwwAuthenticate.collectFirst { case challenge: BearerChallenge => challenge }
+
+    /** Tests whether bearer authentication is present. */
+    def hasBearer: Boolean = getBearer.isDefined
+
+    /** Creates new response with bearer authentication. */
+    def withBearer(params: (String, String)*): HttpResponse =
+      withBearer(BearerChallenge(params : _*))
+
+    /** Creates new response with bearer authentication. */
+    def withBearer(challenge: BearerChallenge): HttpResponse =
       withWwwAuthenticate(challenge)
   }
 }
