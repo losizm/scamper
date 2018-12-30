@@ -37,7 +37,7 @@ import RequestMethods._
  * import scamper.ResponseStatuses.{ NotFound, Ok }
  * import scamper.headers.TransferEncoding
  * import scamper.server.HttpServer
- * import scamper.server.Implicits.HttpRequestType
+ * import scamper.server.Implicits.ServerHttpRequestType
  * import scamper.types.ImplicitConverters.stringToTransferCoding
  *
  * // Get server application

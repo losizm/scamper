@@ -21,7 +21,7 @@ import scamper.ImplicitConverters.stringToUri
 import scamper.RequestMethods.{ DELETE, GET, POST, PUT }
 import scamper.ResponseStatuses.Ok
 
-import Implicits.HttpRequestType
+import Implicits.ServerHttpRequestType
 
 class TargetedRequestHandlerSpec extends FlatSpec {
   "TargetedRequestHandler" should "respond to request" in {

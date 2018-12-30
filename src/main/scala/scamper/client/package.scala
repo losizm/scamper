@@ -81,6 +81,27 @@ import RequestMethods._
  *   }
  * }
  * }}}
+ *
+ * And if the client is declared as an implicit value, you can make use of `send()`
+ * on the request itself.
+ *
+ * {{{
+ * import scamper.BodyParsers
+ * import scamper.ImplicitConverters.stringToUri
+ * import scamper.RequestMethods.GET
+ * import scamper.client.HttpClient
+ * import scamper.client.Implicits.ClientHttpRequestType // Adds send method to request
+ * import scamper.headers.{ Accept, AcceptLanguage }
+ * import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToLanguageRange }
+ *
+ * implicit val client = HttpClient(bufferSize = 8192, readTimeout = 1000)
+ * implicit val parser = BodyParsers.text(4096)
+ *
+ * GET("http://localhost:8080/motd")
+ *   .withAccept("text/plain")
+ *   .withAcceptLanguage("en-US; q=0.6", "fr-CA; q=0.4")
+ *   .send(res => println(res.as[String])) // Send request and print response
+ * }}}
  */
 package object client {
   /** Indicates request was aborted. */

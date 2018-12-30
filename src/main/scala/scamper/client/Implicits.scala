@@ -13,16 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper.server
+package scamper.client
 
 import scamper.HttpRequest
 
-/** Includes server-related type classes. */
+/** Includes client-related type classes. */
 object Implicits {
   /** Adds extension methods to `HttpRequest`. */
-  implicit class ServerHttpRequestType(val req: HttpRequest) extends AnyVal {
-    /** Gets server-side request parameters. */
-    def params(): RequestParameters =
-      new TargetedRequestParameters(req.getHeaderValueOrElse("X-Scamper-Request-Parameters", ""))
+  implicit class ClientHttpRequestType(val req: HttpRequest) extends AnyVal {
+    /**
+     * Sends request and passes response to given handler.
+     *
+     * <strong>Note:</strong> To make effective use of this method, the request
+     * target must be defined with an absolute URI.
+     *
+     * @param handler response handler
+     */
+    def send[T](handler: ResponseHandler[T])(implicit client: HttpClient): T = {
+      require(req.target.isAbsolute, "Request target not absolute")
+      client.send(req, req.target.getScheme == "https")(handler)
+    }
   }
 }

@@ -22,7 +22,7 @@ import scamper.RequestMethods.GET
 import scamper.ResponseStatuses.Ok
 import scamper.headers.ContentLength
 
-import Implicits.HttpRequestType
+import Implicits.ServerHttpRequestType
 
 class RequestHandlerSpec extends FlatSpec {
   "RequestHandler" should "be composed with another" in {
