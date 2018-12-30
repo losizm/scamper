@@ -25,13 +25,13 @@ object Implicits {
      * Sends request and passes response to given handler.
      *
      * <strong>Note:</strong> To make effective use of this method, the request
-     * target must be defined with an absolute URI.
+     * target must be an absolute URI.
      *
      * @param handler response handler
+     *
+     * @see [[HttpClient!.send HttpClient.send()]]
      */
-    def send[T](handler: ResponseHandler[T])(implicit client: HttpClient): T = {
-      require(req.target.isAbsolute, "Request target not absolute")
-      client.send(req, req.target.getScheme == "https")(handler)
-    }
+    def send[T](handler: ResponseHandler[T])(implicit client: HttpClient): T =
+      client.send(req)(handler)
   }
 }

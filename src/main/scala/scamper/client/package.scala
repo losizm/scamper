@@ -36,12 +36,11 @@ import RequestMethods._
  * import scamper.ImplicitConverters.stringToUri
  * import scamper.RequestMethods.GET
  * import scamper.client.HttpClient
- * import scamper.headers.Host
  *
  * implicit val parser = BodyParsers.text()
  *
  * def getMessageOfTheDay(): Either[Int, String] = {
- *   val req = GET("/motd").withHost("localhost:8080")
+ *   val req = GET("localhost:8080/motd")
  *
  *   // Send request and handle response
  *   HttpClient.send(req) { res =>
@@ -53,13 +52,16 @@ import RequestMethods._
  * }
  * }}}
  *
+ * Note the request must be created with an absolute URI to make effective use
+ * of the client.
+ *
  * === Creating HTTP Client ===
  *
- * When using the `HttpClient` object as the client, it actually creates an
- * instance of `HttpClient` for one-time usage. If you plan to send multiple
- * requests, you can create and maintain a reference to an instance, and use it
- * as the client. With that, you also get access to methods corresponding to the
- * standard HTTP request methods.
+ * When using the `HttpClient` object as the client, it creates an instance of
+ * `HttpClient` for one-time usage. If you plan to send multiple requests, you
+ * can create and maintain a reference to an instance, and use it as the client.
+ * With that, you also get access to methods corresponding to the standard HTTP
+ * request methods.
  *
  * {{{
  * import scamper.BodyParsers
@@ -193,17 +195,15 @@ package object client {
     /**
      * Sends request and passes response to supplied handler.
      *
-     * To make effective use of this method, either the request's Host header
-     * must be set, or the request target must be absolute. Note if the target
-     * is absolute, its scheme is overridden in accordance to `secure`.
+     * <strong>Note:</strong> To make effective use of this method, the request
+     * target must be an absolute URI.
      *
      * @param request outgoing request
-     * @param secure specifies whether to use HTTPS
      * @param handler response handler
      *
      * @return value from response handler
      */
-    def send[T](request: HttpRequest, secure: Boolean = false)(handler: ResponseHandler[T]): T
+    def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T
 
     /**
      * Sends GET request and passes response to handler.
@@ -352,12 +352,10 @@ package object client {
     /**
      * Sends request and passes response to supplied handler.
      *
-     * To make effective use of this method, either the request's Host header
-     * must be set, or the request target must be absolute. Note if the target
-     * is absolute, its scheme is overridden in accordance to `secure`.
+     * <strong>Note:</strong> To make effective use of this method, the request
+     * target must be an absolute URI.
      *
      * @param request HTTP request
-     * @param secure specifies whether to use HTTPS
      * @param bufferSize socket buffer size
      * @param readTimeout socket read timeout
      * @param trustStore trust store used for SSL/TLS <em>(<strong>Note:</strong>
@@ -366,7 +364,7 @@ package object client {
      *
      * @return value from applied handler
      */
-    def send[T](request: HttpRequest, secure: Boolean = false, bufferSize: Int = 8192, readTimeout: Int = 5000, trustStore: Option[File] = None)
-      (handler: ResponseHandler[T]): T = HttpClient(bufferSize, readTimeout, trustStore).send(request, secure)(handler)
+    def send[T](request: HttpRequest, bufferSize: Int = 8192, readTimeout: Int = 5000, trustStore: Option[File] = None)
+      (handler: ResponseHandler[T]): T = HttpClient(bufferSize, readTimeout, trustStore).send(request)(handler)
   }
 }

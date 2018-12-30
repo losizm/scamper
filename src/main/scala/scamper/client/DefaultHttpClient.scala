@@ -44,10 +44,14 @@ private object DefaultHttpClient {
 }
 
 private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: Int)(implicit secureSocketFactory: SSLSocketFactory) extends HttpClient {
-  def send[T](request: HttpRequest, secure: Boolean = false)(handler: ResponseHandler[T]): T = {
-    val scheme = if (secure) "https" else "http"
-    val host = getEffectiveHost(request.target, request.getHost)
-    val target = request.target.withScheme(scheme).withAuthority(host)
+  def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T = {
+    val target = request.target
+
+    require(target.isAbsolute, s"Request target not absolute: $target")
+    require(target.getScheme.matches("http(s)?"), s"Invalid scheme: ${target.getScheme}")
+
+    val secure = target.getScheme == "https"
+    val host = getEffectiveHost(target)
     val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/3.1")
     val connection = getEffectiveConnection(request)
 
@@ -113,27 +117,18 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
     (handler: ResponseHandler[T]): T = send(TRACE, target, headers, Nil, Entity.empty())(handler)
 
   private def send[T](method: RequestMethod, target: URI, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T = {
-    if (!target.isAbsolute)
-      throw RequestAborted(s"Target is not absolute: $target")
-
-    if (target.getScheme != "http" && target.getScheme != "https")
-      throw RequestAborted(s"Invalid target scheme: ${target.getScheme}")
-
     val req = cookies match {
       case Nil => HttpRequest(method, target, headers, body)
       case _   => HttpRequest(method, target, headers, body).withCookies(cookies : _*)
     }
 
-    send(req, target.getScheme == "https")(handler)
+    send(req)(handler)
   }
 
-  private def getEffectiveHost(target: URI, default: => Option[String]): String =
-    target.getHost match {
-      case null => default.getOrElse(throw RequestAborted("Cannot determine host"))
-      case host => target.getPort match {
-        case -1   => host
-        case port => s"$host:$port"
-      }
+  private def getEffectiveHost(target: URI): String =
+    target.getPort match {
+      case -1   => target.getHost
+      case port => target.getHost + ":" + port
     }
 
   private def getEffectiveConnection(request: HttpRequest): String =
