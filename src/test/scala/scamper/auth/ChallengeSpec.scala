@@ -33,21 +33,31 @@ class ChallengeSpec extends FlatSpec {
     assert(auth.realm == "Admin Console")
   }
 
+  it should "be created with bearer scheme" in {
+    val challenge = Challenge.parse("Bearer realm=\"example\", error=invalid_token, scope=\"user profile\"")
+    assert(challenge.scheme == "Bearer")
+    assert(!challenge.token.isDefined)
+    assert(challenge.params("realm") == "example")
+    assert(challenge.params("error") == "invalid_token")
+    assert(challenge.toString == "Bearer realm=example, error=invalid_token, scope=\"user profile\"")
+    assert(challenge.isInstanceOf[BearerChallenge])
+
+    val auth = challenge.asInstanceOf[BearerChallenge]
+    assert(auth.realm.contains("example"))
+    assert(auth.error.contains("invalid_token"))
+    assert(auth.scope.size == 2)
+    assert(auth.scope == Seq("user", "profile"))
+    assert(!auth.isInvalidRequest)
+    assert(auth.isInvalidToken)
+    assert(!auth.isInsufficientScope)
+  }
+
   it should "be created with token" in {
     val challenge = Challenge.parse(s"Insecure aXNzYTpyYWUK")
     assert(challenge.scheme == "Insecure")
     assert(challenge.token.contains("aXNzYTpyYWUK"))
     assert(challenge.params.isEmpty)
     assert(challenge.toString == s"Insecure aXNzYTpyYWUK")
-  }
-
-  it should "be created with parameters" in {
-    val challenge = Challenge.parse("Bearer realm=\"example\", error=invalid_token")
-    assert(challenge.scheme == "Bearer")
-    assert(!challenge.token.isDefined)
-    assert(challenge.params("realm") == "example")
-    assert(challenge.params("error") == "invalid_token")
-    assert(challenge.toString == "Bearer realm=example, error=invalid_token")
   }
 
   it should "be destructured" in {
@@ -58,19 +68,17 @@ class ChallengeSpec extends FlatSpec {
         assert(params("charset") == "utf-8")
     }
 
+    Challenge.parse("Bearer realm=\"example\", error=invalid_token") match {
+      case BearerChallenge(params) =>
+        assert(params("realm") == "example")
+        assert(params("error") == "invalid_token")
+    }
+
     Challenge.parse(s"Insecure aXNzYTpyYWUK") match {
       case Challenge(scheme, Some(token), params) =>
         assert(scheme == "Insecure")
         assert(token.contains("aXNzYTpyYWUK"))
         assert(params.isEmpty)
-    }
-
-    Challenge.parse("Bearer realm=\"example\", error=invalid_token") match {
-      case Challenge(scheme, token, params) =>
-        assert(scheme == "Bearer")
-        assert(!token.isDefined)
-        assert(params("realm") == "example")
-        assert(params("error") == "invalid_token")
     }
   }
 

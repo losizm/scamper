@@ -41,7 +41,10 @@ class CredentialsSpec extends FlatSpec {
     assert(credentials.token.contains(token))
     assert(credentials.params.isEmpty)
     assert(credentials.toString == s"Bearer $token")
-    assert(!credentials.isInstanceOf[BasicCredentials])
+    assert(credentials.isInstanceOf[BearerCredentials])
+
+    val auth = credentials.asInstanceOf[BearerCredentials]
+    assert(auth.token.contains(token))
   }
 
   it should "be created with parameters" in {
@@ -61,10 +64,8 @@ class CredentialsSpec extends FlatSpec {
     }
 
     Credentials.parse(s"Bearer $token") match {
-      case Credentials(scheme, token, params) =>
-        assert(scheme == "Bearer")
-        assert(token.isDefined)
-        assert(params.isEmpty)
+      case BearerCredentials(token) =>
+        assert(token.contains(token))
     }
 
     Credentials.parse("Insecure user=issa, password=\"secr,t\"") match {
