@@ -59,7 +59,7 @@ package scamper
  * val req = GET("/admin/users").withAuthorization(credentials)
  * }}}
  *
- * In addition, there are convenience methods available for the Basic scheme.
+ * In addition, there are convenience methods available for Basic authentication.
  *
  * {{{
  * import scamper.ImplicitConverters.stringToUri
@@ -83,8 +83,8 @@ package scamper
  *
  * === Bearer Authentication ===
  *
- * The same applies to Bearer authentication. `BearerChallenge` and
- * `BearerCredentials` are available, along with convenience methods.
+ * `BearerChallenge` and `BearerCredentials` are provided for Bearer
+ * authentication.
  *
  * {{{
  * import scamper.ImplicitConverters.stringToUri

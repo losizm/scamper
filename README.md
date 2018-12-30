@@ -329,7 +329,7 @@ def printUser(message: HttpMessage): Unit = {
 ## HTTP Authentication
 
 **Scamper** includes a separate package (i.e., `scamper.auth`) for working with
-the authentication types and headers.
+authentication types and headers.
 
 ### Challenges and Credentials
 
@@ -379,7 +379,7 @@ val credentials = BasicCredentials("sa", "l3tm31n")
 val req = GET("/admin/users").withAuthorization(credentials)
 ```
 
-In addition, there are convenience methods available for the Basic scheme.
+In addition, there are convenience methods available for Basic authentication.
 
 ```scala
 import scamper.ImplicitConverters.stringToUri
@@ -403,14 +403,13 @@ printf(s"Password: %s%n", req.basic.password)
 
 ### Bearer Authentication
 
-The same applies to Bearer authentication. `BearerChallenge` and `BearerCredentials`
-are available, along with convenience methods.
+`BearerChallenge` and `BearerCredentials` are provided for Bearer authentication.
 
 ```scala
 import scamper.ImplicitConverters.stringToUri
 import scamper.RequestMethods.GET
 import scamper.ResponseStatuses.Unauthorized
-import scamper.auth.{ Authorization, BearerChallenge, BearerCredentials, WwwAuthenticate }
+import scamper.auth.{ Authorization, BearerChallenge, WwwAuthenticate }
 
 // Provide challenge parameters
 val challenge = BearerChallenge(
