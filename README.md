@@ -446,24 +446,24 @@ val req = GET("/users").withBearer("R290IDUgb24gaXQhCg==")
 **Scamper** includes `HttpClient`, which is used for sending requests and
 handling their responses.
 
-Here we create a POST request and send it over HTTPS (i.e., `secure = true`).
-The response handler prints a message based on the response status using the
-filters defined in `ResponseFilter`.
+Here we create a POST request and send it over HTTPS. The response handler
+prints a message based on the response status using the filters defined in
+`ResponseFilter`. Also note the request must be created with an absolute URI
+to make effective use of the client.
 
 ```scala
 import scamper.ImplicitConverters.{ stringToEntity, stringToUri }
 import scamper.RequestMethods.POST
 import scamper.client.HttpClient
 import scamper.client.ResponseFilter._
-import scamper.headers.{ ContentType, Host, Location }
+import scamper.headers.{ ContentType, Location }
 import scamper.types.ImplicitConverters.stringToMediaType
 
-val req = POST("/users")
-  .withHost("localhost:9000")
+val req = POST("https:/localhost:8080/users")
   .withContentType("application/json")
   .withBody(s"""{ "id": 500, "name": "guest" }""")
 
-HttpClient.send(req, secure = true) {
+HttpClient.send(req) {
   case Successful(_)    => println("Successful")
   case Redirection(res) => println(s"Redirection: ${res.location}")
   case ClientError(res) => println(s"Client error: ${res.status}")
@@ -480,12 +480,11 @@ import scamper.BodyParsers
 import scamper.ImplicitConverters.stringToUri
 import scamper.RequestMethods.GET
 import scamper.client.HttpClient
-import scamper.headers.Host
 
 implicit val parser = BodyParsers.text()
 
 def getMessageOfTheDay(): Either[Int, String] = {
-  val req = GET("/motd").withHost("localhost:8080")
+  val req = GET("http://localhost:8080/motd")
 
   HttpClient.send(req) { res =>
     res.status.isSuccessful match {
@@ -525,6 +524,27 @@ def getMessageOfTheDay(): Either[Int, String] = {
     }
   }
 }
+```
+
+And if the client is declared as an implicit value, you can make use of `send()`
+on the request itself.
+
+```scala
+import scamper.BodyParsers
+import scamper.ImplicitConverters.stringToUri
+import scamper.RequestMethods.GET
+import scamper.client.HttpClient
+import scamper.client.Implicits.ClientHttpRequestType // Adds send method to request
+import scamper.headers.{ Accept, AcceptLanguage }
+import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToLanguageRange }
+
+implicit val client = HttpClient(bufferSize = 8192, readTimeout = 1000)
+implicit val parser = BodyParsers.text(4096)
+
+GET("http://localhost:8080/motd")
+  .withAccept("text/plain")
+  .withAcceptLanguage("en-US; q=0.6", "fr-CA; q=0.4")
+  .send(res => println(res.as[String])) // Send request and print response
 ```
 
 ### Providing Truststore
@@ -768,7 +788,7 @@ any remaining components, including intervening path separators (i.e., **/**).
 ```scala
 import scamper.ImplicitConverters.fileToEntity
 import scamper.ResponseStatuses.{ Accepted, NotFound, Ok }
-import scamper.server.Implicits.HttpRequestType
+import scamper.server.Implicits.ServerHttpRequestType
 
 // Match request method and parameterized path
 app.delete("/orders/:id") { req =>
@@ -806,7 +826,7 @@ specified.
 import scamper.BodyParser
 import scamper.ImplicitConverters.stringToEntity
 import scamper.ResponseStatuses.Ok
-import scamper.server.Implicits.HttpRequestType
+import scamper.server.Implicits.ServerHttpRequestType
 
 // Match path with two parameters
 app.post("/translate/:in/to/:out") { req =>
