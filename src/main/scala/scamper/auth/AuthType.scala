@@ -106,8 +106,8 @@ object BearerChallenge {
     BearerChallengeImpl(Params(params.toMap))
 
   /** Destructures BearerChallenge. */
-  def unapply(auth: BearerChallenge): Option[Map[String, String]] =
-    Some(auth.params)
+  def unapply(auth: BearerChallenge): Option[(Option[String], Seq[String], Option[String], Map[String, String])] =
+    Some(auth.realm, auth.scope, auth.error, auth.params)
 }
 
 private case class BearerChallengeImpl(params: Map[String, String]) extends BearerChallenge {

@@ -64,13 +64,19 @@ class ChallengeSpec extends FlatSpec {
     Challenge.parse("Basic realm=Console, charset=utf-8") match {
       case BasicChallenge(realm, params) =>
         assert(realm == "Console")
+        assert(params.size == 2)
         assert(params("realm") == "Console")
         assert(params("charset") == "utf-8")
     }
 
-    Challenge.parse("Bearer realm=\"example\", error=invalid_token") match {
-      case BearerChallenge(params) =>
+    Challenge.parse("Bearer realm=\"example\", error=invalid_token, scope=\"user profile\"") match {
+      case BearerChallenge(Some(realm), scope, Some(error), params) =>
+        assert(realm == "example")
+        assert(scope == Seq("user", "profile"))
+        assert(error == "invalid_token")
+        assert(params.size == 3)
         assert(params("realm") == "example")
+        assert(params("scope") == "user profile")
         assert(params("error") == "invalid_token")
     }
 
