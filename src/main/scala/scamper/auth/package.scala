@@ -21,8 +21,8 @@ package scamper
  * === Challenges and Credentials ===
  *
  * When working with authentication, you present a `Challenge` in the response
- * and `Credentials` in the request. Each of these has an assigned scheme and
- * either a token or a set of parameters.
+ * and `Credentials` in the request. Each of these has an assigned scheme, which
+ * is associated with either a token or a set of parameters.
  *
  * {{{
  * import scamper.ImplicitConverters.stringToUri
@@ -72,6 +72,7 @@ package scamper
  *
  * // Access basic auth in response
  * printf(s"Realm: %s%n", res.basic.realm)
+ * printf(s"Title: %s%n", res.basic.params("title"))
  *
  * // Provide user and password
  * val req = GET("/admin/users").withBasic("sa", "l3tm3m1n")
@@ -104,7 +105,8 @@ package scamper
  * res.bearer.realm.foreach(println)
  *
  * // Print scope from space-delimited parameter
- * res.bearer.scope.foreach(println)
+ * val scope: Seq[String] = res.bearer.scope
+ * scope.foreach(println)
  *
  * // Print error parameters
  * res.bearer.realm.foreach(println)

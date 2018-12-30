@@ -149,9 +149,9 @@ the case for cookies. Specialized access is provided by classes in
 ### Request Cookies
 
 In `HttpRequest`, cookies are stringed together in the **Cookie** header. You
-may, of course, access the cookies in their _unbaked_ form using generalized
-header access. Or you can access them using the extension methods provided by
-`RequestCookies`, with each cookie represented as `PlainCookie`.
+may access the cookies in their _unbaked_ form using generalized header access.
+Or you can access them using the extension methods provided by `RequestCookies`,
+with each cookie represented as `PlainCookie`.
 
 ```scala
 import scamper.ImplicitConverters.stringToUri
@@ -226,8 +226,8 @@ The message body is represented as `Entity`, which encapsulates content in
 `java.io.InputStream`.
 
 ### Creating Body
-When building a message, use one of the `Entity` factory methods to create the
-body. For example, you can create a message body using text content.
+When building a message, use the `Entity` factory to create the body. For
+example, you can create the body using text content.
 
 ```scala
 import scamper.Entity
@@ -249,7 +249,7 @@ val body = Entity("""
 val res = Ok(body).withContentType("text/html; charset=utf-8")
 ```
 
-Or create a message body using file content.
+Or create the message body using file content.
 
 ```scala
 import java.io.File
@@ -334,8 +334,8 @@ authentication types and headers.
 ### Challenges and Credentials
 
 When working with authentication, you present a `Challenge` in the response and
-`Credentials` in the request. Each of these has an assigned scheme and either a
-token or a set of parameters.
+`Credentials` in the request. Each of these has an assigned scheme, which is
+associated with either a token or a set of parameters.
 
 ```scala
 import scamper.ImplicitConverters.stringToUri
@@ -392,6 +392,7 @@ val res = Unauthorized().withBasic("admin", "title" -> "Admin Console")
 
 // Access basic auth in response
 printf(s"Realm: %s%n", res.basic.realm)
+printf(s"Title: %s%n", res.basic.params("title"))
 
 // Provide user and password
 val req = GET("/admin/users").withBasic("sa", "l3tm3m1n")
@@ -423,7 +424,8 @@ val res = Unauthorized().withWwwAuthenticate(challenge)
 res.bearer.realm.foreach(println)
 
 // Print scope from space-delimited parameter
-res.bearer.scope.foreach(println)
+val scope: Seq[String] = res.bearer.scope
+scope.foreach(println)
 
 // Print error parameters
 res.bearer.realm.foreach(println)
@@ -698,11 +700,12 @@ app.request { req =>
 #### Filtering vs. Processing
 
 There are two subclasses of `RequestHandler` reserved for instances where the
-handler always returns the same type: `RequestFilter` always returns an
-`HttpRequest`, and `RequestProcessor` always returns an `HttpResponse`. These
-are _filtering_ and _processing_, respectively.
+handler always returns the same type: `RequestFilter` returns `HttpRequest`, and
+`RequestProcessor` returns `HttpResponse`. These are _filtering_ and
+_processing_, respectively.
 
-The request logger can be rewritten as `RequestFilter`.
+The request logger from earlier is actually a filter and can be rewritten
+expressly as such.
 
 ```scala
 app.request { req =>
@@ -714,8 +717,8 @@ app.request { req =>
 }
 ```
 
-And we used `RequestProcessor` in our _"Hello World"_ server, but here's one
-that would do something more meaningful:
+And we used a processor in our _"Hello World"_ server, but here's one that would
+do something more meaningful:
 
 ```scala
 import scamper.ImplicitConverters.fileToEntity
@@ -726,14 +729,15 @@ app.request { req =>
     ...
   }
 
+  // Always return a response
   findFile(req.path).map(Ok(_)).getOrElse(NotFound())
 }
 ```
 
 #### Targeted Processing
 
-A request processor can be added to a targeted path with or without a targeted
-request method.
+A processor can be added to a targeted path with or without a targeted request
+method.
 
 ```scala
 import scamper.ImplicitConverters.stringToEntity
@@ -751,9 +755,8 @@ app.request("/private") { req =>
 }
 ```
 
-As added convenience, there are methods in `ServerApplication` corresponding to
-the standard HTTP request methods, and targeted processors can be added using
-any one of these.
+And there are methods corresponding to the standard HTTP request methods, so
+processors can be added using any one of these.
 
 ```scala
 import scamper.BodyParsers
@@ -818,7 +821,7 @@ app.get("/archive/*file") { req =>
 ```
 
 Note there can be at most one __*param__, which must be specified as the the
-last component in the path. However, there can be multiple __:param__ instances
+last component in the path; however, there can be multiple __:param__ instances
 specified.
 
 ```scala
@@ -842,8 +845,7 @@ app.post("/translate/:in/to/:out") { req =>
 
 #### Serving Static Files
 
-You can add a specialized request handler to serve static files from a base
-directory.
+You can add a request handler to serve static files from a base directory.
 
 ```scala
 app.files("/app/main", new File("/path/to/public"))
@@ -866,7 +868,7 @@ app.resources("/app/main", "assets")
 In the above configuration, requests prefixed with _/app/main_ are served
 resources from _assets_, which is the base resource name. The mapping works
 similiar to static files, only the resources are located using the class loader.
-_(See [ServerApplication.resources()](https://losizm.github.io/scamper/latest/api/scamper/server/package$$ServerApplication.html#resources)
+_(See [ServerApplication.resources()](https://losizm.github.io/scamper/latest/api/scamper/server/package$$ServerApplication.html#resources(pathPrefix:String,baseName:String,loader:Option[ClassLoader]):ServerApplication.this.type)
 in scaladoc for additional details.)_
 
 #### Aborting Response
