@@ -410,15 +410,14 @@ printf(s"Password: %s%n", req.basic.password)
 import scamper.ImplicitConverters.stringToUri
 import scamper.RequestMethods.GET
 import scamper.ResponseStatuses.Unauthorized
-import scamper.auth.{ Authorization, BearerChallenge, WwwAuthenticate }
+import scamper.auth.{ Authorization, WwwAuthenticate }
 
 // Provide challenge parameters
-val challenge = BearerChallenge(
+val res = Unauthorized().withBearer(
   "scope" -> "user profile",
   "error" -> "invalid_token",
   "error_description" -> "Expired access token"
 )
-val res = Unauthorized().withWwwAuthenticate(challenge)
 
 // Print optional realm parameter
 res.bearer.realm.foreach(println)
