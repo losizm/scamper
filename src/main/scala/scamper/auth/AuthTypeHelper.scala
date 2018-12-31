@@ -32,8 +32,10 @@ private object AuthTypeHelper {
       throw new IllegalArgumentException(s"Invalid auth token: $value")
     }
 
-  def Params(params: Map[String, String]): Map[String, String] =
-    params.map { case (name, value) => ParamName(name) -> ParamValue(value) }
+  def Params(params: Seq[(String, String)]): Map[String, String] =
+    new CaseInsensitiveKeyMap(params.map {
+      case (name, value) => ParamName(name) -> ParamValue(value)
+    })
 
   def ParamName(name: String): String =
     StandardToken(name) getOrElse {

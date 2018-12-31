@@ -34,12 +34,12 @@ class ChallengeSpec extends FlatSpec {
   }
 
   it should "be created with bearer scheme" in {
-    val challenge = Challenge.parse("Bearer realm=\"example\", error=invalid_token, scope=\"user profile\"")
+    val challenge = Challenge.parse("Bearer realm=example, error=invalid_token, scope=\"user profile\"")
     assert(challenge.scheme == "Bearer")
     assert(!challenge.token.isDefined)
     assert(challenge.params("realm") == "example")
     assert(challenge.params("error") == "invalid_token")
-    assert(challenge.toString == "Bearer realm=example, error=invalid_token, scope=\"user profile\"")
+    assert(challenge.toString == "Bearer realm=\"example\", error=invalid_token, scope=\"user profile\"")
     assert(challenge.isInstanceOf[BearerChallenge])
 
     val auth = challenge.asInstanceOf[BearerChallenge]

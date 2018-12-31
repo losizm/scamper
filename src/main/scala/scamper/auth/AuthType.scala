@@ -59,7 +59,7 @@ trait BasicChallenge extends Challenge {
 object BasicChallenge {
   /** Creates BasicChallenge with supplied credentials. */
   def apply(realm: String, params: (String, String)*): BasicChallenge =
-    BasicChallengeImpl(realm, Params((params :+ ("realm" -> realm)).toMap))
+    BasicChallengeImpl(realm, Params(("realm" -> realm) +: params))
 
   /** Destructures BasicChallenge. */
   def unapply(auth: BasicChallenge): Option[(String, Map[String, String])] =
@@ -103,7 +103,7 @@ trait BearerChallenge extends Challenge {
 object BearerChallenge {
   /** Creates BearerChallenge with supplied credentials. */
   def apply(params: (String, String)*): BearerChallenge =
-    BearerChallengeImpl(Params(params.toMap))
+    BearerChallengeImpl(Params(params))
 
   /** Destructures BearerChallenge. */
   def unapply(auth: BearerChallenge): Option[(Option[String], Seq[String], Option[String], Map[String, String])] =
@@ -145,7 +145,7 @@ object Challenge {
 
   /** Creates Challenge with supplied auth scheme and parameters. */
   def apply(scheme: String, params: (String, String)*): Challenge =
-    apply(scheme, None, Params(params.toMap))
+    apply(scheme, None, Params(params))
 
   private def apply(scheme: String, token: Option[String], params: Map[String, String]): Challenge =
     scheme.toLowerCase match {
@@ -257,7 +257,7 @@ object Credentials {
 
   /** Creates Credentials with supplied auth scheme and parameters. */
   def apply(scheme: String, params: (String, String)*): Credentials =
-    apply(scheme, None, Params(params.toMap))
+    apply(scheme, None, Params(params))
 
   private def apply(scheme: String, token: Option[String], params: Map[String, String]): Credentials =
     scheme.toLowerCase match {

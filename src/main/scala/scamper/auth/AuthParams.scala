@@ -18,22 +18,45 @@ package scamper.auth
 import scamper.Grammar._
 import scamper.ListParser
 
+private class CaseInsensitiveKeyMap[V](params: Seq[(String, V)]) extends Map[String, V] {
+  def get(key: String): Option[V] =
+    params.collectFirst {
+      case (k, value) if k.equalsIgnoreCase(key) => value
+    }
+
+  def iterator: Iterator[(String, V)] =
+    params.groupBy(_._1.toLowerCase)
+      .map { case (key, Seq((_, value), _*)) => key -> value }
+      .toIterator
+
+  def -(key: String): Map[String, V] =
+    new CaseInsensitiveKeyMap(params.filterNot {
+      case (k, _) => k.equalsIgnoreCase(key)
+    })
+
+  def +[V1 >: V](pair: (String, V1)): Map[String, V1] = new CaseInsensitiveKeyMap(params :+ pair)
+
+  override def empty: Map[String, V] = new CaseInsensitiveKeyMap(Nil)
+}
+
 private object AuthParams {
   private val TokenParam = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val QuotedParam = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*"([^"]*)"\s*""".r
 
   def parse(params: String): Map[String, String] =
-    ListParser(params).map {
+    new CaseInsensitiveKeyMap(ListParser(params).map {
       case TokenParam(name, value)  => name -> value
       case QuotedParam(name, value) => name -> value
       case param => throw new IllegalArgumentException(s"Malformed auth parameters: $param")
-    }.toMap
+    })
 
   def format(params: Map[String, String]): String =
     if (params.isEmpty) ""
     else
-      params.map { case (name, value) => s"$name=${formatParamValue(value)}" }
-        .toSeq
+      params.map {
+          case ("realm", value) => "realm=\"" + value + "\""
+          case (name, value)    => s"$name=${formatParamValue(value)}"
+        }.toSeq
         .sortBy { format => if (format.startsWith("realm")) 0 else 1 }
         .mkString(" ", ", ", "")
 
