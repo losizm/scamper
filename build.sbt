@@ -1,6 +1,6 @@
 organization := "com.github.losizm"
 name := "scamper"
-version := "4.0.1"
+version := "4.0.2"
 
 scalaVersion := "2.12.8"
 scalacOptions := Seq("-deprecation", "-feature", "-Xcheckinit")
