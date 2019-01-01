@@ -218,7 +218,7 @@ private case class BasicCredentialsImpl(token: Option[String]) extends BasicCred
 
   private def detoken(part: Int): String =
     token.map(Base64.decodeToString)
-      .map(_ split ":")
+      .map(_.split(":", 2))
       .map(_(part))
       .get
 }
