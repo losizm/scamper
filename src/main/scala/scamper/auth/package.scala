@@ -261,6 +261,52 @@ package object auth {
 
     /** Creates new response removing Proxy-Authenticate header. */
     def removeProxyAuthenticate: HttpResponse = response.removeHeaders("Proxy-Authenticate")
+
+    /**
+     * Gets basic proxy authentication.
+     *
+     * @throws HttpException if basic proxy authentication is not present
+     */
+    def proxyBasic: BasicChallenge =
+      getProxyBasic.getOrElse(throw new HttpException("Basic proxy authentication not found"))
+
+    /** Gets basic proxy authentication if present. */
+    def getProxyBasic: Option[BasicChallenge] =
+      proxyAuthenticate.collectFirst { case challenge: BasicChallenge => challenge }
+
+    /** Tests whether basic proxy authentication is present. */
+    def hasProxyBasic: Boolean = getProxyBasic.isDefined
+
+    /** Creates new response with basic proxy authentication. */
+    def withProxyBasic(realm: String, params: (String, String)*): HttpResponse =
+      withProxyBasic(BasicChallenge(realm, params : _*))
+
+    /** Creates new response with basic proxy authentication. */
+    def withProxyBasic(challenge: BasicChallenge): HttpResponse =
+      withProxyAuthenticate(challenge)
+
+    /**
+     * Gets bearer proxy authentication.
+     *
+     * @throws HttpException if bearer proxy authentication is not present
+     */
+    def proxyBearer: BearerChallenge =
+      getProxyBearer.getOrElse(throw new HttpException("Bearer proxy authentication not found"))
+
+    /** Gets bearer proxy authentication if present. */
+    def getProxyBearer: Option[BearerChallenge] =
+      proxyAuthenticate.collectFirst { case challenge: BearerChallenge => challenge }
+
+    /** Tests whether bearer proxy authentication is present. */
+    def hasProxyBearer: Boolean = getProxyBearer.isDefined
+
+    /** Creates new response with bearer proxy authentication. */
+    def withProxyBearer(params: (String, String)*): HttpResponse =
+      withProxyBearer(BearerChallenge(params : _*))
+
+    /** Creates new response with bearer proxy authentication. */
+    def withProxyBearer(challenge: BearerChallenge): HttpResponse =
+      withProxyAuthenticate(challenge)
   }
 
   /** Provides standardized access to Proxy-Authentication-Info header. */
@@ -317,6 +363,56 @@ package object auth {
 
     /** Creates new request removing Proxy-Authorization header. */
     def removeProxyAuthorization: HttpRequest = request.removeHeaders("Proxy-Authorization")
+
+    /**
+     * Gets basic proxy authorization.
+     *
+     * @throws HttpException if basic proxy authorization is not present
+     */
+    def proxyBasic: BasicCredentials =
+      getProxyBasic.getOrElse(throw new HttpException("Basic proxy authorization not found"))
+
+    /** Gets basic proxy authorization if present. */
+    def getProxyBasic: Option[BasicCredentials] =
+      getProxyAuthorization.collect { case challenge: BasicCredentials => challenge }
+
+    /** Tests whether basic proxy authorization is present. */
+    def hasProxyBasic: Boolean = getProxyBasic.isDefined
+
+    /** Creates new request with basic proxy authorization. */
+    def withProxyBasic(token: String): HttpRequest =
+      withProxyBasic(BasicCredentials(token))
+
+    /** Creates new request with basic proxy authorization. */
+    def withProxyBasic(user: String, password: String): HttpRequest =
+      withProxyBasic(BasicCredentials(user, password))
+
+    /** Creates new request with basic proxy authorization. */
+    def withProxyBasic(credentials: BasicCredentials): HttpRequest =
+      withProxyAuthorization(credentials)
+
+    /**
+     * Gets bearer proxy authorization.
+     *
+     * @throws HttpException if bearer proxy authorization is not present
+     */
+    def proxyBearer: BearerCredentials =
+      getProxyBearer.getOrElse(throw new HttpException("Bearer proxy authorization not found"))
+
+    /** Gets bearer proxy authorization if present. */
+    def getProxyBearer: Option[BearerCredentials] =
+      getProxyAuthorization.collect { case challenge: BearerCredentials => challenge }
+
+    /** Tests whether bearer proxy authorization is present. */
+    def hasProxyBearer: Boolean = getProxyBearer.isDefined
+
+    /** Creates new request with bearer proxy authorization. */
+    def withProxyBearer(token: String): HttpRequest =
+      withProxyBearer(BearerCredentials(token))
+
+    /** Creates new request with bearer proxy authorization. */
+    def withProxyBearer(credentials: BearerCredentials): HttpRequest =
+      withProxyAuthorization(credentials)
   }
 
   /** Provides standardized access to WWW-Authenticate header. */
