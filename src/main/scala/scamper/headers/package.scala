@@ -99,7 +99,7 @@ package object headers {
   }
 
   /** Provides standardized access to Accept-Encoding header. */
-  implicit class AcceptEncoding[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
+  implicit class AcceptEncoding[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Accept-Encoding header values.
      *
@@ -119,11 +119,12 @@ package object headers {
     /**
      * Creates new message setting Accept-Encoding header to supplied values.
      */
-    def withAcceptEncoding(values: ContentCodingRange*): HttpMessage =
+    def withAcceptEncoding(values: ContentCodingRange*)(implicit ev: <:<[T, MessageBuilder[T]]): HttpMessage =
       message.withHeader(Header("Accept-Encoding", values.mkString(", ")))
 
     /** Creates new message removing Accept-Encoding header. */
-    def removeAcceptEncoding: HttpMessage = message.removeHeaders("Accept-Encoding")
+    def removeAcceptEncoding(implicit ev: <:<[T, MessageBuilder[T]]): HttpMessage =
+      message.removeHeaders("Accept-Encoding")
   }
 
   /** Provides standardized access to Accept-Language header. */
@@ -255,7 +256,7 @@ package object headers {
   }
 
   /** Provides standardized access to Cache-Control header. */
-  implicit class CacheControl[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
+  implicit class CacheControl[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Cache-Control header values.
      *
@@ -271,11 +272,12 @@ package object headers {
     def hasCacheControl: Boolean = message.hasHeader("Cache-Control")
 
     /** Creates new message setting Cache-Control header to supplied values. */
-    def withCacheControl(values: CacheDirective*): T =
+    def withCacheControl(values: CacheDirective*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.withHeader(Header("Cache-Control", values.mkString(", ")))
 
     /** Creates new message removing Cache-Control header. */
-    def removeCacheControl: T = message.removeHeaders("Cache-Control")
+    def removeCacheControl(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Cache-Control")
   }
 
   /** Provides standardized access to Content-Disposition header. */
@@ -307,7 +309,7 @@ package object headers {
   }
 
   /** Provides standardized access to Content-Encoding header. */
-  implicit class ContentEncoding[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
+  implicit class ContentEncoding[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Content-Encoding header values.
      *
@@ -327,15 +329,16 @@ package object headers {
     /**
      * Creates new message setting Content-Encoding header to supplied values.
      */
-    def withContentEncoding(values: ContentCoding*): T =
+    def withContentEncoding(values: ContentCoding*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.withHeader(Header("Content-Encoding", values.mkString(", ")))
 
     /** Creates new message removing Content-Encoding header. */
-    def removeContentEncoding: T = message.removeHeaders("Content-Encoding")
+    def removeContentEncoding(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Content-Encoding")
   }
 
   /** Provides standardized access to Content-Language header. */
-  implicit class ContentLanguage[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
+  implicit class ContentLanguage[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Content-Language header values.
      *
@@ -353,15 +356,16 @@ package object headers {
     def hasContentLanguage: Boolean = message.hasHeader("Content-Language")
 
     /** Creates new message setting Content-Language header to supplied values. */
-    def withContentLanguage(values: LanguageTag*): T =
+    def withContentLanguage(values: LanguageTag*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.withHeader(Header("Content-Language", values.mkString(", ")))
 
     /** Creates new message removing Content-Language header. */
-    def removeContentLanguage: T = message.removeHeaders("Content-Language")
+    def removeContentLanguage(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Content-Language")
   }
 
   /** Provides standardized access to Content-Length header. */
-  implicit class ContentLength[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
+  implicit class ContentLength[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Content-Length header value.
      *
@@ -377,15 +381,16 @@ package object headers {
     def hasContentLength: Boolean = message.hasHeader("Content-Length")
 
     /** Creates new message setting Content-Length header to supplied value. */
-    def withContentLength(value: Long): T =
+    def withContentLength(value: Long)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.withHeader(Header("Content-Length", value))
 
     /** Creates new message removing Content-Length header. */
-    def removeContentLength: T = message.removeHeaders("Content-Length")
+    def removeContentLength(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Content-Length")
   }
 
   /** Provides standardized access to Content-Location header. */
-  implicit class ContentLocation[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
+  implicit class ContentLocation[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Content-Location header value.
      *
@@ -404,15 +409,16 @@ package object headers {
     /**
      * Creates new message setting Content-Location header to supplied value.
      */
-    def withContentLocation(value: URI): T =
+    def withContentLocation(value: URI)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.withHeader(Header("Content-Location", value.toString))
 
     /** Creates new message removing Content-Location header. */
-    def removeContentLocation: T = message.removeHeaders("Content-Location")
+    def removeContentLocation(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Content-Location")
   }
 
   /** Provides standardized access to Content-Range header. */
-  implicit class ContentRange[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
+  implicit class ContentRange[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Content-Range header value.
      *
@@ -429,15 +435,16 @@ package object headers {
     def hasContentRange: Boolean = message.hasHeader("Content-Range")
 
     /** Creates new message setting Content-Range header to supplied value. */
-    def withContentRange(value: ByteContentRange): T =
+    def withContentRange(value: ByteContentRange)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.withHeader(Header("Content-Range", value.toString))
 
     /** Creates new message removing Content-Range header. */
-    def removeContentRange: T = message.removeHeaders("Content-Range")
+    def removeContentRange(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Content-Range")
   }
 
   /** Provides standardized access to Content-Type header. */
-  implicit class ContentType[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
+  implicit class ContentType[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Content-Type header value.
      *
@@ -453,15 +460,16 @@ package object headers {
     def hasContentType: Boolean = message.hasHeader("Content-Type")
 
     /** Creates new message setting Content-Type header to supplied value. */
-    def withContentType(value: MediaType): T =
+    def withContentType(value: MediaType)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.withHeader(Header("Content-Type", value.toString))
 
     /** Creates new message removing Content-Type header. */
-    def removeContentType: T = message.removeHeaders("Content-Type")
+    def removeContentType(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Content-Type")
   }
 
   /** Provides standardized access to Connection header. */
-  implicit class Connection[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
+  implicit class Connection[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Connection header values.
      *
@@ -477,15 +485,16 @@ package object headers {
     def hasConnection: Boolean = message.hasHeader("Connection")
 
     /** Creates new message setting Connection header to supplied values. */
-    def withConnection(values: String*): T =
+    def withConnection(values: String*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.withHeader(Header("Connection", values.mkString(", ")))
 
     /** Creates new message removing Connection header. */
-    def removeConnection: T = message.removeHeaders("Connection")
+    def removeConnection(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Connection")
   }
 
   /** Provides standardized access to Date header. */
-  implicit class Date[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
+  implicit class Date[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Date header value.
      *
@@ -501,11 +510,12 @@ package object headers {
     def hasDate: Boolean = message.hasHeader("Date")
 
     /** Creates new message setting Date header to supplied value. */
-    def withDate(value: Instant): T =
+    def withDate(value: Instant)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.withHeader(Header("Date", value))
 
     /** Creates new message removing Date header. */
-    def removeDate: T = message.removeHeaders("Date")
+    def removeDate(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Date")
   }
 
   /** Provides standardized access to ETag header. */
@@ -1093,7 +1103,7 @@ package object headers {
   }
 
   /** Provides standardized access to Trailer header. */
-  implicit class Trailer[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
+  implicit class Trailer[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Trailer header values.
      *
@@ -1109,15 +1119,16 @@ package object headers {
     def hasTrailer: Boolean = message.hasHeader("Trailer")
 
     /** Creates new message setting Trailer header to supplied values. */
-    def withTrailer(values: String*): T =
+    def withTrailer(values: String*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.withHeader(Header("Trailer", values.mkString(", ")))
 
     /** Creates new message removing Trailer header. */
-    def removeTrailer: T = message.removeHeaders("Trailer")
+    def removeTrailer(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Trailer")
   }
 
   /** Provides standardized access to Transfer-Encoding header. */
-  implicit class TransferEncoding[T <: HttpMessage with MessageBuilder[T]](val message: T) extends AnyVal {
+  implicit class TransferEncoding[T <: HttpMessage](val message: T) extends AnyVal {
     /**
      * Gets Transfer-Encoding header values.
      *
@@ -1137,11 +1148,12 @@ package object headers {
     /**
      * Creates new message setting Transfer-Encoding header to supplied values.
      */
-    def withTransferEncoding(values: TransferCoding*): T =
+    def withTransferEncoding(values: TransferCoding*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.withHeader(Header("Transfer-Encoding", values.mkString(", ")))
 
     /** Creates new message removing Transfer-Encoding header. */
-    def removeTransferEncoding: T = message.removeHeaders("Transfer-Encoding")
+    def removeTransferEncoding(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Transfer-Encoding")
   }
 
   /** Provides standardized access to Upgrade header. */
@@ -1167,8 +1179,7 @@ package object headers {
       request.withHeader(Header("Upgrade", values.mkString(", ")))
 
     /** Creates new request removing Upgrade header. */
-    def removeUpgrade: HttpRequest =
-      request.removeHeaders("Upgrade")
+    def removeUpgrade: HttpRequest = request.removeHeaders("Upgrade")
   }
 
   /** Provides standardized access to User-Agent header. */
