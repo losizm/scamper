@@ -227,7 +227,7 @@ The message body is represented as `Entity`, which encapsulates content in
 
 ### Creating Body
 When building a message, use the `Entity` factory to create the body. For
-example, you can create the body using text content.
+example, you can create a message with text content.
 
 ```scala
 import scamper.Entity
@@ -249,7 +249,7 @@ val body = Entity("""
 val res = Ok(body).withContentType("text/html; charset=utf-8")
 ```
 
-Or create the message body using file content.
+Or create the message using file content.
 
 ```scala
 import java.io.File
@@ -279,7 +279,7 @@ val res = Ok(new File("./index.html")).withContentType("text/html; charset=utf-8
 
 When handling an incoming message, use an appropriate `BodyParser` to parse the
 message body. There is a set of standard parsers available in `BodyParsers`,
-such as the one used for parsing text content.
+such as one used for parsing text content.
 
 ```scala
 import scamper.{ BodyParsers, HttpMessage }
@@ -476,7 +476,7 @@ HttpClient.send(req) {
 ```
 
 `HttpClient.send()` returns the value returned by the response handler. So you
-can process the response and return whatever information warranted.
+can process the response and return whatever value warranted.
 
 ```scala
 import scamper.BodyParsers
