@@ -24,7 +24,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
 /** Provides auxiliary type classes. */
-package object aux {
+private object Auxiliary {
   private val crlf = "\r\n".getBytes("UTF-8")
 
   /** Adds extension methods to {@code java.io.InputStream}. */

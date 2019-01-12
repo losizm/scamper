@@ -22,8 +22,8 @@ import scala.util.Try
 import scala.util.matching.Regex
 
 import scamper.{ HttpRequest, HttpResponse, RequestMethod }
+import scamper.Auxiliary.StringType
 import scamper.ImplicitConverters.tupleToHeader
-import scamper.aux.StringType
 
 private class TargetedRequestHandler private (handler: RequestHandler, targetPath: Path, targetMethod: Option[RequestMethod]) extends RequestHandler {
   private val target = new Target(targetPath)

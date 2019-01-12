@@ -29,8 +29,8 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
 import scamper.{ Entity, Header, HttpException, HttpRequest, HttpResponse, HttpVersion, RequestLine, RequestMethod, ResponseStatus }
+import scamper.Auxiliary.SocketType
 import scamper.ResponseStatuses.{ BadRequest, InternalServerError, NotFound, RequestTimeout, UriTooLong, RequestHeaderFieldsTooLarge }
-import scamper.aux.SocketType
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
 import scamper.types.ImplicitConverters.stringToTransferCoding
 

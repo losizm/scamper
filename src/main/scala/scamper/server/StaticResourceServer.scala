@@ -23,10 +23,10 @@ import java.time.Instant
 import scala.util.{ Failure, Success, Try }
 
 import scamper.{ HttpRequest, HttpResponse }
+import scamper.Auxiliary.{ InputStreamType, StringType }
 import scamper.ImplicitConverters._
 import scamper.RequestMethods.{ GET, HEAD }
 import scamper.ResponseStatuses.{ MethodNotAllowed, NotAcceptable, NotModified, Ok }
-import scamper.aux.{ InputStreamType, StringType }
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, Date, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 
