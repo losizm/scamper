@@ -97,20 +97,20 @@ classes defined in `scamper.headers`.
 For example, `ContentType` adds the following methods:
 
 ```scala
-/** Tests whether Content-Type header is present. */
-def hasContentType: Boolean
+/** Gets Content-Type header value. */
+def contentType: MediaType
 
 /** Gets Content-Type header value if present. */
 def getContentType: Option[MediaType]
 
-/** Gets Content-Type header value. */
-def contentType: MediaType
+/** Tests whether Content-Type header is present. */
+def hasContentType: Boolean
 
-/** Creates message with Content-Type header. */
+/** Creates message with Content-Type header set to supplied value. */
 def withContentType(value: MediaType): HttpMessage
 
-/** Creates message without Content-Type header. */
-def removeContentType: HttpMessage
+/** Creates message removing Content-Type header. */
+def removeContentType(): HttpMessage
 ```
 
 So you can work with the header in a type-safe manner.
@@ -333,8 +333,8 @@ authentication types and headers.
 
 ### Challenges and Credentials
 
-When working with authentication, you present a `Challenge` in the response and
-`Credentials` in the request. Each of these has an assigned scheme, which is
+When working with authentication, a `Challenge` is presented in the response,
+and `Credentials` in the request. Each of these has an assigned scheme, which is
 associated with either a token or a set of parameters.
 
 ```scala
@@ -379,7 +379,8 @@ val credentials = BasicCredentials("sa", "l3tm31n")
 val req = GET("/admin/users").withAuthorization(credentials)
 ```
 
-In addition, there are convenience methods available for Basic authentication.
+In addition, there are methods for Basic authentication defined in the header
+classes.
 
 ```scala
 import scamper.ImplicitConverters.stringToUri
@@ -404,7 +405,9 @@ printf(s"Password: %s%n", req.basic.password)
 
 ### Bearer Authentication
 
-`BearerChallenge` and `BearerCredentials` are provided for Bearer authentication.
+There are subclasses defined for Bearer authentication: `BearerChallenge` and
+`BearerCredentials`. And, similar to Basic, there are Bearer-specific methods
+available in the header classes.
 
 ```scala
 import scamper.ImplicitConverters.stringToUri

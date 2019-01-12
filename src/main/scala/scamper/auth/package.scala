@@ -20,7 +20,7 @@ package scamper
  *
  * === Challenges and Credentials ===
  *
- * When working with authentication, you present a `Challenge` in the response
+ * When working with authentication, a `Challenge` is presented in the response,
  * and `Credentials` in the request. Each of these has an assigned scheme, which
  * is associated with either a token or a set of parameters.
  *
@@ -59,7 +59,8 @@ package scamper
  * val req = GET("/admin/users").withAuthorization(credentials)
  * }}}
  *
- * In addition, there are convenience methods available for Basic authentication.
+ * In addition, there are methods for Basic authentication defined in the header
+ * classes.
  *
  * {{{
  * import scamper.ImplicitConverters.stringToUri
@@ -84,22 +85,22 @@ package scamper
  *
  * === Bearer Authentication ===
  *
- * `BearerChallenge` and `BearerCredentials` are provided for Bearer
- * authentication.
+ * There are subclasses defined for Bearer authentication: `BearerChallenge` and
+ * `BearerCredentials`. And, similar to Basic, there are Bearer-specific methods
+ * available in the header classes.
  *
  * {{{
  * import scamper.ImplicitConverters.stringToUri
  * import scamper.RequestMethods.GET
  * import scamper.ResponseStatuses.Unauthorized
- * import scamper.auth.{ Authorization, BearerChallenge, WwwAuthenticate }
+ * import scamper.auth.{ Authorization, WwwAuthenticate }
  *
- * // Provide parameters
- * val challenge = BearerChallenge(
+ * // Provide challenge parameters
+ * val res = Unauthorized().withBearer(
  *   "scope" -> "user profile",
  *   "error" -> "invalid_token",
  *   "error_description" -> "Expired access token"
  * )
- * val res = Unauthorized().withWwwAuthenticate(challenge)
  *
  * // Print optional realm parameter
  * res.bearer.realm.foreach(println)
