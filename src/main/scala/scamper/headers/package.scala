@@ -119,11 +119,11 @@ package object headers {
     /**
      * Creates new message setting Accept-Encoding header to supplied values.
      */
-    def withAcceptEncoding(values: ContentCodingRange*)(implicit ev: <:<[T, MessageBuilder[T]]): HttpMessage =
+    def withAcceptEncoding(values: ContentCodingRange*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.withHeader(Header("Accept-Encoding", values.mkString(", ")))
 
     /** Creates new message removing Accept-Encoding header. */
-    def removeAcceptEncoding()(implicit ev: <:<[T, MessageBuilder[T]]): HttpMessage =
+    def removeAcceptEncoding()(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Accept-Encoding")
   }
 
