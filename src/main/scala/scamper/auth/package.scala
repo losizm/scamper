@@ -154,7 +154,7 @@ package object auth {
       response.withHeader(Header("Authentication-Info", AuthParams.format(values.toMap).trim))
 
     /** Creates new response removing Authentication-Info header. */
-    def removeAuthenticationInfo: HttpResponse = response.removeHeaders("Authentication-Info")
+    def removeAuthenticationInfo(): HttpResponse = response.removeHeaders("Authentication-Info")
   }
 
   /** Provides standardized access to Authorization header. */
@@ -179,7 +179,7 @@ package object auth {
       request.withHeader(Header("Authorization", value.toString))
 
     /** Creates new request removing Authorization header. */
-    def removeAuthorization: HttpRequest = request.removeHeaders("Authorization")
+    def removeAuthorization(): HttpRequest = request.removeHeaders("Authorization")
 
     /**
      * Gets basic authorization.
@@ -260,7 +260,7 @@ package object auth {
       response.withHeader(Header("Proxy-Authenticate", values.mkString(", ")))
 
     /** Creates new response removing Proxy-Authenticate header. */
-    def removeProxyAuthenticate: HttpResponse = response.removeHeaders("Proxy-Authenticate")
+    def removeProxyAuthenticate(): HttpResponse = response.removeHeaders("Proxy-Authenticate")
 
     /**
      * Gets basic proxy authentication.
@@ -334,7 +334,7 @@ package object auth {
       response.withHeader(Header("Proxy-Authentication-Info", AuthParams.format(values.toMap).trim))
 
     /** Creates new response removing Proxy-Authentication-Info header. */
-    def removeProxyAuthenticationInfo: HttpResponse =
+    def removeProxyAuthenticationInfo(): HttpResponse =
       response.removeHeaders("Proxy-Authentication-Info")
   }
 
@@ -362,7 +362,7 @@ package object auth {
       request.withHeader(Header("Proxy-Authorization", value.toString))
 
     /** Creates new request removing Proxy-Authorization header. */
-    def removeProxyAuthorization: HttpRequest = request.removeHeaders("Proxy-Authorization")
+    def removeProxyAuthorization(): HttpRequest = request.removeHeaders("Proxy-Authorization")
 
     /**
      * Gets basic proxy authorization.
@@ -442,7 +442,7 @@ package object auth {
       response.withHeader(Header("WWW-Authenticate", values.mkString(", ")))
 
     /** Creates new response removing WWW-Authenticate header. */
-    def removeWwwAuthenticate: HttpResponse = response.removeHeaders("WWW-Authenticate")
+    def removeWwwAuthenticate(): HttpResponse = response.removeHeaders("WWW-Authenticate")
 
     /**
      * Gets basic authentication.

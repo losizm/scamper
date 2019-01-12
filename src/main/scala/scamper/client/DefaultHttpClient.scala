@@ -157,12 +157,12 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
   }
 
   private def toBodilessRequest(request: HttpRequest): HttpRequest =
-    request.withBody(Entity.empty).removeContentLength.removeTransferEncoding
+    request.withBody(Entity.empty).removeContentLength().removeTransferEncoding()
 
   private def toBodyRequest(request: HttpRequest): HttpRequest =
     request.getContentLength.map {
-      case 0          => request.withBody(Entity.empty).removeTransferEncoding
-      case n if n > 0 => request.removeTransferEncoding
+      case 0          => request.withBody(Entity.empty).removeTransferEncoding()
+      case n if n > 0 => request.removeTransferEncoding()
       case length     => throw RequestAborted(s"Invalid Content-Length: $length")
     }.orElse {
       request.getTransferEncoding.map(_ => request)
