@@ -21,6 +21,7 @@ import scala.collection.mutable.ArrayBuffer
 
 import scamper.{ Entity, Header, HttpException, HttpRequest, HttpResponse, StatusLine }
 import scamper.Auxiliary.SocketType
+import scamper.RequestMethods.HEAD
 import scamper.headers.TransferEncoding
 
 private class HttpClientConnection(socket: Socket) extends AutoCloseable {
@@ -35,7 +36,7 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
       writeBody(request)
 
     socket.flush()
-    getResponse()
+    getResponse(request.method == HEAD)
   }
 
   def close(): Unit = socket.close()
@@ -60,7 +61,7 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
         socket.write(buffer, 0, length)
     }
 
-  private def getResponse(): HttpResponse = {
+  private def getResponse(headOnly: Boolean): HttpResponse = {
     val statusLine = StatusLine.parse(socket.readLine(buffer))
     val headers = new ArrayBuffer[Header]
     var line = ""
@@ -75,6 +76,13 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
           headers += Header.parse(line)
       }
 
-    HttpResponse(statusLine, headers.toSeq, Entity(socket.getInputStream))
+    HttpResponse(
+      statusLine,
+      headers.toSeq,
+      headOnly match {
+        case true  => Entity.empty()
+        case false => Entity(socket.getInputStream())
+      }
+    )
   }
 }

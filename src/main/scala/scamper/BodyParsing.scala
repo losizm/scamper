@@ -15,8 +15,10 @@
  */
 package scamper
 
-import java.io.InputStream
+import java.io.{ ByteArrayInputStream, InputStream }
 import java.util.zip.{ GZIPInputStream, InflaterInputStream }
+
+import headers.{ ContentEncoding, ContentLength, TransferEncoding }
 
 /** A mixin providing access to decoded message body. */
 trait BodyParsing {
@@ -37,33 +39,56 @@ trait BodyParsing {
    * @return value from applied handler
    */
   def withInputStream[T](message: HttpMessage)(f: InputStream => T): T =
-    message.body.withInputStream { in =>
-      val dechunked = isChunked(message) match {
-        case true  => new ChunkedInputStream(in)
-        case false => new BoundedInputStream(in, getContentLength(message))
+    if (message.body.isKnownEmpty)
+      f(emptyInputStream)
+    else
+      message match {
+        case res: HttpResponse if res.status.isInformational => f(emptyInputStream)
+        case res: HttpResponse if res.status.code == 204     => f(emptyInputStream)
+        case res: HttpResponse if res.status.code == 304     => f(emptyInputStream)
+        case _ =>
+          message.body.withInputStream { in =>
+            val dechunked = isChunked(message) match {
+              case true  => new ChunkedInputStream(in)
+              case false => new BoundedInputStream(in, getContentLength(message))
+            }
+
+            getContentEncoding(message) match {
+              case "gzip"     => f(new GZIPInputStream(dechunked))
+              case "deflate"  => f(new InflaterInputStream(dechunked))
+              case "identity" => f(dechunked)
+              case encoding   => throw new HttpException(s"Unsupported content encoding: $encoding")
+            }
+          }
       }
 
-      getContentEncoding(message) match {
-        case "gzip"     => f(new GZIPInputStream(dechunked))
-        case "deflate"  => f(new InflaterInputStream(dechunked))
-        case "identity" => f(dechunked)
-        case encoding   => throw new HttpException(s"Unsupported content encoding: $encoding")
-      }
-    }
+  private def emptyInputStream: InputStream =
+    new ByteArrayInputStream(Array.empty)
 
   private def isChunked(message: HttpMessage): Boolean =
-    message.hasHeader("Transfer-Encoding")
+    message.transferEncoding.lastOption.exists(_.isChunked)
 
   private def getContentLength(message: HttpMessage): Long =
-    message.getHeaderValue("Content-Length")
-      .map(_.toLong)
-      .orElse(message.body.getLength)
-      .getOrElse(0)
+    message match {
+      case req: HttpRequest =>
+        req.hasTransferEncoding match {
+          case true  => throw new HttpException("Cannot determining body length")
+          case false =>
+            message.getContentLength
+              .orElse(message.body.getLength)
+              .getOrElse(0)
+        }
+
+      case res: HttpResponse =>
+        res.hasTransferEncoding match {
+          case true  => maxLength
+          case false =>
+            message.getContentLength
+              .orElse(message.body.getLength)
+              .getOrElse(0)
+        }
+    }
 
   private def getContentEncoding(message: HttpMessage): String =
-    message.getHeaderValue("Content-Encoding")
-      .map(ListParser.apply)
-      .flatMap(_.headOption)
-      .map(_.toLowerCase)
-      .getOrElse("identity")
+    message.contentEncoding.lastOption.map(_.name).getOrElse("identity")
 }
