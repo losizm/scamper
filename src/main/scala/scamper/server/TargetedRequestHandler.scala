@@ -49,7 +49,7 @@ private object TargetedRequestHandler {
     apply(handler, Paths.get(path), method)
 
   def apply(handler: RequestHandler, path: Path, method: Option[RequestMethod]): TargetedRequestHandler = {
-    if (!path.startsWith("/"))
+    if (!path.startsWith("/") && path != Paths.get("*"))
       throw new IllegalArgumentException(s"Invalid target path: $path")
 
     new TargetedRequestHandler(handler, path.normalize(), method)
@@ -75,7 +75,7 @@ private class TargetedRequestParameters(params: String) extends RequestParameter
 }
 
 private class Target(path: Path) {
-  if (!path.toString.matchesAny("/", """(/:\w+|/[^/:*]+)+""", """(/:\w+|/[^/:*]+)*/\*\w+"""))
+  if (!path.toString.matchesAny("/", """(/:\w+|/[^/:*]+)+""", """(/:\w+|/[^/:*]+)*/\*\w+""", "\\*"))
     throw new IllegalArgumentException(s"Invalid target path: $path")
 
   private val names = asScalaIterator(path.iterator).map(_.toString).toSeq
@@ -93,10 +93,17 @@ private class Target(path: Path) {
     case name => Regex.quote(name)
   }.mkString("/")
 
+  override val toString = path.toString
+
   def getParams(path: Path): String =
     params.map {
       case (name, getValue) => name + "=" + getValue(path).toUrlEncoded("utf-8")
     }.mkString("&")
 
-  def matches(path: Path): Boolean = path.toString.matches(regex)
+
+  def matches(path: Path): Boolean =
+    toString match {
+      case "*" => path == Paths.get("*")
+      case _   => path.toString.matches(regex)
+    }
 }

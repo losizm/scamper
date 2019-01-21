@@ -25,7 +25,7 @@ import scala.util.{ Success, Try }
 import scamper.{ HttpRequest, HttpResponse }
 import scamper.Auxiliary.StringType
 import scamper.ImplicitConverters.fileToEntity
-import scamper.RequestMethods.{ GET, HEAD }
+import scamper.RequestMethods.{ GET, HEAD, OPTIONS }
 import scamper.ResponseStatuses.{ MethodNotAllowed, NotAcceptable, NotModified, Ok }
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
@@ -46,7 +46,8 @@ private class StaticFileServer(baseDirectory: Path, pathPrefix: Path) extends Re
               getResponse(path, mediaType, getIfModifiedSince(req), method == HEAD)
             else
               NotAcceptable()
-          case _ => MethodNotAllowed().withAllow(GET, HEAD)
+          case OPTIONS => Ok().withAllow(GET, HEAD, OPTIONS).withContentLength(0)
+          case _ => MethodNotAllowed().withAllow(GET, HEAD, OPTIONS)
         }
       }.map(Right(_)).getOrElse(Left(req))
 

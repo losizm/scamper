@@ -76,7 +76,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
 
     effectiveRequest = effectiveRequest.withTarget(new URI(target.toURL.getFile))
 
-    if (! effectiveRequest.path.startsWith("/"))
+    if (! effectiveRequest.path.startsWith("/") && effectiveRequest.path != "*")
       effectiveRequest = effectiveRequest.withPath("/" + effectiveRequest.path)
 
     val conn = getClientConnection(

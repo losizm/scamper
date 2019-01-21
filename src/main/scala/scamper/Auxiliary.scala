@@ -307,10 +307,11 @@ private object Auxiliary {
       if (scheme != null) uri.append(scheme).append(":")
       if (authority != null) uri.append("//").append(authority)
 
-      uri.append('/').append(path.dropWhile(_ == '/'))
+      if (path != null && path != "")
+        uri.append('/').append(path.dropWhile(_ == '/'))
 
-      if (query != null && ! query.isEmpty) uri.append('?').append(query)
-      if (fragment != null && ! fragment.isEmpty) uri.append('#').append(fragment)
+      if (query != null && query != "") uri.append('?').append(query)
+      if (fragment != null && fragment != "") uri.append('#').append(fragment)
 
       new URI(uri.toString)
     }

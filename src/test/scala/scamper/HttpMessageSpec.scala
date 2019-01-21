@@ -35,6 +35,12 @@ class HttpMessageSpec extends FlatSpec {
     assert(GET("").path == "/")
     assert(GET("http://localhost:8080").path == "/")
     assert(GET("http://localhost:8080/index.html").withPath("").path == "/")
+
+    assert(OPTIONS("").path == "*")
+    assert(OPTIONS("http://localhost:8080").path == "*")
+    assert(OPTIONS("http://localhost:8080/index.html").withPath("/").path == "/")
+    assert(OPTIONS("http://localhost:8080/index.html").withPath("*").path == "*")
+    assert(OPTIONS("http://localhost:8080/index.html").withPath("").path == "*")
   }
 
   it should "be created with query parameters" in {

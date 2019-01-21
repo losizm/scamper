@@ -105,7 +105,11 @@ object HttpRequest {
 
 private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header], body: Entity) extends HttpRequest {
   lazy val path: String = target.getRawPath match {
-    case ""   => "/"
+    case "" =>
+      if (method.name == "OPTIONS")
+        "*"
+      else
+        "/"
     case path => path
   }
 
@@ -131,7 +135,10 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
     copy(startLine = RequestLine(method, newTarget, version))
 
   def withPath(newPath: String): HttpRequest =
-    withTarget(target.withPath(newPath))
+    newPath match {
+      case "*" if method.name == "OPTIONS" => withTarget(target.withPath(""))
+      case _   => withTarget(target.withPath(newPath))
+    }
 
   def withQueryParams(params: Map[String, Seq[String]]): HttpRequest =
     withTarget(target.withQueryParams(params))

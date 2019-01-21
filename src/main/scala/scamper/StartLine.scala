@@ -57,11 +57,32 @@ object RequestLine {
 
   /** Creates RequestLine with supplied attributes. */
   def apply(method: RequestMethod, target: URI, version: HttpVersion = HttpVersion(1, 1)): RequestLine =
-    RequestLineImpl(method, target, version)
+    RequestLineImpl(method, adjustTarget(target, method.name), version)
 
   /** Destructures RequestLine. */
   def unapply(line: RequestLine): Option[(RequestMethod, URI, HttpVersion)] =
     Some((line.method, line.target, line.version))
+
+  def adjustTarget(target: URI, method: String): URI =
+    target.isAbsolute match {
+      case true  => target
+      case false =>
+        target.toString match {
+          case "" =>
+            if (method == "OPTIONS")
+              new URI("*")
+            else
+              new URI("/")
+
+          case uri if uri.startsWith("/") => target
+          case uri if uri.startsWith("*") => target
+          case uri =>
+            if (method == "OPTIONS" && (uri.startsWith("?") || uri.startsWith("#")))
+              new URI("*" + uri)
+            else
+              new URI("/" + uri)
+        }
+    }
 }
 
 private case class RequestLineImpl(method: RequestMethod, target: URI, version: HttpVersion) extends RequestLine
