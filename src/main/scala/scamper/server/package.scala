@@ -315,7 +315,7 @@ package object server {
      * @return server
      */
     def create(port: Int)(processor: RequestProcessor): HttpServer =
-      create(InetAddress.getLocalHost(), port)(processor)
+      create("0.0.0.0", port)(processor)
 
     /**
      * Creates `HttpServer` at given host and port using default application and
@@ -751,7 +751,7 @@ package object server {
      * @return new server
      */
     def create(port: Int): HttpServer = synchronized {
-      create(InetAddress.getLocalHost(), port)
+      create("0.0.0.0", port)
     }
 
     /**
