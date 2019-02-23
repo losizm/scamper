@@ -92,4 +92,22 @@ trait HttpMessage {
   /** Gets value of all headers with given name. */
   def getHeaderValues(name: String): Seq[String] =
     getHeaders(name).map(_.value)
+
+  /**
+   * Gets value of attribute with given name.
+   *
+   * @param name attribute name
+   */
+  def getAttribute[T](name: String): Option[T] =
+    attributes.get(name).map(_.asInstanceOf[T])
+
+  /**
+   * Gets value of attribute with given name or returns default is attribute not
+   * present.
+   *
+   * @param name attribute name
+   * @param default default value
+   */
+  def getAttributeOrElse[T](name: String, default: => T): T =
+    attributes.get(name).map(_.asInstanceOf[T]).getOrElse(default)
 }

@@ -23,11 +23,9 @@ object Implicits {
   implicit class ServerHttpRequestType(val req: HttpRequest) extends AnyVal {
     /** Gets request parameters. */
     def params(): RequestParameters =
-      req.attributes.get("scamper.server.request.parameters")
-        .map(_.asInstanceOf[Map[String, String]])
-        .orElse(Some(Map.empty[String, String]))
-        .map(new TargetedRequestParameters(_))
-        .get
+      new TargetedRequestParameters(
+        req.getAttributeOrElse("scamper.server.request.parameters", Map.empty[String, String])
+      )
   }
 
   /** Adds server-side extension methods to `HttpMessage`. */
@@ -38,7 +36,6 @@ object Implicits {
      * A transaction identifier is assigned to each incoming request, and the
      * same identifier is assigned to the outgoing response.
      */
-    def transactionId(): String =
-      msg.attributes("scamper.server.transactionId").asInstanceOf[String]
+    def transactionId(): String = msg.getAttributeOrElse("scamper.server.transactionId", "")
   }
 }
