@@ -22,7 +22,12 @@ object Implicits {
   /** Adds extension methods to `HttpRequest`. */
   implicit class ServerHttpRequestType(val req: HttpRequest) extends AnyVal {
     /** Gets server-side request parameters. */
-    def params(): RequestParameters =
-      new TargetedRequestParameters(req.getHeaderValueOrElse("X-Scamper-Request-Parameters", ""))
+    def params(): RequestParameters = {
+      req.attributes.get("scamper.server.request.parameters")
+        .map(_.asInstanceOf[Map[String, String]])
+        .orElse(Some(Map.empty[String, String]))
+        .map(new TargetedRequestParameters(_))
+        .get
+    }
   }
 }

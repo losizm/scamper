@@ -32,7 +32,7 @@ private class TargetedRequestHandler private (handler: RequestHandler, targetPat
     val path = Paths.get(req.path.toUrlDecoded("utf-8")).normalize()
 
     if (isTargeted(req.method) && isTargeted(path))
-      handler(req.withHeader("X-Scamper-Request-Parameters" -> target.getParams(path)))
+      handler(req.withAttribute("scamper.server.request.parameters", target.getParams(path)))
     else
       Left(req)
   }
@@ -56,12 +56,8 @@ private object TargetedRequestHandler {
   }
 }
 
-private class TargetedRequestParameters(params: String) extends RequestParameters {
-  private lazy val toMap: Map[String, String] = params.split("&").map(_.split("=")).collect {
-    case Array(name, value) => name -> value.toUrlDecoded("utf-8")
-  }.toMap
-
-  def getString(name: String): String = toMap.getOrElse(name, throw ParameterNotFound(name))
+private class TargetedRequestParameters(params: Map[String, String]) extends RequestParameters {
+  def getString(name: String): String = params.getOrElse(name, throw ParameterNotFound(name))
 
   def getInt(name: String): Int = {
     val value = getString(name)
@@ -95,10 +91,10 @@ private class Target(path: Path) {
 
   override val toString = path.toString
 
-  def getParams(path: Path): String =
+  def getParams(path: Path): Map[String, String] =
     params.map {
-      case (name, getValue) => name + "=" + getValue(path).toUrlEncoded("utf-8")
-    }.mkString("&")
+      case (name, getValue) => name -> getValue(path)
+    }.toMap
 
 
   def matches(path: Path): Boolean =
