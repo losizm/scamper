@@ -16,6 +16,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 - [Message Body](#Message-Body)
   - [Creating Body](#Creating-Body)
   - [Parsing Body](#Parsing-Body)
+- [Message Attributes](#Message-Attributes)
 - [HTTP Authentication](#HTTP-Authentication)
   - [Basic Authentication](#Basic-Authentication)
   - [Bearer Authentication](#Bearer-Authentication)
@@ -325,6 +326,27 @@ def printUser(message: HttpMessage): Unit = {
   println(s"uid=${user.id}(${user.name})")
 }
 ```
+
+## Message Attributes
+
+Attributes are arbitrary key/value pairs associated with a message.
+
+```scala
+import scala.concurrent.duration.{ Deadline, DurationInt }
+import scamper.ImplicitConverters.stringToUri
+import scamper.{ HttpRequest, HttpResponse }
+import scamper.RequestMethods.GET
+
+def send(req: HttpRequest): HttpResponse = ???
+
+val req = GET("/motd").withAttribute("send-before", Deadline.now + 1.minute)
+
+val res = req.getAttribute[Deadline]("send-before")
+  .filter(_.hasTimeLeft)
+  .map(_ => send(req))
+```
+
+Note attributes are not included in the transmitted message.
 
 ## HTTP Authentication
 
@@ -690,7 +712,7 @@ import scamper.types.ImplicitConverters.stringToLanguageTag
 
 // Translates message body from French (Oui, oui.)
 app.request { req =>
-  val translator: BodyParser[String] = ...
+  val translator: BodyParser[String] = ???
 
   if (req.method == POST && req.contentLanguage.contains("fr"))
     Left(req.withBody(translator(req)).withContentLanguage("en"))
@@ -727,9 +749,7 @@ import scamper.ImplicitConverters.fileToEntity
 import scamper.ResponseStatuses.{ NotFound, Ok }
 
 app.request { req =>
-  def findFile(path: String): Option[File] = {
-    ...
-  }
+  def findFile(path: String): Option[File] = ???
 
   // Always return a response
   findFile(req.path).map(Ok(_)).getOrElse(NotFound())
@@ -771,9 +791,7 @@ app.get("/about") { req =>
 
 // Match POST requests to given path
 app.post("/messages") { req =>
-  def post(message: String): Int = {
-    ...
-  }
+  def post(message: String): Int = ???
 
   implicit val parser = BodyParsers.text()
 
@@ -796,9 +814,7 @@ import scamper.server.Implicits.ServerHttpRequestType
 
 // Match request method and parameterized path
 app.delete("/orders/:id") { req =>
-  def deleteOrder(id: Int): Boolean = {
-    ...
-  }
+  def deleteOrder(id: Int): Boolean = ???
 
   // Get resolved parameter
   val id = req.params.getInt("id")
@@ -811,9 +827,7 @@ app.delete("/orders/:id") { req =>
 
 // Match prefixed path with any request method
 app.get("/archive/*file") { req =>
-  def findFile(path: String): Option[File] = {
-    ...
-  }
+  def findFile(path: String): Option[File] = ???
 
   // Get resolved parameter
   val file = req.params.getString("file")
@@ -834,9 +848,7 @@ import scamper.server.Implicits.ServerHttpRequestType
 
 // Match path with two parameters
 app.post("/translate/:in/to/:out") { req =>
-  def translator(from: String, to: String): BodyParser[String] = {
-    ...
-  }
+  def translator(from: String, to: String): BodyParser[String] = ???
 
   val from = req.params.getString("in")
   val to = req.params.getString("out")
