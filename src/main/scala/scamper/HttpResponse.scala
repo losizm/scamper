@@ -52,7 +52,7 @@ object HttpResponse {
     HttpResponseImpl(StatusLine(status, version), headers, body)
 }
 
-private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity) extends HttpResponse {
+private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity, attributes: Map[String, Any] = Map.empty) extends HttpResponse {
   def withStartLine(newStartLine: StatusLine) =
     copy(startLine = newStartLine)
 
@@ -76,4 +76,13 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
 
   def withBody(newBody: Entity): HttpResponse =
     copy(body = newBody)
+
+  def withAttributes(newAttributes: Map[String, Any]): HttpResponse =
+    copy(attributes = newAttributes)
+
+  def withAttribute(name: String, value: Any): HttpResponse =
+    copy(attributes = attributes + (name -> value))
+
+  def removeAttribute(name: String): HttpResponse =
+    copy(attributes = attributes - name)
 }

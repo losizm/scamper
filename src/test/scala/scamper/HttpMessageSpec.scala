@@ -50,6 +50,7 @@ class HttpMessageSpec extends FlatSpec {
     assert(req.path == "/find")
     assert(req.getQueryParamValue("user").contains("root"))
     assert(req.getQueryParamValue("group").contains("wheel"))
+    assert(req.attributes.isEmpty)
   }
 
   it should "be created with host" in {
@@ -60,6 +61,21 @@ class HttpMessageSpec extends FlatSpec {
     assert(req.getQueryParamValue("user").contains("root"))
     assert(req.getQueryParamValue("group").contains("wheel"))
     assert(req.host == "localhost:8080")
+    assert(req.attributes.isEmpty)
+  }
+
+  it should "be created with attributes" in {
+    val req = GET("/find?user=root&group=wheel").withHost("localhost:8080").withAttribute("id", 123)
+    assert(req.method.name == "GET")
+    assert(req.target.toString == "/find?user=root&group=wheel")
+    assert(req.path == "/find")
+    assert(req.getQueryParamValue("user").contains("root"))
+    assert(req.getQueryParamValue("group").contains("wheel"))
+    assert(req.host == "localhost:8080")
+    assert(req.attributes.size == 1)
+    assert(req.attributes.get("id").contains(123))
+    assert(!req.removeAttribute("id").attributes.contains("id"))
+
   }
 
   it should "get default value if header not found" in {
@@ -84,6 +100,19 @@ class HttpMessageSpec extends FlatSpec {
     val res = SeeOther().withLocation("/find")
     assert(res.status == SeeOther)
     assert(res.location.toString == "/find")
+  }
+
+  it should "be created with attributes" in {
+    var res = SeeOther().withLocation("/find").withAttribute("id", 123).withAttribute("name", "SeeOther")
+    assert(res.status == SeeOther)
+    assert(res.location.toString == "/find")
+    assert(res.attributes.size == 2)
+    assert(res.attributes.get("id").contains(123))
+    assert(res.attributes.get("name").contains("SeeOther"))
+
+    res = res.removeAttribute("name")
+    assert(res.attributes.contains("id"))
+    assert(!res.attributes.contains("name"))
   }
 
   it should "get default value if header not found" in {

@@ -32,6 +32,14 @@ trait HttpMessage {
   /** Gets message body. */
   def body: Entity
 
+  /**
+   * Gets message attributes.
+   *
+   * Attributes are arbitrary values associated with message and are not part of
+   * transmitted message.
+   */
+  def attributes: Map[String, Any]
+
   /** Parses message body as defined type. */
   def as[T](implicit parser: BodyParser[T]): T =
     parser(this)
