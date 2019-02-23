@@ -15,19 +15,30 @@
  */
 package scamper.server
 
-import scamper.HttpRequest
+import scamper.{ HttpMessage, HttpRequest }
 
 /** Includes server-related type classes. */
 object Implicits {
-  /** Adds extension methods to `HttpRequest`. */
+  /** Adds server-side extension methods to `HttpRequest`. */
   implicit class ServerHttpRequestType(val req: HttpRequest) extends AnyVal {
-    /** Gets server-side request parameters. */
-    def params(): RequestParameters = {
+    /** Gets request parameters. */
+    def params(): RequestParameters =
       req.attributes.get("scamper.server.request.parameters")
         .map(_.asInstanceOf[Map[String, String]])
         .orElse(Some(Map.empty[String, String]))
         .map(new TargetedRequestParameters(_))
         .get
-    }
+  }
+
+  /** Adds server-side extension methods to `HttpMessage`. */
+  implicit class ServerHttpMessageType(val msg: HttpMessage) extends AnyVal {
+    /**
+     * Gets transaction identifier.
+     *
+     * A transaction identifier is assigned to each incoming request, and the
+     * same identifier is assigned to the outgoing response.
+     */
+    def transactionId(): String =
+      msg.attributes("scamper.server.transactionId").asInstanceOf[String]
   }
 }

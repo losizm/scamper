@@ -19,7 +19,7 @@ import java.io.{ File, FileWriter, PrintWriter }
 import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException, URI, URISyntaxException }
 import java.time.Instant
 import java.util.concurrent.{ ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadFactory, ThreadPoolExecutor }
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 
 import javax.net.ServerSocketFactory
 import javax.net.ssl.{ SSLException, SSLServerSocketFactory }
@@ -28,14 +28,14 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
-import scamper.{ Entity, Header, HttpException, HttpRequest, HttpResponse, HttpVersion, RequestLine, RequestMethod, ResponseStatus }
+import scamper.{ Base64, Entity, Header, HttpException, HttpRequest, HttpResponse, HttpVersion, RequestLine, RequestMethod, ResponseStatus }
 import scamper.Auxiliary.SocketType
 import scamper.ResponseStatuses.{ BadRequest, InternalServerError, NotFound, RequestTimeout, UriTooLong, RequestHeaderFieldsTooLarge }
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
 import scamper.types.ImplicitConverters.stringToTransferCoding
 
 private object DefaultHttpServer {
-  private val count = new AtomicInteger(0)
+  private val count = new AtomicLong(0)
 
   case class Application(
     poolSize: Int = Runtime.getRuntime.availableProcessors(),
@@ -54,7 +54,7 @@ private object DefaultHttpServer {
     new DefaultHttpServer(count.incrementAndGet(), app)(host, port)
 }
 
-private class DefaultHttpServer private (id: Int, app: DefaultHttpServer.Application)(val host: InetAddress, val port: Int) extends HttpServer {
+private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Application)(val host: InetAddress, val port: Int) extends HttpServer {
   val poolSize = app.poolSize
   val queueSize = app.queueSize
   val headerSize = app.headerSize
@@ -77,7 +77,7 @@ private class DefaultHttpServer private (id: Int, app: DefaultHttpServer.Applica
     }
 
     object ServiceThreadFactory extends ThreadFactory {
-      private val count = new AtomicInteger(0)
+      private val count = new AtomicLong(0)
       def newThread(task: Runnable) = new Thread(threadGroup, task, s"httpserver-$id-service-${count.incrementAndGet()}")
     }
 
@@ -135,6 +135,9 @@ private class DefaultHttpServer private (id: Int, app: DefaultHttpServer.Applica
   private case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
 
   private object Service extends Thread(threadGroup, s"httpserver-$id-service") {
+    private val transactionCount = new AtomicLong(0)
+    private def nextTransactionId: String = Base64.encodeToString(transactionCount.incrementAndGet + ":" + System.currentTimeMillis)
+
     override def run(): Unit =
       while (!isClosed)
         try
@@ -170,37 +173,41 @@ private class DefaultHttpServer private (id: Int, app: DefaultHttpServer.Applica
       }
 
       Future {
+        val transactionId = nextTransactionId
+
         try {
-          log(s"[info] Servicing request from $connection")
+          log(s"[info] Servicing request from $connection as id=$transactionId")
           socket.setSoTimeout(readTimeout)
 
           Try(read())
+            .map(_.withAttribute("scamper.server.transactionId", transactionId))
             .fold(err => Try(onReadError(err)), req => Try(handle(req)))
             .recover(onHandleError)
+            .map(_.withAttribute("scamper.server.transactionId", transactionId))
             .map { res =>
               Try(filter(res))
                 .map { res =>
                   write(res)
-                  log(s"[info] Response sent to $connection")
+                  log(s"[info] Response sent for id=$transactionId")
                   Try(res.body.getInputStream.close()) // Close filtered response body
                 }.recover {
-                  case err => log(s"[error] Error while filtering response to $connection", Some(err))
+                  case err => log(s"[error] Error while filtering response for id=$transactionId", Some(err))
                 }
 
               Try(res.body.getInputStream.close()) // Close unfiltered response body
             }.get
         } catch {
           case err: ResponseAborted =>
-            log(s"[warn] Response aborted while servicing request from $connection", Some(err))
+            log(s"[warn] Response aborted while servicing request for id=$transactionId", Some(err))
 
           case err: SSLException =>
-            log(s"[warn] SSL error while servicing request from $connection", Some(err))
+            log(s"[warn] SSL error while servicing request for id=$transactionId", Some(err))
 
           case err: Throwable =>
-            log(s"[error] Fatal error while servicing request from $connection", Some(err))
+            log(s"[error] Fatal error while servicing request for id=$transactionId", Some(err))
             throw err
         } finally {
-          log(s"[info] Closing connection to $connection")
+          log(s"[info] Closing connection to id=$transactionId")
           Try(socket.close())
         }
       }
