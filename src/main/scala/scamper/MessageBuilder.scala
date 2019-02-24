@@ -73,23 +73,23 @@ trait MessageBuilder[T <: HttpMessage] {
   def withBody(body: Entity): T
 
   /**
-   * Creates message with supplied attributes.
+   * Creates message with supplied attributes. All previous attributes are
+   * removed.
    *
    * @param attributes message attributes
    *
    * @return new message
    */
-  def withAttributes(attributes: Map[String, Any]): T
+  def withAttributes(attributes: (String, Any)*): T
 
   /**
-   * Creates message with supplied attribute.
+   * Creates message with supplied attribute, replacing existing value, if any.
    *
-   * @param name attribute name
-   * @param value attribute value
+   * @param attribute name/value pair
    *
    * @return new message
    */
-  def withAttribute(name: String, value: Any): T
+  def withAttribute(attribute: (String, Any)): T
 
   /**
    * Creates message excluding attribute with given name.

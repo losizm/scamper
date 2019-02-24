@@ -65,19 +65,20 @@ class HttpMessageSpec extends FlatSpec {
   }
 
   it should "be created with attributes" in {
-    val req = GET("/find?user=root&group=wheel").withHost("localhost:8080").withAttribute("id", 123)
-    assert(req.method.name == "GET")
-    assert(req.target.toString == "/find?user=root&group=wheel")
-    assert(req.path == "/find")
-    assert(req.getQueryParamValue("user").contains("root"))
-    assert(req.getQueryParamValue("group").contains("wheel"))
-    assert(req.host == "localhost:8080")
-    assert(req.attributes.size == 1)
-    assert(req.getAttribute[Int]("id").contains(123))
-    assert(req.getAttributeOrElse("abc", "xyz") == "xyz")
-    assert(req.attributes.get("id").contains(123))
-    assert(!req.removeAttribute("id").attributes.contains("id"))
+    var req = GET("/").withAttributes("id" -> 1, "name" -> "request").withAttribute("success" -> true)
+    assert(req.method == GET)
+    assert(req.attributes.size == 3)
+    assert(req.getAttribute[Int]("id").contains(1))
+    assert(req.getAttribute[String]("name").contains("request"))
+    assert(req.getAttributeOrElse("success", false))
+    assert(req.getAttributeOrElse("answer", 45) == 45)
+    assert(req.withAttributes().attributes.size == 0)
 
+    req = req.removeAttribute("name")
+    assert(req.attributes.size == 2)
+    assert(req.attributes.contains("id"))
+    assert(req.attributes.contains("success"))
+    assert(!req.attributes.contains("name"))
   }
 
   it should "get default value if header not found" in {
@@ -105,18 +106,19 @@ class HttpMessageSpec extends FlatSpec {
   }
 
   it should "be created with attributes" in {
-    var res = SeeOther().withLocation("/find").withAttribute("id", 123).withAttribute("name", "SeeOther")
-    assert(res.status == SeeOther)
-    assert(res.location.toString == "/find")
-    assert(res.attributes.size == 2)
-    assert(res.getAttribute[Int]("id").contains(123))
-    assert(res.getAttribute[String]("name").contains("SeeOther"))
-    assert(res.getAttributeOrElse("none", 45) == 45)
-    assert(res.attributes.get("id").contains(123))
-    assert(res.attributes.get("name").contains("SeeOther"))
+    var res = Ok().withAttributes("id" -> 1, "name" -> "response").withAttribute("success" -> true)
+    assert(res.status == Ok)
+    assert(res.attributes.size == 3)
+    assert(res.getAttribute[Int]("id").contains(1))
+    assert(res.getAttribute[String]("name").contains("response"))
+    assert(res.getAttributeOrElse("success", false))
+    assert(res.getAttributeOrElse("answer", 45) == 45)
+    assert(res.withAttributes().attributes.size == 0)
 
     res = res.removeAttribute("name")
+    assert(res.attributes.size == 2)
     assert(res.attributes.contains("id"))
+    assert(res.attributes.contains("success"))
     assert(!res.attributes.contains("name"))
   }
 

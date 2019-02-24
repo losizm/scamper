@@ -164,11 +164,11 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
   def withBody(newBody: Entity): HttpRequest =
     copy(body = newBody)
 
-  def withAttributes(newAttributes: Map[String, Any]): HttpRequest =
-    copy(attributes = newAttributes)
+  def withAttributes(newAttributes: (String, Any)*): HttpRequest =
+    copy(attributes = newAttributes.toMap)
 
-  def withAttribute(name: String, value: Any): HttpRequest =
-    copy(attributes = attributes + (name -> value))
+  def withAttribute(attribute: (String, Any)): HttpRequest =
+    copy(attributes = attributes + attribute)
 
   def removeAttribute(name: String): HttpRequest =
     copy(attributes = attributes - name)

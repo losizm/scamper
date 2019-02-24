@@ -58,7 +58,7 @@ trait HttpMessage {
     headers.find(_.name.equalsIgnoreCase(name))
 
   /**
-   * Gets header with given name or returns default if header not present.
+   * Gets header with given name, or returns default if header not present.
    *
    * If there are multiple headers with name, then first occurrence is
    * retrieved.
@@ -76,7 +76,7 @@ trait HttpMessage {
     getHeader(name).map(_.value)
 
   /**
-   * Gets value of header with given name or returns default if header not
+   * Gets value of header with given name, or returns default if header not
    * present.
    *
    * If there are multiple headers with name, then first occurrence is
@@ -102,12 +102,12 @@ trait HttpMessage {
     attributes.get(name).map(_.asInstanceOf[T])
 
   /**
-   * Gets value of attribute with given name or returns default is attribute not
-   * present.
+   * Gets value of attribute with given name, or returns default if attribute
+   * not present.
    *
    * @param name attribute name
    * @param default default value
    */
   def getAttributeOrElse[T](name: String, default: => T): T =
-    attributes.get(name).map(_.asInstanceOf[T]).getOrElse(default)
+    getAttribute(name).getOrElse(default)
 }

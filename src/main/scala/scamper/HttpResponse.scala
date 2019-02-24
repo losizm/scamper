@@ -77,11 +77,11 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
   def withBody(newBody: Entity): HttpResponse =
     copy(body = newBody)
 
-  def withAttributes(newAttributes: Map[String, Any]): HttpResponse =
-    copy(attributes = newAttributes)
+  def withAttributes(newAttributes: (String, Any)*): HttpResponse =
+    copy(attributes = newAttributes.toMap)
 
-  def withAttribute(name: String, value: Any): HttpResponse =
-    copy(attributes = attributes + (name -> value))
+  def withAttribute(attribute: (String, Any)): HttpResponse =
+    copy(attributes = attributes + attribute)
 
   def removeAttribute(name: String): HttpResponse =
     copy(attributes = attributes - name)
