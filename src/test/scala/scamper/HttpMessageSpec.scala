@@ -73,6 +73,8 @@ class HttpMessageSpec extends FlatSpec {
     assert(req.getQueryParamValue("group").contains("wheel"))
     assert(req.host == "localhost:8080")
     assert(req.attributes.size == 1)
+    assert(req.getAttribute[Int]("id").contains(123))
+    assert(req.getAttributeOrElse("abc", "xyz") == "xyz")
     assert(req.attributes.get("id").contains(123))
     assert(!req.removeAttribute("id").attributes.contains("id"))
 
@@ -107,6 +109,9 @@ class HttpMessageSpec extends FlatSpec {
     assert(res.status == SeeOther)
     assert(res.location.toString == "/find")
     assert(res.attributes.size == 2)
+    assert(res.getAttribute[Int]("id").contains(123))
+    assert(res.getAttribute[String]("name").contains("SeeOther"))
+    assert(res.getAttributeOrElse("none", 45) == 45)
     assert(res.attributes.get("id").contains(123))
     assert(res.attributes.get("name").contains("SeeOther"))
 
