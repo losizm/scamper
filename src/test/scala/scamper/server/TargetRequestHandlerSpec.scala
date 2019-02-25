@@ -32,7 +32,7 @@ class TargetedRequestHandlerSpec extends FlatSpec {
     assert(handler(DELETE("/")).exists(_.status == Ok))
   }
 
-  it should "respond only to request with certain request method" in {
+  it should "respond to request with certain request method" in {
     val handler = TargetedRequestHandler(req => Right(Ok()), "/", Some(PUT))
     assert(handler(GET("/")).isLeft)
     assert(handler(POST("/")).isLeft)
@@ -40,7 +40,7 @@ class TargetedRequestHandlerSpec extends FlatSpec {
     assert(handler(DELETE("/")).isLeft)
   }
 
-  it should "respond only to request with certain path" in {
+  it should "respond to request with certain path" in {
     val handler = TargetedRequestHandler(req => Right(Ok()), "/a/b/c", None)
     assert(handler(GET("/a/b/c")).exists(_.status == Ok))
     assert(handler(POST("/a/b/c")).exists(_.status == Ok))
@@ -48,7 +48,7 @@ class TargetedRequestHandlerSpec extends FlatSpec {
     assert(handler(DELETE("/a/b/c")).exists(_.status == Ok))
   }
 
-  it should "respond only to request with certain path and request method" in {
+  it should "respond to request with certain path and request method" in {
     val handler = TargetedRequestHandler(req => Right(Ok()), "/a/b/c", Some(POST))
     assert(handler(GET("/a/b/c")).isLeft)
     assert(handler(POST("/a/b/c")).exists(_.status == Ok))
