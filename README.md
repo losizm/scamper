@@ -339,7 +339,7 @@ import scamper.RequestMethods.GET
 
 def send(req: HttpRequest): HttpResponse = ???
 
-val req = GET("/motd").withAttribute("send-before", Deadline.now + 1.minute)
+val req = GET("/motd").withAttribute("send-before" -> (Deadline.now + 1.minute))
 
 val res = req.getAttribute[Deadline]("send-before")
   .filter(_.hasTimeLeft)
