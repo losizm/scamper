@@ -32,6 +32,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
     - [Serving Static Files](#Serving-Static-Files)
     - [Serving Static Resources](#Serving-Static-Resources)
     - [Aborting Response](#Aborting-Response)
+  - [Router](#Router)
   - [Response Filters](#Response-Filters)
   - [Securing Server](#Securing-Server)
   - [Creating Server](#Creating-Server)
@@ -826,13 +827,13 @@ app.delete("/orders/:id") { req =>
 }
 
 // Match prefixed path with any request method
-app.get("/archive/*file") { req =>
+app.get("/archive/*path") { req =>
   def findFile(path: String): Option[File] = ???
 
   // Get resolved parameter
-  val file = req.params.getString("file")
+  val path = req.params.getString("path")
 
-  findFile(req.path).map(Ok(_)).getOrElse(NotFound())
+  findFile(path).map(Ok(_)).getOrElse(NotFound())
 }
 ```
 
@@ -899,6 +900,39 @@ app.request { req =>
   if (req.referer.getHost == "www.phishing.com")
     throw ResponseAborted("Not trusted")
   req
+}
+```
+
+### Router
+
+Use `Router` to structure the application routes hierarchically. `Router` works
+in much the same way as `ServerApplication`, except it is configured for request
+handling only. All router paths are relative to a base path.
+
+```scala
+import scamper.ImplicitConverters.stringToEntity
+import scamper.ResponseStatuses.{ NotFound, Ok }
+import scamper.server.HttpServer
+import scamper.server.Implicits.ServerHttpRequestType
+
+val app = HttpServer.app()
+
+// Base path of router is /api
+app.use("/api") { router =>
+  val messages = Map(1 -> "Hello, world!", 2 -> "Goodbye, cruel world!")
+
+  // Will be mapped to /api/messages
+  router.get("/messages") { req =>
+    Ok(messages.mkString("\r\n"))
+  }
+
+  // Will be mapped to /api/messages/:id
+  router.get("/messages/:id") { req =>
+    val id = req.params.getInt("id")
+    messages.get(id)
+     .map(Ok(_))
+     .getOrElse(NotFound())
+  }
 }
 ```
 
