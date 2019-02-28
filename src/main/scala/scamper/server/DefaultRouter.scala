@@ -22,88 +22,88 @@ import scala.util.Try
 import scamper.Auxiliary.StringType
 import scamper.RequestMethod
 
-private class DefaultRouter(app: ServerApplication, basePath: String) extends Router {
-  private val effectiveBasePath = normalize(basePath)
+private class DefaultRouter(app: ServerApplication, path: String) extends Router {
+  private val basePath = normalize(path, true)
 
   def request(handler: RequestHandler): this.type = synchronized {
-    app.request(TargetedRequestHandler(handler, effectiveBasePath + "/*subpath", None))
+    app.request(TargetedRequestHandler(handler, basePath + "/*subpath", None))
     this
   }
 
   def request(filter: RequestFilter): this.type = synchronized {
-    app.request(TargetedRequestHandler(filter, effectiveBasePath + "/*subpath", None))
+    app.request(TargetedRequestHandler(filter, basePath + "/*subpath", None))
     this
   }
 
   def request(processor: RequestProcessor): this.type = synchronized {
-    app.request(effectiveBasePath + "/*subpath")(processor)
+    app.request(basePath + "/*subpath")(processor)
     this
   }
 
   def request(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.request(effectiveBasePath + normalize(path))(processor)
+    app.request(basePath + normalize(path))(processor)
     this
   }
 
   def request(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.request(method, effectiveBasePath + normalize(path))(processor)
+    app.request(method, basePath + normalize(path))(processor)
     this
   }
 
   def head(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.head(effectiveBasePath + normalize(path))(processor)
+    app.head(basePath + normalize(path))(processor)
     this
   }
 
   def get(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.get(effectiveBasePath + normalize(path))(processor)
+    app.get(basePath + normalize(path))(processor)
     this
   }
 
   def post(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.post(effectiveBasePath + normalize(path))(processor)
+    app.post(basePath + normalize(path))(processor)
     this
   }
 
   def put(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.put(effectiveBasePath + normalize(path))(processor)
+    app.put(basePath + normalize(path))(processor)
     this
   }
 
   def patch(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.patch(effectiveBasePath + normalize(path))(processor)
+    app.patch(basePath + normalize(path))(processor)
     this
   }
 
   def delete(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.delete(effectiveBasePath + normalize(path))(processor)
+    app.delete(basePath + normalize(path))(processor)
     this
   }
 
   def options(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.options(effectiveBasePath + normalize(path))(processor)
+    app.options(basePath + normalize(path))(processor)
     this
   }
 
   def trace(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.trace(effectiveBasePath + normalize(path))(processor)
+    app.trace(basePath + normalize(path))(processor)
     this
   }
 
   def files(path: String, baseDirectory: File): this.type = synchronized {
-    app.files(effectiveBasePath + normalize(path), baseDirectory)
+    app.files(basePath + normalize(path), baseDirectory)
     this
   }
 
   def resources(path: String, baseName: String, loader: Option[ClassLoader] = None): this.type = synchronized {
-    app.resources(effectiveBasePath + normalize(path), baseName, loader)
+    app.resources(basePath + normalize(path), baseName, loader)
     this
   }
 
-  private def normalize(path: String): String =
+  private def normalize(path: String, isBase: Boolean = false): String =
     path.toUri.normalize.toString match {
-      case "/.." => throw new IllegalArgumentException("Invalid path: /..")
-      case path if path.startsWith("/../") => throw new IllegalArgumentException(s"Invalid path: $path")
+      case "/" => if (isBase) "/" else ""
+      case path if path.matches("/\\.\\.(/.*)?") => throw new IllegalArgumentException(s"Invalid path: $path")
       case path if path.startsWith("/") => path
       case path => throw new IllegalArgumentException(s"Invalid path: $path")
     }
