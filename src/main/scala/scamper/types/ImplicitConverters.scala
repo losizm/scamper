@@ -36,7 +36,7 @@ object ImplicitConverters {
   implicit val stringToContentCodingRange = (range: String) => ContentCodingRange.parse(range)
 
   /** Converts string to [[ContentDispositionType]]. */
-  implicit val stringToContentDispositionType = (disposition: String) => ContentDispositionType(disposition)
+  implicit val stringToContentDispositionType = (disposition: String) => ContentDispositionType.parse(disposition)
 
   /** Converts string to [[EntityTag]]. */
   implicit val stringToEntityTag = (tag: String) => EntityTag.parse(tag)
