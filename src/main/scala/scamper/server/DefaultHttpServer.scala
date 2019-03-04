@@ -133,10 +133,11 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   }
 
   private case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
+  private case class TransactionId(value: String)
 
   private object Service extends Thread(threadGroup, s"httpserver-$id-service") {
     private val transactionCount = new AtomicLong(0)
-    private def nextTransactionId: String = Base64.encodeToString(transactionCount.incrementAndGet + ":" + System.currentTimeMillis)
+    private def nextTransactionId = TransactionId(Base64.encodeToString(transactionCount.incrementAndGet + ":" + System.currentTimeMillis))
 
     override def run(): Unit =
       while (!isClosed)
@@ -173,41 +174,41 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
       }
 
       Future {
-        val transactionId = nextTransactionId
+        implicit val transactionId = nextTransactionId
 
         try {
-          log(s"[info] Servicing request from $connection as id=$transactionId")
+          log(s"[info] Servicing request from $connection as $transactionId")
           socket.setSoTimeout(readTimeout)
 
           Try(read())
-            .map(_.withAttribute("scamper.server.transactionId", transactionId))
+            .map(addAttributes)
             .fold(err => Try(onReadError(err)), req => Try(handle(req)))
             .recover(onHandleError)
-            .map(_.withAttribute("scamper.server.transactionId", transactionId))
+            .map(addAttributes)
             .map { res =>
               Try(filter(res))
                 .map { res =>
                   write(res)
-                  log(s"[info] Response sent for id=$transactionId")
+                  log(s"[info] Response sent for $transactionId")
                   Try(res.body.getInputStream.close()) // Close filtered response body
                 }.recover {
-                  case err => log(s"[error] Error while filtering response for id=$transactionId", Some(err))
+                  case err => log(s"[error] Error while filtering response for $transactionId", Some(err))
                 }
 
               Try(res.body.getInputStream.close()) // Close unfiltered response body
             }.get
         } catch {
           case err: ResponseAborted =>
-            log(s"[warn] Response aborted while servicing request for id=$transactionId", Some(err))
+            log(s"[warn] Response aborted while servicing request for $transactionId", Some(err))
 
           case err: SSLException =>
-            log(s"[warn] SSL error while servicing request for id=$transactionId", Some(err))
+            log(s"[warn] SSL error while servicing request for $transactionId", Some(err))
 
           case err: Throwable =>
-            log(s"[error] Fatal error while servicing request for id=$transactionId", Some(err))
+            log(s"[error] Fatal error while servicing request for $transactionId", Some(err))
             throw err
         } finally {
-          log(s"[info] Closing connection to id=$transactionId")
+          log(s"[info] Closing connection to $transactionId")
           Try(socket.close())
         }
       }
@@ -319,5 +320,11 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
           case Some(n) => res.withContentLength(n)
           case None    => res.withTransferEncoding("chunked")
         }
+
+    private def addAttributes(req: HttpRequest)(implicit socket: Socket, id: TransactionId): HttpRequest =
+      req.withAttributes("scamper.server.socket" -> socket, "scamper.server.transactionId" -> id.value)
+
+    private def addAttributes(res: HttpResponse)(implicit socket: Socket, id: TransactionId): HttpResponse =
+      res.withAttributes("scamper.server.socket" -> socket, "scamper.server.transactionId" -> id.value)
   }
 }

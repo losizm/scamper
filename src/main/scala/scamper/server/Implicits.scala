@@ -15,7 +15,12 @@
  */
 package scamper.server
 
-import scamper.{ HttpMessage, HttpRequest }
+import java.net.Socket
+
+import scamper.{ HttpMessage, HttpRequest, StatusLine }
+import scamper.ResponseStatuses.Continue
+import scamper.Auxiliary.SocketType
+import scamper.headers.Expect
 
 /** Includes server-related type classes. */
 object Implicits {
@@ -26,6 +31,22 @@ object Implicits {
       new TargetedRequestParameters(
         req.getAttributeOrElse("scamper.server.request.parameters", Map.empty[String, String])
       )
+
+    /**
+     * Send interim `100 Continue` response if request includes `Expect` header
+     * with `100-Continue`.
+     *
+     * @return `true` if response was sent; `false` otherwise
+     */
+    def continue(): Boolean =
+      req.getExpect
+        .filter(_.toLowerCase == "100-continue")
+        .flatMap(_ => req.getAttribute[Socket]("scamper.server.socket"))
+        .map { socket =>
+          socket.writeLine(StatusLine(Continue).toString)
+          socket.writeLine()
+          socket.flush()
+        }.isDefined
   }
 
   /** Adds server-side extension methods to `HttpMessage`. */
