@@ -426,6 +426,16 @@ class ServerApplication {
   }
 
   /**
+   * Sets error handler.
+   *
+   * @return this application
+   */
+  def error(handler: ErrorHandler): this.type = {
+    app = app.copy(errorHandler = Option(handler))
+    this
+  }
+
+  /**
    * Creates `HttpServer` at given port.
    *
    * @param port port number

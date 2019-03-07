@@ -216,6 +216,17 @@ package object server {
         filters.reduceLeft(_ andThen _)
   }
 
+  /** Provides utility for handling error when servicing request. */
+  trait ErrorHandler {
+    /**
+     * Creates response for given error.
+     *
+     * @param request request for which error was generated
+     * @param error error generated when servicing request
+     */
+    def apply(request: HttpRequest, error: Throwable): HttpResponse
+  }
+
   /**
    * Indicates response was aborted.
    *

@@ -47,6 +47,7 @@ private object DefaultHttpServer {
     log: File = new File("server.log").getCanonicalFile(),
     requestHandlers: Seq[RequestHandler] = Nil,
     responseFilters: Seq[ResponseFilter] = Nil,
+    errorHandler: Option[ErrorHandler] = None,
     factory: ServerSocketFactory = ServerSocketFactory.getDefault()
   )
 
@@ -67,13 +68,20 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   private val threadGroup = new ThreadGroup(s"httpserver-$id")
   private val requestHandler = RequestHandler.coalesce(app.requestHandlers : _*)
   private val responseFilter = ResponseFilter.chain(app.responseFilters : _*)
-  private val logger = new PrintWriter(new FileWriter(app.log, true), true)
+  private val errorHandler = app.errorHandler.getOrElse(new ErrorHandler {
+    def apply(req: HttpRequest, err: Throwable): HttpResponse = {
+      val id = req.getAttribute[String]("scamper.server.transactionId").getOrElse("<unknown>")
+      logMessage(s"[error] Error while handling request for $id", Some(err))
+      InternalServerError()
+    }
+  })
+  private val logWriter = new PrintWriter(new FileWriter(log, true), true)
   private val serverSocket = app.factory.createServerSocket()
   private var closed = false
 
   private implicit val executor = ExecutionContext.fromExecutorService {
     object ServiceUnavailableHandler extends RejectedExecutionHandler {
-      def rejectedExecution(task: Runnable, executor: ThreadPoolExecutor): Unit = log("[error] Task rejected")
+      def rejectedExecution(task: Runnable, executor: ThreadPoolExecutor): Unit = logMessage("[error] Task rejected")
     }
 
     object ServiceThreadFactory extends ThreadFactory {
@@ -98,10 +106,10 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
 
   def close(): Unit = synchronized {
     if (!closed) {
-      Try(log("[info] Shutting down server"))
+      Try(logMessage("[info] Shutting down server"))
       Try(serverSocket.close())
       Try(executor.shutdownNow())
-      Try(logger.close())
+      Try(logWriter.close())
       closed = true
     }
   }
@@ -109,35 +117,34 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   override def toString(): String = s"HttpServer(host=$host, port=$port, isSecure=$isSecure, isClosed=$isClosed)"
 
   try {
-    log(s"[info] Starting server at $authority")
-    log(s"[info] Secure: $isSecure")
-    log(s"[info] Log: $log")
-    log(s"[info] Pool Size: $poolSize")
-    log(s"[info] Queue Size: $queueSize")
-    log(s"[info] Read Timeout: $readTimeout")
+    logMessage(s"[info] Starting server at $authority")
+    logMessage(s"[info] Secure: $isSecure")
+    logMessage(s"[info] Log: $log")
+    logMessage(s"[info] Pool Size: $poolSize")
+    logMessage(s"[info] Queue Size: $queueSize")
+    logMessage(s"[info] Read Timeout: $readTimeout")
 
     serverSocket.bind(new InetSocketAddress(host, port), queueSize)
     Service.start()
 
-    log(s"[info] Server running at $authority")
+    logMessage(s"[info] Server running at $authority")
   } catch {
     case e: Exception =>
-      log(s"[error] Failed to start server at $authority", Some(e))
+      logMessage(s"[error] Failed to start server at $authority", Some(e))
       close()
       throw e
   }
 
-  private def log(message: String, error: Option[Throwable] = None): Unit = {
-    logger.printf("%s [%s]%s%n", Instant.now(), authority, message)
-    error.foreach(_.printStackTrace(logger))
+  private def logMessage(message: String, error: Option[Throwable] = None): Unit = {
+    logWriter.printf("%s [%s]%s%n", Instant.now(), authority, message)
+    error.foreach(_.printStackTrace(logWriter))
   }
 
   private case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
-  private case class TransactionId(value: String)
 
   private object Service extends Thread(threadGroup, s"httpserver-$id-service") {
     private val transactionCount = new AtomicLong(0)
-    private def nextTransactionId = TransactionId(Base64.encodeToString(transactionCount.incrementAndGet + ":" + System.currentTimeMillis))
+    private def nextTransactionId = Base64.encodeToString(transactionCount.incrementAndGet + ":" + System.currentTimeMillis)
 
     override def run(): Unit =
       while (!isClosed)
@@ -145,12 +152,12 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
           service(serverSocket.accept())
         catch {
           case e: Exception if serverSocket.isClosed => close() // Ensure server is closed
-          case e: Exception => log(s"[warning] Error while waiting for connection: $e", Some(e))
+          case e: Exception => logMessage(s"[warning] Error while waiting for connection: $e", Some(e))
         }
 
     private def service(implicit socket: Socket): Unit = {
       val connection = socket.getInetAddress.getHostAddress + ":" + socket.getPort
-      log(s"[info] Connection received from $connection")
+      logMessage(s"[info] Connection received from $connection")
 
       def onReadError: PartialFunction[Throwable, HttpResponse] = {
         case ReadError(status)              => status()
@@ -160,55 +167,52 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
         case err: ResponseAborted           => throw err
         case err: SSLException              => throw err
         case err =>
-          log(s"[error] Error while reading request from $connection", Some(err))
+          logMessage(s"[error] Error while reading request from $connection", Some(err))
           InternalServerError()
       }
 
-      def onHandleError: PartialFunction[Throwable, HttpResponse] = {
+      def onHandleError(req: HttpRequest): PartialFunction[Throwable, HttpResponse] = {
         case err: SocketTimeoutException => RequestTimeout()
         case err: ResponseAborted        => throw err
         case err: SSLException           => throw err
-        case err =>
-          log(s"[error] Error while handling request from $connection", Some(err))
-          InternalServerError()
+        case err                         => errorHandler(req, err)
       }
 
       Future {
-        implicit val transactionId = nextTransactionId
+        val transactionId = nextTransactionId
 
         try {
-          log(s"[info] Servicing request from $connection as $transactionId")
+          logMessage(s"[info] Servicing request from $connection as $transactionId")
           socket.setSoTimeout(readTimeout)
 
           Try(read())
-            .map(addAttributes)
-            .fold(err => Try(onReadError(err)), req => Try(handle(req)))
-            .recover(onHandleError)
-            .map(addAttributes)
+            .map(req => addAttributes(req, transactionId))
+            .fold(err => Try(onReadError(err)), req => Try(handle(req)).recover { case err => onHandleError(req)(err) })
+            .map(res => addAttributes(res, transactionId))
             .map { res =>
               Try(filter(res))
                 .map { res =>
                   write(res)
-                  log(s"[info] Response sent for $transactionId")
+                  logMessage(s"[info] Response sent for $transactionId")
                   Try(res.body.getInputStream.close()) // Close filtered response body
                 }.recover {
-                  case err => log(s"[error] Error while filtering response for $transactionId", Some(err))
+                  case err => logMessage(s"[error] Error while filtering response for $transactionId", Some(err))
                 }
 
               Try(res.body.getInputStream.close()) // Close unfiltered response body
             }.get
         } catch {
           case err: ResponseAborted =>
-            log(s"[warn] Response aborted while servicing request for $transactionId", Some(err))
+            logMessage(s"[warn] Response aborted while servicing request for $transactionId", Some(err))
 
           case err: SSLException =>
-            log(s"[warn] SSL error while servicing request for $transactionId", Some(err))
+            logMessage(s"[warn] SSL error while servicing request for $transactionId", Some(err))
 
           case err: Throwable =>
-            log(s"[error] Fatal error while servicing request for $transactionId", Some(err))
+            logMessage(s"[error] Fatal error while servicing request for $transactionId", Some(err))
             throw err
         } finally {
-          log(s"[info] Closing connection to $transactionId")
+          logMessage(s"[info] Closing connection to $transactionId")
           Try(socket.close())
         }
       }
@@ -321,10 +325,10 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
           case None    => res.withTransferEncoding("chunked")
         }
 
-    private def addAttributes(req: HttpRequest)(implicit socket: Socket, id: TransactionId): HttpRequest =
-      req.withAttributes("scamper.server.socket" -> socket, "scamper.server.transactionId" -> id.value)
+    private def addAttributes(req: HttpRequest, id: String)(implicit socket: Socket): HttpRequest =
+      req.withAttributes("scamper.server.socket" -> socket, "scamper.server.transactionId" -> id)
 
-    private def addAttributes(res: HttpResponse)(implicit socket: Socket, id: TransactionId): HttpResponse =
-      res.withAttributes("scamper.server.socket" -> socket, "scamper.server.transactionId" -> id.value)
+    private def addAttributes(res: HttpResponse, id: String)(implicit socket: Socket): HttpResponse =
+      res.withAttributes("scamper.server.socket" -> socket, "scamper.server.transactionId" -> id)
   }
 }
