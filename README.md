@@ -32,6 +32,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
     - [Serving Static Files](#Serving-Static-Files)
     - [Serving Static Resources](#Serving-Static-Resources)
     - [Aborting Response](#Aborting-Response)
+  - [Error Handler](#Error-Handler)
   - [Router](#Router)
   - [Response Filters](#Response-Filters)
   - [Securing Server](#Securing-Server)
@@ -645,6 +646,7 @@ And there are peformance-related settings that can be tweaked as well.
 ```scala
 app.poolSize(10)
 app.queueSize(25)
+app.bufferSize(4096)
 app.readTimeout(3000)
 ```
 
@@ -656,6 +658,9 @@ this limit are discarded_.
 Note **queueSize** is also used to configure server backlog (i.e., backlog of
 incoming connections), so technically there can be up to double **queueSize**
 waiting to be processed if both request queue and server backlog are filled.
+
+The **bufferSize** is the length in bytes of buffer used when reading from and
+writing to sockets.
 
 The **readTimeout** controls how long a read from a socket blocks before it
 times out, whereafter **408 Request Timeout** is sent to client.
@@ -900,6 +905,24 @@ app.request { req =>
   if (req.referer.getHost == "www.phishing.com")
     throw ResponseAborted("Not trusted")
   req
+}
+```
+### Error Handler
+
+You can define an `ErrorHandler` to handle exceptions thrown from your request
+handlers.
+
+```scala
+import scamper.ResponseStatuses.{ BadRequest, InternalServerError }
+
+// Accepts `Throwable` and `HttpRequest`; returns `HttpResponse`
+app.error { (err, req) =>
+  def isClientError(err: Throwable): Boolean = ???
+
+  isClientError(err) match {
+    case true  => BadRequest("Your bad.")
+    case false => InternalServerError("My bad.")
+  }
 }
 ```
 
