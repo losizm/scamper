@@ -54,7 +54,7 @@ import RequestMethods._
  *
  * // Add request handler using path parameter
  * app.put("/data/:id") { req =>
- *   def update(id: Int, data: String): Boolean = ...
+ *   def update(id: Int, data: String): Boolean = ???
  *
  *   implicit val parser = BodyParsers.text()
  *
@@ -221,10 +221,10 @@ package object server {
     /**
      * Creates response for given error.
      *
-     * @param request request for which error was generated
      * @param error error generated when servicing request
+     * @param request request for which error was generated
      */
-    def apply(request: HttpRequest, error: Throwable): HttpResponse
+    def apply(error: Throwable, request: HttpRequest): HttpResponse
   }
 
   /**

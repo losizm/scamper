@@ -69,7 +69,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   private val requestHandler = RequestHandler.coalesce(app.requestHandlers : _*)
   private val responseFilter = ResponseFilter.chain(app.responseFilters : _*)
   private val errorHandler = app.errorHandler.getOrElse(new ErrorHandler {
-    def apply(req: HttpRequest, err: Throwable): HttpResponse = {
+    def apply(err: Throwable, req: HttpRequest): HttpResponse = {
       val id = req.getAttribute[String]("scamper.server.transactionId").getOrElse("<unknown>")
       logMessage(s"[error] Error while handling request for $id", Some(err))
       InternalServerError()
@@ -175,7 +175,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
         case err: SocketTimeoutException => RequestTimeout()
         case err: ResponseAborted        => throw err
         case err: SSLException           => throw err
-        case err                         => errorHandler(req, err)
+        case err                         => errorHandler(err, req)
       }
 
       Future {
