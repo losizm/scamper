@@ -294,6 +294,9 @@ package object server {
     /** Gets queue size. */
     def queueSize: Int
 
+    /** Gets buffer size. */
+    def bufferSize: Int
+
     /** Gets read timeout. */
     def readTimeout: Int
 

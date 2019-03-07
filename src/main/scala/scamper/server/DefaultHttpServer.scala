@@ -40,7 +40,7 @@ private object DefaultHttpServer {
   case class Application(
     poolSize: Int = Runtime.getRuntime.availableProcessors(),
     queueSize: Int = Runtime.getRuntime.availableProcessors() * 4,
-    bufferSize: Int = Try(sys.props("scamper.server.bufferSize").toInt).getOrElse(8192),
+    bufferSize: Int = 8192,
     headerSize: Int = Try(sys.props("scamper.server.headerSize").toInt).getOrElse(1024),
     readTimeout: Int = 5000,
     keepAliveSeconds: Int = Try(sys.props("scamper.server.keepAliveSeconds").toInt).getOrElse(60),
@@ -59,7 +59,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   val poolSize = app.poolSize
   val queueSize = app.queueSize
   val headerSize = app.headerSize
-  val bufferSize = app.bufferSize
+  val bufferSize = app.bufferSize.max(1024)
   val readTimeout = app.readTimeout
   val keepAliveSeconds = app.keepAliveSeconds
   val log = app.log

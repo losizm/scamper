@@ -36,9 +36,11 @@ import scamper.RequestMethods._
  * | ---------   | ----- |
  * | poolSize    | `Runtime.getRuntime().availableProcessors()` |
  * | queueSize   | `Runtime.getRuntime().availableProcessors() * 4` |
+ * | bufferSize  | `8192` |
  * | readTimeout | `5000` |
  * | log         | `new File("server.log")` |
  * | secure      | <em>(Not configured)</em> |
+ * | error       | <em>(Default error handler &ndash; sends `500 Internal Server Error`)</em> |
  * | request     | <em>(Not configured)</em> |
  * | response    | <em>(Not configured)</em> |
  * <br>
@@ -85,6 +87,24 @@ class ServerApplication {
    */
   def queueSize(size: Int): this.type = synchronized {
     app = app.copy(queueSize = size)
+    this
+  }
+
+  /**
+   * Sets buffer size.
+   *
+   * The `bufferSize` specifies in bytes the size of buffer used when reading
+   * from and writing to socket.
+   *
+   * <strong>Note:</strong> `bufferSize` is also used as the optimal chunk size
+   * when writing a response with chunked transfer encoding.
+   *
+   * @param size buffer size (in bytes)
+   *
+   * @return this application
+   */
+  def bufferSize(size: Int): this.type = synchronized {
+    app = app.copy(bufferSize = size)
     this
   }
 
@@ -157,6 +177,18 @@ class ServerApplication {
    */
   def secure(key: File, certificate: File): this.type = synchronized {
     app = app.copy(factory = SecureServerSocketFactory.create(key, certificate))
+    this
+  }
+
+  /**
+   * Sets error handler.
+   *
+   * @param handler error handler
+   *
+   * @return this application
+   */
+  def error(handler: ErrorHandler): this.type = {
+    app = app.copy(errorHandler = Option(handler))
     this
   }
 
@@ -422,16 +454,6 @@ class ServerApplication {
    */
   def response(filter: ResponseFilter): this.type = synchronized {
     app = app.copy(responseFilters = app.responseFilters :+ filter)
-    this
-  }
-
-  /**
-   * Sets error handler.
-   *
-   * @return this application
-   */
-  def error(handler: ErrorHandler): this.type = {
-    app = app.copy(errorHandler = Option(handler))
     this
   }
 
