@@ -18,6 +18,8 @@ package scamper
 import java.io.File
 import java.net.URI
 
+import javax.net.ssl.TrustManager
+
 import cookies.{ PlainCookie, RequestCookies }
 
 import Auxiliary.UriType
@@ -338,17 +340,23 @@ package object client {
     /**
      * Creates `HttpClient` with supplied configuration.
      *
+     * If a trust store is supplied, the trust manager is ignored.
+     *
      * @param bufferSize socket buffer size
      * @param readTimeout socket read timeout
      * @param trustStore trust store used for SSL/TLS <em>(<strong>Note:</strong>
      *   Store type must be JKS.)</em>
+     * @param trustManager trust manager used for SSL/TLS
      */
-    def apply(bufferSize: Int = 8192, readTimeout: Int = 30000, trustStore: Option[File] = None): HttpClient =
+    def apply(bufferSize: Int = 8192, readTimeout: Int = 30000, trustStore: Option[File] = None, trustManager: Option[TrustManager] = None): HttpClient =
       trustStore.map(DefaultHttpClient(bufferSize, readTimeout, _))
+        .orElse(trustManager.map(DefaultHttpClient(bufferSize, readTimeout, _)))
         .getOrElse(DefaultHttpClient(bufferSize, readTimeout))
 
     /**
      * Sends request and passes response to supplied handler.
+     *
+     * If a trust store is supplied, the trust manager is ignored.
      *
      * <strong>Note:</strong> To make effective use of this method, the request
      * target must be an absolute URI.
@@ -358,11 +366,12 @@ package object client {
      * @param readTimeout socket read timeout
      * @param trustStore trust store used for SSL/TLS <em>(<strong>Note:</strong>
      *   Store type must be JKS.)</em>
+     * @param trustManager trust manager used for SSL/TLS
      * @param handler response handler
      *
      * @return value from applied handler
      */
-    def send[T](request: HttpRequest, bufferSize: Int = 8192, readTimeout: Int = 30000, trustStore: Option[File] = None)
-      (handler: ResponseHandler[T]): T = HttpClient(bufferSize, readTimeout, trustStore).send(request)(handler)
+    def send[T](request: HttpRequest, bufferSize: Int = 8192, readTimeout: Int = 30000, trustStore: Option[File] = None, trustManager: Option[TrustManager] = None)(handler: ResponseHandler[T]): T =
+      HttpClient(bufferSize, readTimeout, trustStore, trustManager).send(request)(handler)
   }
 }

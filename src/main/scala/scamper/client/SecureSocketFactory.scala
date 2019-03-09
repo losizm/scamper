@@ -17,7 +17,8 @@ package scamper.client
 
 import java.io.{ File, FileInputStream }
 import java.security.KeyStore
-import javax.net.ssl.{ SSLContext, SSLSocketFactory, TrustManagerFactory }
+
+import javax.net.ssl.{ SSLContext, SSLSocketFactory, TrustManager, TrustManagerFactory }
 
 import scala.util.Try
 
@@ -41,5 +42,11 @@ private object SecureSocketFactory {
     } finally {
       Try(storeStream.close())
     }
+  }
+
+  def create(trustManager: TrustManager): SSLSocketFactory = {
+    val sslContext = SSLContext.getInstance("TLS")
+    sslContext.init(null, Array(trustManager), null)
+    sslContext.getSocketFactory()
   }
 }

@@ -19,7 +19,7 @@ import java.io.File
 import java.net.URI
 
 import javax.net.SocketFactory
-import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.{ SSLSocketFactory, TrustManager }
 
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -39,6 +39,11 @@ private object DefaultHttpClient {
 
   def apply(bufferSize: Int, readTimeout: Int, trustStore: File): DefaultHttpClient = {
     implicit val factory = SecureSocketFactory.create(trustStore)
+    new DefaultHttpClient(bufferSize, readTimeout)
+  }
+
+  def apply(bufferSize: Int, readTimeout: Int, trustManager: TrustManager): DefaultHttpClient = {
+    implicit val factory = SecureSocketFactory.create(trustManager)
     new DefaultHttpClient(bufferSize, readTimeout)
   }
 }
