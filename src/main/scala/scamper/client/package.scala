@@ -341,13 +341,11 @@ package object client {
      * @param bufferSize socket buffer size
      * @param readTimeout socket read timeout
      * @param trustStore trust store used for SSL/TLS <em>(<strong>Note:</strong>
-     *   Type must be JKS.)</em>
+     *   Store type must be JKS.)</em>
      */
-    def apply(bufferSize: Int = 8192, readTimeout: Int = 5000, trustStore: Option[File] = None): HttpClient =
-      trustStore match {
-        case Some(file) => DefaultHttpClient(bufferSize, readTimeout, file)
-        case None       => DefaultHttpClient(bufferSize, readTimeout)
-      }
+    def apply(bufferSize: Int = 8192, readTimeout: Int = 30000, trustStore: Option[File] = None): HttpClient =
+      trustStore.map(DefaultHttpClient(bufferSize, readTimeout, _))
+        .getOrElse(DefaultHttpClient(bufferSize, readTimeout))
 
     /**
      * Sends request and passes response to supplied handler.
@@ -359,12 +357,12 @@ package object client {
      * @param bufferSize socket buffer size
      * @param readTimeout socket read timeout
      * @param trustStore trust store used for SSL/TLS <em>(<strong>Note:</strong>
-     *   Type must be JKS.)</em>
+     *   Store type must be JKS.)</em>
      * @param handler response handler
      *
      * @return value from applied handler
      */
-    def send[T](request: HttpRequest, bufferSize: Int = 8192, readTimeout: Int = 5000, trustStore: Option[File] = None)
+    def send[T](request: HttpRequest, bufferSize: Int = 8192, readTimeout: Int = 30000, trustStore: Option[File] = None)
       (handler: ResponseHandler[T]): T = HttpClient(bufferSize, readTimeout, trustStore).send(request)(handler)
   }
 }
