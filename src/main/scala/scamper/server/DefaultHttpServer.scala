@@ -122,6 +122,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     logMessage(s"[info] Log: $log")
     logMessage(s"[info] Pool Size: $poolSize")
     logMessage(s"[info] Queue Size: $queueSize")
+    logMessage(s"[info] Buffer Size: $bufferSize")
     logMessage(s"[info] Read Timeout: $readTimeout")
 
     serverSocket.bind(new InetSocketAddress(host, port), queueSize)
