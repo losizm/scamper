@@ -110,7 +110,6 @@ package scamper
  * scope.foreach(println)
  *
  * // Print error parameters
- * res.bearer.realm.foreach(println)
  * res.bearer.error.foreach(println)
  * res.bearer.errorDescription.foreach(println)
  * res.bearer.errorUri.foreach(println)
@@ -136,11 +135,11 @@ package object auth {
     /**
      * Gets Authentication-Info header values.
      *
-     * @return header values or empty sequence if Authentication-Info is not present
+     * @return header value or empty map if Authentication-Info is not present
      */
     def authenticationInfo: Map[String, String] = getAuthenticationInfo.getOrElse(Map.empty)
 
-    /** Gets Authentication-Info header values if present. */
+    /** Gets Authentication-Info header value if present. */
     def getAuthenticationInfo: Option[Map[String, String]] =
       response.getHeaderValue("Authentication-Info").map(AuthParams.parse)
 
@@ -315,12 +314,12 @@ package object auth {
     /**
      * Gets Proxy-Authentication-Info header values.
      *
-     * @return header values or empty sequence if Proxy-Authentication-Info is not present
+     * @return header value or empty map if Proxy-Authentication-Info is not present
      */
     def proxyAuthenticationInfo: Map[String, String] =
       getProxyAuthenticationInfo.getOrElse(Map.empty)
 
-    /** Gets Proxy-Authentication-Info header values if present. */
+    /** Gets Proxy-Authentication-Info header value if present. */
     def getProxyAuthenticationInfo: Option[Map[String, String]] =
       response.getHeaderValue("Proxy-Authentication-Info").map(AuthParams.parse)
 
