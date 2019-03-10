@@ -22,7 +22,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
   - [Bearer Authentication](#Bearer-Authentication)
 - [HTTP Client](#HTTP-Client)
   - [Creating Client](#Creating-Client)
-  - [Providing Truststore](#Providing-Truststore)
+  - [Providing Truststore and Trust Manager](#Providing-Truststore-and-Trust-Manager)
 - [HTTP Server](#HTTP-Server)
   - [Server Application](#Server-Application)
   - [Request Handlers](#Request-Handlers)
@@ -225,7 +225,7 @@ _**Note:** Each response cookie is presented in its own **Set-Cookie** header.
 `getHeaderValue()` retrieves first header value only._
 
 ## Message Body
-The message body is represented as `Entity`, which encapsulates content in
+The message body is represented as `Entity`, which provides access to a
 `java.io.InputStream`.
 
 ### Creating Body
@@ -252,7 +252,7 @@ val body = Entity("""
 val res = Ok(body).withContentType("text/html; charset=utf-8")
 ```
 
-Or create the message using file content.
+Or create a message using file content.
 
 ```scala
 import java.io.File
@@ -377,7 +377,7 @@ val req = GET("/dev/projects").withAuthorization(credentials)
 ```
 
 _**Note:** The `Authorization` and `WwwAuthenticate` header classes are for
-authentication between the user agent and origin server. There are other header
+authentication between user agent and origin server. There are other header
 classes available for proxy authentication &ndash; see
 [scaladoc](https://losizm.github.io/scamper/latest/api/scamper/index.html) for
 details._
@@ -454,7 +454,6 @@ val scope: Seq[String] = res.bearer.scope
 scope.foreach(println)
 
 // Print error parameters
-res.bearer.realm.foreach(println)
 res.bearer.error.foreach(println)
 res.bearer.errorDescription.foreach(println)
 res.bearer.errorUri.foreach(println)
@@ -471,7 +470,7 @@ val req = GET("/users").withBearer("R290IDUgb24gaXQhCg==")
 ## HTTP Client
 
 **Scamper** includes `HttpClient`, which is used for sending requests and
-handling their responses.
+handling the responses.
 
 Here we create a POST request and send it over HTTPS. The response handler
 prints a message based on the response status using the filters defined in
@@ -574,7 +573,7 @@ GET("http://localhost:8080/motd")
   .send(res => println(res.as[String])) // Send request and print response
 ```
 
-### Providing Truststore
+### Providing Truststore and Trust Manager
 
 When creating a client, you can supply the truststore used for all requests made
 via HTTPS.
@@ -582,7 +581,6 @@ via HTTPS.
 ```scala
 import scamper.ImplicitConverters.{ stringToEntity, stringToUri }
 import scamper.client.HttpClient
-import scamper.headers.Host
 
 // Create client that will use supplied truststore
 val client = HttpClient(trustStore = Some(new File("/path/to/truststore")))
@@ -590,6 +588,26 @@ val client = HttpClient(trustStore = Some(new File("/path/to/truststore")))
 client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
   if (!res.status.isSuccessful)
     throw new Exception(s"Message not posted: ${res.status.code}")
+}
+```
+
+Or, if greater control is required for verifying SSL connections, you may
+instead provide a trust manager.
+
+```scala
+import javax.net.ssl.TrustManager
+import scamper.ImplicitConverters.stringToUri
+import scamper.client.HttpClient
+
+class SingleSiteTrustManager(address: String) extends TrustManager {
+  ???
+}
+
+// Create client that trusts connections to given IP address
+val client = HttpClient(trustManager = Some(new SingleSiteTrustManager("192.168.0.2")))
+
+client.get("https://192.168.0.2:3000/messages") { res =>
+  ???
 }
 ```
 
@@ -659,8 +677,8 @@ Note **queueSize** is also used to configure server backlog (i.e., backlog of
 incoming connections), so technically there can be up to double **queueSize**
 waiting to be processed if both request queue and server backlog are filled.
 
-The **bufferSize** is the length in bytes of buffer used when reading from and
-writing to sockets.
+The **bufferSize** is the length in bytes of the buffer used when reading from
+and writing to a socket.
 
 The **readTimeout** controls how long a read from a socket blocks before it
 times out, whereafter **408 Request Timeout** is sent to client.
@@ -731,8 +749,7 @@ app.request { req =>
 
 There are two subclasses of `RequestHandler` reserved for instances where the
 handler always returns the same type: `RequestFilter` returns `HttpRequest`, and
-`RequestProcessor` returns `HttpResponse`. These are _filtering_ and
-_processing_, respectively.
+`RequestProcessor` returns `HttpResponse`.
 
 The request logger from earlier is actually a filter and can be rewritten
 expressly as such.
@@ -784,7 +801,7 @@ app.request("/private") { req =>
 ```
 
 And there are methods corresponding to the standard HTTP request methods, so
-processors can be added using any one of these.
+processors can be added using any of these.
 
 ```scala
 import scamper.BodyParsers
@@ -894,7 +911,7 @@ in scaladoc for additional details.)_
 #### Aborting Response
 
 At times, you may wish to omit a response for a particular request. On such
-occassions, you'd throw `ResponseAborted` from within the request handler.
+occassions, you'd throw `ResponseAborted` from the request handler.
 
 ```scala
 import scamper.headers.Referer
@@ -1035,6 +1052,7 @@ printf("Secure: %s%n", server.isSecure)
 printf("Log: %s%n", server.log)
 printf("Pool Size: %d%n", server.poolSize)
 printf("Queue Size: %d%n", server.queueSize)
+printf("Buffer Size: %d%n", server.bufferSize)
 printf("Read Timeout: %d%n", server.readTimeout)
 printf("Closed: %s%n", server.isClosed)
 ```
