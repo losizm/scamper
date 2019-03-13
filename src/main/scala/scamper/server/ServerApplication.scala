@@ -386,60 +386,71 @@ class ServerApplication {
   }
 
   /**
-   * Adds request handler to serve static files from given base directory.
+   * Adds request handler to serve files from given base directory.
    *
-   * Files are mapped from base directory to request path excluding path
-   * prefix.
+   * The mount path is stripped from the request path, and the resulting path is
+   * used to locate files within the base directory.
    *
    * === File Mapping Examples ===
    *
-   * | Path Prefix | Base Directory | Request Path              | Maps to |
+   * | Mount Path  | Base Directory | Request Path              | Maps to |
    * | ----------- | -------------- | ------------------------- | ------- |
    * | /images     | /tmp           | /images/logo.png          | /tmp/logo.png |
    * | /images     | /tmp           | /images/icons/warning.png | /tmp/icons/warning.png |
    * | /images     | /tmp           | /styles/main.css          | <em>Doesn't map to anything</em> |
    *
-   * @param pathPrefix request path prefix
+   * @param mountPath mount path
    * @param baseDirectory base directory from which files are served
    *
    * @return this application
    */
-  def files(pathPrefix: String, baseDirectory: File): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ StaticFileServer(baseDirectory, pathPrefix))
+  def files(mountPath: String, baseDirectory: File): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ StaticFileServer(mountPath, baseDirectory))
     this
   }
 
   /**
-   * Adds request handler to serve static resources from given base name.
+   * Adds request handler to serve resources from given base name.
    *
-   * Resources are mapped from base name to request path excluding path
-   * prefix.
+   * The mount path is stripped from the request path, and the resulting path is
+   * used to locate resources starting at the base name.
    *
    * <strong>Note:</strong> If `loader` is not supplied, then the current
    * thread's context class loader is used.
    *
    * === Resource Mapping Examples ===
    *
-   * | Path Prefix | Base Name | Request Path              | Maps to |
+   * | Mount Path  | Base Name | Request Path              | Maps to |
    * | ----------- | --------- | ------------------------- | ------- |
    * | /images     | assets    | /images/logo.png          | assets/logo.png |
    * | /images     | assets    | /images/icons/warning.png | assets/icons/warning.png |
    * | /images     | assets    | /styles/main.css          | <em>Doesn't map to anything</em> |
    *
-   * @param pathPrefix request path prefix
+   * @param mountPath mount path
    * @param baseName base name from which resources are served
    * @param loader class loader from which resources are loaded
    *
    * @return this application
    */
-  def resources(pathPrefix: String, baseName: String, loader: Option[ClassLoader] = None): this.type = synchronized {
+  def resources(mountPath: String, baseName: String, loader: Option[ClassLoader] = None): this.type = synchronized {
     val effectiveLoader = loader.getOrElse(Thread.currentThread.getContextClassLoader)
-    app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(baseName, pathPrefix, effectiveLoader))
+    app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(mountPath, baseName, effectiveLoader))
     this
   }
 
-  def use[T](basePath: String)(routing: Router => T): this.type = synchronized {
-    routing(new DefaultRouter(this, basePath))
+  /**
+   * Mounts routing application at given path.
+   *
+   * A router is created and passed to the routing application. The routing
+   * application adds request handlers at router subpaths.
+   *
+   * @param path mount path of router
+   * @param routing routing application
+   *
+   * @return this application
+   */
+  def use[T](path: String)(routing: Router => T): this.type = synchronized {
+    routing(new DefaultRouter(this, path))
     this
   }
 

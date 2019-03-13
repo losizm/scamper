@@ -206,48 +206,49 @@ trait Router {
   def trace(path: String)(processor: RequestProcessor): this.type
 
   /**
-   * Adds request handler to serve static files from given base directory.
+   * Adds request handler to serve files from given base directory.
    *
-   * Files are mapped from base directory to router path excluding path
-   * prefix.
+   * The mount path is stripped from the router path, and the resulting path is
+   * used to locate files within the base directory.
    *
    * === File Mapping Examples ===
    *
-   * | Path Prefix | Base Directory | Router Path               | Maps to |
+   * | Mount Path  | Base Directory | Router Path               | Maps to |
    * | ----------- | -------------- | ------------------------- | ------- |
    * | /images     | /tmp           | /images/logo.png          | /tmp/logo.png |
    * | /images     | /tmp           | /images/icons/warning.png | /tmp/icons/warning.png |
    * | /images     | /tmp           | /styles/main.css          | <em>Doesn't map to anything</em> |
    *
-   * @param pathPrefix request path prefix
+   * @param mountPath mount path
    * @param baseDirectory base directory from which files are served
    *
    * @return this router
    */
-  def files(pathPrefix: String, baseDirectory: File): this.type
+  def files(mountPath: String, baseDirectory: File): this.type
 
   /**
-   * Adds request handler to serve static resources from given base name.
+   * Adds request handler to serve resources from given base name.
    *
-   * Resources are mapped from base name to router path excluding path prefix.
+   * The mount path is stripped from the router path, and the resulting path is
+   * used to locate resources starting at the base name.
    *
    * <strong>Note:</strong> If `loader` is not supplied, then the current
    * thread's context class loader is used.
    *
    * === Resource Mapping Examples ===
    *
-   * | Path Prefix | Base Name | Router Path               | Maps to |
+   * | Mount Path  | Base Name | Router Path               | Maps to |
    * | ----------- | --------- | ------------------------- | ------- |
    * | /images     | assets    | /images/logo.png          | assets/logo.png |
    * | /images     | assets    | /images/icons/warning.png | assets/icons/warning.png |
    * | /images     | assets    | /styles/main.css          | <em>Doesn't map to anything</em> |
    *
-   * @param pathPrefix request path prefix
+   * @param mountPath mount path
    * @param baseName base name from which resources are served
    * @param loader class loader from which resources are loaded
    *
    * @return this router
    */
-  def resources(pathPrefix: String, baseName: String, loader: Option[ClassLoader] = None): this.type
+  def resources(mountPath: String, baseName: String, loader: Option[ClassLoader] = None): this.type
 }
 

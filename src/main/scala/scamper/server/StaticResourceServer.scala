@@ -30,7 +30,7 @@ import scamper.ResponseStatuses.{ MethodNotAllowed, NotAcceptable, NotModified, 
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, Date, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 
-private class StaticResourceServer(baseName: Path, pathPrefix: Path, loader: ClassLoader) extends StaticFileServer(baseName, pathPrefix) {
+private class StaticResourceServer(mountPath: Path, baseName: Path, loader: ClassLoader) extends StaticFileServer(mountPath, baseName) {
   override protected def exists(path: Path): Boolean =
     path.startsWith(baseName) &&
       path != Paths.get("") && {
@@ -61,15 +61,15 @@ private class StaticResourceServer(baseName: Path, pathPrefix: Path, loader: Cla
 }
 
 private object StaticResourceServer {
-  def apply(baseName: String, pathPrefix: String, loader: ClassLoader): StaticResourceServer = {
-    val normBaseName = Paths.get(baseName).normalize()
-    val normPathPrefix = Paths.get(pathPrefix).normalize()
+  def apply(mountPath: String, baseName: String, loader: ClassLoader): StaticResourceServer = {
+    val path = Paths.get(mountPath).normalize()
+    val name = Paths.get(baseName).normalize()
 
-    if (normBaseName != Paths.get(""))
-      require(loader.getResource(normBaseName + "/") != null, s"Invalid base name: $baseName")
+    require(mountPath.startsWith("/"), s"Invalid mount path: $mountPath")
 
-    require(pathPrefix.startsWith("/"), s"Invalid path prefix: $pathPrefix")
+    if (name != Paths.get(""))
+      require(loader.getResource(name + "/") != null, s"Invalid base name: $baseName")
 
-    new StaticResourceServer(normBaseName, normPathPrefix, loader)
+    new StaticResourceServer(path, name, loader)
   }
 }

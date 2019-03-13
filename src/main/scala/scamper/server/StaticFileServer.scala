@@ -30,7 +30,7 @@ import scamper.ResponseStatuses.{ MethodNotAllowed, NotAcceptable, NotModified, 
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 
-private class StaticFileServer(baseDirectory: Path, pathPrefix: Path) extends RequestHandler {
+private class StaticFileServer(mountPath: Path, baseDirectory: Path) extends RequestHandler {
   private val `application/octet-stream` = MediaType("application", "octet-stream")
   private val `*/*` = MediaRange("*", "*")
 
@@ -76,8 +76,8 @@ private class StaticFileServer(baseDirectory: Path, pathPrefix: Path) extends Re
   private def getRealPath(path: String): Option[Path] = {
     val toPath = Paths.get(path.toUrlDecoded("utf-8")).normalize()
 
-    toPath.startsWith(pathPrefix) match {
-      case true  => Some(baseDirectory.resolve(pathPrefix.relativize(toPath)))
+    toPath.startsWith(mountPath) match {
+      case true  => Some(baseDirectory.resolve(mountPath.relativize(toPath)))
       case false => None
     }
   }
@@ -107,13 +107,13 @@ private class StaticFileServer(baseDirectory: Path, pathPrefix: Path) extends Re
 }
 
 private object StaticFileServer {
-  def apply(baseDirectory: File, pathPrefix: String): StaticFileServer = {
-    val normBaseDirectory = baseDirectory.toPath.toAbsolutePath.normalize()
-    val normPathPrefix = Paths.get(pathPrefix).normalize()
+  def apply(mountPath: String, baseDirectory: File): StaticFileServer = {
+    val path = Paths.get(mountPath).normalize()
+    val directory = baseDirectory.toPath.toAbsolutePath.normalize()
 
-    require(Files.isDirectory(normBaseDirectory), s"Not a directory ($normBaseDirectory)")
-    require(normPathPrefix.startsWith("/"), s"Invalid path prefix ($normPathPrefix)")
+    require(path.startsWith("/"), s"Invalid mount path ($path)")
+    require(Files.isDirectory(directory), s"Not a directory ($directory)")
 
-    new StaticFileServer(normBaseDirectory, normPathPrefix)
+    new StaticFileServer(path, directory)
   }
 }
