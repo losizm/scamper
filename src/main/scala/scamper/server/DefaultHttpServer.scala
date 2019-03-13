@@ -70,7 +70,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   private val responseFilter = ResponseFilter.chain(app.responseFilters : _*)
   private val errorHandler = app.errorHandler.getOrElse(new ErrorHandler {
     def apply(err: Throwable, req: HttpRequest): HttpResponse = {
-      val id = req.getAttribute[String]("scamper.server.transactionId").getOrElse("<unknown>")
+      val id = req.getAttribute[String]("scamper.server.message.correlate").getOrElse("<unknown>")
       logMessage(s"[error] Error while handling request for $id", Some(err))
       InternalServerError()
     }
@@ -144,8 +144,8 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   private case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
 
   private object Service extends Thread(threadGroup, s"httpserver-$id-service") {
-    private val transactionCount = new AtomicLong(0)
-    private def nextTransactionId = Base64.encodeToString(transactionCount.incrementAndGet + ":" + System.currentTimeMillis)
+    private val requestCount = new AtomicLong(0)
+    private def nextCorrelate = Base64.encodeToString(requestCount.incrementAndGet + ":" + System.currentTimeMillis)
 
     override def run(): Unit =
       while (!isClosed)
@@ -158,7 +158,10 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
 
     private def service(implicit socket: Socket): Unit = {
       val connection = socket.getInetAddress.getHostAddress + ":" + socket.getPort
-      logMessage(s"[info] Connection received from $connection")
+      val correlate = nextCorrelate
+      val tag = connection + " (" + correlate + ")"
+
+      logMessage(s"[info] Connection received from $tag")
 
       def onReadError: PartialFunction[Throwable, HttpResponse] = {
         case ReadError(status)              => status()
@@ -168,7 +171,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
         case err: ResponseAborted           => throw err
         case err: SSLException              => throw err
         case err =>
-          logMessage(s"[error] Error while reading request from $connection", Some(err))
+          logMessage(s"[error] Error while reading request from $tag", Some(err))
           InternalServerError()
       }
 
@@ -180,40 +183,38 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
       }
 
       Future {
-        val transactionId = nextTransactionId
-
         try {
-          logMessage(s"[info] Servicing request from $connection as $transactionId")
+          logMessage(s"[info] Servicing request from $tag")
           socket.setSoTimeout(readTimeout)
 
           Try(read())
-            .map(req => addAttributes(req, transactionId))
+            .map(req => addAttributes(req, correlate))
             .fold(err => Try(onReadError(err)), req => Try(handle(req)).recover { case err => onHandleError(req)(err) })
-            .map(res => addAttributes(res, transactionId))
+            .map(res => addAttributes(res, correlate))
             .map { res =>
               Try(filter(res))
                 .map { res =>
                   write(res)
-                  logMessage(s"[info] Response sent for $transactionId")
+                  logMessage(s"[info] Response sent to $tag")
                   Try(res.body.getInputStream.close()) // Close filtered response body
                 }.recover {
-                  case err => logMessage(s"[error] Error while filtering response for $transactionId", Some(err))
+                  case err => logMessage(s"[error] Error while filtering response to $tag", Some(err))
                 }
 
               Try(res.body.getInputStream.close()) // Close unfiltered response body
             }.get
         } catch {
           case err: ResponseAborted =>
-            logMessage(s"[warn] Response aborted while servicing request for $transactionId", Some(err))
+            logMessage(s"[warn] Response aborted while servicing request from $tag", Some(err))
 
           case err: SSLException =>
-            logMessage(s"[warn] SSL error while servicing request for $transactionId", Some(err))
+            logMessage(s"[warn] SSL error while servicing request from $tag", Some(err))
 
           case err: Throwable =>
-            logMessage(s"[error] Fatal error while servicing request for $transactionId", Some(err))
+            logMessage(s"[error] Fatal error while servicing request from $tag", Some(err))
             throw err
         } finally {
-          logMessage(s"[info] Closing connection to $transactionId")
+          logMessage(s"[info] Closing connection to $tag")
           Try(socket.close())
         }
       }
@@ -327,9 +328,9 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
         }
 
     private def addAttributes(req: HttpRequest, id: String)(implicit socket: Socket): HttpRequest =
-      req.withAttributes("scamper.server.socket" -> socket, "scamper.server.transactionId" -> id)
+      req.withAttributes("scamper.server.message.socket" -> socket, "scamper.server.message.correlate" -> id)
 
     private def addAttributes(res: HttpResponse, id: String)(implicit socket: Socket): HttpResponse =
-      res.withAttributes("scamper.server.socket" -> socket, "scamper.server.transactionId" -> id)
+      res.withAttributes("scamper.server.message.socket" -> socket, "scamper.server.message.correlate" -> id)
   }
 }
