@@ -15,8 +15,10 @@
  */
 package scamper
 
-import java.io.{ ByteArrayInputStream, File, FileInputStream, InputStream }
+import java.io.{ ByteArrayInputStream, File, FileInputStream, InputStream, OutputStream }
 import java.nio.file.Path
+
+import scala.concurrent.ExecutionContext
 
 /** Representation of message body. */
 trait Entity {
@@ -50,6 +52,10 @@ object Entity {
   /** Creates `Entity` with bytes from supplied input stream. */
   def apply(in: InputStream): Entity =
     InputStreamEntity(in)
+
+  /** Creates `Entity` with bytes writing to output stream. */
+  def apply(writer: OutputStream => Unit)(implicit executor: ExecutionContext): Entity =
+    InputStreamEntity(new WriterInputStream(writer))
 
   /** Creates `Entity` with data from supplied file. */
   def apply(file: File): Entity =

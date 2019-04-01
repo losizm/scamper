@@ -15,9 +15,12 @@
  */
 package scamper
 
-import java.io.{ File, InputStream }
+import java.io.{ File, InputStream, OutputStream }
 import java.net.URI
 import java.time.Instant
+
+import scala.concurrent.ExecutionContext
+import scala.language.implicitConversions
 
 /** Includes implicit converter functions. */
 object ImplicitConverters {
@@ -50,6 +53,9 @@ object ImplicitConverters {
 
   /** Converts input stream to [[Entity]]. */
   implicit val inputStreamToEntity = (entity: InputStream) => Entity(entity)
+
+  /** Converts writer to [[Entity]]. */
+  implicit def writerToEntity(writer: OutputStream => Unit)(implicit executor: ExecutionContext) = Entity(writer)
 
   /** Converts string to [[RequestMethod]]. */
   implicit val stringToRequestMethod = (method: String) => RequestMethod(method)
