@@ -80,8 +80,8 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
       statusLine,
       headers.toSeq,
       headOnly match {
-        case true  => Entity.empty()
-        case false => Entity(socket.getInputStream())
+        case true  => Entity.empty
+        case false => Entity.fromInputStream(socket.getInputStream())
       }
     )
   }

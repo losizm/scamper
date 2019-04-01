@@ -50,7 +50,7 @@ trait ResponseStatus {
     code >= 500 && code <= 599
 
   /** Creates `HttpResponse` with supplied body. */
-  def apply(body: Entity = Entity.empty()): HttpResponse =
+  def apply(body: Entity = Entity.empty): HttpResponse =
     HttpResponse(this, Nil, body)
 
   /** Returns formatted response status. */

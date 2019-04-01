@@ -43,54 +43,51 @@ trait Entity {
     f(getInputStream)
 }
 
-/** Provided factory for `Entity`. */
+/** Provides factory for `Entity`. */
 object Entity {
-  /** Creates `Entity` with supplied bytes. */
-  def apply(bytes: Array[Byte]): Entity =
+  /** Creates `Entity` from supplied bytes. */
+  def fromBytes(bytes: Array[Byte]): Entity =
     ByteArrayEntity(bytes)
 
   /** Creates `Entity` with bytes from supplied input stream. */
-  def apply(in: InputStream): Entity =
+  def fromInputStream(in: InputStream): Entity =
     InputStreamEntity(in)
 
-  /** Creates `Entity` with bytes writing to output stream. */
-  def apply(writer: OutputStream => Unit)(implicit executor: ExecutionContext): Entity =
+  /** Creates `Entity` from bytes writing to output stream. */
+  def fromOutputStream(writer: OutputStream => Unit)(implicit executor: ExecutionContext): Entity =
     InputStreamEntity(new WriterInputStream(writer))
 
   /** Creates `Entity` with data from supplied file. */
-  def apply(file: File): Entity =
+  def fromFile(file: File): Entity =
     FileEntity(file)
 
-  /** Creates `Entity` with data at supplied path. */
-  def apply(path: Path): Entity =
-    FileEntity(path.toFile)
+  /** Creates `Entity` from string using specified character encoding. */
+  def fromString(s: String, charset: String = "UTF-8"): Entity =
+    ByteArrayEntity(s.getBytes(charset))
 
   /**
-   * Creates `Entity` with supplied text.
+   * Creates `Entity` from supplied query parameters.
    *
-   * The text is encoded using `UTF-8` charset.
+   * The query parameters are encoded as `application/x-www-form-urlencoded`.
    */
-  def apply(text: String): Entity =
-    ByteArrayEntity(text.getBytes("UTF-8"))
+  def fromQueryParams(params: Map[String, Seq[String]]): Entity =
+    fromString(QueryParams.format(params), "UTF-8")
 
   /**
-   * Creates `Entity` with supplied form data.
+   * Creates `Entity` from supplied query parameters.
    *
-   * The form data is converted to `application/x-www-form-urlencoded` format.
+   * The query parameters are encoded as `application/x-www-form-urlencoded`.
    */
-  def apply(form: Map[String, Seq[String]]): Entity =
-    apply(QueryParams.format(form))
+  def fromQueryParams(params: (String, String)*): Entity =
+    fromString(QueryParams.format(params : _*), "UTF-8")
 
-  /**
-   * Creates `Entity` with supplied form data.
-   *
-   * The form data is converted to `application/x-www-form-urlencoded` format.
-   */
-  def apply(form: (String, String)*): Entity =
-    apply(QueryParams.format(form : _*))
+  /** Returns empty `Entity`. */
+  def empty: Entity = EmptyEntity
+}
 
-  /** Creates empty `Entity`. */
-  def empty(): Entity = ByteArrayEntity(Array.empty)
+private object EmptyEntity extends Entity {
+  val getLength = Some(0L)
+  val getInputStream = new ByteArrayInputStream(Array.empty)
 }
 
 private case class ByteArrayEntity(bytes: Array[Byte]) extends Entity {

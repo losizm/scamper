@@ -43,19 +43,19 @@ object ImplicitConverters {
   implicit val tupleToHeaderWithDateValue = (header: (String, Instant)) => Header(header._1, header._2)
 
   /** Converts byte array to [[Entity]]. */
-  implicit val bytesToEntity = (entity: Array[Byte]) => Entity(entity)
+  implicit val bytesToEntity = (entity: Array[Byte]) => Entity.fromBytes(entity)
 
-  /** Converts string to [[Entity]] where text is UTF-8 encoded. */
-  implicit val stringToEntity = (entity: String) => Entity(entity)
+  /** Converts string to [[Entity]]. */
+  implicit val stringToEntity = (entity: String) => Entity.fromString(entity, "UTF-8")
 
   /** Converts file to [[Entity]]. */
-  implicit val fileToEntity = (entity: File) => Entity(entity)
+  implicit val fileToEntity = (entity: File) => Entity.fromFile(entity)
 
   /** Converts input stream to [[Entity]]. */
-  implicit val inputStreamToEntity = (entity: InputStream) => Entity(entity)
+  implicit val inputStreamToEntity = (entity: InputStream) => Entity.fromInputStream(entity)
 
-  /** Converts writer to [[Entity]]. */
-  implicit def writerToEntity(writer: OutputStream => Unit)(implicit executor: ExecutionContext) = Entity(writer)
+  /** Converts output stream writer to [[Entity]]. */
+  implicit def writerToEntity(writer: OutputStream => Unit)(implicit executor: ExecutionContext) = Entity.fromOutputStream(writer)
 
   /** Converts string to [[RequestMethod]]. */
   implicit val stringToRequestMethod = (method: String) => RequestMethod(method)

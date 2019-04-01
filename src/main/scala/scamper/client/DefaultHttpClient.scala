@@ -98,28 +98,28 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
   }
 
   def get[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
-    (handler: ResponseHandler[T]): T = send(GET, target, headers, cookies, Entity.empty())(handler)
+    (handler: ResponseHandler[T]): T = send(GET, target, headers, cookies, Entity.empty)(handler)
 
-  def post[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+  def post[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T = send(POST, target, headers, cookies, body)(handler)
 
-  def put[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+  def put[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T = send(PUT, target, headers, cookies, body)(handler)
 
-  def patch[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+  def patch[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T = send(PATCH, target, headers, cookies, body)(handler)
 
   def delete[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
-    (handler: ResponseHandler[T]): T = send(DELETE, target, headers, cookies, Entity.empty())(handler)
+    (handler: ResponseHandler[T]): T = send(DELETE, target, headers, cookies, Entity.empty)(handler)
 
   def head[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
-    (handler: ResponseHandler[T]): T = send(HEAD, target, headers, cookies, Entity.empty())(handler)
+    (handler: ResponseHandler[T]): T = send(HEAD, target, headers, cookies, Entity.empty)(handler)
 
-  def options[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+  def options[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T = send(OPTIONS, target, headers, cookies, body)(handler)
 
   def trace[T](target: URI, headers: Seq[Header] = Nil)
-    (handler: ResponseHandler[T]): T = send(TRACE, target, headers, Nil, Entity.empty())(handler)
+    (handler: ResponseHandler[T]): T = send(TRACE, target, headers, Nil, Entity.empty)(handler)
 
   private def send[T](method: RequestMethod, target: URI, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T = {
     val req = cookies match {

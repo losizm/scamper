@@ -236,7 +236,7 @@ package object client {
      *
      * @return value from response handler
      */
-    def post[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+    def post[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
       (handler: ResponseHandler[T]): T
 
     /**
@@ -253,7 +253,7 @@ package object client {
      *
      * @return value from response handler
      */
-    def put[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+    def put[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
       (handler: ResponseHandler[T]): T
 
     /**
@@ -270,7 +270,7 @@ package object client {
      *
      * @return value from response handler
      */
-    def patch[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+    def patch[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
       (handler: ResponseHandler[T]): T
 
     /**
@@ -317,7 +317,7 @@ package object client {
      *
      * @return value from response handler
      */
-    def options[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty())
+    def options[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
       (handler: ResponseHandler[T]): T
 
     /**

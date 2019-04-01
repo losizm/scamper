@@ -28,7 +28,7 @@ import scamper.types.ImplicitConverters._
 class BodyParserSpec extends FlatSpec {
   "BodyParser" should "parse response with text body" in {
     implicit val bodyParser = BodyParsers.text()
-    val body = Entity("Hello, world!")
+    val body = Entity.fromString("Hello, world!")
     val message = Ok(body).withContentType("text/plain").withContentLength(body.getLength.get)
 
     assert(message.status == Ok)
@@ -40,7 +40,7 @@ class BodyParserSpec extends FlatSpec {
 
   it should "parse response with chunked text body" in {
     implicit val bodyParser = BodyParsers.text()
-    val body = Entity("7\r\nHello, \r\n6\r\nworld!\r\n0\r\n")
+    val body = Entity.fromString("7\r\nHello, \r\n6\r\nworld!\r\n0\r\n")
     val message = Ok(body).withContentType("text/plain; charset=utf8").withTransferEncoding("chunked")
 
     assert(message.as[String] == "Hello, world!")
@@ -48,13 +48,13 @@ class BodyParserSpec extends FlatSpec {
 
   it should "detect truncation in chunked text body" in {
     implicit val bodyParser = BodyParsers.text()
-    val message = Ok(Entity("100\r\nHello, world!")).withContentType("text/plain; charset=utf8").withTransferEncoding("chunked")
+    val message = Ok(Entity.fromString("100\r\nHello, world!")).withContentType("text/plain; charset=utf8").withTransferEncoding("chunked")
     assertThrows[EOFException](message.as[String])
   }
 
   it should "parse request with form body" in {
     implicit val bodyParser = BodyParsers.form()
-    val body = Entity("id=0&name=root")
+    val body = Entity.fromQueryParams("id" -> "0", "name" -> "root")
     val request = POST("users").withBody(body).withContentLength(body.getLength.get)
     val form = request.as[Map[String, Seq[String]]]
 
@@ -64,7 +64,7 @@ class BodyParserSpec extends FlatSpec {
 
   it should "not parse response with large body" in {
     implicit val bodyParser = BodyParsers.text(8)
-    val body = Entity("Hello, world!")
+    val body = Entity.fromString("Hello, world!")
     val message = Ok(body).withContentType("text/plain").withContentLength(body.getLength.get)
 
     assertThrows[HttpException](message.as[String])

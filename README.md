@@ -238,7 +238,7 @@ import scamper.ResponseStatuses.Ok
 import scamper.headers.ContentType
 import scamper.types.ImplicitConverters.stringToMediaType
 
-val body = Entity("""
+val body = Entity.fromString("""
 <!DOCTYPE html>
 <html>
   <head>
@@ -261,7 +261,7 @@ import scamper.ResponseStatuses.Ok
 import scamper.headers.ContentType
 import scamper.types.ImplicitConverters.stringToMediaType
 
-val body = Entity(new File("./index.html"))
+val body = Entity.fromFile(new File("./index.html"))
 val res = Ok(body).withContentType("text/html; charset=utf-8")
 ```
 
