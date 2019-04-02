@@ -31,6 +31,8 @@ trait HttpVersion {
 
 /** HttpVersion factory */
 object HttpVersion {
+  private val `HTTP/1.1` = HttpVersionImpl(1, 1)
+
   private val syntax = """(\d+)(?:\.(\d+))?""".r
 
   /** Parses formatted HTTP version. */
@@ -46,7 +48,9 @@ object HttpVersion {
 
   /** Creates HttpVersion with supplied major and minor. */
   def apply(major: Int, minor: Int): HttpVersion =
-    HttpVersionImpl(major, minor)
+    if (major == 1 && minor == 1)
+      `HTTP/1.1`
+    else HttpVersionImpl(major, minor)
 
   /** Destructures HttpVersion. */
   def unapply(version: HttpVersion): Option[(Int, Int)] =
