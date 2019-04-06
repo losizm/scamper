@@ -345,7 +345,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
         else if (enc.isGzip || enc.isDeflate)
           new WriterInputStream({ out =>
             val gzip = if (enc.isGzip) new GZIPOutputStream(out) else new DeflaterOutputStream(out)
-            val buffer = new Array[Byte](8192)
+            val buffer = new Array[Byte](bufferSize)
             var length = 0
 
             while ({ length = in.read(buffer); length != -1 })
