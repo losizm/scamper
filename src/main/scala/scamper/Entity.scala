@@ -87,7 +87,7 @@ object Entity {
 
 private object EmptyEntity extends Entity {
   val getLength = Some(0L)
-  val getInputStream = new ByteArrayInputStream(Array.empty)
+  val getInputStream = EmptyInputStream
 }
 
 private case class ByteArrayEntity(bytes: Array[Byte]) extends Entity {

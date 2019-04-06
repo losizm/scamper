@@ -15,7 +15,7 @@
  */
 package scamper
 
-import java.io.{ ByteArrayInputStream, InputStream }
+import java.io.InputStream
 import java.util.zip.{ GZIPInputStream, InflaterInputStream }
 
 import headers.{ ContentEncoding, ContentLength, TransferEncoding }
@@ -41,12 +41,12 @@ trait BodyParsing {
    */
   def withInputStream[T](message: HttpMessage)(f: InputStream => T): T =
     if (message.body.isKnownEmpty)
-      f(emptyInputStream)
+      f(EmptyInputStream)
     else
       message match {
-        case res: HttpResponse if res.status.isInformational => f(emptyInputStream)
-        case res: HttpResponse if res.status.code == 204     => f(emptyInputStream)
-        case res: HttpResponse if res.status.code == 304     => f(emptyInputStream)
+        case res: HttpResponse if res.status.isInformational => f(EmptyInputStream)
+        case res: HttpResponse if res.status.code == 204     => f(EmptyInputStream)
+        case res: HttpResponse if res.status.code == 304     => f(EmptyInputStream)
         case _ =>
           message.body.withInputStream { in =>
             val transferIn = message.transferEncoding match {
@@ -59,8 +59,6 @@ trait BodyParsing {
             f(contentIn)
           }
       }
-
-  private def emptyInputStream: InputStream = new ByteArrayInputStream(Array.empty)
 
   private def transferInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
     encoding.takeRight(6).foldRight(in) { (encoding, in) =>
