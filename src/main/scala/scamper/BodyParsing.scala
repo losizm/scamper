@@ -19,7 +19,7 @@ import java.io.{ ByteArrayInputStream, InputStream }
 import java.util.zip.{ GZIPInputStream, InflaterInputStream }
 
 import headers.{ ContentEncoding, ContentLength, TransferEncoding }
-import types.TransferCoding
+import types.{ ContentCoding, TransferCoding }
 
 /** A mixin providing access to decoded message body. */
 trait BodyParsing {
@@ -49,25 +49,21 @@ trait BodyParsing {
         case res: HttpResponse if res.status.code == 304     => f(emptyInputStream)
         case _ =>
           message.body.withInputStream { in =>
-            val decoded = message.transferEncoding match {
+            val transferIn = message.transferEncoding match {
               case Nil      => new BoundedInputStream(in, getContentLength(message))
-              case encoding => decodeInputStream(in, encoding)
+              case encoding => transferInputStream(in, encoding)
             }
 
-            getContentEncoding(message) match {
-              case "gzip"     => f(new GZIPInputStream(decoded))
-              case "deflate"  => f(new InflaterInputStream(decoded))
-              case "identity" => f(decoded)
-              case encoding   => throw new HttpException(s"Unsupported content encoding: $encoding")
-            }
+            val contentIn = contentInputStream(transferIn, message.contentEncoding)
+
+            f(contentIn)
           }
       }
 
-  private def emptyInputStream: InputStream =
-    new ByteArrayInputStream(Array.empty)
+  private def emptyInputStream: InputStream = new ByteArrayInputStream(Array.empty)
 
-  private def decodeInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
-    encoding.foldRight(in) { (encoding, in) =>
+  private def transferInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
+    encoding.takeRight(6).foldRight(in) { (encoding, in) =>
       if (encoding.isChunked)
         new ChunkedInputStream(in)
       else if (encoding.isGzip)
@@ -77,9 +73,17 @@ trait BodyParsing {
       else throw new HttpException(s"Unsupported transfer encoding: $encoding")
     }
 
+  private def contentInputStream(in: InputStream, encoding: Seq[ContentCoding]): InputStream =
+    encoding.takeRight(6).foldRight(in) { (encoding, in) =>
+      if (encoding.isGzip)
+        new GZIPInputStream(in)
+      else if (encoding.isDeflate)
+        new InflaterInputStream(in)
+      else if (encoding.isIdentity)
+        in
+      else throw new HttpException(s"Unsupported transfer encoding: $encoding")
+    }
+
   private def getContentLength(message: HttpMessage): Long =
     message.getContentLength.orElse(message.body.getLength).getOrElse(0)
-
-  private def getContentEncoding(message: HttpMessage): String =
-    message.contentEncoding.lastOption.map(_.name).getOrElse("identity")
 }
