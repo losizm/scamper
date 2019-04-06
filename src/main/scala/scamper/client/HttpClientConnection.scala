@@ -15,14 +15,17 @@
  */
 package scamper.client
 
+import java.io.InputStream
 import java.net.Socket
+import java.util.zip.{ DeflaterOutputStream, GZIPOutputStream }
 
 import scala.collection.mutable.ArrayBuffer
 
-import scamper.{ Entity, Header, HttpException, HttpRequest, HttpResponse, StatusLine }
+import scamper.{ Entity, Header, HttpException, HttpRequest, HttpResponse, StatusLine, WriterInputStream }
 import scamper.Auxiliary.SocketType
 import scamper.RequestMethods.HEAD
 import scamper.headers.TransferEncoding
+import scamper.types.TransferCoding
 
 private class HttpClientConnection(socket: Socket) extends AutoCloseable {
   private val buffer = new Array[Byte](8192)
@@ -32,7 +35,7 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
     request.headers.map(_.toString).foreach(socket.writeLine)
     socket.writeLine()
 
-    if (! request.body.isKnownEmpty)
+    if (!request.body.isKnownEmpty)
       writeBody(request)
 
     socket.flush()
@@ -43,7 +46,7 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
 
   private def writeBody(request: HttpRequest): Unit =
     request.getTransferEncoding.map { encoding =>
-      val in = request.body.getInputStream
+      val in = encodeInputStream(request.body.getInputStream, encoding)
       var chunkSize = 0
 
       while ({ chunkSize = in.read(buffer); chunkSize != -1 }) {
@@ -59,6 +62,24 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
       var length = 0
       while ({ length = in.read(buffer); length != -1 })
         socket.write(buffer, 0, length)
+    }
+
+  private def encodeInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
+    encoding.foldLeft(in) { (in, enc) =>
+      if (enc.isChunked)
+        in
+      else if (enc.isGzip || enc.isDeflate)
+        new WriterInputStream({ out =>
+          val gzip = if (enc.isGzip) new GZIPOutputStream(out) else new DeflaterOutputStream(out)
+          val buffer = new Array[Byte](8192)
+          var length = 0
+
+          while ({ length = in.read(buffer); length != -1 })
+            gzip.write(buffer, 0, length)
+          gzip.finish()
+          gzip.flush()
+        })
+      else throw new HttpException(s"Unsupported transfer encoding: $enc")
     }
 
   private def getResponse(headOnly: Boolean): HttpResponse = {

@@ -17,8 +17,12 @@ package scamper
 
 import java.io.File
 import java.net.URI
+import java.util.concurrent.{ ArrayBlockingQueue, ThreadFactory, ThreadPoolExecutor, TimeUnit }
+import java.util.concurrent.atomic.AtomicLong
 
 import javax.net.ssl.TrustManager
+
+import scala.concurrent.ExecutionContext
 
 import cookies.{ PlainCookie, RequestCookies }
 
@@ -373,5 +377,28 @@ package object client {
      */
     def send[T](request: HttpRequest, bufferSize: Int = 8192, readTimeout: Int = 30000, trustStore: Option[File] = None, trustManager: Option[TrustManager] = None)(handler: ResponseHandler[T]): T =
       HttpClient(bufferSize, readTimeout, trustStore, trustManager).send(request)(handler)
+  }
+
+  private[client] lazy implicit val executor = ExecutionContext.fromExecutorService {
+    val threadGroup = new ThreadGroup(s"httpclient-executor")
+    val threadCount = new AtomicLong(0)
+    val maxPoolSize = Runtime.getRuntime.availableProcessors
+
+    object ServiceThreadFactory extends ThreadFactory {
+      def newThread(task: Runnable) = {
+        val thread = new Thread(threadGroup, task, s"httpclient-executor-${threadCount.incrementAndGet()}")
+        thread.setDaemon(true)
+        thread
+      }
+    }
+
+    new ThreadPoolExecutor(
+      2,
+      maxPoolSize,
+      30,
+      TimeUnit.SECONDS,
+      new ArrayBlockingQueue[Runnable](maxPoolSize),
+      ServiceThreadFactory
+    )
   }
 }

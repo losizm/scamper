@@ -165,12 +165,14 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
     request.withBody(Entity.empty).removeContentLength().removeTransferEncoding()
 
   private def toBodyRequest(request: HttpRequest): HttpRequest =
-    request.getContentLength.map {
-      case 0          => request.withBody(Entity.empty).removeTransferEncoding()
-      case n if n > 0 => request.removeTransferEncoding()
-      case length     => throw RequestAborted(s"Invalid Content-Length: $length")
+    request.getTransferEncoding.map { encoding =>
+      request.withTransferEncoding(encoding.filterNot(_.isChunked) :+ TransferCoding("chunked") : _*).removeContentLength
     }.orElse {
-      request.getTransferEncoding.map(_ => request)
+      request.getContentLength.map {
+        case 0          => request.withBody(Entity.empty)
+        case n if n > 0 => request
+        case length     => throw RequestAborted(s"Invalid Content-Length: $length")
+      }
     }.orElse {
       request.body.getLength.collect {
         case 0          => request.withBody(Entity.empty).withContentLength(0)

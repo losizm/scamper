@@ -15,11 +15,12 @@
  */
 package scamper.server
 
-import java.io.{ File, FileWriter, PrintWriter }
+import java.io.{ File, FileWriter, InputStream, PrintWriter }
 import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException, URI, URISyntaxException }
 import java.time.Instant
 import java.util.concurrent.{ ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadFactory, ThreadPoolExecutor }
 import java.util.concurrent.atomic.AtomicLong
+import java.util.zip.{ DeflaterOutputStream, GZIPOutputStream }
 
 import javax.net.ServerSocketFactory
 import javax.net.ssl.{ SSLException, SSLServerSocketFactory }
@@ -28,11 +29,11 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
-import scamper.{ Base64, Entity, Header, HttpException, HttpRequest, HttpResponse, HttpVersion, RequestLine, RequestMethod, ResponseStatus }
+import scamper._
 import scamper.Auxiliary.SocketType
 import scamper.ResponseStatuses.{ BadRequest, InternalServerError, NotFound, RequestTimeout, UriTooLong, RequestHeaderFieldsTooLarge }
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
-import scamper.types.ImplicitConverters.stringToTransferCoding
+import scamper.types.TransferCoding
 
 private object DefaultHttpServer {
   private val count = new AtomicLong(0)
@@ -77,16 +78,41 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   })
   private val logWriter = new PrintWriter(new FileWriter(log, true), true)
   private val serverSocket = app.factory.createServerSocket()
+  private val chunked = TransferCoding("chunked")
   private var closed = false
 
-  private implicit val executor = ExecutionContext.fromExecutorService {
+  private val writerContext = ExecutionContext.fromExecutorService {
+    object ServiceThreadFactory extends ThreadFactory {
+      private val count = new AtomicLong(0)
+      def newThread(task: Runnable) = {
+        val thread = new Thread(threadGroup, task, s"httpserver-$id-writer-${count.incrementAndGet()}")
+        thread.setDaemon(true)
+        thread
+      }
+    }
+
+    new ThreadPoolExecutor(
+      2,
+      poolSize * 2,
+      keepAliveSeconds,
+      TimeUnit.SECONDS,
+      new ArrayBlockingQueue[Runnable](poolSize * 2),
+      ServiceThreadFactory
+    )
+  }
+
+  private implicit val serviceContext = ExecutionContext.fromExecutorService {
     object ServiceUnavailableHandler extends RejectedExecutionHandler {
       def rejectedExecution(task: Runnable, executor: ThreadPoolExecutor): Unit = logMessage("[error] Task rejected")
     }
 
     object ServiceThreadFactory extends ThreadFactory {
       private val count = new AtomicLong(0)
-      def newThread(task: Runnable) = new Thread(threadGroup, task, s"httpserver-$id-service-${count.incrementAndGet()}")
+      def newThread(task: Runnable) = {
+        val thread = new Thread(threadGroup, task, s"httpserver-$id-service-${count.incrementAndGet()}")
+        thread.setDaemon(true)
+        thread
+      }
     }
 
     new ThreadPoolExecutor(
@@ -108,7 +134,8 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     if (!closed) {
       Try(logMessage("[info] Shutting down server"))
       Try(serverSocket.close())
-      Try(executor.shutdownNow())
+      Try(writerContext.shutdownNow())
+      Try(serviceContext.shutdownNow())
       Try(logWriter.close())
       closed = true
     }
@@ -289,20 +316,20 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
       socket.writeLine()
 
       if (!res.body.isKnownEmpty) {
-        val in = res.body.getInputStream
         val buffer = new Array[Byte](bufferSize)
         var length = 0
 
-        res.getTransferEncoding.map { _ =>
+        res.getTransferEncoding.map { encoding =>
+          val in = encode(res.body.getInputStream, encoding)
           while ({ length = in.read(buffer); length != -1 }) {
             socket.writeLine(length.toHexString)
             socket.write(buffer, 0, length)
             socket.writeLine()
           }
-
           socket.writeLine("0")
           socket.writeLine()
         }.getOrElse {
+          val in = res.body.getInputStream
           while ({ length = in.read(buffer); length != -1 })
             socket.write(buffer, 0, length)
         }
@@ -311,6 +338,24 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
       socket.flush()
     }
 
+    private def encode(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
+      encoding.foldLeft(in) { (in, enc) =>
+        if (enc.isChunked)
+          in
+        else if (enc.isGzip || enc.isDeflate)
+          new WriterInputStream({ out =>
+            val gzip = if (enc.isGzip) new GZIPOutputStream(out) else new DeflaterOutputStream(out)
+            val buffer = new Array[Byte](8192)
+            var length = 0
+
+            while ({ length = in.read(buffer); length != -1 })
+              gzip.write(buffer, 0, length)
+            gzip.finish()
+            gzip.flush()
+          })(writerContext)
+        else throw new HttpException(s"Unsupported transfer encoding: $enc")
+      }
+
     private def handle(req: HttpRequest): HttpResponse =
       requestHandler(req).getOrElse(NotFound())
 
@@ -318,13 +363,15 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
       responseFilter(prepare(res).withDate(Instant.now).withConnection("close"))
 
     private def prepare(res: HttpResponse): HttpResponse =
-      if (res.hasTransferEncoding || res.hasContentLength)
+      if (res.hasTransferEncoding)
+        res.withTransferEncoding(res.transferEncoding.filterNot(_.isChunked) :+ chunked : _*).removeContentLength
+      else if (res.hasContentLength)
         res
       else
         res.body.getLength match {
           case Some(0) => res.getContentType.map(_ => res.withContentLength(0)).getOrElse(res)
           case Some(n) => res.withContentLength(n)
-          case None    => res.withTransferEncoding("chunked")
+          case None    => res.withTransferEncoding(chunked)
         }
 
     private def addAttributes(req: HttpRequest, id: String)(implicit socket: Socket): HttpRequest =
