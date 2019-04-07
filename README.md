@@ -1003,9 +1003,9 @@ returning the same response it consumes.
 import scamper.headers.TransferEncoding
 import scamper.types.ImplicitConverters.stringToTransferCoding
 
+// Tell server to compress response
 app.response { res =>
-  res.withBody(new DeflaterInputStream(res.body.getInputStream))
-    .withTransferEncoding("deflate", "chunked")
+  res.withTransferEncoding("gzip", "chunked")
 }
 ```
 

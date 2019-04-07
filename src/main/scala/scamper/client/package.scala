@@ -186,7 +186,8 @@ package object client {
     /**
      * Gets buffer size.
      *
-     * The buffer size is used for setting each socket's buffer size.
+     * The buffer size specifies the size in bytes of the socket's send/receive
+     * buffer.
      */
     def bufferSize: Int
 
@@ -214,8 +215,7 @@ package object client {
     /**
      * Sends GET request and passes response to handler.
      *
-     * <strong>Note:</strong> `target` must be absolute with a scheme of either
-     * `http` or `https`.
+     * <strong>Note:</strong> The target must be an absolute URI.
      *
      * @param target request target
      * @param header request headers
@@ -229,8 +229,7 @@ package object client {
     /**
      * Sends POST request and passes response to handler.
      *
-     * <strong>Note:</strong> `target` must be absolute with a scheme of either
-     * `http` or `https`.
+     * <strong>Note:</strong> The target must be an absolute URI.
      *
      * @param target request target
      * @param header request headers
@@ -246,8 +245,7 @@ package object client {
     /**
      * Sends PUT request and passes response to handler.
      *
-     * <strong>Note:</strong> `target` must be absolute with a scheme of either
-     * `http` or `https`.
+     * <strong>Note:</strong> The target must be an absolute URI.
      *
      * @param target request target
      * @param header request headers
@@ -263,8 +261,7 @@ package object client {
     /**
      * Sends PATCH request and passes response to handler.
      *
-     * <strong>Note:</strong> `target` must be absolute with a scheme of either
-     * `http` or `https`.
+     * <strong>Note:</strong> The target must be an absolute URI.
      *
      * @param target request target
      * @param header request headers
@@ -280,8 +277,7 @@ package object client {
     /**
      * Sends DELETE request and passes response to handler.
      *
-     * <strong>Note:</strong> `target` must be absolute with a scheme of either
-     * `http` or `https`.
+     * <strong>Note:</strong> The target must be an absolute URI.
      *
      * @param target request target
      * @param header request headers
@@ -295,8 +291,7 @@ package object client {
     /**
      * Sends HEAD request and passes response to handler.
      *
-     * <strong>Note:</strong> `target` must be absolute with a scheme of either
-     * `http` or `https`.
+     * <strong>Note:</strong> The target must be an absolute URI.
      *
      * @param target request target
      * @param header request headers
@@ -310,8 +305,7 @@ package object client {
     /**
      * Sends OPTIONS request and passes response to handler.
      *
-     * <strong>Note:</strong> `target` must be absolute with a scheme of either
-     * `http` or `https`.
+     * <strong>Note:</strong> The target must be an absolute URI.
      *
      * @param target request target
      * @param header request headers
@@ -327,8 +321,7 @@ package object client {
     /**
      * Sends TRACE request and passes response to handler.
      *
-     * <strong>Note:</strong> `target` must be absolute with a scheme of either
-     * `http` or `https`.
+     * <strong>Note:</strong> The target must be an absolute URI.
      *
      * @param target request target
      * @param header request headers

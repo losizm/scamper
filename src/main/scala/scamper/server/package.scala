@@ -31,7 +31,6 @@ import RequestMethods._
  *
  * {{{
  * import java.io.File
- * import java.util.zip.DeflaterInputStream
  * import scamper.BodyParsers
  * import scamper.ImplicitConverters.{ stringToEntity, inputStreamToEntity }
  * import scamper.ResponseStatuses.{ NotFound, Ok }
@@ -70,10 +69,9 @@ import RequestMethods._
  * // Serve static files
  * app.files("/main", new File("/path/to/public"))
  *
- * // Add response filter to deflate response
+ * // Tell server to compress response
  * app.response { res =>
- *   res.withBody(new DeflaterInputStream(res.body.getInputStream))
- *     .withTransferEncoding("deflate", "chunked")
+ *   res.withTransferEncoding("gzip", "chunked")
  * }
  *
  * // Create server
