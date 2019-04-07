@@ -66,19 +66,19 @@ object Entity {
     ByteArrayEntity(s.getBytes(charset))
 
   /**
-   * Creates `Entity` from supplied query parameters.
+   * Creates `Entity` from supplied parameters.
    *
-   * The query parameters are encoded as `application/x-www-form-urlencoded`.
+   * The parameters are encoded as `application/x-www-form-urlencoded`.
    */
-  def fromQueryParams(params: Map[String, Seq[String]]): Entity =
+  def fromParams(params: Map[String, Seq[String]]): Entity =
     fromString(QueryParams.format(params), "UTF-8")
 
   /**
-   * Creates `Entity` from supplied query parameters.
+   * Creates `Entity` from supplied parameters.
    *
-   * The query parameters are encoded as `application/x-www-form-urlencoded`.
+   * The parameters are encoded as `application/x-www-form-urlencoded`.
    */
-  def fromQueryParams(params: (String, String)*): Entity =
+  def fromParams(params: (String, String)*): Entity =
     fromString(QueryParams.format(params : _*), "UTF-8")
 
   /** Returns empty `Entity`. */
