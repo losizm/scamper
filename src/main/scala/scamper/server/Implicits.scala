@@ -25,7 +25,7 @@ import scamper.headers.Expect
 
 import Auxiliary.SocketType
 
-/** Includes server-related type classes. */
+/** Includes server-side type classes. */
 object Implicits {
   /** Adds server-side extension methods to `HttpMessage`. */
   implicit class ServerHttpMessageType(val msg: HttpMessage) extends AnyVal {
@@ -64,10 +64,10 @@ object Implicits {
         }.isDefined
   }
 
-  /** Adds extension methods to `HttpResponse`. */
+  /** Adds server-side extension methods to `HttpResponse`. */
   implicit class ServerHttpResponseType(val res: HttpResponse) extends AnyVal {
     /**
-     * Sets `Content-Encoding` header to `gzip` and encodes message body.
+     * Adds `gzip` to `Content-Encoding` header and encodes message body.
      *
      * @param bufferSize size in bytes of buffer used to encode message body
      *
@@ -77,7 +77,7 @@ object Implicits {
       ContentEncoder.gzip(res, bufferSize)(Auxiliary.executor)
 
     /**
-     * Sets `Content-Encoding` header to `deflate` and encodes message body.
+     * Adds `deflate` to `Content-Encoding` header and encodes message body.
      *
      * @param bufferSize size in bytes of buffer used to encode message body
      *
