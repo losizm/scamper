@@ -372,14 +372,14 @@ package object client {
       HttpClient(bufferSize, readTimeout, trustStore, trustManager).send(request)(handler)
   }
 
-  private[client] lazy implicit val executor = ExecutionContext.fromExecutorService {
-    val threadGroup = new ThreadGroup(s"httpclient-executor")
+  private[client] lazy val defaultExecutor = ExecutionContext.fromExecutorService {
+    val threadGroup = new ThreadGroup(s"httpclient-default-executor")
     val threadCount = new AtomicLong(0)
-    val maxPoolSize = Runtime.getRuntime.availableProcessors
+    val maxPoolSize = Runtime.getRuntime.availableProcessors + 2
 
     object ServiceThreadFactory extends ThreadFactory {
       def newThread(task: Runnable) = {
-        val thread = new Thread(threadGroup, task, s"httpclient-executor-${threadCount.incrementAndGet()}")
+        val thread = new Thread(threadGroup, task, s"httpclient-default-executor-${threadCount.incrementAndGet()}")
         thread.setDaemon(true)
         thread
       }
@@ -390,7 +390,7 @@ package object client {
       maxPoolSize,
       30,
       TimeUnit.SECONDS,
-      new ArrayBlockingQueue[Runnable](maxPoolSize),
+      new ArrayBlockingQueue[Runnable](16.max(maxPoolSize * 4)),
       ServiceThreadFactory
     )
   }

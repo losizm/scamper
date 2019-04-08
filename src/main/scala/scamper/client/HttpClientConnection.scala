@@ -17,11 +17,10 @@ package scamper.client
 
 import java.io.InputStream
 import java.net.Socket
-import java.util.zip.{ DeflaterOutputStream, GZIPOutputStream }
 
 import scala.collection.mutable.ArrayBuffer
 
-import scamper.{ Entity, Header, HttpException, HttpRequest, HttpResponse, StatusLine, WriterInputStream }
+import scamper.{ Compressor, Entity, Header, HttpException, HttpRequest, HttpResponse, StatusLine }
 import scamper.Auxiliary.SocketType
 import scamper.RequestMethods.HEAD
 import scamper.headers.TransferEncoding
@@ -66,19 +65,9 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
 
   private def encodeInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
     encoding.foldLeft(in) { (in, enc) =>
-      if (enc.isChunked)
-        in
-      else if (enc.isGzip || enc.isDeflate)
-        new WriterInputStream({ out =>
-          val gzip = if (enc.isGzip) new GZIPOutputStream(out) else new DeflaterOutputStream(out)
-          val buffer = new Array[Byte](8192)
-          var length = 0
-
-          while ({ length = in.read(buffer); length != -1 })
-            gzip.write(buffer, 0, length)
-          gzip.finish()
-          gzip.flush()
-        })
+      if (enc.isChunked) in
+      else if (enc.isGzip) Compressor.gzip(in)(defaultExecutor)
+      else if (enc.isDeflate) Compressor.deflate(in)(defaultExecutor)
       else throw new HttpException(s"Unsupported transfer encoding: $enc")
     }
 

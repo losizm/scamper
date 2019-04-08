@@ -20,14 +20,13 @@ import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException
 import java.time.Instant
 import java.util.concurrent.{ ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadFactory, ThreadPoolExecutor }
 import java.util.concurrent.atomic.AtomicLong
-import java.util.zip.{ DeflaterOutputStream, GZIPOutputStream }
 
 import javax.net.ServerSocketFactory
 import javax.net.ssl.{ SSLException, SSLServerSocketFactory }
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success, Try }
+import scala.util.Try
 
 import scamper._
 import scamper.Auxiliary.SocketType
@@ -340,19 +339,9 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
 
     private def encode(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
       encoding.foldLeft(in) { (in, enc) =>
-        if (enc.isChunked)
-          in
-        else if (enc.isGzip || enc.isDeflate)
-          new WriterInputStream({ out =>
-            val gzip = if (enc.isGzip) new GZIPOutputStream(out) else new DeflaterOutputStream(out)
-            val buffer = new Array[Byte](bufferSize)
-            var length = 0
-
-            while ({ length = in.read(buffer); length != -1 })
-              gzip.write(buffer, 0, length)
-            gzip.finish()
-            gzip.flush()
-          })(writerContext)
+        if (enc.isChunked) in
+        else if (enc.isGzip) Compressor.gzip(in, bufferSize)(writerContext)
+        else if (enc.isDeflate) Compressor.deflate(in, bufferSize)(writerContext)
         else throw new HttpException(s"Unsupported transfer encoding: $enc")
       }
 
