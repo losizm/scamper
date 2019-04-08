@@ -169,7 +169,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
 
   private case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
 
-  private object Service extends Thread(threadGroup, s"httpserver-$id-service") {
+  private object Service extends Thread(threadGroup, s"scamper-server-$id-service") {
     private val requestCount = new AtomicLong(0)
     private def nextCorrelate = Base64.encodeToString(requestCount.incrementAndGet + ":" + System.currentTimeMillis)
 
