@@ -18,8 +18,6 @@ package scamper
 import java.io.{ ByteArrayInputStream, File, FileInputStream, InputStream, OutputStream }
 import java.nio.file.Path
 
-import scala.concurrent.ExecutionContext
-
 /** Representation of message body. */
 trait Entity {
   /** Gets length in bytes if known. */
@@ -54,8 +52,8 @@ object Entity {
     InputStreamEntity(in)
 
   /** Creates `Entity` from bytes writing to output stream. */
-  def fromOutputStream(writer: OutputStream => Unit)(implicit executor: ExecutionContext): Entity =
-    InputStreamEntity(new WriterInputStream(writer))
+  def fromOutputStream(writer: OutputStream => Unit): Entity =
+    InputStreamEntity(new WriterInputStream(writer)(Auxiliary.executor))
 
   /** Creates `Entity` with data from supplied file. */
   def fromFile(file: File): Entity =

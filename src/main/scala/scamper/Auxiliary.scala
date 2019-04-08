@@ -338,7 +338,7 @@ private object Auxiliary {
     new ThreadPoolExecutor(
       2,
       maxPoolSize,
-      30,
+      60,
       TimeUnit.SECONDS,
       new ArrayBlockingQueue[Runnable](maxPoolSize * 4),
       ServiceThreadFactory

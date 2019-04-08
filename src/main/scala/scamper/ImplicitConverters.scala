@@ -19,9 +19,6 @@ import java.io.{ File, InputStream, OutputStream }
 import java.net.URI
 import java.time.Instant
 
-import scala.concurrent.ExecutionContext
-import scala.language.implicitConversions
-
 /** Includes implicit converter functions. */
 object ImplicitConverters {
   /** Converts string to {@code java.net.URI}. */
@@ -55,7 +52,7 @@ object ImplicitConverters {
   implicit val inputStreamToEntity = (entity: InputStream) => Entity.fromInputStream(entity)
 
   /** Converts output stream writer to [[Entity]]. */
-  implicit def writerToEntity(writer: OutputStream => Unit)(implicit executor: ExecutionContext) = Entity.fromOutputStream(writer)
+  implicit val writerToEntity = (writer: OutputStream => Unit) => Entity.fromOutputStream(writer)
 
   /** Converts string to [[RequestMethod]]. */
   implicit val stringToRequestMethod = (method: String) => RequestMethod(method)
