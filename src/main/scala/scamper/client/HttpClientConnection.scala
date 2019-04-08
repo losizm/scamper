@@ -20,11 +20,12 @@ import java.net.Socket
 
 import scala.collection.mutable.ArrayBuffer
 
-import scamper.{ Compressor, Entity, Header, HttpException, HttpRequest, HttpResponse, StatusLine }
-import scamper.Auxiliary.SocketType
+import scamper.{ Auxiliary, Compressor, Entity, Header, HttpException, HttpRequest, HttpResponse, StatusLine }
 import scamper.RequestMethods.HEAD
 import scamper.headers.TransferEncoding
 import scamper.types.TransferCoding
+
+import Auxiliary.SocketType
 
 private class HttpClientConnection(socket: Socket) extends AutoCloseable {
   private val buffer = new Array[Byte](8192)
@@ -66,8 +67,8 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
   private def encodeInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
     encoding.foldLeft(in) { (in, enc) =>
       if (enc.isChunked) in
-      else if (enc.isGzip) Compressor.gzip(in)(defaultExecutor)
-      else if (enc.isDeflate) Compressor.deflate(in)(defaultExecutor)
+      else if (enc.isGzip) Compressor.gzip(in)(Auxiliary.executor)
+      else if (enc.isDeflate) Compressor.deflate(in)(Auxiliary.executor)
       else throw new HttpException(s"Unsupported transfer encoding: $enc")
     }
 

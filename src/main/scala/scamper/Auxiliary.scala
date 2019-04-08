@@ -19,8 +19,11 @@ import java.io.{ File, InputStream, OutputStream }
 import java.net.{ Socket, URI, URLDecoder, URLEncoder }
 import java.nio.file.{ Paths, Path }
 import java.time.Instant
+import java.util.concurrent.{ ArrayBlockingQueue, ThreadFactory, ThreadPoolExecutor, TimeUnit }
+import java.util.concurrent.atomic.AtomicLong
 
 import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.ExecutionContext
 import scala.util.Try
 
 /** Provides auxiliary type classes. */
@@ -315,5 +318,30 @@ private object Auxiliary {
 
       new URI(uri.toString)
     }
+  }
+
+  lazy val executor = ExecutionContext.fromExecutorService {
+    val threadGroup = new ThreadGroup(s"scamper-auxiliary")
+    val threadCount = new AtomicLong(0)
+    val maxPoolSize = Try(sys.props("scamper.auxiliary.executor.maxPoolSize").toInt)
+      .getOrElse(Runtime.getRuntime.availableProcessors + 2)
+      .max(8)
+
+    object ServiceThreadFactory extends ThreadFactory {
+      def newThread(task: Runnable) = {
+        val thread = new Thread(threadGroup, task, s"scamper-auxiliary-${threadCount.incrementAndGet()}")
+        thread.setDaemon(true)
+        thread
+      }
+    }
+
+    new ThreadPoolExecutor(
+      2,
+      maxPoolSize,
+      30,
+      TimeUnit.SECONDS,
+      new ArrayBlockingQueue[Runnable](maxPoolSize * 4),
+      ServiceThreadFactory
+    )
   }
 }

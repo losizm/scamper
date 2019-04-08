@@ -65,7 +65,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   val log = app.log
 
   private val authority = s"${host.getCanonicalHostName}:$port"
-  private val threadGroup = new ThreadGroup(s"httpserver-$id")
+  private val threadGroup = new ThreadGroup(s"scamper-server-$id")
   private val requestHandler = RequestHandler.coalesce(app.requestHandlers : _*)
   private val responseFilter = ResponseFilter.chain(app.responseFilters : _*)
   private val errorHandler = app.errorHandler.getOrElse(new ErrorHandler {
@@ -84,7 +84,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     object ServiceThreadFactory extends ThreadFactory {
       private val count = new AtomicLong(0)
       def newThread(task: Runnable) = {
-        val thread = new Thread(threadGroup, task, s"httpserver-$id-writer-${count.incrementAndGet()}")
+        val thread = new Thread(threadGroup, task, s"scamper-server-$id-writer-${count.incrementAndGet()}")
         thread.setDaemon(true)
         thread
       }
@@ -108,7 +108,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     object ServiceThreadFactory extends ThreadFactory {
       private val count = new AtomicLong(0)
       def newThread(task: Runnable) = {
-        val thread = new Thread(threadGroup, task, s"httpserver-$id-service-${count.incrementAndGet()}")
+        val thread = new Thread(threadGroup, task, s"scamper-server-$id-service-${count.incrementAndGet()}")
         thread.setDaemon(true)
         thread
       }

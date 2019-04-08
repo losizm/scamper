@@ -15,7 +15,7 @@
  */
 package scamper.client
 
-import scamper.{ ContentEncoder, HttpRequest }
+import scamper.{ Auxiliary, ContentEncoder, HttpRequest }
 
 /** Includes client-related type classes. */
 object Implicits {
@@ -42,7 +42,7 @@ object Implicits {
      * @return new request
      */
     def withGzipContentEncoding(bufferSize: Int = 8192): HttpRequest =
-      ContentEncoder.gzip(req, bufferSize)(defaultExecutor)
+      ContentEncoder.gzip(req, bufferSize)(Auxiliary.executor)
 
     /**
      * Sets `Content-Encoding` header to `deflate` and encodes message body.
@@ -52,6 +52,6 @@ object Implicits {
      * @return new request
      */
     def withDeflateContentEncoding(bufferSize: Int = 8192): HttpRequest =
-      ContentEncoder.deflate(req, bufferSize)(defaultExecutor)
+      ContentEncoder.deflate(req, bufferSize)(Auxiliary.executor)
   }
 }
