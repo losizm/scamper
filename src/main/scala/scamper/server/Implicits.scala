@@ -19,7 +19,7 @@ import java.net.Socket
 
 import scala.util.Try
 
-import scamper.{ HttpException, HttpMessage, HttpRequest, StatusLine }
+import scamper.{ ContentEncoder, HttpException, HttpMessage, HttpRequest, HttpResponse, StatusLine }
 import scamper.ResponseStatuses.Continue
 import scamper.Auxiliary.SocketType
 import scamper.headers.Expect
@@ -61,5 +61,28 @@ object Implicits {
           socket.writeLine()
           socket.flush()
         }.isDefined
+  }
+
+  /** Adds extension methods to `HttpResponse`. */
+  implicit class ServerHttpResponseType(val res: HttpResponse) extends AnyVal {
+    /**
+     * Sets `Content-Encoding` header to `gzip` and encodes message body.
+     *
+     * @param bufferSize size in bytes of buffer used to encode message body
+     *
+     * @return new response
+     */
+    def withGzipContentEncoding(bufferSize: Int = 8192): HttpResponse =
+      ContentEncoder.gzip(res, bufferSize)(defaultExecutor)
+
+    /**
+     * Sets `Content-Encoding` header to `deflate` and encodes message body.
+     *
+     * @param bufferSize size in bytes of buffer used to encode message body
+     *
+     * @return new response
+     */
+    def withDeflateContentEncoding(bufferSize: Int = 8192): HttpResponse =
+      ContentEncoder.deflate(res, bufferSize)(defaultExecutor)
   }
 }

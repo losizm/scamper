@@ -17,6 +17,10 @@ package scamper
 
 import java.io.File
 import java.net.InetAddress
+import java.util.concurrent.{ ArrayBlockingQueue, ThreadFactory, ThreadPoolExecutor, TimeUnit }
+import java.util.concurrent.atomic.AtomicLong
+
+import scala.concurrent.ExecutionContext
 
 import RequestMethods._
 
@@ -354,5 +358,28 @@ package object server {
      */
     def create(host: InetAddress, port: Int)(processor: RequestProcessor): HttpServer =
       app().request(processor).create(host, port)
+  }
+
+  private[server] lazy val defaultExecutor = ExecutionContext.fromExecutorService {
+    val threadGroup = new ThreadGroup(s"httpserver-default-executor")
+    val threadCount = new AtomicLong(0)
+    val maxPoolSize = Runtime.getRuntime.availableProcessors + 2
+
+    object ServiceThreadFactory extends ThreadFactory {
+      def newThread(task: Runnable) = {
+        val thread = new Thread(threadGroup, task, s"httpserver-default-executor-${threadCount.incrementAndGet()}")
+        thread.setDaemon(true)
+        thread
+      }
+    }
+
+    new ThreadPoolExecutor(
+      2,
+      maxPoolSize,
+      30,
+      TimeUnit.SECONDS,
+      new ArrayBlockingQueue[Runnable](16.max(maxPoolSize * 4)),
+      ServiceThreadFactory
+    )
   }
 }
