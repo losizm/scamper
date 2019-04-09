@@ -58,5 +58,5 @@ object ImplicitConverters {
   implicit val stringToRequestMethod = (method: String) => RequestMethod(method)
 
   /** Converts int to [[ResponseStatus]]. */
-  implicit val stringToResponseStatus = (statusCode: Int) => ResponseStatus(statusCode)
+  implicit val intToResponseStatus = (statusCode: Int) => ResponseStatus(statusCode)
 }
