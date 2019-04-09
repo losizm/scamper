@@ -63,7 +63,7 @@ object RequestLine {
   def unapply(line: RequestLine): Option[(RequestMethod, URI, HttpVersion)] =
     Some((line.method, line.target, line.version))
 
-  def adjustTarget(target: URI, method: String): URI =
+  private def adjustTarget(target: URI, method: String): URI =
     target.isAbsolute match {
       case true  => target
       case false =>
