@@ -312,14 +312,13 @@ package object server {
     def isClosed: Boolean
   }
 
-  /** Provides factory for configuring and creating `HttpServer`. */
+  /** Provides factory methods for creating `HttpServer`. */
   object HttpServer {
     /** Gets default server application. */
     def app(): ServerApplication = new ServerApplication()
 
     /**
-     * Creates `HttpServer` at given port using default application and supplied
-     * processor.
+     * Creates `HttpServer` at given port using supplied processor.
      *
      * @param port port number
      * @param processor request processor
@@ -330,8 +329,7 @@ package object server {
       create("0.0.0.0", port)(processor)
 
     /**
-     * Creates `HttpServer` at given host and port using default application and
-     * supplied processor.
+     * Creates `HttpServer` at given host and port using supplied processor.
      *
      * @param host host address
      * @param port port number
@@ -343,8 +341,7 @@ package object server {
       create(InetAddress.getByName(host), port)(processor)
 
     /**
-     * Creates `HttpServer` at given host and port using default application and
-     * supplied processor.
+     * Creates `HttpServer` at given host and port using supplied processor.
      *
      * @param host host address
      * @param port port number
@@ -354,5 +351,102 @@ package object server {
      */
     def create(host: InetAddress, port: Int)(processor: RequestProcessor): HttpServer =
       app().request(processor).create(host, port)
+
+    /**
+     * Creates `HttpServer` at given port using supplied processor.
+     *
+     * The server is secured with key and certificate.
+     *
+     * @param port port number
+     * @param key private key
+     * @param certificate public key certificate
+     * @param processor request processor
+     *
+     * @return server
+     */
+    def create(port: Int, key: File, certificate: File)(processor: RequestProcessor): HttpServer =
+      create("0.0.0.0", port, key, certificate)(processor)
+
+    /**
+     * Creates `HttpServer` at given host and port using supplied processor.
+     *
+     * The server is secured with key and certificate.
+     *
+     * @param host host address
+     * @param port port number
+     * @param key private key
+     * @param certificate public key certificate
+     * @param processor request processor
+     *
+     * @return server
+     */
+    def create(host: String, port: Int, key: File, certificate: File)(processor: RequestProcessor): HttpServer =
+      create(InetAddress.getByName(host), port, key, certificate)(processor)
+
+    /**
+     * Creates `HttpServer` at given host and port using supplied processor.
+     *
+     * The server is secured with key and certificate.
+     *
+     * @param host host address
+     * @param port port number
+     * @param key private key
+     * @param certificate public key certificate
+     * @param processor request processor
+     *
+     * @return server
+     */
+    def create(host: InetAddress, port: Int, key: File, certificate: File)(processor: RequestProcessor): HttpServer =
+      app().request(processor).secure(key, certificate).create(host, port)
+
+    /**
+     * Creates `HttpServer` at given port using supplied processor.
+     *
+     * The server is secured with keystore.
+     *
+     * @param port port number
+     * @param keyStore server key store
+     * @param password key store password
+     * @param storeType key store type (i.e., JKS, JCEKS, etc.)
+     * @param processor request processor
+     *
+     * @return server
+     */
+    def create(port: Int, keyStore: File, password: String, storeType: String)(processor: RequestProcessor): HttpServer =
+      create("0.0.0.0", port, keyStore, password, storeType)(processor)
+
+    /**
+     * Creates `HttpServer` at given host and port using supplied processor.
+     *
+     * The server is secured with keystore.
+     *
+     * @param host host address
+     * @param port port number
+     * @param keyStore server key store
+     * @param password key store password
+     * @param storeType key store type (i.e., JKS, JCEKS, etc.)
+     * @param processor request processor
+     *
+     * @return server
+     */
+    def create(host: String, port: Int, keyStore: File, password: String, storeType: String)(processor: RequestProcessor): HttpServer =
+      create(InetAddress.getByName(host), port, keyStore, password, storeType)(processor)
+
+    /**
+     * Creates `HttpServer` at given host and port using supplied processor.
+     *
+     * The server is secured with keystore.
+     *
+     * @param host host address
+     * @param port port number
+     * @param keyStore server key store
+     * @param password key store password
+     * @param storeType key store type (i.e., JKS, JCEKS, etc.)
+     * @param processor request processor
+     *
+     * @return server
+     */
+    def create(host: InetAddress, port: Int, keyStore: File, password: String, storeType: String)(processor: RequestProcessor): HttpServer =
+      app().request(processor).secure(keyStore, password, storeType).create(host, port)
   }
 }
