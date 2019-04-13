@@ -68,8 +68,8 @@ class CookiesSpec extends FlatSpec {
   }
 
   "HttpRequest" should "be created with cookies" in {
-    val req = GET(new URI("/")).withCookies(PlainCookie("a", "123"), PlainCookie("b", "xyz"))
-    assert(req.getHeaderValue("Cookie").contains("a=123; b=xyz"))
+    val req = GET(new URI("/")).withCookies(PlainCookie("a", "123"), PlainCookie("b", "xyz")).withCookie(PlainCookie("c", "XYZ"))
+    assert(req.getHeaderValue("Cookie").contains("a=123; b=xyz; c=XYZ"))
   }
 
   it should "be created without cookies" in {
@@ -78,9 +78,9 @@ class CookiesSpec extends FlatSpec {
   }
 
   "HttpResponse" should "be created with cookies" in {
-    val res = Ok().withCookies(SetCookie("a", "123"), SetCookie("b", "xyz"))
+    val res = Ok().withCookies(SetCookie("a", "123"), SetCookie("b", "xyz")).withCookie(SetCookie("c", "XYZ"))
     assert(res.getHeaderValue("Set-Cookie").contains("a=123"))
-    assert(res.getHeaderValues("Set-Cookie").sameElements(Seq("a=123", "b=xyz")))
+    assert(res.getHeaderValues("Set-Cookie").sameElements(Seq("a=123", "b=xyz", "c=XYZ")))
   }
 
   it should "be created without cookies" in {

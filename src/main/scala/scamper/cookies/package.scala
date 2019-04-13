@@ -235,15 +235,24 @@ package object cookies {
       getCookie(name).map(_.value)
 
     /**
-     * Creates copy of message with new set of cookies.
+     * Creates copy of request with supplied cookie.
+     *
+     * If a cookie already exists with given name, the existing cookie is
+     * replaced with the new cookie.
+     *
+     * @param cookies new cookie
+     */
+    def withCookie(cookie: PlainCookie): HttpRequest =
+      withCookies({ cookies.filterNot(_.name == cookie.name) :+ cookie } : _*)
+
+    /**
+     * Creates copy of request with new set of cookies.
      *
      * @param cookies new set of cookies
      */
     def withCookies(cookies: PlainCookie*): HttpRequest =
       if (cookies.isEmpty) request.removeHeaders("Cookie")
-      else request.withHeaders({
-        request.headers.filterNot(_.name.equalsIgnoreCase("Cookie")) :+ Header("Cookie", cookies.mkString("; "))
-      } : _*)
+      else request.withHeader(Header("Cookie", cookies.mkString("; ")))
   }
 
   /** Provides access to response cookies in `Set-Cookie` headers. */
@@ -269,7 +278,18 @@ package object cookies {
       getCookie(name).map(_.value)
 
     /**
-     * Creates copy of message with new set of cookies.
+     * Creates copy of response with supplied cookie.
+     *
+     * If a cookie already exists with given name, the existing cookie is
+     * replaced with the new cookie.
+     *
+     * @param cookies new cookie
+     */
+    def withCookie(cookie: SetCookie): HttpResponse =
+      withCookies({ cookies.filterNot(_.name == cookie.name) :+ cookie } : _*)
+
+    /**
+     * Creates copy of response with new set of cookies.
      *
      * @param cookies new set of cookies
      */
