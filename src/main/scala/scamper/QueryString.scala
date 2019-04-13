@@ -26,6 +26,9 @@ trait QueryString {
   /** Gets all values of named parameter. */
   def getValues(name: String): Seq[String]
 
+  /** Tests whether query is empty. */
+  def isEmpty: Boolean
+
   /** Gets query string as mapped parameters. */
   def toMap: Map[String, Seq[String]]
 
@@ -88,6 +91,7 @@ object QueryString {
 private object EmptyQueryString extends QueryString {
   def getValue(name: String) = None
   def getValues(name: String) = Nil
+  val isEmpty = true
   val toMap = Map.empty
   val toSimpleMap = Map.empty
 }
@@ -95,5 +99,6 @@ private object EmptyQueryString extends QueryString {
 private case class QueryStringImpl(toMap: Map[String, Seq[String]]) extends QueryString {
   def getValue(name: String) = toMap.get(name).flatMap(_.headOption)
   def getValues(name: String) = toMap.get(name).getOrElse(Nil)
+  def isEmpty = toMap.isEmpty
   lazy val toSimpleMap = toMap.collect { case (name, Seq(value, _*)) => name -> value }.toMap
 }
