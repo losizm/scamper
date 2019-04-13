@@ -35,19 +35,8 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
   /** Gets target path. */
   def path: String
 
-  /** Gets query parameters. */
-  def queryParams: Map[String, Seq[String]]
-
-  /**
-   * Gets value for named query parameter.
-   *
-   * If there are multiple parameters with given name, then value of first
-   * occurrence is retrieved.
-   */
-  def getQueryParamValue(name: String): Option[String]
-
-  /** Gets all values for named query parameter. */
-  def getQueryParamValues(name: String): Seq[String]
+  /** Gets query string. */
+  def query: QueryString
 
   /**
    * Creates request with new method.
@@ -71,18 +60,25 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
   def withPath(path: String): HttpRequest
 
   /**
-   * Creates request with new query parameters.
+   * Creates request with new query.
    *
    * @return new request
    */
-  def withQueryParams(params: Map[String, Seq[String]]): HttpRequest
+  def withQuery(query: QueryString): HttpRequest
 
   /**
    * Creates request with new query parameters.
    *
    * @return new request
    */
-  def withQueryParams(params: (String, String)*): HttpRequest
+  def withQuery(params: Map[String, Seq[String]]): HttpRequest
+
+  /**
+   * Creates request with new query parameters.
+   *
+   * @return new request
+   */
+  def withQuery(params: (String, String)*): HttpRequest
 
   /**
    * Creates request with new HTTP version.
@@ -113,17 +109,11 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
     case path => path
   }
 
-  lazy val queryParams: Map[String, Seq[String]] =
+  lazy val query: QueryString =
     target.getRawQuery match {
-      case null  => Map.empty
-      case query => QueryParams.parse(query)
+      case null  => QueryString.empty
+      case query => QueryString(query)
     }
-
-  def getQueryParamValue(name: String): Option[String] =
-    queryParams.get(name).flatMap(_.headOption)
-
-  def getQueryParamValues(name: String): Seq[String] =
-    queryParams.getOrElse(name, Nil)
 
   def withStartLine(newStartLine: RequestLine): HttpRequest =
     copy(startLine = newStartLine)
@@ -140,11 +130,14 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
       case _   => withTarget(target.withPath(newPath))
     }
 
-  def withQueryParams(params: Map[String, Seq[String]]): HttpRequest =
-    withTarget(target.withQueryParams(params))
+  def withQuery(query: QueryString): HttpRequest =
+    withTarget(target.withQuery(query.toString))
 
-  def withQueryParams(params: (String, String)*): HttpRequest =
-    withTarget(target.withQueryParams(params : _*))
+  def withQuery(params: Map[String, Seq[String]]): HttpRequest =
+    withQuery(QueryString(params))
+
+  def withQuery(params: (String, String)*): HttpRequest =
+    withQuery(QueryString(params : _*))
 
   def withVersion(newVersion: HttpVersion): HttpRequest =
     copy(startLine = RequestLine(method, target, newVersion))

@@ -62,6 +62,16 @@ class BodyParserSpec extends FlatSpec {
     assert(form("name").head == "root")
   }
 
+  it should "parse request with form body (as query)" in {
+    implicit val bodyParser = BodyParsers.query()
+    val body = Entity.fromParams("id" -> "0", "name" -> "root")
+    val request = POST("users").withBody(body).withContentLength(body.getLength.get)
+    val form = request.as[QueryString]
+
+    assert(form.getValue("id").contains("0"))
+    assert(form.getValue("name").contains("root"))
+  }
+
   it should "not parse response with large body" in {
     implicit val bodyParser = BodyParsers.text(8)
     val body = Entity.fromString("Hello, world!")

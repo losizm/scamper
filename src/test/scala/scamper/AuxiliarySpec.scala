@@ -25,15 +25,14 @@ import Auxiliary._
 class AuxiliarySpec extends FlatSpec {
   val uri = new URI("http://localhost:8080/index.html")
   val uriPath = new URI("/index.html")
-  val uriPathWithParams = new URI("/index.html?name=guest")
+  val uriPathWithQuery = new URI("/index.html?name=guest")
 
   "URI" should "be created with new path" in {
     assert(uriPath.withPath("/home.html") == new URI("/home.html"))
   }
 
   it should "be created with new query" in {
-    assert(uriPath.withQuery("name=guest") == uriPathWithParams)
-    assert(uriPath.withQueryParams("name" -> "guest") == uriPathWithParams)
+    assert(uriPath.withQuery("name=guest") == uriPathWithQuery)
   }
 
   it should "created with new scheme and authority" in {

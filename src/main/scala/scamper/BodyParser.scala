@@ -59,6 +59,14 @@ object BodyParsers {
     new FormBodyParser(maxLength.max(0))
 
   /**
+   * Gets body parser for collecting form data (as query) in message body.
+   *
+   * @param maxLength maximum length in bytes
+   */
+  def query(maxLength: Int = 8 * 1024 * 1024): BodyParser[QueryString] =
+    new QueryBodyParser(maxLength.max(0))
+
+  /**
    * Gets body parser for storing message body to file.
    *
    * If `dest` is a directory, then the parser creates a new file in the
@@ -104,11 +112,18 @@ private class TextBodyParser(maxLength: Int) extends BodyParser[String] {
       .map(charset => new String(parser(message), charset)).get
 }
 
+private class QueryBodyParser(maxLength: Int) extends BodyParser[QueryString] {
+  private val parser = new TextBodyParser(maxLength)
+
+  def apply(message: HttpMessage): QueryString =
+    QueryString(parser(message))
+}
+
 private class FormBodyParser(maxLength: Int) extends BodyParser[Map[String, Seq[String]]] {
   private val parser = new TextBodyParser(maxLength)
 
   def apply(message: HttpMessage): Map[String, Seq[String]] =
-    QueryParams.parse(parser(message))
+    QueryString.parse(parser(message))
 }
 
 private class FileBodyParser(val dest: File, val maxLength: Long, val bufferSize: Int) extends BodyParser[File] with BodyParsing {

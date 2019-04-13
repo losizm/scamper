@@ -69,7 +69,7 @@ object Entity {
    * The parameters are encoded as `application/x-www-form-urlencoded`.
    */
   def fromParams(params: Map[String, Seq[String]]): Entity =
-    fromString(QueryParams.format(params), "UTF-8")
+    fromString(QueryString.format(params))
 
   /**
    * Creates `Entity` from supplied parameters.
@@ -77,7 +77,15 @@ object Entity {
    * The parameters are encoded as `application/x-www-form-urlencoded`.
    */
   def fromParams(params: (String, String)*): Entity =
-    fromString(QueryParams.format(params : _*), "UTF-8")
+    fromString(QueryString.format(params : _*))
+
+  /**
+   * Creates `Entity` from query.
+   *
+   * The query is encoded as `application/x-www-form-urlencoded`.
+   */
+  def fromQuery(query: QueryString): Entity =
+    fromString(query.toString)
 
   /** Returns empty `Entity`. */
   def empty: Entity = EmptyEntity
