@@ -15,14 +15,14 @@
  */
 package scamper.types
 
-import ContentDispositionTypeHelper._
+import DispositionTypeHelper._
 
 /**
  * Standardized type for Content-Disposition header value.
  *
  * @see [[scamper.headers.ContentDisposition]]
  */
-trait ContentDispositionType {
+trait DispositionType {
   /** Gets disposition type name. */
   def name: String
 
@@ -39,25 +39,25 @@ trait ContentDispositionType {
   override lazy val toString: String = name + FormatParams(params)
 }
 
-/** ContentDispositionType factory */
-object ContentDispositionType {
+/** DispositionType factory */
+object DispositionType {
   /** Parses formatted content disposition type and optional parameters. */
-  def parse(disposition: String): ContentDispositionType =
+  def parse(disposition: String): DispositionType =
     ParseContentDisposition(disposition) match {
       case (name, params) => apply(name, params)
     }
 
-  /** Creates ContentDispositionType with supplied name and parameters. */
-  def apply(name: String, params: Map[String, String]): ContentDispositionType =
-    ContentDispositionTypeImpl(Name(name), Params(params))
+  /** Creates DispositionType with supplied name and parameters. */
+  def apply(name: String, params: Map[String, String]): DispositionType =
+    DispositionTypeImpl(Name(name), Params(params))
 
-  /** Creates ContentDispositionType with supplied name and paramaters. */
-  def apply(name: String, params: (String, String)*): ContentDispositionType =
+  /** Creates DispositionType with supplied name and paramaters. */
+  def apply(name: String, params: (String, String)*): DispositionType =
     apply(name, params.toMap)
 
-  /** Destructures ContentDispositionType. */
-  def unapply(disposition: ContentDispositionType): Option[(String, Map[String, String])] =
+  /** Destructures DispositionType. */
+  def unapply(disposition: DispositionType): Option[(String, Map[String, String])] =
     Some((disposition.name, disposition.params))
 }
 
-private case class ContentDispositionTypeImpl(name: String, params: Map[String, String]) extends ContentDispositionType
+private case class DispositionTypeImpl(name: String, params: Map[String, String]) extends DispositionType

@@ -17,7 +17,7 @@ package scamper.types
 
 import scamper.Grammar._
 
-private object ContentDispositionTypeHelper {
+private object DispositionTypeHelper {
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)(\s*(?:;.*)?)""".r
 
   def Name(name: String): String =

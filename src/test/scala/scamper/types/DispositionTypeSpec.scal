@@ -17,16 +17,16 @@ package scamper.types
 
 import org.scalatest.FlatSpec
 
-class ContentDispositionTypeSpec extends FlatSpec {
-  "ContentDispositionType" should "be created without parameters" in {
-    var disposition = ContentDispositionType.parse("INLINE")
+class DispositionTypeSpec extends FlatSpec {
+  "DispositionType" should "be created without parameters" in {
+    var disposition = DispositionType.parse("INLINE")
     assert(disposition.name == "inline")
     assert(disposition.isInline)
     assert(!disposition.isAttachment)
     assert(disposition.params.isEmpty)
     assert(disposition.toString == "inline")
 
-    disposition = ContentDispositionType.parse("Attachment")
+    disposition = DispositionType.parse("Attachment")
     assert(disposition.name == "attachment")
     assert(disposition.isAttachment)
     assert(!disposition.isInline)
@@ -35,7 +35,7 @@ class ContentDispositionTypeSpec extends FlatSpec {
   }
 
   it should "be created with parameters" in {
-    var disposition = ContentDispositionType.parse("Inline; Filename=\"a text file.txt\"")
+    var disposition = DispositionType.parse("Inline; Filename=\"a text file.txt\"")
     assert(disposition.name == "inline")
     assert(disposition.isInline)
     assert(!disposition.isAttachment)
@@ -43,7 +43,7 @@ class ContentDispositionTypeSpec extends FlatSpec {
     assert(disposition.params.get("filename").contains("a text file.txt"))
     assert(disposition.toString == "inline; filename=\"a text file.txt\"")
 
-    disposition = ContentDispositionType.parse("ATTACHMENT; FILENAME*=\"example.txt\"")
+    disposition = DispositionType.parse("ATTACHMENT; FILENAME*=\"example.txt\"")
     assert(disposition.name == "attachment")
     assert(disposition.isAttachment)
     assert(!disposition.isInline)
@@ -53,18 +53,18 @@ class ContentDispositionTypeSpec extends FlatSpec {
   }
 
   it should "be destructured" in {
-    val disposition = ContentDispositionType.parse("""extended-type; a=1; b="t w o"; c=trois""")
+    val disposition = DispositionType.parse("""extended-type; a=1; b="t w o"; c=trois""")
 
     disposition match {
-      case ContentDispositionType(name, params) =>
+      case DispositionType(name, params) =>
         assert(name == disposition.name)
         assert(params == disposition.params)
     }
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](ContentDispositionType.parse("inline; filename"))
-    assertThrows[IllegalArgumentException](ContentDispositionType.parse("inline; filename="))
-    assertThrows[IllegalArgumentException](ContentDispositionType.parse("inline; =0.1"))
+    assertThrows[IllegalArgumentException](DispositionType.parse("inline; filename"))
+    assertThrows[IllegalArgumentException](DispositionType.parse("inline; filename="))
+    assertThrows[IllegalArgumentException](DispositionType.parse("inline; =0.1"))
   }
 }

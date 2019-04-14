@@ -287,12 +287,12 @@ package object headers {
      *
      * @throws HeaderNotFound if Content-Disposition is not present
      */
-    def contentDisposition: ContentDispositionType =
+    def contentDisposition: DispositionType =
       getContentDisposition.getOrElse(throw HeaderNotFound("Content-Disposition"))
 
     /** Gets Content-Disposition header value if present. */
-    def getContentDisposition: Option[ContentDispositionType] =
-      response.getHeaderValue("Content-Disposition").map(ContentDispositionType.parse)
+    def getContentDisposition: Option[DispositionType] =
+      response.getHeaderValue("Content-Disposition").map(DispositionType.parse)
 
     /** Tests whether Content-Disposition header is present. */
     def hasContentDisposition: Boolean = response.hasHeader("Content-Disposition")
@@ -301,7 +301,7 @@ package object headers {
      * Creates new response setting Content-Disposition header to supplied
      * value.
      */
-    def withContentDisposition(value: ContentDispositionType): HttpResponse =
+    def withContentDisposition(value: DispositionType): HttpResponse =
       response.withHeader(Header("Content-Disposition", value.toString))
 
     /** Creates new response removing Content-Disposition header. */
