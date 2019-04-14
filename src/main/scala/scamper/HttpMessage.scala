@@ -48,39 +48,21 @@ trait HttpMessage {
   def hasHeader(name: String): Boolean =
     headers.exists(_.name.equalsIgnoreCase(name))
 
-  /**
-   * Gets header with given name.
-   *
-   * If there are multiple headers with name, then first occurrence is
-   * retrieved.
-   */
+  /** Gets first header with given name.  */
   def getHeader(name: String): Option[Header] =
     headers.find(_.name.equalsIgnoreCase(name))
 
-  /**
-   * Gets header with given name, or returns default if header not present.
-   *
-   * If there are multiple headers with name, then first occurrence is
-   * retrieved.
-   */
+  /** Gets first header with given name, or returns default if header not present. */
   def getHeaderOrElse(name: String, default: => Header): Header =
     getHeader(name).getOrElse(default)
 
-  /**
-   * Gets value of header with given name.
-   *
-   * If there are multiple headers with name, then first occurrence is
-   * retrieved.
-   */
+  /** Gets value of first header with given name. */
   def getHeaderValue(name: String): Option[String] =
     getHeader(name).map(_.value)
 
   /**
-   * Gets value of header with given name, or returns default if header not
+   * Gets value of first header with given name, or returns default if header not
    * present.
-   *
-   * If there are multiple headers with name, then first occurrence is
-   * retrieved.
    */
   def getHeaderValueOrElse(name: String, default: => String): String =
     getHeaderValue(name).getOrElse(default)

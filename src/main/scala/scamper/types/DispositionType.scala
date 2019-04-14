@@ -35,6 +35,9 @@ trait DispositionType {
   /** Tests whether disposition type is inline. */
   def isInline: Boolean = name == "inline"
 
+  /** Tests whether disposition type is form-data. */
+  def isFormData: Boolean = name == "form-data"
+
   /** Returns formatted content disposition type and parameters. */
   override lazy val toString: String = name + FormatParams(params)
 }
