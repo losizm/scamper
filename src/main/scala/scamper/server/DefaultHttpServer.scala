@@ -258,11 +258,11 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     }
 
     private def readMethod(buffer: Array[Byte])(implicit socket: Socket): RequestMethod =
-      RequestMethod(socket.readToken(" ", buffer))
+      RequestMethod(socket.getToken(" ", buffer))
 
     private def readTarget(buffer: Array[Byte])(implicit socket: Socket): URI =
       try
-        new URI(socket.readToken(" ", buffer))
+        new URI(socket.getToken(" ", buffer))
       catch {
         case _: IndexOutOfBoundsException => throw ReadError(UriTooLong)
         case _: URISyntaxException        => throw ReadError(BadRequest)
@@ -271,7 +271,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     private def readVersion(buffer: Array[Byte])(implicit socket: Socket): HttpVersion = {
       val regex = "HTTP/(.+)".r
 
-      socket.readLine(buffer) match {
+      socket.getLine(buffer) match {
         case regex(version) => HttpVersion.parse(version)
         case _ => throw ReadError(BadRequest)
       }
@@ -284,7 +284,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
       var line = ""
 
       try {
-        while ({ line = socket.readLine(buffer); line != "" }) {
+        while ({ line = socket.getLine(buffer); line != "" }) {
           readSize += line.size
 
           if (readSize <= readLimit)

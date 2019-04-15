@@ -15,7 +15,7 @@
  */
 package scamper
 
-import java.io.{ File, InputStream, OutputStream }
+import java.io.{ File, FileOutputStream, InputStream, OutputStream }
 import java.net.{ Socket, URI, URLDecoder, URLEncoder }
 import java.nio.file.{ Paths, Path }
 import java.time.Instant
@@ -28,6 +28,17 @@ import scala.util.Try
 
 private object Auxiliary {
   private val crlf = "\r\n".getBytes("UTF-8")
+
+  val `application/octet-stream` = types.MediaType("application", "octet-stream")
+  val `text/plain` = types.MediaType("text", "plain")
+
+  implicit class FileType(val file: File) extends AnyVal {
+    def withOutputStream[T](f: OutputStream => T): T = {
+      val out = new FileOutputStream(file)
+      try f(out)
+      finally Try(out.close())
+    }
+  }
 
   implicit class InputStreamType(val in: InputStream) extends AnyVal {
     def getBytes(bufferSize: Int = 8192): Array[Byte] = {
@@ -44,7 +55,7 @@ private object Auxiliary {
     def getText(bufferSize: Int = 8192): String =
       new String(getBytes(bufferSize), "UTF-8")
 
-    def readToken(delimiters: String, buffer: Array[Byte]): String = {
+    def getToken(delimiters: String, buffer: Array[Byte]): String = {
       var length = 0
       var byte = -1
 
@@ -56,7 +67,7 @@ private object Auxiliary {
       new String(buffer, 0, length, "UTF-8")
     }
 
-    def readLine(buffer: Array[Byte]): String = {
+    def getLine(buffer: Array[Byte]): String = {
       var length = 0
       var byte = -1
 
@@ -69,6 +80,27 @@ private object Auxiliary {
         length -= 1
 
       new String(buffer, 0, length, "UTF-8")
+    }
+
+    def readLine(buffer: Array[Byte]): Int = {
+      val bufferSize = buffer.size
+      var length = 0
+      var byte = -1
+      var continue = length < bufferSize
+
+      while (continue) {
+        val byte = in.read()
+
+        if (byte == -1)
+          continue = false
+        else {
+          buffer(length) = byte.toByte
+          length += 1
+          continue = length < bufferSize && byte != '\n'
+        }
+      }
+
+      length
     }
   }
 
@@ -89,11 +121,14 @@ private object Auxiliary {
     def read(buffer: Array[Byte], offset: Int, length: Int): Int =
       socket.getInputStream().read(buffer, offset, length)
 
-    def readLine(buffer: Array[Byte]): String =
+    def readLine(buffer: Array[Byte]): Int =
       socket.getInputStream().readLine(buffer)
 
-    def readToken(delimiters: String, buffer: Array[Byte]): String =
-      socket.getInputStream().readToken(delimiters, buffer)
+    def getToken(delimiters: String, buffer: Array[Byte]): String =
+      socket.getInputStream().getToken(delimiters, buffer)
+
+    def getLine(buffer: Array[Byte]): String =
+      socket.getInputStream().getLine(buffer)
 
     def write(byte: Int): Unit = socket.getOutputStream().write(byte)
 

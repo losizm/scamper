@@ -112,8 +112,6 @@ object Multipart {
 
 /** Provides factory for TextPart. */
 object TextPart {
-  private val `text/plain` = MediaType("text", "plain")
-
   /** Creates TextPart with given name and content. */
   def apply(name: String, content: String): TextPart =
     apply(DispositionType("form-data", Map("name" -> name)), content)
@@ -126,7 +124,7 @@ object TextPart {
     val name = contentDisposition.params.get("name")
       .getOrElse(throw HeaderNotFound("Missing name parameter in Content-Disposition header"))
 
-    TextPartImpl(name, content, contentDisposition, `text/plain`)
+    TextPartImpl(name, content, contentDisposition, Auxiliary.`text/plain`)
   }
 
   /** Creates TextPart with supplied disposition, content type, and content. */
@@ -154,7 +152,7 @@ object TextPart {
 
     val contentType = headers.collectFirst {
       case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType.parse(value)
-    }.getOrElse(`text/plain`)
+    }.getOrElse(Auxiliary.`text/plain`)
 
     if (!contentType.isText)
       throw new HttpException("Content-Type not supplied as text")
@@ -165,8 +163,6 @@ object TextPart {
 
 /** Provides factory for FilePart. */
 object FilePart {
-  private val `application/octet-stream` = MediaType("application", "octet-stream")
-
   /** Creates FilePart with given name and content. */
   def apply(name: String, content: File): FilePart =
     apply(DispositionType("form-data", Map("name" -> name, "filename" -> content.getName)), content)
@@ -188,7 +184,7 @@ object FilePart {
     val name = contentDisposition.params.get("name")
       .getOrElse(throw new HttpException("Missing name parameter in Content-Disposition header"))
 
-    FilePartImpl(name, content, contentDisposition, `application/octet-stream`)
+    FilePartImpl(name, content, contentDisposition, Auxiliary.`application/octet-stream`)
   }
 
   /** Creates FilePart from supplied disposition, content type, and content. */
@@ -213,7 +209,7 @@ object FilePart {
 
     val contentType = headers.collectFirst {
       case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType.parse(value)
-    }.getOrElse(`application/octet-stream`)
+    }.getOrElse(Auxiliary.`application/octet-stream`)
 
     apply(contentDisposition, contentType, content)
   }

@@ -73,11 +73,11 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
     }
 
   private def getResponse(headOnly: Boolean): HttpResponse = {
-    val statusLine = StatusLine.parse(socket.readLine(buffer))
+    val statusLine = StatusLine.parse(socket.getLine(buffer))
     val headers = new ArrayBuffer[Header]
     var line = ""
 
-    while ({ line = socket.readLine(buffer); line != "" })
+    while ({ line = socket.getLine(buffer); line != "" })
       line.matches("[ \t]+.*") match {
         case true =>
           if (headers.isEmpty) throw new HttpException("Cannot parse response headers")
