@@ -15,7 +15,7 @@
  */
 package scamper
 
-import java.io.{ File, FileOutputStream, InputStream, OutputStream }
+import java.io.{ File, FileOutputStream, FileInputStream, InputStream, OutputStream }
 import java.net.{ Socket, URI, URLDecoder, URLEncoder }
 import java.nio.file.{ Paths, Path }
 import java.time.Instant
@@ -37,6 +37,12 @@ private object Auxiliary {
       val out = new FileOutputStream(file)
       try f(out)
       finally Try(out.close())
+    }
+
+    def withInputStream[T](f: InputStream => T): T = {
+      val in = new FileInputStream(file)
+      try f(in)
+      finally Try(in.close())
     }
   }
 

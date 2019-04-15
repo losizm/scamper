@@ -18,6 +18,8 @@ package scamper
 import java.io.{ ByteArrayInputStream, File, FileInputStream, InputStream, OutputStream }
 import java.nio.file.Path
 
+import Auxiliary.{ FileType, OutputStreamType }
+
 /** Representation of message body. */
 trait Entity {
   /** Gets length in bytes if known. */
@@ -87,6 +89,10 @@ object Entity {
   def fromQuery(query: QueryString): Entity =
     fromString(query.toString)
 
+  /** Creates `Entity` from multipart form data using supplied boundary. */
+  def fromMultipart(multipart: Multipart, boundary: String = Multipart.boundary()): Entity =
+    MultipartEntity(multipart, boundary)
+
   /** Returns empty `Entity`. */
   def empty: Entity = EmptyEntity
 }
@@ -109,3 +115,37 @@ private case class FileEntity(file: File) extends Entity {
 private case class InputStreamEntity(getInputStream: InputStream) extends Entity {
   val getLength = None
 }
+
+private case class MultipartEntity(multipart: Multipart, boundary: String) extends Entity {
+  val getLength = None
+  lazy val getInputStream = new WriterInputStream(writeMultipart, 8192)(Auxiliary.executor)
+
+  private def writeMultipart(out: OutputStream): Unit = {
+    val start = "--" + boundary
+    val end = "--" + boundary + "--"
+
+    multipart.parts.foreach { part =>
+      out.writeLine(start)
+      out.writeLine("Content-Disposition: " + part.contentDisposition.toString)
+      if (!part.contentType.isText || part.contentType.subtype != "plain" || part.contentType.params.nonEmpty)
+        out.writeLine("Content-Type: " + part.contentType.toString)
+      out.writeLine()
+
+      part match {
+        case text: TextPart => out.writeLine(text.content)
+        case file: FilePart =>
+          file.content.withInputStream { in =>
+            val buf = new Array[Byte](8192)
+            var len = 0
+            while ({ len = in.read(buf); len != -1 })
+              out.write(buf, 0, len)
+            out.writeLine()
+          }
+      }
+    }
+
+    out.writeLine(end)
+    out.flush()
+  }
+}
+

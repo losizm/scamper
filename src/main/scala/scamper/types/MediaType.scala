@@ -15,6 +15,7 @@
  */
 package scamper.types
 
+import java.io.File
 import java.util.Properties
 
 import scala.collection.JavaConverters.propertiesAsScalaMap
@@ -85,9 +86,22 @@ object MediaType {
     }.toMap
   }.getOrElse(Map.empty)
 
-  /** Gets MediaType for given file name extension. */
-  def get(extension: String): Option[MediaType] =
-    mappings.get(extension.toLowerCase)
+  private val fileNamePattern = ".+\\.(\\w+)".r
+
+  /** Gets MediaType for given file. */
+  def fromFile(file: File): Option[MediaType] =
+    fromFileName(file.getName)
+
+  /** Gets MediaType for given file name. */
+  def fromFileName(fileName: String): Option[MediaType] =
+    fileName match {
+      case fileNamePattern(suffix) => fromSuffix(suffix)
+      case _ => None
+    }
+
+  /** Gets MediaType for given file name suffix. */
+  def fromSuffix(suffix: String): Option[MediaType] =
+    mappings.get(suffix.toLowerCase)
 
   /** Parses formatted media type. */
   def parse(mediaType: String): MediaType =

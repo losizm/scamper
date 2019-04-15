@@ -53,8 +53,8 @@ class MultipartSpec extends FlatSpec {
     assert(part.contentDisposition.name == "form-data")
     assert(part.contentDisposition.params("name") == "photo")
     assert(part.contentDisposition.params("filename") == "photo.jpg")
-    assert(part.contentType.isApplication)
-    assert(part.contentType.subtype == "octet-stream")
+    assert(part.contentType.isImage)
+    assert(part.contentType.subtype == "jpeg")
 
     part = FilePart("photo", new File("photo.jpg"), "my-photo.jpg")
     assert(part.name == "photo")
@@ -63,8 +63,8 @@ class MultipartSpec extends FlatSpec {
     assert(part.contentDisposition.name == "form-data")
     assert(part.contentDisposition.params("name") == "photo")
     assert(part.contentDisposition.params("filename") == "my-photo.jpg")
-    assert(part.contentType.isApplication)
-    assert(part.contentType.subtype == "octet-stream")
+    assert(part.contentType.isImage)
+    assert(part.contentType.subtype == "jpeg")
 
     part = FilePart("photo", new File("photo.jpg"), Some("my-photo.jpg"))
     assert(part.name == "photo")
@@ -73,8 +73,8 @@ class MultipartSpec extends FlatSpec {
     assert(part.contentDisposition.name == "form-data")
     assert(part.contentDisposition.params("name") == "photo")
     assert(part.contentDisposition.params("filename") == "my-photo.jpg")
-    assert(part.contentType.isApplication)
-    assert(part.contentType.subtype == "octet-stream")
+    assert(part.contentType.isImage)
+    assert(part.contentType.subtype == "jpeg")
 
     part = FilePart("photo", new File("photo.jpg"), None)
     assert(part.name == "photo")
@@ -83,15 +83,14 @@ class MultipartSpec extends FlatSpec {
     assert(part.contentDisposition.name == "form-data")
     assert(part.contentDisposition.params("name") == "photo")
     assert(part.contentDisposition.params.get("filename").isEmpty)
-    assert(part.contentType.isApplication)
-    assert(part.contentType.subtype == "octet-stream")
+    assert(part.contentType.isImage)
+    assert(part.contentType.subtype == "jpeg")
   }
 
   it should "not be created in" in {
     val formData = DispositionType("form-data", Map("name" -> "id"))
     val formDataNoName = DispositionType("form-data")
     val attachment = DispositionType("attachment", Map("filename" -> "photo.jpg"))
-    val octetStream = MediaType("application", "octet-stream")
     val header = Header("Content-Type", "text/plain")
     val content = new File("photo.jpg")
 

@@ -92,18 +92,7 @@ private class StaticFileServer(mountPath: Path, baseDirectory: Path) extends Req
     Try(req.ifModifiedSince).getOrElse(Instant.MIN)
 
   private def getMediaType(path: Path): MediaType =
-    getFileNameExtension(path)
-      .flatMap(MediaType.get)
-      .getOrElse(`application/octet-stream`)
-
-  private def getFileNameExtension(path: Path): Option[String] = {
-    val namePattern = ".+\\.(\\w+)".r
-
-    path.getFileName().toString match {
-      case namePattern(ext) => Some(ext)
-      case _ => None
-    }
-  }
+    MediaType.fromFileName(path.getFileName.toString).getOrElse(`application/octet-stream`)
 }
 
 private object StaticFileServer {
