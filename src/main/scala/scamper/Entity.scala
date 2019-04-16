@@ -127,6 +127,7 @@ private case class MultipartEntity(multipart: Multipart, boundary: String) exten
     multipart.parts.foreach { part =>
       out.writeLine(start)
       out.writeLine("Content-Disposition: " + part.contentDisposition.toString)
+
       if (!part.contentType.isText || part.contentType.subtype != "plain" || part.contentType.params.nonEmpty)
         out.writeLine("Content-Type: " + part.contentType.toString)
       out.writeLine()

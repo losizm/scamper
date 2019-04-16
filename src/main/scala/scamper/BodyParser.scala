@@ -143,11 +143,14 @@ private class FileBodyParser(val dest: File, val maxLength: Long, val bufferSize
   def apply(message: HttpMessage): File =
     withInputStream(message) { in =>
       val destFile = getDestFile()
+
       destFile.withOutputStream { out =>
         val buffer = new Array[Byte](bufferSize)
         var length = 0
+
         while ({ length = in.read(buffer); length != -1 })
           out.write(buffer, 0, length)
+
         destFile
       }
     }
@@ -160,7 +163,7 @@ private class FileBodyParser(val dest: File, val maxLength: Long, val bufferSize
 }
 
 private class MultipartBodyParser(val dest: File, val maxLength: Long, val bufferSize: Int) extends BodyParser[Multipart] with BodyParsing {
-  private class Tracker(val boundary: String) {
+  private class Status(val boundary: String) {
     val start = ("--" + boundary).getBytes("UTF-8")
     val end = ("--" + boundary + "--").getBytes("UTF-8")
     var continue = true
@@ -169,22 +172,23 @@ private class MultipartBodyParser(val dest: File, val maxLength: Long, val buffe
   def apply(message: HttpMessage): Multipart =
     message.contentType match {
       case MediaType("multipart", "form-data", params) =>
-        val boundary = params.get("boundary").getOrElse(throw new HttpException("Missing boundary in Content-Type header"))
-        withInputStream(message) { in => getMultipart(in, boundary) }
+        params.get("boundary")
+          .map { boundary => withInputStream(message) { in => getMultipart(in, boundary) } }
+          .getOrElse(throw new HttpException("Missing boundary in Content-Type header"))
 
       case value => throw new HttpException(s"Content-Type is not multipart/form-data: $value")
     }
 
   private def getMultipart(in: InputStream, boundary: String): Multipart = {
     val buffer = new Array[Byte](bufferSize)
-    val tracker = new Tracker(boundary)
+    val status = new Status(boundary)
 
     in.getLine(buffer) match {
-      case line if line.startsWith(new String(tracker.start)) =>
+      case line if line.startsWith(new String(status.start)) =>
         val parts = new ListBuffer[Part]
 
-        while (tracker.continue) {
-          val headers = getHeaders(in, buffer)
+        while (status.continue) {
+          val headers = HeaderStream.getHeaders(in, buffer)
 
           val disposition = headers.collectFirst {
             case Header(name, value) if name.equalsIgnoreCase("Content-Disposition") => DispositionType.parse(value)
@@ -196,45 +200,28 @@ private class MultipartBodyParser(val dest: File, val maxLength: Long, val buffe
 
           if (contentType.isText && disposition.params.get("filename").isEmpty) {
             val charset = contentType.params.getOrElse("charset", "UTF-8")
-
-            parts += TextPart(headers, getTextContent(in, buffer, charset, tracker))
-          } else
-            parts += FilePart(headers, getFileContent(in, buffer, tracker))
+            parts += TextPart(headers, getTextContent(in, buffer, charset, status))
+          } else {
+            parts += FilePart(headers, getFileContent(in, buffer, status))
+          }
         }
 
         Multipart(parts : _*)
 
-      case line if line.startsWith(new String(tracker.end)) => Multipart()
+      case line if line.startsWith(new String(status.end)) => Multipart()
 
       case line => throw new HttpException("Invalid start of mulitpart")
     }
   }
 
-  private def getHeaders(in: InputStream, buffer: Array[Byte]): Seq[Header] = {
-    val headers = new ListBuffer[Header]
-    var line = ""
-
-    while ({ line = in.getLine(buffer); line != "" })
-      line.matches("[ \t]+.*") match {
-        case true =>
-          if (headers.isEmpty) throw new HttpException("Cannot parse part headers")
-          val last = headers.last
-          headers.update(headers.length - 1, Header(last.name, last.value + " " + line.trim()))
-        case false =>
-          headers += Header.parse(line)
-      }
-
-    headers
-  }
-
-  private def getTextContent(in: InputStream, buffer: Array[Byte], charset: String, tracker: Tracker): String = {
+  private def getTextContent(in: InputStream, buffer: Array[Byte], charset: String, status: Status): String = {
     var content = new ArrayBuffer[Byte]
 
     var length = in.readLine(buffer)
     if (length == -1)
       throw new HttpException("Invalid part: truncation detected")
 
-    while (!buffer.startsWith(tracker.start)) {
+    while (!buffer.startsWith(status.start)) {
       content ++= buffer.take(length)
 
       length = in.readLine(buffer)
@@ -242,14 +229,14 @@ private class MultipartBodyParser(val dest: File, val maxLength: Long, val buffe
         throw new HttpException("Invalid part: truncation detected")
     }
 
-    if (buffer.startsWith(tracker.end))
-      tracker.continue = false
+    if (buffer.startsWith(status.end))
+      status.continue = false
 
     // Remove trailing crlf
     new String(content.dropRight(2).toArray, charset)
   }
 
-  private def getFileContent(in: InputStream, buffer: Array[Byte], tracker: Tracker): File = {
+  private def getFileContent(in: InputStream, buffer: Array[Byte], status: Status): File = {
     val content = File.createTempFile("scamper-dest-file-", ".tmp", dest)
 
     content.withOutputStream { out =>
@@ -257,7 +244,7 @@ private class MultipartBodyParser(val dest: File, val maxLength: Long, val buffe
       if (length == -1)
         throw new HttpException("Invalid part: truncation detected")
 
-      while (!buffer.startsWith(tracker.start)) {
+      while (!buffer.startsWith(status.start)) {
         out.write(buffer, 0, length)
 
         length = in.readLine(buffer)
@@ -265,14 +252,14 @@ private class MultipartBodyParser(val dest: File, val maxLength: Long, val buffe
           throw new HttpException("Invalid part: truncation detected")
       }
 
-      if (buffer.startsWith(tracker.end))
-        tracker.continue = false
+      if (buffer.startsWith(status.end))
+        status.continue = false
     }
 
     // Remove trailing crlf
-    val raf = new java.io.RandomAccessFile(content, "rw")
-    try raf.setLength(content.length - 2)
-    finally Try(raf.close())
+    val file = new java.io.RandomAccessFile(content, "rw")
+    try file.setLength(content.length - 2)
+    finally Try(file.close())
 
     content
   }

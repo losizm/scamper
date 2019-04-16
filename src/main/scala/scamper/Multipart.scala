@@ -97,25 +97,24 @@ trait TextPart extends Part {
  * @see [[TextPart]]
  */
 trait FilePart extends Part {
-  /** Gets file name specified in Content-Disposition header. */
-  def getFileName: Option[String]
-
   /** Gets file content. */
   def content: File
+
+  /** Gets file name specified in Content-Disposition header. */
+  def getFileName: Option[String]
 }
 
 /** Provides factory for Multipart. */
 object Multipart {
   private val random = new java.security.SecureRandom()
   private val prefix = "----ScamperMultipartBoundary_"
-  private val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz"
+  private val charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz"
 
   /** Creates Multipart with supplied parts. */
   def apply(parts: Part*): Multipart = MultipartImpl(parts)
 
   /** Generates boundary. */
-  def boundary(): String =
-    prefix + new String(random.ints(16, 0, 62).toArray.map(chars(_)))
+  def boundary(): String = prefix + new String(random.ints(16, 0, 62).toArray.map(charset))
 }
 
 /** Provides factory for TextPart. */
@@ -131,13 +130,13 @@ object TextPart {
   /** Creates TextPart with supplied disposition, content type, and content. */
   def apply(contentDisposition: DispositionType, contentType: MediaType, content: String): TextPart = {
     if (!contentDisposition.isFormData)
-      throw new HttpException("Disposition not form-data")
+      throw new HttpException("Content disposition is not form-data")
 
     if (!contentType.isText)
-      throw new HttpException("Content-Type not supplied as text")
+      throw new HttpException("Content type is not text")
 
     val name = contentDisposition.params.get("name")
-      .getOrElse(throw new HttpException("Missing name parameter in Content-Disposition header"))
+      .getOrElse(throw new HttpException("Missing name parameter in content disposition"))
 
     TextPartImpl(name, content, contentDisposition, contentType)
   }
@@ -160,27 +159,27 @@ object TextPart {
 object FilePart {
   /** Creates FilePart with given name and content. */
   def apply(name: String, content: File): FilePart =
-    apply(createContentDisposition(name, Some(content.getName)), createContentType(content), content)
+    apply(getDisposition(name, Some(content.getName)), getType(content), content)
 
   /** Creates FilePart with given name, file name, and content. */
   def apply(name: String, content: File, fileName: String): FilePart =
-    apply(createContentDisposition(name, Some(fileName)), createContentType(content), content)
+    apply(getDisposition(name, Some(fileName)), getType(content), content)
 
   /** Creates FilePart with given name and content. */
   def apply(name: String, content: File, fileName: Option[String]): FilePart =
-    apply(createContentDisposition(name, fileName), createContentType(content), content)
+    apply(getDisposition(name, fileName), getType(content), content)
 
   /** Creates FilePart from supplied disposition and content. */
   def apply(contentDisposition: DispositionType, content: File): FilePart =
-    apply(contentDisposition, createContentType(content), content)
+    apply(contentDisposition, getType(content), content)
 
   /** Creates FilePart from supplied disposition, content type, and content. */
   def apply(contentDisposition: DispositionType, contentType: MediaType, content: File): FilePart = {
     if (!contentDisposition.isFormData)
-      throw new HttpException("Disposition type is not form-data")
+      throw new HttpException("Content disposition is not form-data")
 
     val name = contentDisposition.params.get("name")
-      .getOrElse(throw new HttpException("Missing name parameter in Content-Disposition header"))
+      .getOrElse(throw new HttpException("Missing name parameter in content disposition"))
 
     FilePartImpl(name, content, contentDisposition, contentType)
   }
@@ -193,16 +192,16 @@ object FilePart {
 
     val contentType = headers.collectFirst {
       case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType.parse(value)
-    }.getOrElse(createContentType(content))
+    }.getOrElse(getType(content))
 
     apply(contentDisposition, contentType, content)
   }
 
-  private def createContentDisposition(name: String, fileName: Option[String]): DispositionType =
-    fileName.map(fn => DispositionType("form-data", Map("name" -> name, "filename" -> fn)))
+  private def getDisposition(name: String, optFileName: Option[String]): DispositionType =
+    optFileName.map(fileName => DispositionType("form-data", Map("name" -> name, "filename" -> fileName)))
       .getOrElse(DispositionType("form-data", Map("name" -> name)))
 
-  private def createContentType(content: File): MediaType =
+  private def getType(content: File): MediaType =
     MediaType.fromFile(content).getOrElse(Auxiliary.`application/octet-stream`)
 }
 

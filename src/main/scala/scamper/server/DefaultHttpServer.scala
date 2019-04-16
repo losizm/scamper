@@ -306,7 +306,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
         case _: IndexOutOfBoundsException => throw ReadError(RequestHeaderFieldsTooLarge)
       }
 
-      headers.toSeq
+      headers
     }
 
     private def write(res: HttpResponse)(implicit socket: Socket): Unit = {

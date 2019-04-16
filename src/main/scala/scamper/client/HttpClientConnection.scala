@@ -18,9 +18,7 @@ package scamper.client
 import java.io.InputStream
 import java.net.Socket
 
-import scala.collection.mutable.ArrayBuffer
-
-import scamper.{ Auxiliary, Compressor, Entity, Header, HttpException, HttpRequest, HttpResponse, StatusLine }
+import scamper.{ Auxiliary, Compressor, Entity, Header, HeaderStream, HttpException, HttpRequest, HttpResponse, StatusLine }
 import scamper.RequestMethods.HEAD
 import scamper.headers.TransferEncoding
 import scamper.types.TransferCoding
@@ -74,22 +72,11 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
 
   private def getResponse(headOnly: Boolean): HttpResponse = {
     val statusLine = StatusLine.parse(socket.getLine(buffer))
-    val headers = new ArrayBuffer[Header]
-    var line = ""
-
-    while ({ line = socket.getLine(buffer); line != "" })
-      line.matches("[ \t]+.*") match {
-        case true =>
-          if (headers.isEmpty) throw new HttpException("Cannot parse response headers")
-          val last = headers.last
-          headers.update(headers.length - 1, Header(last.name, last.value + " " + line.trim()))
-        case false =>
-          headers += Header.parse(line)
-      }
+    val headers = HeaderStream.getHeaders(socket.getInputStream, buffer)
 
     HttpResponse(
       statusLine,
-      headers.toSeq,
+      headers,
       headOnly match {
         case true  => Entity.empty
         case false => Entity.fromInputStream(socket.getInputStream())
