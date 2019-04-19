@@ -33,9 +33,9 @@ class MultipartSpec extends FlatSpec {
   }
 
   it should "not be created in" in {
-    val formData = DispositionType("form-data", Map("name" -> "id"))
+    val formData = DispositionType("form-data", "name" -> "id")
     val formDataNoName = DispositionType("form-data")
-    val attachment = DispositionType("attachment", Map("filename" -> "photo.jpg"))
+    val attachment = DispositionType("attachment", "filename" -> "photo.jpg")
     val octetStream = MediaType("application", "octet-stream")
     val header = Header("Content-Type", "text/plain")
 
@@ -88,9 +88,9 @@ class MultipartSpec extends FlatSpec {
   }
 
   it should "not be created in" in {
-    val formData = DispositionType("form-data", Map("name" -> "id"))
+    val formData = DispositionType("form-data", "name" -> "id")
     val formDataNoName = DispositionType("form-data")
-    val attachment = DispositionType("attachment", Map("filename" -> "photo.jpg"))
+    val attachment = DispositionType("attachment", "filename" -> "photo.jpg")
     val header = Header("Content-Type", "text/plain")
     val content = new File("photo.jpg")
 

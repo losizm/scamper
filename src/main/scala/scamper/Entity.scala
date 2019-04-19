@@ -90,7 +90,7 @@ object Entity {
     fromString(query.toString)
 
   /** Creates `Entity` from multipart form data using supplied boundary. */
-  def fromMultipart(multipart: Multipart, boundary: String = Multipart.boundary()): Entity =
+  def fromMultipart(multipart: Multipart, boundary: String): Entity =
     MultipartEntity(multipart, boundary)
 
   /** Returns empty `Entity`. */

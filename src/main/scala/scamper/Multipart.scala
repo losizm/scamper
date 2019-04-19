@@ -121,7 +121,7 @@ object Multipart {
 object TextPart {
   /** Creates TextPart with given name and content. */
   def apply(name: String, content: String): TextPart =
-    apply(DispositionType("form-data", Map("name" -> name)), content)
+    apply(DispositionType("form-data", "name" -> name), content)
 
   /** Creates TextPart with supplied disposition and content. */
   def apply(contentDisposition: DispositionType, content: String): TextPart =
@@ -198,8 +198,8 @@ object FilePart {
   }
 
   private def getDisposition(name: String, optFileName: Option[String]): DispositionType =
-    optFileName.map(fileName => DispositionType("form-data", Map("name" -> name, "filename" -> fileName)))
-      .getOrElse(DispositionType("form-data", Map("name" -> name)))
+    optFileName.map(fileName => DispositionType("form-data", "name" -> name, "filename" -> fileName))
+      .getOrElse(DispositionType("form-data", "name" -> name))
 
   private def getType(content: File): MediaType =
     MediaType.fromFile(content).getOrElse(Auxiliary.`application/octet-stream`)

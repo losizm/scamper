@@ -59,4 +59,34 @@ object Implicits {
 
   /** Converts int to [[ResponseStatus]]. */
   implicit val intToResponseStatus = (statusCode: Int) => ResponseStatus(statusCode)
+
+  /** Adds methods to HttpMessage for building message with mulitpart body. */
+  implicit class MultipartHttpMessageType[T <: HttpMessage](val message: T) extends AnyVal {
+    /**
+     * Creates new message with supplied multipart body.
+     *
+     * Before adding body to message, the Content-Type header is set to
+     * `multipart/form-data` with a boundary parameter whose value is used
+     * when encoding the body.
+     *
+     * @param body multipart body
+     */
+    def withMultipartBody(body: Multipart)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+      val boundary = Multipart.boundary()
+      message.withHeader(Header("Content-Type", s"multipart/form-data; boundary=$boundary"))
+        .withBody(Entity.fromMultipart(body, boundary))
+    }
+
+    /**
+     * Creates new message with multipart body constructed from supplied parts.
+     *
+     * Before adding body to message, the Content-Type header is set to
+     * `multipart/form-data` with a boundary parameter whose value is used
+     * when encoding the body.
+     *
+     * @param parts parts used to construct multipart body
+     */
+    def withMultipartBody(parts: Part*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      withMultipartBody(Multipart(parts : _*))
+  }
 }
