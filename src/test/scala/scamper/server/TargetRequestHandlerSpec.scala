@@ -17,7 +17,7 @@ package scamper.server
 
 import org.scalatest.FlatSpec
 
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.RequestMethods.{ DELETE, GET, POST, PUT }
 import scamper.ResponseStatuses.Ok
 

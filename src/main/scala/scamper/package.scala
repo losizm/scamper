@@ -28,7 +28,7 @@
  *
  * {{{
  * import scamper.Header
- * import scamper.ImplicitConverters.stringToUri
+ * import scamper.Implicits.stringToUri
  * import scamper.RequestMethods.GET
  *
  * val request = GET("/motd").withHeaders(
@@ -50,7 +50,7 @@
  *
  * {{{
  * import scamper.{ BodyParsers, Header }
- * import scamper.ImplicitConverters.stringToEntity
+ * import scamper.Implicits.stringToEntity
  * import scamper.ResponseStatuses.Ok
  *
  * val response = Ok("There is an answer.").withHeaders(

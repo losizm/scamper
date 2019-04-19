@@ -28,7 +28,7 @@ import scala.util.Try
  * [[RequestCookies]], with each cookie represented as [[PlainCookie]].
  *
  * {{{
- * import scamper.ImplicitConverters.stringToUri
+ * import scamper.Implicits.stringToUri
  * import scamper.RequestMethods.GET
  * import scamper.cookies.{ PlainCookie, RequestCookies }
  *
@@ -56,7 +56,7 @@ import scala.util.Try
  * each cookie represented as [[SetCookie]].
  *
  * {{{
- * import scamper.ImplicitConverters.stringToEntity
+ * import scamper.Implicits.stringToEntity
  * import scamper.ResponseStatuses.Ok
  * import scamper.cookies.{ ResponseCookies, SetCookie }
  *

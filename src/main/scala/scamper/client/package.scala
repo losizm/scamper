@@ -35,7 +35,7 @@ import RequestMethods._
  *
  * {{{
  * import scamper.BodyParsers
- * import scamper.ImplicitConverters.stringToUri
+ * import scamper.Implicits.stringToUri
  * import scamper.RequestMethods.GET
  * import scamper.client.HttpClient
  *
@@ -67,7 +67,7 @@ import RequestMethods._
  *
  * {{{
  * import scamper.BodyParsers
- * import scamper.ImplicitConverters.stringToUri
+ * import scamper.Implicits.stringToUri
  * import scamper.client.HttpClient
  *
  * implicit val parser = BodyParsers.text()
@@ -91,12 +91,12 @@ import RequestMethods._
  *
  * {{{
  * import scamper.BodyParsers
- * import scamper.ImplicitConverters.stringToUri
+ * import scamper.Implicits.stringToUri
  * import scamper.RequestMethods.GET
  * import scamper.client.HttpClient
  * import scamper.client.Implicits.ClientHttpRequestType // Adds send method to request
  * import scamper.headers.{ Accept, AcceptLanguage }
- * import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToLanguageRange }
+ * import scamper.types.Implicits.{ stringToMediaRange, stringToLanguageRange }
  *
  * implicit val client = HttpClient(bufferSize = 8192, readTimeout = 1000)
  * implicit val parser = BodyParsers.text(4096)

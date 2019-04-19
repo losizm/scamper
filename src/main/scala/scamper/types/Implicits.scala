@@ -16,7 +16,7 @@
 package scamper.types
 
 /** Contains implicit converter functions. */
-object ImplicitConverters {
+object Implicits {
   /** Converts string to [[ByteRange]]. */
   implicit val stringToByteRange = (range: String) => ByteRange.parse(range)
 

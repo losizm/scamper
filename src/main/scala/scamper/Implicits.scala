@@ -20,7 +20,7 @@ import java.net.URI
 import java.time.Instant
 
 /** Includes implicit converter functions. */
-object ImplicitConverters {
+object Implicits {
   /** Converts string to {@code java.net.URI}. */
   implicit val stringToUri = (uri: String) => new URI(uri)
 

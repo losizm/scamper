@@ -17,7 +17,7 @@ package scamper
 
 import scala.concurrent.ExecutionContext
 
-import ImplicitConverters.inputStreamToEntity
+import Implicits.inputStreamToEntity
 
 private object ContentEncoder {
   private val `Content-Encoding: gzip` = Header("Content-Encoding", "gzip")

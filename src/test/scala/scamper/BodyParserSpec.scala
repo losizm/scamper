@@ -19,11 +19,11 @@ import java.io.EOFException
 
 import org.scalatest.FlatSpec
 
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.RequestMethods._
 import scamper.ResponseStatuses._
 import scamper.headers._
-import scamper.types.ImplicitConverters._
+import scamper.types.Implicits._
 
 class BodyParserSpec extends FlatSpec {
   "BodyParser" should "parse response with text body" in {

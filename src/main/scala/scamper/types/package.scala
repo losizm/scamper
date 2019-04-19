@@ -19,7 +19,7 @@ package scamper
  * Defines standardized types for header classes in [[scamper.headers]].
  *
  * {{{
- * import scamper.ImplicitConverters.{ stringToEntity, stringToUri }
+ * import scamper.Implicits.{ stringToEntity, stringToUri }
  * import scamper.RequestMethods.GET
  * import scamper.ResponseStatuses.Ok
  * import scamper.headers.{ Accept, ContentType, TransferEncoding }
@@ -36,15 +36,15 @@ package scamper
  * val res = Ok("There is an answer.").withContentType(text).withTransferEncoding(gzip)
  * }}}
  *
- * Using values defined in [[ImplicitConverters]], properly formatted strings
+ * Using values defined in [[Implicits]], properly formatted strings
  * can be implicitly converted to standardized types.
  *
  * {{{
- * import scamper.ImplicitConverters.{ stringToEntity, stringToUri }
+ * import scamper.Implicits.{ stringToEntity, stringToUri }
  * import scamper.RequestMethods.GET
  * import scamper.ResponseStatuses.Ok
  * import scamper.headers.{ Accept, ContentType, TransferEncoding }
- * import scamper.types.ImplicitConverters._
+ * import scamper.types.Implicits._
  *
  * val req = GET("/motd").withAccept("application/json; q=0.9", "text/html; q=0.1")
  *

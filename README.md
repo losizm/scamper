@@ -52,10 +52,10 @@ companion object. Or you can start with a `RequestMethod` and use builder
 methods to further define the request.
 
 ```scala
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.RequestMethods.GET
 import scamper.headers.{ Accept, Host}
-import scamper.types.ImplicitConverters.stringToMediaRange
+import scamper.types.Implicits.stringToMediaRange
 
 val req = GET("/motd")
   .withHost("localhost:8080")
@@ -68,10 +68,10 @@ companion object. Or you can start with a `ResponseStatus` and use builder
 methods to further define the response.
 
 ```scala
-import scamper.ImplicitConverters.stringToEntity
+import scamper.Implicits.stringToEntity
 import scamper.ResponseStatuses.Ok
 import scamper.headers.{ Connection, ContentType }
-import scamper.types.ImplicitConverters.stringToMediaType
+import scamper.types.Implicits.stringToMediaType
 
 val res = Ok("There is an answer.")
   .withContentType("text/plain")
@@ -85,7 +85,7 @@ access. With these methods, the header field name is a `String`, which is
 case-insensitive, and the header value is a `String`.
 
 ```scala
-import scamper.ImplicitConverters.{ stringToUri, tupleToHeader }
+import scamper.Implicits.{ stringToUri, tupleToHeader }
 import scamper.RequestMethods.POST
 
 val req = POST("/api/users").withHeader("Content-Type" -> "application/json")
@@ -119,7 +119,7 @@ def removeContentType(): HttpMessage
 So you can work with the header in a type-safe manner.
 
 ```scala
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.RequestMethods.POST
 import scamper.headers.ContentType
 import scamper.types.MediaType
@@ -133,10 +133,10 @@ And with `stringToMediaType` in scope, you can implicitly convert `String` to
 `MediaType`.
 
 ```scala
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.RequestMethods.POST
 import scamper.headers.ContentType
-import scamper.types.ImplicitConverters.stringToMediaType
+import scamper.types.Implicits.stringToMediaType
 
 val req = POST("/api/users").withContentType("application/json")
 println(req.contentType.mainType) // application
@@ -157,7 +157,7 @@ Or you can access them using the extension methods provided by `RequestCookies`,
 with each cookie represented as `PlainCookie`.
 
 ```scala
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.RequestMethods.GET
 import scamper.cookies.{ PlainCookie, RequestCookies }
 
@@ -191,7 +191,7 @@ the path to which the cookie is valid, when the cookie expires, whether the
 cookie should be sent over secure channels only, and a few others.
 
 ```scala
-import scamper.ImplicitConverters.stringToEntity
+import scamper.Implicits.stringToEntity
 import scamper.ResponseStatuses.Ok
 import scamper.cookies.{ ResponseCookies, SetCookie }
 
@@ -236,7 +236,7 @@ example, you can create a message with text content.
 import scamper.Entity
 import scamper.ResponseStatuses.Ok
 import scamper.headers.ContentType
-import scamper.types.ImplicitConverters.stringToMediaType
+import scamper.types.Implicits.stringToMediaType
 
 val body = Entity.fromString("""
 <!DOCTYPE html>
@@ -259,7 +259,7 @@ import java.io.File
 import scamper.Entity
 import scamper.ResponseStatuses.Ok
 import scamper.headers.ContentType
-import scamper.types.ImplicitConverters.stringToMediaType
+import scamper.types.Implicits.stringToMediaType
 
 val body = Entity.fromFile(new File("./index.html"))
 val res = Ok(body).withContentType("text/html; charset=utf-8")
@@ -270,10 +270,10 @@ required to create them explicitly.
 
 ```scala
 import java.io.File
-import scamper.ImplicitConverters.fileToEntity
+import scamper.Implicits.fileToEntity
 import scamper.ResponseStatuses.Ok
 import scamper.headers.ContentType
-import scamper.types.ImplicitConverters.stringToMediaType
+import scamper.types.Implicits.stringToMediaType
 
 val res = Ok(new File("./index.html")).withContentType("text/html; charset=utf-8")
 ```
@@ -335,7 +335,7 @@ Attributes are arbitrary key/value pairs associated with a message.
 
 ```scala
 import scala.concurrent.duration.{ Deadline, DurationInt }
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.{ HttpRequest, HttpResponse }
 import scamper.RequestMethods.GET
 
@@ -362,7 +362,7 @@ and `Credentials` in the request. Each of these has an assigned scheme, which is
 associated with either a token or a set of parameters.
 
 ```scala
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.RequestMethods.GET
 import scamper.ResponseStatuses.Unauthorized
 import scamper.auth.{ Authorization, Challenge, Credentials, WwwAuthenticate }
@@ -389,7 +389,7 @@ There are subclasses defined for Basic authentication: `BasicChallenge` and
 `BasicCredentials`.
 
 ```scala
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.RequestMethods.GET
 import scamper.ResponseStatuses.Unauthorized
 import scamper.auth.{ Authorization, BasicChallenge, BasicCredentials, WwwAuthenticate }
@@ -407,7 +407,7 @@ In addition, there are methods for Basic authentication defined in the header
 classes.
 
 ```scala
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.RequestMethods.GET
 import scamper.ResponseStatuses.Unauthorized
 import scamper.auth.{ Authorization, WwwAuthenticate }
@@ -434,7 +434,7 @@ There are subclasses defined for Bearer authentication: `BearerChallenge` and
 available in the header classes.
 
 ```scala
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.RequestMethods.GET
 import scamper.ResponseStatuses.Unauthorized
 import scamper.auth.{ Authorization, WwwAuthenticate }
@@ -478,12 +478,12 @@ prints a message based on the response status using the filters defined in
 to make effective use of the client.
 
 ```scala
-import scamper.ImplicitConverters.{ stringToEntity, stringToUri }
+import scamper.Implicits.{ stringToEntity, stringToUri }
 import scamper.RequestMethods.POST
 import scamper.client.HttpClient
 import scamper.client.ResponseFilter._
 import scamper.headers.{ ContentType, Location }
-import scamper.types.ImplicitConverters.stringToMediaType
+import scamper.types.Implicits.stringToMediaType
 
 val req = POST("https:/localhost:8080/users")
   .withContentType("application/json")
@@ -503,7 +503,7 @@ can process the response and return whatever value warranted.
 
 ```scala
 import scamper.BodyParsers
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.RequestMethods.GET
 import scamper.client.HttpClient
 
@@ -533,7 +533,7 @@ methods corresponding to the standard HTTP request methods.
 
 ```scala
 import scamper.BodyParsers
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.client.HttpClient
 
 implicit val parser = BodyParsers.text()
@@ -557,12 +557,12 @@ on the request itself.
 
 ```scala
 import scamper.BodyParsers
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.RequestMethods.GET
 import scamper.client.HttpClient
 import scamper.client.Implicits.ClientHttpRequestType // Adds send method to request
 import scamper.headers.{ Accept, AcceptLanguage }
-import scamper.types.ImplicitConverters.{ stringToMediaRange, stringToLanguageRange }
+import scamper.types.Implicits.{ stringToMediaRange, stringToLanguageRange }
 
 implicit val client = HttpClient(bufferSize = 8192, readTimeout = 1000)
 implicit val parser = BodyParsers.text(4096)
@@ -579,7 +579,7 @@ When creating a client, you can supply the truststore used for all requests made
 via HTTPS.
 
 ```scala
-import scamper.ImplicitConverters.{ stringToEntity, stringToUri }
+import scamper.Implicits.{ stringToEntity, stringToUri }
 import scamper.client.HttpClient
 
 // Create client that will use supplied truststore
@@ -596,7 +596,7 @@ instead provide a trust manager.
 
 ```scala
 import javax.net.ssl.TrustManager
-import scamper.ImplicitConverters.stringToUri
+import scamper.Implicits.stringToUri
 import scamper.client.HttpClient
 
 class SingleSiteTrustManager(address: String) extends TrustManager {
@@ -617,7 +617,7 @@ client.get("https://192.168.0.2:3000/messages") { res =>
 with a simple example.
 
 ```scala
-import scamper.ImplicitConverters.stringToEntity
+import scamper.Implicits.stringToEntity
 import scamper.ResponseStatuses.Ok
 import scamper.server.HttpServer
 
@@ -728,11 +728,11 @@ is passed.
 
 ```scala
 import scamper.BodyParser
-import scamper.ImplicitConverters.stringToEntity
+import scamper.Implicits.stringToEntity
 import scamper.RequestMethods.POST
 import scamper.headers.ContentLanguage
 import scamper.types.LanguageTag
-import scamper.types.ImplicitConverters.stringToLanguageTag
+import scamper.types.Implicits.stringToLanguageTag
 
 // Translates message body from French (Oui, oui.)
 app.request { req =>
@@ -768,7 +768,7 @@ And we used a processor in our _"Hello World"_ server, but here's one that would
 do something more meaningful:
 
 ```scala
-import scamper.ImplicitConverters.fileToEntity
+import scamper.Implicits.fileToEntity
 import scamper.ResponseStatuses.{ NotFound, Ok }
 
 app.request { req =>
@@ -785,7 +785,7 @@ A processor can be added to a targeted path with or without a targeted request
 method.
 
 ```scala
-import scamper.ImplicitConverters.stringToEntity
+import scamper.Implicits.stringToEntity
 import scamper.RequestMethods.GET
 import scamper.ResponseStatuses.{ Forbidden, Ok }
 
@@ -831,7 +831,7 @@ single path component; whereas, __*param__ matches the path component along with
 any remaining components, including intervening path separators (i.e., **/**).
 
 ```scala
-import scamper.ImplicitConverters.fileToEntity
+import scamper.Implicits.fileToEntity
 import scamper.ResponseStatuses.{ Accepted, NotFound, Ok }
 import scamper.server.Implicits.ServerHttpRequestType
 
@@ -865,7 +865,7 @@ specified.
 
 ```scala
 import scamper.BodyParser
-import scamper.ImplicitConverters.stringToEntity
+import scamper.Implicits.stringToEntity
 import scamper.ResponseStatuses.Ok
 import scamper.server.Implicits.ServerHttpRequestType
 
@@ -950,7 +950,7 @@ in much the same way as `ServerApplication`, except it is configured for request
 handling only. All router paths are relative to a base path.
 
 ```scala
-import scamper.ImplicitConverters.stringToEntity
+import scamper.Implicits.stringToEntity
 import scamper.ResponseStatuses.{ NotFound, Ok }
 import scamper.server.HttpServer
 import scamper.server.Implicits.ServerHttpRequestType
@@ -1001,7 +1001,7 @@ returning the same response it consumes.
 
 ```scala
 import scamper.headers.TransferEncoding
-import scamper.types.ImplicitConverters.stringToTransferCoding
+import scamper.types.Implicits.stringToTransferCoding
 
 // Tell server to compress response
 app.response { res =>

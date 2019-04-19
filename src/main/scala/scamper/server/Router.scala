@@ -27,7 +27,7 @@ import scamper.RequestMethod
  * base path defined in the owner application.
  *
  * {{{
- * import scamper.ImplicitConverters.stringToEntity
+ * import scamper.Implicits.stringToEntity
  * import scamper.ResponseStatuses.{ NotFound, Ok }
  * import scamper.server.HttpServer
  * import scamper.server.Implicits.ServerHttpRequestType

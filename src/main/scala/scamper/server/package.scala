@@ -32,12 +32,12 @@ import RequestMethods._
  * {{{
  * import java.io.File
  * import scamper.BodyParsers
- * import scamper.ImplicitConverters.{ stringToEntity, inputStreamToEntity }
+ * import scamper.Implicits.{ stringToEntity, inputStreamToEntity }
  * import scamper.ResponseStatuses.{ NotFound, Ok }
  * import scamper.headers.TransferEncoding
  * import scamper.server.HttpServer
  * import scamper.server.Implicits.ServerHttpRequestType
- * import scamper.types.ImplicitConverters.stringToTransferCoding
+ * import scamper.types.Implicits.stringToTransferCoding
  *
  * // Get server application
  * val app = HttpServer.app()

@@ -25,7 +25,7 @@ package scamper
  * is associated with either a token or a set of parameters.
  *
  * {{{
- * import scamper.ImplicitConverters.stringToUri
+ * import scamper.Implicits.stringToUri
  * import scamper.RequestMethods.GET
  * import scamper.ResponseStatuses.Unauthorized
  * import scamper.auth.{ Authorization, Challenge, Credentials, WwwAuthenticate }
@@ -45,7 +45,7 @@ package scamper
  * `BasicCredentials`.
  *
  * {{{
- * import scamper.ImplicitConverters.stringToUri
+ * import scamper.Implicits.stringToUri
  * import scamper.RequestMethods.GET
  * import scamper.ResponseStatuses.Unauthorized
  * import scamper.auth.{ Authorization, BasicChallenge, BasicCredentials, WwwAuthenticate }
@@ -63,7 +63,7 @@ package scamper
  * classes.
  *
  * {{{
- * import scamper.ImplicitConverters.stringToUri
+ * import scamper.Implicits.stringToUri
  * import scamper.RequestMethods.GET
  * import scamper.ResponseStatuses.Unauthorized
  * import scamper.auth.{ Authorization, WwwAuthenticate }
@@ -90,7 +90,7 @@ package scamper
  * available in the header classes.
  *
  * {{{
- * import scamper.ImplicitConverters.stringToUri
+ * import scamper.Implicits.stringToUri
  * import scamper.RequestMethods.GET
  * import scamper.ResponseStatuses.Unauthorized
  * import scamper.auth.{ Authorization, WwwAuthenticate }

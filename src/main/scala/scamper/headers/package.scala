@@ -32,10 +32,10 @@ import scamper.types._
  * specific message type. This behavior is driven by the HTTP specification.
  *
  * {{{
- * import scamper.ImplicitConverters.stringToUri
+ * import scamper.Implicits.stringToUri
  * import scamper.RequestMethods.GET
  * import scamper.headers.{ Accept, Host }
- * import scamper.types.ImplicitConverters.stringToMediaRange
+ * import scamper.types.Implicits.stringToMediaRange
  *
  * // Build request using 'Host' and 'Accept' headers
  * val req = GET("/motd").withHost("localhost:8080").withAccept("text/plain")
