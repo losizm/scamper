@@ -29,6 +29,26 @@ trait Multipart {
   def parts: Seq[Part]
 
   /**
+   * Gets text content of first part with given name.
+   *
+   * @param name part name
+   *
+   * @throws ClassCastException if part is present and is not text part
+   */
+  def getText(name: String): Option[String] =
+    getTextPart(name).map(_.content)
+
+  /**
+   * Gets file content of first part with given name.
+   *
+   * @param name part name
+   *
+   * @throws ClassCastException if part is present and is not file part
+   */
+  def getFile(name: String): Option[File] =
+    getFilePart(name).map(_.content)
+
+  /**
    * Gets first part with given name and casts it to `TextPart`.
    *
    * @param name part name

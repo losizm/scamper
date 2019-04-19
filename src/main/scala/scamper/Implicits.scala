@@ -67,7 +67,7 @@ object Implicits {
      *
      * Before adding body to message, the Content-Type header is set to
      * `multipart/form-data` with a boundary parameter whose value is used
-     * when encoding the body.
+     * to delimit parts in encoded message body.
      *
      * @param body multipart body
      */
@@ -82,7 +82,7 @@ object Implicits {
      *
      * Before adding body to message, the Content-Type header is set to
      * `multipart/form-data` with a boundary parameter whose value is used
-     * when encoding the body.
+     * to delimit parts in encoded message body.
      *
      * @param parts parts used to construct multipart body
      */

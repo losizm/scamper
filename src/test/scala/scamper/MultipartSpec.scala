@@ -112,22 +112,30 @@ class MultipartSpec extends FlatSpec {
     assert(multipart.getPart("id").contains(id))
     assert(multipart.getParts("id").sameElements(Seq(id)))
     assert(multipart.getTextPart("id").contains(id))
+    assert(multipart.getText("id").contains("root"))
     assertThrows[ClassCastException] { multipart.getFilePart("id") }
+    assertThrows[ClassCastException] { multipart.getFile("id") }
 
     assert(multipart.getPart("photo").contains(photo))
     assert(multipart.getParts("photo").sameElements(Seq(photo)))
     assert(multipart.getFilePart("photo").contains(photo))
+    assert(multipart.getFile("photo").contains(new File("photo.jpg")))
     assertThrows[ClassCastException] { multipart.getTextPart("photo") }
+    assertThrows[ClassCastException] { multipart.getText("photo") }
 
     assert(multipart.getPart("genre").contains(rap))
     assert(multipart.getParts("genre").sameElements(Seq(rap, rnb, reggae)))
     assert(multipart.getTextPart("genre").contains(rap))
+    assert(multipart.getText("genre").contains("Rap"))
     assertThrows[ClassCastException] { multipart.getFilePart("genre") }
+    assertThrows[ClassCastException] { multipart.getFile("genre") }
 
     assert(multipart.getPart("none").isEmpty)
     assert(multipart.getParts("none").isEmpty)
     assert(multipart.getTextPart("none").isEmpty)
     assert(multipart.getFilePart("none").isEmpty)
+    assert(multipart.getText("none").isEmpty)
+    assert(multipart.getFile("none").isEmpty)
   }
 }
 
