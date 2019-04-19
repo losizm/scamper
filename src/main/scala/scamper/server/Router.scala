@@ -23,8 +23,8 @@ import scamper.RequestMethod
  * Configures routing for `ServerApplication`.
  *
  * `Router` works in much the same way as [[ServerApplication]], except it is
- * configured for request handling only. All router paths are relative to a
- * base path defined in the owner application.
+ * configured for request handling only, and all router paths are relative to a
+ * moint point defined in the owner application.
  *
  * {{{
  * import scamper.Implicits.stringToEntity
@@ -34,7 +34,7 @@ import scamper.RequestMethod
  *
  * val app = HttpServer.app()
  *
- * // Base path of router is /api
+ * // Mount point of router is /api
  * app.use("/api") { router =>
  *   val messages = Map(1 -> "Hello, world!", 2 -> "Goodbye, cruel world!")
  *
@@ -206,49 +206,49 @@ trait Router {
   def trace(path: String)(processor: RequestProcessor): this.type
 
   /**
-   * Adds request handler to serve files from given base directory.
+   * Adds request handler at mount point to serve files from given source directory.
    *
-   * The mount path is stripped from the router path, and the resulting path is
-   * used to locate files within the base directory.
+   * The mount point is stripped from the router path, and the resulting path is
+   * used to locate files within source directory.
    *
    * === File Mapping Examples ===
    *
-   * | Mount Path  | Base Directory | Router Path               | Maps to |
-   * | ----------- | -------------- | ------------------------- | ------- |
-   * | /images     | /tmp           | /images/logo.png          | /tmp/logo.png |
-   * | /images     | /tmp           | /images/icons/warning.png | /tmp/icons/warning.png |
-   * | /images     | /tmp           | /styles/main.css          | <em>Doesn't map to anything</em> |
+   * | Mount Point | Source Directory | Router Path               | Maps to |
+   * | ----------- | ---------------- | ------------------------- | ------- |
+   * | /images     | /tmp             | /images/logo.png          | /tmp/logo.png |
+   * | /images     | /tmp             | /images/icons/warning.png | /tmp/icons/warning.png |
+   * | /images     | /tmp             | /styles/main.css          | <em>Doesn't map to anything</em> |
    *
-   * @param mountPath mount path
-   * @param baseDirectory base directory from which files are served
+   * @param mountPoint router path at which directory is mounted
+   * @param sourceDirectory source directory from which files are served
    *
    * @return this router
    */
-  def files(mountPath: String, baseDirectory: File): this.type
+  def files(mountPoint: String, sourceDirectory: File): this.type
 
   /**
-   * Adds request handler to serve resources from given base name.
+   * Adds request handler at mount point to serve resources from given base name.
    *
-   * The mount path is stripped from the router path, and the resulting path is
-   * used to locate resources starting at the base name.
+   * The mount point is stripped from the router path, and the resulting path is
+   * used to locate resources starting at base name.
    *
    * <strong>Note:</strong> If `loader` is not supplied, then the current
    * thread's context class loader is used.
    *
    * === Resource Mapping Examples ===
    *
-   * | Mount Path  | Base Name | Router Path               | Maps to |
+   * | Mount Point | Base Name | Router Path               | Maps to |
    * | ----------- | --------- | ------------------------- | ------- |
    * | /images     | assets    | /images/logo.png          | assets/logo.png |
    * | /images     | assets    | /images/icons/warning.png | assets/icons/warning.png |
    * | /images     | assets    | /styles/main.css          | <em>Doesn't map to anything</em> |
    *
-   * @param mountPath mount path
+   * @param mountPoint router path at which resources are mointed
    * @param baseName base name from which resources are served
    * @param loader class loader from which resources are loaded
    *
    * @return this router
    */
-  def resources(mountPath: String, baseName: String, loader: Option[ClassLoader] = None): this.type
+  def resources(mountPoint: String, baseName: String, loader: Option[ClassLoader] = None): this.type
 }
 

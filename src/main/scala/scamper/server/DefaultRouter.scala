@@ -90,13 +90,13 @@ private class DefaultRouter(app: ServerApplication, path: String) extends Router
     this
   }
 
-  def files(mountPath: String, baseDirectory: File): this.type = synchronized {
-    app.files(basePath + normalize(mountPath), baseDirectory)
+  def files(mointPoint: String, baseDirectory: File): this.type = synchronized {
+    app.files(basePath + normalize(mointPoint), baseDirectory)
     this
   }
 
-  def resources(mountPath: String, baseName: String, loader: Option[ClassLoader] = None): this.type = synchronized {
-    app.resources(basePath + normalize(mountPath), baseName, loader)
+  def resources(mointPoint: String, baseName: String, loader: Option[ClassLoader] = None): this.type = synchronized {
+    app.resources(basePath + normalize(mointPoint), baseName, loader)
     this
   }
 

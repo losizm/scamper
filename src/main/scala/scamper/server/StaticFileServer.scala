@@ -23,15 +23,14 @@ import java.time.Instant
 import scala.util.{ Success, Try }
 
 import scamper.{ HttpRequest, HttpResponse }
-import scamper.Auxiliary.StringType
+import scamper.Auxiliary.{ StringType, `application/octet-stream` }
 import scamper.Implicits.fileToEntity
 import scamper.RequestMethods.{ GET, HEAD, OPTIONS }
 import scamper.ResponseStatuses.{ MethodNotAllowed, NotAcceptable, NotModified, Ok }
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 
-private class StaticFileServer(mountPath: Path, baseDirectory: Path) extends RequestHandler {
-  private val `application/octet-stream` = MediaType("application", "octet-stream")
+private class StaticFileServer(mointPoint: Path, sourceDirectory: Path) extends RequestHandler {
   private val `*/*` = MediaRange("*", "*")
 
   def apply(req: HttpRequest): Either[HttpRequest, HttpResponse] =
@@ -52,7 +51,7 @@ private class StaticFileServer(mountPath: Path, baseDirectory: Path) extends Req
       }.map(Right(_)).getOrElse(Left(req))
 
   protected def exists(path: Path): Boolean =
-    path.startsWith(baseDirectory) && Files.isRegularFile(path) && !Files.isHidden(path)
+    path.startsWith(sourceDirectory) && Files.isRegularFile(path) && !Files.isHidden(path)
 
   protected def getResponse(path: Path, mediaType: MediaType, ifModifiedSince: Instant, headOnly: Boolean): HttpResponse = {
     val attrs = Files.readAttributes(path, classOf[BasicFileAttributes])
@@ -76,8 +75,8 @@ private class StaticFileServer(mountPath: Path, baseDirectory: Path) extends Req
   private def getRealPath(path: String): Option[Path] = {
     val toPath = Paths.get(path.toUrlDecoded("utf-8")).normalize()
 
-    toPath.startsWith(mountPath) match {
-      case true  => Some(baseDirectory.resolve(mountPath.relativize(toPath)))
+    toPath.startsWith(mointPoint) match {
+      case true  => Some(sourceDirectory.resolve(mointPoint.relativize(toPath)))
       case false => None
     }
   }
@@ -92,15 +91,16 @@ private class StaticFileServer(mountPath: Path, baseDirectory: Path) extends Req
     Try(req.ifModifiedSince).getOrElse(Instant.MIN)
 
   private def getMediaType(path: Path): MediaType =
-    MediaType.fromFileName(path.getFileName.toString).getOrElse(`application/octet-stream`)
+    MediaType.fromFileName(path.getFileName.toString)
+      .getOrElse(`application/octet-stream`)
 }
 
 private object StaticFileServer {
-  def apply(mountPath: String, baseDirectory: File): StaticFileServer = {
-    val path = Paths.get(mountPath).normalize()
-    val directory = baseDirectory.toPath.toAbsolutePath.normalize()
+  def apply(mointPoint: String, sourceDirectory: File): StaticFileServer = {
+    val path = Paths.get(mointPoint).normalize()
+    val directory = sourceDirectory.toPath.toAbsolutePath.normalize()
 
-    require(path.startsWith("/"), s"Invalid mount path ($path)")
+    require(path.startsWith("/"), s"Invalid mount point ($path)")
     require(Files.isDirectory(directory), s"Not a directory ($directory)")
 
     new StaticFileServer(path, directory)
