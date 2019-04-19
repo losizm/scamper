@@ -37,14 +37,14 @@ import scala.util.{ Failure, Try }
  * @param bufferSize buffer size used by underlying input stream.
  * @param executor execution context
  */
-private class WriterInputStream(writer: OutputStream => Unit, bufferSize: Int)(implicit executor: ExecutionContext) extends InputStream {
+private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(implicit executor: ExecutionContext) extends InputStream {
   /**
    * Creates WriterInputStream using supplied writer.
    *
    * @param writer output stream handler
    * @param executor execution context
    */
-  def this(writer: OutputStream => Unit)(implicit executor: ExecutionContext) = this(writer, 8192)
+  def this(writer: OutputStream => Unit)(implicit executor: ExecutionContext) = this(8192, writer)
 
   private val in = new PipedInputStream(bufferSize)
   private val out = new PipedOutputStream(in)
@@ -110,10 +110,8 @@ private class WriterInputStream(writer: OutputStream => Unit, bufferSize: Int)(i
    *
    * @throws IOException if an I/O error occurs
    */
-  override def read(buffer: Array[Byte]): Int = {
-    checkForError()
-    in.read(buffer)
-  }
+  override def read(buffer: Array[Byte]): Int =
+    read(buffer, 0, buffer.length)
 
   /**
    * Reads bytes from input stream into supplied buffer starting at given
@@ -124,8 +122,21 @@ private class WriterInputStream(writer: OutputStream => Unit, bufferSize: Int)(i
    * @throws IOException if an I/O error occurs
    */
   override def read(buffer: Array[Byte], offset: Int, length: Int): Int = {
-    checkForError()
-    in.read(buffer, offset, length)
+    var eof = false
+    var count = 0
+
+    while (!eof && count < length) {
+      checkForError()
+
+      in.read(buffer, offset + count, length - count) match {
+        case -1 => eof = true
+        case n  => count += n
+      }
+    }
+
+    if (eof && count == 0)
+      -1
+    else count
   }
 
   /** Closes input stream. */

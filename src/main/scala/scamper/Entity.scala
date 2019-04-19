@@ -55,7 +55,7 @@ object Entity {
 
   /** Creates `Entity` from bytes written to output stream. */
   def fromOutputStream(writer: OutputStream => Unit): Entity =
-    InputStreamEntity(new WriterInputStream(writer, 8192)(Auxiliary.executor))
+    InputStreamEntity(new WriterInputStream(writer)(Auxiliary.executor))
 
   /** Creates `Entity` with data from supplied file. */
   def fromFile(file: File): Entity =
@@ -118,7 +118,7 @@ private case class InputStreamEntity(getInputStream: InputStream) extends Entity
 
 private case class MultipartEntity(multipart: Multipart, boundary: String) extends Entity {
   val getLength = None
-  lazy val getInputStream = new WriterInputStream(writeMultipart, 8192)(Auxiliary.executor)
+  lazy val getInputStream = new WriterInputStream(writeMultipart)(Auxiliary.executor)
 
   private def writeMultipart(out: OutputStream): Unit = {
     val start = "--" + boundary
