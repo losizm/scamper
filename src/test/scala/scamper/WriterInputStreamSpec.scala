@@ -20,21 +20,23 @@ import java.io.IOException
 import org.scalatest.FlatSpec
 
 class WriterInputStreamSpec extends FlatSpec {
-  "WriterInputStream" should "be read fully" in {
-    val writer = new WriterInputStream(8, out => (0 until 256).foreach(out.write))(Auxiliary.executor)
-    val buffer = new Array[Byte](256)
-    assert(writer.read(buffer) == 256)
-    assert(writer.read(buffer) == -1)
+  private val buf = new Array[Byte](256)
+
+  "WriterInputStream" should "read fully" in {
+    val in = new WriterInputStream(8, out => (0 until 256).foreach(out.write))(Auxiliary.executor)
+    try assert(in.read(buf) == 256 && in.read() == -1)
+    finally in.close()
+  }
+
+  it should "skip fully" in {
+    val in = new WriterInputStream(8, out => (0 until 256).foreach(out.write))(Auxiliary.executor)
+    try assert(in.skip(256) == 256 && in.read() == -1)
+    finally in.close()
   }
 
   it should "throw IOException" in {
-    val writer = new WriterInputStream(8, { out =>
-      (0 until 8).foreach(out.write)
-      throw new RuntimeException
-    })(Auxiliary.executor)
-
-    val buffer = new Array[Byte](8)
-    assert(writer.read(buffer) == 8)
-    assertThrows[IOException](writer.read(buffer))
+    val in = new WriterInputStream(8, { out => (0 until 4).foreach(out.write); throw new Exception })(Auxiliary.executor)
+    try assertThrows[IOException](in.read(buf))
+    finally in.close()
   }
 }
