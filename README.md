@@ -16,6 +16,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 - [Message Body](#Message-Body)
   - [Creating Body](#Creating-Body)
   - [Parsing Body](#Parsing-Body)
+- [Multipart Message Body](#Multipart-Message-Body)
 - [Message Attributes](#Message-Attributes)
 - [HTTP Authentication](#HTTP-Authentication)
   - [Basic Authentication](#Basic-Authentication)
@@ -327,6 +328,55 @@ def printUser(message: HttpMessage): Unit = {
 
   println(s"uid=${user.id}(${user.name})")
 }
+```
+
+## Multipart Message Body
+
+You can create a message with multipart form-data, which is generally required for
+form submission containing file content. When the multipart body is added to the
+message, the **Content-Type** header is set to `multipart/form-data` with a
+boundary parameter whose value is used to delimit parts in the encoded body.
+
+```scala
+import java.io.File
+import scamper.{ Multipart, TextPart, FilePart }
+import scamper.Implicits.{ MultipartHttpMessageType, stringToUri }
+import scamper.RequestMethods.POST
+
+// Build multipart form-data with text and file content
+val formData = Multipart(
+  TextPart("track", "Form Of Intellect"),
+  TextPart("artist", "Gang Starr"),
+  TextPart("album", "Step In The Arena"),
+  FilePart("file", new File("/music/gangstarr/form_of_intellect.m4a"))
+)
+
+// Create request with multipart body
+val req = POST("https://upload.musiclibrary.com/songs").withMultipartBody(formData)
+```
+
+And for an incoming message with multipart form-data, there's a standard
+`BodyParser` for parsing the message content.
+
+```scala
+import scamper.{ BodyParsers, HttpRequest, Multipart }
+
+def saveTrack(req: HttpRequest): Unit = {
+  // Get parser for multipart message body
+  implicit val parser = BodyParsers.multipart()
+
+  // Parse message to Multipart instance
+  val multipart = req.as[Multipart]
+
+  // Extracts content from the parts
+  val track = multipart.getText("track")
+  val artist = multipart.getText("artist")
+  val album = multipart.getText("album")
+  val file = multipart.getFile("file")
+
+  ...
+}
+
 ```
 
 ## Message Attributes
@@ -882,14 +932,15 @@ app.post("/translate/:in/to/:out") { req =>
 
 #### Serving Static Files
 
-You can add a request handler to serve static files from a base directory.
+You can add a request handler at a moint point to serve static files from a
+source directory.
 
 ```scala
 app.files("/app/main", new File("/path/to/public"))
 ```
 
 This adds a handler to serve files from the directory at _/path/to/public_. The
-files are mapped based on the request path excluding path prefix. For example,
+files are mapped based on the request path excluding the moint point. For example,
 _http://localhost:8080/app/main/images/logo.png_ would map to
 _/path/to/public/images/logo.png_.
 
@@ -947,7 +998,7 @@ app.error { (err, req) =>
 
 Use `Router` to structure the application routes hierarchically. `Router` works
 in much the same way as `ServerApplication`, except it is configured for request
-handling only. All router paths are relative to a base path.
+handling only, and all router paths are relative to its moint point.
 
 ```scala
 import scamper.Implicits.stringToEntity
@@ -957,7 +1008,7 @@ import scamper.server.Implicits.ServerHttpRequestType
 
 val app = HttpServer.app()
 
-// Base path of router is /api
+// Moint point of router is /api
 app.use("/api") { router =>
   val messages = Map(1 -> "Hello, world!", 2 -> "Goodbye, cruel world!")
 
