@@ -19,6 +19,8 @@ import java.io.{ File, InputStream, OutputStream }
 import java.net.URI
 import java.time.Instant
 
+import scamper.types.MediaType
+
 /** Includes implicit converter functions. */
 object Implicits {
   /** Converts string to {@code java.net.URI}. */
@@ -60,31 +62,94 @@ object Implicits {
   /** Converts int to [[ResponseStatus]]. */
   implicit val intToResponseStatus = (statusCode: Int) => ResponseStatus(statusCode)
 
-  /** Adds methods to HttpMessage for building message with mulitpart body. */
-  implicit class MultipartHttpMessageType[T <: HttpMessage](val message: T) extends AnyVal {
+  /**
+   * Adds extension methods to HttpMessage for building messages with various
+   * content types.
+   */
+  implicit class HttpMessageType[T <: HttpMessage](val message: T) extends AnyVal {
     /**
-     * Creates new message with supplied multipart body.
+     * Creates new message with content from supplied file as message body.
      *
-     * Before adding body to message, the Content-Type header is set to
-     * `multipart/form-data` with a boundary parameter whose value is used
-     * to delimit parts in encoded message body.
+     * After adding body to message, the Content-Type header is set based on
+     * file type, and Content-Length is set to file size.
      *
-     * @param body multipart body
+     * @param file message body
      */
-    def withMultipartBody(body: Multipart)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
-      val boundary = Multipart.boundary()
-      message.withHeader(Header("Content-Type", s"multipart/form-data; boundary=$boundary"))
-        .withBody(Entity.fromMultipart(body, boundary))
+    def withFileBody(file: File)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+      val entity = Entity.fromFile(file)
+      val mediaType = MediaType.fromFile(file).getOrElse(Auxiliary.`application/octet-stream`)
+      message.withBody(entity)
+        .withHeader(Header("Content-Type", mediaType.toString))
+        .withHeader(Header("Content-Length", entity.getLength.get))
     }
 
     /**
-     * Creates new message with multipart body constructed from supplied parts.
+     * Creates new message with supplied parameters as message body, with the
+     * parameters encoded as form data.
+     *
+     * After adding body to message, the Content-Type header is set to
+     * `application/x-www-form-urlencoded`, and Content-Length is set to length
+     * of encoded form data.
+     *
+     * @param params message body
+     */
+    def withFormBody(params: Map[String, Seq[String]])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      withFormBody(QueryString(params))
+
+    /**
+     * Creates new message with supplied parameters as message body, with the
+     * parameters encoded as form data.
+     *
+     * After adding body to message, the Content-Type header is set to
+     * `application/x-www-form-urlencoded`, and Content-Length is set to length
+     * of encoded form data.
+     *
+     * @param params message body
+     */
+    def withFormBody(params: (String, String)*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      withFormBody(QueryString(params : _*))
+
+    /**
+     * Creates new message with supplied query string as message body, with the
+     * query string encoded as form data.
+     *
+     * After adding body to message, the Content-Type header is set to
+     * `application/x-www-form-urlencoded`, and Content-Length is set to length
+     * of encoded form data.
+     *
+     * @param query message body
+     */
+    def withFormBody(query: QueryString)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+      val entity = Entity.fromQuery(query)
+      message.withBody(entity)
+        .withHeader(Header("Content-Type", "application/x-www-form-urlencoded"))
+        .withHeader(Header("Content-Length", entity.getLength.get))
+    }
+
+    /**
+     * Creates new message with supplied multipart as message body.
+     *
+     * After adding body to message, the Content-Type header is set to
+     * `multipart/form-data` with a boundary parameter whose value is used
+     * to delimit parts in encoded message body.
+     *
+     * @param multipart message body
+     */
+    def withMultipartBody(multipart: Multipart)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+      val boundary = Multipart.boundary()
+      message.withBody(Entity.fromMultipart(multipart, boundary))
+        .withHeader(Header("Content-Type", s"multipart/form-data; boundary=$boundary"))
+    }
+
+    /**
+     * Creates new message with supplied parts as message body, with the parts encoded as
+     * multipart form data.
      *
      * Before adding body to message, the Content-Type header is set to
      * `multipart/form-data` with a boundary parameter whose value is used
      * to delimit parts in encoded message body.
      *
-     * @param parts parts used to construct multipart body
+     * @param parts message body
      */
     def withMultipartBody(parts: Part*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       withMultipartBody(Multipart(parts : _*))

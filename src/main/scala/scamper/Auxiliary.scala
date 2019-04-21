@@ -26,11 +26,13 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext
 import scala.util.Try
 
+import scamper.types.MediaType
+
 private object Auxiliary {
   private val crlf = "\r\n".getBytes("UTF-8")
 
-  val `application/octet-stream` = types.MediaType("application", "octet-stream")
-  val `text/plain` = types.MediaType("text", "plain")
+  val `application/octet-stream` = MediaType("application", "octet-stream")
+  val `text/plain` = MediaType("text", "plain")
 
   implicit class FileType(val file: File) extends AnyVal {
     def withOutputStream[T](f: OutputStream => T): T = {
