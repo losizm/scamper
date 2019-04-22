@@ -28,6 +28,18 @@ trait Multipart {
   /** Gets parts. */
   def parts: Seq[Part]
 
+  /** Gets all text parts. */
+  lazy val textParts: Seq[TextPart] =
+    parts.collect { case part: TextPart => part }
+
+  /** Gets all file parts. */
+  lazy val fileParts: Seq[FilePart] =
+    parts.collect { case part: FilePart => part }
+
+  /** Collects all text parts into query string. */
+  lazy val toQuery: QueryString =
+    QueryString(textParts.map { part => part.name -> part.content } : _*)
+
   /**
    * Gets first part with given name.
    *

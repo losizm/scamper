@@ -136,6 +136,16 @@ class MultipartSpec extends FlatSpec {
     assert(multipart.getFilePart("none").isEmpty)
     assert(multipart.getText("none").isEmpty)
     assert(multipart.getFile("none").isEmpty)
+
+    assert(multipart.textParts.sameElements(Seq(id, rap, rnb, reggae)))
+    assert(multipart.fileParts.sameElements(Seq(photo)))
+
+    val query = multipart.toQuery
+    assert(query("id") == "root")
+    assert(query.getValues("id") == Seq("root"))
+    assert(query("genre") == "Rap")
+    assert(query.getValues("genre").sameElements(Seq("Rap", "R&B", "Reggae")))
+    assertThrows[NoSuchElementException] { query("photo") }
   }
 }
 
