@@ -340,15 +340,15 @@ boundary parameter whose value is used to delimit parts in the encoded body.
 ```scala
 import java.io.File
 import scamper.{ Multipart, TextPart, FilePart }
-import scamper.Implicits.{ MultipartHttpMessageType, stringToUri }
+import scamper.Implicits.{ HttpMessageType, stringToUri }
 import scamper.RequestMethods.POST
 
 // Build multipart form-data with text and file content
 val formData = Multipart(
-  TextPart("track", "Form Of Intellect"),
+  TextPart("title", "Form Of Intellect"),
   TextPart("artist", "Gang Starr"),
   TextPart("album", "Step In The Arena"),
-  FilePart("file", new File("/music/gangstarr/form_of_intellect.m4a"))
+  FilePart("track", new File("/music/gangstarr/form_of_intellect.m4a"))
 )
 
 // Create request with multipart body
@@ -369,14 +369,13 @@ def saveTrack(req: HttpRequest): Unit = {
   val multipart = req.as[Multipart]
 
   // Extracts content from the parts
-  val track = multipart.getText("track")
+  val title = multipart.getText("title")
   val artist = multipart.getText("artist")
   val album = multipart.getText("album")
-  val file = multipart.getFile("file")
+  val track = multipart.getFile("track")
 
   ...
 }
-
 ```
 
 ## Message Attributes
