@@ -1,0 +1,561 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+          <title></title>
+          <meta name="description" content="" />
+          <meta name="keywords" content="" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../lib/jquery.panzoom.min.js"></script>
+      <script type="text/javascript" src="../../lib/jquery.mousewheel.min.js"></script>
+      <script type="text/javascript" src="../../lib/index.js"></script>
+      <script type="text/javascript" src="../../index.js"></script>
+      <script type="text/javascript" src="../../lib/scheduler.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+        /* this variable can be used by the JS to determine the path to the root document */
+        var toRoot = '../../';
+      </script>
+    
+        </head>
+        <body>
+      <div id="search">
+        <span id="doc-title"><span id="doc-version"></span></span>
+        <span class="close-results"><span class="left">&lt;</span> Back</span>
+        <div id="textfilter">
+          <span class="input">
+            <input autocapitalize="none" placeholder="Search" id="index-input" type="text" accesskey="/" />
+            <i class="clear material-icons"></i>
+            <i id="search-icon" class="material-icons"></i>
+          </span>
+        </div>
+    </div>
+      <div id="search-results">
+        <div id="search-progress">
+          <div id="progress-fill"></div>
+        </div>
+        <div id="results-content">
+          <div id="entity-results"></div>
+          <div id="member-results"></div>
+        </div>
+      </div>
+      <div id="content-scroll-container" style="-webkit-overflow-scrolling: touch;">
+        <div id="content-container" style="-webkit-overflow-scrolling: touch;">
+          <div id="subpackage-spacer">
+            <div id="packages">
+              <h1>Packages</h1>
+              <ul>
+                <li name="_root_.root" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="_root_"></a><a id="root:_root_"></a>
+      <span class="permalink">
+      <a href="index.html#_root_" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="../../index.html"><span class="name">root</span></a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../index.html" class="extype" name="_root_">root</a></dd></dl></div>
+    </li><li name="_root_.scamper" visbl="pub" class="indented1 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="scamper"></a><a id="scamper:scamper"></a>
+      <span class="permalink">
+      <a href="index.html#scamper" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="At the core Scamper is HttpMessage, which is a trait that defines the fundamental characteristics of an HTTP message." href="../index.html"><span class="name">scamper</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">At the core <em>Scamper</em> is <a href="../HttpMessage.html" class="extype" name="scamper.HttpMessage">HttpMessage</a>, which is a trait that
+defines the fundamental characteristics of an HTTP message.</p><div class="fullcomment"><div class="comment cmt"><h5> HTTP Messages </h5><p>At the core <em>Scamper</em> is <a href="../HttpMessage.html" class="extype" name="scamper.HttpMessage">HttpMessage</a>, which is a trait that
+defines the fundamental characteristics of an HTTP message. <a href="../HttpRequest.html" class="extype" name="scamper.HttpRequest">HttpRequest</a>
+and <a href="../HttpResponse.html" class="extype" name="scamper.HttpResponse">HttpResponse</a> extend the specification to define characteristics
+specific to their respective message types.</p><p>An <a href="../HttpRequest.html" class="extype" name="scamper.HttpRequest">HttpRequest</a> can be created using one of the factory methods defined in
+its companion object. Or you can start with a <a href="../RequestMethod.html" class="extype" name="scamper.RequestMethod">RequestMethod</a> and use
+builder methods to further define the request.</p><pre><span class="kw">import</span> scamper.Header
+<span class="kw">import</span> scamper.Implicits.stringToUri
+<span class="kw">import</span> scamper.RequestMethods.GET
+
+<span class="kw">val</span> request = GET(<span class="lit">"/motd"</span>).withHeaders(
+  Header(<span class="lit">"Host"</span>, <span class="lit">"localhost:8080"</span>),
+  Header(<span class="lit">"Accept"</span>, <span class="lit">"text/plain"</span>)
+)
+
+printf(<span class="lit">"Request Method: %s%n"</span>, request.method)
+printf(<span class="lit">"Target URI: %s%n"</span>, request.target)
+
+request.headers.foreach(println)
+
+<span class="kw">val</span> host: <span class="std">Option</span>[<span class="std">String</span>] = request.getHeaderValue(<span class="lit">"Host"</span>)</pre><p>An <a href="../HttpResponse.html" class="extype" name="scamper.HttpResponse">HttpResponse</a> can be created using one of the factory methods defined
+in its companion object. Or you can start with a <a href="../ResponseStatus.html" class="extype" name="scamper.ResponseStatus">ResponseStatus</a> and use
+builder methods to further define the response.</p><pre><span class="kw">import</span> scamper.{ BodyParsers, Header }
+<span class="kw">import</span> scamper.Implicits.stringToEntity
+<span class="kw">import</span> scamper.ResponseStatuses.Ok
+
+<span class="kw">val</span> response = Ok(<span class="lit">"There is an answer."</span>).withHeaders(
+  Header(<span class="lit">"Content-Type"</span>, <span class="lit">"text/plain"</span>),
+  Header(<span class="lit">"Connection"</span>, <span class="lit">"close"</span>)
+)
+
+printf(<span class="lit">"Status Code: %s%n"</span>, response.status.code)
+printf(<span class="lit">"Reason Phrase: %s%n"</span>, response.status.reason)
+
+response.headers.foreach(println)
+
+<span class="kw">val</span> contentType: <span class="std">Option</span>[<span class="std">String</span>] = response.getHeaderValue(<span class="lit">"Content-Type"</span>)
+
+<span class="kw">implicit</span> <span class="kw">val</span> parser = BodyParsers.text()
+
+printf(<span class="lit">"Body: %s%n"</span>, response.as[<span class="std">String</span>])</pre></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../index.html" class="extype" name="_root_">root</a></dd></dl></div>
+    </li><li name="scamper.cookies" visbl="pub" class="indented2 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cookies"></a><a id="cookies:cookies"></a>
+      <span class="permalink">
+      <a href="../scamper/index.html#cookies" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="Provides specialized access to message cookies." href="index.html"><span class="name">cookies</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">Provides specialized access to message cookies.</p><div class="fullcomment"><div class="comment cmt"><p>Provides specialized access to message cookies.</p><h5> Request Cookies </h5><p>In <a href="../HttpRequest.html" class="extype" name="scamper.HttpRequest">HttpRequest</a>, cookies are stringed together in the <strong>Cookie</strong>
+header. You can access them using the extension methods provided by
+<a href="" class="extype" name="scamper.cookies.RequestCookies">RequestCookies</a>, with each cookie represented as <a href="package$$PlainCookie.html" class="extype" name="scamper.cookies.PlainCookie">PlainCookie</a>.</p><pre><span class="kw">import</span> scamper.Implicits.stringToUri
+<span class="kw">import</span> scamper.RequestMethods.GET
+<span class="kw">import</span> scamper.cookies.{ PlainCookie, RequestCookies }
+
+<span class="cmt">// Build request with cookies</span>
+<span class="kw">val</span> req = GET(<span class="lit">"https://localhost:8080/motd"</span>).withCookies(
+  PlainCookie(<span class="lit">"ID"</span>, <span class="lit">"bG9zCg"</span>), PlainCookie(<span class="lit">"Region"</span>, <span class="lit">"SE-US"</span>)
+)
+
+<span class="cmt">// Access and print all cookies</span>
+req.cookies.foreach(println)
+
+<span class="cmt">// Get cookies by name</span>
+<span class="kw">val</span> id: <span class="std">Option</span>[PlainCookie] = req.getCookie(<span class="lit">"ID"</span>)
+<span class="kw">val</span> region: <span class="std">Option</span>[PlainCookie] = req.getCookie(<span class="lit">"Region"</span>)
+
+<span class="cmt">// Get cookie values by name</span>
+assert(req.getCookieValue(<span class="lit">"ID"</span>).contains(<span class="lit">"bG9zCg"</span>))
+assert(req.getCookieValue(<span class="lit">"Region"</span>).contains(<span class="lit">"SE-US"</span>))</pre><h5> Response Cookies </h5><p>In <a href="../HttpResponse.html" class="extype" name="scamper.HttpResponse">HttpResponse</a>, the cookies are a collection of <strong>Set-Cookie</strong>
+header values.  Specialized access is provided by <a href="package$$ResponseCookies.html" class="extype" name="scamper.cookies.ResponseCookies">ResponseCookies</a>, with
+each cookie represented as <a href="package$$SetCookie.html" class="extype" name="scamper.cookies.SetCookie">SetCookie</a>.</p><pre><span class="kw">import</span> scamper.Implicits.stringToEntity
+<span class="kw">import</span> scamper.ResponseStatuses.Ok
+<span class="kw">import</span> scamper.cookies.{ ResponseCookies, SetCookie }
+
+<span class="cmt">// Build response with cookies</span>
+<span class="kw">val</span> res = Ok(<span class="lit">"There is an answer."</span>).withCookies(
+  SetCookie(<span class="lit">"ID"</span>, <span class="lit">"bG9zCg"</span>, path = <span class="std">Some</span>(<span class="lit">"/motd"</span>), secure = <span class="kw">true</span>),
+  SetCookie(<span class="lit">"Region"</span>, <span class="lit">"SE-US"</span>)
+)
+
+<span class="cmt">// Access and print all cookies</span>
+res.cookies.foreach(println)
+
+<span class="cmt">// Get cookies by name</span>
+<span class="kw">val</span> id: <span class="std">Option</span>[SetCookie] = res.getCookie(<span class="lit">"ID"</span>)
+<span class="kw">val</span> region: <span class="std">Option</span>[SetCookie] = res.getCookie(<span class="lit">"Region"</span>)
+
+<span class="cmt">// Get attributes of ID cookie</span>
+<span class="kw">val</span> path: <span class="std">String</span> = id.flatMap(_.path).getOrElse(<span class="lit">"/"</span>)
+<span class="kw">val</span> secure: <span class="std">Boolean</span> = id.map(_.secure).getOrElse(<span class="kw">false</span>)
+
+<span class="cmt">// Get cookie values by name</span>
+assert(res.getCookieValue(<span class="lit">"ID"</span>).contains(<span class="lit">"bG9zCg"</span>))
+assert(res.getCookieValue(<span class="lit">"Region"</span>).contains(<span class="lit">"SE-US"</span>))</pre></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="scamper">scamper</a></dd></dl></div>
+    </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="trait" href="package$$Cookie.html" title="HTTP Cookie"></a>
+                        <a href="package$$Cookie.html" title="HTTP Cookie">Cookie</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="package$$PlainCookie$.html" title="PlainCookie factory"></a>
+                        <a class="trait" href="package$$PlainCookie.html" title="HTTP request cookie"></a>
+                        <a href="package$$PlainCookie.html" title="HTTP request cookie">PlainCookie</a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="class" href="" title="Provides access to request cookies in Cookie header."></a>
+                        <a href="" title="Provides access to request cookies in Cookie header.">RequestCookies</a>
+                      </li><li class="current-entities indented2">
+                        <span class="separator"></span>
+                        <a class="class" href="package$$ResponseCookies.html" title="Provides access to response cookies in Set-Cookie headers."></a>
+                        <a href="package$$ResponseCookies.html" title="Provides access to response cookies in Set-Cookie headers.">ResponseCookies</a>
+                      </li><li class="current-entities indented2">
+                        <a class="object" href="package$$SetCookie$.html" title="SetCookie factory"></a>
+                        <a class="trait" href="package$$SetCookie.html" title="HTTP response cookie"></a>
+                        <a href="package$$SetCookie.html" title="HTTP response cookie">SetCookie</a>
+                      </li>
+              </ul>
+            </div>
+          </div>
+          <div id="content">
+            <body class="class type">
+      <div id="definition">
+        <div class="big-circle class">c</div>
+        <p id="owner"><a href="../index.html" class="extype" name="scamper">scamper</a>.<a href="index.html" class="extype" name="scamper.cookies">cookies</a></p>
+        <h1>RequestCookies<span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span></h1>
+        <h3><span class="morelinks"></span></h3>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit final </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">RequestCookies</span><span class="result"> extends <span class="extype" name="scala.AnyVal">AnyVal</span></span>
+      </span>
+      </h4>
+
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Provides access to request cookies in <code>Cookie</code> header.</p></div><div class="toggleContainer block">
+          <span class="toggle">
+            Linear Supertypes
+          </span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyVal">AnyVal</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div class="toggle"></div>
+        <div id="memberfilter">
+          <i class="material-icons arrow"></i>
+          <span class="input">
+            <input id="mbrsel-input" placeholder="Filter all members" type="text" accesskey="/" />
+          </span>
+          <i class="clear material-icons"></i>
+        </div>
+        <div id="filterby">
+          <div id="order">
+            <span class="filtertype">Ordering</span>
+            <ol>
+              
+              <li class="alpha in"><span>Alphabetic</span></li>
+              <li class="inherit out"><span>By Inheritance</span></li>
+            </ol>
+          </div>
+          <div class="ancestors">
+                  <span class="filtertype">Inherited<br />
+                  </span>
+                  <ol id="linearization">
+                    <li class="in" name="scamper.cookies.RequestCookies"><span>RequestCookies</span></li><li class="in" name="scala.AnyVal"><span>AnyVal</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  </ol>
+                </div><div class="ancestors">
+              <span class="filtertype"></span>
+              <ol>
+                <li class="hideall out"><span>Hide All</span></li>
+                <li class="showall in"><span>Show All</span></li>
+              </ol>
+            </div>
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+            </div>
+        </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="scamper.cookies.RequestCookies#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(request:scamper.HttpRequest):scamper.cookies.package.RequestCookies"></a><a id="&lt;init&gt;:RequestCookies"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html#&lt;init&gt;(request:scamper.HttpRequest):scamper.cookies.package.RequestCookies" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">RequestCookies</span><span class="params">(<span name="request">request: <a href="../HttpRequest.html" class="extype" name="scamper.HttpRequest">HttpRequest</a></span>)</span>
+      </span>
+      
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol>
+                <li name="scala.Any#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html#!=(x$1:Any):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.Any###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html###():Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html#==(x$1:Any):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html#asInstanceOf[T0]:T0" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scamper.cookies.RequestCookies#cookies" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="cookies:Seq[scamper.cookies.package.PlainCookie]"></a><a id="cookies:Seq[PlainCookie]"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html#cookies:Seq[scamper.cookies.package.PlainCookie]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cookies</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="package$$PlainCookie.html" class="extype" name="scamper.cookies.PlainCookie">PlainCookie</a>]</span>
+      </span>
+      
+      <p class="shortcomment cmt">Gets cookies.</p>
+    </li><li name="scala.AnyVal#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_&lt;:AnyVal]"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html#getClass():Class[_&lt;:AnyVal]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.Class">Class</span>[_ &lt;: <span class="extype" name="scala.AnyVal">AnyVal</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyVal → Any</dd></dl></div>
+    </li><li name="scamper.cookies.RequestCookies#getCookie" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getCookie(name:String):Option[scamper.cookies.package.PlainCookie]"></a><a id="getCookie(String):Option[PlainCookie]"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html#getCookie(name:String):Option[scamper.cookies.package.PlainCookie]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getCookie</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="package$$PlainCookie.html" class="extype" name="scamper.cookies.PlainCookie">PlainCookie</a>]</span>
+      </span>
+      
+      <p class="shortcomment cmt">Gets specified cookie.</p><div class="fullcomment"><div class="comment cmt"><p>Gets specified cookie.
+</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>cookie name</p></dd></dl></div>
+    </li><li name="scamper.cookies.RequestCookies#getCookieValue" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getCookieValue(name:String):Option[String]"></a><a id="getCookieValue(String):Option[String]"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html#getCookieValue(name:String):Option[String]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getCookieValue</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      
+      <p class="shortcomment cmt">Gets value of specified cookie.</p><div class="fullcomment"><div class="comment cmt"><p>Gets value of specified cookie.
+</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>cookie name</p></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html#isInstanceOf[T0]:Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scamper.cookies.RequestCookies#request" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="request:scamper.HttpRequest"></a><a id="request:HttpRequest"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html#request:scamper.HttpRequest" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">request</span><span class="result">: <a href="../HttpRequest.html" class="extype" name="scamper.HttpRequest">HttpRequest</a></span>
+      </span>
+      
+      
+    </li><li name="scala.Any#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html#toString():String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scamper.cookies.RequestCookies#withCookie" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="withCookie(cookie:scamper.cookies.package.PlainCookie):scamper.HttpRequest"></a><a id="withCookie(PlainCookie):HttpRequest"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html#withCookie(cookie:scamper.cookies.package.PlainCookie):scamper.HttpRequest" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">withCookie</span><span class="params">(<span name="cookie">cookie: <a href="package$$PlainCookie.html" class="extype" name="scamper.cookies.PlainCookie">PlainCookie</a></span>)</span><span class="result">: <a href="../HttpRequest.html" class="extype" name="scamper.HttpRequest">HttpRequest</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Creates copy of request with supplied cookie.</p><div class="fullcomment"><div class="comment cmt"><p>Creates copy of request with supplied cookie.</p><p>If a cookie already exists with given name, the existing cookie is
+replaced with the new cookie.
+</p></div></div>
+    </li><li name="scamper.cookies.RequestCookies#withCookies" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="withCookies(cookies:scamper.cookies.package.PlainCookie*):scamper.HttpRequest"></a><a id="withCookies(PlainCookie*):HttpRequest"></a>
+      <span class="permalink">
+      <a href="../../scamper/cookies/package$$RequestCookies.html#withCookies(cookies:scamper.cookies.package.PlainCookie*):scamper.HttpRequest" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">withCookies</span><span class="params">(<span name="cookies">cookies: <a href="package$$PlainCookie.html" class="extype" name="scamper.cookies.PlainCookie">PlainCookie</a>*</span>)</span><span class="result">: <a href="../HttpRequest.html" class="extype" name="scamper.HttpRequest">HttpRequest</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Creates copy of request with new set of cookies.</p><div class="fullcomment"><div class="comment cmt"><p>Creates copy of request with new set of cookies.
+</p></div><dl class="paramcmts block"><dt class="param">cookies</dt><dd class="cmt"><p>new set of cookies</p></dd></dl></div>
+    </li>
+              </ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyVal">
+              <h3>Inherited from <span class="extype" name="scala.AnyVal">AnyVal</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+    </body>
+          </div>
+        </div>
+      </div>
+    </body>
+      </html>
