@@ -20,7 +20,14 @@ import java.net.URLEncoder.encode
 
 /** Represents query string as mapped parameters. */
 trait QueryString {
-  /** Gets first value of named parameter. */
+  /**
+   * Gets first value of named parameter.
+   *
+   * @throws NoSuchElementException if parameter not present
+   */
+  def apply(name: String) = getValue(name).getOrElse(throw new NoSuchElementException(name))
+
+  /** Gets first value of named parameter if present. */
   def getValue(name: String): Option[String]
 
   /** Gets all values of named parameter. */
@@ -59,7 +66,11 @@ object QueryString {
    * @param params parameters
    */
   def apply(params: (String, String)*): QueryString =
-   apply(params.map { case (name, value) => name -> Seq(value) }.toMap)
+    apply {
+      params.groupBy(_._1).map {
+        case (name, params) => name -> params.map(_._2)
+      }.toMap
+    }
 
   /**
    * Parses formatted query string.
