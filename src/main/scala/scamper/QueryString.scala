@@ -20,17 +20,46 @@ import java.net.URLEncoder.encode
 
 /** Represents query string as mapped parameters. */
 trait QueryString {
+  /** Get parameter names. */
+  def names: Seq[String]
+
   /**
    * Gets first value of named parameter.
    *
+   * @param name parameter name
+   *
    * @throws NoSuchElementException if parameter not present
    */
-  def apply(name: String) = getValue(name).getOrElse(throw new NoSuchElementException(name))
+  def apply(name: String) = getOrElse(name, throw new NoSuchElementException(name))
 
-  /** Gets first value of named parameter if present. */
-  def getValue(name: String): Option[String]
+  /**
+   * Gets first value of named parameter if present.
+   *
+   * @param name parameter name
+   */
+  def get(name: String): Option[String]
 
-  /** Gets all values of named parameter. */
+  /**
+   * Gets first value of named parameter if present, otherwise returns default
+   * value.
+   *
+   * @param name parameter name
+   * @param default default value
+   */
+  def getOrElse(name: String, default: => String): String = get(name).getOrElse(default)
+
+  /**
+   * Tests whether query string contains named parameter.
+   *
+   * @param name parameter name
+   */
+  def contains(name: String): Boolean = get(name).isDefined
+
+  /**
+   * Gets all values of named parameter.
+   *
+   * @param name parameter name
+   */
   def getValues(name: String): Seq[String]
 
   /** Tests whether query is empty. */
@@ -100,7 +129,8 @@ object QueryString {
 }
 
 private object EmptyQueryString extends QueryString {
-  def getValue(name: String) = None
+  def names = Nil
+  def get(name: String) = None
   def getValues(name: String) = Nil
   val isEmpty = true
   val toMap = Map.empty
@@ -108,7 +138,8 @@ private object EmptyQueryString extends QueryString {
 }
 
 private case class QueryStringImpl(toMap: Map[String, Seq[String]]) extends QueryString {
-  def getValue(name: String) = toMap.get(name).flatMap(_.headOption)
+  lazy val names = toMap.keys.toSeq
+  def get(name: String) = toMap.get(name).flatMap(_.headOption)
   def getValues(name: String) = toMap.get(name).getOrElse(Nil)
   def isEmpty = toMap.isEmpty
   lazy val toSimpleMap = toMap.collect { case (name, Seq(value, _*)) => name -> value }.toMap

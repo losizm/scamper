@@ -27,8 +27,8 @@ class HttpMessageSpec extends FlatSpec {
     assert(req.method.name == "GET")
     assert(req.target.toString == "/find?user=root&group=wheel")
     assert(req.path == "/find")
-    assert(req.query.getValue("user").contains("root"))
-    assert(req.query.getValue("group").contains("wheel"))
+    assert(req.query.get("user").contains("root"))
+    assert(req.query.get("group").contains("wheel"))
   }
 
   it should "be created with empty path" in {
@@ -48,8 +48,8 @@ class HttpMessageSpec extends FlatSpec {
     assert(req.method.name == "GET")
     assert(req.target.toString == s"/find?${req.query}")
     assert(req.path == "/find")
-    assert(req.query.getValue("user").contains("root"))
-    assert(req.query.getValue("group").contains("wheel"))
+    assert(req.query.get("user").contains("root"))
+    assert(req.query.get("group").contains("wheel"))
     assert(req.attributes.isEmpty)
   }
 
@@ -58,8 +58,8 @@ class HttpMessageSpec extends FlatSpec {
     assert(req.method.name == "GET")
     assert(req.target.toString == "/find?user=root&group=wheel")
     assert(req.path == "/find")
-    assert(req.query.getValue("user").contains("root"))
-    assert(req.query.getValue("group").contains("wheel"))
+    assert(req.query.get("user").contains("root"))
+    assert(req.query.get("group").contains("wheel"))
     assert(req.host == "localhost:8080")
     assert(req.attributes.isEmpty)
   }

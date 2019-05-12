@@ -68,8 +68,8 @@ class BodyParserSpec extends FlatSpec {
     val request = POST("users").withBody(body).withContentLength(body.getLength.get)
     val form = request.as[QueryString]
 
-    assert(form.getValue("id").contains("0"))
-    assert(form.getValue("name").contains("root"))
+    assert(form.get("id").contains("0"))
+    assert(form.get("name").contains("root"))
   }
 
   it should "not parse response with large body" in {

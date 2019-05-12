@@ -21,19 +21,23 @@ class QueryStringSpec extends FlatSpec {
   "QueryString" should "be created from map" in {
     val query = QueryString(Map("id" -> Seq("0"), "name" -> Seq("root"), "groups" -> Seq("wheel", "admin")))
 
+    assert(query.contains("id"))
     assert(query("id") == "0")
-    assert(query.getValue("id").contains("0"))
+    assert(query.get("id").contains("0"))
     assert(query.getValues("id") == Seq("0"))
 
+    assert(query.contains("name"))
     assert(query("name") == "root")
-    assert(query.getValue("name").contains("root"))
+    assert(query.get("name").contains("root"))
     assert(query.getValues("name") == Seq("root"))
 
+    assert(query.contains("groups"))
     assert(query("groups") == "wheel")
-    assert(query.getValue("groups").contains("wheel"))
+    assert(query.get("groups").contains("wheel"))
     assert(query.getValues("groups") == Seq("wheel", "admin"))
 
     assert(!query.isEmpty)
+    assert(!query.contains("idx"))
 
     val toMap = query.toMap
     assert(toMap("id") == Seq("0"))
@@ -53,19 +57,23 @@ class QueryStringSpec extends FlatSpec {
   it should "be created from name/value pairs" in {
     val query = QueryString("id" -> "0", "name" -> "root", "groups" -> "wheel", "groups" -> "admin")
 
+    assert(query.contains("id"))
     assert(query("id") == "0")
-    assert(query.getValue("id").contains("0"))
+    assert(query.get("id").contains("0"))
     assert(query.getValues("id") == Seq("0"))
 
+    assert(query.contains("name"))
     assert(query("name") == "root")
-    assert(query.getValue("name").contains("root"))
+    assert(query.get("name").contains("root"))
     assert(query.getValues("name") == Seq("root"))
 
+    assert(query.contains("groups"))
     assert(query("groups") == "wheel")
-    assert(query.getValue("groups").contains("wheel"))
+    assert(query.get("groups").contains("wheel"))
     assert(query.getValues("groups") == Seq("wheel", "admin"))
 
     assert(!query.isEmpty)
+    assert(!query.contains("idx"))
 
     val toMap = query.toMap
     assert(toMap("id") == Seq("0"))
@@ -85,19 +93,23 @@ class QueryStringSpec extends FlatSpec {
   it should "be created from formatted query string" in {
     val query = QueryString("id=0&name=root&groups=wheel&groups=admin")
 
+    assert(query.contains("id"))
     assert(query("id") == "0")
-    assert(query.getValue("id").contains("0"))
+    assert(query.get("id").contains("0"))
     assert(query.getValues("id") == Seq("0"))
 
+    assert(query.contains("name"))
     assert(query("name") == "root")
-    assert(query.getValue("name").contains("root"))
+    assert(query.get("name").contains("root"))
     assert(query.getValues("name") == Seq("root"))
 
+    assert(query.contains("groups"))
     assert(query("groups") == "wheel")
-    assert(query.getValue("groups").contains("wheel"))
+    assert(query.get("groups").contains("wheel"))
     assert(query.getValues("groups") == Seq("wheel", "admin"))
 
     assert(!query.isEmpty)
+    assert(!query.contains("idx"))
 
     val toMap = query.toMap
     assert(toMap("id") == Seq("0"))
@@ -112,6 +124,11 @@ class QueryStringSpec extends FlatSpec {
     val empty = QueryString()
     assert(empty.isEmpty)
     assert(empty.toString == "")
+  }
+
+  it should "throw NoSuchElementException if parameter not present" in {
+    val query = QueryString("id=0&name=root&groups=wheel&groups=admin")
+    assertThrows[NoSuchElementException] { query("idx") }
   }
 }
 
