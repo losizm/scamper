@@ -23,7 +23,7 @@ import scamper.types.MediaType
 
 /** Includes implicit converter functions. */
 object Implicits {
-  /** Converts string to {@code java.net.URI}. */
+  /** Converts string to `java.net.URI`. */
   implicit val stringToUri = (uri: String) => new URI(uri)
 
   /** Converts string to [[Header]]. */
@@ -40,6 +40,12 @@ object Implicits {
 
   /** Converts tuple to [[Header]] where tuple is name-value pair. */
   implicit val tupleToHeaderWithDateValue = (header: (String, Instant)) => Header(header._1, header._2)
+
+  /** Converts tuple to [[TextPart]] where tuple is name-content pair. */
+  implicit val tupleToTextPart = (part: (String, String)) => TextPart(part._1, part._2)
+
+  /** Converts tuple to [[FilePart]] where tuple is name-content pair. */
+  implicit val tupleToFilePart = (part: (String, File)) => FilePart(part._1, part._2)
 
   /** Converts byte array to [[Entity]]. */
   implicit val bytesToEntity = (entity: Array[Byte]) => Entity.fromBytes(entity)
