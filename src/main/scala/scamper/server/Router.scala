@@ -24,7 +24,7 @@ import scamper.RequestMethod
  *
  * `Router` works in much the same way as [[ServerApplication]], except it is
  * configured for request handling only, and all router paths are relative to a
- * moint point defined in the owner application.
+ * mount point defined in the owner application.
  *
  * {{{
  * import scamper.Implicits.stringToEntity
@@ -51,6 +51,9 @@ import scamper.RequestMethod
  * @see [[ServerApplication.use]]
  */
 trait Router {
+  /** Gets router mount point. */
+  def mountPoint: String
+
   /**
    * Adds supplied request handler.
    *
@@ -243,7 +246,7 @@ trait Router {
    * | /images     | assets    | /images/icons/warning.png | assets/icons/warning.png |
    * | /images     | assets    | /styles/main.css          | <em>Doesn't map to anything</em> |
    *
-   * @param mountPoint router path at which resources are mointed
+   * @param mountPoint router path at which resources are mounted
    * @param baseName base name from which resources are served
    * @param loader class loader from which resources are loaded
    *

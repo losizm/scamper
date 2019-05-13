@@ -426,7 +426,7 @@ class ServerApplication {
    * | /images     | assets    | /images/icons/warning.png | assets/icons/warning.png |
    * | /images     | assets    | /styles/main.css          | <em>Doesn't map to anything</em> |
    *
-   * @param mountPoint request path at which resources are mointed
+   * @param mountPoint request path at which resources are mounted
    * @param baseName base name from which resources are served
    * @param loader class loader from which resources are loaded
    *
@@ -444,13 +444,13 @@ class ServerApplication {
    * A router is created and passed to routing application, and the routing
    * application adds request handlers to router.
    *
-   * @param mointPoint request path at which routing application is mounted
+   * @param mountPoint request path at which routing application is mounted
    * @param routing routing application
    *
    * @return this application
    */
-  def use[T](mointPoint: String)(routing: Router => T): this.type = synchronized {
-    routing(new DefaultRouter(this, mointPoint))
+  def use[T](mountPoint: String)(routing: Router => T): this.type = synchronized {
+    routing(new DefaultRouter(this, mountPoint))
     this
   }
 

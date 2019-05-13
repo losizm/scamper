@@ -30,7 +30,7 @@ import scamper.ResponseStatuses.{ MethodNotAllowed, NotAcceptable, NotModified, 
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 
-private class StaticFileServer(mointPoint: Path, sourceDirectory: Path) extends RequestHandler {
+private class StaticFileServer(mountPoint: Path, sourceDirectory: Path) extends RequestHandler {
   private val `*/*` = MediaRange("*", "*")
 
   def apply(req: HttpRequest): Either[HttpRequest, HttpResponse] =
@@ -75,8 +75,8 @@ private class StaticFileServer(mointPoint: Path, sourceDirectory: Path) extends 
   private def getRealPath(path: String): Option[Path] = {
     val toPath = Paths.get(path.toUrlDecoded("utf-8")).normalize()
 
-    toPath.startsWith(mointPoint) match {
-      case true  => Some(sourceDirectory.resolve(mointPoint.relativize(toPath)))
+    toPath.startsWith(mountPoint) match {
+      case true  => Some(sourceDirectory.resolve(mountPoint.relativize(toPath)))
       case false => None
     }
   }
@@ -96,8 +96,8 @@ private class StaticFileServer(mointPoint: Path, sourceDirectory: Path) extends 
 }
 
 private object StaticFileServer {
-  def apply(mointPoint: String, sourceDirectory: File): StaticFileServer = {
-    val path = Paths.get(mointPoint).normalize()
+  def apply(mountPoint: String, sourceDirectory: File): StaticFileServer = {
+    val path = Paths.get(mountPoint).normalize()
     val directory = sourceDirectory.toPath.toAbsolutePath.normalize()
 
     require(path.startsWith("/"), s"Invalid mount point ($path)")
