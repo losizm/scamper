@@ -31,7 +31,7 @@ private class TargetedRequestHandler private (handler: RequestHandler, target: T
 
 private object TargetedRequestHandler {
   def apply(handler: RequestHandler, path: String, method: Option[RequestMethod]): TargetedRequestHandler =
-    new TargetedRequestHandler(handler, new Target(path), method)
+    new TargetedRequestHandler(handler, new Target(path.toUri.normalize.toString), method)
 }
 
 private class TargetedRequestParameters(params: Map[String, String]) extends RequestParameters {
@@ -78,14 +78,10 @@ private class Target(path: String) {
       }.toMap
     }
 
-  def matches(path: String): Boolean =
-    normalize(path).matches(regex)
-
-  private def normalize(path: String): String =
-    path.toUri.normalize.toString
+  def matches(path: String): Boolean = path.matches(regex)
 
   private def segment(path: String): Seq[String] =
-    normalize(path) match {
+    path match {
       case "/" => Nil
       case "*" => Nil
       case p   => p.tail.split("/").toSeq

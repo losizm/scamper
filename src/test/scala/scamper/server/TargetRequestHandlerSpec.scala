@@ -42,7 +42,7 @@ class TargetedRequestHandlerSpec extends FlatSpec {
 
   it should "respond to request with certain path" in {
     val handler = TargetedRequestHandler(req => Right(Ok()), "/a/b/c", None)
-    assert(handler(GET("http://localhost:8080/a//b/../../a/b////c")).exists(_.status == Ok))
+    assert(handler(GET("http://localhost:8080//a//b/../../a/b////c")).exists(_.status == Ok))
     assert(handler(POST("/a/.//b/c")).exists(_.status == Ok))
     assert(handler(PUT("/a/b/c")).exists(_.status == Ok))
     assert(handler(DELETE("/a/b/c")).exists(_.status == Ok))

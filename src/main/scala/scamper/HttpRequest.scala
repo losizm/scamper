@@ -100,7 +100,7 @@ object HttpRequest {
 }
 
 private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header], body: Entity, attributes: Map[String, Any] = Map.empty) extends HttpRequest {
-  lazy val path: String = target.getRawPath match {
+  lazy val path: String = target.normalize.getRawPath match {
     case "" =>
       if (method.name == "OPTIONS")
         "*"

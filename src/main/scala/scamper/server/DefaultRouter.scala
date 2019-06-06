@@ -104,6 +104,7 @@ private class DefaultRouter(app: ServerApplication, rawMountPoint: String) exten
     path.toUri.normalize.toString match {
       case "/" => if (isMountPoint) "/" else ""
       case path if path.matches("/\\.\\.(/.*)?") => throw new IllegalArgumentException(s"Invalid path: $path")
+      case path if path.matches("//+.*") => throw new IllegalArgumentException(s"Invalid path: $path")
       case path if path.startsWith("/") => path
       case path => throw new IllegalArgumentException(s"Invalid path: $path")
     }
