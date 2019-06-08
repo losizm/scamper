@@ -23,8 +23,8 @@ import javax.net.ssl.{ KeyManagerFactory, SSLContext, SSLServerSocketFactory }
 
 import scala.util.Try
 
-import scamper.Base64
 import scamper.Auxiliary.InputStreamType
+import scamper.Base64
 
 private object SecureServerSocketFactory {
   def create(keyStore: KeyStore, password: Array[Char]): SSLServerSocketFactory = {
@@ -70,13 +70,13 @@ private object Keys {
   private val factory = KeyFactory.getInstance("RSA")
 
   def create(bytes: Array[Byte]): PrivateKey = {
-    val spec = new PKCS8EncodedKeySpec(RfcDecoder.decode(bytes).getOrElse(bytes))
+    val spec = new PKCS8EncodedKeySpec(PemDecoder.decode(bytes).getOrElse(bytes))
     factory.generatePrivate(spec)
   }
 
   def create(file: File): PrivateKey = {
     if (file.length > 8388608)
-      throw new IllegalArgumentException(s"Key file too large: ${file.length}")
+      throw new IllegalArgumentException(s"Key file too large: ${file.length} bytes")
 
     val in = new FileInputStream(file)
     try create(in.getBytes())
@@ -88,27 +88,24 @@ private object Certificates {
   private val factory = CertificateFactory.getInstance("X509")
 
   def create(bytes: Array[Byte]): Certificate = {
-    val in = new ByteArrayInputStream(RfcDecoder.decode(bytes).getOrElse(bytes))
+    val in = new ByteArrayInputStream(bytes)
     try factory.generateCertificate(in)
     finally Try(in.close())
   }
 
   def create(file: File): Certificate = {
-    if (file.length > 8388608)
-      throw new IllegalArgumentException(s"Certificate file too large: ${file.length}")
-
     val in = new FileInputStream(file)
     try factory.generateCertificate(in)
     finally Try(in.close())
   }
 }
 
-private object RfcDecoder {
-  private val encoding = """(?s).*-{5}BEGIN(?: .+)?-{5}\s+([A-Za-z0-9+/=\s]+)\s+-{5}END(?: .+)?-{5}.*""".r
+private object PemDecoder {
+  private val encoded = """(?s).*-{5}BEGIN(?: .+)?-{5}\s*([A-Za-z0-9+/=\s]+)\s*-{5}END(?: .+)?-{5}.*""".r
 
   def decode(bytes: Array[Byte]): Option[Array[Byte]] =
     new String(bytes, "ASCII") match {
-      case encoding(content) => Some { Base64.decode(content.split("\\s+").mkString) }
+      case encoded(text) => Some { Base64.decode(text.split("\\s+").mkString) }
       case _ => None
     }
 }
