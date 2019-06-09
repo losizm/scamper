@@ -106,7 +106,10 @@ package object server {
      * @param other initial handler
      */
     def compose(other: RequestHandler): RequestHandler =
-      req => other(req).left.flatMap(req => apply(req))
+      other(_) match {
+        case Left(req) => apply(req)
+        case right     => right
+      }
 
     /**
      * Composes this handler with other, using other as a fallback.
@@ -117,7 +120,10 @@ package object server {
      * @param other fallback handler
      */
     def orElse(other: RequestHandler): RequestHandler =
-      req => apply(req).left.flatMap(req => other(req))
+      apply(_) match {
+        case Left(req) => other(req)
+        case right     => right
+      }
   }
 
   /** Provides `RequestHandler` utilities. */
@@ -131,11 +137,19 @@ package object server {
      *
      * @param handlers request handlers
      */
-    def coalesce(handlers: RequestHandler*): RequestHandler =
-      if (handlers.isEmpty)
-        req => Left(req)
-      else
-        handlers.reduceLeft(_ orElse _)
+    def coalesce(handlers: RequestHandler*): RequestHandler = {
+      @annotation.tailrec
+      def handle(req: HttpRequest, handlers: Seq[RequestHandler]): Either[HttpRequest, HttpResponse] =
+        handlers match {
+          case Nil          => Left(req)
+          case head +: tail =>
+            head(req) match {
+              case Left(req) => handle(req, tail)
+              case right     => right
+            }
+        }
+      handle(_, handlers)
+    }
   }
 
   /** Provides utility for filtering incoming request. */
@@ -207,11 +221,15 @@ package object server {
      *
      * @param filters response filters
      */
-    def chain(filters: ResponseFilter*): ResponseFilter =
-      if (filters.isEmpty)
-        identity
-      else
-        filters.reduceLeft(_ andThen _)
+    def chain(filters: ResponseFilter*): ResponseFilter = {
+      @annotation.tailrec
+      def filter(res: HttpResponse, filters: Seq[ResponseFilter]): HttpResponse =
+        filters match {
+          case Nil          => res
+          case head +: tail => filter(head(res), tail)
+        }
+      filter(_, filters)
+    }
   }
 
   /** Provides utility for handling error when servicing request. */
