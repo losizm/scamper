@@ -206,7 +206,7 @@ private class MultipartBodyParser(val dest: File, val maxLength: Long, val buffe
           }
         }
 
-        Multipart(parts : _*)
+        Multipart(parts.toSeq : _*)
 
       case line if line.startsWith(new String(status.end)) => Multipart()
 

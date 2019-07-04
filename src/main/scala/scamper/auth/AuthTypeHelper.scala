@@ -15,8 +15,8 @@
  */
 package scamper.auth
 
+import scamper.{ CaseInsensitiveKeyMap, ListParser }
 import scamper.Grammar.{ QuotableString, Token => StandardToken, Token68 }
-import scamper.ListParser
 
 private object AuthTypeHelper {
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)(?:\s+(?:([\w!#$%&'*+.^`|~-]+=*)|([\w.~+/-]+\s*=\s*[^ =].*)))?\s*""".r

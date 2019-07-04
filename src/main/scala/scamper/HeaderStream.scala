@@ -36,7 +36,7 @@ private object HeaderStream {
           headers += Header.parse(line)
       }
 
-    headers
+    headers.toSeq
   }
 }
 
