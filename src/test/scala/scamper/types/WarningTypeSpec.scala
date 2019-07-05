@@ -52,7 +52,7 @@ class WarningTypeSpec extends FlatSpec {
     assert(warn2.date == None)
     assert(warn2.toString == "299 - \"Miscellaneous Persistent Warning\"")
 
-    assert(WarningType.parseAll(warn1 + ", " + warn2) == Seq(warn1, warn2))
+    assert(WarningType.parseAll(s"$warn1, $warn2") == Seq(warn1, warn2))
   }
 
   it should "be destructured" in {
