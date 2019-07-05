@@ -32,7 +32,7 @@ trait CacheDirective {
 
   /** Returns formatted cache directive. */
   override lazy val toString: String =
-    name + value.map(x => '=' + Token(x).getOrElse('"' + x + '"')).getOrElse("")
+    name + value.map(x => "=" + Token(x).getOrElse(s"""\"$x\"""")).getOrElse("")
 }
 
 /** CacheDirective factory */

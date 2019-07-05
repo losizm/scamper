@@ -37,7 +37,7 @@ trait Preference {
   /** Returns formatted preference. */
   override lazy val toString: String = {
     def pair(a: String, b: Option[String]) = a + {
-      b.map(x => '=' + Token(x).getOrElse('"' + x + '"')).getOrElse("")
+      b.map(x => "=" + Token(x).getOrElse(s"""\"$x\"""")).getOrElse("")
     }
 
     pair(name, value) + params.map {

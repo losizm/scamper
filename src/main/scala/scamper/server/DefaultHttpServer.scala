@@ -171,7 +171,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
 
   private object Service extends Thread(threadGroup, s"scamper-server-$id-service") {
     private val requestCount = new AtomicLong(0)
-    private def nextCorrelate = Base64.encodeToString(requestCount.incrementAndGet + ":" + System.currentTimeMillis)
+    private def nextCorrelate = Base64.encodeToString(s"${requestCount.incrementAndGet}:${System.currentTimeMillis}")
 
     override def run(): Unit =
       while (!isClosed)

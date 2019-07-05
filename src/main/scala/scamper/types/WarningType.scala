@@ -39,7 +39,7 @@ trait WarningType {
 
   /** Returns formatted warning. */
   override lazy val toString: String =
-    code + " " + agent + " \"" + text + '"' + date.map(x => " \"" + DateValue.format(x) + '"').getOrElse("")
+    s"""$code $agent "$text"${date.map(x => " \"" + DateValue.format(x) + "\"").getOrElse("")}"""
 }
 
 /** WarningType factory */

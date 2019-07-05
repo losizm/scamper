@@ -32,7 +32,7 @@ trait ProductType {
 
   /** Returns formatted product. */
   override lazy val toString: String =
-    name + version.map('/' + _).getOrElse("")
+    name + version.map("/" + _).getOrElse("")
 }
 
 /** ProductType factory */

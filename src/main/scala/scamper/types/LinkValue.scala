@@ -33,7 +33,7 @@ trait LinkValue {
 
   /** Returns formatted link. */
   override lazy val toString: String =
-    '<' + ref.toString + '>' + LinkParams.format(params)
+    s"<$ref>${LinkParams.format(params)}"
 }
 
 /** LinkValue factory */

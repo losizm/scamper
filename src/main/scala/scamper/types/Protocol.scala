@@ -31,7 +31,7 @@ trait Protocol {
 
   /** Returns formatted protocol. */
   override lazy val toString: String =
-    name + version.map('/' + _).getOrElse("")
+    name + version.map("/" + _).getOrElse("")
 }
 
 /** Protocol factory */

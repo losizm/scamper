@@ -24,7 +24,7 @@ private class CaseInsensitiveKeyMap[V](params: Seq[(String, V)]) extends Map[Str
   def iterator: Iterator[(String, V)] =
     params.groupBy(_._1.toLowerCase)
       .map { case (key, Seq((_, value), _*)) => key -> value }
-      .toIterator
+      .iterator
 
   def removed(key: String): Map[String, V] =
     new CaseInsensitiveKeyMap(params.filterNot {

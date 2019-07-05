@@ -18,8 +18,9 @@ package scamper.types
 import java.io.File
 import java.util.Properties
 
-import scala.collection.JavaConverters.propertiesAsScalaMap
 import scala.util.{ Success, Try }
+
+import scamper.CollectionConverters._
 
 import MediaTypeHelper._
 
@@ -79,7 +80,7 @@ object MediaType {
     try props.load(in)
     finally Try(in.close())
 
-    propertiesAsScalaMap(props).map {
+    props.asScala.map {
       case (key, value) => key.toLowerCase -> Try(parse(value))
     }.collect {
       case (key, Success(value)) => key -> value

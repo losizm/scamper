@@ -68,7 +68,7 @@ private object StaticResourceServer {
     require(mountPath.startsWith("/"), s"Invalid mount path: $mountPath")
 
     if (name != Paths.get(""))
-      require(loader.getResource(name + "/") != null, s"Invalid base name: $baseName")
+      require(loader.getResource(s"$name/") != null, s"Invalid base name: $baseName")
 
     new StaticResourceServer(path, name, loader)
   }

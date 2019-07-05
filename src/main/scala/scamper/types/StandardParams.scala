@@ -42,5 +42,5 @@ private object StandardParams {
       (m.group(1), m.group(2), m.after.toString)
     }
 
-  private def formatParamValue(value: String): String = Token(value).getOrElse('"' + value + '"')
+  private def formatParamValue(value: String): String = Token(value).getOrElse(s"""\"$value\"""")
 }

@@ -47,9 +47,9 @@ trait ByteRange extends RangeType {
   /** Gets formatted byte range. */
   lazy override val toString: String =
     unit + '=' + (set.map {
-      case Slice(first, Some(last)) => first + "-" + last
-      case Slice(first, None) => first + "-"
-      case Suffix(length) => "-" + length
+      case Slice(first, Some(last)) => s"$first-$last"
+      case Slice(first, None)       => s"$first-"
+      case Suffix(length)           => s"-$length"
     } mkString ",")
 }
 

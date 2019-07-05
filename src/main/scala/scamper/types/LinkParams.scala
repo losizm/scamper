@@ -41,5 +41,5 @@ private object LinkParams {
         case (name, None)        => s"; $name"
       }.mkString
 
-  private def formatParamValue(value: String): String = Token(value).getOrElse('"' + value + '"')
+  private def formatParamValue(value: String): String = Token(value).getOrElse(s"""\"$value\"""")
 }

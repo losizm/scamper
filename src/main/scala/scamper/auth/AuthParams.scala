@@ -39,5 +39,5 @@ private object AuthParams {
         .sortBy { format => if (format.startsWith("realm")) 0 else 1 }
         .mkString(" ", ", ", "")
 
-  private def formatParamValue(value: String): String = Token(value).getOrElse('"' + value + '"')
+  private def formatParamValue(value: String): String = Token(value).getOrElse(s"""\"$value\"""")
 }
