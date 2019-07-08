@@ -31,8 +31,13 @@ import Auxiliary.{ FileType, InputStreamType }
  * @see [[BodyParsers]]
  */
 trait BodyParser[T] {
-  /** Parses body of supplied message and returns instance of defined type. */
-  def apply(message: HttpMessage): T
+  /**
+   * Parses body of supplied message and returns instance of defined type.
+   *
+   * @throws ReadLimitExceeded if message body is too large
+   * @throws EntityTooLarge if constructed entity is too large
+   */
+  def parse(message: HttpMessage): T
 }
 
 /** Includes default body parser implementations. */
@@ -62,7 +67,7 @@ object BodyParsers {
     new FormBodyParser(maxLength.max(0))
 
   /**
-   * Gets body parser for collecting form data as query.
+   * Gets body parser for collecting form data as query string.
    *
    * @param maxLength maximum length in bytes
    */
@@ -97,7 +102,7 @@ object BodyParsers {
 private class ByteArrayBodyParser(val maxLength: Long) extends BodyParser[Array[Byte]] with BodyParsing {
   val bufferSize = maxLength.min(8192).toInt
 
-  def apply(message: HttpMessage): Array[Byte] =
+  def parse(message: HttpMessage): Array[Byte] =
     withInputStream(message) { in =>
       val out = new ArrayBuffer[Byte](bufferSize)
       val buf = new Array[Byte](bufferSize)
@@ -117,30 +122,30 @@ private class ByteArrayBodyParser(val maxLength: Long) extends BodyParser[Array[
 private class TextBodyParser(maxLength: Int) extends BodyParser[String] {
   private val parser = new ByteArrayBodyParser(maxLength)
 
-  def apply(message: HttpMessage): String =
+  def parse(message: HttpMessage): String =
     message.getHeaderValue("Content-Type")
       .map(MediaType.parse)
       .flatMap(_.params.get("charset"))
       .orElse(Some("UTF-8"))
-      .map(charset => new String(parser(message), charset)).get
+      .map(charset => new String(parser.parse(message), charset)).get
 }
 
 private class QueryBodyParser(maxLength: Int) extends BodyParser[QueryString] {
   private val parser = new TextBodyParser(maxLength)
 
-  def apply(message: HttpMessage): QueryString =
-    QueryString(parser(message))
+  def parse(message: HttpMessage): QueryString =
+    QueryString(parser.parse(message))
 }
 
 private class FormBodyParser(maxLength: Int) extends BodyParser[Map[String, Seq[String]]] {
   private val parser = new TextBodyParser(maxLength)
 
-  def apply(message: HttpMessage): Map[String, Seq[String]] =
-    QueryString(parser(message)).toMap
+  def parse(message: HttpMessage): Map[String, Seq[String]] =
+    QueryString(parser.parse(message)).toMap
 }
 
 private class FileBodyParser(val dest: File, val maxLength: Long, val bufferSize: Int) extends BodyParser[File] with BodyParsing {
-  def apply(message: HttpMessage): File =
+  def parse(message: HttpMessage): File =
     withInputStream(message) { in =>
       val destFile = getDestFile()
 
@@ -173,7 +178,7 @@ private class MultipartBodyParser(val dest: File, val maxLength: Long, val buffe
     var continue = true
   }
 
-  def apply(message: HttpMessage): Multipart =
+  def parse(message: HttpMessage): Multipart =
     message.contentType match {
       case MediaType("multipart", "form-data", params) =>
         params.get("boundary")

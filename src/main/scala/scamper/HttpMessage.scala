@@ -42,7 +42,7 @@ trait HttpMessage {
 
   /** Parses message body as defined type. */
   def as[T](implicit parser: BodyParser[T]): T =
-    parser(this)
+    parser.parse(this)
 
   /** Tests whether header with given name is present. */
   def hasHeader(name: String): Boolean =
