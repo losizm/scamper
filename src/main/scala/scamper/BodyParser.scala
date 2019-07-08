@@ -106,7 +106,7 @@ private class ByteArrayBodyParser(val maxLength: Long) extends BodyParser[Array[
 
       while ({ len = in.read(buf); len != -1 }) {
         tot += len
-        if (tot > maxLength) throw new HttpException(s"Entity too large: length > $maxLength")
+        if (tot > maxLength) throw EntityTooLarge(maxLength)
         out ++= buf.take(len)
       }
 
@@ -147,9 +147,13 @@ private class FileBodyParser(val dest: File, val maxLength: Long, val bufferSize
       destFile.withOutputStream { out =>
         val buffer = new Array[Byte](bufferSize)
         var length = 0
+        var total = 0
 
-        while ({ length = in.read(buffer); length != -1 })
+        while ({ length = in.read(buffer); length != -1 }) {
+          total += length
+          if (total > maxLength) throw EntityTooLarge(maxLength)
           out.write(buffer, 0, length)
+        }
 
         destFile
       }

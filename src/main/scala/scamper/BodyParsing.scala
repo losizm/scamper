@@ -23,7 +23,12 @@ import types.{ ContentCoding, TransferCoding }
 
 /** A mixin providing access to decoded message body. */
 trait BodyParsing {
-  /** Gets maximum body length. */
+  /**
+   * Gets maximum body length.
+   *
+   * The input stream obtained from `withInputStream` throws [[ReadLimitExceeded]]
+   * if an attempt is made to read beyond `maxLength` from message body.
+   */
   def maxLength: Long
 
   /** Gets buffer size. */
@@ -38,6 +43,8 @@ trait BodyParsing {
    * @param f stream handler
    *
    * @return value from applied handler
+   * @note Input stream throws [[ReadLimitExceeded]] if attempt is made to read
+   *   beyond `maxLength` from message body.
    */
   def withInputStream[T](message: HttpMessage)(f: InputStream => T): T =
     if (message.body.isKnownEmpty)
@@ -50,8 +57,8 @@ trait BodyParsing {
         case _ =>
           message.body.withInputStream { in =>
             val transferIn = message.transferEncoding match {
-              case Nil      => new BoundedInputStream(in, getContentLength(message))
-              case encoding => transferInputStream(in, encoding)
+              case Nil      => new BoundedInputStream(in, maxLength, getContentLength(message))
+              case encoding => transferInputStream(new BoundedInputStream(in, maxLength, Long.MaxValue), encoding)
             }
 
             val contentIn = contentInputStream(transferIn, message.contentEncoding)
@@ -79,7 +86,7 @@ trait BodyParsing {
         new InflaterInputStream(in)
       else if (encoding.isIdentity)
         in
-      else throw new HttpException(s"Unsupported transfer encoding: $encoding")
+      else throw new HttpException(s"Unsupported content encoding: $encoding")
     }
 
   private def getContentLength(message: HttpMessage): Long =

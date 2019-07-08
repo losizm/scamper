@@ -44,3 +44,16 @@ class HttpException(message: String, cause: Throwable) extends RuntimeException(
 
 /** Indicates absence of specified header. */
 case class HeaderNotFound(name: String) extends HttpException(name)
+
+/**
+ * Indicates entity exceeds established limit.
+ *
+ * `EntityTooLarge` is a complement to `ReadLimitExceeded`. Whereas
+ * `ReadLimitExceeded` applies to the raw bytes of an input stream,
+ * `EntityTooLarge` pertains to the entity itself, potentially subjected to
+ * decompression.
+ *
+ * @see [[ReadLimitExceeded]]
+ */
+case class EntityTooLarge(limit: Long) extends HttpException(s"Entity cannot exceed $limit byte(s)")
+

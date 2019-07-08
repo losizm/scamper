@@ -19,6 +19,7 @@ import java.io.EOFException
 
 import org.scalatest.FlatSpec
 
+import scamper.Auxiliary.InputStreamType
 import scamper.Implicits.stringToUri
 import scamper.RequestMethods._
 import scamper.ResponseStatuses._
@@ -77,6 +78,25 @@ class BodyParserSpec extends FlatSpec {
     val body = Entity.fromString("Hello, world!")
     val message = Ok(body).withContentType("text/plain").withContentLength(body.getLength.get)
 
-    assertThrows[HttpException](message.as[String])
+    assertThrows[ReadLimitExceeded](message.as[String])
+  }
+
+  it should "not parse response with large entity" in {
+    implicit val bodyParser = BodyParsers.text(256)
+    val body = Entity.fromBytes(getResourceBytes("/test.html.gz"))
+
+    assertThrows[EntityTooLarge] {
+      Ok(body)
+        .withContentType("text/html")
+        .withContentEncoding("gzip")
+        .withContentLength(body.getLength.get)
+        .as[String]
+    }
+  }
+
+  private def getResourceBytes(name: String): Array[Byte] = {
+    val in = getClass.getResourceAsStream(name)
+    try in.getBytes()
+    finally in.close()
   }
 }

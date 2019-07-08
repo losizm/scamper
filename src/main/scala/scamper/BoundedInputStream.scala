@@ -15,13 +15,25 @@
  */
 package scamper
 
-import java.io.{ FilterInputStream, InputStream }
+import java.io.{ FilterInputStream, InputStream, IOException }
 
-private class BoundedInputStream(in: InputStream, maxLength: Long) extends FilterInputStream(in) {
+/**
+ * Indicates attempt to read beyond an `InputStream`'s established limit.
+ *
+ * `ReadLimitExceeded` is a complement to `EntityTooLarge`. Whereas
+ * `ReadLimitExceeded` applies to the raw bytes of an input stream,
+ * `EntityTooLarge` pertains to the entity itself, potentially subjected to
+ * decompression.
+ *
+ * @see [[EntityTooLarge]]
+ */
+case class ReadLimitExceeded(limit: Long) extends IOException(s"Cannot read beyond $limit byte(s)")
+
+private class BoundedInputStream(in: InputStream, limit: Long, capacity: Long) extends FilterInputStream(in) {
   private var position: Long = 0
 
   override def read(): Int =
-    if (position >= maxLength) -1
+    if (position >= capacity) -1
     else
       in.read() match {
         case -1   => -1
@@ -29,13 +41,17 @@ private class BoundedInputStream(in: InputStream, maxLength: Long) extends Filte
       }
 
   override def read(buffer: Array[Byte], offset: Int, length: Int): Int =
-    if (position >= maxLength) -1
+    if (position >= capacity) -1
     else
       in.read(buffer, offset, length.min(maxRead)) match {
-        case -1  => -1
-        case len => position += len; len
+        case -1    => -1
+        case count =>
+          position += count
+          if (position > limit) throw ReadLimitExceeded(limit)
+          count
       }
 
   private def maxRead: Int =
-    (maxLength - position).min(Int.MaxValue).toInt
+    (capacity - position).min(Int.MaxValue).toInt
 }
+
