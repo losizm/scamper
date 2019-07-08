@@ -51,7 +51,7 @@ object Implicits {
   implicit val bytesToEntity = (entity: Array[Byte]) => Entity.fromBytes(entity)
 
   /** Converts string to [[Entity]]. */
-  implicit val stringToEntity = (entity: String) => Entity.fromString(entity, "UTF-8")
+  implicit val stringToEntity = (entity: String) => Entity.fromText(entity, "UTF-8")
 
   /** Converts file to [[Entity]]. */
   implicit val fileToEntity = (entity: File) => Entity.fromFile(entity)
@@ -59,8 +59,8 @@ object Implicits {
   /** Converts input stream to [[Entity]]. */
   implicit val inputStreamToEntity = (entity: InputStream) => Entity.fromInputStream(entity)
 
-  /** Converts output stream writer to [[Entity]]. */
-  implicit val writerToEntity = (writer: OutputStream => Unit) => Entity.fromOutputStream(writer)
+  /** Converts writer output to [[Entity]]. */
+  implicit val writerOutputToEntity = (writer: OutputStream => Unit) => Entity.fromWriterOutput(writer)
 
   /** Converts string to [[RequestMethod]]. */
   implicit val stringToRequestMethod = (method: String) => RequestMethod(method)
@@ -90,30 +90,28 @@ object Implicits {
     }
 
     /**
-     * Creates new message with supplied parameters as message body, with the
-     * parameters encoded as form data.
+     * Creates new message with supplied form data as message body.
      *
      * After adding body to message, the Content-Type header is set to
      * `application/x-www-form-urlencoded`, and Content-Length is set to length
      * of encoded form data.
      *
-     * @param params message body
+     * @param data message body
      */
-    def withFormBody(params: Map[String, Seq[String]])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withFormBody(QueryString(params))
+    def withFormBody(data: Map[String, Seq[String]])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      withFormBody(QueryString(data))
 
     /**
-     * Creates new message with supplied parameters as message body, with the
-     * parameters encoded as form data.
+     * Creates new message with supplied form data as message body.
      *
      * After adding body to message, the Content-Type header is set to
      * `application/x-www-form-urlencoded`, and Content-Length is set to length
      * of encoded form data.
      *
-     * @param params message body
+     * @param data message body
      */
-    def withFormBody(params: (String, String)*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withFormBody(QueryString(params : _*))
+    def withFormBody(data: (String, String)*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      withFormBody(QueryString(data : _*))
 
     /**
      * Creates new message with supplied query string as message body, with the
@@ -148,8 +146,8 @@ object Implicits {
     }
 
     /**
-     * Creates new message with supplied parts as message body, with the parts encoded as
-     * multipart form data.
+     * Creates new message with supplied parts as message body, with the parts
+     * encoded as multipart form data.
      *
      * Before adding body to message, the Content-Type header is set to
      * `multipart/form-data` with a boundary parameter whose value is used

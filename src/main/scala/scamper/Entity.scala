@@ -54,40 +54,40 @@ object Entity {
     InputStreamEntity(in)
 
   /** Creates `Entity` from bytes written to output stream. */
-  def fromOutputStream(writer: OutputStream => Unit): Entity =
+  def fromWriterOutput(writer: OutputStream => Unit): Entity =
     InputStreamEntity(new WriterInputStream(writer)(Auxiliary.executor))
 
   /** Creates `Entity` with data from supplied file. */
   def fromFile(file: File): Entity =
     FileEntity(file)
 
-  /** Creates `Entity` from string using specified character encoding. */
-  def fromString(s: String, charset: String = "UTF-8"): Entity =
-    ByteArrayEntity(s.getBytes(charset))
+  /** Creates `Entity` from text using specified character encoding. */
+  def fromText(text: String, charset: String = "UTF-8"): Entity =
+    ByteArrayEntity(text.getBytes(charset))
 
   /**
-   * Creates `Entity` from supplied parameters.
+   * Creates `Entity` from supplied form data.
    *
-   * The parameters are encoded as `application/x-www-form-urlencoded`.
+   * The form data are encoded as `application/x-www-form-urlencoded`.
    */
-  def fromParams(params: Map[String, Seq[String]]): Entity =
-    fromString(QueryString.format(params))
+  def fromForm(data: Map[String, Seq[String]]): Entity =
+    fromText(QueryString.format(data))
 
   /**
-   * Creates `Entity` from supplied parameters.
+   * Creates `Entity` from supplied form data.
    *
-   * The parameters are encoded as `application/x-www-form-urlencoded`.
+   * The form data are encoded as `application/x-www-form-urlencoded`.
    */
-  def fromParams(params: (String, String)*): Entity =
-    fromString(QueryString.format(params))
+  def fromForm(data: (String, String)*): Entity =
+    fromText(QueryString.format(data))
 
   /**
-   * Creates `Entity` from query.
+   * Creates `Entity` from query string.
    *
-   * The query is encoded as `application/x-www-form-urlencoded`.
+   * The query string is encoded as `application/x-www-form-urlencoded`.
    */
   def fromQuery(query: QueryString): Entity =
-    fromString(query.toString)
+    fromText(query.toString)
 
   /** Creates `Entity` from multipart form data using supplied boundary. */
   def fromMultipart(multipart: Multipart, boundary: String): Entity =
