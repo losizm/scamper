@@ -46,7 +46,7 @@ class HttpMessageSpec extends FlatSpec {
   it should "be created with query parameters" in {
     val req = GET("/find").withQuery("user" -> "root", "group" -> "wheel")
     assert(req.method.name == "GET")
-    assert(Seq("/find?user=root&group=wheel", "/find?group=wheel&user=root").contains(req.target.toString))
+    assert(req.target.toString == "/find?user=root&group=wheel")
     assert(req.path == "/find")
     assert(req.query.get("user").contains("root"))
     assert(req.query.get("group").contains("wheel"))

@@ -79,7 +79,7 @@ object Entity {
    * The parameters are encoded as `application/x-www-form-urlencoded`.
    */
   def fromParams(params: (String, String)*): Entity =
-    fromString(QueryString.format(params : _*))
+    fromString(QueryString.format(params))
 
   /**
    * Creates `Entity` from query.

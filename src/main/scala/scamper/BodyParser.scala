@@ -136,7 +136,7 @@ private class FormBodyParser(maxLength: Int) extends BodyParser[Map[String, Seq[
   private val parser = new TextBodyParser(maxLength)
 
   def apply(message: HttpMessage): Map[String, Seq[String]] =
-    QueryString.parse(parser(message))
+    QueryString(parser(message)).toMap
 }
 
 private class FileBodyParser(val dest: File, val maxLength: Long, val bufferSize: Int) extends BodyParser[File] with BodyParsing {

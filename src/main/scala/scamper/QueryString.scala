@@ -49,30 +49,30 @@ trait QueryString {
   def getOrElse(name: String, default: => String): String = get(name).getOrElse(default)
 
   /**
-   * Tests whether query string contains named parameter.
-   *
-   * @param name parameter name
-   */
-  def contains(name: String): Boolean = get(name).isDefined
-
-  /**
    * Gets all values of named parameter.
    *
    * @param name parameter name
    */
   def getValues(name: String): Seq[String]
 
-  /** Tests whether query is empty. */
+  /**
+   * Tests whether query string contains named parameter.
+   *
+   * @param name parameter name
+   */
+  def contains(name: String): Boolean
+
+  /** Tests whether query string is empty. */
   def isEmpty: Boolean
+
+  /** Gets query string as sequence of parameters. */
+  def toSeq: Seq[(String, String)]
 
   /** Gets query string as mapped parameters. */
   def toMap: Map[String, Seq[String]]
 
   /** Gets query string as mapped parameters with each having a single value. */
   def toSimpleMap: Map[String, String]
-
-  /** Gets URL encoded query string. */
-  override lazy val toString: String = QueryString.format(toMap)
 }
 
 /** Provides factory methods for QueryString. */
@@ -87,7 +87,7 @@ object QueryString {
    */
   def apply(params: Map[String, Seq[String]]): QueryString =
     if (params.isEmpty) EmptyQueryString
-    else QueryStringImpl(params)
+    else MapToQueryString(params)
 
   /**
    * Creates QueryString from parameters.
@@ -95,11 +95,8 @@ object QueryString {
    * @param params parameters
    */
   def apply(params: (String, String)*): QueryString =
-    apply {
-      params.groupBy(_._1).map {
-        case (name, params) => name -> params.map(_._2)
-      }.toMap
-    }
+    if (params.isEmpty) EmptyQueryString
+    else SeqToQueryString(params)
 
   /**
    * Parses formatted query string.
@@ -107,22 +104,23 @@ object QueryString {
    * @param query formatted query string
    */
   def apply(query: String): QueryString =
-    apply(parse(query))
+    parse(query) match {
+      case Nil    => EmptyQueryString
+      case params => SeqToQueryString(params)
+    }
 
-  private[scamper] def parse(query: String): Map[String, Seq[String]] =
-    query.split("&").map(_.split("=")) collect {
+  private def parse(query: String): Seq[(String, String)] =
+    query.split("&").map(_.split("=")).toIndexedSeq.collect {
       case Array(name, value) if !name.isEmpty => decode(name, "UTF-8") -> decode(value, "UTF-8")
       case Array(name)        if !name.isEmpty => decode(name, "UTF-8") -> ""
-    } groupBy(_._1) map {
-      case (name, params) => name -> params.map(_._2).toSeq
     }
 
   private[scamper] def format(params: Map[String, Seq[String]]): String =
     params map {
-      case (name, values) => format(values.map(value => name -> value) : _*)
+      case (name, values) => format(values.map(value => name -> value))
     } mkString "&"
 
-  private[scamper] def format(params: (String, String)*): String =
+  private[scamper] def format(params: Seq[(String, String)]): String =
     params map {
       case (name, value) => s"${encode(name, "UTF-8")}=${encode(value, "UTF-8")}"
     } mkString "&"
@@ -132,15 +130,33 @@ private object EmptyQueryString extends QueryString {
   def names = Nil
   def get(name: String) = None
   def getValues(name: String) = Nil
+  def contains(name: String) = false
   val isEmpty = true
+  val toSeq = Nil
   val toMap = Map.empty
   val toSimpleMap = Map.empty
+  override val toString = ""
 }
 
-private case class QueryStringImpl(toMap: Map[String, Seq[String]]) extends QueryString {
+private case class MapToQueryString(toMap: Map[String, Seq[String]]) extends QueryString {
   lazy val names = toMap.keys.toSeq
   def get(name: String) = toMap.get(name).flatMap(_.headOption)
   def getValues(name: String) = toMap.get(name).getOrElse(Nil)
+  def contains(name: String) = toMap.contains(name)
   def isEmpty = toMap.isEmpty
+  lazy val toSeq = toMap.toSeq.flatMap { case (name, values) => values.map(value => name -> value) }
   lazy val toSimpleMap = toMap.collect { case (name, Seq(value, _*)) => name -> value }.toMap
+  override lazy val toString = QueryString.format(toMap)
 }
+
+private case class SeqToQueryString(toSeq: Seq[(String, String)]) extends QueryString {
+  lazy val names = toSeq.map(_._1).distinct
+  def get(name: String) = toSeq.collectFirst { case (`name`, value) => value }
+  def getValues(name: String) = toSeq.collect { case (`name`, value) => value }
+  def contains(name: String) = toSeq.exists(_._1 == name)
+  def isEmpty = toSeq.isEmpty
+  lazy val toMap = toSeq.groupBy(_._1).collect { case (name, params) => name -> params.map(_._2) }.toMap
+  lazy val toSimpleMap = toSeq.groupBy(_._1).collect { case (name, params) => name -> params.head._2 }.toMap
+  override lazy val toString = QueryString.format(toSeq)
+}
+
