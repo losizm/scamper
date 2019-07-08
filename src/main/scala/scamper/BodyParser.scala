@@ -46,33 +46,37 @@ object BodyParsers {
    * Gets body parser for collecting raw bytes.
    *
    * @param maxLength maximum length
+   * @param bufferSize buffer size in bytes
    */
-  def bytes(maxLength: Int = 8388608): BodyParser[Array[Byte]] =
-    new ByteArrayBodyParser(maxLength.max(0))
+  def bytes(maxLength: Int = 8388608, bufferSize: Int = 8192): BodyParser[Array[Byte]] =
+    new ByteArrayBodyParser(maxLength.max(0), bufferSize.max(8192))
 
   /**
    * Gets body parser for collecting text.
    *
    * @param maxLength maximum length in bytes
+   * @param bufferSize buffer size in bytes
    */
-  def text(maxLength: Int = 8388608): BodyParser[String] =
-    new TextBodyParser(maxLength.max(0))
+  def text(maxLength: Int = 8388608, bufferSize: Int = 8192): BodyParser[String] =
+    new TextBodyParser(maxLength.max(0), bufferSize.max(8192))
 
   /**
    * Gets body parser for collecting form data.
    *
    * @param maxLength maximum length in bytes
+   * @param bufferSize buffer size in bytes
    */
-  def form(maxLength: Int = 8388608): BodyParser[Map[String, Seq[String]]] =
-    new FormBodyParser(maxLength.max(0))
+  def form(maxLength: Int = 8388608, bufferSize: Int = 8192): BodyParser[Map[String, Seq[String]]] =
+    new FormBodyParser(maxLength.max(0), bufferSize.max(8192))
 
   /**
    * Gets body parser for collecting form data as query string.
    *
    * @param maxLength maximum length in bytes
+   * @param bufferSize buffer size in bytes
    */
-  def query(maxLength: Int = 8388608): BodyParser[QueryString] =
-    new QueryBodyParser(maxLength.max(0))
+  def query(maxLength: Int = 8388608, bufferSize: Int = 8192): BodyParser[QueryString] =
+    new QueryBodyParser(maxLength.max(0), bufferSize.max(8192))
 
   /**
    * Gets body parser for collecting multipart form data.
@@ -99,9 +103,7 @@ object BodyParsers {
     new FileBodyParser(dest, maxLength.max(0), bufferSize.max(8192))
 }
 
-private class ByteArrayBodyParser(val maxLength: Long) extends BodyParser[Array[Byte]] with BodyParsing {
-  val bufferSize = maxLength.min(8192).toInt
-
+private class ByteArrayBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[Array[Byte]] with BodyParsing {
   def parse(message: HttpMessage): Array[Byte] =
     withInputStream(message) { in =>
       val out = new ArrayBuffer[Byte](bufferSize)
@@ -119,8 +121,8 @@ private class ByteArrayBodyParser(val maxLength: Long) extends BodyParser[Array[
     }
 }
 
-private class TextBodyParser(maxLength: Int) extends BodyParser[String] {
-  private val parser = new ByteArrayBodyParser(maxLength)
+private class TextBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser[String] {
+  private val parser = new ByteArrayBodyParser(maxLength, bufferSize)
 
   def parse(message: HttpMessage): String =
     message.getHeaderValue("Content-Type")
@@ -130,21 +132,21 @@ private class TextBodyParser(maxLength: Int) extends BodyParser[String] {
       .map(charset => new String(parser.parse(message), charset)).get
 }
 
-private class QueryBodyParser(maxLength: Int) extends BodyParser[QueryString] {
-  private val parser = new TextBodyParser(maxLength)
+private class QueryBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser[QueryString] {
+  private val parser = new TextBodyParser(maxLength, bufferSize)
 
   def parse(message: HttpMessage): QueryString =
     QueryString(parser.parse(message))
 }
 
-private class FormBodyParser(maxLength: Int) extends BodyParser[Map[String, Seq[String]]] {
-  private val parser = new TextBodyParser(maxLength)
+private class FormBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser[Map[String, Seq[String]]] {
+  private val parser = new QueryBodyParser(maxLength, bufferSize)
 
   def parse(message: HttpMessage): Map[String, Seq[String]] =
-    QueryString(parser.parse(message)).toMap
+    parser.parse(message).toMap
 }
 
-private class FileBodyParser(val dest: File, val maxLength: Long, val bufferSize: Int) extends BodyParser[File] with BodyParsing {
+private class FileBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[File] with BodyParsing {
   def parse(message: HttpMessage): File =
     withInputStream(message) { in =>
       val destFile = getDestFile()
@@ -171,7 +173,7 @@ private class FileBodyParser(val dest: File, val maxLength: Long, val bufferSize
     }
 }
 
-private class MultipartBodyParser(val dest: File, val maxLength: Long, val bufferSize: Int) extends BodyParser[Multipart] with BodyParsing {
+private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[Multipart] with BodyParsing {
   private class Status(val boundary: String) {
     val start = ("--" + boundary).getBytes("UTF-8")
     val end = ("--" + boundary + "--").getBytes("UTF-8")

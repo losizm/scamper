@@ -31,9 +31,6 @@ trait BodyParsing {
    */
   def maxLength: Long
 
-  /** Gets buffer size. */
-  def bufferSize: Int
-
   /**
    * Provides input stream to decoded message body.
    *
