@@ -239,7 +239,7 @@ import scamper.ResponseStatuses.Ok
 import scamper.headers.ContentType
 import scamper.types.Implicits.stringToMediaType
 
-val body = Entity.fromString("""
+val body = Entity.fromText("""
 <!DOCTYPE html>
 <html>
   <head>
@@ -318,7 +318,7 @@ implicit object UserBodyParser extends BodyParser[User] {
   }
 
   // Parses JSON message body to User
-  def apply(message: HttpMessage): User =
+  def parse(message: HttpMessage): User =
     Json.parse(message.body.getInputStream).as[User]
 }
 
@@ -534,7 +534,7 @@ import scamper.client.ResponseFilter._
 import scamper.headers.{ ContentType, Location }
 import scamper.types.Implicits.stringToMediaType
 
-val req = POST("https:/localhost:8080/users")
+val req = POST("https://localhost:8080/users")
   .withContentType("application/json")
   .withBody(s"""{ "id": 500, "name": "guest" }""")
 
@@ -628,6 +628,7 @@ When creating a client, you can supply the truststore used for all requests made
 via HTTPS.
 
 ```scala
+import java.io.File
 import scamper.Implicits.{ stringToEntity, stringToUri }
 import scamper.client.HttpClient
 
@@ -788,7 +789,7 @@ app.request { req =>
   val translator: BodyParser[String] = ???
 
   if (req.method == POST && req.contentLanguage.contains("fr"))
-    Left(req.withBody(translator(req)).withContentLanguage("en"))
+    Left(req.withBody(translator.parse(req)).withContentLanguage("en"))
   else
     Left(req)
 }
@@ -854,7 +855,9 @@ processors can be added using any of these.
 
 ```scala
 import scamper.BodyParsers
+import scamper.Implicits.stringToUri
 import scamper.ResponseStatuses.{ Created, Ok }
+import scamper.headers.Location
 
 // Match GET requests to given path
 app.get("/about") { req =>
@@ -925,7 +928,7 @@ app.post("/translate/:in/to/:out") { req =>
   val from = req.params.getString("in")
   val to = req.params.getString("out")
 
-  Ok(translator(from, to)(req))
+  Ok(translator(from, to).parse(req))
 }
 ```
 
