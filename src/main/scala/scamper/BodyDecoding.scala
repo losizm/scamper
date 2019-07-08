@@ -22,12 +22,12 @@ import headers.{ ContentEncoding, ContentLength, TransferEncoding }
 import types.{ ContentCoding, TransferCoding }
 
 /** A mixin providing access to decoded message body. */
-trait BodyParsing {
+trait BodyDecoding {
   /**
    * Gets maximum body length.
    *
-   * The input stream obtained from `withInputStream` throws [[ReadLimitExceeded]]
-   * if an attempt is made to read beyond `maxLength` from message body.
+   * The input stream obtained from `decode` throws [[ReadLimitExceeded]] if an
+   * attempt is made to read beyond `maxLength` from message body.
    */
   def maxLength: Long
 
@@ -43,7 +43,7 @@ trait BodyParsing {
    * @note Input stream throws [[ReadLimitExceeded]] if attempt is made to read
    *   beyond `maxLength` from message body.
    */
-  def withInputStream[T](message: HttpMessage)(f: InputStream => T): T =
+  def decode[T](message: HttpMessage)(f: InputStream => T): T =
     if (message.body.isKnownEmpty)
       f(EmptyInputStream)
     else

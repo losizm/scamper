@@ -91,21 +91,21 @@ object BodyParsers {
   /**
    * Gets body parser for storing message body to file.
    *
-   * If `dest` is a directory, then the parser creates a new file in the
-   * specified directory on each parsing invocation. Otherwise, the parser
-   * overwrites the specified file on each invocation.
-   *
    * @param dest destination to which message body is stored
    * @param maxLength maximum length in bytes
    * @param bufferSize buffer size in bytes
+   *
+   * @note If `dest` is a directory, then the parser creates a new file in the
+   * specified directory on each parsing invocation. Otherwise, the parser
+   * overwrites the specified file on each invocation.
    */
   def file(dest: File = new File(sys.props("java.io.tmpdir")), maxLength: Long = 8388608, bufferSize: Int = 8192): BodyParser[File] =
     new FileBodyParser(dest, maxLength.max(0), bufferSize.max(8192))
 }
 
-private class ByteArrayBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[Array[Byte]] with BodyParsing {
+private class ByteArrayBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[Array[Byte]] with BodyDecoding {
   def parse(message: HttpMessage): Array[Byte] =
-    withInputStream(message) { in =>
+    decode(message) { in =>
       val out = new ArrayBuffer[Byte](bufferSize)
       val buf = new Array[Byte](bufferSize)
       var len = 0
@@ -146,9 +146,9 @@ private class FormBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser
     parser.parse(message).toMap
 }
 
-private class FileBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[File] with BodyParsing {
+private class FileBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[File] with BodyDecoding {
   def parse(message: HttpMessage): File =
-    withInputStream(message) { in =>
+    decode(message) { in =>
       val destFile = getDestFile()
 
       destFile.withOutputStream { out =>
@@ -173,7 +173,7 @@ private class FileBodyParser(dest: File, val maxLength: Long, bufferSize: Int) e
     }
 }
 
-private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[Multipart] with BodyParsing {
+private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[Multipart] with BodyDecoding {
   private class Status(val boundary: String) {
     val start = ("--" + boundary).getBytes("UTF-8")
     val end = ("--" + boundary + "--").getBytes("UTF-8")
@@ -184,7 +184,7 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
     message.contentType match {
       case MediaType("multipart", "form-data", params) =>
         params.get("boundary")
-          .map { boundary => withInputStream(message) { in => getMultipart(in, boundary) } }
+          .map { boundary => decode(message) { in => getMultipart(in, boundary) } }
           .getOrElse(throw new HttpException("Missing boundary in Content-Type header"))
 
       case value => throw new HttpException(s"Content-Type is not multipart/form-data: $value")
