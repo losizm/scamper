@@ -198,20 +198,18 @@ package object client {
     /**
      * Sends request and passes response to supplied handler.
      *
-     * <strong>Note:</strong> To make effective use of this method, the request
-     * target must be an absolute URI.
-     *
      * @param request outgoing request
      * @param handler response handler
      *
      * @return value from response handler
+     *
+     * @note To make effective use of this method, `request.target` must be an
+     *   absolute URI.
      */
     def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T
 
     /**
      * Sends GET request and passes response to handler.
-     *
-     * <strong>Note:</strong> The target must be an absolute URI.
      *
      * @param target request target
      * @param header request headers
@@ -219,13 +217,13 @@ package object client {
      * @param handler response handler
      *
      * @return value from response handler
+     *
+     * @note To make effective use of this method, `target` must be an absolute URI.
      */
     def get[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
 
     /**
      * Sends POST request and passes response to handler.
-     *
-     * <strong>Note:</strong> The target must be an absolute URI.
      *
      * @param target request target
      * @param header request headers
@@ -234,6 +232,8 @@ package object client {
      * @param handler response handler
      *
      * @return value from response handler
+     *
+     * @note To make effective use of this method, `target` must be an absolute URI.
      */
     def post[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
       (handler: ResponseHandler[T]): T
@@ -241,8 +241,6 @@ package object client {
     /**
      * Sends PUT request and passes response to handler.
      *
-     * <strong>Note:</strong> The target must be an absolute URI.
-     *
      * @param target request target
      * @param header request headers
      * @param cookies request cookies
@@ -250,6 +248,8 @@ package object client {
      * @param handler response handler
      *
      * @return value from response handler
+     *
+     * @note To make effective use of this method, `target` must be an absolute URI.
      */
     def put[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
       (handler: ResponseHandler[T]): T
@@ -257,8 +257,6 @@ package object client {
     /**
      * Sends PATCH request and passes response to handler.
      *
-     * <strong>Note:</strong> The target must be an absolute URI.
-     *
      * @param target request target
      * @param header request headers
      * @param cookies request cookies
@@ -266,6 +264,8 @@ package object client {
      * @param handler response handler
      *
      * @return value from response handler
+     *
+     * @note To make effective use of this method, `target` must be an absolute URI.
      */
     def patch[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
       (handler: ResponseHandler[T]): T
@@ -273,35 +273,33 @@ package object client {
     /**
      * Sends DELETE request and passes response to handler.
      *
-     * <strong>Note:</strong> The target must be an absolute URI.
-     *
      * @param target request target
      * @param header request headers
      * @param cookies request cookies
      * @param handler response handler
      *
      * @return value from response handler
+     *
+     * @note To make effective use of this method, `target` must be an absolute URI.
      */
     def delete[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
 
     /**
      * Sends HEAD request and passes response to handler.
      *
-     * <strong>Note:</strong> The target must be an absolute URI.
-     *
      * @param target request target
      * @param header request headers
      * @param cookies request cookies
      * @param handler response handler
      *
      * @return value from response handler
+     *
+     * @note To make effective use of this method, `target` must be an absolute URI.
      */
     def head[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
 
     /**
      * Sends OPTIONS request and passes response to handler.
-     *
-     * <strong>Note:</strong> The target must be an absolute URI.
      *
      * @param target request target
      * @param header request headers
@@ -310,6 +308,8 @@ package object client {
      * @param handler response handler
      *
      * @return value from response handler
+     *
+     * @note To make effective use of this method, `target` must be an absolute URI.
      */
     def options[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
       (handler: ResponseHandler[T]): T
@@ -317,13 +317,13 @@ package object client {
     /**
      * Sends TRACE request and passes response to handler.
      *
-     * <strong>Note:</strong> The target must be an absolute URI.
-     *
      * @param target request target
      * @param header request headers
      * @param handler response handler
      *
      * @return value from response handler
+     *
+     * @note To make effective use of this method, `target` must be an absolute URI.
      */
     def trace[T](target: URI, headers: Seq[Header] = Nil)(handler: ResponseHandler[T]): T
   }
@@ -333,12 +333,11 @@ package object client {
     /**
      * Creates `HttpClient` with supplied configuration.
      *
-     * If a trust store is supplied, the trust manager is ignored.
+     * If a truststore is supplied, the trust manager is ignored.
      *
      * @param bufferSize socket buffer size
      * @param readTimeout socket read timeout
-     * @param trustStore trust store used for SSL/TLS <em>(<strong>Note:</strong>
-     *   Store type must be JKS.)</em>
+     * @param trustStore truststore used for SSL/TLS &ndash; ''if supplied, store type must be JKS''
      * @param trustManager trust manager used for SSL/TLS
      */
     def apply(bufferSize: Int = 8192, readTimeout: Int = 30000, trustStore: Option[File] = None, trustManager: Option[TrustManager] = None): HttpClient =
@@ -351,18 +350,16 @@ package object client {
      *
      * If a trust store is supplied, the trust manager is ignored.
      *
-     * <strong>Note:</strong> To make effective use of this method, the request
-     * target must be an absolute URI.
-     *
      * @param request HTTP request
      * @param bufferSize socket buffer size
      * @param readTimeout socket read timeout
-     * @param trustStore trust store used for SSL/TLS <em>(<strong>Note:</strong>
-     *   Store type must be JKS.)</em>
+     * @param trustStore truststore used for SSL/TLS &ndash; ''if supplied, store type must be JKS''
      * @param trustManager trust manager used for SSL/TLS
      * @param handler response handler
      *
      * @return value from applied handler
+     *
+     * @note To make effective use of this method, `request.target` must be an absolute URI.
      */
     def send[T](request: HttpRequest, bufferSize: Int = 8192, readTimeout: Int = 30000, trustStore: Option[File] = None, trustManager: Option[TrustManager] = None)(handler: ResponseHandler[T]): T =
       HttpClient(bufferSize, readTimeout, trustStore, trustManager).send(request)(handler)

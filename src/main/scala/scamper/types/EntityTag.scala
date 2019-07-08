@@ -50,8 +50,8 @@ object EntityTag {
   /**
    * Creates EntityTag with supplied values.
    *
-   * <strong>Note:</strong> The opaque tag is automatically enclosed in
-   * double-quotes if not already supplied as such.
+   * @note The opaque tag is automatically enclosed in double-quotes if not
+   * already supplied as such.
    */
   def apply(opaque: String, weak: Boolean): EntityTag =
     if (opaque.matches("\"[^\"]*\"")) EntityTagImpl(opaque, weak)

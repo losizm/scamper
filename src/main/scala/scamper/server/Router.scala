@@ -220,7 +220,7 @@ trait Router {
    * | ----------- | ---------------- | ------------------------- | ------- |
    * | /images     | /tmp             | /images/logo.png          | /tmp/logo.png |
    * | /images     | /tmp             | /images/icons/warning.png | /tmp/icons/warning.png |
-   * | /images     | /tmp             | /styles/main.css          | <em>Doesn't map to anything</em> |
+   * | /images     | /tmp             | /styles/main.css          | ''Doesn't map to anything'' |
    *
    * @param mountPoint router path at which directory is mounted
    * @param sourceDirectory source directory from which files are served
@@ -235,22 +235,22 @@ trait Router {
    * The mount point is stripped from the router path, and the resulting path is
    * used to locate resources starting at base name.
    *
-   * <strong>Note:</strong> If `loader` is not supplied, then the current
-   * thread's context class loader is used.
-   *
    * === Resource Mapping Examples ===
    *
    * | Mount Point | Base Name | Router Path               | Maps to |
    * | ----------- | --------- | ------------------------- | ------- |
    * | /images     | assets    | /images/logo.png          | assets/logo.png |
    * | /images     | assets    | /images/icons/warning.png | assets/icons/warning.png |
-   * | /images     | assets    | /styles/main.css          | <em>Doesn't map to anything</em> |
+   * | /images     | assets    | /styles/main.css          | ''Doesn't map to anything'' |
    *
    * @param mountPoint router path at which resources are mounted
    * @param baseName base name from which resources are served
    * @param loader class loader from which resources are loaded
    *
    * @return this router
+   *
+   * @note If `loader` is not supplied, then the current thread's context class
+   * loader is used.
    */
   def resources(mountPoint: String, baseName: String, loader: Option[ClassLoader] = None): this.type
 }

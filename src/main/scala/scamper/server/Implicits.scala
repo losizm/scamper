@@ -32,7 +32,7 @@ object Implicits {
     /**
      * Gets message correlate.
      *
-     * Each incoming request is assigned a tag (i.e., <em>correlate</em>), which is
+     * Each incoming request is assigned a tag (i.e., ''correlate''), which is
      * later assigned to its outgoing response.
      */
     def correlate(): String = msg.getAttributeOrElse("scamper.server.message.correlate", "")

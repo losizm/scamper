@@ -39,10 +39,10 @@ import scamper.RequestMethods._
  * | bufferSize  | `8192` |
  * | readTimeout | `5000` |
  * | log         | `new File("server.log")` |
- * | secure      | <em>(Not configured)</em> |
- * | error       | <em>(Default error handler &ndash; sends `500 Internal Server Error`)</em> |
- * | request     | <em>(Not configured)</em> |
- * | response    | <em>(Not configured)</em> |
+ * | secure      | ''(Not configured)'' |
+ * | error       | ''(Default error handler &ndash; sends `500 Internal Server Error`)'' |
+ * | request     | ''(Not configured)'' |
+ * | response    | ''(Not configured)'' |
  * <br>
  */
 class ServerApplication {
@@ -76,14 +76,14 @@ class ServerApplication {
    * wait for processing. Incoming requests that would exceed this limit are
    * discarded.
    *
-   * <strong>Note:</strong> `queueSize` is also used to configure server
-   * backlog (i.e., backlog of incoming connections), so technically there can
-   * be up to double `queueSize` waiting to be processed if both request queue
-   * and server backlog are filled.
-   *
    * @param size queue size
    *
    * @return this application
+   *
+   * @note `queueSize` is also used to configure server backlog (i.e., backlog
+   *   of incoming connections), so technically there can be up to double
+   *   `queueSize` waiting to be processed if both request queue and server
+   *   backlog are filled.
    */
   def queueSize(size: Int): this.type = synchronized {
     app = app.copy(queueSize = size)
@@ -96,12 +96,12 @@ class ServerApplication {
    * The `bufferSize` specifies in bytes the size of buffer used when reading
    * from and writing to socket.
    *
-   * <strong>Note:</strong> `bufferSize` is also used as the optimal chunk size
-   * when writing a response with chunked transfer encoding.
-   *
    * @param size buffer size (in bytes)
    *
    * @return this application
+   *
+   * @note `bufferSize` is also used as the optimal chunk size when writing a
+   *   response with chunked transfer encoding.
    */
   def bufferSize(size: Int): this.type = synchronized {
     app = app.copy(bufferSize = size)
@@ -112,8 +112,7 @@ class ServerApplication {
    * Sets read timeout.
    *
    * The `readTimeout` controls how long a read from a socket blocks before it
-   * times out, whereafter <strong>408 Request Timeout</strong> is sent to
-   * client.
+   * times out, whereafter '''408 Request Timeout''' is sent to client.
    *
    * @param timeout read timeout in milliseconds
    *
@@ -153,14 +152,13 @@ class ServerApplication {
   /**
    * Sets key store to be used for SSL/TLS.
    *
-   * <strong>Note:</strong> The password can be discarded after invoking this
-   * method.
-   *
    * @param keyStore server key store
    * @param password key store password
    * @param storeType key store type (i.e., JKS, JCEKS, etc.)
    *
    * @return this application
+   *
+   * @note The password can be discarded after invoking this method.
    */
   def secure(keyStore: File, password: Array[Char], storeType: String): this.type = synchronized {
     app = app.copy(factory = SecureServerSocketFactory.create(keyStore, password, storeType))
@@ -397,7 +395,7 @@ class ServerApplication {
    * | ----------- | ---------------- | ------------------------- | ------- |
    * | /images     | /tmp             | /images/logo.png          | /tmp/logo.png |
    * | /images     | /tmp             | /images/icons/warning.png | /tmp/icons/warning.png |
-   * | /images     | /tmp             | /styles/main.css          | <em>Doesn't map to anything</em> |
+   * | /images     | /tmp             | /styles/main.css          | ''Doesn't map to anything'' |
    *
    * @param mountPoint request path at which directory is mounted
    * @param sourceDirectory source directory from which files are served
@@ -415,22 +413,22 @@ class ServerApplication {
    * The mount point is stripped from the request path, and the resulting path is
    * used to locate resources starting at base name.
    *
-   * <strong>Note:</strong> If `loader` is not supplied, then the current
-   * thread's context class loader is used.
-   *
    * === Resource Mapping Examples ===
    *
    * | Mount Point | Base Name | Request Path              | Maps to |
    * | ----------- | --------- | ------------------------- | ------- |
    * | /images     | assets    | /images/logo.png          | assets/logo.png |
    * | /images     | assets    | /images/icons/warning.png | assets/icons/warning.png |
-   * | /images     | assets    | /styles/main.css          | <em>Doesn't map to anything</em> |
+   * | /images     | assets    | /styles/main.css          | ''Doesn't map to anything'' |
    *
    * @param mountPoint request path at which resources are mounted
    * @param baseName base name from which resources are served
    * @param loader class loader from which resources are loaded
    *
    * @return this application
+   *
+   * @note If `loader` is not supplied, then the current thread's context class
+   *   loader is used.
    */
   def resources(mountPoint: String, baseName: String, loader: Option[ClassLoader] = None): this.type = synchronized {
     val effectiveLoader = loader.getOrElse(Thread.currentThread.getContextClassLoader)

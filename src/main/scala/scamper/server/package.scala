@@ -132,10 +132,10 @@ package object server {
      * Composes head handler with tail handlers, using tail handlers as
      * fallbacks.
      *
-     * <strong>Note:</strong> If `handlers` is empty, a request handler is
-     * created that returns the request it receives.
-     *
      * @param handlers request handlers
+     *
+     * @note If `handlers` is empty, a request handler is created that returns
+     *   the request it receives.
      */
     def coalesce(handlers: RequestHandler*): RequestHandler = {
       @annotation.tailrec
@@ -216,10 +216,10 @@ package object server {
      * Composes chain of response filters, with response of preceding filter
      * passed to its successor.
      *
-     * <strong>Note:</strong> If `filters` is empty, a response filter is
-     * created that returns the response it receives.
-     *
      * @param filters response filters
+     *
+     * @note If `filters` is empty, a response filter is created that returns
+     *   the response it receives.
      */
     def chain(filters: ResponseFilter*): ResponseFilter = {
       @annotation.tailrec
