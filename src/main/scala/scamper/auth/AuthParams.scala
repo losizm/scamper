@@ -36,7 +36,7 @@ private object AuthParams {
           case ("realm", value) => "realm=\"" + value + "\""
           case (name, value)    => s"$name=${formatParamValue(value)}"
         }.toSeq
-        .sortBy { format => if (format.startsWith("realm")) 0 else 1 }
+        .sortWith { (a, b) => a.startsWith("realm") }
         .mkString(" ", ", ", "")
 
   private def formatParamValue(value: String): String = Token(value).getOrElse(s"""\"$value\"""")

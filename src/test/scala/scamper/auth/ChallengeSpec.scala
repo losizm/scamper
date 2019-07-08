@@ -39,7 +39,7 @@ class ChallengeSpec extends FlatSpec {
     assert(!challenge.token.isDefined)
     assert(challenge.params("realm") == "example")
     assert(challenge.params("error") == "invalid_token")
-    assert { Seq("Bearer realm=\"example\", error=invalid_token, scope=\"user profile\"", "Bearer realm=\"example\", scope=\"user profile\", error=invalid_token").contains(challenge.toString) }
+    assert(challenge.toString == "Bearer realm=\"example\", error=invalid_token, scope=\"user profile\"")
     assert(challenge.isInstanceOf[BearerChallenge])
 
     val auth = challenge.asInstanceOf[BearerChallenge]

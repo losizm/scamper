@@ -17,22 +17,18 @@ package scamper
 
 private class CaseInsensitiveKeyMap[V](params: Seq[(String, V)]) extends Map[String, V] {
   def get(key: String): Option[V] =
-    params.collectFirst {
-      case (k, value) if k.equalsIgnoreCase(key) => value
-    }
+    params.collectFirst { case (k, value) if k.equalsIgnoreCase(key) => value }
 
   def iterator: Iterator[(String, V)] =
-    params.groupBy(_._1.toLowerCase)
-      .map { case (key, Seq((_, value), _*)) => key -> value }
-      .iterator
+    params.distinctBy(_._1.toLowerCase).iterator
 
   def removed(key: String): Map[String, V] =
-    new CaseInsensitiveKeyMap(params.filterNot {
-      case (k, _) => k.equalsIgnoreCase(key)
-    })
+    new CaseInsensitiveKeyMap(params.filterNot { case (k, _) => k.equalsIgnoreCase(key) })
 
-  def updated[V1 >: V](key: String, value: V1): Map[String, V1] = new CaseInsensitiveKeyMap(params :+ (key, value))
+  def updated[V1 >: V](key: String, value: V1): Map[String, V1] =
+    new CaseInsensitiveKeyMap(params :+ (key, value))
 
-  override def empty: Map[String, V] = new CaseInsensitiveKeyMap(Nil)
+  override def empty: Map[String, V] =
+    new CaseInsensitiveKeyMap(Nil)
 }
 
