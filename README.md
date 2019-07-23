@@ -6,6 +6,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_2.12.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_2.12%22)
 
 ## Table of Contents
+- [Getting Started](#Getting-Started)
 - [HTTP Messages](#HTTP-Messages)
   - [Building Requests](#Building-Requests)
   - [Building Responses](#Building-Responses)
@@ -40,6 +41,13 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
   - [Creating Server](#Creating-Server)
 - [API Documentation](#API-Documentation)
 - [License](#License)
+
+## Getting Started
+To use **Scamper**, start by adding it as a dependency to your project:
+
+```scala
+libraryDependencies += "com.github.losizm" %% "scamper" % "9.0.0"
+```
 
 ## HTTP Messages
 At the core of **Scamper** is `HttpMessage`, which is a trait that defines the
@@ -706,7 +714,7 @@ This gives you the default application as a starting point. With this in hand,
 you can change the location of the server log.
 
 ```scala
-app.log(new File("/tmp/server.log"))
+app.logger(new File("/tmp/server.log"))
 ```
 
 And there are peformance-related settings that can be tweaked as well.
