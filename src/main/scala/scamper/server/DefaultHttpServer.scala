@@ -15,7 +15,7 @@
  */
 package scamper.server
 
-import java.io.{ File, FileWriter, InputStream, PrintWriter }
+import java.io.{ Closeable, File, InputStream }
 import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException, URI, URISyntaxException }
 import java.time.Instant
 import java.util.concurrent.{ ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadFactory, ThreadPoolExecutor }
@@ -32,6 +32,7 @@ import scamper._
 import scamper.Auxiliary.SocketType
 import scamper.ResponseStatuses.{ BadRequest, InternalServerError, NotFound, RequestTimeout, UriTooLong, RequestHeaderFieldsTooLarge }
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
+import scamper.logging.{ ConsoleLogger, Logger }
 import scamper.types.TransferCoding
 
 private object DefaultHttpServer {
@@ -44,7 +45,7 @@ private object DefaultHttpServer {
     headerSize: Int = Try(sys.props("scamper.server.headerSize").toInt).getOrElse(1024),
     readTimeout: Int = 5000,
     keepAliveSeconds: Int = Try(sys.props("scamper.server.keepAliveSeconds").toInt).getOrElse(60),
-    log: File = new File("server.log").getCanonicalFile(),
+    logger: Logger = ConsoleLogger,
     requestHandlers: Seq[RequestHandler] = Nil,
     responseFilters: Seq[ResponseFilter] = Nil,
     errorHandler: Option[ErrorHandler] = None,
@@ -62,7 +63,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   val bufferSize = app.bufferSize.max(1024)
   val readTimeout = app.readTimeout
   val keepAliveSeconds = app.keepAliveSeconds
-  val log = app.log
+  val logger = app.logger
 
   private val authority = s"${host.getCanonicalHostName}:$port"
   private val threadGroup = new ThreadGroup(s"scamper-server-$id")
@@ -71,11 +72,10 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   private val errorHandler = app.errorHandler.getOrElse(new ErrorHandler {
     def apply(err: Throwable, req: HttpRequest): HttpResponse = {
       val id = req.getAttribute[String]("scamper.server.message.correlate").getOrElse("<unknown>")
-      logMessage(s"[error] Error while handling request for $id", Some(err))
+      logger.error(s"$authority - Error while handling request for $id", err)
       InternalServerError()
     }
   })
-  private val logWriter = new PrintWriter(new FileWriter(log, true), true)
   private val serverSocket = app.factory.createServerSocket()
   private val chunked = TransferCoding("chunked")
   private var closed = false
@@ -102,7 +102,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
 
   private implicit val serviceContext = ExecutionContext.fromExecutorService {
     object ServiceUnavailableHandler extends RejectedExecutionHandler {
-      def rejectedExecution(task: Runnable, executor: ThreadPoolExecutor): Unit = logMessage("[error] Task rejected")
+      def rejectedExecution(task: Runnable, executor: ThreadPoolExecutor): Unit = logger.error(s"$authority - Task rejected")
     }
 
     object ServiceThreadFactory extends ThreadFactory {
@@ -131,11 +131,11 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
 
   def close(): Unit = synchronized {
     if (!closed) {
-      Try(logMessage("[info] Shutting down server"))
+      Try(logger.info(s"$authority - Shutting down server"))
       Try(serverSocket.close())
       Try(writerContext.shutdownNow())
       Try(serviceContext.shutdownNow())
-      Try(logWriter.close())
+      Try(logger.asInstanceOf[Closeable].close())
       closed = true
     }
   }
@@ -143,28 +143,23 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   override def toString(): String = s"HttpServer(host=$host, port=$port, isSecure=$isSecure, isClosed=$isClosed)"
 
   try {
-    logMessage(s"[info] Starting server at $authority")
-    logMessage(s"[info] Secure: $isSecure")
-    logMessage(s"[info] Log: $log")
-    logMessage(s"[info] Pool Size: $poolSize")
-    logMessage(s"[info] Queue Size: $queueSize")
-    logMessage(s"[info] Buffer Size: $bufferSize")
-    logMessage(s"[info] Read Timeout: $readTimeout")
+    logger.info(s"$authority - Starting server")
+    logger.info(s"$authority - Secure: $isSecure")
+    logger.info(s"$authority - Logger: $logger")
+    logger.info(s"$authority - Pool Size: $poolSize")
+    logger.info(s"$authority - Queue Size: $queueSize")
+    logger.info(s"$authority - Buffer Size: $bufferSize")
+    logger.info(s"$authority - Read Timeout: $readTimeout")
 
     serverSocket.bind(new InetSocketAddress(host, port), queueSize)
     Service.start()
 
-    logMessage(s"[info] Server running at $authority")
+    logger.info(s"$authority - Server is up and running")
   } catch {
     case e: Exception =>
-      logMessage(s"[error] Failed to start server at $authority", Some(e))
+      logger.error(s"$authority - Failed to start server", e)
       close()
       throw e
-  }
-
-  private def logMessage(message: String, error: Option[Throwable] = None): Unit = {
-    logWriter.printf("%s [%s]%s%n", Instant.now(), authority, message)
-    error.foreach(_.printStackTrace(logWriter))
   }
 
   private case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
@@ -179,7 +174,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
           service(serverSocket.accept())
         catch {
           case e: Exception if serverSocket.isClosed => close() // Ensure server is closed
-          case e: Exception => logMessage(s"[warning] Error while waiting for connection: $e", Some(e))
+          case e: Exception => logger.warn(s"$authority - Error while waiting for connection: $e")
         }
 
     private def service(implicit socket: Socket): Unit = {
@@ -187,7 +182,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
       val correlate = nextCorrelate
       val tag = connection + " (" + correlate + ")"
 
-      logMessage(s"[info] Connection received from $tag")
+      logger.info(s"$authority - Connection received from $tag")
 
       def onReadError: PartialFunction[Throwable, HttpResponse] = {
         case ReadError(status)              => status()
@@ -197,7 +192,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
         case err: ResponseAborted           => throw err
         case err: SSLException              => throw err
         case err =>
-          logMessage(s"[error] Error while reading request from $tag", Some(err))
+          logger.error(s"$authority - Error while reading request from $tag", err)
           InternalServerError()
       }
 
@@ -210,7 +205,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
 
       Future {
         try {
-          logMessage(s"[info] Servicing request from $tag")
+          logger.info(s"$authority - Servicing request from $tag")
           socket.setSoTimeout(readTimeout)
 
           Try(read())
@@ -221,26 +216,26 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
               Try(filter(res))
                 .map { res =>
                   write(res)
-                  logMessage(s"[info] Response sent to $tag")
+                  logger.info(s"$authority - Response sent to $tag")
                   Try(res.body.getInputStream.close()) // Close filtered response body
                 }.recover {
-                  case err => logMessage(s"[error] Error while filtering response to $tag", Some(err))
+                  case err => logger.error(s"$authority - Error while filtering response to $tag", err)
                 }
 
               Try(res.body.getInputStream.close()) // Close unfiltered response body
             }.get
         } catch {
           case err: ResponseAborted =>
-            logMessage(s"[warn] Response aborted while servicing request from $tag", Some(err))
+            logger.warn(s"$authority - Response aborted while servicing request from $tag", err)
 
           case err: SSLException =>
-            logMessage(s"[warn] SSL error while servicing request from $tag", Some(err))
+            logger.warn(s"$authority - SSL error while servicing request from $tag", err)
 
           case err: Throwable =>
-            logMessage(s"[error] Fatal error while servicing request from $tag", Some(err))
+            logger.error(s"$authority - Fatal error while servicing request from $tag", err)
             throw err
         } finally {
-          logMessage(s"[info] Closing connection to $tag")
+          logger.info(s"$authority - Closing connection to $tag")
           Try(socket.close())
         }
       }

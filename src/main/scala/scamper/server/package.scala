@@ -19,6 +19,7 @@ import java.io.File
 import java.net.InetAddress
 
 import RequestMethods._
+import logging.Logger
 
 /**
  * Provides HTTP server implementation.
@@ -301,8 +302,8 @@ package object server {
     /** Gets port number. */
     def port: Int
 
-    /** Gets log file. */
-    def log: File
+    /** Gets logger. */
+    def logger: Logger
 
     /** Gets pool size. */
     def poolSize: Int

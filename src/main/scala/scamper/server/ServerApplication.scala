@@ -20,6 +20,7 @@ import java.net.InetAddress
 
 import scamper.RequestMethod
 import scamper.RequestMethods._
+import scamper.logging.{ Logger, LogWriter }
 
 /**
  * Configures and creates `HttpServer`.
@@ -38,7 +39,7 @@ import scamper.RequestMethods._
  * | queueSize   | `Runtime.getRuntime().availableProcessors() * 4` |
  * | bufferSize  | `8192` |
  * | readTimeout | `5000` |
- * | log         | `new File("server.log")` |
+ * | logger      | `ConsoleLogger` |
  * | secure      | ''(Not configured)'' |
  * | error       | ''(Default error handler &ndash; sends `500 Internal Server Error`)'' |
  * | request     | ''(Not configured)'' |
@@ -124,14 +125,26 @@ class ServerApplication {
   }
 
   /**
-   * Sets location of server log file.
+   * Sets logger to given file.
    *
-   * @param file log file
+   * @param file file to which server logs are written
    *
    * @return this application
    */
-  def log(file: File): this.type = synchronized {
-    app = app.copy(log = file.getCanonicalFile())
+  def logger(file: File): this.type = synchronized {
+    app = app.copy(logger = new LogWriter(file, true))
+    this
+  }
+
+  /**
+   * Sets logger.
+   *
+   * @param logger logger to which server logs are written
+   *
+   * @return this application
+   */
+  def logger(logger: Logger): this.type = synchronized {
+    app = app.copy(logger = logger)
     this
   }
 
