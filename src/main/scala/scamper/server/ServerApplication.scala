@@ -132,7 +132,7 @@ class ServerApplication {
    * @return this application
    */
   def logger(file: File): this.type = synchronized {
-    app = app.copy(logger = new LogWriter(file, true))
+    app = app.copy(logger = LogWriter(file, true))
     this
   }
 

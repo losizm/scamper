@@ -15,7 +15,7 @@
  */
 package scamper
 
-import java.io.{ Closeable, File, FileOutputStream, PrintWriter }
+import java.io.{ Closeable, File, FileOutputStream, OutputStream, PrintWriter, Writer }
 import java.nio.file.{ Files, Path, OpenOption }
 import java.time.Instant
 
@@ -145,28 +145,10 @@ package object logging {
   /**
    * Provides logger to `java.io.PrintWriter`.
    *
-   * @constructor Creates logger to given writer.
+   * @constructor Creates log writer.
    * @param writer writer to which logs are written
    */
   class LogWriter(writer: PrintWriter) extends Logger with Closeable {
-    /**
-     * Creates log writer to given path.
-     *
-     * @param path path to which logs are written
-     * @param opts open options
-     */
-    def this(path: Path, opts: OpenOption*) =
-      this(new PrintWriter(Files.newOutputStream(path, opts : _*)))
-
-    /**
-     * Creates log writer to given file.
-     *
-     * @param file file to which logs are written
-     * @param append specifies if file should be opened in append mode
-     */
-    def this(file: File, append: Boolean = true) =
-      this(new PrintWriter(new FileOutputStream(file, append)))
-
     def trace(message: String): Unit =
       log("trace", message)
 
@@ -209,5 +191,45 @@ package object logging {
       log(level, message)
       cause.printStackTrace(writer)
     }
+  }
+
+  /** LogWriter factory. */
+  object LogWriter {
+    /**
+     * Creates log writer.
+     *
+     * @param writer writer to which log files are written
+     */
+    def apply(writer: Writer) =
+      writer match {
+        case writer: PrintWriter => new LogWriter(writer)
+        case _ => new LogWriter(new PrintWriter(writer))
+      }
+
+    /**
+     * Creates log writer to given output stream.
+     *
+     * @param file output stream to which logs are written
+     */
+    def apply(out: OutputStream) =
+      new LogWriter(new PrintWriter(out))
+
+    /**
+     * Creates log writer to given file.
+     *
+     * @param file file to which logs are written
+     * @param append specifies if file should be opened in append mode
+     */
+    def apply(file: File, append: Boolean = true) =
+      new LogWriter(new PrintWriter(new FileOutputStream(file, append)))
+
+    /**
+     * Creates log writer to given path.
+     *
+     * @param path path to which logs are written
+     * @param opts open options
+     */
+    def apply(path: Path, opts: OpenOption*) =
+      new LogWriter(new PrintWriter(Files.newOutputStream(path, opts : _*)))
   }
 }
