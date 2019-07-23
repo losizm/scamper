@@ -130,6 +130,8 @@ class ServerApplication {
    * @param file file to which server logs are written
    *
    * @return this application
+   *
+   * @note If file exists, it is opened in append mode.
    */
   def logger(file: File): this.type = synchronized {
     app = app.copy(logger = LogWriter(file, true))

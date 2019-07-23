@@ -218,10 +218,35 @@ package object logging {
      * Creates log writer to given file.
      *
      * @param file file to which logs are written
+     */
+    def apply(file: File) =
+      new LogWriter(new PrintWriter(new FileOutputStream(file)))
+
+    /**
+     * Creates log writer to given file.
+     *
+     * @param file file to which logs are written
      * @param append specifies if file should be opened in append mode
      */
-    def apply(file: File, append: Boolean = true) =
+    def apply(file: File, append: Boolean) =
       new LogWriter(new PrintWriter(new FileOutputStream(file, append)))
+
+    /**
+     * Creates log writer to given file.
+     *
+     * @param fileName file name to which logs are written
+     */
+    def apply(fileName: String) =
+      new LogWriter(new PrintWriter(new FileOutputStream(fileName)))
+
+    /**
+     * Creates log writer to given file.
+     *
+     * @param fileName file name to which logs are written
+     * @param append specifies if file should be opened in append mode
+     */
+    def apply(fileName: String, append: Boolean) =
+      new LogWriter(new PrintWriter(new FileOutputStream(fileName, append)))
 
     /**
      * Creates log writer to given path.
