@@ -74,6 +74,23 @@ object Implicits {
    */
   implicit class HttpMessageType[T <: HttpMessage](val message: T) extends AnyVal {
     /**
+     * Creates new message with supplied text as message body.
+     *
+     * After adding body to message, the Content-Type header is set to
+     * `text/plain` with its charset parameter set accordingly, and
+     * Content-Length is set to length of encoded characters.
+     *
+     * @param text message body
+     * @param charset character set
+     */
+    def withTextBody(text: String, charset: String = "UTF-8")(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+      val entity = Entity.fromText(text, charset)
+      message.withBody(entity)
+        .withHeader(Header("Content-Type", s"text/plain; charset=$charset"))
+        .withHeader(Header("Content-Length", entity.getLength.get))
+    }
+
+    /**
      * Creates new message with content from supplied file as message body.
      *
      * After adding body to message, the Content-Type header is set based on
