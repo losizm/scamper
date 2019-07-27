@@ -198,6 +198,33 @@ package object logging {
   }
 
   /**
+   * Provides logger to nothing.
+   *
+   * @note Each logger method is effectively a noop.
+   */
+  object NullLogger extends Logger {
+    def trace(message: String): Unit = ()
+    def trace(format: String, args: Any*): Unit = ()
+    def trace(message: String, cause: Throwable): Unit = ()
+
+    def debug(message: String): Unit = ()
+    def debug(format: String, args: Any*): Unit = ()
+    def debug(message: String, cause: Throwable): Unit = ()
+
+    def info(message: String): Unit = ()
+    def info(format: String, args: Any*): Unit = ()
+    def info(message: String, cause: Throwable): Unit = ()
+
+    def warn(message: String): Unit = ()
+    def warn(format: String, args: Any*): Unit = ()
+    def warn(message: String, cause: Throwable): Unit = ()
+
+    def error(message: String): Unit = ()
+    def error(format: String, args: Any*): Unit = ()
+    def error(message: String, cause: Throwable): Unit = ()
+  }
+
+  /**
    * Provides logger to `java.io.PrintWriter`.
    *
    * @constructor Creates log writer.
