@@ -33,6 +33,14 @@ package object logging {
     def trace(message: String): Unit
 
     /**
+     * Logs formatted trace message.
+     *
+     * @param format message format
+     * @param args message arguments
+     */
+    def trace(format: String, args: Any*): Unit
+
+    /**
      * Logs trace message and stack trace of given cause.
      *
      * @param message log message
@@ -46,6 +54,14 @@ package object logging {
      * @param message log message
      */
     def debug(message: String): Unit
+
+    /**
+     * Logs formatted debug message.
+     *
+     * @param format message format
+     * @param args message arguments
+     */
+    def debug(format: String, args: Any*): Unit
 
     /**
      * Logs debug message and stack trace of given cause.
@@ -63,6 +79,14 @@ package object logging {
     def info(message: String): Unit
 
     /**
+     * Logs formatted information message.
+     *
+     * @param format message format
+     * @param args message arguments
+     */
+    def info(format: String, args: Any*): Unit
+
+    /**
      * Logs information message and stack trace of given cause.
      *
      * @param message log message
@@ -76,6 +100,14 @@ package object logging {
      * @param message log message
      */
     def warn(message: String): Unit
+
+    /**
+     * Logs formatted warning message.
+     *
+     * @param format message format
+     * @param args message arguments
+     */
+    def warn(format: String, args: Any*): Unit
 
     /**
      * Logs warning message and stack trace of given cause.
@@ -93,6 +125,14 @@ package object logging {
     def error(message: String): Unit
 
     /**
+     * Logs formatted error message.
+     *
+     * @param format message format
+     * @param args message arguments
+     */
+    def error(format: String, args: Any*): Unit
+
+    /**
      * Logs error message and stack trace of given cause.
      *
      * @param message log message
@@ -106,11 +146,17 @@ package object logging {
     def trace(message: String): Unit =
       log("trace", message)
 
+    def trace(format: String, args: Any*): Unit =
+      log("trace", format.format(args : _*))
+
     def trace(message: String, cause: Throwable): Unit =
       log("trace", message, cause)
 
     def debug(message: String): Unit =
       log("debug", message)
+
+    def debug(format: String, args: Any*): Unit =
+      log("debug", format.format(args : _*))
 
     def debug(message: String, cause: Throwable): Unit =
       log("debug", message, cause)
@@ -118,17 +164,26 @@ package object logging {
     def info(message: String): Unit =
       log("info", message)
 
+    def info(format: String, args: Any*): Unit =
+      log("info", format.format(args : _*))
+
     def info(message: String, cause: Throwable): Unit =
       log("info", message, cause)
 
     def warn(message: String): Unit =
       log("warn", message)
 
+    def warn(format: String, args: Any*): Unit =
+      log("warn", format.format(args : _*))
+
     def warn(message: String, cause: Throwable): Unit =
       log("warn", message, cause)
 
     def error(message: String): Unit =
       log("error", message)
+
+    def error(format: String, args: Any*): Unit =
+      log("error", format.format(args : _*))
 
     def error(message: String, cause: Throwable): Unit =
       log("error", message, cause)
@@ -152,11 +207,17 @@ package object logging {
     def trace(message: String): Unit =
       log("trace", message)
 
+    def trace(format: String, args: Any*): Unit =
+      log("trace", format.format(args : _*))
+
     def trace(message: String, cause: Throwable): Unit =
       log("trace", message, cause)
 
     def debug(message: String): Unit =
       log("debug", message)
+
+    def debug(format: String, args: Any*): Unit =
+      log("debug", format.format(args : _*))
 
     def debug(message: String, cause: Throwable): Unit =
       log("debug", message, cause)
@@ -164,17 +225,26 @@ package object logging {
     def info(message: String): Unit =
       log("info", message)
 
+    def info(format: String, args: Any*): Unit =
+      log("info", format.format(args : _*))
+
     def info(message: String, cause: Throwable): Unit =
       log("info", message, cause)
 
     def warn(message: String): Unit =
       log("warn", message)
 
+    def warn(format: String, args: Any*): Unit =
+      log("warn", format.format(args : _*))
+
     def warn(message: String, cause: Throwable): Unit =
       log("warn", message, cause)
 
     def error(message: String): Unit =
       log("error", message)
+
+    def error(format: String, args: Any*): Unit =
+      log("error", format.format(args : _*))
 
     def error(message: String, cause: Throwable): Unit =
       log("error", message, cause)
