@@ -15,15 +15,31 @@
  */
 package scamper
 
-import java.util.Properties
-import scala.collection.convert.AsScalaConverters
-import scala.collection.mutable.{ Map => MutableMap }
+import java.{ lang => jl }
+import java.{ util => ju }
 
-private object CollectionConverters {
-  private object Converter extends AsScalaConverters
+import scala.collection.concurrent
+import scala.collection.mutable
 
-  implicit class PropertiesAsScala(private val properties: Properties) extends AnyVal {
-    def asScala: MutableMap[String, String] = Converter.propertiesAsScalaMap(properties)
-  }
+private object CollectionConverters extends scala.collection.convert.AsScalaConverters {
+  def asScala[A](list: ju.List[A]): mutable.Buffer[A] = asScalaBuffer(list)
+
+  def asScala[A](set: ju.Set[A]): mutable.Set[A] = asScalaSet(set)
+
+  def asScala[A](iter: ju.Iterator[A]): Iterator[A] = asScalaIterator(iter)
+
+  def asScala[A](enum: ju.Enumeration[A]): Iterator[A] = enumerationAsScalaIterator(enum)
+
+  def asScala[A](iter: jl.Iterable[A]): Iterable[A] = iterableAsScalaIterable(iter)
+
+  def asScala[A](coll: ju.Collection[A]): Iterable[A] = collectionAsScalaIterable(coll)
+
+  def asScala[K, V](map: ju.Map[K, V]): mutable.Map[K, V] = mapAsScalaMap(map)
+
+  def asScala[K, V](dict: ju.Dictionary[K, V]): mutable.Map[K, V] = dictionaryAsScalaMap(dict)
+
+  def asScala(props: ju.Properties): mutable.Map[String, String] = propertiesAsScalaMap(props)
+
+  def asScala[K, V](map: ju.concurrent.ConcurrentMap[K, V]): concurrent.Map[K, V] = mapAsScalaConcurrentMap(map)
 }
 

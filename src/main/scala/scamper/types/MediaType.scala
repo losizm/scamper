@@ -80,7 +80,7 @@ object MediaType {
     try props.load(in)
     finally Try(in.close())
 
-    props.asScala.map {
+    asScala(props).map {
       case (key, value) => key.toLowerCase -> Try(parse(value))
     }.collect {
       case (key, Success(value)) => key -> value

@@ -15,15 +15,5 @@
  */
 package scamper
 
-import java.util.Properties
-import scala.collection.convert.AsScalaConverters
-import scala.collection.mutable.{ Map => MutableMap }
-
-private object CollectionConverters {
-  private object Converter extends AsScalaConverters
-
-  implicit class PropertiesAsScala(private val properties: Properties) extends AnyVal {
-    def asScala: MutableMap[String, String] = Converter.asScala(properties)
-  }
-}
+private object CollectionConverters extends scala.collection.convert.AsScalaConverters
 
