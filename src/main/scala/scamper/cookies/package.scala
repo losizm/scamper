@@ -210,7 +210,7 @@ package object cookies {
   }
 
   /** Provides access to request cookies in `Cookie` header. */
-  implicit class RequestCookies(val request: HttpRequest) extends AnyVal {
+  implicit class RequestCookies(private val request: HttpRequest) extends AnyVal {
     /** Gets cookies. */
     def cookies: Seq[PlainCookie] =
       request.getHeaderValue("Cookie")
@@ -256,7 +256,7 @@ package object cookies {
   }
 
   /** Provides access to response cookies in `Set-Cookie` headers. */
-  implicit class ResponseCookies(val response: HttpResponse) extends AnyVal {
+  implicit class ResponseCookies(private val response: HttpResponse) extends AnyVal {
     /** Gets cookies. */
     def cookies: Seq[SetCookie] =
       response.getHeaderValues("Set-Cookie").map(SetCookie.parse)

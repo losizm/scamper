@@ -34,7 +34,7 @@ private object Auxiliary {
   val `application/octet-stream` = MediaType("application", "octet-stream")
   val `text/plain` = MediaType("text", "plain")
 
-  implicit class FileType(val file: File) extends AnyVal {
+  implicit class FileType(private val file: File) extends AnyVal {
     def withOutputStream[T](f: OutputStream => T): T = {
       val out = new FileOutputStream(file)
       try f(out)
@@ -48,7 +48,7 @@ private object Auxiliary {
     }
   }
 
-  implicit class InputStreamType(val in: InputStream) extends AnyVal {
+  implicit class InputStreamType(private val in: InputStream) extends AnyVal {
     def getBytes(bufferSize: Int = 8192): Array[Byte] = {
       val bytes = new ArrayBuffer[Byte]
       val buffer = new Array[Byte](bufferSize.max(1024))
@@ -112,7 +112,7 @@ private object Auxiliary {
     }
   }
 
-  implicit class OutputStreamType(val out: OutputStream) extends AnyVal {
+  implicit class OutputStreamType(private val out: OutputStream) extends AnyVal {
     def writeLine(text: String): Unit = {
       out.write(text.getBytes("UTF-8"))
       out.write(crlf)
@@ -121,7 +121,7 @@ private object Auxiliary {
     def writeLine(): Unit = out.write(crlf)
   }
 
-  implicit class SocketType(val socket: Socket) extends AnyVal {
+  implicit class SocketType(private val socket: Socket) extends AnyVal {
     def read(): Int = socket.getInputStream().read()
 
     def read(buffer: Array[Byte]): Int = socket.getInputStream().read(buffer)
@@ -152,7 +152,7 @@ private object Auxiliary {
     def flush(): Unit = socket.getOutputStream().flush()
   }
 
-  implicit class StringType(val string: String) extends AnyVal {
+  implicit class StringType(private val string: String) extends AnyVal {
     def matchesAny(regexes: String*): Boolean = regexes.exists(string.matches)
 
     def toInstant: Instant = Try(Instant.parse(string)).getOrElse(DateValue.parse(string))
@@ -172,7 +172,7 @@ private object Auxiliary {
     def toUrlDecoded(encoding: String): String = URLDecoder.decode(string, encoding)
   }
 
-  implicit class UriType(val uri: URI) extends AnyVal {
+  implicit class UriType(private val uri: URI) extends AnyVal {
     def withScheme(scheme: String): URI =
       buildUri(scheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
 

@@ -72,7 +72,7 @@ object Implicits {
    * Adds extension methods to HttpMessage for building messages with various
    * content types.
    */
-  implicit class HttpMessageType[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class HttpMessageType[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Creates new message with supplied text as message body.
      *

@@ -131,7 +131,7 @@ package object auth {
   implicit val stringToCredentials = (credentials: String) => Credentials.parse(credentials)
 
   /** Provides standardized access to Authentication-Info header. */
-  implicit class AuthenticationInfo(val response: HttpResponse) extends AnyVal {
+  implicit class AuthenticationInfo(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Authentication-Info header values.
      *
@@ -158,7 +158,7 @@ package object auth {
   }
 
   /** Provides standardized access to Authorization header. */
-  implicit class Authorization(val request: HttpRequest) extends AnyVal {
+  implicit class Authorization(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Authorization header value.
      *
@@ -233,7 +233,7 @@ package object auth {
   }
 
   /** Provides standardized access to Proxy-Authenticate header. */
-  implicit class ProxyAuthenticate(val response: HttpResponse) extends AnyVal {
+  implicit class ProxyAuthenticate(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Proxy-Authenticate header values.
      *
@@ -310,7 +310,7 @@ package object auth {
   }
 
   /** Provides standardized access to Proxy-Authentication-Info header. */
-  implicit class ProxyAuthenticationInfo(val response: HttpResponse) extends AnyVal {
+  implicit class ProxyAuthenticationInfo(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Proxy-Authentication-Info header values.
      *
@@ -339,7 +339,7 @@ package object auth {
   }
 
   /** Provides standardized access to Proxy-Authorization header. */
-  implicit class ProxyAuthorization(val request: HttpRequest) extends AnyVal {
+  implicit class ProxyAuthorization(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Proxy-Authorization header value.
      *
@@ -416,7 +416,7 @@ package object auth {
   }
 
   /** Provides standardized access to WWW-Authenticate header. */
-  implicit class WwwAuthenticate(val response: HttpResponse) extends AnyVal {
+  implicit class WwwAuthenticate(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets WWW-Authenticate header values.
      *

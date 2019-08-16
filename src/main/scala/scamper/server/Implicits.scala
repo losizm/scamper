@@ -28,7 +28,7 @@ import Auxiliary.SocketType
 /** Includes server-side type classes. */
 object Implicits {
   /** Adds server-side extension methods to `HttpMessage`. */
-  implicit class ServerHttpMessageType(val msg: HttpMessage) extends AnyVal {
+  implicit class ServerHttpMessageType(private val msg: HttpMessage) extends AnyVal {
     /**
      * Gets message correlate.
      *
@@ -42,7 +42,7 @@ object Implicits {
   }
 
   /** Adds server-side extension methods to `HttpRequest`. */
-  implicit class ServerHttpRequestType(val req: HttpRequest) extends AnyVal {
+  implicit class ServerHttpRequestType(private val req: HttpRequest) extends AnyVal {
     /** Gets request parameters. */
     def params(): RequestParameters =
       new TargetedRequestParameters(req.getAttributeOrElse("scamper.server.request.parameters", Map.empty[String, String]))
@@ -65,7 +65,7 @@ object Implicits {
   }
 
   /** Adds server-side extension methods to `HttpResponse`. */
-  implicit class ServerHttpResponseType(val res: HttpResponse) extends AnyVal {
+  implicit class ServerHttpResponseType(private val res: HttpResponse) extends AnyVal {
     /**
      * Adds `gzip` to `Content-Encoding` header and encodes message body.
      *

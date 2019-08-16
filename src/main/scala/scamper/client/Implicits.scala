@@ -20,7 +20,7 @@ import scamper.{ Auxiliary, ContentEncoder, HttpRequest }
 /** Includes client-side type classes. */
 object Implicits {
   /** Adds client-side extension methods to `HttpRequest`. */
-  implicit class ClientHttpRequestType(val req: HttpRequest) extends AnyVal {
+  implicit class ClientHttpRequestType(private val req: HttpRequest) extends AnyVal {
     /**
      * Sends request and passes response to given handler.
      *

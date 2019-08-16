@@ -22,7 +22,7 @@ import scala.collection.mutable.{ Map => MutableMap }
 private object CollectionConverters {
   private object Converter extends AsScalaConverters
 
-  implicit class PropertiesAsScala(val properties: Properties) extends AnyVal {
+  implicit class PropertiesAsScala(private val properties: Properties) extends AnyVal {
     def asScala: MutableMap[String, String] = Converter.propertiesAsScalaMap(properties)
   }
 }

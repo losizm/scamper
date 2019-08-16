@@ -47,7 +47,7 @@ import scamper.types._
  */
 package object headers {
   /** Provides standardized access to Accept header. */
-  implicit class Accept(val request: HttpRequest) extends AnyVal {
+  implicit class Accept(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Accept header values.
      *
@@ -73,7 +73,7 @@ package object headers {
   }
 
   /** Provides standardized access to Accept-Charset header. */
-  implicit class AcceptCharset(val request: HttpRequest) extends AnyVal {
+  implicit class AcceptCharset(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Accept-Charset header values.
      *
@@ -99,7 +99,7 @@ package object headers {
   }
 
   /** Provides standardized access to Accept-Encoding header. */
-  implicit class AcceptEncoding[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class AcceptEncoding[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Gets Accept-Encoding header values.
      *
@@ -128,7 +128,7 @@ package object headers {
   }
 
   /** Provides standardized access to Accept-Language header. */
-  implicit class AcceptLanguage(val request: HttpRequest) extends AnyVal {
+  implicit class AcceptLanguage(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Accept-Language header values.
      *
@@ -156,7 +156,7 @@ package object headers {
   }
 
   /** Provides standardized access to Accept-Patch header. */
-  implicit class AcceptPatch(val response: HttpResponse) extends AnyVal {
+  implicit class AcceptPatch(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Accept-Patch header values.
      *
@@ -182,7 +182,7 @@ package object headers {
   }
 
   /** Provides standardized access to Accept-Ranges header. */
-  implicit class AcceptRanges(val response: HttpResponse) extends AnyVal {
+  implicit class AcceptRanges(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Accept-Ranges header values.
      *
@@ -206,7 +206,7 @@ package object headers {
   }
 
   /** Provides standardized access to Age header. */
-  implicit class Age(val response: HttpResponse) extends AnyVal {
+  implicit class Age(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Age header value.
      *
@@ -230,7 +230,7 @@ package object headers {
   }
 
   /** Provides standardized access to Allow header. */
-  implicit class Allow(val response: HttpResponse) extends AnyVal {
+  implicit class Allow(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Allow header values.
      *
@@ -256,7 +256,7 @@ package object headers {
   }
 
   /** Provides standardized access to Cache-Control header. */
-  implicit class CacheControl[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class CacheControl[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Gets Cache-Control header values.
      *
@@ -281,7 +281,7 @@ package object headers {
   }
 
   /** Provides standardized access to Content-Disposition header. */
-  implicit class ContentDisposition(val response: HttpResponse) extends AnyVal {
+  implicit class ContentDisposition(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Content-Disposition header value.
      *
@@ -309,7 +309,7 @@ package object headers {
   }
 
   /** Provides standardized access to Content-Encoding header. */
-  implicit class ContentEncoding[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class ContentEncoding[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Gets Content-Encoding header values.
      *
@@ -338,7 +338,7 @@ package object headers {
   }
 
   /** Provides standardized access to Content-Language header. */
-  implicit class ContentLanguage[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class ContentLanguage[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Gets Content-Language header values.
      *
@@ -365,7 +365,7 @@ package object headers {
   }
 
   /** Provides standardized access to Content-Length header. */
-  implicit class ContentLength[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class ContentLength[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Gets Content-Length header value.
      *
@@ -390,7 +390,7 @@ package object headers {
   }
 
   /** Provides standardized access to Content-Location header. */
-  implicit class ContentLocation[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class ContentLocation[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Gets Content-Location header value.
      *
@@ -418,7 +418,7 @@ package object headers {
   }
 
   /** Provides standardized access to Content-Range header. */
-  implicit class ContentRange[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class ContentRange[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Gets Content-Range header value.
      *
@@ -444,7 +444,7 @@ package object headers {
   }
 
   /** Provides standardized access to Content-Type header. */
-  implicit class ContentType[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class ContentType[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Gets Content-Type header value.
      *
@@ -469,7 +469,7 @@ package object headers {
   }
 
   /** Provides standardized access to Connection header. */
-  implicit class Connection[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class Connection[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Gets Connection header values.
      *
@@ -494,7 +494,7 @@ package object headers {
   }
 
   /** Provides standardized access to Date header. */
-  implicit class Date[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class Date[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Gets Date header value.
      *
@@ -519,7 +519,7 @@ package object headers {
   }
 
   /** Provides standardized access to ETag header. */
-  implicit class ETag(val response: HttpResponse) extends AnyVal {
+  implicit class ETag(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets ETag header value.
      *
@@ -543,7 +543,7 @@ package object headers {
   }
 
   /** Provides standardized access to Early-Data header. */
-  implicit class EarlyData(val request: HttpRequest) extends AnyVal {
+  implicit class EarlyData(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Early-Data header value.
      *
@@ -567,7 +567,7 @@ package object headers {
   }
 
   /** Provides standardized access to Expect header. */
-  implicit class Expect(val request: HttpRequest) extends AnyVal {
+  implicit class Expect(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Expect header value.
      *
@@ -591,7 +591,7 @@ package object headers {
   }
 
   /** Provides standardized access to Expires header. */
-  implicit class Expires(val response: HttpResponse) extends AnyVal {
+  implicit class Expires(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Expires header value.
      *
@@ -615,7 +615,7 @@ package object headers {
   }
 
   /** Provides standardized access to From header. */
-  implicit class From(val request: HttpRequest) extends AnyVal {
+  implicit class From(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets From header value.
      *
@@ -639,7 +639,7 @@ package object headers {
   }
 
   /** Provides standardized access to Host header. */
-  implicit class Host(val request: HttpRequest) extends AnyVal {
+  implicit class Host(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Host header value.
      *
@@ -663,7 +663,7 @@ package object headers {
   }
 
   /** Provides standardized access to If-Match header. */
-  implicit class IfMatch(val request: HttpRequest) extends AnyVal {
+  implicit class IfMatch(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets If-Match header values.
      *
@@ -689,7 +689,7 @@ package object headers {
   }
 
   /** Provides standardized access to If-Modified-Since header. */
-  implicit class IfModifiedSince(val request: HttpRequest) extends AnyVal {
+  implicit class IfModifiedSince(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets If-Modified-Since header value.
      *
@@ -714,7 +714,7 @@ package object headers {
   }
 
   /** Provides standardized access to If-None-Match header. */
-  implicit class IfNoneMatch(val request: HttpRequest) extends AnyVal {
+  implicit class IfNoneMatch(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets If-None-Match header values.
      *
@@ -740,7 +740,7 @@ package object headers {
   }
 
   /** Provides standardized access to If-Range header. */
-  implicit class IfRange(val request: HttpRequest) extends AnyVal {
+  implicit class IfRange(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets If-Range header value.
      *
@@ -779,7 +779,7 @@ package object headers {
   }
 
   /** Provides standardized access to If-Unmodified-Since header. */
-  implicit class IfUnmodifiedSince(val request: HttpRequest) extends AnyVal {
+  implicit class IfUnmodifiedSince(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets If-Unmodified-Since header value.
      *
@@ -806,7 +806,7 @@ package object headers {
   }
 
   /** Provides standardized access to Last-Modified header. */
-  implicit class LastModified(val response: HttpResponse) extends AnyVal {
+  implicit class LastModified(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Last-Modified header value.
      *
@@ -831,7 +831,7 @@ package object headers {
   }
 
   /** Provides standardized access to Link header. */
-  implicit class Link(val response: HttpResponse) extends AnyVal {
+  implicit class Link(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Link header values.
      *
@@ -855,7 +855,7 @@ package object headers {
   }
 
   /** Provides standardized access to Location header. */
-  implicit class Location(val response: HttpResponse) extends AnyVal {
+  implicit class Location(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Location header value.
      *
@@ -879,7 +879,7 @@ package object headers {
   }
 
   /** Provides standardized access to Max-Forwards header. */
-  implicit class MaxForwards(val request: HttpRequest) extends AnyVal {
+  implicit class MaxForwards(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Max-Forwards header value.
      *
@@ -903,7 +903,7 @@ package object headers {
   }
 
   /** Provides standardized access to Pragma header. */
-  implicit class Pragma(val request: HttpRequest) extends AnyVal {
+  implicit class Pragma(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Pragma header values.
      *
@@ -927,7 +927,7 @@ package object headers {
   }
 
   /** Provides standardized access to Prefer header. */
-  implicit class Prefer(val request: HttpRequest) extends AnyVal {
+  implicit class Prefer(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Prefer header values.
      *
@@ -955,7 +955,7 @@ package object headers {
   }
 
   /** Provides standardized access to Preference-Applied header. */
-  implicit class PreferenceApplied(val response: HttpResponse) extends AnyVal {
+  implicit class PreferenceApplied(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Preference-Applied header values.
      *
@@ -981,7 +981,7 @@ package object headers {
   }
 
   /** Provides standardized access to Range header. */
-  implicit class Range(val request: HttpRequest) extends AnyVal {
+  implicit class Range(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Range header value.
      *
@@ -1005,7 +1005,7 @@ package object headers {
   }
 
   /** Provides standardized access to Referer header. */
-  implicit class Referer(val request: HttpRequest) extends AnyVal {
+  implicit class Referer(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Referer header value.
      *
@@ -1029,7 +1029,7 @@ package object headers {
   }
 
   /** Provides standardized access to Retry-After header. */
-  implicit class RetryAfter(val response: HttpResponse) extends AnyVal {
+  implicit class RetryAfter(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Retry-After header value.
      *
@@ -1053,7 +1053,7 @@ package object headers {
   }
 
   /** Provides standardized access to Server header. */
-  implicit class Server(val response: HttpResponse) extends AnyVal {
+  implicit class Server(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Server header values.
      *
@@ -1077,7 +1077,7 @@ package object headers {
   }
 
   /** Provides standardized access to TE header. */
-  implicit class TE(val request: HttpRequest) extends AnyVal {
+  implicit class TE(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets TE header values.
      *
@@ -1103,7 +1103,7 @@ package object headers {
   }
 
   /** Provides standardized access to Trailer header. */
-  implicit class Trailer[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class Trailer[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Gets Trailer header values.
      *
@@ -1128,7 +1128,7 @@ package object headers {
   }
 
   /** Provides standardized access to Transfer-Encoding header. */
-  implicit class TransferEncoding[T <: HttpMessage](val message: T) extends AnyVal {
+  implicit class TransferEncoding[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Gets Transfer-Encoding header values.
      *
@@ -1157,7 +1157,7 @@ package object headers {
   }
 
   /** Provides standardized access to Upgrade header. */
-  implicit class Upgrade(val request: HttpRequest) extends AnyVal {
+  implicit class Upgrade(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Upgrade header values.
      *
@@ -1183,7 +1183,7 @@ package object headers {
   }
 
   /** Provides standardized access to User-Agent header. */
-  implicit class UserAgent(val request: HttpRequest) extends AnyVal {
+  implicit class UserAgent(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets User-Agent header values.
      *
@@ -1207,7 +1207,7 @@ package object headers {
   }
 
   /** Provides standardized access to Vary header. */
-  implicit class Vary(val response: HttpResponse) extends AnyVal {
+  implicit class Vary(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Vary header values.
      *
@@ -1231,7 +1231,7 @@ package object headers {
   }
 
   /** Provides standardized access to Via header. */
-  implicit class Via(val response: HttpResponse) extends AnyVal {
+  implicit class Via(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Via header values.
      *
@@ -1255,7 +1255,7 @@ package object headers {
   }
 
   /** Provides standardized access to Warning header. */
-  implicit class Warning(val response: HttpResponse) extends AnyVal {
+  implicit class Warning(private val response: HttpResponse) extends AnyVal {
     /**
      * Gets Warning header values.
      *
