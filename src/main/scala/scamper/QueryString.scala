@@ -87,7 +87,7 @@ object QueryString {
    */
   def apply(params: Map[String, Seq[String]]): QueryString =
     if (params.isEmpty) EmptyQueryString
-    else MapToQueryString(params)
+    else MapQueryString(params)
 
   /**
    * Creates QueryString from parameters.
@@ -96,7 +96,7 @@ object QueryString {
    */
   def apply(params: (String, String)*): QueryString =
     if (params.isEmpty) EmptyQueryString
-    else SeqToQueryString(params)
+    else SeqQueryString(params)
 
   /**
    * Parses formatted query string.
@@ -106,7 +106,7 @@ object QueryString {
   def apply(query: String): QueryString =
     parse(query) match {
       case Nil    => EmptyQueryString
-      case params => SeqToQueryString(params)
+      case params => SeqQueryString(params)
     }
 
   private def parse(query: String): Seq[(String, String)] =
@@ -138,7 +138,7 @@ private object EmptyQueryString extends QueryString {
   override val toString = ""
 }
 
-private case class MapToQueryString(toMap: Map[String, Seq[String]]) extends QueryString {
+private case class MapQueryString(toMap: Map[String, Seq[String]]) extends QueryString {
   lazy val names = toMap.keys.toSeq
   def get(name: String) = toMap.get(name).flatMap(_.headOption)
   def getValues(name: String) = toMap.get(name).getOrElse(Nil)
@@ -149,7 +149,7 @@ private case class MapToQueryString(toMap: Map[String, Seq[String]]) extends Que
   override lazy val toString = QueryString.format(toMap)
 }
 
-private case class SeqToQueryString(toSeq: Seq[(String, String)]) extends QueryString {
+private case class SeqQueryString(toSeq: Seq[(String, String)]) extends QueryString {
   lazy val names = toSeq.map(_._1).distinct
   def get(name: String) = toSeq.collectFirst { case (`name`, value) => value }
   def getValues(name: String) = toSeq.collect { case (`name`, value) => value }
