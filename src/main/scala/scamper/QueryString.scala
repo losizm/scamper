@@ -20,11 +20,11 @@ import java.net.URLEncoder.encode
 
 /** Represents query string as mapped parameters. */
 trait QueryString {
-  /** Get parameter names. */
+  /** Gets parameter names. */
   def names: Seq[String]
 
   /**
-   * Gets first value of named parameter.
+   * Gets first parameter value with given name.
    *
    * @param name parameter name
    *
@@ -33,15 +33,15 @@ trait QueryString {
   def apply(name: String) = getOrElse(name, throw new NoSuchElementException(name))
 
   /**
-   * Gets first value of named parameter if present.
+   * Gets first parameter value with given name if present.
    *
    * @param name parameter name
    */
   def get(name: String): Option[String]
 
   /**
-   * Gets first value of named parameter if present, otherwise returns default
-   * value.
+   * Gets first parameter value with given name if present, otherwise returns
+   * default value.
    *
    * @param name parameter name
    * @param default default value
@@ -49,14 +49,16 @@ trait QueryString {
   def getOrElse(name: String, default: => String): String = get(name).getOrElse(default)
 
   /**
-   * Gets all values of named parameter.
+   * Gets all parameter values with given name.
    *
    * @param name parameter name
+   *
+   * @note If parameter is not present, an empty sequence is returned.
    */
   def getValues(name: String): Seq[String]
 
   /**
-   * Tests whether query string contains named parameter.
+   * Tests whether query string contains parameter with given name.
    *
    * @param name parameter name
    */
@@ -65,19 +67,25 @@ trait QueryString {
   /** Tests whether query string is empty. */
   def isEmpty: Boolean
 
-  /** Gets query string as sequence of parameters. */
+  /** Gets query string as `Seq` of name-value pairs. */
   def toSeq: Seq[(String, String)]
 
-  /** Gets query string as mapped parameters. */
+  /**
+   * Gets query string as `Map` with each parameter mapped to its sequence of
+   * values.
+   */
   def toMap: Map[String, Seq[String]]
 
-  /** Gets query string as mapped parameters with each having a single value. */
+  /**
+   * Gets query string as `Map` with each parameter mapped to its first value
+   * only.
+   */
   def toSimpleMap: Map[String, String]
 }
 
 /** Provides factory methods for QueryString. */
 object QueryString {
-  /** Gets empty query string. */
+  /** Gets empty QueryString. */
   def empty: QueryString = EmptyQueryString
 
   /**
@@ -99,9 +107,9 @@ object QueryString {
     else SeqQueryString(params)
 
   /**
-   * Parses formatted query string.
+   * Creates QueryString from encoded query string.
    *
-   * @param query formatted query string
+   * @param query encoded query string
    */
   def apply(query: String): QueryString =
     parse(query) match {
