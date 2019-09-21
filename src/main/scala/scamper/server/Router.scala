@@ -63,7 +63,7 @@ trait Router {
    *
    * @return this router
    */
-  def request(handler: RequestHandler): this.type
+  def incoming(handler: RequestHandler): this.type
 
   /**
    * Adds supplied request filter.
@@ -74,7 +74,7 @@ trait Router {
    *
    * @return this router
    */
-  def request(filter: RequestFilter): this.type
+  def incoming(filter: RequestFilter): this.type
 
   /**
    * Adds supplied request processor.
@@ -85,7 +85,7 @@ trait Router {
    *
    * @return this router
    */
-  def request(processor: RequestProcessor): this.type
+  def incoming(processor: RequestProcessor): this.type
 
   /**
    * Adds supplied processor for requests with given router path.
@@ -97,7 +97,7 @@ trait Router {
    *
    * @return this router
    */
-  def request(path: String)(processor: RequestProcessor): this.type
+  def incoming(path: String)(processor: RequestProcessor): this.type
 
   /**
    * Adds supplied processor for requests with given method and router path.
@@ -110,7 +110,7 @@ trait Router {
    *
    * @return this router
    */
-  def request(method: RequestMethod, path: String)(processor: RequestProcessor): this.type
+  def incoming(method: RequestMethod, path: String)(processor: RequestProcessor): this.type
 
   /**
    * Adds supplied processor for HEAD requests to given router path.

@@ -25,28 +25,28 @@ import scamper.RequestMethod
 private class DefaultRouter(app: ServerApplication, rawMountPoint: String) extends Router {
   val mountPoint = normalize(rawMountPoint, true)
 
-  def request(handler: RequestHandler): this.type = synchronized {
-    app.request(TargetedRequestHandler(handler, mountPoint + "/*subpath", None))
+  def incoming(handler: RequestHandler): this.type = synchronized {
+    app.incoming(TargetedRequestHandler(handler, mountPoint + "/*subpath", None))
     this
   }
 
-  def request(filter: RequestFilter): this.type = synchronized {
-    app.request(TargetedRequestHandler(filter, mountPoint + "/*subpath", None))
+  def incoming(filter: RequestFilter): this.type = synchronized {
+    app.incoming(TargetedRequestHandler(filter, mountPoint + "/*subpath", None))
     this
   }
 
-  def request(processor: RequestProcessor): this.type = synchronized {
-    app.request(mountPoint + "/*subpath")(processor)
+  def incoming(processor: RequestProcessor): this.type = synchronized {
+    app.incoming(mountPoint + "/*subpath")(processor)
     this
   }
 
-  def request(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.request(mountPoint + normalize(path))(processor)
+  def incoming(path: String)(processor: RequestProcessor): this.type = synchronized {
+    app.incoming(mountPoint + normalize(path))(processor)
     this
   }
 
-  def request(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.request(method, mountPoint + normalize(path))(processor)
+  def incoming(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
+    app.incoming(method, mountPoint + normalize(path))(processor)
     this
   }
 

@@ -44,7 +44,7 @@ import logging.Logger
  * val app = HttpServer.app()
  *
  * // Add request handler to log all requests
- * app.request { req =>
+ * app.incoming { req =>
  *   println(req.startLine)
  *   req
  * }
@@ -71,7 +71,7 @@ import logging.Logger
  * app.files("/main", new File("/path/to/public"))
  *
  * // Tell server to compress response
- * app.response { res =>
+ * app.outgoing { res =>
  *   res.withTransferEncoding("gzip", "chunked")
  * }
  *
@@ -369,7 +369,7 @@ package object server {
      * @return server
      */
     def create(host: InetAddress, port: Int)(processor: RequestProcessor): HttpServer =
-      app().request(processor).create(host, port)
+      app().incoming(processor).create(host, port)
 
     /**
      * Creates `HttpServer` at given port using supplied processor.
@@ -416,7 +416,7 @@ package object server {
      * @return server
      */
     def create(host: InetAddress, port: Int, key: File, certificate: File)(processor: RequestProcessor): HttpServer =
-      app().request(processor).secure(key, certificate).create(host, port)
+      app().incoming(processor).secure(key, certificate).create(host, port)
 
     /**
      * Creates `HttpServer` at given port using supplied processor.
@@ -466,6 +466,6 @@ package object server {
      * @return server
      */
     def create(host: InetAddress, port: Int, keyStore: File, password: String, storeType: String)(processor: RequestProcessor): HttpServer =
-      app().request(processor).secure(keyStore, password, storeType).create(host, port)
+      app().incoming(processor).secure(keyStore, password, storeType).create(host, port)
   }
 }

@@ -42,8 +42,8 @@ import scamper.logging.{ Logger, LogWriter }
  * | logger      | `ConsoleLogger` |
  * | secure      | ''(Not configured)'' |
  * | error       | ''(Default error handler &ndash; sends `500 Internal Server Error`)'' |
- * | request     | ''(Not configured)'' |
- * | response    | ''(Not configured)'' |
+ * | incoming    | ''(Not configured)'' |
+ * | outgoing    | ''(Not configured)'' |
  * <br>
  */
 class ServerApplication {
@@ -214,7 +214,7 @@ class ServerApplication {
    *
    * @return this application
    */
-  def request(handler: RequestHandler): this.type = synchronized {
+  def incoming(handler: RequestHandler): this.type = synchronized {
     app = app.copy(requestHandlers = app.requestHandlers :+ handler)
     this
   }
@@ -228,7 +228,7 @@ class ServerApplication {
    *
    * @return this application
    */
-  def request(filter: RequestFilter): this.type = synchronized {
+  def incoming(filter: RequestFilter): this.type = synchronized {
     app = app.copy(requestHandlers = app.requestHandlers :+ filter)
     this
   }
@@ -242,7 +242,7 @@ class ServerApplication {
    *
    * @return this application
    */
-  def request(processor: RequestProcessor): this.type = synchronized {
+  def incoming(processor: RequestProcessor): this.type = synchronized {
     app = app.copy(requestHandlers = app.requestHandlers :+ processor)
     this
   }
@@ -257,7 +257,7 @@ class ServerApplication {
    *
    * @return this application
    */
-  def request(path: String)(processor: RequestProcessor): this.type = synchronized {
+  def incoming(path: String)(processor: RequestProcessor): this.type = synchronized {
     app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, None))
     this
   }
@@ -273,7 +273,7 @@ class ServerApplication {
    *
    * @return this application
    */
-  def request(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
+  def incoming(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
     app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(method)))
     this
   }
@@ -476,7 +476,7 @@ class ServerApplication {
    *
    * @return this application
    */
-  def response(filter: ResponseFilter): this.type = synchronized {
+  def outgoing(filter: ResponseFilter): this.type = synchronized {
     app = app.copy(responseFilters = app.responseFilters :+ filter)
     this
   }
