@@ -32,7 +32,7 @@ import logging.Logger
  *
  * {{{
  * import java.io.File
- * import scamper.BodyParsers
+ * import scamper.{ BodyParsers, HttpRequest, HttpResponse }
  * import scamper.Implicits.{ stringToEntity, inputStreamToEntity }
  * import scamper.ResponseStatuses.{ NotFound, Ok }
  * import scamper.headers.TransferEncoding
@@ -44,7 +44,7 @@ import logging.Logger
  * val app = HttpServer.app()
  *
  * // Add request handler to log all requests
- * app.incoming { req =>
+ * app.incoming { req: HttpRequest =>
  *   println(req.startLine)
  *   req
  * }
@@ -71,7 +71,7 @@ import logging.Logger
  * app.files("/main", new File("/path/to/public"))
  *
  * // Tell server to compress response
- * app.outgoing { res =>
+ * app.outgoing { res: HttpResponse =>
  *   res.withTransferEncoding("gzip", "chunked")
  * }
  *

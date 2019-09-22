@@ -46,7 +46,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 To use **Scamper**, start by adding it as a dependency to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "9.2.1"
+libraryDependencies += "com.github.losizm" %% "scamper" % "10.0.0"
 ```
 
 ## HTTP Messages
@@ -685,14 +685,8 @@ val server = HttpServer.create(8080) { req =>
 ```
 
 This is as bare-bones as it gets. We create a server at port 8080, and, on each
-incoming request, we send _Hello, world!_ back to the client. Although trite, it
-shows how easy it is to get going. What it doesn't show, however, are the pieces
-being put together to create the server. Minus imports, here's the semantic
-equivalent in long form:
-
-```scala
-val server = HttpServer.app().request(req => Ok("Hello, world!")).create(8080)
-```
+incoming request, we send a _Hello World_ message back to the client. Although
+trite, it demonstrates how easy it is to get going.
 
 We'll use the remainder of this documentation to describe what goes into
 creating more practical applications.
@@ -711,7 +705,7 @@ val app = HttpServer.app()
 ```
 
 This gives you the default application as a starting point. With this in hand,
-you can change the location of the server log.
+you can set the location of the server log.
 
 ```scala
 app.logger(new File("/tmp/server.log"))
@@ -728,12 +722,12 @@ app.readTimeout(3000)
 
 The **poolSize** specifies the maximum number of requests processed
 concurrently, and **queueSize** specifies the maximum number of requests
-permitted to wait for processing &mdash; _incoming requests that would exceed
-this limit are discarded_.
+permitted to wait for processing.
 
 Note **queueSize** is also used to configure server backlog (i.e., backlog of
 incoming connections), so technically there can be up to double **queueSize**
-waiting to be processed if both request queue and server backlog are filled.
+waiting to be processed if both request queue and server backlog are filled
+&mdash; _incoming requests that would exceed this limit are discarded_.
 
 The **bufferSize** is the length in bytes of the buffer used when reading from
 and writing to a socket.
@@ -751,12 +745,13 @@ Otherwise, if it returns an `HttpResponse`, any remaining handlers are
 effectively ignored.
 
 ```scala
+import scamper.HttpRequest
 import scamper.RequestMethods.{ GET, HEAD }
 import scamper.ResponseStatuses.MethodNotAllowed
 import scamper.headers.Allow
 
 // Add handler to log request line and headers to stdout
-app.request { req =>
+app.incoming { req: HttpRequest =>
   println(req.startLine)
   req.headers.foreach(println)
   println()
@@ -766,7 +761,7 @@ app.request { req =>
 }
 
 // Add handler to allow GET and HEAD requests only
-app.request { req =>
+app.incoming { req: HttpRequest =>
   if (req.method == GET || req.method == HEAD)
     // Return request for next handler
     Left(req)
@@ -778,8 +773,8 @@ app.request { req =>
 
 Note the order in which handlers are applied matters. For instance, in the
 example above, you'd swap the order of handlers if you wanted to log GET and
-HEAD requests only, meaning all other requests would immediately be sent **405
-Method Not Allowed** and never make it to the handler that logs requests.
+HEAD requests only, which means all other requests would immediately be sent
+**405 Method Not Allowed** and never make it to the request logger.
 
 Also note a request handler is not restricted to returning the same request it
 is passed.
@@ -793,7 +788,7 @@ import scamper.types.LanguageTag
 import scamper.types.Implicits.stringToLanguageTag
 
 // Translates message body from French (Oui, oui.)
-app.request { req =>
+app.incoming { req: HttpRequest =>
   val translator: BodyParser[String] = ???
 
   if (req.method == POST && req.contentLanguage.contains("fr"))
@@ -813,7 +808,7 @@ The request logger from earlier is actually a filter and can be rewritten
 expressly as such.
 
 ```scala
-app.request { req =>
+app.incoming { req: HttpRequest =>
   println(req.startLine)
   req.headers.foreach(println)
   println()
@@ -829,7 +824,7 @@ do something more meaningful:
 import scamper.Implicits.fileToEntity
 import scamper.ResponseStatuses.{ NotFound, Ok }
 
-app.request { req =>
+app.incoming { req: HttpRequest =>
   def findFile(path: String): Option[File] = ???
 
   // Always return a response
@@ -848,12 +843,12 @@ import scamper.RequestMethods.GET
 import scamper.ResponseStatuses.{ Forbidden, Ok }
 
 // Match request method and exact path
-app.request(GET, "/about") { req =>
+app.incoming(GET, "/about") { req =>
   Ok("This server is powered by Scamper.")
 }
 
 // Match exact path and any method
-app.request("/private") { req =>
+app.incoming("/private") { req =>
   Forbidden()
 }
 ```
@@ -942,7 +937,7 @@ app.post("/translate/:in/to/:out") { req =>
 
 #### Serving Static Files
 
-You can add a request handler at a moint point to serve static files from a
+You can add a request handler at a moint path to serve static files from a
 source directory.
 
 ```scala
@@ -950,7 +945,7 @@ app.files("/app/main", new File("/path/to/public"))
 ```
 
 This adds a handler to serve files from the directory at _/path/to/public_. The
-files are mapped based on the request path excluding the moint point. For example,
+files are mapped based on the request path excluding the moint path. For example,
 _http://localhost:8080/app/main/images/logo.png_ would map to
 _/path/to/public/images/logo.png_.
 
@@ -979,7 +974,7 @@ import scamper.headers.Referer
 import scamper.server.ResponseAborted
 
 // Ignore requests originating from evil site
-app.request { req =>
+app.incoming { req: HttpRequest =>
   if (req.referer.getHost == "www.phishing.com")
     throw ResponseAborted("Not trusted")
   req
@@ -1008,7 +1003,7 @@ app.error { (err, req) =>
 
 Use `Router` to structure the application routes hierarchically. `Router` works
 in much the same way as `ServerApplication`, except it is configured for request
-handling only, and all router paths are relative to its moint point.
+handling only, and all router paths are relative to its moint path.
 
 ```scala
 import scamper.Implicits.stringToEntity
@@ -1018,7 +1013,7 @@ import scamper.server.Implicits.ServerHttpRequestType
 
 val app = HttpServer.app()
 
-// Moint point of router is /api
+// Moint path of router is /api
 app.use("/api") { router =>
   val messages = Map(1 -> "Hello, world!", 2 -> "Goodbye, cruel world!")
 
@@ -1044,7 +1039,7 @@ filtering is performed by adding instances of `ResponseFilter`. They are
 applied, in order, after one of the request handlers generates a response.
 
 ```scala
-app.response { res =>
+app.outgoing { res: HttpResponse =>
   println(res.startLine)
   res.headers.foreach(println)
   println()
@@ -1055,17 +1050,17 @@ app.response { res =>
 ```
 
 This is pretty much the same as the request logger from earlier, only instead of
-`HttpRequest`, it consumes and produces `HttpResponse`.
+`HttpRequest`, it accepts and returns `HttpResponse`.
 
 And, similar to a request filter, the response filter is not restricted to
-returning the same response it consumes.
+returning the same response it accepts.
 
 ```scala
 import scamper.headers.TransferEncoding
 import scamper.types.Implicits.stringToTransferCoding
 
 // Tell server to compress response
-app.response { res =>
+app.outgoing { res: HttpResponse =>
   res.withTransferEncoding("gzip", "chunked")
 }
 ```
