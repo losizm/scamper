@@ -342,7 +342,10 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
       }
 
     private def handle(req: HttpRequest): HttpResponse =
-      requestHandler(req).getOrElse(NotFound())
+      requestHandler(req) match {
+        case req: HttpRequest  => NotFound()
+        case res: HttpResponse => res
+      }
 
     private def filter(res: HttpResponse): HttpResponse =
       responseFilter(prepare(res).withDate(Instant.now).withConnection("close"))

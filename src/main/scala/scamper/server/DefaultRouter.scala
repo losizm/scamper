@@ -30,63 +30,53 @@ private class DefaultRouter(app: ServerApplication, rawMountPath: String) extend
     this
   }
 
-  def incoming(filter: RequestFilter): this.type = synchronized {
-    app.incoming(TargetedRequestHandler(filter, mountPath + "/*subpath", None))
+  def incoming(path: String)(handler: RequestHandler): this.type = synchronized {
+    app.incoming(mountPath + normalize(path))(handler)
     this
   }
 
-  def incoming(processor: RequestProcessor): this.type = synchronized {
-    app.incoming(mountPath + "/*subpath")(processor)
+  def incoming(method: RequestMethod, path: String)(handler: RequestHandler): this.type = synchronized {
+    app.incoming(method, mountPath + normalize(path))(handler)
     this
   }
 
-  def incoming(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.incoming(mountPath + normalize(path))(processor)
+  def head(path: String)(handler: RequestHandler): this.type = synchronized {
+    app.head(mountPath + normalize(path))(handler)
     this
   }
 
-  def incoming(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.incoming(method, mountPath + normalize(path))(processor)
+  def get(path: String)(handler: RequestHandler): this.type = synchronized {
+    app.get(mountPath + normalize(path))(handler)
     this
   }
 
-  def head(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.head(mountPath + normalize(path))(processor)
+  def post(path: String)(handler: RequestHandler): this.type = synchronized {
+    app.post(mountPath + normalize(path))(handler)
     this
   }
 
-  def get(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.get(mountPath + normalize(path))(processor)
+  def put(path: String)(handler: RequestHandler): this.type = synchronized {
+    app.put(mountPath + normalize(path))(handler)
     this
   }
 
-  def post(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.post(mountPath + normalize(path))(processor)
+  def patch(path: String)(handler: RequestHandler): this.type = synchronized {
+    app.patch(mountPath + normalize(path))(handler)
     this
   }
 
-  def put(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.put(mountPath + normalize(path))(processor)
+  def delete(path: String)(handler: RequestHandler): this.type = synchronized {
+    app.delete(mountPath + normalize(path))(handler)
     this
   }
 
-  def patch(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.patch(mountPath + normalize(path))(processor)
+  def options(path: String)(handler: RequestHandler): this.type = synchronized {
+    app.options(mountPath + normalize(path))(handler)
     this
   }
 
-  def delete(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.delete(mountPath + normalize(path))(processor)
-    this
-  }
-
-  def options(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.options(mountPath + normalize(path))(processor)
-    this
-  }
-
-  def trace(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.trace(mountPath + normalize(path))(processor)
+  def trace(path: String)(handler: RequestHandler): this.type = synchronized {
+    app.trace(mountPath + normalize(path))(handler)
     this
   }
 

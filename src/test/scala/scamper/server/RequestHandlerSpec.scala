@@ -17,33 +17,21 @@ package scamper.server
 
 import org.scalatest.FlatSpec
 
-import scamper.Implicits.stringToUri
+import scamper.Implicits.{ tupleToHeader, stringToUri }
+import scamper.{ HttpRequest, HttpResponse }
 import scamper.RequestMethods.GET
 import scamper.ResponseStatuses.Ok
-import scamper.headers.ContentLength
-
-import Implicits.ServerHttpRequestType
 
 class RequestHandlerSpec extends FlatSpec {
   "RequestHandler" should "be composed with another" in {
-    val filter: RequestFilter = _.withContentLength(9)
-    val processor: RequestProcessor = req => Ok().withContentLength(req.getContentLength.getOrElse(0))
     val req = GET("/")
+    val filter: RequestHandler = _.withHeader("foo" -> "bar")
+    val processor: RequestHandler = req => Ok().withHeader(req.getHeader("foo").getOrElse("foo" -> "baz"))
 
-    assert {
-      filter.compose(processor).apply(req).exists(_.contentLength == 0)
-    }
+    assert { filter.compose(processor)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("baz") }
+    assert { filter.orElse(processor)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("bar") }
 
-    assert {
-      filter.orElse(processor).apply(req).exists(_.contentLength == 9)
-    }
-
-    assert {
-      processor.compose(filter).apply(req).exists(_.contentLength == 9)
-    }
-
-    assert {
-      processor.orElse(filter).apply(req).exists(_.contentLength == 0)
-    }
+    assert { processor.compose(filter)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("bar") }
+    assert { processor.orElse(filter)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("baz") }
   }
 }

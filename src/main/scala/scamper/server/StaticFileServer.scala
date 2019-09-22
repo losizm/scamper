@@ -22,7 +22,7 @@ import java.time.Instant
 
 import scala.util.{ Success, Try }
 
-import scamper.{ HttpRequest, HttpResponse }
+import scamper.{ HttpMessage, HttpRequest, HttpResponse }
 import scamper.Auxiliary.{ StringType, `application/octet-stream` }
 import scamper.Implicits.fileToEntity
 import scamper.RequestMethods.{ GET, HEAD, OPTIONS }
@@ -33,7 +33,7 @@ import scamper.types.{ MediaRange, MediaType }
 private class StaticFileServer(mountPath: Path, sourceDirectory: Path) extends RequestHandler {
   private val `*/*` = MediaRange("*", "*")
 
-  def apply(req: HttpRequest): Either[HttpRequest, HttpResponse] =
+  def apply(req: HttpRequest): HttpMessage =
     getRealPath(req.path)
       .filter(exists)
       .map { path =>
@@ -48,7 +48,7 @@ private class StaticFileServer(mountPath: Path, sourceDirectory: Path) extends R
           case OPTIONS => Ok().withAllow(GET, HEAD, OPTIONS).withContentLength(0)
           case _ => MethodNotAllowed().withAllow(GET, HEAD, OPTIONS)
         }
-      }.map(Right(_)).getOrElse(Left(req))
+      }.getOrElse(req)
 
   protected def exists(path: Path): Boolean =
     path.startsWith(sourceDirectory) && Files.isRegularFile(path) && !Files.isHidden(path)

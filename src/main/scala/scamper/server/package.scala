@@ -32,19 +32,17 @@ import logging.Logger
  *
  * {{{
  * import java.io.File
- * import scamper.{ BodyParsers, HttpRequest, HttpResponse }
- * import scamper.Implicits.{ stringToEntity, inputStreamToEntity }
+ * import scamper.BodyParsers
+ * import scamper.Implicits.stringToEntity
  * import scamper.ResponseStatuses.{ NotFound, Ok }
- * import scamper.headers.TransferEncoding
  * import scamper.server.HttpServer
- * import scamper.server.Implicits.ServerHttpRequestType
- * import scamper.types.Implicits.stringToTransferCoding
+ * import scamper.server.Implicits._
  *
  * // Get server application
  * val app = HttpServer.app()
  *
  * // Add request handler to log all requests
- * app.incoming { req: HttpRequest =>
+ * app.incoming { req =>
  *   println(req.startLine)
  *   req
  * }
@@ -70,9 +68,12 @@ import logging.Logger
  * // Serve static files
  * app.files("/main", new File("/path/to/public"))
  *
- * // Tell server to compress response
- * app.outgoing { res: HttpResponse =>
- *   res.withTransferEncoding("gzip", "chunked")
+ * // Gzip response body if not empty
+ * app.outgoing { res =>
+ *   res.body.isKnownEmpty match {
+ *     case true  => res
+ *     case false => res.withGzipContentEncoding()
+ *   }
  * }
  *
  * // Create server
@@ -93,10 +94,11 @@ package object server {
     /**
      * Handles incoming request.
      *
-     * If handler satisfies request, then it returns a response. Otherwise, it
-     * returns a request, which may be the original request or an alternate one.
+     * If handler can satisfy the request, then it should return an
+     * HttpResponse.  Otherwise, it should return an HttpRequest, which can be
+     * either the original request or an alternate one.
      */
-    def apply(request: HttpRequest): Either[HttpRequest, HttpResponse]
+    def apply(request: HttpRequest): HttpMessage
 
     /**
      * Composes this handler with other, using this as a fallback.
@@ -108,8 +110,8 @@ package object server {
      */
     def compose(other: RequestHandler): RequestHandler =
       other(_) match {
-        case Left(req) => apply(req)
-        case right     => right
+        case req: HttpRequest  => apply(req)
+        case res: HttpResponse => res
       }
 
     /**
@@ -122,8 +124,8 @@ package object server {
      */
     def orElse(other: RequestHandler): RequestHandler =
       apply(_) match {
-        case Left(req) => other(req)
-        case right     => right
+        case req: HttpRequest  => other(req)
+        case res: HttpResponse => res
       }
   }
 
@@ -140,47 +142,17 @@ package object server {
      */
     def coalesce(handlers: RequestHandler*): RequestHandler = {
       @annotation.tailrec
-      def handle(req: HttpRequest, handlers: Seq[RequestHandler]): Either[HttpRequest, HttpResponse] =
+      def handle(req: HttpRequest, handlers: Seq[RequestHandler]): HttpMessage =
         handlers match {
-          case Nil          => Left(req)
+          case Nil          => req
           case head +: tail =>
             head(req) match {
-              case Left(req) => handle(req, tail)
-              case right     => right
+              case req: HttpRequest  => handle(req, tail)
+              case res: HttpResponse => res
             }
         }
       handle(_, handlers)
     }
-  }
-
-  /** Provides utility for filtering incoming request. */
-  trait RequestFilter extends RequestHandler {
-    /**
-     * Filters incoming request.
-     *
-     * The filter may return the original request or an alternate one.
-     *
-     * @param request incoming request
-     */
-    def filter(request: HttpRequest): HttpRequest
-
-    def apply(request: HttpRequest): Either[HttpRequest, HttpResponse] =
-      Left(filter(request))
-  }
-
-  /** Provides utility for processing incoming request. */
-  trait RequestProcessor extends RequestHandler {
-    /**
-     * Processes incoming request.
-     *
-     * The processor returns a response that satisfies the request.
-     *
-     * @param request incoming request
-     */
-    def process(request: HttpRequest): HttpResponse
-
-    def apply(request: HttpRequest): Either[HttpRequest, HttpResponse] =
-      Right(process(request))
   }
 
   /** Provides utility for filtering outgoing response. */
@@ -337,73 +309,57 @@ package object server {
     def app(): ServerApplication = new ServerApplication()
 
     /**
-     * Creates `HttpServer` at given port using supplied processor.
+     * Creates `HttpServer` at given port using supplied handler.
      *
      * @param port port number
-     * @param processor request processor
+     * @param handler request handler
      *
      * @return server
      */
-    def create(port: Int)(processor: RequestProcessor): HttpServer =
-      create("0.0.0.0", port)(processor)
+    def create(port: Int)(handler: RequestHandler): HttpServer =
+      create("0.0.0.0", port)(handler)
 
     /**
-     * Creates `HttpServer` at given host and port using supplied processor.
+     * Creates `HttpServer` at given host and port using supplied handler.
      *
      * @param host host address
      * @param port port number
-     * @param processor request processor
+     * @param handler request handler
      *
      * @return server
      */
-    def create(host: String, port: Int)(processor: RequestProcessor): HttpServer =
-      create(InetAddress.getByName(host), port)(processor)
+    def create(host: String, port: Int)(handler: RequestHandler): HttpServer =
+      create(InetAddress.getByName(host), port)(handler)
 
     /**
-     * Creates `HttpServer` at given host and port using supplied processor.
+     * Creates `HttpServer` at given host and port using supplied handler.
      *
      * @param host host address
      * @param port port number
-     * @param processor request processor
+     * @param handler request handler
      *
      * @return server
      */
-    def create(host: InetAddress, port: Int)(processor: RequestProcessor): HttpServer =
-      app().incoming(processor).create(host, port)
+    def create(host: InetAddress, port: Int)(handler: RequestHandler): HttpServer =
+      app().incoming(handler).create(host, port)
 
     /**
-     * Creates `HttpServer` at given port using supplied processor.
+     * Creates `HttpServer` at given port using supplied handler.
      *
      * The server is secured with key and certificate.
      *
      * @param port port number
      * @param key private key
      * @param certificate public key certificate
-     * @param processor request processor
+     * @param handler request handler
      *
      * @return server
      */
-    def create(port: Int, key: File, certificate: File)(processor: RequestProcessor): HttpServer =
-      create("0.0.0.0", port, key, certificate)(processor)
+    def create(port: Int, key: File, certificate: File)(handler: RequestHandler): HttpServer =
+      create("0.0.0.0", port, key, certificate)(handler)
 
     /**
-     * Creates `HttpServer` at given host and port using supplied processor.
-     *
-     * The server is secured with key and certificate.
-     *
-     * @param host host address
-     * @param port port number
-     * @param key private key
-     * @param certificate public key certificate
-     * @param processor request processor
-     *
-     * @return server
-     */
-    def create(host: String, port: Int, key: File, certificate: File)(processor: RequestProcessor): HttpServer =
-      create(InetAddress.getByName(host), port, key, certificate)(processor)
-
-    /**
-     * Creates `HttpServer` at given host and port using supplied processor.
+     * Creates `HttpServer` at given host and port using supplied handler.
      *
      * The server is secured with key and certificate.
      *
@@ -411,15 +367,31 @@ package object server {
      * @param port port number
      * @param key private key
      * @param certificate public key certificate
-     * @param processor request processor
+     * @param handler request handler
      *
      * @return server
      */
-    def create(host: InetAddress, port: Int, key: File, certificate: File)(processor: RequestProcessor): HttpServer =
-      app().incoming(processor).secure(key, certificate).create(host, port)
+    def create(host: String, port: Int, key: File, certificate: File)(handler: RequestHandler): HttpServer =
+      create(InetAddress.getByName(host), port, key, certificate)(handler)
 
     /**
-     * Creates `HttpServer` at given port using supplied processor.
+     * Creates `HttpServer` at given host and port using supplied handler.
+     *
+     * The server is secured with key and certificate.
+     *
+     * @param host host address
+     * @param port port number
+     * @param key private key
+     * @param certificate public key certificate
+     * @param handler request handler
+     *
+     * @return server
+     */
+    def create(host: InetAddress, port: Int, key: File, certificate: File)(handler: RequestHandler): HttpServer =
+      app().incoming(handler).secure(key, certificate).create(host, port)
+
+    /**
+     * Creates `HttpServer` at given port using supplied handler.
      *
      * The server is secured with keystore.
      *
@@ -427,32 +399,15 @@ package object server {
      * @param keyStore server key store
      * @param password key store password
      * @param storeType key store type (i.e., JKS, JCEKS, etc.)
-     * @param processor request processor
+     * @param handler request handler
      *
      * @return server
      */
-    def create(port: Int, keyStore: File, password: String, storeType: String)(processor: RequestProcessor): HttpServer =
-      create("0.0.0.0", port, keyStore, password, storeType)(processor)
+    def create(port: Int, keyStore: File, password: String, storeType: String)(handler: RequestHandler): HttpServer =
+      create("0.0.0.0", port, keyStore, password, storeType)(handler)
 
     /**
-     * Creates `HttpServer` at given host and port using supplied processor.
-     *
-     * The server is secured with keystore.
-     *
-     * @param host host address
-     * @param port port number
-     * @param keyStore server key store
-     * @param password key store password
-     * @param storeType key store type (i.e., JKS, JCEKS, etc.)
-     * @param processor request processor
-     *
-     * @return server
-     */
-    def create(host: String, port: Int, keyStore: File, password: String, storeType: String)(processor: RequestProcessor): HttpServer =
-      create(InetAddress.getByName(host), port, keyStore, password, storeType)(processor)
-
-    /**
-     * Creates `HttpServer` at given host and port using supplied processor.
+     * Creates `HttpServer` at given host and port using supplied handler.
      *
      * The server is secured with keystore.
      *
@@ -461,11 +416,28 @@ package object server {
      * @param keyStore server key store
      * @param password key store password
      * @param storeType key store type (i.e., JKS, JCEKS, etc.)
-     * @param processor request processor
+     * @param handler request handler
      *
      * @return server
      */
-    def create(host: InetAddress, port: Int, keyStore: File, password: String, storeType: String)(processor: RequestProcessor): HttpServer =
-      app().incoming(processor).secure(keyStore, password, storeType).create(host, port)
+    def create(host: String, port: Int, keyStore: File, password: String, storeType: String)(handler: RequestHandler): HttpServer =
+      create(InetAddress.getByName(host), port, keyStore, password, storeType)(handler)
+
+    /**
+     * Creates `HttpServer` at given host and port using supplied handler.
+     *
+     * The server is secured with keystore.
+     *
+     * @param host host address
+     * @param port port number
+     * @param keyStore server key store
+     * @param password key store password
+     * @param storeType key store type (i.e., JKS, JCEKS, etc.)
+     * @param handler request handler
+     *
+     * @return server
+     */
+    def create(host: InetAddress, port: Int, keyStore: File, password: String, storeType: String)(handler: RequestHandler): HttpServer =
+      app().incoming(handler).secure(keyStore, password, storeType).create(host, port)
   }
 }

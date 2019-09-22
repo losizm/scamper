@@ -66,147 +66,125 @@ trait Router {
   def incoming(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied request filter.
+   * Adds supplied handler for requests with given router path.
    *
-   * The filter is appended to existing request handler chain.
-   *
-   * @param filter request filter
-   *
-   * @return this router
-   */
-  def incoming(filter: RequestFilter): this.type
-
-  /**
-   * Adds supplied request processor.
-   *
-   * The processor is appended to existing request handler chain.
-   *
-   * @param processor request processor
-   *
-   * @return this router
-   */
-  def incoming(processor: RequestProcessor): this.type
-
-  /**
-   * Adds supplied processor for requests with given router path.
-   *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path router path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this router
    */
-  def incoming(path: String)(processor: RequestProcessor): this.type
+  def incoming(path: String)(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied processor for requests with given method and router path.
+   * Adds supplied handler for requests with given method and router path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param method request method
    * @param path router path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this router
    */
-  def incoming(method: RequestMethod, path: String)(processor: RequestProcessor): this.type
+  def incoming(method: RequestMethod, path: String)(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied processor for HEAD requests to given router path.
+   * Adds supplied handler for HEAD requests to given router path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path router path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this router
    */
-  def head(path: String)(processor: RequestProcessor): this.type
+  def head(path: String)(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied processor for GET requests to given router path.
+   * Adds supplied handler for GET requests to given router path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path router path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this router
    */
-  def get(path: String)(processor: RequestProcessor): this.type
+  def get(path: String)(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied processor for POST requests to given router path.
+   * Adds supplied handler for POST requests to given router path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path router path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this router
    */
-  def post(path: String)(processor: RequestProcessor): this.type
+  def post(path: String)(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied processor for PUT requests to given router path.
+   * Adds supplied handler for PUT requests to given router path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path router path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this router
    */
-  def put(path: String)(processor: RequestProcessor): this.type
+  def put(path: String)(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied processor for PATCH requests to given router path.
+   * Adds supplied handler for PATCH requests to given router path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path router path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this router
    */
-  def patch(path: String)(processor: RequestProcessor): this.type
+  def patch(path: String)(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied processor for DELETE requests to given router path.
+   * Adds supplied handler for DELETE requests to given router path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path router path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this router
    */
-  def delete(path: String)(processor: RequestProcessor): this.type
+  def delete(path: String)(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied processor for OPTIONS requests to given router path.
+   * Adds supplied handler for OPTIONS requests to given router path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path router path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this router
    */
-  def options(path: String)(processor: RequestProcessor): this.type
+  def options(path: String)(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied processor for TRACE requests to given router path.
+   * Adds supplied handler for TRACE requests to given router path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path router path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this router
    */
-  def trace(path: String)(processor: RequestProcessor): this.type
+  def trace(path: String)(handler: RequestHandler): this.type
 
   /**
    * Adds request handler at mount path to serve files from given source directory.

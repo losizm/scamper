@@ -220,181 +220,153 @@ class ServerApplication {
   }
 
   /**
-   * Adds supplied request filter.
+   * Adds supplied handler for requests with given path.
    *
-   * The filter is appended to existing request handler chain.
-   *
-   * @param filter request filter
-   *
-   * @return this application
-   */
-  def incoming(filter: RequestFilter): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ filter)
-    this
-  }
-
-  /**
-   * Adds supplied request processor.
-   *
-   * The processor is appended to existing request handler chain.
-   *
-   * @param processor request processor
-   *
-   * @return this application
-   */
-  def incoming(processor: RequestProcessor): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ processor)
-    this
-  }
-
-  /**
-   * Adds supplied processor for requests with given path.
-   *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path request path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this application
    */
-  def incoming(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, None))
+  def incoming(path: String)(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, None))
     this
   }
 
   /**
-   * Adds supplied processor for requests with given method and path.
+   * Adds supplied handler for requests with given method and path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param method request method
    * @param path request path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this application
    */
-  def incoming(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(method)))
+  def incoming(method: RequestMethod, path: String)(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(method)))
     this
   }
 
   /**
-   * Adds supplied processor for GET requests to given path.
+   * Adds supplied handler for GET requests to given path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path request path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this application
    */
-  def get(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(GET)))
+  def get(path: String)(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(GET)))
     this
   }
 
   /**
-   * Adds supplied processor for POST requests to given path.
+   * Adds supplied handler for POST requests to given path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path request path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this application
    */
-  def post(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(POST)))
+  def post(path: String)(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(POST)))
     this
   }
 
   /**
-   * Adds supplied processor for PUT requests to given path.
+   * Adds supplied handler for PUT requests to given path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path request path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this application
    */
-  def put(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(PUT)))
+  def put(path: String)(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(PUT)))
     this
   }
 
   /**
-   * Adds supplied processor for PATCH requests to given path.
+   * Adds supplied handler for PATCH requests to given path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path request path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this application
    */
-  def patch(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(PATCH)))
+  def patch(path: String)(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(PATCH)))
     this
   }
 
   /**
-   * Adds supplied processor for DELETE requests to given path.
+   * Adds supplied handler for DELETE requests to given path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path request path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this application
    */
-  def delete(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(DELETE)))
+  def delete(path: String)(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(DELETE)))
     this
   }
 
   /**
-   * Adds supplied processor for HEAD requests to given path.
+   * Adds supplied handler for HEAD requests to given path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path request path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this application
    */
-  def head(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(HEAD)))
+  def head(path: String)(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(HEAD)))
     this
   }
 
   /**
-   * Adds supplied processor for OPTIONS requests to given path.
+   * Adds supplied handler for OPTIONS requests to given path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path request path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this application
    */
-  def options(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(OPTIONS)))
+  def options(path: String)(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(OPTIONS)))
     this
   }
 
   /**
-   * Adds supplied processor for TRACE requests to given path.
+   * Adds supplied handler for TRACE requests to given path.
    *
-   * The processor is appended to existing request handler chain.
+   * The handler is appended to existing request handler chain.
    *
    * @param path request path
-   * @param processor request processor
+   * @param handler request handler
    *
    * @return this application
    */
-  def trace(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(processor, path, Some(TRACE)))
+  def trace(path: String)(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(TRACE)))
     this
   }
 

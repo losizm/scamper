@@ -18,15 +18,15 @@ package scamper.server
 import scala.util.Try
 import scala.util.matching.Regex
 
-import scamper.{ HttpRequest, HttpResponse, RequestMethod }
+import scamper.{ HttpMessage, HttpRequest, RequestMethod }
 import scamper.Auxiliary.StringType
 
 private class TargetedRequestHandler private (handler: RequestHandler, target: Target, method: Option[RequestMethod]) extends RequestHandler {
-  def apply(req: HttpRequest): Either[HttpRequest, HttpResponse] =
+  def apply(req: HttpRequest): HttpMessage =
     if (method.forall(req.method.==) && target.matches(req.path))
       handler(req.withAttribute("scamper.server.request.parameters" -> target.getParams(req.path)))
     else
-      Left(req)
+      req
 }
 
 private object TargetedRequestHandler {

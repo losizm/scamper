@@ -28,8 +28,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 - [HTTP Server](#HTTP-Server)
   - [Server Application](#Server-Application)
   - [Request Handlers](#Request-Handlers)
-    - [Filtering vs. Processing](#Filtering-vs-Processing)
-    - [Targeted Processing](#Targeted-Processing)
+    - [Targeted Handling](#Targeted-Handling)
     - [Path Parameters](#Path-Parameters)
     - [Serving Static Files](#Serving-Static-Files)
     - [Serving Static Resources](#Serving-Static-Resources)
@@ -739,35 +738,32 @@ times out, whereafter **408 Request Timeout** is sent to client.
 
 You define application-specific logic in instances of `RequestHandler` and add
 them to the application. The request handler accepts an `HttpRequest` and
-returns `Either[HttpRequest, HttpResponse]`. If the handler is unable to satisfy
-the request, it returns an `HttpRequest` so that the next handler has its turn.
-Otherwise, if it returns an `HttpResponse`, any remaining handlers are
-effectively ignored.
+returns either an `HttpRequest` or an `HttpResponse`. If the handler does not
+satisfy the request, it returns an `HttpRequest` so that the next handler has
+its turn. Otherwise, it returns an `HttpResponse`, and any remaining handlers
+are effectively ignored.
 
 ```scala
-import scamper.HttpRequest
 import scamper.RequestMethods.{ GET, HEAD }
 import scamper.ResponseStatuses.MethodNotAllowed
 import scamper.headers.Allow
 
 // Add handler to log request line and headers to stdout
-app.incoming { req: HttpRequest =>
+app.incoming { req =>
   println(req.startLine)
   req.headers.foreach(println)
   println()
-
-  // Return request for next handler
-  Left(req)
+  req // Return request for next handler
 }
 
 // Add handler to allow GET and HEAD requests only
-app.incoming { req: HttpRequest =>
-  if (req.method == GET || req.method == HEAD)
+app.incoming { req =>
+  (req.method == GET || req.method == HEAD) match {
     // Return request for next handler
-    Left(req)
-  else
+    case true  => req
     // Otherwise return response to end request chain
-    Right(MethodNotAllowed().withAllow(GET, HEAD))
+    case false => MethodNotAllowed().withAllow(GET, HEAD)
+  }
 }
 ```
 
@@ -788,53 +784,19 @@ import scamper.types.LanguageTag
 import scamper.types.Implicits.stringToLanguageTag
 
 // Translates message body from French (Oui, oui.)
-app.incoming { req: HttpRequest =>
+app.incoming { req =>
   val translator: BodyParser[String] = ???
 
-  if (req.method == POST && req.contentLanguage.contains("fr"))
-    Left(req.withBody(translator.parse(req)).withContentLanguage("en"))
-  else
-    Left(req)
+  (req.method == POST && req.contentLanguage.contains("fr")) match {
+    case true  => req.withBody(translator.parse(req)).withContentLanguage("en")
+    case false => req
+  }
 }
 ```
 
-#### Filtering vs. Processing
+#### Targeted Handling
 
-There are two subclasses of `RequestHandler` reserved for instances where the
-handler always returns the same type: `RequestFilter` returns `HttpRequest`, and
-`RequestProcessor` returns `HttpResponse`.
-
-The request logger from earlier is actually a filter and can be rewritten
-expressly as such.
-
-```scala
-app.incoming { req: HttpRequest =>
-  println(req.startLine)
-  req.headers.foreach(println)
-  println()
-
-  req // Not wrapped in Left
-}
-```
-
-And we used a processor in our _"Hello World"_ server, but here's one that would
-do something more meaningful:
-
-```scala
-import scamper.Implicits.fileToEntity
-import scamper.ResponseStatuses.{ NotFound, Ok }
-
-app.incoming { req: HttpRequest =>
-  def findFile(path: String): Option[File] = ???
-
-  // Always return a response
-  findFile(req.path).map(Ok(_)).getOrElse(NotFound())
-}
-```
-
-#### Targeted Processing
-
-A processor can be added to a targeted path with or without a targeted request
+A handler can be added to a targeted path with or without a targeted request
 method.
 
 ```scala
@@ -853,8 +815,7 @@ app.incoming("/private") { req =>
 }
 ```
 
-And there are methods corresponding to the standard HTTP request methods, so
-processors can be added using any of these.
+And there are methods corresponding to the standard HTTP request methods.
 
 ```scala
 import scamper.BodyParsers
@@ -881,9 +842,9 @@ app.post("/messages") { req =>
 #### Path Parameters
 
 Parameters can be specified in the path and their resolved values made available
-to the processor. When a parameter is specified as __:param__, it matches a
-single path component; whereas, __*param__ matches the path component along with
-any remaining components, including intervening path separators (i.e., **/**).
+to the handler. When a parameter is specified as __:param__, it matches a single
+path segment; whereas, __*param__ matches the path segment along with any
+remaining segments, including intervening path separators (i.e., **/**).
 
 ```scala
 import scamper.Implicits.fileToEntity
@@ -974,7 +935,7 @@ import scamper.headers.Referer
 import scamper.server.ResponseAborted
 
 // Ignore requests originating from evil site
-app.incoming { req: HttpRequest =>
+app.incoming { req =>
   if (req.referer.getHost == "www.phishing.com")
     throw ResponseAborted("Not trusted")
   req
@@ -1039,29 +1000,28 @@ filtering is performed by adding instances of `ResponseFilter`. They are
 applied, in order, after one of the request handlers generates a response.
 
 ```scala
-app.outgoing { res: HttpResponse =>
+app.outgoing { res =>
   println(res.startLine)
   res.headers.foreach(println)
   println()
-
-  // Return response for next filter
-  res
+  res // Return response for next filter
 }
 ```
 
 This is pretty much the same as the request logger from earlier, only instead of
 `HttpRequest`, it accepts and returns `HttpResponse`.
 
-And, similar to a request filter, the response filter is not restricted to
-returning the same response it accepts.
+And the filter is not restricted to returning the same response it accepts.
 
 ```scala
-import scamper.headers.TransferEncoding
-import scamper.types.Implicits.stringToTransferCoding
+import scamper.server.Implicits.ServerHttpResponseType
 
-// Tell server to compress response
-app.outgoing { res: HttpResponse =>
-  res.withTransferEncoding("gzip", "chunked")
+// Gzip response body if not empty
+app.outgoing { res =>
+  res.body.isKnownEmpty match {
+    case true  => res
+    case false => res.withGzipContentEncoding()
+  }
 }
 ```
 
@@ -1105,7 +1065,7 @@ details.
 printf("Host: %s%n", server.host)
 printf("Port: %d%n", server.port)
 printf("Secure: %s%n", server.isSecure)
-printf("Log: %s%n", server.log)
+printf("Logger: %s%n", server.logger)
 printf("Pool Size: %d%n", server.poolSize)
 printf("Queue Size: %d%n", server.queueSize)
 printf("Buffer Size: %d%n", server.bufferSize)

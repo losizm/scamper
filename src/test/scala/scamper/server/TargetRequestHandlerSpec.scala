@@ -18,6 +18,7 @@ package scamper.server
 import org.scalatest.FlatSpec
 
 import scamper.Implicits.stringToUri
+import scamper.{ HttpRequest, HttpResponse }
 import scamper.RequestMethods.{ DELETE, GET, POST, PUT }
 import scamper.ResponseStatuses.Ok
 
@@ -25,35 +26,35 @@ import Implicits.ServerHttpRequestType
 
 class TargetedRequestHandlerSpec extends FlatSpec {
   "TargetedRequestHandler" should "respond to request" in {
-    val handler = TargetedRequestHandler(req => Right(Ok()), "/", None)
-    assert(handler(GET("/")).exists(_.status == Ok))
-    assert(handler(POST("/")).exists(_.status == Ok))
-    assert(handler(PUT("/")).exists(_.status == Ok))
-    assert(handler(DELETE("/")).exists(_.status == Ok))
+    val handler = TargetedRequestHandler(req => Ok(), "/", None)
+    assert { handler(GET("/")).asInstanceOf[HttpResponse].status == Ok }
+    assert { handler(POST("/")).asInstanceOf[HttpResponse].status == Ok }
+    assert { handler(PUT("/")).asInstanceOf[HttpResponse].status == Ok }
+    assert { handler(DELETE("/")).asInstanceOf[HttpResponse].status == Ok }
   }
 
   it should "respond to request with certain request method" in {
-    val handler = TargetedRequestHandler(req => Right(Ok()), "/", Some(PUT))
-    assert(handler(GET("/")).isLeft)
-    assert(handler(POST("/")).isLeft)
-    assert(handler(PUT("/")).exists(_.status == Ok))
-    assert(handler(DELETE("/")).isLeft)
+    val handler = TargetedRequestHandler(req => Ok(), "/", Some(PUT))
+    assert { handler(GET("/")).isInstanceOf[HttpRequest] }
+    assert { handler(POST("/")).isInstanceOf[HttpRequest] }
+    assert { handler(PUT("/")).asInstanceOf[HttpResponse].status == Ok }
+    assert { handler(DELETE("/")).isInstanceOf[HttpRequest] }
   }
 
   it should "respond to request with certain path" in {
-    val handler = TargetedRequestHandler(req => Right(Ok()), "/a/b/c", None)
-    assert(handler(GET("http://localhost:8080//a//b/../../a/b////c")).exists(_.status == Ok))
-    assert(handler(POST("/a/.//b/c")).exists(_.status == Ok))
-    assert(handler(PUT("/a/b/c")).exists(_.status == Ok))
-    assert(handler(DELETE("/a/b/c")).exists(_.status == Ok))
+    val handler = TargetedRequestHandler(req => Ok(), "/a/b/c", None)
+    assert { handler(GET("http://localhost:8080//a//b/../../a/b////c")).asInstanceOf[HttpResponse].status == Ok }
+    assert { handler(POST("/a/.//b/c")).asInstanceOf[HttpResponse].status == Ok }
+    assert { handler(PUT("/a/b/c")).asInstanceOf[HttpResponse].status == Ok }
+    assert { handler(DELETE("/a/b/c")).asInstanceOf[HttpResponse].status == Ok }
   }
 
   it should "respond to request with certain path and request method" in {
-    val handler = TargetedRequestHandler(req => Right(Ok()), "/a/b/c", Some(POST))
-    assert(handler(GET("/a/b/c")).isLeft)
-    assert(handler(POST("/a/b/c")).exists(_.status == Ok))
-    assert(handler(PUT("/a/b/c")).isLeft)
-    assert(handler(DELETE("/a/b/c")).isLeft)
+    val handler = TargetedRequestHandler(req => Ok(), "/a/b/c", Some(POST))
+    assert { handler(GET("/a/b/c")).isInstanceOf[HttpRequest] }
+    assert { handler(POST("/a/b/c")).asInstanceOf[HttpResponse].status == Ok }
+    assert { handler(PUT("/a/b/c")).isInstanceOf[HttpRequest] }
+    assert { handler(DELETE("/a/b/c")).isInstanceOf[HttpRequest] }
   }
 
   it should "have access to request parameters" in {
@@ -62,54 +63,54 @@ class TargetedRequestHandlerSpec extends FlatSpec {
         assert(req.params.getString("a") == "One")
         assert(req.params.getInt("b") == 200)
         assert(req.params.getLong("c") == 3000)
-        Right(Ok())
+        Ok()
       },
       "/A/B/C/:a/:b/:c/d",
       None
     )
 
-    assert(h1(GET("/A/B/C/One/200/3000/d")).isRight)
-    assert(h1(POST("/A/B/C/One/200/3000/d")).isRight)
-    assert(h1(PUT("/A/B/C/One/200/3000/d")).isRight)
-    assert(h1(DELETE("/A/B/C/One/200/3000/d")).isRight)
+    assert { h1(GET("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
+    assert { h1(POST("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
+    assert { h1(PUT("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
+    assert { h1(DELETE("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
 
-    assert(h1(GET("/a/B/C/One/200/3000/d")).isLeft)
-    assert(h1(POST("/A/b/C/One/200/3000/d")).isLeft)
-    assert(h1(PUT("/A/B/c/One/200/3000/d")).isLeft)
-    assert(h1(DELETE("/a/b/c/One/200/3000/d")).isLeft)
+    assert { h1(GET("/a/B/C/One/200/3000/d")).isInstanceOf[HttpRequest] }
+    assert { h1(POST("/A/b/C/One/200/3000/d")).isInstanceOf[HttpRequest] }
+    assert { h1(PUT("/A/B/c/One/200/3000/d")).isInstanceOf[HttpRequest] }
+    assert { h1(DELETE("/a/b/c/One/200/3000/d")).isInstanceOf[HttpRequest] }
 
     val h2 = TargetedRequestHandler(
       { req =>
         assert(req.params.getString("abc") == "One/200/3000/d")
-        Right(Ok())
+        Ok()
       },
       "/A/B/C/*abc",
       None
     )
 
-    assert(h2(GET("/A/B/C/One/200/3000/d")).isRight)
-    assert(h2(POST("/A/B/C/One/200/3000/d")).isRight)
-    assert(h2(PUT("/A/B/C/One/200/3000/d")).isRight)
-    assert(h2(DELETE("/A/B/C/One/200/3000/d")).isRight)
+    assert { h2(GET("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
+    assert { h2(POST("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
+    assert { h2(PUT("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
+    assert { h2(DELETE("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
 
-    assert(h2(GET("/a/B/C/One/200/3000/d")).isLeft)
-    assert(h2(POST("/A/b/C/One/200/3000/d")).isLeft)
-    assert(h2(PUT("/A/B/c/One/200/3000/d")).isLeft)
-    assert(h2(DELETE("/a/b/c/One/200/3000/d")).isLeft)
+    assert { h2(GET("/a/B/C/One/200/3000/d")).isInstanceOf[HttpRequest] }
+    assert { h2(POST("/A/b/C/One/200/3000/d")).isInstanceOf[HttpRequest] }
+    assert { h2(PUT("/A/B/c/One/200/3000/d")).isInstanceOf[HttpRequest] }
+    assert { h2(DELETE("/a/b/c/One/200/3000/d")).isInstanceOf[HttpRequest] }
   }
 
   it should "not have access to non-convertible parameter" in {
-    val h1 = TargetedRequestHandler({ req => req.params.getInt("id"); Right(Ok()) }, "/:id", None)
-    val h2 = TargetedRequestHandler({ req => req.params.getLong("id"); Right(Ok()) }, "/:id", None)
+    val h1 = TargetedRequestHandler({ req => req.params.getInt("id"); Ok() }, "/:id", None)
+    val h2 = TargetedRequestHandler({ req => req.params.getLong("id"); Ok() }, "/:id", None)
 
     assertThrows[ParameterNotConvertible](h1(GET("/a")))
     assertThrows[ParameterNotConvertible](h2(GET("/a")))
   }
 
   it should "not have access to missing parameter" in {
-    val h1 = TargetedRequestHandler({ req => req.params.getString("id"); Right(Ok()) }, "/:identifier", None)
-    val h2 = TargetedRequestHandler({ req => req.params.getInt("id"); Right(Ok()) }, "/:identifier", None)
-    val h3 = TargetedRequestHandler({ req => req.params.getLong("id"); Right(Ok()) }, "/:identifier", None)
+    val h1 = TargetedRequestHandler({ req => req.params.getString("id"); Ok() }, "/:identifier", None)
+    val h2 = TargetedRequestHandler({ req => req.params.getInt("id"); Ok() }, "/:identifier", None)
+    val h3 = TargetedRequestHandler({ req => req.params.getLong("id"); Ok() }, "/:identifier", None)
 
     assertThrows[ParameterNotFound](h1(GET("/a")))
     assertThrows[ParameterNotFound](h2(GET("/a")))
@@ -117,7 +118,7 @@ class TargetedRequestHandlerSpec extends FlatSpec {
   }
 
   it should "have invalid path" in {
-    assertThrows[IllegalArgumentException](TargetedRequestHandler(req => Right(Ok()), "a/b/c", None))
-    assertThrows[IllegalArgumentException](TargetedRequestHandler(req => Right(Ok()), "/a/*b/c", None))
+    assertThrows[IllegalArgumentException](TargetedRequestHandler(req => Ok(), "a/b/c", None))
+    assertThrows[IllegalArgumentException](TargetedRequestHandler(req => Ok(), "/a/*b/c", None))
   }
 }
