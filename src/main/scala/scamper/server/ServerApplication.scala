@@ -399,44 +399,44 @@ class ServerApplication {
   }
 
   /**
-   * Adds request handler at mount point to serve files from given source directory.
+   * Adds request handler at mount path to serve files from given source directory.
    *
-   * The mount point is stripped from the request path, and the resulting path is
+   * The mount path is stripped from the request path, and the remaining path is
    * used to locate files within source directory.
    *
    * === File Mapping Examples ===
    *
-   * | Mount Point | Source Directory | Request Path              | Maps to |
-   * | ----------- | ---------------- | ------------------------- | ------- |
-   * | /images     | /tmp             | /images/logo.png          | /tmp/logo.png |
-   * | /images     | /tmp             | /images/icons/warning.png | /tmp/icons/warning.png |
-   * | /images     | /tmp             | /styles/main.css          | ''Doesn't map to anything'' |
+   * | Mount Path | Source Directory | Request Path              | Maps to |
+   * | ---------- | ---------------- | ------------------------- | ------- |
+   * | /images    | /tmp             | /images/logo.png          | /tmp/logo.png |
+   * | /images    | /tmp             | /images/icons/warning.png | /tmp/icons/warning.png |
+   * | /images    | /tmp             | /styles/main.css          | ''Doesn't map to anything'' |
    *
-   * @param mountPoint request path at which directory is mounted
+   * @param mountPath request path at which directory is mounted
    * @param sourceDirectory source directory from which files are served
    *
    * @return this application
    */
-  def files(mountPoint: String, sourceDirectory: File): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ StaticFileServer(mountPoint, sourceDirectory))
+  def files(mountPath: String, sourceDirectory: File): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ StaticFileServer(mountPath, sourceDirectory))
     this
   }
 
   /**
-   * Adds request handler at mount point to serve resources from given base name.
+   * Adds request handler at mount path to serve resources from given base name.
    *
-   * The mount point is stripped from the request path, and the resulting path is
+   * The mount path is stripped from the request path, and the remaining path is
    * used to locate resources starting at base name.
    *
    * === Resource Mapping Examples ===
    *
-   * | Mount Point | Base Name | Request Path              | Maps to |
-   * | ----------- | --------- | ------------------------- | ------- |
-   * | /images     | assets    | /images/logo.png          | assets/logo.png |
-   * | /images     | assets    | /images/icons/warning.png | assets/icons/warning.png |
-   * | /images     | assets    | /styles/main.css          | ''Doesn't map to anything'' |
+   * | Mount Path | Base Name | Request Path              | Maps to |
+   * | ---------- | --------- | ------------------------- | ------- |
+   * | /images    | assets    | /images/logo.png          | assets/logo.png |
+   * | /images    | assets    | /images/icons/warning.png | assets/icons/warning.png |
+   * | /images    | assets    | /styles/main.css          | ''Doesn't map to anything'' |
    *
-   * @param mountPoint request path at which resources are mounted
+   * @param mountPath request path at which resources are mounted
    * @param baseName base name from which resources are served
    * @param loader class loader from which resources are loaded
    *
@@ -445,25 +445,25 @@ class ServerApplication {
    * @note If `loader` is not supplied, then the current thread's context class
    *   loader is used.
    */
-  def resources(mountPoint: String, baseName: String, loader: Option[ClassLoader] = None): this.type = synchronized {
+  def resources(mountPath: String, baseName: String, loader: Option[ClassLoader] = None): this.type = synchronized {
     val effectiveLoader = loader.getOrElse(Thread.currentThread.getContextClassLoader)
-    app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(mountPoint, baseName, effectiveLoader))
+    app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(mountPath, baseName, effectiveLoader))
     this
   }
 
   /**
-   * Adds routing application at given mount point.
+   * Adds routing application at given mount path.
    *
    * A router is created and passed to routing application, and the routing
    * application adds request handlers to router.
    *
-   * @param mountPoint request path at which routing application is mounted
+   * @param mountPath request path at which routing application is mounted
    * @param routing routing application
    *
    * @return this application
    */
-  def use[T](mountPoint: String)(routing: Router => T): this.type = synchronized {
-    routing(new DefaultRouter(this, mountPoint))
+  def use[T](mountPath: String)(routing: Router => T): this.type = synchronized {
+    routing(new DefaultRouter(this, mountPath))
     this
   }
 

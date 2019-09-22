@@ -22,87 +22,87 @@ import scala.util.Try
 import scamper.Auxiliary.StringType
 import scamper.RequestMethod
 
-private class DefaultRouter(app: ServerApplication, rawMountPoint: String) extends Router {
-  val mountPoint = normalize(rawMountPoint, true)
+private class DefaultRouter(app: ServerApplication, rawMountPath: String) extends Router {
+  val mountPath = normalize(rawMountPath, true)
 
   def incoming(handler: RequestHandler): this.type = synchronized {
-    app.incoming(TargetedRequestHandler(handler, mountPoint + "/*subpath", None))
+    app.incoming(TargetedRequestHandler(handler, mountPath + "/*subpath", None))
     this
   }
 
   def incoming(filter: RequestFilter): this.type = synchronized {
-    app.incoming(TargetedRequestHandler(filter, mountPoint + "/*subpath", None))
+    app.incoming(TargetedRequestHandler(filter, mountPath + "/*subpath", None))
     this
   }
 
   def incoming(processor: RequestProcessor): this.type = synchronized {
-    app.incoming(mountPoint + "/*subpath")(processor)
+    app.incoming(mountPath + "/*subpath")(processor)
     this
   }
 
   def incoming(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.incoming(mountPoint + normalize(path))(processor)
+    app.incoming(mountPath + normalize(path))(processor)
     this
   }
 
   def incoming(method: RequestMethod, path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.incoming(method, mountPoint + normalize(path))(processor)
+    app.incoming(method, mountPath + normalize(path))(processor)
     this
   }
 
   def head(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.head(mountPoint + normalize(path))(processor)
+    app.head(mountPath + normalize(path))(processor)
     this
   }
 
   def get(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.get(mountPoint + normalize(path))(processor)
+    app.get(mountPath + normalize(path))(processor)
     this
   }
 
   def post(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.post(mountPoint + normalize(path))(processor)
+    app.post(mountPath + normalize(path))(processor)
     this
   }
 
   def put(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.put(mountPoint + normalize(path))(processor)
+    app.put(mountPath + normalize(path))(processor)
     this
   }
 
   def patch(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.patch(mountPoint + normalize(path))(processor)
+    app.patch(mountPath + normalize(path))(processor)
     this
   }
 
   def delete(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.delete(mountPoint + normalize(path))(processor)
+    app.delete(mountPath + normalize(path))(processor)
     this
   }
 
   def options(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.options(mountPoint + normalize(path))(processor)
+    app.options(mountPath + normalize(path))(processor)
     this
   }
 
   def trace(path: String)(processor: RequestProcessor): this.type = synchronized {
-    app.trace(mountPoint + normalize(path))(processor)
+    app.trace(mountPath + normalize(path))(processor)
     this
   }
 
-  def files(mountPoint: String, sourceDirectory: File): this.type = synchronized {
-    app.files(this.mountPoint + normalize(mountPoint), sourceDirectory)
+  def files(mountPath: String, sourceDirectory: File): this.type = synchronized {
+    app.files(this.mountPath + normalize(mountPath), sourceDirectory)
     this
   }
 
-  def resources(mountPoint: String, baseName: String, loader: Option[ClassLoader] = None): this.type = synchronized {
-    app.resources(this.mountPoint + normalize(mountPoint), baseName, loader)
+  def resources(mountPath: String, baseName: String, loader: Option[ClassLoader] = None): this.type = synchronized {
+    app.resources(this.mountPath + normalize(mountPath), baseName, loader)
     this
   }
 
-  private def normalize(path: String, isMountPoint: Boolean = false): String =
+  private def normalize(path: String, isMountPath: Boolean = false): String =
     path.toUri.normalize.toString match {
-      case "/" => if (isMountPoint) "/" else ""
+      case "/" => if (isMountPath) "/" else ""
       case path if path.matches("/\\.\\.(/.*)?") => throw new IllegalArgumentException(s"Invalid path: $path")
       case path if path.matches("//+.*") => throw new IllegalArgumentException(s"Invalid path: $path")
       case path if path.startsWith("/") => path
