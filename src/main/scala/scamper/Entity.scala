@@ -54,7 +54,7 @@ object Entity {
     InputStreamEntity(in)
 
   /** Creates `Entity` from bytes written to output stream. */
-  def fromWriterOutput(writer: OutputStream => Unit): Entity =
+  def fromWriter(writer: OutputStream => Unit): Entity =
     InputStreamEntity(new WriterInputStream(writer)(Auxiliary.executor))
 
   /** Creates `Entity` with data from supplied file. */

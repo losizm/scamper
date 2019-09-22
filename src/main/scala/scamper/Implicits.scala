@@ -59,8 +59,8 @@ object Implicits {
   /** Converts input stream to [[Entity]]. */
   implicit val inputStreamToEntity = (entity: InputStream) => Entity.fromInputStream(entity)
 
-  /** Converts writer output to [[Entity]]. */
-  implicit val writerOutputToEntity = (writer: OutputStream => Unit) => Entity.fromWriterOutput(writer)
+  /** Converts writer to [[Entity]]. */
+  implicit val writerToEntity = (writer: OutputStream => Unit) => Entity.fromWriter(writer)
 
   /** Converts string to [[RequestMethod]]. */
   implicit val stringToRequestMethod = (method: String) => RequestMethod(method)
