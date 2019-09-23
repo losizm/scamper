@@ -815,7 +815,8 @@ app.incoming("/private") { req =>
 }
 ```
 
-And there are methods corresponding to the standard HTTP request methods.
+And handlers can be added using methods corresponding to the standard HTTP
+request methods.
 
 ```scala
 import scamper.BodyParsers
@@ -876,7 +877,7 @@ app.get("/archive/*path") { req =>
 ```
 
 Note there can be at most one __*param__, which must be specified as the the
-last component in the path; however, there can be multiple __:param__ instances
+last segment in the path; however, there can be multiple __:param__ instances
 specified.
 
 ```scala
@@ -898,7 +899,7 @@ app.post("/translate/:in/to/:out") { req =>
 
 #### Serving Static Files
 
-You can add a request handler at a moint path to serve static files from a
+You can add a request handler at a mount path to serve static files from a
 source directory.
 
 ```scala
@@ -906,7 +907,7 @@ app.files("/app/main", new File("/path/to/public"))
 ```
 
 This adds a handler to serve files from the directory at _/path/to/public_. The
-files are mapped based on the request path excluding the moint path. For example,
+files are mapped based on the request path excluding the mount path. For example,
 _http://localhost:8080/app/main/images/logo.png_ would map to
 _/path/to/public/images/logo.png_.
 
@@ -964,7 +965,7 @@ app.error { (err, req) =>
 
 Use `Router` to structure the application routes hierarchically. `Router` works
 in much the same way as `ServerApplication`, except it is configured for request
-handling only, and all router paths are relative to its moint path.
+handling only, and all router paths are relative to its mount path.
 
 ```scala
 import scamper.Implicits.stringToEntity
@@ -974,7 +975,7 @@ import scamper.server.Implicits.ServerHttpRequestType
 
 val app = HttpServer.app()
 
-// Moint path of router is /api
+// Mount path of router is /api
 app.use("/api") { router =>
   val messages = Map(1 -> "Hello, world!", 2 -> "Goodbye, cruel world!")
 
@@ -995,9 +996,9 @@ app.use("/api") { router =>
 
 ### Response Filters
 
-In much the same way requests can be filtered, so too can responses. Response
-filtering is performed by adding instances of `ResponseFilter`. They are
-applied, in order, after one of the request handlers generates a response.
+Response filtering is performed by adding instances of `ResponseFilter` to the
+application. They are applied, in order, after one of the request handlers
+generates a response.
 
 ```scala
 app.outgoing { res =>
