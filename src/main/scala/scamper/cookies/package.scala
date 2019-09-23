@@ -253,6 +253,14 @@ package object cookies {
     def withCookies(cookies: PlainCookie*): HttpRequest =
       if (cookies.isEmpty) request.removeHeaders("Cookie")
       else request.withHeader(Header("Cookie", cookies.mkString("; ")))
+
+    /**
+     * Creates copy of request excluding cookies with given names.
+     *
+     * @param names cookie names
+     */
+    def removeCookies(names: String*): HttpRequest =
+      withCookies { cookies.filterNot { cookie => names.contains(cookie.name) } : _* }
   }
 
   /** Provides access to response cookies in `Set-Cookie` headers. */
@@ -297,6 +305,14 @@ package object cookies {
       response.withHeaders({
         response.headers.filterNot(_.name.equalsIgnoreCase("Set-Cookie")) ++ cookies.map(c => Header("Set-Cookie", c.toString))
       } : _*)
+
+    /**
+     * Creates copy of response excluding cookies with given names.
+     *
+     * @param names cookie names
+     */
+    def removeCookies(names: String*): HttpResponse =
+      withCookies { cookies.filterNot { cookie => names.contains(cookie.name) } : _* }
   }
 
   private case class PlainCookieImpl(name: String, value: String) extends PlainCookie
