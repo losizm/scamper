@@ -30,9 +30,9 @@ import scamper.ResponseStatuses.{ MethodNotAllowed, NotAcceptable, NotModified, 
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, Date, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 
-private class StaticResourceServer(mountPath: Path, baseName: Path, loader: ClassLoader) extends StaticFileServer(mountPath, baseName) {
+private class StaticResourceServer(mountPath: Path, sourceDirectory: Path, loader: ClassLoader) extends StaticFileServer(mountPath, sourceDirectory) {
   override protected def exists(path: Path): Boolean =
-    path.startsWith(baseName) &&
+    path.startsWith(sourceDirectory) &&
       path != Paths.get("") && {
         loader.getResource(path.toString) match {
           case null => false
@@ -61,15 +61,15 @@ private class StaticResourceServer(mountPath: Path, baseName: Path, loader: Clas
 }
 
 private object StaticResourceServer {
-  def apply(mountPath: String, baseName: String, loader: ClassLoader): StaticResourceServer = {
+  def apply(mountPath: String, sourceDirectory: String, loader: ClassLoader): StaticResourceServer = {
     val path = Paths.get(mountPath).normalize()
-    val name = Paths.get(baseName).normalize()
+    val directory = Paths.get(sourceDirectory).normalize()
 
     require(mountPath.startsWith("/"), s"Invalid mount path: $mountPath")
 
-    if (name != Paths.get(""))
-      require(loader.getResource(s"$name/") != null, s"Invalid base name: $baseName")
+    if (directory != Paths.get(""))
+      require(loader.getResource(s"$directory/") != null, s"Invalid source directory: $sourceDirectory")
 
-    new StaticResourceServer(path, name, loader)
+    new StaticResourceServer(path, directory, loader)
   }
 }

@@ -395,21 +395,22 @@ class ServerApplication {
   }
 
   /**
-   * Adds request handler at mount path to serve resources from given base name.
+   * Adds request handler at mount path to serve resources from given source
+   * directory.
    *
    * The mount path is stripped from the request path, and the remaining path is
-   * used to locate resources starting at base name.
+   * used to locate resources within the source directory
    *
    * === Resource Mapping Examples ===
    *
-   * | Mount Path | Base Name | Request Path              | Maps to |
-   * | ---------- | --------- | ------------------------- | ------- |
-   * | /images    | assets    | /images/logo.png          | assets/logo.png |
-   * | /images    | assets    | /images/icons/warning.png | assets/icons/warning.png |
-   * | /images    | assets    | /styles/main.css          | ''Doesn't map to anything'' |
+   * | Mount Path | Source Directory | Request Path              | Maps to |
+   * | ---------- | ---------------- | ------------------------- | ------- |
+   * | /images    | assets           | /images/logo.png          | assets/logo.png |
+   * | /images    | assets           | /images/icons/warning.png | assets/icons/warning.png |
+   * | /images    | assets           | /styles/main.css          | ''Doesn't map to anything'' |
    *
-   * @param mountPath request path at which resources are mounted
-   * @param baseName base name from which resources are served
+   * @param mountPath request path at which directory is mounted
+   * @param sourceDirectory source directory from which resources are served
    * @param loader class loader from which resources are loaded
    *
    * @return this application
@@ -417,9 +418,9 @@ class ServerApplication {
    * @note If `loader` is not supplied, then the current thread's context class
    *   loader is used.
    */
-  def resources(mountPath: String, baseName: String, loader: Option[ClassLoader] = None): this.type = synchronized {
+  def resources(mountPath: String, sourceDirectory: String, loader: Option[ClassLoader] = None): this.type = synchronized {
     val effectiveLoader = loader.getOrElse(Thread.currentThread.getContextClassLoader)
-    app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(mountPath, baseName, effectiveLoader))
+    app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(mountPath, sourceDirectory, effectiveLoader))
     this
   }
 

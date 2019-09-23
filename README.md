@@ -920,9 +920,9 @@ app.resources("/app/main", "assets")
 ```
 
 In the above configuration, requests prefixed with _/app/main_ are served
-resources from _assets_, which is the base resource name. The mapping works
-similiar to static files, only the resources are located using the class loader.
-_(See [ServerApplication.resources()](https://losizm.github.io/scamper/latest/api/scamper/server/package$$ServerApplication.html#resources(pathPrefix:String,baseName:String,loader:Option[ClassLoader]):ServerApplication.this.type)
+resources from the _assets_ directory. The mapping works similiar to static
+files, only the resources are located using the class loader.  _(See
+[ServerApplication.resources()](https://losizm.github.io/scamper/latest/api/scamper/server/package$$ServerApplication.html#resources(pathPrefix:String,baseName:String,loader:Option[ClassLoader]):ServerApplication.this.type)
 in scaladoc for additional details.)_
 
 #### Aborting Response
