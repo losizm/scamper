@@ -28,7 +28,7 @@ import scamper.RequestMethod
  *
  * {{{
  * import scamper.Implicits.stringToEntity
- * import scamper.ResponseStatuses.{ NotFound, Ok }
+ * import scamper.ResponseStatus.Registry.{ NotFound, Ok }
  * import scamper.server.HttpServer
  * import scamper.server.Implicits.ServerHttpRequestType
  *

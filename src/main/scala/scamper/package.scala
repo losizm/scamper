@@ -29,7 +29,7 @@
  * {{{
  * import scamper.Header
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethods.GET
+ * import scamper.RequestMethod.Registry.GET
  *
  * val request = GET("/motd").withHeaders(
  *   Header("Host", "localhost:8080"),
@@ -51,7 +51,7 @@
  * {{{
  * import scamper.{ BodyParsers, Header }
  * import scamper.Implicits.stringToEntity
- * import scamper.ResponseStatuses.Ok
+ * import scamper.ResponseStatus.Registry.Ok
  *
  * val response = Ok("There is an answer.").withHeaders(
  *   Header("Content-Type", "text/plain"),

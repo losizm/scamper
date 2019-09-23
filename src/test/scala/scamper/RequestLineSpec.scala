@@ -16,7 +16,7 @@
 package scamper
 
 import org.scalatest.FlatSpec
-import scamper.RequestMethods._
+import scamper.RequestMethod.Registry._
 
 class RequestLineSpec extends FlatSpec {
   "RequestLine" should "be created" in {

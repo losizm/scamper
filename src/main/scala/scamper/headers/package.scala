@@ -33,7 +33,7 @@ import scamper.types._
  *
  * {{{
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethods.GET
+ * import scamper.RequestMethod.Registry.GET
  * import scamper.headers.{ Accept, Host }
  * import scamper.types.Implicits.stringToMediaRange
  *

@@ -17,7 +17,7 @@ package scamper.client
 
 import org.scalatest.FlatSpec
 
-import scamper.ResponseStatuses._
+import scamper.ResponseStatus.Registry._
 import ResponseFilter._
 
 class ResponseFilterSpec extends FlatSpec {

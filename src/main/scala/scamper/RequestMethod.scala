@@ -20,7 +20,7 @@ import java.net.URI
 /**
  * HTTP request method
  *
- * @see [[RequestMethods]]
+ * @see [[RequestMethod.Registry]]
  */
 trait RequestMethod {
   /** Gets method name. */
@@ -37,10 +37,36 @@ trait RequestMethod {
 /**
  * Provided factory for `RequestMethod`.
  *
- * @see [[RequestMethods]]
+ * @see [[RequestMethod.Registry]]
  */
 object RequestMethod {
-  import RequestMethods._
+  /** Contains registered HTTP request methods. */
+  object Registry {
+    /** GET request method */
+    val GET: RequestMethod = RequestMethodImpl("GET")
+
+    /** HEAD request method */
+    val HEAD: RequestMethod = RequestMethodImpl("HEAD")
+
+    /** POST request method */
+    val POST: RequestMethod = RequestMethodImpl("POST")
+
+    /** PUT request method */
+    val PUT: RequestMethod = RequestMethodImpl("PUT")
+
+    /** PATCH request method */
+    val PATCH: RequestMethod = RequestMethodImpl("PATCH")
+
+    /** DELETE request method */
+    val DELETE: RequestMethod = RequestMethodImpl("DELETE")
+
+    /** OPTIONS request method */
+    val OPTIONS: RequestMethod = RequestMethodImpl("OPTIONS")
+
+    /** TRACE request method */
+    val TRACE: RequestMethod = RequestMethodImpl("TRACE")
+  }
+  import Registry._
 
   /** Gets `RequestMethod` for given name. */
   def apply(name: String): RequestMethod =

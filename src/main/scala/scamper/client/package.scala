@@ -23,7 +23,7 @@ import javax.net.ssl.TrustManager
 import cookies.{ PlainCookie, RequestCookies }
 
 import Auxiliary.UriType
-import RequestMethods._
+import RequestMethod.Registry._
 
 /**
  * Provides HTTP client implementation.
@@ -36,7 +36,7 @@ import RequestMethods._
  * {{{
  * import scamper.BodyParsers
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethods.GET
+ * import scamper.RequestMethod.Registry.GET
  * import scamper.client.HttpClient
  *
  * implicit val parser = BodyParsers.text()
@@ -92,7 +92,7 @@ import RequestMethods._
  * {{{
  * import scamper.BodyParsers
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethods.GET
+ * import scamper.RequestMethod.Registry.GET
  * import scamper.client.HttpClient
  * import scamper.client.Implicits.ClientHttpRequestType // Adds send method to request
  * import scamper.headers.{ Accept, AcceptLanguage }

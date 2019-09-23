@@ -19,8 +19,8 @@ import java.io.File
 import java.net.InetAddress
 
 import scamper.RequestMethod
-import scamper.RequestMethods._
 import scamper.logging.{ Logger, LogWriter }
+import RequestMethod.Registry._
 
 /**
  * Configures and creates `HttpServer`.

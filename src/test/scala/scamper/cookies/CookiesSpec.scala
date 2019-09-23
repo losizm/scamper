@@ -20,8 +20,8 @@ import java.time.OffsetDateTime
 
 import org.scalatest.FlatSpec
 
-import scamper.RequestMethods.GET
-import scamper.ResponseStatuses.Ok
+import scamper.RequestMethod.Registry.GET
+import scamper.ResponseStatus.Registry.Ok
 
 class CookiesSpec extends FlatSpec {
   "PlainCookie" should "be created from formatted value" in {

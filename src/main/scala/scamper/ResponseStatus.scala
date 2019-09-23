@@ -20,7 +20,7 @@ import scala.collection.mutable.TreeMap
 /**
  * HTTP response status
  *
- * @see [[ResponseStatuses]]
+ * @see [[ResponseStatus.Registry]]
  */
 trait ResponseStatus {
   /** Gets status code. */
@@ -60,18 +60,182 @@ trait ResponseStatus {
 /**
  * Provided factory for `ResponseStatus`.
  *
- * @see [[ResponseStatuses]]
+ * @see [[ResponseStatus.Registry]]
  */
 object ResponseStatus {
-  private val statuses = new TreeMap[Int, ResponseStatus]
+  /** Contains registered HTTP status codes. */
+  object Registry {
+    private val statuses = new TreeMap[Int, ResponseStatus]
+
+    /** 100 Continue */
+    val Continue = add(100, "Continue")
+
+    /** 101 Switching Protocols */
+    val SwitchingProtocols = add(101, "Switching Protocols")
+
+    /** 103 Early Hints */
+    val EarlyHints = add(103, "Early Hints")
+
+    /** 200 OK */
+    val Ok = add(200, "OK")
+
+    /** 201 Created */
+    val Created = add(201, "Created")
+
+    /** 202 Accepted */
+    val Accepted = add(202, "Accepted")
+
+    /** 203 Non-Authoritative Information */
+    val NonAuthoritativeInformation = add(203, "Non-Authoritative Information")
+
+    /** 204 No Content */
+    val NoContent = add(204, "No Content")
+
+    /** 205 Reset Content */
+    val ResetContent = add(205, "Reset Content")
+
+    /** 206 Partial Content */
+    val PartialContent = add(206, "Partial Content")
+
+    /** 300 Multiple Choices */
+    val MultipleChoices = add(300, "Multiple Choices")
+
+    /** 301 Moved Permanently */
+    val MovedPermanently = add(301, "Moved Permanently")
+
+    /** 302 Found */
+    val Found = add(302, "Found")
+
+    /** 303 See Other */
+    val SeeOther = add(303, "See Other")
+
+    /** 304 Not Modified */
+    val NotModified = add(304, "Not Modified")
+
+    /** 305 Use Proxy */
+    val UseProxy = add(305, "Use Proxy")
+
+    /** 307 Temporary Redirect */
+    val TemporaryRedirect = add(307, "Temporary Redirect")
+
+    /** 308 Permanent Redirect */
+    val PermanentRedirect = add(308, "Permanent Redirect")
+
+    /** 400 Bad Request */
+    val BadRequest = add(400, "Bad Request")
+
+    /** 401 Unauthorized */
+    val Unauthorized = add(401, "Unauthorized")
+
+    /** 402 Payment Required */
+    val PaymentRequired = add(402, "Payment Required")
+
+    /** 403 Forbidden */
+    val Forbidden = add(403, "Forbidden")
+
+    /** 404 Not Found */
+    val NotFound = add(404, "Not Found")
+
+    /** 405 Method Not Allowed */
+    val MethodNotAllowed = add(405, "Method Not Allowed")
+
+    /** 406 Not Acceptable */
+    val NotAcceptable = add(406, "Not Acceptable")
+
+    /** 407 Proxy Authentication Required */
+    val ProxyAuthenticationRequired = add(407, "Proxy Authentication Required")
+
+    /** 408 Request Timeout */
+    val RequestTimeout = add(408, "Request Timeout")
+
+    /** 409 Conflict */
+    val Conflict = add(409, "Conflict")
+
+    /** 410 Gone */
+    val Gone = add(410, "Gone")
+
+    /** 411 Length Required */
+    val LengthRequired = add(411, "Length Required")
+
+    /** 412 Precondition Failed */
+    val PreconditionFailed = add(412, "Precondition Failed")
+
+    /** 413 Payload Too Large */
+    val PayloadTooLarge = add(413, "Payload Too Large")
+
+    /** 414 URI Too Long */
+    val UriTooLong = add(414, "URI Too Long")
+
+    /** 415 Unsupported Media Type */
+    val UnsupportedMediaType = add(415, "Unsupported Media Type")
+
+    /** 416 Range Not Satisfiable */
+    val RangeNotSatisfiable = add(416, "Range Not Satisfiable")
+
+    /** 417 Expectation Failed */
+    val ExpectationFailed = add(417, "Expectation Failed")
+
+    /** 422 Unprocessable Entity */
+    val UnprocessableEntity = add(422, "Unprocessable Entity")
+
+    /** 425 Too Early */
+    val TooEarly = add(425, "Too Early")
+
+    /** 426 Upgrade Required */
+    val UpgradeRequired = add(426, "Upgrade Required")
+
+    /** 428 Precondition Required */
+    val PreconditionRequired = add(428, "Precondition Required")
+
+    /** 429 Too Many Requests */
+    val TooManyRequests = add(429, "Too Many Requests")
+
+    /** 431 Request Header Fields Too Large */
+    val RequestHeaderFieldsTooLarge = add(431, "Request Header Fields Too Large")
+
+    /** 451 Unavailable For Legal Reasons */
+    val UnavailableForLegalReasons = add(451, "Unavailable For Legal Reasons")
+
+    /** 500 Internal Server Error */
+    val InternalServerError = add(500, "Internal Server Error")
+
+    /** 501 Not Implemented */
+    val NotImplemented = add(501, "Not Implemented")
+
+    /** 502 Bad Gateway */
+    val BadGateway = add(502, "Bad Gateway")
+
+    /** 503 Service Unavailable */
+    val ServiceUnavailable = add(503, "Service Unavailable")
+
+    /** 504 Gateway Timeout */
+    val GatewayTimeout = add(504, "Gateway Timeout")
+
+    /** 505 HTTP Version Not Supported */
+    val HttpVersionNotSupported = add(505, "HTTP Version Not Supported")
+
+    /** 511 Network Authentication Required */
+    val NetworkAuthenticationRequired = add(511, "Network Authentication Required")
+
+    private def add(code: Int, reason: String): ResponseStatus = {
+      val status = ResponseStatusImpl(code, reason)
+      statuses += { code -> status }
+      status
+    }
+
+    private[ResponseStatus] def apply(code: Int): ResponseStatus = statuses(code)
+    private[ResponseStatus] def get(code: Int): Option[ResponseStatus] = statuses.get(code)
+  }
+
+  /** Gets `ResponseStatus` for given status code, if registered. */
+  def get(code: Int): Option[ResponseStatus] = Registry.get(code)
 
   /**
    * Gets registered `ResponseStatus` for given status code.
    *
    * Throws `NoSuchElementException` if status code is not registered.
    */
-  def apply(code: Int): ResponseStatus =
-    statuses(code)
+  def apply(code: Int): ResponseStatus = Registry(code)
 
   /** Creates `ResponseStatus` with supplied code and reason. */
   def apply(code: Int, reason: String): ResponseStatus =
@@ -80,60 +244,6 @@ object ResponseStatus {
   /** Destructures `ResponseStatus`. */
   def unapply(status: ResponseStatus): Option[(Int, String)] =
     Some((status.code, status.reason))
-
-  private def add(code: Int, reason: String): Unit =
-    statuses += code -> ResponseStatus(code, reason)
-
-  add(100, "Continue")
-  add(101, "Switching Protocols")
-  add(103, "Early Hints")
-  add(200, "OK")
-  add(201, "Created")
-  add(202, "Accepted")
-  add(203, "Non-Authoritative Information")
-  add(204, "No Content")
-  add(205, "Reset Content")
-  add(206, "Partial Content")
-  add(300, "Multiple Choices")
-  add(301, "Moved Permanently")
-  add(302, "Found")
-  add(303, "See Other")
-  add(304, "Not Modified")
-  add(305, "Use Proxy")
-  add(307, "Temporary Redirect")
-  add(308, "Permanent Redirect")
-  add(400, "Bad Request")
-  add(401, "Unauthorized")
-  add(402, "Payment Required")
-  add(403, "Forbidden")
-  add(404, "Not Found")
-  add(405, "Method Not Allowed")
-  add(406, "Not Acceptable")
-  add(407, "Proxy Authentication Required")
-  add(408, "Request Timeout")
-  add(409, "Conflict")
-  add(410, "Gone")
-  add(411, "Length Required")
-  add(412, "Precondition Failed")
-  add(413, "Payload Too Large")
-  add(414, "URI Too Long")
-  add(415, "Unsupported Media Type")
-  add(416, "Range Not Satisfiable")
-  add(417, "Expectation Failed")
-  add(422, "Unprocessable Entity")
-  add(425, "Too Early")
-  add(426, "Upgrade Required")
-  add(428, "Precondition Required")
-  add(429, "Too Many Requests")
-  add(431, "Request Header Fields Too Large")
-  add(451, "Unavailable For Legal Reasons")
-  add(500, "Internal Server Error")
-  add(501, "Not Implemented")
-  add(502, "Bad Gateway")
-  add(503, "Service Unavailable")
-  add(504, "Gateway Timeout")
-  add(505, "HTTP Version Not Supported")
-  add(511, "Network Authentication Required")
 }
 
 private case class ResponseStatusImpl(code: Int, reason: String) extends ResponseStatus

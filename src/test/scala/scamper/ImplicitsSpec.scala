@@ -21,6 +21,9 @@ import java.time.Instant
 
 import org.scalatest.FlatSpec
 
+import RequestMethod.Registry.GET
+import ResponseStatus.Registry.Ok
+
 import Implicits._
 
 class ImplicitsSpec extends FlatSpec {
@@ -41,12 +44,12 @@ class ImplicitsSpec extends FlatSpec {
 
   it should "be converted to RequestMethod" in {
     val method: RequestMethod = "GET"
-    assert(method == RequestMethods.GET)
+    assert(method == GET)
   }
 
   "Int" should "be converted to ResponseStatus" in {
     val status: ResponseStatus = 200
-    assert(status == ResponseStatuses.Ok)
+    assert(status == Ok)
   }
 
   "File" should "be converted to Entity" in {

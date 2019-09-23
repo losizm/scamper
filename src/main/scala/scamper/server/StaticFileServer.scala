@@ -25,8 +25,8 @@ import scala.util.{ Success, Try }
 import scamper.{ HttpMessage, HttpRequest, HttpResponse }
 import scamper.Auxiliary.{ StringType, `application/octet-stream` }
 import scamper.Implicits.fileToEntity
-import scamper.RequestMethods.{ GET, HEAD, OPTIONS }
-import scamper.ResponseStatuses.{ MethodNotAllowed, NotAcceptable, NotModified, Ok }
+import scamper.RequestMethod.Registry.{ GET, HEAD, OPTIONS }
+import scamper.ResponseStatus.Registry.{ MethodNotAllowed, NotAcceptable, NotModified, Ok }
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 

@@ -20,8 +20,8 @@ package scamper
  *
  * {{{
  * import scamper.Implicits.{ stringToEntity, stringToUri }
- * import scamper.RequestMethods.GET
- * import scamper.ResponseStatuses.Ok
+ * import scamper.RequestMethod.Registry.GET
+ * import scamper.ResponseStatus.Registry.Ok
  * import scamper.headers.{ Accept, ContentType, TransferEncoding }
  * import scamper.types.{ MediaRange, MediaType, TransferCoding }
  *
@@ -41,8 +41,8 @@ package scamper
  *
  * {{{
  * import scamper.Implicits.{ stringToEntity, stringToUri }
- * import scamper.RequestMethods.GET
- * import scamper.ResponseStatuses.Ok
+ * import scamper.RequestMethod.Registry.GET
+ * import scamper.ResponseStatus.Registry.Ok
  * import scamper.headers.{ Accept, ContentType, TransferEncoding }
  * import scamper.types.Implicits._
  *

@@ -19,8 +19,8 @@ import org.scalatest.FlatSpec
 
 import scamper.Implicits.stringToUri
 import scamper.{ HttpRequest, HttpResponse }
-import scamper.RequestMethods.{ DELETE, GET, POST, PUT }
-import scamper.ResponseStatuses.Ok
+import scamper.RequestMethod.Registry.{ DELETE, GET, POST, PUT }
+import scamper.ResponseStatus.Registry.Ok
 
 import Implicits.ServerHttpRequestType
 

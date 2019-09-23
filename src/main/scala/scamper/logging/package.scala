@@ -306,7 +306,7 @@ package object logging {
     /**
      * Creates log writer to given output stream.
      *
-     * @param file output stream to which logs are written
+     * @param out output stream to which logs are written
      */
     def apply(out: OutputStream) =
       new LogWriter(new PrintWriter(out))

@@ -19,8 +19,8 @@ import org.scalatest.FlatSpec
 
 import scamper.Implicits.{ tupleToHeader, stringToUri }
 import scamper.{ HttpRequest, HttpResponse }
-import scamper.RequestMethods.GET
-import scamper.ResponseStatuses.Ok
+import scamper.RequestMethod.Registry.GET
+import scamper.ResponseStatus.Registry.Ok
 
 class RequestHandlerSpec extends FlatSpec {
   "RequestHandler" should "be composed with another" in {

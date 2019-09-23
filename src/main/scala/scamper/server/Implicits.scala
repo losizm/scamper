@@ -20,7 +20,7 @@ import java.net.Socket
 import scala.util.Try
 
 import scamper.{ Auxiliary, ContentEncoder, HttpException, HttpMessage, HttpRequest, HttpResponse, StatusLine }
-import scamper.ResponseStatuses.Continue
+import scamper.ResponseStatus.Registry.Continue
 import scamper.headers.Expect
 
 import Auxiliary.SocketType

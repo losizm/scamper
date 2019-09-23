@@ -26,8 +26,8 @@ package scamper
  *
  * {{{
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethods.GET
- * import scamper.ResponseStatuses.Unauthorized
+ * import scamper.RequestMethod.Registry.GET
+ * import scamper.ResponseStatus.Registry.Unauthorized
  * import scamper.auth.{ Authorization, Challenge, Credentials, WwwAuthenticate }
  *
  * // Present response challenge (scheme and parameters)
@@ -46,8 +46,8 @@ package scamper
  *
  * {{{
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethods.GET
- * import scamper.ResponseStatuses.Unauthorized
+ * import scamper.RequestMethod.Registry.GET
+ * import scamper.ResponseStatus.Registry.Unauthorized
  * import scamper.auth.{ Authorization, BasicChallenge, BasicCredentials, WwwAuthenticate }
  *
  * // Provide realm and optional parameters
@@ -64,8 +64,8 @@ package scamper
  *
  * {{{
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethods.GET
- * import scamper.ResponseStatuses.Unauthorized
+ * import scamper.RequestMethod.Registry.GET
+ * import scamper.ResponseStatus.Registry.Unauthorized
  * import scamper.auth.{ Authorization, WwwAuthenticate }
  *
  * // Provide realm and optional parameters
@@ -91,8 +91,8 @@ package scamper
  *
  * {{{
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethods.GET
- * import scamper.ResponseStatuses.Unauthorized
+ * import scamper.RequestMethod.Registry.GET
+ * import scamper.ResponseStatus.Registry.Unauthorized
  * import scamper.auth.{ Authorization, WwwAuthenticate }
  *
  * // Provide challenge parameters

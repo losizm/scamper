@@ -19,7 +19,7 @@ import java.io.InputStream
 import java.net.Socket
 
 import scamper.{ Auxiliary, Compressor, Entity, Header, HeaderStream, HttpException, HttpRequest, HttpResponse, StatusLine }
-import scamper.RequestMethods.HEAD
+import scamper.RequestMethod.Registry.HEAD
 import scamper.headers.TransferEncoding
 import scamper.types.TransferCoding
 

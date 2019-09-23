@@ -29,7 +29,7 @@ import scala.util.Try
  *
  * {{{
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethods.GET
+ * import scamper.RequestMethod.Registry.GET
  * import scamper.cookies.{ PlainCookie, RequestCookies }
  *
  * // Build request with cookies
@@ -57,7 +57,7 @@ import scala.util.Try
  *
  * {{{
  * import scamper.Implicits.stringToEntity
- * import scamper.ResponseStatuses.Ok
+ * import scamper.ResponseStatus.Registry.Ok
  * import scamper.cookies.{ ResponseCookies, SetCookie }
  *
  * // Build response with cookies

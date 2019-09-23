@@ -17,8 +17,8 @@ package scamper
 
 import org.scalatest.FlatSpec
 import scamper.Implicits.stringToUri
-import scamper.RequestMethods._
-import scamper.ResponseStatuses._
+import scamper.RequestMethod.Registry._
+import scamper.ResponseStatus.Registry._
 import scamper.headers._
 
 class HttpMessageSpec extends FlatSpec {

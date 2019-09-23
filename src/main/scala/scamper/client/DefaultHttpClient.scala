@@ -26,7 +26,7 @@ import scala.util.control.NonFatal
 
 import scamper.{ Entity, Header, HttpRequest, ListParser, RequestMethod }
 import scamper.Auxiliary.UriType
-import scamper.RequestMethods._
+import scamper.RequestMethod.Registry._
 import scamper.cookies.{ PlainCookie, RequestCookies }
 import scamper.headers.{ Connection, ContentLength, Host, TE, TransferEncoding }
 import scamper.types.TransferCoding

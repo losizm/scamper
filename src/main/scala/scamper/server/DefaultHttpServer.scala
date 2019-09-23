@@ -30,7 +30,7 @@ import scala.util.Try
 
 import scamper._
 import scamper.Auxiliary.SocketType
-import scamper.ResponseStatuses.{ BadRequest, InternalServerError, NotFound, RequestTimeout, UriTooLong, RequestHeaderFieldsTooLarge }
+import scamper.ResponseStatus.Registry._
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
 import scamper.logging.{ ConsoleLogger, Logger }
 import scamper.types.TransferCoding
