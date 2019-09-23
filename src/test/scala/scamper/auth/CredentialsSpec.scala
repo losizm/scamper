@@ -25,8 +25,7 @@ class CredentialsSpec extends FlatSpec {
   "Credentials" should "be created with basic scheme" in {
     val credentials = Credentials.parse(s"Basic $token")
     assert(credentials.scheme == "Basic")
-    assert(credentials.token.contains(token))
-    assert(credentials.params.isEmpty)
+    assert(credentials.token == token)
     assert(credentials.toString == s"Basic $token")
     assert(credentials.isInstanceOf[BasicCredentials])
 
@@ -35,25 +34,22 @@ class CredentialsSpec extends FlatSpec {
     assert(auth.password == "letmein")
   }
 
-  it should "be created with token" in {
+  it should "be created with bearer scheme" in {
     val credentials = Credentials.parse(s"Bearer $token")
     assert(credentials.scheme == "Bearer")
-    assert(credentials.token.contains(token))
-    assert(credentials.params.isEmpty)
+    assert(credentials.token == token)
     assert(credentials.toString == s"Bearer $token")
     assert(credentials.isInstanceOf[BearerCredentials])
 
     val auth = credentials.asInstanceOf[BearerCredentials]
-    assert(auth.token.contains(token))
+    assert(auth.token == token)
   }
 
-  it should "be created with parameters" in {
-    val credentials = Credentials.parse("Insecure user=issa, password=\"secr,t\"")
+  it should "be created with other scheme" in {
+    val credentials = Credentials.parse("Insecure aXNzYTpyYWUK")
     assert(credentials.scheme == "Insecure")
-    assert(!credentials.token.isDefined)
-    assert(credentials.params("user") == "issa")
-    assert(credentials.params("password") == "secr,t")
-    assert(credentials.toString == "Insecure user=issa, password=\"secr,t\"")
+    assert(credentials.token == "aXNzYTpyYWUK")
+    assert(credentials.toString == "Insecure aXNzYTpyYWUK")
   }
 
   it should "be destructured" in {
@@ -68,12 +64,10 @@ class CredentialsSpec extends FlatSpec {
         assert(token.contains(token))
     }
 
-    Credentials.parse("Insecure user=issa, password=\"secr,t\"") match {
-      case Credentials(scheme, token, params) =>
+    Credentials.parse("Insecure aXNzYTpyYWUK") match {
+      case Credentials(scheme, token) =>
         assert(scheme == "Insecure")
-        assert(!token.isDefined)
-        assert(params("user") == "issa")
-        assert(params("password") == "secr,t")
+        assert(token == "aXNzYTpyYWUK")
     }
   }
 

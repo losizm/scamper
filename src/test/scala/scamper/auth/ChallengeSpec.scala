@@ -23,7 +23,6 @@ class ChallengeSpec extends FlatSpec {
   "Challenge" should "be created with basic scheme" in {
     val challenge = Challenge.parse("Basic realm=\"Admin Console\", charset=utf-8")
     assert(challenge.scheme == "Basic")
-    assert(!challenge.token.isDefined)
     assert(challenge.params("realm") == "Admin Console")
     assert(challenge.params("charset") == "utf-8")
     assert(challenge.toString == "Basic realm=\"Admin Console\", charset=utf-8")
@@ -36,7 +35,6 @@ class ChallengeSpec extends FlatSpec {
   it should "be created with bearer scheme" in {
     val challenge = Challenge.parse("Bearer realm=example, error=invalid_token, scope=\"user profile\"")
     assert(challenge.scheme == "Bearer")
-    assert(!challenge.token.isDefined)
     assert(challenge.params("realm") == "example")
     assert(challenge.params("error") == "invalid_token")
     assert(challenge.toString == "Bearer realm=\"example\", error=invalid_token, scope=\"user profile\"")
@@ -52,12 +50,12 @@ class ChallengeSpec extends FlatSpec {
     assert(!auth.isInsufficientScope)
   }
 
-  it should "be created with token" in {
-    val challenge = Challenge.parse(s"Insecure aXNzYTpyYWUK")
+  it should "be created with other scheme" in {
+    val challenge = Challenge.parse(s"Insecure foo=bar")
     assert(challenge.scheme == "Insecure")
-    assert(challenge.token.contains("aXNzYTpyYWUK"))
-    assert(challenge.params.isEmpty)
-    assert(challenge.toString == s"Insecure aXNzYTpyYWUK")
+    assert(challenge.params.size == 1)
+    assert(challenge.params("foo") == "bar")
+    assert(challenge.toString == s"Insecure foo=bar")
   }
 
   it should "be destructured" in {
@@ -80,11 +78,11 @@ class ChallengeSpec extends FlatSpec {
         assert(params("error") == "invalid_token")
     }
 
-    Challenge.parse(s"Insecure aXNzYTpyYWUK") match {
-      case Challenge(scheme, Some(token), params) =>
+    Challenge.parse(s"Insecure foo=bar") match {
+      case Challenge(scheme, params) =>
         assert(scheme == "Insecure")
-        assert(token.contains("aXNzYTpyYWUK"))
-        assert(params.isEmpty)
+        assert(params("foo") == "bar")
+        assert(params.size == 1)
     }
   }
 

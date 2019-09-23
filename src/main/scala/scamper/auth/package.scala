@@ -121,6 +121,9 @@ package scamper
  *
  * // Create request with Bearer token
  * val req = GET("/users").withBearer("R290IDUgb24gaXQhCg==")
+ *
+ * // Access bearer auth in request
+ * printf("Token: %s%n", req.bearer.token)
  * }}}
  */
 package object auth {

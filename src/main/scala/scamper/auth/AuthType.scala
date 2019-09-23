@@ -24,18 +24,8 @@ import AuthTypeHelper._
 
 /** Base type for authentication header types. */
 trait AuthType {
-  /** Gets auth scheme. */
+  /** Gets scheme. */
   def scheme: String
-
-  /** Gets auth token. */
-  def token: Option[String]
-
-  /** Gets auth parameters. */
-  def params: Map[String, String]
-
-  /** Returns formatted auth type. */
-  override lazy val toString: String =
-    scheme + token.map(" " + _).getOrElse(AuthParams.format(params))
 }
 
 /**
@@ -45,7 +35,14 @@ trait AuthType {
  * @see [[ProxyAuthenticate]]
  * @see [[Credentials]]
  */
-trait Challenge extends AuthType
+trait Challenge extends AuthType {
+  /** Gets parameters. */
+  def params: Map[String, String]
+
+  /** Returns formatted challenge. */
+  override lazy val toString: String =
+    scheme + AuthParams.format(params)
+}
 
 /** Challenge for Basic authentication. */
 trait BasicChallenge extends Challenge {
@@ -66,9 +63,7 @@ object BasicChallenge {
     Some(auth.realm -> auth.params)
 }
 
-private case class BasicChallengeImpl(realm: String, params: Map[String, String]) extends BasicChallenge {
-  val token: Option[String] = None
-}
+private case class BasicChallengeImpl(realm: String, params: Map[String, String]) extends BasicChallenge
 
 /** Challenge for Bearer authentication. */
 trait BearerChallenge extends Challenge {
@@ -111,7 +106,6 @@ object BearerChallenge {
 }
 
 private case class BearerChallengeImpl(params: Map[String, String]) extends BearerChallenge {
-  val token: Option[String] = None
   lazy val realm: Option[String] = params.get("realm")
   lazy val scope: Seq[String] = params.get("scope")
     .map(_ split " ")
@@ -139,11 +133,7 @@ object Challenge {
   def parseAll(challenges: String): Seq[Challenge] =
     SplitAuthTypes(challenges).map(parse)
 
-  /** Creates Challenge with supplied auth scheme and token. */
-  def apply(scheme: String, token: String): Challenge =
-    apply(scheme, Some(Token(token)), Map.empty[String, String])
-
-  /** Creates Challenge with supplied auth scheme and parameters. */
+  /** Creates Challenge with supplied scheme and parameters. */
   def apply(scheme: String, params: (String, String)*): Challenge =
     apply(scheme, None, Params(params))
 
@@ -158,17 +148,16 @@ object Challenge {
         require(token.isEmpty, s"Invalid bearer challenge: token not allowed")
         BearerChallenge(params.toSeq : _*)
       case _ =>
-        require(token.nonEmpty || params.nonEmpty, "Invalid challenge: either token or params required")
-        require(token.isEmpty || params.isEmpty, "Invalid challenge: cannot provide both token and params")
-        DefaultChallenge(scheme, token, params)
+        require(token.isEmpty, s"Invalid challenge: token not allowed")
+        DefaultChallenge(scheme, params)
     }
 
   /** Destructures Challenge. */
-  def unapply(challenge: Challenge): Option[(String, Option[String], Map[String, String])] =
-    Some((challenge.scheme, challenge.token, challenge.params))
+  def unapply(challenge: Challenge): Option[(String, Map[String, String])] =
+    Some((challenge.scheme, challenge.params))
 }
 
-private case class DefaultChallenge(scheme: String, token: Option[String], params: Map[String, String]) extends Challenge
+private case class DefaultChallenge(scheme: String, params: Map[String, String]) extends Challenge
 
 /**
  * Standardized type for Authorization and Proxy-Authorization header value.
@@ -177,7 +166,14 @@ private case class DefaultChallenge(scheme: String, token: Option[String], param
  * @see [[ProxyAuthorization]]
  * @see [[Challenge]]
  */
-trait Credentials extends AuthType
+trait Credentials extends AuthType {
+  /** Gets token. */
+  def token: String
+
+  /** Returns formatted credentials. */
+  override lazy val toString: String =
+    scheme + " " + token
+}
 
 /** Credentials for Basic authorization. */
 trait BasicCredentials extends Credentials {
@@ -197,30 +193,25 @@ object BasicCredentials {
     val valid = "(.+):(.*)".r
 
     Try(Base64.decodeToString(token))
-      .collect { case valid(_, _) => BasicCredentialsImpl(Some(token)) }
+      .collect { case valid(_, _) => BasicCredentialsImpl(token) }
       .getOrElse { throw new IllegalArgumentException(s"Invalid token: $token") }
   }
 
   /** Creates BasicCredentials with supplied credentials. */
   def apply(user: String, password: String): BasicCredentials =
-    BasicCredentialsImpl(Some(Base64.encodeToString(user + ":" + password)))
+    BasicCredentialsImpl(Base64.encodeToString(user + ":" + password))
 
   /** Destructures BasicCredentials. */
   def unapply(auth: BasicCredentials): Option[(String, String)] =
     Some(auth.user -> auth.password)
 }
 
-private case class BasicCredentialsImpl(token: Option[String]) extends BasicCredentials {
-  val params: Map[String, String] = Map.empty
-
+private case class BasicCredentialsImpl(token: String) extends BasicCredentials {
   def user: String = detoken(0)
   def password: String = detoken(1)
 
   private def detoken(part: Int): String =
-    token.map(Base64.decodeToString)
-      .map(_.split(":", 2))
-      .map(_(part))
-      .get
+    Base64.decodeToString(token).split(":", 2)(part)
 }
 
 /** Credentials for Bearer authorization. */
@@ -232,16 +223,14 @@ trait BearerCredentials extends Credentials {
 object BearerCredentials {
   /** Creates BearerCredentials with supplied credentials. */
   def apply(token: String): BearerCredentials =
-    BearerCredentialsImpl(Some(Token(token)))
+    BearerCredentialsImpl(Token(token))
 
   /** Destructures BearerCredentials. */
   def unapply(auth: BearerCredentials): Option[String] =
-    Some(auth.token.get)
+    Some(auth.token)
 }
 
-private case class BearerCredentialsImpl(token: Option[String]) extends BearerCredentials {
-  val params: Map[String, String] = Map.empty
-}
+private case class BearerCredentialsImpl(token: String) extends BearerCredentials
 
 /** Credentials factory */
 object Credentials {
@@ -251,11 +240,11 @@ object Credentials {
       case (scheme, token, params) => apply(scheme, token, params)
     }
 
-  /** Creates Credentials with supplied auth scheme and token. */
+  /** Creates Credentials with supplied scheme and token. */
   def apply(scheme: String, token: String): Credentials =
     apply(scheme, Some(Token(token)), Map.empty[String, String])
 
-  /** Creates Credentials with supplied auth scheme and parameters. */
+  /** Creates Credentials with supplied scheme and parameters. */
   def apply(scheme: String, params: (String, String)*): Credentials =
     apply(scheme, None, Params(params))
 
@@ -270,14 +259,14 @@ object Credentials {
         token.map(BearerCredentials.apply)
           .getOrElse(throw new IllegalArgumentException("Token required for bearer credentials"))
       case _ =>
-        require(token.nonEmpty || params.nonEmpty, "Invalid credentials: either token or params required")
-        require(token.isEmpty || params.isEmpty, "Invalid credentials: cannot provide both token and params")
-        DefaultCredentials(scheme, token, params)
+        require(params.isEmpty, "Invalid credentials: params not allowed")
+        token.map(DefaultCredentials(scheme, _))
+          .getOrElse(throw new IllegalArgumentException("Token required for credentials"))
     }
 
   /** Destructures Credentials. */
-  def unapply(credentials: Credentials): Option[(String, Option[String], Map[String, String])] =
-    Some((credentials.scheme, credentials.token, credentials.params))
+  def unapply(credentials: Credentials): Option[(String, String)] =
+    Some((credentials.scheme, credentials.token))
 }
 
-private case class DefaultCredentials(scheme: String, token: Option[String], params: Map[String, String]) extends Credentials
+private case class DefaultCredentials(scheme: String, token: String) extends Credentials
