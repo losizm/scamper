@@ -85,8 +85,8 @@ private class DefaultRouter(app: ServerApplication, rawMountPath: String) extend
     this
   }
 
-  def resources(mountPath: String, sourceDirectory: String, loader: Option[ClassLoader] = None): this.type = synchronized {
-    app.resources(this.mountPath + normalize(mountPath), sourceDirectory, loader)
+  def resources(mountPath: String, sourceDirectory: String, classLoader: ClassLoader): this.type = synchronized {
+    app.resources(this.mountPath + normalize(mountPath), sourceDirectory, classLoader)
     this
   }
 

@@ -30,14 +30,14 @@ import scamper.ResponseStatuses.{ MethodNotAllowed, NotAcceptable, NotModified, 
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, Date, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 
-private class StaticResourceServer(mountPath: Path, sourceDirectory: Path, loader: ClassLoader) extends StaticFileServer(mountPath, sourceDirectory) {
+private class StaticResourceServer(mountPath: Path, sourceDirectory: Path, classLoader: ClassLoader) extends StaticFileServer(mountPath, sourceDirectory) {
   override protected def exists(path: Path): Boolean =
     path.startsWith(sourceDirectory) &&
       path != Paths.get("") && {
-        loader.getResource(path.toString) match {
+        classLoader.getResource(path.toString) match {
           case null => false
           case url if url.getProtocol == "file" => new File(url.toString.stripPrefix("file:")).isFile
-          case url => loader.getResource(path.toString + "/") == null
+          case url => classLoader.getResource(path.toString + "/") == null
         }
       }
 
@@ -54,16 +54,17 @@ private class StaticResourceServer(mountPath: Path, sourceDirectory: Path, loade
   }
 
   private def getResource(path: Path): Array[Byte] = {
-    val in = loader.getResourceAsStream(path.toString)
+    val in = classLoader.getResourceAsStream(path.toString)
     try in.getBytes()
     finally Try(in.close())
   }
 }
 
 private object StaticResourceServer {
-  def apply(mountPath: String, sourceDirectory: String, loader: ClassLoader): StaticResourceServer = {
+  def apply(mountPath: String, sourceDirectory: String, classLoader: ClassLoader): StaticResourceServer = {
     val path = Paths.get(mountPath).normalize()
     val directory = Paths.get(sourceDirectory).normalize()
+    val loader = if (classLoader == null) Thread.currentThread.getContextClassLoader else classLoader
 
     require(mountPath.startsWith("/"), s"Invalid mount path: $mountPath")
 

@@ -224,13 +224,35 @@ trait Router {
    *
    * @param mountPath router path at which directory is mounted
    * @param sourceDirectory source directory from which resources are served
-   * @param loader class loader from which resources are loaded
    *
    * @return this router
    *
-   * @note If `loader` is not supplied, then the current thread's context class
-   * loader is used.
+   * @note The current thread's context class loader is used to load resources.
    */
-  def resources(mountPath: String, sourceDirectory: String, loader: Option[ClassLoader] = None): this.type
+  def resources(mountPath: String, sourceDirectory: String): this.type =
+    resources(mountPath, sourceDirectory, Thread.currentThread.getContextClassLoader)
+
+  /**
+   * Adds request handler at mount path to serve resources from given source
+   * directory.
+   *
+   * The mount path is stripped from the router path, and the remaining path is
+   * used to locate resources within the source directory.
+   *
+   * === Resource Mapping Examples ===
+   *
+   * | Mount Path | Source Directory | Request Path              | Maps to |
+   * | ---------- | ---------------- | ------------------------- | ------- |
+   * | /images    | assets           | /images/logo.png          | assets/logo.png |
+   * | /images    | assets           | /images/icons/warning.png | assets/icons/warning.png |
+   * | /images    | assets           | /styles/main.css          | ''Doesn't map to anything'' |
+   *
+   * @param mountPath router path at which directory is mounted
+   * @param sourceDirectory source directory from which resources are served
+   * @param classLoader class loader from which resources are loaded
+   *
+   * @return this router
+   */
+  def resources(mountPath: String, sourceDirectory: String, classLoader: ClassLoader): this.type
 }
 
