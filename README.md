@@ -137,8 +137,8 @@ println(req.contentType.mainType) // application
 println(req.contentType.subtype) // json
 ```
 
-And with `stringToMediaType` in scope, you can implicitly convert `String` to
-`MediaType`.
+And with utilities defined in `scamper.types.Implicits`, you can implicitly
+convert to specialized header types.
 
 ```scala
 import scamper.Implicits.stringToUri
@@ -306,12 +306,12 @@ def printText(message: HttpMessage): Unit = {
 }
 ```
 
-And you can implement your own body parsers. Here's one that exploits the power
-of [little-json](https://github.com/losizm/little-json):
+And you can implement your own parser. Here's one that employs the power of
+[little-json](https://github.com/losizm/little-json):
 
 ```scala
 import javax.json.{ JsonObject, JsonValue }
-import little.json.{ Json, FromJson }
+import little.json.{ Json, JsonInput }
 import little.json.Implicits._
 import scamper.{ BodyParser, HttpMessage }
 
@@ -319,7 +319,7 @@ case class User(id: Int, name: String)
 
 implicit object UserBodyParser extends BodyParser[User] {
   // Define how to convert JsonObject to User
-  implicit val userFromJson: FromJson[User] = {
+  implicit val userInput: JsonInput[User] = {
     case json: JsonObject => User(json.getInt("id"), json.getString("name"))
     case json: JsonValue  => throw new IllegalArgumentException("Not an OBJECT")
   }
@@ -387,7 +387,7 @@ def saveTrack(req: HttpRequest): Unit = {
 
 ## Message Attributes
 
-Attributes are arbitrary key/value pairs associated with a message.
+Attributes are arbitrary key-value pairs associated with a message.
 
 ```scala
 import scala.concurrent.duration.{ Deadline, DurationInt }
@@ -776,7 +776,7 @@ HEAD requests only, which means all other requests would immediately be sent
 **405 Method Not Allowed** and never make it to the request logger.
 
 Also note a request handler is not restricted to returning the same request it
-is passed.
+accepted.
 
 ```scala
 import scamper.BodyParser
@@ -925,7 +925,7 @@ app.resources("/app/main", "assets")
 
 In the above configuration, requests prefixed with _/app/main_ are served
 resources from the _assets_ directory. The mapping works similiar to static
-files, only the resources are located using the class loader.  _(See
+files, only the resources are located using a class loader. _(See
 [ServerApplication.resources()](https://losizm.github.io/scamper/latest/api/scamper/server/package$$ServerApplication.html#resources(pathPrefix:String,baseName:String,loader:Option[ClassLoader]):ServerApplication.this.type)
 in scaladoc for additional details.)_
 
@@ -1089,5 +1089,5 @@ See [scaladoc](https://losizm.github.io/scamper/latest/api/scamper/index.html)
 for additional details.
 
 ## License
-**Scamper** is licensed under the Apache license, version 2. See LICENSE file
+**Scamper** is licensed under the Apache License, Version 2. See LICENSE file
 for more information.
