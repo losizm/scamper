@@ -102,7 +102,7 @@ trait Multipart {
  *
  * @see [[Multipart]]
  */
-trait Part {
+sealed trait Part {
   /** Gets name. */
   def name: String
 

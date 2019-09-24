@@ -23,7 +23,7 @@ import scamper.Base64
 import AuthTypeHelper._
 
 /** Base type for authentication header types. */
-trait AuthType {
+sealed trait AuthType {
   /** Gets scheme. */
   def scheme: String
 }

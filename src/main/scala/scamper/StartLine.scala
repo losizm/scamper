@@ -20,7 +20,7 @@ import java.net.URI
 import scala.util.Try
 
 /** HTTP message start line */
-trait StartLine {
+sealed trait StartLine {
   /** Gets HTTP version. */
   def version: HttpVersion
 }

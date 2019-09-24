@@ -100,7 +100,7 @@ package object cookies {
   import CookieHelper._
 
   /** HTTP Cookie */
-  trait Cookie {
+  sealed trait Cookie {
     /** Gets cookie name. */
     def name: String
 
