@@ -10,7 +10,8 @@
 # Vim
 *.swp
 
-# MacOS
+# macOS
 .DS_Store
 
+# Miscellaneous
 target/
