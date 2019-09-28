@@ -18,7 +18,7 @@ package scamper.server
 import java.io.{ Closeable, File, InputStream }
 import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException, URI, URISyntaxException }
 import java.time.Instant
-import java.util.concurrent.{ ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadFactory, ThreadPoolExecutor }
+import java.util.concurrent._
 import java.util.concurrent.atomic.AtomicLong
 
 import javax.net.ServerSocketFactory
@@ -26,7 +26,7 @@ import javax.net.ssl.{ SSLException, SSLServerSocketFactory }
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.Try
+import scala.util.{ Failure, Success, Try }
 
 import scamper._
 import scamper.Auxiliary.SocketType
@@ -78,10 +78,11 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   })
   private val serverSocket = app.factory.createServerSocket()
   private val chunked = TransferCoding("chunked")
+  private val serviceUnavailable = ServiceUnavailable().withHeader(Header("Retry-After", 120))
   private var closed = false
 
   private val writerContext = ExecutionContext.fromExecutorService {
-    object ServiceThreadFactory extends ThreadFactory {
+    val threadFactory = new ThreadFactory {
       private val count = new AtomicLong(0)
       def newThread(task: Runnable) = {
         val thread = new Thread(threadGroup, task, s"scamper-server-$id-writer-${count.incrementAndGet()}")
@@ -95,17 +96,17 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
       poolSize * 2,
       keepAliveSeconds,
       TimeUnit.SECONDS,
-      new ArrayBlockingQueue[Runnable](poolSize * 2),
-      ServiceThreadFactory
+      new LinkedBlockingQueue[Runnable](),
+      threadFactory
     )
   }
 
-  private implicit val serviceContext = ExecutionContext.fromExecutorService {
-    object ServiceUnavailableHandler extends RejectedExecutionHandler {
-      def rejectedExecution(task: Runnable, executor: ThreadPoolExecutor): Unit = logger.error(s"$authority - Task rejected")
+  private val serviceContext = ExecutionContext.fromExecutorService {
+    val rejectedExecutionHandler = new RejectedExecutionHandler {
+      def rejectedExecution(task: Runnable, executor: ThreadPoolExecutor): Unit = throw new RejectedExecutionException()
     }
 
-    object ServiceThreadFactory extends ThreadFactory {
+    val threadFactory = new ThreadFactory {
       private val count = new AtomicLong(0)
       def newThread(task: Runnable) = {
         val thread = new Thread(threadGroup, task, s"scamper-server-$id-service-${count.incrementAndGet()}")
@@ -119,9 +120,32 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
       poolSize,
       keepAliveSeconds,
       TimeUnit.SECONDS,
-      new ArrayBlockingQueue[Runnable](queueSize),
-      ServiceThreadFactory,
-      ServiceUnavailableHandler
+      queueSize match {
+        case 0 => new SynchronousQueue()
+        case _ => new ArrayBlockingQueue[Runnable](queueSize)
+      },
+      threadFactory,
+      rejectedExecutionHandler
+    )
+  }
+
+  private val closerContext = ExecutionContext.fromExecutorService {
+    val threadFactory = new ThreadFactory {
+      private val count = new AtomicLong(0)
+      def newThread(task: Runnable) = {
+        val thread = new Thread(threadGroup, task, s"scamper-server-$id-closer-${count.incrementAndGet()}")
+        thread.setDaemon(true)
+        thread
+      }
+    }
+
+    new ThreadPoolExecutor(
+      2,
+      poolSize.max(2),
+      keepAliveSeconds,
+      TimeUnit.SECONDS,
+      new LinkedBlockingQueue[Runnable](),
+      threadFactory
     )
   }
 
@@ -135,6 +159,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
       Try(serverSocket.close())
       Try(writerContext.shutdownNow())
       Try(serviceContext.shutdownNow())
+      Try(closerContext.shutdownNow())
       Try(logger.asInstanceOf[Closeable].close())
       closed = true
     }
@@ -231,14 +256,28 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
           case err: SSLException =>
             logger.warn(s"$authority - SSL error while servicing request from $tag", err)
 
-          case err: Throwable =>
-            logger.error(s"$authority - Fatal error while servicing request from $tag", err)
-            throw err
-        } finally {
+          case err: Exception =>
+            logger.error(s"$authority - Unhandled error while servicing request from $tag", err)
+        }
+      } (serviceContext).onComplete {
+        case Success(_) =>
           logger.info(s"$authority - Closing connection to $tag")
           Try(socket.close())
-        }
-      }
+
+        case Failure(err) =>
+          if (err.isInstanceOf[RejectedExecutionException]) {
+            logger.warn(s"$authority - Server overflow while servicing request from $tag", err)
+            Try(addAttributes(serviceUnavailable, correlate))
+              .map(filter)
+              .map(write)
+              .map(_ => logger.info(s"$authority - (Server Overflow Mode) Response sent to $tag"))
+              .recover {
+                case err => logger.error(s"$authority - (Server Overflow Mode) Error while filtering response to $tag", err)
+              }
+            logger.info(s"$authority - Closing connection to $tag")
+          }
+          Try(socket.close())
+      } (closerContext)
     }
 
     private def read()(implicit socket: Socket): HttpRequest = {
