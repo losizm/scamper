@@ -32,7 +32,7 @@ import scamper._
 import scamper.Auxiliary.SocketType
 import scamper.ResponseStatus.Registry._
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
-import scamper.logging.{ ConsoleLogger, Logger }
+import scamper.logging.{ ConsoleLogger, Logger, NullLogger }
 import scamper.types.TransferCoding
 
 private object DefaultHttpServer {
@@ -57,13 +57,13 @@ private object DefaultHttpServer {
 }
 
 private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Application)(val host: InetAddress, val port: Int) extends HttpServer {
-  val poolSize = app.poolSize
-  val queueSize = app.queueSize
-  val headerSize = app.headerSize
+  val poolSize = app.poolSize.max(1)
+  val queueSize = app.queueSize.max(0)
+  val headerSize = app.headerSize.max(1024)
   val bufferSize = app.bufferSize.max(1024)
-  val readTimeout = app.readTimeout
-  val keepAliveSeconds = app.keepAliveSeconds
-  val logger = app.logger
+  val readTimeout = app.readTimeout.max(0)
+  val keepAliveSeconds = app.keepAliveSeconds.max(0)
+  val logger = if (app.logger == null) NullLogger else app.logger
 
   private val authority = s"${host.getCanonicalHostName}:$port"
   private val threadGroup = new ThreadGroup(s"scamper-server-$id")
