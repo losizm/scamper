@@ -227,6 +227,22 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
         case err                         => errorHandler(err, req)
       }
 
+      def onHandleResponse(res: HttpResponse): Unit = {
+        Try(filter(res)).recover {
+          case err =>
+            logger.error(s"$authority - Error while filtering response to $tag", err)
+            InternalServerError().withDate(Instant.now).withConnection("close")
+        }.map { res =>
+          write(res)
+          logger.info(s"$authority - Response sent to $tag")
+          Try(res.body.getInputStream.close()) // Close filtered response body
+        }.recover {
+          case err => logger.error(s"$authority - Error while writing response to $tag", err)
+        }
+
+        Try(res.body.getInputStream.close()) // Close unfiltered response body
+      }
+
       Future {
         try {
           logger.info(s"$authority - Servicing request from $tag")
@@ -236,27 +252,12 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
             .map(req => addAttributes(req, correlate))
             .fold(err => Try(onReadError(err)), req => Try(handle(req)).recover { case err => onHandleError(req)(err) })
             .map(res => addAttributes(res, correlate))
-            .map { res =>
-              Try(filter(res))
-                .map { res =>
-                  write(res)
-                  logger.info(s"$authority - Response sent to $tag")
-                  Try(res.body.getInputStream.close()) // Close filtered response body
-                }.recover {
-                  case err => logger.error(s"$authority - Error while filtering response to $tag", err)
-                }
-
-              Try(res.body.getInputStream.close()) // Close unfiltered response body
-            }.get
+            .map(onHandleResponse)
+            .get
         } catch {
-          case err: ResponseAborted =>
-            logger.warn(s"$authority - Response aborted while servicing request from $tag", err)
-
-          case err: SSLException =>
-            logger.warn(s"$authority - SSL error while servicing request from $tag", err)
-
-          case err: Exception =>
-            logger.error(s"$authority - Unhandled error while servicing request from $tag", err)
+          case err: ResponseAborted => logger.warn(s"$authority - Response aborted while servicing request from $tag", err)
+          case err: SSLException    => logger.warn(s"$authority - SSL error while servicing request from $tag", err)
+          case err: Exception       => logger.error(s"$authority - Unhandled error while servicing request from $tag", err)
         }
       } (serviceContext).onComplete {
         case Success(_) =>
@@ -265,16 +266,11 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
 
         case Failure(err) =>
           if (err.isInstanceOf[RejectedExecutionException]) {
-            logger.warn(s"$authority - Server overflow while servicing request from $tag", err)
+            logger.warn(s"$authority - Request overflow while servicing request from $tag", err)
             Try(addAttributes(ServiceUnavailable().withRetryAfter(Instant.now plusSeconds 300), correlate))
-              .map(filter)
-              .map(write)
-              .map(_ => logger.info(s"$authority - (Server Overflow Mode) Response sent to $tag"))
-              .recover {
-                case err => logger.error(s"$authority - (Server Overflow Mode) Error while filtering response to $tag", err)
-              }
-            logger.info(s"$authority - Closing connection to $tag")
+              .map(onHandleResponse)
           }
+          logger.info(s"$authority - Closing connection to $tag")
           Try(socket.close())
       } (closerContext)
     }
