@@ -31,7 +31,7 @@ import scala.util.{ Failure, Success, Try }
 import scamper._
 import scamper.Auxiliary.SocketType
 import scamper.ResponseStatus.Registry._
-import scamper.headers.{ Connection, ContentLength, ContentType, Date, TransferEncoding }
+import scamper.headers.{ Connection, ContentLength, ContentType, Date, RetryAfter, TransferEncoding }
 import scamper.logging.{ ConsoleLogger, Logger, NullLogger }
 import scamper.types.TransferCoding
 
@@ -78,7 +78,6 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   })
   private val serverSocket = app.factory.createServerSocket()
   private val chunked = TransferCoding("chunked")
-  private val serviceUnavailable = ServiceUnavailable().withHeader(Header("Retry-After", 120))
   private var closed = false
 
   private val writerContext = ExecutionContext.fromExecutorService {
@@ -267,7 +266,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
         case Failure(err) =>
           if (err.isInstanceOf[RejectedExecutionException]) {
             logger.warn(s"$authority - Server overflow while servicing request from $tag", err)
-            Try(addAttributes(serviceUnavailable, correlate))
+            Try(addAttributes(ServiceUnavailable().withRetryAfter(Instant.now plusSeconds 300), correlate))
               .map(filter)
               .map(write)
               .map(_ => logger.info(s"$authority - (Server Overflow Mode) Response sent to $tag"))
