@@ -97,6 +97,26 @@ class TargetedRequestHandlerSpec extends FlatSpec {
     assert { h2(POST("/A/b/C/One/200/3000/d")).isInstanceOf[HttpRequest] }
     assert { h2(PUT("/A/B/c/One/200/3000/d")).isInstanceOf[HttpRequest] }
     assert { h2(DELETE("/a/b/c/One/200/3000/d")).isInstanceOf[HttpRequest] }
+
+    val h3 = TargetedRequestHandler(
+      { req =>
+        assert(req.params.getString("a") == "One")
+        assert(req.params.getInt("b") == 200)
+        Ok()
+      },
+      "/A/B/C/:a/:b/*",
+      None
+    )
+
+    assert { h3(GET("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
+    assert { h3(POST("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
+    assert { h3(PUT("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
+    assert { h3(DELETE("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
+
+    assert { h3(GET("/a/B/C/One/200/3000/d")).isInstanceOf[HttpRequest] }
+    assert { h3(POST("/A/b/C/One/200/3000/d")).isInstanceOf[HttpRequest] }
+    assert { h3(PUT("/A/B/c/One/200/3000/d")).isInstanceOf[HttpRequest] }
+    assert { h3(DELETE("/a/b/c/One/200/3000/d")).isInstanceOf[HttpRequest] }
   }
 
   it should "not have access to non-convertible parameter" in {

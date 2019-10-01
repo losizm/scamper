@@ -49,7 +49,7 @@ private class TargetedRequestParameters(params: Map[String, String]) extends Req
 }
 
 private class Target(path: String) {
-  if (!path.matchesAny("/", "\\*", """(/:\w+|/[\w+\-.~%]+)+""", """(/:\w+|/[\w+\-.~%]+)*/\*\w+"""))
+  if (!path.matchesAny("/", "\\*", """(/:\w+|/[\w+\-.~%]+)+""", """(/:\w+|/[\w+\-.~%]+)*/\*\w*"""))
     throw new IllegalArgumentException(s"Invalid target path: $path")
 
   private val segments = segment(path)
@@ -59,7 +59,7 @@ private class Target(path: String) {
     case "*" => "\\*"
     case _   => "/" + segments.map {
       case s if s.matches("(:\\w+)")   => """[\w+\-.~%]+"""
-      case s if s.matches("(\\*\\w+)") => """[\w+\-.~%/]*"""
+      case s if s.matches("(\\*\\w*)") => """[\w+\-.~%/]*"""
       case s => Regex.quote(s)
     }.mkString("/")
   }

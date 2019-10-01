@@ -26,7 +26,7 @@ private class DefaultRouter(app: ServerApplication, rawMountPath: String) extend
   val mountPath = normalize(rawMountPath, true)
 
   def incoming(handler: RequestHandler): this.type = synchronized {
-    app.incoming(TargetedRequestHandler(handler, mountPath + "/*subpath", None))
+    app.incoming(TargetedRequestHandler(handler, mountPath + "/*", None))
     this
   }
 
