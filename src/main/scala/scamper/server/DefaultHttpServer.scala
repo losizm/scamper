@@ -339,7 +339,6 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     }
 
     private def write(res: HttpResponse)(implicit socket: Socket): Unit = {
-      socket.shutdownInput()
       socket.writeLine(res.startLine.toString)
       res.headers.map(_.toString).foreach(socket.writeLine)
       socket.writeLine()
