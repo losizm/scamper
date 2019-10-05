@@ -44,7 +44,6 @@ private object DefaultHttpServer {
     bufferSize: Int = 8192,
     headerSize: Int = Try(sys.props("scamper.server.headerSize").toInt).getOrElse(1024),
     readTimeout: Int = 5000,
-    keepAliveSeconds: Int = Try(sys.props("scamper.server.keepAliveSeconds").toInt).getOrElse(60),
     logger: Logger = ConsoleLogger,
     requestHandlers: Seq[RequestHandler] = Nil,
     responseFilters: Seq[ResponseFilter] = Nil,
@@ -62,7 +61,6 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   val headerSize = app.headerSize.max(1024)
   val bufferSize = app.bufferSize.max(1024)
   val readTimeout = app.readTimeout.max(0)
-  val keepAliveSeconds = app.keepAliveSeconds.max(0)
   val logger = if (app.logger == null) NullLogger else app.logger
 
   private val authority = s"${host.getCanonicalHostName}:$port"
@@ -81,26 +79,6 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   private val serviceUnavailable = ServiceUnavailable().withHeader(Header("Retry-After", 120))
   private var closed = false
 
-  private val writerContext = ExecutionContext.fromExecutorService {
-    val threadFactory = new ThreadFactory {
-      private val count = new AtomicLong(0)
-      def newThread(task: Runnable) = {
-        val thread = new Thread(threadGroup, task, s"scamper-server-$id-writer-${count.incrementAndGet()}")
-        thread.setDaemon(true)
-        thread
-      }
-    }
-
-    new ThreadPoolExecutor(
-      2,
-      poolSize * 2,
-      keepAliveSeconds,
-      TimeUnit.SECONDS,
-      new LinkedBlockingQueue[Runnable](),
-      threadFactory
-    )
-  }
-
   private val serviceContext = ExecutionContext.fromExecutorService {
     val rejectedExecutionHandler = new RejectedExecutionHandler {
       def rejectedExecution(task: Runnable, executor: ThreadPoolExecutor): Unit = throw new RejectedExecutionException()
@@ -118,7 +96,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     new ThreadPoolExecutor(
       poolSize,
       poolSize,
-      keepAliveSeconds,
+      60,
       TimeUnit.SECONDS,
       queueSize match {
         case 0 => new SynchronousQueue()
@@ -129,24 +107,14 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     )
   }
 
-  private val closerContext = ExecutionContext.fromExecutorService {
-    val threadFactory = new ThreadFactory {
-      private val count = new AtomicLong(0)
-      def newThread(task: Runnable) = {
-        val thread = new Thread(threadGroup, task, s"scamper-server-$id-closer-${count.incrementAndGet()}")
-        thread.setDaemon(true)
-        thread
-      }
-    }
+  private val writerContext = GenerousExecutorService(s"scamper-server-$id-writer", poolSize * 2, Some(threadGroup)) { name =>
+    logger.warn(s"$authority - Running rejected '$name' task on dedicated thread")
+    true
+  }
 
-    new ThreadPoolExecutor(
-      2,
-      poolSize.max(2),
-      keepAliveSeconds,
-      TimeUnit.SECONDS,
-      new LinkedBlockingQueue[Runnable](),
-      threadFactory
-    )
+  private val closerContext = GenerousExecutorService(s"scamper-server-$id-closer", poolSize * 2, Some(threadGroup)) { name =>
+    logger.warn(s"$authority - Running rejected '$name' task on dedicated thread")
+    true
   }
 
   val isSecure: Boolean = app.factory.isInstanceOf[SSLServerSocketFactory]
