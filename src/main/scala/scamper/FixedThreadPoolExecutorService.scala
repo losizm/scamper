@@ -21,13 +21,15 @@ import java.util.concurrent.atomic.AtomicLong
 import scala.concurrent.{ ExecutionContext, ExecutionContextExecutorService }
 
 private object FixedThreadPoolExecutorService {
-  def apply(name: String, poolSize: Int, queueSize: Int)(rejectedExecutionHandler: RejectedExecutionHandler): ExecutionContextExecutorService =
+  def apply(name: String, poolSize: Int, queueSize: Int, threadGroup: Option[ThreadGroup] = None)
+      (rejectedExecutionHandler: RejectedExecutionHandler): ExecutionContextExecutorService =
     ExecutionContext.fromExecutorService {
       val threadFactory = new ThreadFactory {
+        private val group = threadGroup.getOrElse(new ThreadGroup(name))
         private val count = new AtomicLong(0)
 
         def newThread(task: Runnable) = {
-          val thread = new Thread(new ThreadGroup(name), task, s"$name-${count.incrementAndGet()}")
+          val thread = new Thread(group, task, s"$name-${count.incrementAndGet()}")
           thread.setDaemon(true)
           thread
         }

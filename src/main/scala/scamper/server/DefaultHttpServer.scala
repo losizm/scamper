@@ -79,16 +79,16 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   private val serviceUnavailable = ServiceUnavailable().withHeader(Header("Retry-After", 120))
   private var closed = false
 
-  private val serviceContext = FixedThreadPoolExecutorService(s"scamper-server-$id-service", poolSize * 2, queueSize) { (task, executor) =>
+  private val serviceContext = FixedThreadPoolExecutorService(s"scamper-server-$id-service", poolSize, queueSize, Some(threadGroup)) { (task, executor) =>
     throw new RejectedExecutionException(s"Rejected scamper-server-$id-service task")
   }
 
-  private val writerContext = FixedThreadPoolExecutorService(s"scamper-server-$id-writer", poolSize * 2, 0) { (task, executor) =>
+  private val writerContext = FixedThreadPoolExecutorService(s"scamper-server-$id-writer", poolSize * 2, 0, Some(threadGroup)) { (task, executor) =>
     logger.warn(s"$authority - Running rejected scamper-server-$id-writer task on dedicated thread")
     executor.getThreadFactory.newThread(task).start()
   }
 
-  private val closerContext = FixedThreadPoolExecutorService(s"scamper-server-$id-closer", poolSize * 2, 0) { (task, executor) =>
+  private val closerContext = FixedThreadPoolExecutorService(s"scamper-server-$id-closer", poolSize * 2, 0, Some(threadGroup)) { (task, executor) =>
     logger.warn(s"$authority - Running rejected scamper-server-$id-closer task on dedicated thread")
     executor.getThreadFactory.newThread(task).start()
   }
@@ -210,7 +210,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
 
         case Failure(err) =>
           if (err.isInstanceOf[RejectedExecutionException]) {
-            logger.warn(s"$authority - Server overflow while servicing request from $tag", err)
+            logger.warn(s"$authority - Server overflow while servicing request from $tag")
             Try(addAttributes(serviceUnavailable, correlate))
               .map(filter)
               .map(write)
