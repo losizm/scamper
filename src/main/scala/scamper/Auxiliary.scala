@@ -19,11 +19,8 @@ import java.io.{ File, FileOutputStream, FileInputStream, InputStream, OutputStr
 import java.net.{ Socket, URI, URLDecoder, URLEncoder }
 import java.nio.file.{ Paths, Path }
 import java.time.Instant
-import java.util.concurrent.{ ArrayBlockingQueue, SynchronousQueue, ThreadFactory, ThreadPoolExecutor, TimeUnit }
-import java.util.concurrent.atomic.AtomicLong
 
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.ExecutionContext
 import scala.util.Try
 
 import scamper.types.MediaType

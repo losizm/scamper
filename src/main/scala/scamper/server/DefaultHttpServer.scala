@@ -18,7 +18,7 @@ package scamper.server
 import java.io.{ Closeable, File, InputStream }
 import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException, URI, URISyntaxException }
 import java.time.Instant
-import java.util.concurrent._
+import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.atomic.AtomicLong
 
 import javax.net.ServerSocketFactory
