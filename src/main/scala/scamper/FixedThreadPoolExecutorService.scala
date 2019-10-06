@@ -20,31 +20,28 @@ import java.util.concurrent.atomic.AtomicLong
 
 import scala.concurrent.{ ExecutionContext, ExecutionContextExecutorService }
 
-private object GenerousExecutorService {
-  def apply(name: String, poolSize: Int, threadGroup: Option[ThreadGroup] = None)(generous: String => Boolean): ExecutionContextExecutorService =
+private object FixedThreadPoolExecutorService {
+  def apply(name: String, poolSize: Int, queueSize: Int)(rejectedExecutionHandler: RejectedExecutionHandler): ExecutionContextExecutorService =
     ExecutionContext.fromExecutorService {
       val threadFactory = new ThreadFactory {
-        private val group = threadGroup.getOrElse(new ThreadGroup(name))
         private val count = new AtomicLong(0)
 
         def newThread(task: Runnable) = {
-          val thread = new Thread(group, task, s"$name-${count.incrementAndGet()}")
+          val thread = new Thread(new ThreadGroup(name), task, s"$name-${count.incrementAndGet()}")
           thread.setDaemon(true)
           thread
         }
       }
 
-      val rejectedExecutionHandler = new RejectedExecutionHandler {
-        def rejectedExecution(task: Runnable, executor: ThreadPoolExecutor): Unit =
-          if (generous(name)) threadFactory.newThread(task).start()
-      }
-
       new ThreadPoolExecutor(
-        poolSize,
-        poolSize,
+        poolSize.max(1),
+        poolSize.max(1),
         60,
         TimeUnit.SECONDS,
-        new SynchronousQueue(),
+        queueSize.max(0) match {
+          case 0 => new SynchronousQueue()
+          case n => new ArrayBlockingQueue(n)
+        },
         threadFactory,
         rejectedExecutionHandler
       )

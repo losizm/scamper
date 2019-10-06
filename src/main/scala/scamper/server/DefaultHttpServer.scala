@@ -79,42 +79,18 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   private val serviceUnavailable = ServiceUnavailable().withHeader(Header("Retry-After", 120))
   private var closed = false
 
-  private val serviceContext = ExecutionContext.fromExecutorService {
-    val rejectedExecutionHandler = new RejectedExecutionHandler {
-      def rejectedExecution(task: Runnable, executor: ThreadPoolExecutor): Unit = throw new RejectedExecutionException()
-    }
-
-    val threadFactory = new ThreadFactory {
-      private val count = new AtomicLong(0)
-      def newThread(task: Runnable) = {
-        val thread = new Thread(threadGroup, task, s"scamper-server-$id-service-${count.incrementAndGet()}")
-        thread.setDaemon(true)
-        thread
-      }
-    }
-
-    new ThreadPoolExecutor(
-      poolSize,
-      poolSize,
-      60,
-      TimeUnit.SECONDS,
-      queueSize match {
-        case 0 => new SynchronousQueue()
-        case _ => new ArrayBlockingQueue[Runnable](queueSize)
-      },
-      threadFactory,
-      rejectedExecutionHandler
-    )
+  private val serviceContext = FixedThreadPoolExecutorService(s"scamper-server-$id-service", poolSize * 2, queueSize) { (task, executor) =>
+    throw new RejectedExecutionException(s"Rejected scamper-server-$id-service task")
   }
 
-  private val writerContext = GenerousExecutorService(s"scamper-server-$id-writer", poolSize * 2, Some(threadGroup)) { name =>
-    logger.warn(s"$authority - Running rejected '$name' task on dedicated thread")
-    true
+  private val writerContext = FixedThreadPoolExecutorService(s"scamper-server-$id-writer", poolSize * 2, 0) { (task, executor) =>
+    logger.warn(s"$authority - Running rejected scamper-server-$id-writer task on dedicated thread")
+    executor.getThreadFactory.newThread(task).start()
   }
 
-  private val closerContext = GenerousExecutorService(s"scamper-server-$id-closer", poolSize * 2, Some(threadGroup)) { name =>
-    logger.warn(s"$authority - Running rejected '$name' task on dedicated thread")
-    true
+  private val closerContext = FixedThreadPoolExecutorService(s"scamper-server-$id-closer", poolSize * 2, 0) { (task, executor) =>
+    logger.warn(s"$authority - Running rejected scamper-server-$id-closer task on dedicated thread")
+    executor.getThreadFactory.newThread(task).start()
   }
 
   val isSecure: Boolean = app.factory.isInstanceOf[SSLServerSocketFactory]

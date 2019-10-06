@@ -204,11 +204,13 @@ private object Auxiliary {
     }
   }
 
-  lazy val executor = GenerousExecutorService(
+  lazy val executor = FixedThreadPoolExecutorService(
     "scamper-auxiliary",
-    Try(sys.props("scamper.auxiliary.executor.poolSize").toInt).getOrElse(Runtime.getRuntime.availableProcessors * 2).max(8)
-  ) { name  =>
-    System.err.println(s"[WARNING] Running rejected $name task on dedicated thread.")
-    true
+    Try(sys.props("scamper.auxiliary.executor.poolSize").toInt)
+      .getOrElse(Runtime.getRuntime.availableProcessors * 2).max(8),
+    0
+  ) { (task, executor) =>
+    System.err.println(s"[WARNING] Running rejected scamper-auxiliary task on dedicated thread.")
+    executor.getThreadFactory.newThread(task).start()
   }
 }
