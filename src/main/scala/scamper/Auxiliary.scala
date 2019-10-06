@@ -208,7 +208,7 @@ private object Auxiliary {
     "scamper-auxiliary",
     Try(sys.props("scamper.auxiliary.executor.poolSize").toInt)
       .getOrElse(Runtime.getRuntime.availableProcessors * 2).max(8),
-    0
+    Try(sys.props("scamper.auxiliary.executor.queueSize").toInt).getOrElse(0).max(0)
   ) { (task, executor) =>
     System.err.println(s"[WARNING] Running rejected scamper-auxiliary task on dedicated thread.")
     executor.getThreadFactory.newThread(task).start()

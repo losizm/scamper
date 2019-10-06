@@ -43,6 +43,8 @@ private object DefaultHttpServer {
     queueSize: Int = Runtime.getRuntime.availableProcessors() * 4,
     bufferSize: Int = 8192,
     headerSize: Int = Try(sys.props("scamper.server.headerSize").toInt).getOrElse(1024),
+    writerQueueSize: Int = Try(sys.props("scamper.server.writer.queueSize").toInt).getOrElse(0),
+    closerQueueSize: Int = Try(sys.props("scamper.server.closer.queueSize").toInt).getOrElse(0),
     readTimeout: Int = 5000,
     logger: Logger = ConsoleLogger,
     requestHandlers: Seq[RequestHandler] = Nil,
@@ -58,10 +60,13 @@ private object DefaultHttpServer {
 private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Application)(val host: InetAddress, val port: Int) extends HttpServer {
   val poolSize = app.poolSize.max(1)
   val queueSize = app.queueSize.max(0)
-  val headerSize = app.headerSize.max(1024)
   val bufferSize = app.bufferSize.max(1024)
+  val headerSize = app.headerSize.max(1024)
   val readTimeout = app.readTimeout.max(0)
   val logger = if (app.logger == null) NullLogger else app.logger
+
+  private val writerQueueSize = app.writerQueueSize.max(0)
+  private val closerQueueSize = app.closerQueueSize.max(0)
 
   private val authority = s"${host.getCanonicalHostName}:$port"
   private val threadGroup = new ThreadGroup(s"scamper-server-$id")
@@ -83,12 +88,12 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     throw new RejectedExecutionException(s"Rejected scamper-server-$id-service task")
   }
 
-  private val writerContext = FixedThreadPoolExecutorService(s"scamper-server-$id-writer", poolSize * 2, 0, Some(threadGroup)) { (task, executor) =>
+  private val writerContext = FixedThreadPoolExecutorService(s"scamper-server-$id-writer", poolSize * 2, writerQueueSize, Some(threadGroup)) { (task, executor) =>
     logger.warn(s"$authority - Running rejected scamper-server-$id-writer task on dedicated thread")
     executor.getThreadFactory.newThread(task).start()
   }
 
-  private val closerContext = FixedThreadPoolExecutorService(s"scamper-server-$id-closer", poolSize * 2, 0, Some(threadGroup)) { (task, executor) =>
+  private val closerContext = FixedThreadPoolExecutorService(s"scamper-server-$id-closer", poolSize * 2, closerQueueSize, Some(threadGroup)) { (task, executor) =>
     logger.warn(s"$authority - Running rejected scamper-server-$id-closer task on dedicated thread")
     executor.getThreadFactory.newThread(task).start()
   }
