@@ -18,6 +18,8 @@ package scamper.client
 import java.io.InputStream
 import java.net.Socket
 
+import scala.concurrent.Future
+
 import scamper.{ Auxiliary, Compressor, Entity, Header, HeaderStream, HttpException, HttpRequest, HttpResponse, StatusLine }
 import scamper.RequestMethods.HEAD
 import scamper.headers.TransferEncoding
@@ -26,17 +28,15 @@ import scamper.types.TransferCoding
 import Auxiliary.SocketType
 
 private class HttpClientConnection(socket: Socket) extends AutoCloseable {
-  private val buffer = new Array[Byte](8192)
-
   def send(request: HttpRequest): HttpResponse = {
     socket.writeLine(request.startLine.toString)
     request.headers.map(_.toString).foreach(socket.writeLine)
     socket.writeLine()
+    socket.flush()
 
     if (!request.body.isKnownEmpty)
-      writeBody(request)
+      Future { writeBody(request) }(Auxiliary.executor)
 
-    socket.flush()
     getResponse(request.method == HEAD)
   }
 
@@ -44,6 +44,7 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
 
   private def writeBody(request: HttpRequest): Unit =
     request.getTransferEncoding.map { encoding =>
+      val buffer = new Array[Byte](8192)
       val in = encodeInputStream(request.body.getInputStream, encoding)
       var chunkSize = 0
 
@@ -55,11 +56,14 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
 
       socket.writeLine("0")
       socket.writeLine()
+      socket.flush()
     }.getOrElse {
+      val buffer = new Array[Byte](8192)
       val in = request.body.getInputStream
       var length = 0
       while ({ length = in.read(buffer); length != -1 })
         socket.write(buffer, 0, length)
+      socket.flush()
     }
 
   private def encodeInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
@@ -71,6 +75,7 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
     }
 
   private def getResponse(headOnly: Boolean): HttpResponse = {
+    val buffer = new Array[Byte](8192)
     val statusLine = StatusLine.parse(socket.getLine(buffer))
     val headers = HeaderStream.getHeaders(socket.getInputStream, buffer)
 
