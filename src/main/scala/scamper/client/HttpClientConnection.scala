@@ -17,11 +17,13 @@ package scamper.client
 
 import java.io.InputStream
 import java.net.Socket
+import java.util.concurrent.atomic.AtomicBoolean
 
 import scala.concurrent.Future
 
 import scamper.{ Auxiliary, Compressor, Entity, Header, HeaderStream, HttpException, HttpRequest, HttpResponse, StatusLine }
 import scamper.RequestMethods.HEAD
+import scamper.ResponseStatuses.Continue
 import scamper.headers.TransferEncoding
 import scamper.types.TransferCoding
 
@@ -34,10 +36,26 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
     socket.writeLine()
     socket.flush()
 
-    if (!request.body.isKnownEmpty)
-      Future { writeBody(request) }(Auxiliary.executor)
+    val continue = new AtomicBoolean(true)
 
-    getResponse(request.method == HEAD)
+    if (!request.body.isKnownEmpty)
+      Future {
+        if (request.getHeaderValues("Expect").exists { _.toLowerCase == "100-continue" })
+          continue.synchronized { continue.wait(waitForContinueTimeout) }
+
+        if (continue.get)
+          writeBody(request)
+      }(Auxiliary.executor)
+
+    getResponse(request.method == HEAD) match {
+      case res if res.status == Continue => getResponse(request.method == HEAD)
+      case res                           =>
+        if (!res.status.isSuccessful) {
+          continue.set(false)
+          continue.synchronized { continue.notify() }
+        }
+        res
+    }
   }
 
   def close(): Unit = socket.close()
