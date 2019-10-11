@@ -17,33 +17,52 @@ package scamper.client
 
 import java.io.InputStream
 import java.net.Socket
+import java.util.concurrent.atomic.AtomicBoolean
+
+import scala.concurrent.Future
 
 import scamper.{ Auxiliary, Compressor, Entity, Header, HeaderStream, HttpException, HttpRequest, HttpResponse, StatusLine }
 import scamper.RequestMethod.Registry.HEAD
+import scamper.ResponseStatus.Registry.Continue
 import scamper.headers.TransferEncoding
 import scamper.types.TransferCoding
 
 import Auxiliary.SocketType
 
 private class HttpClientConnection(socket: Socket) extends AutoCloseable {
-  private val buffer = new Array[Byte](8192)
-
   def send(request: HttpRequest): HttpResponse = {
     socket.writeLine(request.startLine.toString)
     request.headers.map(_.toString).foreach(socket.writeLine)
     socket.writeLine()
+    socket.flush()
+
+    val continue = new AtomicBoolean(true)
 
     if (!request.body.isKnownEmpty)
-      writeBody(request)
+      Future {
+        if (request.getHeaderValues("Expect").exists { _.toLowerCase == "100-continue" })
+          continue.synchronized { continue.wait(waitForContinueTimeout) }
 
-    socket.flush()
-    getResponse(request.method == HEAD)
+        if (continue.get)
+          writeBody(request)
+      }(Auxiliary.executor)
+
+    getResponse(request.method == HEAD) match {
+      case res if res.status == Continue => getResponse(request.method == HEAD)
+      case res                           =>
+        if (!res.status.isSuccessful) {
+          continue.set(false)
+          continue.synchronized { continue.notify() }
+        }
+        res
+    }
   }
 
   def close(): Unit = socket.close()
 
   private def writeBody(request: HttpRequest): Unit =
     request.getTransferEncoding.map { encoding =>
+      val buffer = new Array[Byte](8192)
       val in = encodeInputStream(request.body.getInputStream, encoding)
       var chunkSize = 0
 
@@ -55,11 +74,14 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
 
       socket.writeLine("0")
       socket.writeLine()
+      socket.flush()
     }.getOrElse {
+      val buffer = new Array[Byte](8192)
       val in = request.body.getInputStream
       var length = 0
       while ({ length = in.read(buffer); length != -1 })
         socket.write(buffer, 0, length)
+      socket.flush()
     }
 
   private def encodeInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
@@ -71,6 +93,7 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
     }
 
   private def getResponse(headOnly: Boolean): HttpResponse = {
+    val buffer = new Array[Byte](8192)
     val statusLine = StatusLine.parse(socket.getLine(buffer))
     val headers = HeaderStream.getHeaders(socket.getInputStream, buffer)
 

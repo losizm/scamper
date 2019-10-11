@@ -20,6 +20,8 @@ import java.net.URI
 
 import javax.net.ssl.TrustManager
 
+import scala.util.Try
+
 import cookies.{ PlainCookie, RequestCookies }
 
 import Auxiliary.UriType
@@ -108,6 +110,8 @@ import RequestMethod.Registry._
  * }}}
  */
 package object client {
+  private[client] val waitForContinueTimeout = Try(sys.props("scamper.client.waitForContinueTimeout").toInt.max(0)).getOrElse(1000)
+
   /** Indicates request was aborted. */
   case class RequestAborted(message: String) extends HttpException(message)
 
