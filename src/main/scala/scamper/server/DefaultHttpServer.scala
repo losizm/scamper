@@ -29,7 +29,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
 import scamper._
-import scamper.Auxiliary.SocketType
+import scamper.Auxiliary.{ SocketType, getIntProperty }
 import scamper.ResponseStatus.Registry._
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, RetryAfter, TransferEncoding }
 import scamper.logging.{ ConsoleLogger, Logger, NullLogger }
@@ -42,9 +42,7 @@ private object DefaultHttpServer {
     poolSize: Int = Runtime.getRuntime.availableProcessors(),
     queueSize: Int = Runtime.getRuntime.availableProcessors() * 4,
     bufferSize: Int = 8192,
-    headerSize: Int = Try(sys.props("scamper.server.headerSize").toInt).getOrElse(1024),
-    writerQueueSize: Int = Try(sys.props("scamper.server.writer.queueSize").toInt).getOrElse(0),
-    closerQueueSize: Int = Try(sys.props("scamper.server.closer.queueSize").toInt).getOrElse(0),
+    headerSize: Int = getIntProperty("scamper.server.headerSize", 1024),
     readTimeout: Int = 5000,
     logger: Logger = ConsoleLogger,
     requestHandlers: Seq[RequestHandler] = Nil,
@@ -65,9 +63,6 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   val readTimeout = app.readTimeout.max(0)
   val logger = if (app.logger == null) NullLogger else app.logger
 
-  private val writerQueueSize = app.writerQueueSize.max(0)
-  private val closerQueueSize = app.closerQueueSize.max(0)
-
   private val authority = s"${host.getCanonicalHostName}:$port"
   private val threadGroup = new ThreadGroup(s"scamper-server-$id")
   private val requestHandler = RequestHandler.coalesce(app.requestHandlers : _*)
@@ -83,16 +78,16 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
   private val chunked = TransferCoding("chunked")
   private var closed = false
 
-  private val serviceContext = FixedThreadPoolExecutorService(s"scamper-server-$id-service", poolSize, queueSize, Some(threadGroup)) { (task, executor) =>
+  private val serviceContext = ThreadPoolExecutorService.fixed(s"scamper-server-$id-service", poolSize, queueSize, Some(threadGroup)) { (_, _) =>
     throw new RejectedExecutionException(s"Rejected scamper-server-$id-service task")
   }
 
-  private val writerContext = FixedThreadPoolExecutorService(s"scamper-server-$id-writer", poolSize * 2, writerQueueSize, Some(threadGroup)) { (task, executor) =>
-    logger.warn(s"$authority - Running rejected scamper-server-$id-writer task on dedicated thread")
+  private val encoderContext = ThreadPoolExecutorService.dynamic(s"scamper-server-$id-encoder", poolSize, poolSize * 2, 60L, 0, Some(threadGroup)) { (task, executor) =>
+    logger.warn(s"$authority - Running rejected scamper-server-$id-encoder task on dedicated thread")
     executor.getThreadFactory.newThread(task).start()
   }
 
-  private val closerContext = FixedThreadPoolExecutorService(s"scamper-server-$id-closer", poolSize * 2, closerQueueSize, Some(threadGroup)) { (task, executor) =>
+  private val closerContext = ThreadPoolExecutorService.dynamic(s"scamper-server-$id-closer", poolSize, poolSize * 2, 60L, 0, Some(threadGroup)) { (task, executor) =>
     logger.warn(s"$authority - Running rejected scamper-server-$id-closer task on dedicated thread")
     executor.getThreadFactory.newThread(task).start()
   }
@@ -105,7 +100,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     if (!closed) {
       Try(logger.info(s"$authority - Shutting down server"))
       Try(serverSocket.close())
-      Try(writerContext.shutdownNow())
+      Try(encoderContext.shutdownNow())
       Try(serviceContext.shutdownNow())
       Try(closerContext.shutdownNow())
       Try(logger.asInstanceOf[Closeable].close())
@@ -124,7 +119,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     logger.info(s"$authority - Buffer Size: $bufferSize")
     logger.info(s"$authority - Read Timeout: $readTimeout")
 
-    serverSocket.bind(new InetSocketAddress(host, port), queueSize)
+    serverSocket.bind(new InetSocketAddress(host, port), poolSize + queueSize * 2)
     Service.start()
 
     logger.info(s"$authority - Server is up and running")
@@ -318,8 +313,8 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     private def encode(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
       encoding.foldLeft(in) { (in, enc) =>
         if (enc.isChunked) in
-        else if (enc.isGzip) Compressor.gzip(in, bufferSize)(writerContext)
-        else if (enc.isDeflate) Compressor.deflate(in, bufferSize)(writerContext)
+        else if (enc.isGzip) Compressor.gzip(in, bufferSize)(encoderContext)
+        else if (enc.isDeflate) Compressor.deflate(in, bufferSize)(encoderContext)
         else throw new HttpException(s"Unsupported transfer encoding: $enc")
       }
 
