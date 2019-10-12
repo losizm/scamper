@@ -201,13 +201,26 @@ private object Auxiliary {
     }
   }
 
-  lazy val executor = FixedThreadPoolExecutorService(
+  def getBooleanProperty(name: String, default: => Boolean): Boolean =
+    Try(sys.props(name).toBoolean).getOrElse(default)
+
+  def getIntProperty(name: String, default: => Int): Int =
+    Try(sys.props(name).toInt).getOrElse(default)
+
+  def getLongProperty(name: String, default: => Long): Long =
+    Try(sys.props(name).toLong).getOrElse(default)
+
+  private val showWarning = getBooleanProperty("scamper.auxiliary.executor.showWarning", false)
+
+  lazy val executor = ThreadPoolExecutorService.dynamic(
     "scamper-auxiliary",
-    Try(sys.props("scamper.auxiliary.executor.poolSize").toInt)
-      .getOrElse(Runtime.getRuntime.availableProcessors * 2).max(8),
-    Try(sys.props("scamper.auxiliary.executor.queueSize").toInt).getOrElse(0).max(0)
+    getIntProperty("scamper.auxiliary.executor.corePoolSize", 0),
+    getIntProperty("scamper.auxiliary.executor.maxPoolSize", Runtime.getRuntime.availableProcessors * 2),
+    getLongProperty("scamper.auxiliary.executor.keepAliveSeconds", 60),
+    getIntProperty("scamper.auxiliary.executor.queueSize", 0),
   ) { (task, executor) =>
-    System.err.println(s"[WARNING] Running rejected scamper-auxiliary task on dedicated thread.")
+    if (showWarning)
+      System.err.println(s"[WARNING] Running rejected scamper-auxiliary task on dedicated thread.")
     executor.getThreadFactory.newThread(task).start()
   }
 }
