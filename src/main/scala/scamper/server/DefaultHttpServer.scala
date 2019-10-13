@@ -39,12 +39,12 @@ private object DefaultHttpServer {
   private val count = new AtomicLong(0)
 
   case class Application(
+    backlogSize: Int = 50,
     poolSize: Int = Runtime.getRuntime.availableProcessors(),
     queueSize: Int = Runtime.getRuntime.availableProcessors() * 4,
-    backlogSize: Int = 50,
     bufferSize: Int = 8192,
-    headerLimit: Int = 100,
     readTimeout: Int = 5000,
+    headerLimit: Int = 100,
     logger: Logger = ConsoleLogger,
     requestHandlers: Seq[RequestHandler] = Nil,
     responseFilters: Seq[ResponseFilter] = Nil,
@@ -57,12 +57,12 @@ private object DefaultHttpServer {
 }
 
 private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Application)(val host: InetAddress, val port: Int) extends HttpServer {
+  val backlogSize = app.backlogSize.max(1)
   val poolSize = app.poolSize.max(1)
   val queueSize = app.queueSize.max(0)
-  val backlogSize = app.backlogSize.max(1)
   val bufferSize = app.bufferSize.max(1024)
-  val headerLimit = app.headerLimit.max(10)
   val readTimeout = app.readTimeout.max(0)
+  val headerLimit = app.headerLimit.max(10)
   val logger = if (app.logger == null) NullLogger else app.logger
 
   private val authority = s"${host.getCanonicalHostName}:$port"
@@ -116,12 +116,12 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     logger.info(s"$authority - Starting server")
     logger.info(s"$authority - Secure: $isSecure")
     logger.info(s"$authority - Logger: $logger")
+    logger.info(s"$authority - Backlog Size: $backlogSize")
     logger.info(s"$authority - Pool Size: $poolSize")
     logger.info(s"$authority - Queue Size: $queueSize")
-    logger.info(s"$authority - Backlog Size: $backlogSize")
     logger.info(s"$authority - Buffer Size: $bufferSize")
-    logger.info(s"$authority - Header Limit: $headerLimit")
     logger.info(s"$authority - Read Timeout: $readTimeout")
+    logger.info(s"$authority - Header Limit: $headerLimit")
 
     serverSocket.bind(new InetSocketAddress(host, port), backlogSize)
     Service.start()

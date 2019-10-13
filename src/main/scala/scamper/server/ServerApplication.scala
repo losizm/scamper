@@ -35,12 +35,12 @@ import RequestMethod.Registry._
  *
  * | Key         | Value |
  * | ---------   | ----- |
+ * | backlogSize | `50` |
  * | poolSize    | `Runtime.getRuntime().availableProcessors()` |
  * | queueSize   | `Runtime.getRuntime().availableProcessors() * 4` |
- * | backlogSize | `50` |
  * | bufferSize  | `8192` |
- * | headerLimit | `100` |
  * | readTimeout | `5000` |
+ * | headerLimit | `100` |
  * | logger      | `ConsoleLogger` |
  * | secure      | ''(Not configured)'' |
  * | error       | ''(Default error handler &ndash; sends `500 Internal Server Error`)'' |
@@ -54,6 +54,22 @@ class ServerApplication {
   /** Resets application to default configuration. */
   def reset(): this.type = synchronized {
     app = DefaultHttpServer.Application()
+    this
+  }
+
+  /**
+   * Sets backlog size.
+   *
+   * The `backlogSize` specifies the maximum number of incoming connections that
+   * can wait before being accepted. Incoming connections that exceed this limit
+   * are refused.
+   *
+   * @param size backlog size
+   *
+   * @return this application
+   */
+  def backlogSize(size: Int): this.type = synchronized {
+    app = app.copy(backlogSize = size)
     this
   }
 
@@ -89,22 +105,6 @@ class ServerApplication {
   }
 
   /**
-   * Sets backlog size.
-   *
-   * The `backlogSize` specifies the maximum number of incoming connections that
-   * can wait before being accepted. Incoming connections that exceed this limit
-   * are refused.
-   *
-   * @param size backlog size
-   *
-   * @return this application
-   */
-  def backlogSize(size: Int): this.type = synchronized {
-    app = app.copy(backlogSize = size)
-    this
-  }
-
-  /**
    * Sets buffer size.
    *
    * The `bufferSize` specifies in bytes the size of buffer used when reading
@@ -126,21 +126,6 @@ class ServerApplication {
   }
 
   /**
-   * Sets header limit.
-   *
-   * The `headerLimit` specifies the maximum number of headers allowed. Incoming
-   * requests that exceed this limit are sent '''431 Request Header Fields Too Large'''.
-   *
-   * @param limit header limit
-   *
-   * @return this application
-   */
-  def headerLimit(limit: Int): this.type = synchronized {
-    app = app.copy(headerLimit = limit)
-    this
-  }
-
-  /**
    * Sets read timeout.
    *
    * The `readTimeout` controls how long a read from a socket blocks before it
@@ -152,6 +137,21 @@ class ServerApplication {
    */
   def readTimeout(timeout: Int): this.type = synchronized {
     app = app.copy(readTimeout = timeout)
+    this
+  }
+
+  /**
+   * Sets header limit.
+   *
+   * The `headerLimit` specifies the maximum number of headers allowed. Incoming
+   * requests that exceed this limit are sent '''431 Request Header Fields Too Large'''.
+   *
+   * @param limit header limit
+   *
+   * @return this application
+   */
+  def headerLimit(limit: Int): this.type = synchronized {
+    app = app.copy(headerLimit = limit)
     this
   }
 
