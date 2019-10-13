@@ -29,7 +29,7 @@ import scamper.types.TransferCoding
 
 import Auxiliary.SocketType
 
-private class HttpClientConnection(socket: Socket) extends AutoCloseable {
+private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTimeout: Int) extends AutoCloseable {
   def send(request: HttpRequest): HttpResponse = {
     socket.writeLine(request.startLine.toString)
     request.headers.map(_.toString).foreach(socket.writeLine)
@@ -41,7 +41,7 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
     if (!request.body.isKnownEmpty)
       Future {
         if (request.getHeaderValues("Expect").exists { _.toLowerCase == "100-continue" })
-          continue.synchronized { continue.wait(waitForContinueTimeout) }
+          continue.synchronized { continue.wait(continueTimeout) }
 
         if (continue.get)
           writeBody(request)
@@ -62,7 +62,7 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
 
   private def writeBody(request: HttpRequest): Unit =
     request.getTransferEncoding.map { encoding =>
-      val buffer = new Array[Byte](8192)
+      val buffer = new Array[Byte](bufferSize)
       val in = encodeInputStream(request.body.getInputStream, encoding)
       var chunkSize = 0
 
@@ -76,7 +76,7 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
       socket.writeLine()
       socket.flush()
     }.getOrElse {
-      val buffer = new Array[Byte](8192)
+      val buffer = new Array[Byte](bufferSize)
       val in = request.body.getInputStream
       var length = 0
       while ({ length = in.read(buffer); length != -1 })
@@ -93,7 +93,7 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable {
     }
 
   private def getResponse(headOnly: Boolean): HttpResponse = {
-    val buffer = new Array[Byte](8192)
+    val buffer = new Array[Byte](bufferSize)
     val statusLine = StatusLine.parse(socket.getLine(buffer))
     val headers = HeaderStream.getHeaders(socket.getInputStream, buffer)
 

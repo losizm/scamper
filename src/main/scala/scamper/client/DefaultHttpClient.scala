@@ -32,23 +32,23 @@ import scamper.headers.{ Connection, ContentLength, Host, TE, TransferEncoding }
 import scamper.types.TransferCoding
 
 private object DefaultHttpClient {
-  def apply(bufferSize: Int, readTimeout: Int): DefaultHttpClient = {
+  def apply(bufferSize: Int, readTimeout: Int, continueTimeout: Int): DefaultHttpClient = {
     implicit val factory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
-    new DefaultHttpClient(bufferSize, readTimeout)
+    new DefaultHttpClient(bufferSize.max(1024), readTimeout.max(0), continueTimeout.max(0))
   }
 
-  def apply(bufferSize: Int, readTimeout: Int, trustStore: File): DefaultHttpClient = {
+  def apply(bufferSize: Int, readTimeout: Int, continueTimeout: Int, trustStore: File): DefaultHttpClient = {
     implicit val factory = SecureSocketFactory.create(trustStore)
-    new DefaultHttpClient(bufferSize, readTimeout)
+    new DefaultHttpClient(bufferSize.max(1024), readTimeout.max(0), continueTimeout.max(0))
   }
 
-  def apply(bufferSize: Int, readTimeout: Int, trustManager: TrustManager): DefaultHttpClient = {
+  def apply(bufferSize: Int, readTimeout: Int, continueTimeout: Int, trustManager: TrustManager): DefaultHttpClient = {
     implicit val factory = SecureSocketFactory.create(trustManager)
-    new DefaultHttpClient(bufferSize, readTimeout)
+    new DefaultHttpClient(bufferSize.max(1024), readTimeout.max(0), continueTimeout.max(0))
   }
 }
 
-private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: Int)(implicit secureSocketFactory: SSLSocketFactory) extends HttpClient {
+private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: Int, val continueTimeout: Int)(implicit secureSocketFactory: SSLSocketFactory) extends HttpClient {
   def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T = {
     val target = request.target
 
@@ -57,7 +57,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
 
     val secure = target.getScheme == "https"
     val host = getEffectiveHost(target)
-    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/10.0.7")
+    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/10.1.0")
     val connection = getEffectiveConnection(request)
 
     var effectiveRequest = request.method match {
@@ -158,7 +158,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
         throw cause
     }
 
-    new HttpClientConnection(socket)
+    new HttpClientConnection(socket, bufferSize, continueTimeout)
   }
 
   private def toBodilessRequest(request: HttpRequest): HttpRequest =

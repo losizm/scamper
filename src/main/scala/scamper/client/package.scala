@@ -24,7 +24,7 @@ import scala.util.Try
 
 import cookies.{ PlainCookie, RequestCookies }
 
-import Auxiliary.{ UriType, getLongProperty }
+import Auxiliary.UriType
 import RequestMethod.Registry._
 
 /**
@@ -110,8 +110,6 @@ import RequestMethod.Registry._
  * }}}
  */
 package object client {
-  private[client] val waitForContinueTimeout = getLongProperty("scamper.client.waitForContinueTimeout", 1000).max(0)
-
   /** Indicates request was aborted. */
   case class RequestAborted(message: String) extends HttpException(message)
 
@@ -194,10 +192,21 @@ package object client {
     /**
      * Gets read timeout.
      *
-     * The read timeout controls how long a read from a socket blocks before it
-     * times out, whereafter the client throws `SocketTimeoutException`.
+     * The read timeout controls how long (in milliseconds) a read from a socket
+     * blocks before it times out, whereafter the client throws `SocketTimeoutException`.
      */
     def readTimeout: Int
+
+    /**
+     * Gets continue timeout.
+     *
+     * The continue timeout specifies how long to wait (in milliseconds) for a
+     * '''100 Continue''' response before sending the request body.
+     *
+     * @note This applies only to requests that include `Except: 100-Continue`
+     *   header and request body.
+     */
+    def continueTimeout: Int
 
     /**
      * Sends request and passes response to supplied handler.
@@ -341,13 +350,23 @@ package object client {
      *
      * @param bufferSize socket buffer size
      * @param readTimeout socket read timeout
+     * @param continueTimeout how long to wait (in milliseconds) for '''100 Continue''' before sending request body
      * @param trustStore truststore used for SSL/TLS &ndash; ''if supplied, store type must be JKS''
      * @param trustManager trust manager used for SSL/TLS
+     *
+     * @note The `continueTimeout` applies only to requests that include
+     *  `Except: 100-Continue` header and request body.
      */
-    def apply(bufferSize: Int = 8192, readTimeout: Int = 30000, trustStore: Option[File] = None, trustManager: Option[TrustManager] = None): HttpClient =
-      trustStore.map(DefaultHttpClient(bufferSize, readTimeout, _))
-        .orElse(trustManager.map(DefaultHttpClient(bufferSize, readTimeout, _)))
-        .getOrElse(DefaultHttpClient(bufferSize, readTimeout))
+    def apply(
+      bufferSize: Int = 8192,
+      readTimeout: Int = 30000,
+      continueTimeout: Int = 1000,
+      trustStore: Option[File] = None,
+      trustManager: Option[TrustManager] = None
+    ): HttpClient =
+      trustStore.map(DefaultHttpClient(bufferSize, readTimeout, continueTimeout, _))
+        .orElse(trustManager.map(DefaultHttpClient(bufferSize, readTimeout, continueTimeout, _)))
+        .getOrElse(DefaultHttpClient(bufferSize, readTimeout, continueTimeout))
 
     /**
      * Sends request and passes response to supplied handler.
@@ -357,6 +376,7 @@ package object client {
      * @param request HTTP request
      * @param bufferSize socket buffer size
      * @param readTimeout socket read timeout
+     * @param continueTimeout how long to wait (in milliseconds) for '''100 Continue''' before sending request body
      * @param trustStore truststore used for SSL/TLS &ndash; ''if supplied, store type must be JKS''
      * @param trustManager trust manager used for SSL/TLS
      * @param handler response handler
@@ -364,8 +384,17 @@ package object client {
      * @return value from applied handler
      *
      * @note To make effective use of this method, `request.target` must be an absolute URI.
+     *
+     * @note The `continueTimeout` applies only to requests that include
+     *  `Except: 100-Continue` header and request body.
      */
-    def send[T](request: HttpRequest, bufferSize: Int = 8192, readTimeout: Int = 30000, trustStore: Option[File] = None, trustManager: Option[TrustManager] = None)(handler: ResponseHandler[T]): T =
-      HttpClient(bufferSize, readTimeout, trustStore, trustManager).send(request)(handler)
+    def send[T](request: HttpRequest,
+      bufferSize: Int = 8192,
+      readTimeout: Int = 30000,
+      continueTimeout: Int = 1000,
+      trustStore: Option[File] = None,
+      trustManager: Option[TrustManager] = None
+    )(handler: ResponseHandler[T]): T =
+      HttpClient(bufferSize, readTimeout, continueTimeout, trustStore, trustManager).send(request)(handler)
   }
 }
