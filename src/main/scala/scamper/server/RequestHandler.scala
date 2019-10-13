@@ -22,9 +22,9 @@ trait RequestHandler {
   /**
    * Handles incoming request.
    *
-   * If handler can satisfy the request, then it should return an
-   * HttpResponse.  Otherwise, it should return an HttpRequest, which can be
-   * either the original request or an alternate one.
+   * If handler satisfies the request, then it returns an HttpResponse.
+   * Otherwise, it returns an HttpRequest, which can be either the
+   * original request or an alternate one.
    */
   def apply(request: HttpRequest): HttpMessage
 

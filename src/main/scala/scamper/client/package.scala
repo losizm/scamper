@@ -63,9 +63,9 @@ import RequestMethod.Registry._
  *
  * When using the `HttpClient` object as the client, it creates an instance of
  * `HttpClient` for one-time usage. If you plan to send multiple requests, you
- * can create and maintain a reference to an instance, and use it as the client.
- * With that, you also get access to methods corresponding to the standard HTTP
- * request methods.
+ * can create and maintain a reference to an HttpClient instance. With that,
+ * you also get access to methods corresponding to the standard HTTP request
+ * methods.
  *
  * {{{
  * import scamper.BodyParsers

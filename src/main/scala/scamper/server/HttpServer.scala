@@ -53,7 +53,11 @@ trait HttpServer {
   /** Gets header limit. */
   def headerLimit: Int
 
-  /** Tests whether server is secure. */
+  /**
+   * Tests whether server is secure.
+   *
+   * @return `true` if server uses SSL/TLS; `false` otherwise
+   */
   def isSecure: Boolean
 
   /** Closes server. */

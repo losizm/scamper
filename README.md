@@ -933,7 +933,7 @@ app.resources("/app/main", "assets")
 In the above configuration, requests prefixed with _/app/main_ are served
 resources from the _assets_ directory. The mapping works similiar to static
 files, only the resources are located using a class loader. _(See
-[ServerApplication.resources()](https://losizm.github.io/scamper/latest/api/scamper/server/package$$ServerApplication.html#resources(pathPrefix:String,baseName:String,loader:Option[ClassLoader]):ServerApplication.this.type)
+[ServerApplication.resources()](https://losizm.github.io/scamper/latest/api/scamper/server/ServerApplication.html#resources(mountPath:String,sourceDirectory:String,classLoader:ClassLoader):ServerApplication.this.type)
 in scaladoc for additional details.)_
 
 #### Aborting Response
@@ -1077,10 +1077,12 @@ printf("Host: %s%n", server.host)
 printf("Port: %d%n", server.port)
 printf("Secure: %s%n", server.isSecure)
 printf("Logger: %s%n", server.logger)
+printf("Backlog Size: %d%n", server.backlogSize)
 printf("Pool Size: %d%n", server.poolSize)
 printf("Queue Size: %d%n", server.queueSize)
 printf("Buffer Size: %d%n", server.bufferSize)
 printf("Read Timeout: %d%n", server.readTimeout)
+printf("Header Limit: %d%n", server.headerLimit)
 printf("Closed: %s%n", server.isClosed)
 ```
 

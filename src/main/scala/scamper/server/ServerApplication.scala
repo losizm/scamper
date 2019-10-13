@@ -41,7 +41,7 @@ import RequestMethod.Registry._
  * | bufferSize  | `8192` |
  * | readTimeout | `5000` |
  * | headerLimit | `100` |
- * | logger      | `ConsoleLogger` |
+ * | logger      | `scamper.logging.ConsoleLogger` |
  * | secure      | ''(Not configured)'' |
  * | error       | ''(Default error handler &ndash; sends `500 Internal Server Error`)'' |
  * | incoming    | ''(Not configured)'' |
@@ -111,7 +111,8 @@ class ServerApplication {
    * from and writing to socket.
    *
    * The `bufferSize` also determines the maximum length of any header line.
-   * Incoming requests that exceed this limit are sent '''431 Request Header Fields Too Large'''.
+   * Incoming requests containing a header that exceeds this limit are sent
+   * '''431 Request Header Fields Too Large'''.
    *
    * @param size buffer size (in bytes)
    *
@@ -144,7 +145,8 @@ class ServerApplication {
    * Sets header limit.
    *
    * The `headerLimit` specifies the maximum number of headers allowed. Incoming
-   * requests that exceed this limit are sent '''431 Request Header Fields Too Large'''.
+   * requests containing headers that exceed this limit are sent
+   * '''431 Request Header Fields Too Large'''.
    *
    * @param limit header limit
    *

@@ -42,7 +42,9 @@ package scamper
  * }
  *
  * // Add request handler to specific request method and path
- * app.get("/about") { req => Ok("This server is powered by Scamper.") }
+ * app.get("/about") { req =>
+ *   Ok("This server is powered by Scamper.")
+ * }
  *
  * // Add request handler using path parameter
  * app.put("/data/:id") { req =>
