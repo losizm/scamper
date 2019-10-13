@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicLong
 
 import scala.concurrent.{ ExecutionContext, ExecutionContextExecutorService }
 
-object ThreadPoolExecutorService {
+private object ThreadPoolExecutorService {
   def fixed(
     name: String,
     poolSize: Int,
