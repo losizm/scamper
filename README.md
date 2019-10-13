@@ -45,7 +45,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 To use **Scamper**, start by adding it as a dependency to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "10.0.7"
+libraryDependencies += "com.github.losizm" %% "scamper" % "10.1.0"
 ```
 
 ## HTTP Messages
@@ -716,26 +716,33 @@ app.logger(new File("/tmp/server.log"))
 And there are peformance-related settings that can be tweaked as well.
 
 ```scala
+app.backlogSize(50)
 app.poolSize(10)
 app.queueSize(25)
-app.bufferSize(4096)
+app.bufferSize(8192)
 app.readTimeout(3000)
+app.headerLimit(100)
 ```
 
-The **poolSize** specifies the maximum number of requests processed
-concurrently, and **queueSize** specifies the maximum number of requests
-permitted to wait for processing.
+The **backlogSize** specifies the maximum number of incoming connections that
+can wait before being accepted. Incoming connections that exceed this limit are
+refused.
 
-Note **queueSize** is also used to configure server backlog (i.e., backlog of
-incoming connections), so technically there can be up to double **queueSize**
-waiting to be processed if both request queue and server backlog are filled
-&mdash; _incoming requests that would exceed this limit are discarded_.
+The **poolSize** specifies the maximum number of requests processed
+concurrently.
+
+The **queueSize** specifies the maximum number of requests permitted to wait for
+processing. Incoming requests that exceed this limit are sent **503 Service
+Unavailable**.
 
 The **bufferSize** is the length in bytes of the buffer used when reading from
 and writing to a socket.
 
 The **readTimeout** controls how long a read from a socket blocks before it
 times out, whereafter **408 Request Timeout** is sent to client.
+
+The **headerLimit** sets the maximum number of request headers allowed. Incoming
+requests that exceed this limit are sent **431 Request Header Fields Too Large**.
 
 ### Request Handlers
 
