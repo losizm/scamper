@@ -15,16 +15,18 @@
  */
 package scamper.server
 
+import java.io.File
 import java.net.Socket
 
 import scala.util.Try
 
-import scamper.{ Auxiliary, ContentEncoder, HttpException, HttpMessage, HttpRequest, HttpResponse, StatusLine }
+import scamper.{ Auxiliary, ContentEncoder, Entity, HttpException, HttpMessage, HttpRequest, HttpResponse, StatusLine }
 import scamper.ResponseStatus.Registry.Continue
-import scamper.headers.Expect
+import scamper.headers.{ ContentDisposition, ContentLength, ContentType, Expect }
 import scamper.logging.{ Logger, NullLogger }
+import scamper.types.{ DispositionType, MediaType }
 
-import Auxiliary.SocketType
+import Auxiliary.{ SocketType, StringType }
 
 /** Includes server-side type classes. */
 object Implicits {
@@ -93,5 +95,42 @@ object Implicits {
      */
     def withDeflateContentEncoding(bufferSize: Int = 8192): HttpResponse =
       ContentEncoder.deflate(res, bufferSize)(Auxiliary.executor)
+
+    /**
+     * Creates new response with supplied file as attachment.
+     *
+     * The Content-Type, Content-Length, and Content-Disposition headers are set
+     * accordingly.
+     *
+     * @param file attachment
+     */
+    def withAttachment(file: File): HttpResponse =
+      createWithContentDisposition("attachment", file)
+
+    /**
+     * Creates new response with supplied file as inline content.
+     *
+     * The Content-Type, Content-Length, and Content-Disposition headers are set
+     * accordingly.
+     *
+     * @param file inline content
+     */
+    def withInline(file: File): HttpResponse =
+      createWithContentDisposition("inline", file)
+
+    private def createWithContentDisposition(typeName: String, file: File): HttpResponse = {
+      val entity = Entity.fromFile(file)
+      val mediaType = MediaType.fromFile(file).getOrElse(Auxiliary.`application/octet-stream`)
+      val disposition = DispositionType(
+        typeName,
+        "filename" -> file.getName(),
+        "filename*" -> s"utf-8''${file.getName().toUrlEncoded("utf-8")}"
+      )
+
+      res.withBody(entity)
+        .withContentType(mediaType)
+        .withContentLength(entity.getLength.get)
+        .withContentDisposition(disposition)
+    }
   }
 }
