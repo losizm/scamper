@@ -41,8 +41,9 @@ private object DefaultHttpServer {
   case class Application(
     poolSize: Int = Runtime.getRuntime.availableProcessors(),
     queueSize: Int = Runtime.getRuntime.availableProcessors() * 4,
+    backlogSize: Int = 50,
     bufferSize: Int = 8192,
-    headerSize: Int = getIntProperty("scamper.server.headerSize", 1024),
+    headerLimit: Int = 100,
     readTimeout: Int = 5000,
     logger: Logger = ConsoleLogger,
     requestHandlers: Seq[RequestHandler] = Nil,
@@ -58,8 +59,9 @@ private object DefaultHttpServer {
 private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Application)(val host: InetAddress, val port: Int) extends HttpServer {
   val poolSize = app.poolSize.max(1)
   val queueSize = app.queueSize.max(0)
+  val backlogSize = app.backlogSize.max(1)
   val bufferSize = app.bufferSize.max(1024)
-  val headerSize = app.headerSize.max(1024)
+  val headerLimit = app.headerLimit.max(10)
   val readTimeout = app.readTimeout.max(0)
   val logger = if (app.logger == null) NullLogger else app.logger
 
@@ -116,10 +118,12 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
     logger.info(s"$authority - Logger: $logger")
     logger.info(s"$authority - Pool Size: $poolSize")
     logger.info(s"$authority - Queue Size: $queueSize")
+    logger.info(s"$authority - Backlog Size: $backlogSize")
     logger.info(s"$authority - Buffer Size: $bufferSize")
+    logger.info(s"$authority - Header Limit: $headerLimit")
     logger.info(s"$authority - Read Timeout: $readTimeout")
 
-    serverSocket.bind(new InetSocketAddress(host, port), poolSize + queueSize * 2)
+    serverSocket.bind(new InetSocketAddress(host, port), backlogSize)
     Service.start()
 
     logger.info(s"$authority - Server is up and running")
@@ -252,7 +256,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
 
     private def readHeaders(buffer: Array[Byte])(implicit socket: Socket): Seq[Header] = {
       val headers = new ArrayBuffer[Header]
-      val readLimit = headerSize * bufferSize
+      val readLimit = headerLimit * bufferSize
       var readSize = 0
       var line = ""
 
@@ -267,7 +271,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
                 val last = headers.last
                 headers.update(headers.size - 1, Header(last.name, last.value + " " + line.trim()))
               case false =>
-                if (headers.size < headerSize)
+                if (headers.size < headerLimit)
                   headers += Header.parse(line)
                 else
                   throw ReadError(RequestHeaderFieldsTooLarge)
