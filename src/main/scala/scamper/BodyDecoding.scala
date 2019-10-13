@@ -89,3 +89,12 @@ trait BodyDecoding {
   private def getContentLength(message: HttpMessage): Long =
     message.getContentLength.orElse(message.body.getLength).getOrElse(0)
 }
+
+/** Provides factory for `BodyDecoding`. */
+object BodyDecoding {
+  /** Creates instance of `BodyDecoding` that enforces specified max length. */
+  def apply(maxLength: Long): BodyDecoding =
+    maxLength match {
+      case length => new BodyDecoding { val maxLength = length }
+    }
+}
