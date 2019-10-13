@@ -35,6 +35,9 @@ trait HttpServer {
   /** Gets logger. */
   def logger: Logger
 
+  /** Gets backlog size. */
+  def backlogSize: Int
+
   /** Gets pool size. */
   def poolSize: Int
 
@@ -46,6 +49,9 @@ trait HttpServer {
 
   /** Gets read timeout. */
   def readTimeout: Int
+
+  /** Gets header limit. */
+  def headerLimit: Int
 
   /** Tests whether server is secure. */
   def isSecure: Boolean
