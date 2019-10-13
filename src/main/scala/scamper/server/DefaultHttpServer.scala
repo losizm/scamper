@@ -29,7 +29,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
 import scamper._
-import scamper.Auxiliary.{ SocketType, getIntProperty }
+import scamper.Auxiliary.SocketType
 import scamper.ResponseStatus.Registry._
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, RetryAfter, TransferEncoding }
 import scamper.logging.{ ConsoleLogger, Logger, NullLogger }
@@ -344,9 +344,9 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
         }
 
     private def addAttributes(req: HttpRequest, id: String)(implicit socket: Socket): HttpRequest =
-      req.withAttributes("scamper.server.message.socket" -> socket, "scamper.server.message.correlate" -> id)
+      req.withAttributes("scamper.server.message.socket" -> socket, "scamper.server.message.correlate" -> id, "scamper.server.message.logger" -> logger)
 
     private def addAttributes(res: HttpResponse, id: String)(implicit socket: Socket): HttpResponse =
-      res.withAttributes("scamper.server.message.socket" -> socket, "scamper.server.message.correlate" -> id)
+      res.withAttributes("scamper.server.message.socket" -> socket, "scamper.server.message.correlate" -> id, "scamper.server.message.logger" -> logger)
   }
 }

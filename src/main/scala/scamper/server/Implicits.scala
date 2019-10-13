@@ -22,6 +22,7 @@ import scala.util.Try
 import scamper.{ Auxiliary, ContentEncoder, HttpException, HttpMessage, HttpRequest, HttpResponse, StatusLine }
 import scamper.ResponseStatus.Registry.Continue
 import scamper.headers.Expect
+import scamper.logging.{ Logger, NullLogger }
 
 import Auxiliary.SocketType
 
@@ -37,8 +38,15 @@ object Implicits {
      */
     def correlate(): String = msg.getAttributeOrElse("scamper.server.message.correlate", "")
 
-    /** Gets socket associated with message.  */
+    /** Gets socket associated with message. */
     def socket(): Socket = msg.getAttributeOrElse("scamper.server.message.socket", throw new HttpException("Socket not available"))
+
+    /**
+     * Gets logger associated with message &ndash; i.e., the server logger.
+     *
+     * @see [[HttpServer.logger]]
+     */
+    def logger(): Logger = msg.getAttributeOrElse("scamper.server.message.logger", NullLogger)
   }
 
   /** Adds server-side extension methods to `HttpRequest`. */
@@ -48,7 +56,7 @@ object Implicits {
       new TargetedRequestParameters(req.getAttributeOrElse("scamper.server.request.parameters", Map.empty[String, String]))
 
     /**
-     * Send interim `100 Continue` response if request includes `Expect` header
+     * Sends interim `100 Continue` response if request includes `Expect` header
      * with `100-Continue`.
      *
      * @return `true` if response was sent; `false` otherwise
