@@ -23,34 +23,25 @@ import types.{ ContentCoding, TransferCoding }
 
 /** A mixin providing access to decoded message body. */
 trait BodyDecoding {
-  /**
-   * Gets maximum body length.
-   *
-   * The input stream obtained from `decode` throws [[ReadLimitExceeded]] if an
-   * attempt is made to read beyond `maxLength` from message body.
-   */
+  /** Gets maximum length of message body. */
   def maxLength: Long
 
   /**
-   * Provides input stream to decoded message body.
-   *
-   * The decoded input stream is passed to supplied function.
+   * Gets input stream to decoded message body.
    *
    * @param message HTTP message
-   * @param f stream handler
    *
-   * @return value from applied handler
-   * @note Input stream throws [[ReadLimitExceeded]] if attempt is made to read
-   *   beyond `maxLength` from message body.
+   * @note The decoded input stream throws [[ReadLimitExceeded]] if it attempts
+   *   to read beyond `maxLength` of message body.
    */
-  def decode[T](message: HttpMessage)(f: InputStream => T): T =
+  def decode(message: HttpMessage): InputStream =
     if (message.body.isKnownEmpty)
-      f(EmptyInputStream)
+      EmptyInputStream
     else
       message match {
-        case res: HttpResponse if res.status.isInformational => f(EmptyInputStream)
-        case res: HttpResponse if res.status.code == 204     => f(EmptyInputStream)
-        case res: HttpResponse if res.status.code == 304     => f(EmptyInputStream)
+        case res: HttpResponse if res.status.isInformational => EmptyInputStream
+        case res: HttpResponse if res.status.code == 204     => EmptyInputStream
+        case res: HttpResponse if res.status.code == 304     => EmptyInputStream
         case _ =>
           message.body.withInputStream { in =>
             val transferIn = message.transferEncoding match {
@@ -58,11 +49,24 @@ trait BodyDecoding {
               case encoding => transferInputStream(new BoundedInputStream(in, maxLength, Long.MaxValue), encoding)
             }
 
-            val contentIn = contentInputStream(transferIn, message.contentEncoding)
-
-            f(contentIn)
+            contentInputStream(transferIn, message.contentEncoding)
           }
       }
+
+  /**
+   * Gets input stream to decoded message body and passes it to supplied
+   * function.
+   *
+   * @param message HTTP message
+   * @param f function
+   *
+   * @return value from applied function
+   *
+   * @note The decoded input stream throws [[ReadLimitExceeded]] if it attempts
+   *   to read beyond `maxLength` of message body.
+   */
+  def withDecoded[T](message: HttpMessage)(f: InputStream => T): T =
+    f { decode(message) }
 
   private def transferInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
     encoding.takeRight(6).foldRight(in) { (encoding, in) =>

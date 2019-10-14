@@ -105,7 +105,7 @@ object BodyParsers {
 
 private class ByteArrayBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[Array[Byte]] with BodyDecoding {
   def parse(message: HttpMessage): Array[Byte] =
-    decode(message) { in =>
+    withDecoded(message) { in =>
       val out = new ArrayBuffer[Byte](bufferSize)
       val buf = new Array[Byte](bufferSize)
       var len = 0
@@ -148,7 +148,7 @@ private class FormBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser
 
 private class FileBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[File] with BodyDecoding {
   def parse(message: HttpMessage): File =
-    decode(message) { in =>
+    withDecoded(message) { in =>
       val destFile = getDestFile()
 
       destFile.withOutputStream { out =>
@@ -184,7 +184,7 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
     message.contentType match {
       case MediaType("multipart", "form-data", params) =>
         params.get("boundary")
-          .map { boundary => decode(message) { in => getMultipart(in, boundary) } }
+          .map { boundary => getMultipart(decode(message), boundary) }
           .getOrElse(throw new HttpException("Missing boundary in Content-Type header"))
 
       case value => throw new HttpException(s"Content-Type is not multipart/form-data: $value")
