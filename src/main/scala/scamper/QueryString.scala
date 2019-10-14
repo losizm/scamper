@@ -67,6 +67,43 @@ trait QueryString {
   /** Tests whether query string is empty. */
   def isEmpty: Boolean
 
+  /**
+   * Adds supplied values to parameter with given name.
+   *
+   * If the parameter with given name already exists, the newly supplied values
+   * are appended to the existing values.
+   *
+   * If the parameter does not exist, it is added with the supplied values.
+   *
+   * @param name parameter name
+   *
+   * @return new query string
+   */
+  def add(name: String, values: String*): QueryString
+
+  /**
+   * Updates parameter with given name to supplied values.
+   *
+   * If the parameter with given name already exists, its values are replaced
+   * with the newly supplied values.
+   *
+   * If the parameter does not exist, it is added with the supplied values.
+   *
+   * @param name parameter name
+   *
+   * @return new query string
+   */
+  def update(name: String, values: String*): QueryString
+
+  /**
+   * Removes parameter with given name.
+   *
+   * @param name parameter name
+   *
+   * @return new query string
+   */
+  def remove(name: String): QueryString
+
   /** Gets query string as `Seq` of name-value pairs. */
   def toSeq: Seq[(String, String)]
 
@@ -143,6 +180,9 @@ private object EmptyQueryString extends QueryString {
   val toSeq = Nil
   val toMap = Map.empty
   val toSimpleMap = Map.empty
+  def add(name: String, values: String*) = SeqQueryString(values.map { value => name -> value })
+  def update(name: String, values: String*) = SeqQueryString(values.map { value => name -> value })
+  def remove(name: String) = this
   override val toString = ""
 }
 
@@ -152,6 +192,16 @@ private case class MapQueryString(toMap: Map[String, Seq[String]]) extends Query
   def getValues(name: String) = toMap.get(name).getOrElse(Nil)
   def contains(name: String) = toMap.contains(name)
   def isEmpty = toMap.isEmpty
+
+  def add(name: String, values: String*) =
+    MapQueryString(toMap + { name -> (getValues(name) ++ values) })
+
+  def update(name: String, values: String*) =
+    MapQueryString(toMap + { name -> values })
+
+  def remove(name: String) =
+    MapQueryString(toMap - name)
+
   lazy val toSeq = toMap.toSeq.flatMap { case (name, values) => values.map(value => name -> value) }
   lazy val toSimpleMap = toMap.collect { case (name, Seq(value, _*)) => name -> value }.toMap
   override lazy val toString = QueryString.format(toMap)
@@ -163,6 +213,16 @@ private case class SeqQueryString(toSeq: Seq[(String, String)]) extends QueryStr
   def getValues(name: String) = toSeq.collect { case (`name`, value) => value }
   def contains(name: String) = toSeq.exists(_._1 == name)
   def isEmpty = toSeq.isEmpty
+
+  def add(name: String, values: String*) =
+    SeqQueryString(toSeq ++ values.map { value => name -> value })
+
+  def update(name: String, values: String*) =
+    SeqQueryString(toSeq.filterNot(_._1 == name) ++ values.map { value => name -> value })
+
+  def remove(name: String) =
+    SeqQueryString(toSeq.filterNot(_._1 == name))
+
   lazy val toMap = toSeq.groupBy(_._1).collect { case (name, params) => name -> params.map(_._2) }.toMap
   lazy val toSimpleMap = toSeq.groupBy(_._1).collect { case (name, params) => name -> params.head._2 }.toMap
   override lazy val toString = QueryString.format(toSeq)

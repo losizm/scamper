@@ -18,7 +18,7 @@ package scamper
 import org.scalatest.FlatSpec
 
 class QueryStringSpec extends FlatSpec {
-  "QueryString" should "be created from map" in {
+  it should "create QueryString from map" in {
     val query = QueryString(Map("id" -> Seq("0"), "name" -> Seq("root"), "groups" -> Seq("wheel", "admin")))
 
     assert(query.contains("id"))
@@ -39,6 +39,30 @@ class QueryStringSpec extends FlatSpec {
     assert(!query.isEmpty)
     assert(!query.contains("idx"))
 
+    val added = query.add("name", "superuser", "admin").add("description", "user information")
+    assert(added.contains("id"))
+    assert(added.contains("name"))
+    assert(added("name") == "root")
+    assert(added.getValues("name") == Seq("root", "superuser", "admin"))
+    assert(added.contains("groups"))
+    assert(added.contains("description"))
+    assert(added.getValues("description") == Seq("user information"))
+
+    val updated = query.update("name", "superuser", "admin").update("description", "user information")
+    assert(updated.contains("id"))
+    assert(updated.contains("name"))
+    assert(updated("name") == "superuser")
+    assert(updated.getValues("name") == Seq("superuser", "admin"))
+    assert(updated.contains("groups"))
+    assert(updated.contains("description"))
+    assert(updated.getValues("description") == Seq("user information"))
+
+    val removed = query.remove("name").remove("description")
+    assert(removed.contains("id"))
+    assert(!removed.contains("name"))
+    assert(removed.contains("groups"))
+    assert(!removed.contains("description"))
+
     val toMap = query.toMap
     assert(toMap("id") == Seq("0"))
     assert(toMap("name") == Seq("root"))
@@ -54,7 +78,7 @@ class QueryStringSpec extends FlatSpec {
     assert(empty.toString == "")
   }
 
-  it should "be created from name/value pairs" in {
+  it should "create QueryString from sequence of name-value pairs" in {
     val query = QueryString("id" -> "0", "name" -> "root", "groups" -> "wheel", "groups" -> "admin")
 
     assert(query.contains("id"))
@@ -75,6 +99,30 @@ class QueryStringSpec extends FlatSpec {
     assert(!query.isEmpty)
     assert(!query.contains("idx"))
 
+    val added = query.add("name", "superuser", "admin").add("description", "user information")
+    assert(added.contains("id"))
+    assert(added.contains("name"))
+    assert(added("name") == "root")
+    assert(added.getValues("name") == Seq("root", "superuser", "admin"))
+    assert(added.contains("groups"))
+    assert(added.contains("description"))
+    assert(added.getValues("description") == Seq("user information"))
+
+    val updated = query.update("name", "superuser", "admin").update("description", "user information")
+    assert(updated.contains("id"))
+    assert(updated.contains("name"))
+    assert(updated("name") == "superuser")
+    assert(updated.getValues("name") == Seq("superuser", "admin"))
+    assert(updated.contains("groups"))
+    assert(updated.contains("description"))
+    assert(updated.getValues("description") == Seq("user information"))
+
+    val removed = query.remove("name").remove("description")
+    assert(removed.contains("id"))
+    assert(!removed.contains("name"))
+    assert(removed.contains("groups"))
+    assert(!removed.contains("description"))
+
     val toMap = query.toMap
     assert(toMap("id") == Seq("0"))
     assert(toMap("name") == Seq("root"))
@@ -90,7 +138,7 @@ class QueryStringSpec extends FlatSpec {
     assert(empty.toString == "")
   }
 
-  it should "be created from formatted query string" in {
+  it should "create QueryString formatted query string" in {
     val query = QueryString("id=0&name=root&groups=wheel&groups=admin")
 
     assert(query.contains("id"))
@@ -111,6 +159,30 @@ class QueryStringSpec extends FlatSpec {
     assert(!query.isEmpty)
     assert(!query.contains("idx"))
 
+    val added = query.add("name", "superuser", "admin").add("description", "user information")
+    assert(added.contains("id"))
+    assert(added.contains("name"))
+    assert(added("name") == "root")
+    assert(added.getValues("name") == Seq("root", "superuser", "admin"))
+    assert(added.contains("groups"))
+    assert(added.contains("description"))
+    assert(added.getValues("description") == Seq("user information"))
+
+    val updated = query.update("name", "superuser", "admin").update("description", "user information")
+    assert(updated.contains("id"))
+    assert(updated.contains("name"))
+    assert(updated("name") == "superuser")
+    assert(updated.getValues("name") == Seq("superuser", "admin"))
+    assert(updated.contains("groups"))
+    assert(updated.contains("description"))
+    assert(updated.getValues("description") == Seq("user information"))
+
+    val removed = query.remove("name").remove("description")
+    assert(removed.contains("id"))
+    assert(!removed.contains("name"))
+    assert(removed.contains("groups"))
+    assert(!removed.contains("description"))
+
     val toMap = query.toMap
     assert(toMap("id") == Seq("0"))
     assert(toMap("name") == Seq("root"))
@@ -124,6 +196,26 @@ class QueryStringSpec extends FlatSpec {
     val empty = QueryString()
     assert(empty.isEmpty)
     assert(empty.toString == "")
+  }
+
+  it should "create empty QueryString" in {
+    val query = QueryString.empty
+
+    val added = query.add("name", "superuser", "admin")
+    assert(added.contains("name"))
+    assert(added("name") == "superuser")
+    assert(added.getValues("name") == Seq("superuser", "admin"))
+
+    val updated = query.update("name", "superuser", "admin")
+    assert(updated("name") == "superuser")
+    assert(updated.getValues("name") == Seq("superuser", "admin"))
+
+    val removed = query.remove("name")
+    assert(!removed.contains("name"))
+
+    assert(query.toSeq.isEmpty)
+    assert(query.toMap.isEmpty)
+    assert(query.toSimpleMap.isEmpty)
   }
 
   it should "throw NoSuchElementException if parameter not present" in {
