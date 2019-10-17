@@ -41,6 +41,9 @@ object Implicits {
   /** Converts string to [[EntityTag]]. */
   implicit val stringToEntityTag = (tag: String) => EntityTag.parse(tag)
 
+  /** Converts string to [[KeepAliveParameters]]. */
+  implicit val stringToKeepAliveParameters = (params: String) => KeepAliveParameters.parse(params)
+
   /** Converts string to [[LanguageTag]]. */
   implicit val stringToLanguageTag = (tag: String) => LanguageTag.parse(tag)
 

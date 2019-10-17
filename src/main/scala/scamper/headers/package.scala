@@ -805,6 +805,32 @@ package object headers {
     def removeIfUnmodifiedSince(): HttpRequest = request.removeHeaders("If-Unmodified-Since")
   }
 
+  /** Provides standardized access to Keep-Alive header. */
+  implicit class KeepAlive[T <: HttpMessage](private val message: T) extends AnyVal {
+    /**
+     * Gets Keep-Alive header value.
+     *
+     * @throws HeaderNotFound if Keep-Alive is not present
+     */
+    def keepAlive: KeepAliveParameters =
+      getKeepAlive.getOrElse(throw HeaderNotFound("Keep-Alive"))
+
+    /** Gets Keep-Alive header value if present. */
+    def getKeepAlive: Option[KeepAliveParameters] =
+      message.getHeaderValue("Keep-Alive").map(KeepAliveParameters.parse)
+
+    /** Tests whether Keep-Alive header is present. */
+    def hasKeepAlive: Boolean = message.hasHeader("Keep-Alive")
+
+    /** Creates new message setting Keep-Alive header to supplied value. */
+    def withKeepAlive(value: KeepAliveParameters)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.withHeader(Header("Keep-Alive", value.toString))
+
+    /** Creates new message removing Keep-Alive header. */
+    def removeKeepAlive()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Keep-Alive")
+  }
+
   /** Provides standardized access to Last-Modified header. */
   implicit class LastModified(private val response: HttpResponse) extends AnyVal {
     /**
