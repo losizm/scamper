@@ -26,8 +26,8 @@ import RequestMethod.Registry._
  * Configures and creates `HttpServer`.
  *
  * `ServerApplication` is a mutable structure. With each applied change, the
- * application is modified and returned. Changes applied after creating a
- * server are not effected in the server.
+ * application is modified and returned. After the desired settings are applied,
+ * the server is created using one of several factory methods.
  *
  * @constructor Creates default server application.
  *
@@ -35,17 +35,17 @@ import RequestMethod.Registry._
  *
  * | Key         | Value |
  * | ---------   | ----- |
+ * | logger      | `scamper.logging.ConsoleLogger` |
  * | backlogSize | `50` |
  * | poolSize    | `Runtime.getRuntime().availableProcessors()` |
  * | queueSize   | `Runtime.getRuntime().availableProcessors() * 4` |
  * | bufferSize  | `8192` |
  * | readTimeout | `5000` |
  * | headerLimit | `100` |
- * | logger      | `scamper.logging.ConsoleLogger` |
  * | secure      | ''(Not configured)'' |
- * | error       | ''(Default error handler &ndash; sends `500 Internal Server Error`)'' |
  * | incoming    | ''(Not configured)'' |
  * | outgoing    | ''(Not configured)'' |
+ * | error       | ''(Sends `500 Internal Server Error`)'' |
  * <br>
  */
 class ServerApplication {
@@ -54,6 +54,32 @@ class ServerApplication {
   /** Resets application to default configuration. */
   def reset(): this.type = synchronized {
     app = DefaultHttpServer.Application()
+    this
+  }
+
+  /**
+   * Sets logger to given file.
+   *
+   * @param file file to which server logs are written
+   *
+   * @return this application
+   *
+   * @note If file exists, it is opened in append mode.
+   */
+  def logger(file: File): this.type = synchronized {
+    app = app.copy(logger = LogWriter(file, true))
+    this
+  }
+
+  /**
+   * Sets logger.
+   *
+   * @param logger logger to which server logs are written
+   *
+   * @return this application
+   */
+  def logger(logger: Logger): this.type = synchronized {
+    app = app.copy(logger = logger)
     this
   }
 
@@ -158,32 +184,6 @@ class ServerApplication {
   }
 
   /**
-   * Sets logger to given file.
-   *
-   * @param file file to which server logs are written
-   *
-   * @return this application
-   *
-   * @note If file exists, it is opened in append mode.
-   */
-  def logger(file: File): this.type = synchronized {
-    app = app.copy(logger = LogWriter(file, true))
-    this
-  }
-
-  /**
-   * Sets logger.
-   *
-   * @param logger logger to which server logs are written
-   *
-   * @return this application
-   */
-  def logger(logger: Logger): this.type = synchronized {
-    app = app.copy(logger = logger)
-    this
-  }
-
-  /**
    * Sets key store to be used for SSL/TLS.
    *
    * @param keyStore server key store
@@ -223,18 +223,6 @@ class ServerApplication {
    */
   def secure(key: File, certificate: File): this.type = synchronized {
     app = app.copy(factory = SecureServerSocketFactory.create(key, certificate))
-    this
-  }
-
-  /**
-   * Sets error handler.
-   *
-   * @param handler error handler
-   *
-   * @return this application
-   */
-  def error(handler: ErrorHandler): this.type = {
-    app = app.copy(errorHandler = Option(handler))
     this
   }
 
@@ -299,6 +287,21 @@ class ServerApplication {
   }
 
   /**
+   * Adds supplied handler for HEAD requests to given path.
+   *
+   * The handler is appended to existing request handler chain.
+   *
+   * @param path request path
+   * @param handler request handler
+   *
+   * @return this application
+   */
+  def head(path: String)(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(HEAD)))
+    this
+  }
+
+  /**
    * Adds supplied handler for POST requests to given path.
    *
    * The handler is appended to existing request handler chain.
@@ -355,21 +358,6 @@ class ServerApplication {
    */
   def delete(path: String)(handler: RequestHandler): this.type = synchronized {
     app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(DELETE)))
-    this
-  }
-
-  /**
-   * Adds supplied handler for HEAD requests to given path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path request path
-   * @param handler request handler
-   *
-   * @return this application
-   */
-  def head(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(HEAD)))
     this
   }
 
@@ -509,6 +497,18 @@ class ServerApplication {
   }
 
   /**
+   * Sets error handler.
+   *
+   * @param handler error handler
+   *
+   * @return this application
+   */
+  def error(handler: ErrorHandler): this.type = {
+    app = app.copy(errorHandler = Option(handler))
+    this
+  }
+
+  /**
    * Creates `HttpServer` at given port.
    *
    * @param port port number
@@ -540,7 +540,7 @@ class ServerApplication {
    * @return new server
    */
   def create(host: InetAddress, port: Int): HttpServer = synchronized {
-    DefaultHttpServer(app, host, port)
+    DefaultHttpServer(host, port)(app)
   }
 }
 
@@ -549,4 +549,3 @@ object ServerApplication {
   /** Creates default `ServerApplication`. */
   def apply(): ServerApplication = new ServerApplication()
 }
-

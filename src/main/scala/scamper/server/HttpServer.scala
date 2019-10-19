@@ -26,12 +26,6 @@ import scamper.logging.Logger
  * @see [[HttpServer$ HttpServer]], [[ServerApplication]]
  */
 trait HttpServer {
-  /** Gets host address. */
-  def host: InetAddress
-
-  /** Gets port number. */
-  def port: Int
-
   /** Gets logger. */
   def logger: Logger
 
@@ -53,6 +47,12 @@ trait HttpServer {
   /** Gets header limit. */
   def headerLimit: Int
 
+  /** Gets host address. */
+  def host: InetAddress
+
+  /** Gets port number. */
+  def port: Int
+
   /**
    * Tests whether server is secure.
    *
@@ -60,15 +60,15 @@ trait HttpServer {
    */
   def isSecure: Boolean
 
-  /** Closes server. */
-  def close(): Unit
-
   /**
    * Tests whether server is closed.
    *
    * @return `true` if server is closed; `false` otherwise
    */
   def isClosed: Boolean
+
+  /** Closes server. */
+  def close(): Unit
 }
 
 /** Provides factory methods for creating `HttpServer`. */

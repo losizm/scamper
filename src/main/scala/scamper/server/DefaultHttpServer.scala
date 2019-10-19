@@ -39,46 +39,47 @@ private object DefaultHttpServer {
   private val count = new AtomicLong(0)
 
   case class Application(
+    logger: Logger = ConsoleLogger,
     backlogSize: Int = 50,
     poolSize: Int = Runtime.getRuntime.availableProcessors(),
     queueSize: Int = Runtime.getRuntime.availableProcessors() * 4,
     bufferSize: Int = 8192,
     readTimeout: Int = 5000,
     headerLimit: Int = 100,
-    logger: Logger = ConsoleLogger,
     requestHandlers: Seq[RequestHandler] = Nil,
     responseFilters: Seq[ResponseFilter] = Nil,
     errorHandler: Option[ErrorHandler] = None,
     factory: ServerSocketFactory = ServerSocketFactory.getDefault()
   )
 
-  def apply(app: Application, host: InetAddress, port: Int) =
-    new DefaultHttpServer(count.incrementAndGet(), app)(host, port)
+  def apply(host: InetAddress, port: Int)(implicit app: Application) =
+    new DefaultHttpServer(count.incrementAndGet(), host, port)
 }
 
-private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Application)(val host: InetAddress, val port: Int) extends HttpServer {
+private class DefaultHttpServer private (val id: Long, val host: InetAddress, val port: Int)(implicit app: DefaultHttpServer.Application) extends HttpServer {
+  val logger = if (app.logger == null) NullLogger else app.logger
   val backlogSize = app.backlogSize.max(1)
   val poolSize = app.poolSize.max(1)
   val queueSize = app.queueSize.max(0)
   val bufferSize = app.bufferSize.max(1024)
-  val readTimeout = app.readTimeout.max(0)
+  val readTimeout = app.readTimeout.max(100)
   val headerLimit = app.headerLimit.max(10)
-  val logger = if (app.logger == null) NullLogger else app.logger
 
   private val authority = s"${host.getCanonicalHostName}:$port"
-  private val threadGroup = new ThreadGroup(s"scamper-server-$id")
   private val requestHandler = RequestHandler.coalesce(app.requestHandlers : _*)
   private val responseFilter = ResponseFilter.chain(app.responseFilters : _*)
   private val errorHandler = app.errorHandler.getOrElse(new ErrorHandler {
     def apply(err: Throwable, req: HttpRequest): HttpResponse = {
-      val id = req.getAttribute[String]("scamper.server.message.correlate").getOrElse("<unknown>")
-      logger.error(s"$authority - Error while handling request for $id", err)
+      val correlate = req.getAttribute[String]("scamper.server.message.correlate").getOrElse("<unknown>")
+      logger.error(s"$authority - Error while handling request for $correlate", err)
       InternalServerError()
     }
   })
   private val serverSocket = app.factory.createServerSocket()
   private val chunked = TransferCoding("chunked")
   private var closed = false
+
+  private val threadGroup = new ThreadGroup(s"scamper-server-$id")
 
   private val serviceContext = ThreadPoolExecutorService.fixed(s"scamper-server-$id-service", poolSize, queueSize, Some(threadGroup)) { (_, _) =>
     throw new RejectedExecutionException(s"Rejected scamper-server-$id-service task")
@@ -197,9 +198,9 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
           socket.setSoTimeout(readTimeout)
 
           Try(read())
-            .map(req => addAttributes(req, correlate))
+            .map(req => addAttributes(req, socket, correlate))
             .fold(err => Try(onReadError(err)), req => Try(handle(req)).recover { case err => onHandleError(req)(err) })
-            .map(res => addAttributes(res, correlate))
+            .map(res => addAttributes(res, socket, correlate))
             .map(onHandleResponse)
             .get
         } catch {
@@ -215,7 +216,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
         case Failure(err) =>
           if (err.isInstanceOf[RejectedExecutionException]) {
             logger.warn(s"$authority - Request overflow while servicing request from $tag")
-            Try(addAttributes(ServiceUnavailable().withRetryAfter(Instant.now plusSeconds 300), correlate))
+            Try(addAttributes(ServiceUnavailable().withRetryAfter(Instant.now plusSeconds 300), socket, correlate))
               .map(onHandleResponse)
           }
           logger.info(s"$authority - Closing connection to $tag")
@@ -329,7 +330,7 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
       }
 
     private def filter(res: HttpResponse): HttpResponse =
-      responseFilter(prepare(res).withDate(Instant.now).withConnection("close"))
+      responseFilter { prepare(res).withDate(Instant.now).withConnection("close") }
 
     private def prepare(res: HttpResponse): HttpResponse =
       if (res.hasTransferEncoding)
@@ -343,10 +344,18 @@ private class DefaultHttpServer private (id: Long, app: DefaultHttpServer.Applic
           case None    => res.withTransferEncoding(chunked)
         }
 
-    private def addAttributes(req: HttpRequest, id: String)(implicit socket: Socket): HttpRequest =
-      req.withAttributes("scamper.server.message.socket" -> socket, "scamper.server.message.correlate" -> id, "scamper.server.message.logger" -> logger)
+    private def addAttributes(req: HttpRequest, socket: Socket, correlate: String): HttpRequest =
+      req.withAttributes(
+        "scamper.server.message.socket"    -> socket,
+        "scamper.server.message.correlate" -> correlate,
+        "scamper.server.message.logger"    -> logger
+      )
 
-    private def addAttributes(res: HttpResponse, id: String)(implicit socket: Socket): HttpResponse =
-      res.withAttributes("scamper.server.message.socket" -> socket, "scamper.server.message.correlate" -> id, "scamper.server.message.logger" -> logger)
+    private def addAttributes(res: HttpResponse, socket: Socket, correlate: String): HttpResponse =
+      res.withAttributes(
+        "scamper.server.message.socket"    -> socket,
+        "scamper.server.message.correlate" -> correlate,
+        "scamper.server.message.logger"    -> logger
+      )
   }
 }
