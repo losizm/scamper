@@ -55,9 +55,13 @@ private object DefaultHttpServer {
 
   def apply(host: InetAddress, port: Int)(implicit app: Application) =
     new DefaultHttpServer(count.incrementAndGet(), host, port)
+
+  case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
 }
 
-private class DefaultHttpServer private (val id: Long, val host: InetAddress, val port: Int)(implicit app: DefaultHttpServer.Application) extends HttpServer {
+import DefaultHttpServer.{ Application, ReadError }
+
+private class DefaultHttpServer private (val id: Long, val host: InetAddress, val port: Int)(implicit app: Application) extends HttpServer {
   val logger = if (app.logger == null) NullLogger else app.logger
   val backlogSize = app.backlogSize.max(1)
   val poolSize = app.poolSize.max(1)
@@ -144,22 +148,50 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
       throw e
   }
 
-  private case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
+  private object ConnectionManager {
+    private val keepAliveEnabled = keepAlive.isDefined
+    private val keepAliveMax = keepAlive.map(_.max).getOrElse(1)
+    private val keepAliveTimeout = keepAlive.map(_.timeout).getOrElse(0)
+    private val keepAliveHeader = Header("Keep-Alive", s"timeout=$keepAliveTimeout, max=$keepAliveMax")
+    private val connectionKeepAlive = Header("Connection", "keep-alive")
+    private val connectionClose = Header("Connection", "close")
+
+    def apply(req: HttpRequest, res: HttpResponse): HttpResponse =
+      doKeepAlive(req, res) match {
+        case true  => res.withHeader(connectionKeepAlive).withHeader(keepAliveHeader)
+        case false => res.withHeader(connectionClose)
+      }
+
+    private def doKeepAlive(req: HttpRequest, res: HttpResponse): Boolean =
+      keepAliveEnabled &&
+        isKeepAliveRequested(req) &&
+        isKeepAliveMaxLeft(req) &&
+        (res.status.isSuccessful || res.status.isRedirection)
+
+    private def isKeepAliveRequested(req: HttpRequest): Boolean =
+      req.getConnection.exists { _.exists(_.toLowerCase == "keep-alive") }
+
+    private def isKeepAliveMaxLeft(req: HttpRequest): Boolean =
+      req.getAttribute[Int]("scamper.server.message.requestCount")
+        .map(_ < keepAliveMax)
+        .getOrElse(false)
+  }
 
   private object Service extends Thread(threadGroup, s"scamper-server-$id-service") {
-    private val requestCount = new AtomicLong(0)
-    private def nextCorrelate = Base64.encodeToString(s"${requestCount.incrementAndGet}:${System.currentTimeMillis}")
+    private val connectionCount = new AtomicLong(0)
+    private val serviceCount = new AtomicLong(0)
+    private def nextCorrelate = Base64.encodeToString(s"${serviceCount.incrementAndGet}:${System.currentTimeMillis}")
 
     override def run(): Unit =
       while (!isClosed)
         try
-          service(serverSocket.accept())
+          service(connectionCount.incrementAndGet, 1)(serverSocket.accept())
         catch {
           case e: Exception if serverSocket.isClosed => close() // Ensure server is closed
           case e: Exception => logger.warn(s"$authority - Error while waiting for connection: $e")
         }
 
-    private def service(implicit socket: Socket): Unit = {
+    private def service(connectionId: Long, requestCount: Int)(implicit socket: Socket): Unit = {
       val connection = socket.getInetAddress.getHostAddress + ":" + socket.getPort
       val correlate = nextCorrelate
       val tag = connection + " (" + correlate + ")"
@@ -207,9 +239,9 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
           socket.setSoTimeout(readTimeout)
 
           Try(read())
-            .map(req => addAttributes(req, socket, correlate))
+            .map(req => addAttributes(req, socket, requestCount, correlate))
             .fold(err => Try(onReadError(err)), req => Try(handle(req)).recover { case err => onHandleError(req)(err) })
-            .map(res => addAttributes(res, socket, correlate))
+            .map(res => addAttributes(res, socket, requestCount, correlate))
             .map(onHandleResponse)
             .get
         } catch {
@@ -225,7 +257,7 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
         case Failure(err) =>
           if (err.isInstanceOf[RejectedExecutionException]) {
             logger.warn(s"$authority - Request overflow while servicing request from $tag")
-            Try(addAttributes(ServiceUnavailable().withRetryAfter(Instant.now plusSeconds 300), socket, correlate))
+            Try(addAttributes(ServiceUnavailable().withRetryAfter(Instant.now plusSeconds 300), socket, requestCount, correlate))
               .map(onHandleResponse)
           }
           logger.info(s"$authority - Closing connection to $tag")
@@ -332,14 +364,15 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
         else throw new HttpException(s"Unsupported transfer encoding: $enc")
       }
 
-    private def handle(req: HttpRequest): HttpResponse =
+    private def handle(req: HttpRequest): HttpResponse = {
       requestHandler(req) match {
         case req: HttpRequest  => NotFound()
-        case res: HttpResponse => res
+        case res: HttpResponse => ConnectionManager(req, res)
       }
+    }
 
     private def filter(res: HttpResponse): HttpResponse =
-      responseFilter { prepare(res).withDate(Instant.now).withConnection("close") }
+      responseFilter { prepare(res).withDate(Instant.now) }
 
     private def prepare(res: HttpResponse): HttpResponse =
       if (res.hasTransferEncoding)
@@ -353,18 +386,12 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
           case None    => res.withTransferEncoding(chunked)
         }
 
-    private def addAttributes(req: HttpRequest, socket: Socket, correlate: String): HttpRequest =
-      req.withAttributes(
-        "scamper.server.message.socket"    -> socket,
-        "scamper.server.message.correlate" -> correlate,
-        "scamper.server.message.logger"    -> logger
-      )
-
-    private def addAttributes(res: HttpResponse, socket: Socket, correlate: String): HttpResponse =
-      res.withAttributes(
-        "scamper.server.message.socket"    -> socket,
-        "scamper.server.message.correlate" -> correlate,
-        "scamper.server.message.logger"    -> logger
+    private def addAttributes[T <: HttpMessage](msg: T, socket: Socket, requestCount: Int, correlate: String)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      msg.withAttributes(
+        "scamper.server.message.socket"       -> socket,
+        "scamper.server.message.requestCount" -> requestCount,
+        "scamper.server.message.correlate"    -> correlate,
+        "scamper.server.message.logger"       -> logger
       )
   }
 }

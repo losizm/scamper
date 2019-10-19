@@ -44,6 +44,14 @@ object Implicits {
     def socket(): Socket = msg.getAttributeOrElse("scamper.server.message.socket", throw new HttpException("Socket not available"))
 
     /**
+     * Gets request count associated with message.
+     *
+     * The request count is the number of requests that have been received from
+     * current connection.
+     */
+    def requestCount(): Int = msg.getAttributeOrElse("scamper.server.message.requestCount", 1)
+
+    /**
      * Gets logger associated with message &ndash; i.e., the server logger.
      *
      * @see [[HttpServer.logger]]
