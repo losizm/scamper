@@ -240,8 +240,8 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
   def withBody(newBody: Entity): HttpResponse =
     copy(body = newBody)
 
-  def withAttributes(newAttributes: (String, Any)*): HttpResponse =
-    copy(attributes = newAttributes.toMap)
+  def withAttributes(newAttributes: Map[String, Any]): HttpResponse =
+    copy(attributes = newAttributes)
 
   def withAttribute(attribute: (String, Any)): HttpResponse =
     copy(attributes = attributes + attribute)
@@ -308,8 +308,8 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
   def withBody(newBody: Entity): HttpRequest =
     copy(body = newBody)
 
-  def withAttributes(newAttributes: (String, Any)*): HttpRequest =
-    copy(attributes = newAttributes.toMap)
+  def withAttributes(newAttributes: Map[String, Any]): HttpRequest =
+    copy(attributes = newAttributes)
 
   def withAttribute(attribute: (String, Any)): HttpRequest =
     copy(attributes = attributes + attribute)

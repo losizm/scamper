@@ -80,7 +80,18 @@ trait MessageBuilder[T <: HttpMessage] {
    *
    * @return new message
    */
-  def withAttributes(attributes: (String, Any)*): T
+  def withAttributes(attributes: Map[String, Any]): T
+
+  /**
+   * Creates message with supplied attributes. All previous attributes are
+   * removed.
+   *
+   * @param attributes message attributes
+   *
+   * @return new message
+   */
+  def withAttributes(attributes: (String, Any)*): T =
+    withAttributes(attributes.toMap)
 
   /**
    * Creates message with supplied attribute, replacing existing value, if any.
