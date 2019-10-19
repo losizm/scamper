@@ -20,6 +20,7 @@ import java.net.InetAddress
 
 import scamper.RequestMethod
 import scamper.logging.{ Logger, LogWriter }
+import scamper.types.KeepAliveParameters
 import RequestMethod.Registry._
 
 /**
@@ -42,6 +43,7 @@ import RequestMethod.Registry._
  * | bufferSize  | `8192` |
  * | readTimeout | `5000` |
  * | headerLimit | `100` |
+ * | keepAlive   | ''(Not configured)'' |
  * | secure      | ''(Not configured)'' |
  * | incoming    | ''(Not configured)'' |
  * | outgoing    | ''(Not configured)'' |
@@ -180,6 +182,31 @@ class ServerApplication {
    */
   def headerLimit(limit: Int): this.type = synchronized {
     app = app.copy(headerLimit = limit)
+    this
+  }
+
+  /**
+   * Enables keep-alive connections using specified parameters.
+   *
+   * @param params keep-alive parameters
+   *
+   * @return this application
+   */
+  def keepAlive(params: KeepAliveParameters): this.type = synchronized {
+    app = app.copy(keepAlive = Option(params))
+    this
+  }
+
+  /**
+   * Enables keep-alive connections using specified timeout and max.
+   *
+   * @param timeout connection timeout (in seconds)
+   * @param max maximum number of requests per connection
+   *
+   * @return this application
+   */
+  def keepAlive(timeout: Int, max: Int): this.type = synchronized {
+    app = app.copy(keepAlive = Some(KeepAliveParameters(timeout, max)))
     this
   }
 

@@ -19,6 +19,7 @@ import java.io.File
 import java.net.InetAddress
 
 import scamper.logging.Logger
+import scamper.types.KeepAliveParameters
 
 /**
  * Provides handle to server instance.
@@ -46,6 +47,9 @@ trait HttpServer {
 
   /** Gets header limit. */
   def headerLimit: Int
+
+  /** Gets Keep-Alive parameters. */
+  def keepAlive: Option[KeepAliveParameters]
 
   /** Gets host address. */
   def host: InetAddress

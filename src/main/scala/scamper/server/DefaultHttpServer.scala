@@ -31,9 +31,9 @@ import scala.util.{ Failure, Success, Try }
 import scamper._
 import scamper.Auxiliary.SocketType
 import scamper.ResponseStatus.Registry._
-import scamper.headers.{ Connection, ContentLength, ContentType, Date, RetryAfter, TransferEncoding }
+import scamper.headers.{ Connection, ContentLength, ContentType, Date, KeepAlive, RetryAfter, TransferEncoding }
 import scamper.logging.{ ConsoleLogger, Logger, NullLogger }
-import scamper.types.TransferCoding
+import scamper.types.{ KeepAliveParameters, TransferCoding }
 
 private object DefaultHttpServer {
   private val count = new AtomicLong(0)
@@ -46,6 +46,7 @@ private object DefaultHttpServer {
     bufferSize: Int = 8192,
     readTimeout: Int = 5000,
     headerLimit: Int = 100,
+    keepAlive: Option[KeepAliveParameters] = None,
     requestHandlers: Seq[RequestHandler] = Nil,
     responseFilters: Seq[ResponseFilter] = Nil,
     errorHandler: Option[ErrorHandler] = None,
@@ -64,6 +65,7 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
   val bufferSize = app.bufferSize.max(1024)
   val readTimeout = app.readTimeout.max(100)
   val headerLimit = app.headerLimit.max(10)
+  val keepAlive = app.keepAlive.map(params => KeepAliveParameters(params.timeout.max(1), params.max.max(2)))
 
   private val authority = s"${host.getCanonicalHostName}:$port"
   private val requestHandler = RequestHandler.coalesce(app.requestHandlers : _*)
@@ -90,6 +92,11 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
     executor.getThreadFactory.newThread(task).start()
   }
 
+  private val keepAliveContext = ThreadPoolExecutorService.dynamic(s"scamper-server-$id-keepAlive", poolSize, poolSize * 2, 60L, 0, Some(threadGroup)) { (task, executor) =>
+    logger.warn(s"$authority - Running rejected scamper-server-$id-keepAlive task on dedicated thread")
+    executor.getThreadFactory.newThread(task).start()
+  }
+
   private val closerContext = ThreadPoolExecutorService.dynamic(s"scamper-server-$id-closer", poolSize, poolSize * 2, 60L, 0, Some(threadGroup)) { (task, executor) =>
     logger.warn(s"$authority - Running rejected scamper-server-$id-closer task on dedicated thread")
     executor.getThreadFactory.newThread(task).start()
@@ -105,6 +112,7 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
       Try(serverSocket.close())
       Try(encoderContext.shutdownNow())
       Try(serviceContext.shutdownNow())
+      Try(keepAliveContext.shutdownNow())
       Try(closerContext.shutdownNow())
       Try(logger.asInstanceOf[Closeable].close())
       closed = true
@@ -123,6 +131,7 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
     logger.info(s"$authority - Buffer Size: $bufferSize")
     logger.info(s"$authority - Read Timeout: $readTimeout")
     logger.info(s"$authority - Header Limit: $headerLimit")
+    logger.info(s"$authority - Keep-Alive: ${keepAlive.getOrElse("disabled")}")
 
     serverSocket.bind(new InetSocketAddress(host, port), backlogSize)
     Service.start()
