@@ -60,8 +60,8 @@ private object Auxiliary {
     def getText(bufferSize: Int = 8192): String =
       new String(getBytes(bufferSize), "UTF-8")
 
-    def getToken(delimiters: String, buffer: Array[Byte]): String = {
-      var length = 0
+    def getToken(delimiters: String, buffer: Array[Byte], offset: Int = 0): String = {
+      var length = offset
       var byte = -1
 
       while ({ byte = in.read(); !delimiters.contains(byte) && byte != -1}) {
@@ -72,8 +72,8 @@ private object Auxiliary {
       new String(buffer, 0, length, "UTF-8")
     }
 
-    def getLine(buffer: Array[Byte]): String = {
-      var length = 0
+    def getLine(buffer: Array[Byte], offset: Int = 0): String = {
+      var length = offset
       var byte = -1
 
       while ({ byte = in.read(); byte != '\n' && byte != -1}) {
@@ -87,9 +87,9 @@ private object Auxiliary {
       new String(buffer, 0, length, "UTF-8")
     }
 
-    def readLine(buffer: Array[Byte]): Int = {
+    def readLine(buffer: Array[Byte], offset: Int = 0): Int = {
       val bufferSize = buffer.size
-      var length = 0
+      var length = offset
       var byte = -1
       var continue = length < bufferSize
 
@@ -126,14 +126,14 @@ private object Auxiliary {
     def read(buffer: Array[Byte], offset: Int, length: Int): Int =
       socket.getInputStream().read(buffer, offset, length)
 
-    def readLine(buffer: Array[Byte]): Int =
-      socket.getInputStream().readLine(buffer)
+    def readLine(buffer: Array[Byte], offset: Int = 0): Int =
+      socket.getInputStream().readLine(buffer, offset)
 
-    def getToken(delimiters: String, buffer: Array[Byte]): String =
-      socket.getInputStream().getToken(delimiters, buffer)
+    def getToken(delimiters: String, buffer: Array[Byte], offset: Int = 0): String =
+      socket.getInputStream().getToken(delimiters, buffer, offset)
 
-    def getLine(buffer: Array[Byte]): String =
-      socket.getInputStream().getLine(buffer)
+    def getLine(buffer: Array[Byte], offset: Int = 0): String =
+      socket.getInputStream().getLine(buffer, offset)
 
     def write(byte: Int): Unit = socket.getOutputStream().write(byte)
 
