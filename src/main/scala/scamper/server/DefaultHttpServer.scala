@@ -15,7 +15,7 @@
  */
 package scamper.server
 
-import java.io.{ Closeable, File, InputStream }
+import java.io.{ Closeable, EOFException, File, InputStream }
 import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException, URI, URISyntaxException }
 import java.time.Instant
 import java.util.concurrent.RejectedExecutionException
@@ -29,7 +29,8 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
 import scamper._
-import scamper.Auxiliary.SocketType
+import scamper.Auxiliary.{ SocketType, getIntProperty }
+import scamper.RequestMethod.Registry._
 import scamper.ResponseStatus.Registry._
 import scamper.headers.{ Connection, ContentLength, ContentType, Date, KeepAlive, RetryAfter, TransferEncoding }
 import scamper.logging.{ ConsoleLogger, Logger, NullLogger }
@@ -53,13 +54,14 @@ private object DefaultHttpServer {
     factory: ServerSocketFactory = ServerSocketFactory.getDefault()
   )
 
+  case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
+  case class ReadAborted(reason: String) extends HttpException(s"Read aborted with $reason")
+
   def apply(host: InetAddress, port: Int)(implicit app: Application) =
     new DefaultHttpServer(count.incrementAndGet(), host, port)
-
-  case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
 }
 
-import DefaultHttpServer.{ Application, ReadError }
+import DefaultHttpServer.{ Application, ReadAborted, ReadError }
 
 private class DefaultHttpServer private (val id: Long, val host: InetAddress, val port: Int)(implicit app: Application) extends HttpServer {
   val logger = if (app.logger == null) NullLogger else app.logger
@@ -71,7 +73,16 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
   val headerLimit = app.headerLimit.max(10)
   val keepAlive = app.keepAlive.map(params => KeepAliveParameters(params.timeout.max(1), params.max.max(2)))
 
+  private val keepAliveEnabled = keepAlive.isDefined
+  private val keepAliveMax = keepAlive.map(_.max).getOrElse(1)
+  private val keepAliveTimeout = keepAlive.map(_.timeout).getOrElse(0)
+
+  private val keepAlivePoolSizeFactor = getIntProperty("scamper.server.keepAlive.poolSizeFactor", 2).max(1)
+  private val encoderPoolSizeFactor = getIntProperty("scamper.server.encoder.poolSizeFactor", 2).max(1)
+  private val closerPoolSizeFactor = getIntProperty("scamper.server.closer.poolSizeFactor", 2).max(1)
+
   private val authority = s"${host.getCanonicalHostName}:$port"
+
   private val requestHandler = RequestHandler.coalesce(app.requestHandlers : _*)
   private val responseFilter = ResponseFilter.chain(app.responseFilters : _*)
   private val errorHandler = app.errorHandler.getOrElse(new ErrorHandler {
@@ -81,29 +92,39 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
       InternalServerError()
     }
   })
+
   private val serverSocket = app.factory.createServerSocket()
   private val chunked = TransferCoding("chunked")
   private var closed = false
 
   private val threadGroup = new ThreadGroup(s"scamper-server-$id")
 
-  private val serviceContext = ThreadPoolExecutorService.fixed(s"scamper-server-$id-service", poolSize, queueSize, Some(threadGroup)) { (_, _) =>
-    throw new RejectedExecutionException(s"Rejected scamper-server-$id-service task")
+  private val serviceContext = ThreadPoolExecutorService.fixed(
+    s"scamper-server-$id-service", poolSize, queueSize, Some(threadGroup)
+  ) {
+    (_, _) => throw new RejectedExecutionException(s"Rejected scamper-server-$id-service task")
   }
 
-  private val encoderContext = ThreadPoolExecutorService.dynamic(s"scamper-server-$id-encoder", poolSize, poolSize * 2, 60L, 0, Some(threadGroup)) { (task, executor) =>
-    logger.warn(s"$authority - Running rejected scamper-server-$id-encoder task on dedicated thread")
-    executor.getThreadFactory.newThread(task).start()
+  private val keepAliveContext = ThreadPoolExecutorService.dynamic(
+    s"scamper-server-$id-keepAlive", poolSize, poolSize * keepAlivePoolSizeFactor, 60L, 0, Some(threadGroup)
+  ) {
+    (task, executor) => throw new ReadAborted(s"rejected scamper-server-$id-keepAlive task")
   }
 
-  private val keepAliveContext = ThreadPoolExecutorService.dynamic(s"scamper-server-$id-keepAlive", poolSize, poolSize * 2, 60L, 0, Some(threadGroup)) { (task, executor) =>
-    logger.warn(s"$authority - Running rejected scamper-server-$id-keepAlive task on dedicated thread")
-    executor.getThreadFactory.newThread(task).start()
+  private val encoderContext = ThreadPoolExecutorService.dynamic(
+    s"scamper-server-$id-encoder", poolSize, poolSize * encoderPoolSizeFactor, 60L, 0, Some(threadGroup)
+  ) {
+    (task, executor) =>
+      logger.warn(s"$authority - Running rejected scamper-server-$id-encoder task on dedicated thread")
+      executor.getThreadFactory.newThread(task).start()
   }
 
-  private val closerContext = ThreadPoolExecutorService.dynamic(s"scamper-server-$id-closer", poolSize, poolSize * 2, 60L, 0, Some(threadGroup)) { (task, executor) =>
-    logger.warn(s"$authority - Running rejected scamper-server-$id-closer task on dedicated thread")
-    executor.getThreadFactory.newThread(task).start()
+  private val closerContext = ThreadPoolExecutorService.dynamic(
+    s"scamper-server-$id-closer", poolSize, poolSize * closerPoolSizeFactor, 60L, 0, Some(threadGroup)
+  ) {
+    (task, executor) =>
+      logger.warn(s"$authority - Running rejected scamper-server-$id-closer task on dedicated thread")
+      executor.getThreadFactory.newThread(task).start()
   }
 
   val isSecure: Boolean = app.factory.isInstanceOf[SSLServerSocketFactory]
@@ -114,9 +135,9 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
     if (!closed) {
       Try(logger.info(s"$authority - Shutting down server"))
       Try(serverSocket.close())
+      Try(keepAliveContext.shutdownNow())
       Try(encoderContext.shutdownNow())
       Try(serviceContext.shutdownNow())
-      Try(keepAliveContext.shutdownNow())
       Try(closerContext.shutdownNow())
       Try(logger.asInstanceOf[Closeable].close())
       closed = true
@@ -149,9 +170,6 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
   }
 
   private object ConnectionManager {
-    private val keepAliveEnabled = keepAlive.isDefined
-    private val keepAliveMax = keepAlive.map(_.max).getOrElse(1)
-    private val keepAliveTimeout = keepAlive.map(_.timeout).getOrElse(0)
     private val keepAliveHeader = Header("Keep-Alive", s"timeout=$keepAliveTimeout, max=$keepAliveMax")
     private val connectionKeepAlive = Header("Connection", "keep-alive")
     private val connectionClose = Header("Connection", "close")
@@ -166,7 +184,7 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
       keepAliveEnabled &&
         isKeepAliveRequested(req) &&
         isKeepAliveMaxLeft(req) &&
-        (res.status.isSuccessful || res.status.isRedirection)
+        isKeepAliveSafe(req, res)
 
     private def isKeepAliveRequested(req: HttpRequest): Boolean =
       req.getConnection.exists { _.exists(_.toLowerCase == "keep-alive") }
@@ -175,12 +193,18 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
       req.getAttribute[Int]("scamper.server.message.requestCount")
         .map(_ < keepAliveMax)
         .getOrElse(false)
+
+    private def isKeepAliveSafe(req: HttpRequest, res: HttpResponse): Boolean =
+      res.status.isSuccessful ||
+        ((req.method == GET || req.method == HEAD) && res.status.isRedirection)
   }
 
   private object Service extends Thread(threadGroup, s"scamper-server-$id-service") {
     private val connectionCount = new AtomicLong(0)
     private val serviceCount = new AtomicLong(0)
-    private def nextCorrelate = Base64.encodeToString(s"${serviceCount.incrementAndGet}:${System.currentTimeMillis}")
+
+    private def createCorrelate(serviceId: Long, connectionId: Long, requestCount: Int): String =
+      f"${System.currentTimeMillis}%x-$serviceId%04x-$connectionId%04x-$requestCount%02x"
 
     override def run(): Unit =
       while (!isClosed)
@@ -192,11 +216,13 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
         }
 
     private def service(connectionId: Long, requestCount: Int)(implicit socket: Socket): Unit = {
+      val serviceId = serviceCount.incrementAndGet
       val connection = socket.getInetAddress.getHostAddress + ":" + socket.getPort
-      val correlate = nextCorrelate
-      val tag = connection + " (" + correlate + ")"
+      val correlate = createCorrelate(serviceId, connectionId, requestCount)
+      val tag = connection + " (correlate=" + correlate + ")"
 
-      logger.info(s"$authority - Connection received from $tag")
+      if (requestCount == 1)
+        logger.info(s"$authority - Connection accepted from $tag")
 
       def onReadError: PartialFunction[Throwable, HttpResponse] = {
         case ReadError(status)              => status()
@@ -217,7 +243,7 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
         case err                         => errorHandler(err, req)
       }
 
-      def onHandleResponse(res: HttpResponse): Unit = {
+      def onHandleResponse(res: HttpResponse): Boolean =
         Try(filter(res)).recover {
           case err =>
             logger.error(s"$authority - Error while filtering response to $tag", err)
@@ -226,48 +252,94 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
           write(res)
           logger.info(s"$authority - Response sent to $tag")
           Try(res.body.getInputStream.close()) // Close filtered response body
+          res.getConnection.exists { _.exists(_.toLowerCase == "keep-alive") }
+        }.map { keepAlive =>
+          Try(res.body.getInputStream.close()) // Close unfiltered response body
+          keepAlive
         }.recover {
-          case err => logger.error(s"$authority - Error while writing response to $tag", err)
-        }
+          case err =>
+            logger.error(s"$authority - Error while writing response to $tag", err)
+            false
+        }.get
 
-        Try(res.body.getInputStream.close()) // Close unfiltered response body
+      val futureFirstByte = (requestCount > 1) match {
+        case true  => Future { readByte(true) } (keepAliveContext)
+        case false => Future { readByte(false) } (serviceContext)
       }
 
-      Future {
+      futureFirstByte.map { firstByte =>
         try {
           logger.info(s"$authority - Servicing request from $tag")
-          socket.setSoTimeout(readTimeout)
 
-          Try(read())
+          Try(read(firstByte))
             .map(req => addAttributes(req, socket, requestCount, correlate))
             .fold(err => Try(onReadError(err)), req => Try(handle(req)).recover { case err => onHandleError(req)(err) })
             .map(res => addAttributes(res, socket, requestCount, correlate))
             .map(onHandleResponse)
             .get
         } catch {
-          case err: ResponseAborted => logger.warn(s"$authority - Response aborted while servicing request from $tag", err)
-          case err: SSLException    => logger.warn(s"$authority - SSL error while servicing request from $tag", err)
-          case err: Exception       => logger.error(s"$authority - Unhandled error while servicing request from $tag", err)
+          case err: ResponseAborted =>
+            logger.warn(s"$authority - Response aborted while servicing request from $tag", err)
+            false
+          case err: SSLException =>
+            logger.warn(s"$authority - SSL error while servicing request from $tag", err)
+            false
+          case err: Exception =>
+            logger.error(s"$authority - Unhandled error while servicing request from $tag", err)
+            false
         }
       } (serviceContext).onComplete {
-        case Success(_) =>
+        case Success(true) =>
+          logger.info(s"$authority - Keeping alive connection to $tag")
+          service(connectionId, requestCount + 1)
+
+        case Success(false) =>
+          logger.info(s"$authority - Closing connection to $tag")
+          Try(socket.close())
+
+        case Failure(err: ReadAborted) =>
+          (requestCount > 1) match {
+            case true  => logger.info(s"$authority - Keep-alive aborted with ${err.reason} from $tag")
+            case false => logger.info(s"$authority - Service aborted with ${err.reason} from $tag")
+          }
+          logger.info(s"$authority - Closing connection to $tag")
+          Try(socket.close())
+
+        case Failure(err: RejectedExecutionException) =>
+          logger.warn(s"$authority - Request overflow while servicing request from $tag")
+          Try(addAttributes(ServiceUnavailable().withRetryAfter(Instant.now plusSeconds 300), socket, requestCount, correlate))
+            .map(onHandleResponse)
           logger.info(s"$authority - Closing connection to $tag")
           Try(socket.close())
 
         case Failure(err) =>
-          if (err.isInstanceOf[RejectedExecutionException]) {
-            logger.warn(s"$authority - Request overflow while servicing request from $tag")
-            Try(addAttributes(ServiceUnavailable().withRetryAfter(Instant.now plusSeconds 300), socket, requestCount, correlate))
-              .map(onHandleResponse)
-          }
           logger.info(s"$authority - Closing connection to $tag")
           Try(socket.close())
       } (closerContext)
     }
 
-    private def read()(implicit socket: Socket): HttpRequest = {
+    private def readByte(keepingAlive: Boolean)(implicit socket: Socket): Byte = {
+      keepingAlive match {
+        case true  => socket.setSoTimeout(keepAliveTimeout * 1000)
+        case false => socket.setSoTimeout(readTimeout)
+      }
+
+      try
+        socket.read() match {
+          case -1   => throw new EOFException()
+          case byte => byte.toByte
+        }
+      catch {
+        case err: Exception => throw ReadAborted(err.getClass.getName)
+      }
+    }
+
+    private def read(firstByte: Byte)(implicit socket: Socket): HttpRequest = {
       val buffer = new Array[Byte](bufferSize)
-      val method = readMethod(buffer)
+
+      buffer(0) = firstByte
+
+      val method = readMethod(buffer, 1)
       val target = readTarget(buffer)
       val version = readVersion(buffer)
       val startLine = RequestLine(method, target, version)
@@ -276,8 +348,8 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
       HttpRequest(startLine, headers, Entity.fromInputStream(socket.getInputStream))
     }
 
-    private def readMethod(buffer: Array[Byte])(implicit socket: Socket): RequestMethod =
-      RequestMethod(socket.getToken(" ", buffer))
+    private def readMethod(buffer: Array[Byte], offset: Int)(implicit socket: Socket): RequestMethod =
+      RequestMethod(socket.getToken(" ", buffer, offset))
 
     private def readTarget(buffer: Array[Byte])(implicit socket: Socket): URI =
       try
@@ -366,13 +438,18 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
 
     private def handle(req: HttpRequest): HttpResponse = {
       requestHandler(req) match {
-        case req: HttpRequest  => NotFound()
+        case req: HttpRequest  => ConnectionManager(req, NotFound())
         case res: HttpResponse => ConnectionManager(req, res)
       }
     }
 
     private def filter(res: HttpResponse): HttpResponse =
-      responseFilter { prepare(res).withDate(Instant.now) }
+      responseFilter {
+        res.hasConnection match {
+          case true  => prepare(res).withDate(Instant.now)
+          case false => prepare(res).withDate(Instant.now).withConnection("close")
+        }
+      }
 
     private def prepare(res: HttpResponse): HttpResponse =
       if (res.hasTransferEncoding)
