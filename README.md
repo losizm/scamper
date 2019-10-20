@@ -45,7 +45,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 To use **Scamper**, start by adding it as a dependency to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "10.1.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "10.2.0"
 ```
 
 ## HTTP Messages
@@ -713,7 +713,7 @@ you can set the location of the server log.
 app.logger(new File("/tmp/server.log"))
 ```
 
-And there are peformance-related settings that can be tweaked as well.
+And there are performance-related settings that can be tweaked as well.
 
 ```scala
 app.backlogSize(50)
@@ -722,6 +722,7 @@ app.queueSize(25)
 app.bufferSize(8192)
 app.readTimeout(3000)
 app.headerLimit(100)
+app.keepAlive(5, 10)
 ```
 
 The **backlogSize** specifies the maximum number of incoming connections that
@@ -743,6 +744,9 @@ times out, whereafter **408 Request Timeout** is sent to client.
 
 The **headerLimit** sets the maximum number of request headers allowed. Incoming
 requests that exceed this limit are sent **431 Request Header Fields Too Large**.
+
+The **keepAlive** settings enable keep-alive connections using the specified
+timeout (in seconds) and max requests per connection.
 
 ### Request Handlers
 
@@ -1083,6 +1087,7 @@ printf("Queue Size: %d%n", server.queueSize)
 printf("Buffer Size: %d%n", server.bufferSize)
 printf("Read Timeout: %d%n", server.readTimeout)
 printf("Header Limit: %d%n", server.headerLimit)
+printf("Keep-Alive: %s%n", server.keepAlive.getOrElse("disabled"))
 printf("Closed: %s%n", server.isClosed)
 ```
 
