@@ -270,6 +270,7 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
       futureFirstByte.map { firstByte =>
         try {
           logger.info(s"$authority - Servicing request from $tag")
+          socket.setSoTimeout(readTimeout)
 
           Try(read(firstByte))
             .map(req => addAttributes(req, socket, requestCount, correlate))
@@ -290,7 +291,7 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
         }
       } (serviceContext).onComplete {
         case Success(true) =>
-          logger.info(s"$authority - Keeping alive connection to $tag")
+          logger.info(s"$authority - Persisting connection to $tag")
           service(connectionId, requestCount + 1)
 
         case Success(false) =>
