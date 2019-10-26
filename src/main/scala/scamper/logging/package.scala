@@ -290,7 +290,7 @@ package object logging {
     }
   }
 
-  /** LogWriter factory. */
+  /** Provides factory methods for `LogWriter`. */
   object LogWriter {
     /**
      * Creates log writer.

@@ -31,7 +31,7 @@ trait KeepAliveParameters {
   override lazy val toString: String = s"timeout=$timeout, max=$max"
 }
 
-/** KeepAliveParameters factory. */
+/** Provides factory methods for `KeepAliveParameters`. */
 object KeepAliveParameters {
   /** Creates KeepLiveParameters with supplied timeout and max. */
   def apply(timeout: Int, max: Int): KeepAliveParameters =

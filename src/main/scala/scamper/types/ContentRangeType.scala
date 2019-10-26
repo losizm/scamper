@@ -50,7 +50,7 @@ trait ByteContentRange extends ContentRangeType {
     })
 }
 
-/** ByteContentRange factory */
+/** Provides factory methods for `ByteContentRange`. */
 object ByteContentRange {
   private val syntax = """(?i:bytes)\s+(.+)""".r
   private val satisfied = """(\d+)-(\d+)/(\*|\d+)""".r

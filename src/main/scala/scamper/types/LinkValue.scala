@@ -34,7 +34,7 @@ trait LinkValue {
     s"<$ref>${LinkParams.format(params)}"
 }
 
-/** LinkValue factory */
+/** Provides factory methods for `LinkValue`. */
 object LinkValue {
   private val syntax = """\s*<([^,<>"]+)>\s*(;.+)?\s*""".r
 

@@ -37,7 +37,7 @@ trait Header {
   override lazy val toString: String = s"$name: $value"
 }
 
-/** Provided for factory for `Header`. */
+/** Provides factory methods for `Header`. */
 object Header {
   /** Creates `Header` using supplied name and value. */
   def apply(name: String, value: String): Header =

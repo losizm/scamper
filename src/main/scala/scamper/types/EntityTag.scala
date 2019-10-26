@@ -36,7 +36,7 @@ trait EntityTag {
     if (weak) "W/" + opaque else opaque
 }
 
-/** EntityTag factory */
+/** Provides factory methods for `EntityTag`. */
 object EntityTag {
   private val syntax = """\s*(W/)?("[^"]*")\s*""".r
 

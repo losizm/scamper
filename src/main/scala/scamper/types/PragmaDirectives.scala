@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-/** Registered pragma directives */
+/** Provides registered pragma directives. */
 case object PragmaDirectives {
   /** Pragma directive for no-cache */
   case object `no-cache` extends PragmaDirective {

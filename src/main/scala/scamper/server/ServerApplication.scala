@@ -571,7 +571,7 @@ class ServerApplication {
   }
 }
 
-/** Provides factory for `ServerApplication`. */
+/** Provides factory methods for `ServerApplication`. */
 object ServerApplication {
   /** Creates default `ServerApplication`. */
   def apply(): ServerApplication = new ServerApplication()

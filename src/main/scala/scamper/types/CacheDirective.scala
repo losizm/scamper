@@ -35,7 +35,7 @@ trait CacheDirective {
     name + value.map(x => "=" + Token(x).getOrElse(s"""\"$x\"""")).getOrElse("")
 }
 
-/** CacheDirective factory */
+/** Provides factory methods for `CacheDirective`. */
 object CacheDirective {
   import CacheDirectives._
 

@@ -35,7 +35,7 @@ trait ProductType {
     name + version.map("/" + _).getOrElse("")
 }
 
-/** ProductType factory */
+/** Provides factory methods for `ProductType`. */
 object ProductType {
   private val syntax = """([\w!#$%&'*+.^`|~-]+)(?:/([\w!#$%&'*+.^`|~-]+))?(?:\s+\(.*\)\s*)?""".r
 

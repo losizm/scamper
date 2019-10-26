@@ -37,7 +37,7 @@ trait ViaType {
     (if (protocol.name == "HTTP") protocol.version.getOrElse("-") else protocol.toString) + ' ' + by + comment.map(" (" + _ + ')').getOrElse("")
 }
 
-/** ViaType factory */
+/** Provides factory methods for `ViaType`. */
 object ViaType {
   private val syntax = """\s*(?:([\w!#$%&'*+.^`|~-]+)/)?([\w!#$%&'*+.^`|~-]+)\s+([\w!#$%&'*+.:^`|~-]+)(?:\s+\(\s*(.*?)\s*\))?\s*""".r
 

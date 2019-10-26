@@ -50,7 +50,7 @@ trait BasicChallenge extends Challenge {
   def realm: String
 }
 
-/** Factory for BasicChallenge. */
+/** Provides factory methods for `BasicChallenge`. */
 object BasicChallenge {
   /** Creates BasicChallenge with supplied credentials. */
   def apply(realm: String, params: (String, String)*): BasicChallenge =
@@ -92,7 +92,7 @@ trait BearerChallenge extends Challenge {
   def isInsufficientScope: Boolean
 }
 
-/** Factory for BearerChallenge. */
+/** Provides factory methods for `BearerChallenge`. */
 object BearerChallenge {
   /** Creates BearerChallenge with supplied credentials. */
   def apply(params: (String, String)*): BearerChallenge =
@@ -119,7 +119,7 @@ private case class BearerChallengeImpl(params: Map[String, String]) extends Bear
   lazy val isInsufficientScope: Boolean = error.contains("insufficient_scope")
 }
 
-/** Challenge factory */
+/** Provides factory methods for `Challenge`. */
 object Challenge {
   /** Parses formatted challenge. */
   def parse(challenge: String): Challenge =
@@ -184,7 +184,7 @@ trait BasicCredentials extends Credentials {
   def password: String
 }
 
-/** Factory for BasicCredentials. */
+/** Provides factory methods for `BasicCredentials`. */
 object BasicCredentials {
   /** Creates BasicCredentials with supplied credentials. */
   def apply(token: String): BasicCredentials = {
@@ -217,7 +217,7 @@ trait BearerCredentials extends Credentials {
   val scheme: String = "Bearer"
 }
 
-/** Factory for BearerCredentials. */
+/** Provides factory methods for `BearerCredentials`. */
 object BearerCredentials {
   /** Creates BearerCredentials with supplied credentials. */
   def apply(token: String): BearerCredentials =
@@ -230,7 +230,7 @@ object BearerCredentials {
 
 private case class BearerCredentialsImpl(token: String) extends BearerCredentials
 
-/** Credentials factory */
+/** Provides factory methods for `Credentials`. */
 object Credentials {
   /** Parses formatted credentials. */
   def parse(credentials: String): Credentials =

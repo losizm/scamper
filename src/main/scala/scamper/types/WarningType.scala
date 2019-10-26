@@ -42,7 +42,7 @@ trait WarningType {
     s"""$code $agent "$text"${date.map(x => " \"" + DateValue.format(x) + "\"").getOrElse("")}"""
 }
 
-/** WarningType factory */
+/** Provides factory methods for `WarningType`. */
 object WarningType {
   private val syntax = """\s*(\d{3})\s*([\p{Graph}&&[^",]]+)\s*"([^"]*)"\s*(?:"([\w, :+-]+)")?\s*""".r
 

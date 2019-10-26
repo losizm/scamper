@@ -35,7 +35,7 @@ trait PragmaDirective {
     name + value.map(x => "=" + Token(x).getOrElse(s"""\"$x\"""")).getOrElse("")
 }
 
-/** PragmaDirective factory */
+/** Provides factory methods for `PragmaDirective`. */
 object PragmaDirective {
   import PragmaDirectives._
 

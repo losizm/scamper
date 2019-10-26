@@ -118,7 +118,7 @@ package object cookies {
     override lazy val toString: String = s"$name=$value"
   }
 
-  /** PlainCookie factory */
+  /** Provides factory methods for `PlainCookie`. */
   object PlainCookie {
     /** Parses formatted cookie. */
     def parse(cookie: String): PlainCookie =
@@ -184,7 +184,7 @@ package object cookies {
     }
   }
 
-  /** SetCookie factory */
+  /** Provides factory methods for `SetCookie`. */
   object SetCookie {
     /** Parses formatted cookie. */
     def parse(cookie: String): SetCookie =

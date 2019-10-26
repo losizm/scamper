@@ -45,7 +45,7 @@ trait TransferCoding {
   override lazy val toString: String = name + FormatParams(params)
 }
 
-/** TransferCoding factory */
+/** Provides factory methods for `TransferCoding`. */
 object TransferCoding {
   /** Parses formatted transfer coding. */
   def parse(coding: String): TransferCoding =

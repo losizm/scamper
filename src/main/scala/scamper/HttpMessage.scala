@@ -40,7 +40,7 @@ sealed trait HttpMessage {
    */
   def attributes: Map[String, Any]
 
-  /** Parses message body as defined type. */
+  /** Parses message body to instance of type T. */
   def as[T](implicit parser: BodyParser[T]): T =
     parser.parse(this)
 
@@ -164,7 +164,7 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
   def withVersion(version: HttpVersion): HttpRequest
 }
 
-/** HttpRequest factory */
+/** Provides factory methods for `HttpRequest`. */
 object HttpRequest {
   /** Creates HttpRequest with supplied values. */
   def apply(requestLine: RequestLine, headers: Seq[Header], body: Entity): HttpRequest =
@@ -201,7 +201,7 @@ trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse] {
   def withVersion(version: HttpVersion): HttpResponse
 }
 
-/** HttpResponse factory */
+/** Provides factory methods for `HttpResponse`. */
 object HttpResponse {
   /** Creates HttpResponse with supplied values. */
   def apply(statusLine: StatusLine, headers: Seq[Header], body: Entity): HttpResponse =

@@ -34,7 +34,7 @@ trait Protocol {
     name + version.map("/" + _).getOrElse("")
 }
 
-/** Protocol factory */
+/** Provides factory methods for `Protocol`. */
 object Protocol {
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)(?:/([\w!#$%&'*+.^`|~-]+))?\s*""".r
 

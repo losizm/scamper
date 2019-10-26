@@ -340,7 +340,7 @@ package object client {
     def trace[T](target: Uri, headers: Seq[Header] = Nil)(handler: ResponseHandler[T]): T
   }
 
-  /** Provides factory for `HttpClient`. */
+  /** Provides factory methods for `HttpClient`. */
   object HttpClient {
     /**
      * Creates `HttpClient` with supplied configuration.

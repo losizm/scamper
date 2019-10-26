@@ -36,7 +36,7 @@ trait LanguageTag {
     primary + others.foldLeft("")((sum, it) => sum + "-" + it)
 }
 
-/** LanguageTag factory */
+/** Provides factory methods for `LanguageTag`. */
 object LanguageTag {
   private val syntax = """(\p{Alpha}{1,8})((?:-\p{Alnum}{1,8})*)?""".r
   private val primary = "(\\p{Alpha}{1,8})".r

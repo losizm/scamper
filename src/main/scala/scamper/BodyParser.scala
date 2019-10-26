@@ -32,7 +32,7 @@ import Auxiliary.{ FileType, InputStreamType }
  */
 trait BodyParser[T] {
   /**
-   * Parses body of supplied message and returns instance of defined type.
+   * Parses body of supplied message and returns instance of type T.
    *
    * @throws ReadLimitExceeded if message body is too large
    * @throws EntityTooLarge if constructed entity is too large

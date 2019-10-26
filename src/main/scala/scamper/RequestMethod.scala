@@ -33,7 +33,7 @@ trait RequestMethod {
 }
 
 /**
- * Provided factory for `RequestMethod`.
+ * Provided factory methods for `RequestMethod`.
  *
  * @see [[RequestMethod.Registry]]
  */

@@ -15,8 +15,7 @@
  */
 package scamper
 
-import java.util.Base64.getDecoder
-import java.util.Base64.getEncoder
+import java.util.Base64.{ getDecoder, getEncoder }
 
 private object Base64 {
   private val encoder = getEncoder()

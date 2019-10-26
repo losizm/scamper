@@ -29,7 +29,7 @@ trait HttpVersion {
   override val toString: String = s"$major.$minor"
 }
 
-/** HttpVersion factory */
+/** Provides factory methods for `HttpVersion`. */
 object HttpVersion {
   private val `HTTP/1.0` = HttpVersionImpl(1, 0)
   private val `HTTP/1.1` = HttpVersionImpl(1, 1)

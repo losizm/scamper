@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-/** Registered cache directives */
+/** Provides registered cache directives. */
 case object CacheDirectives {
   /** Cache directive for `immutable`. */
   case object `immutable` extends CacheDirective {

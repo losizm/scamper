@@ -60,7 +60,7 @@ trait TransferCodingRange {
   }
 }
 
-/** TransferCodingRange factory */
+/** Provides factory methods for `TransferCodingRange`. */
 object TransferCodingRange {
   /** Parses formatted transfer coding range. */
   def parse(range: String): TransferCodingRange =

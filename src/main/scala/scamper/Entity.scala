@@ -43,7 +43,7 @@ trait Entity {
     f(getInputStream)
 }
 
-/** Provides factory for `Entity`. */
+/** Provides factory methods for `Entity`. */
 object Entity {
   /** Creates `Entity` from supplied bytes. */
   def fromBytes(bytes: Array[Byte]): Entity =

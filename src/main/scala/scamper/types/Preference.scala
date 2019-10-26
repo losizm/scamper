@@ -46,7 +46,7 @@ trait Preference {
   }
 }
 
-/** Registered preferences */
+/** Provides registered preferences. */
 object Preferences {
   /** Preference for `wait=duration`. */
   final case class `wait=duration`(seconds: Long) extends Preference {
@@ -92,7 +92,7 @@ object Preferences {
 }
 import Preferences._
 
-/** Preference factory */
+/** Provides factory methods for `Preference`. */
 object Preference {
   /** Parses formatted preference. */
   def parse(preference: String): Preference = {
