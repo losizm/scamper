@@ -15,9 +15,7 @@
  */
 package scamper.types
 
-import java.net.URI
-
-import scamper.ListParser
+import scamper.{ ListParser, Uri }
 
 /**
  * Standardized type for Link header value.
@@ -26,7 +24,7 @@ import scamper.ListParser
  */
 trait LinkValue {
   /** Gets link reference. */
-  def ref: URI
+  def ref: Uri
 
   /** Gets link parameters. */
   def params: Map[String, Option[String]]
@@ -43,8 +41,8 @@ object LinkValue {
   /** Parses formatted link. */
   def parse(link: String): LinkValue =
     link match {
-      case syntax(ref, null)   => apply(new URI(ref))
-      case syntax(ref, params) => apply(new URI(ref), LinkParams.parse(params))
+      case syntax(ref, null)   => apply(Uri(ref))
+      case syntax(ref, params) => apply(Uri(ref), LinkParams.parse(params))
       case _ => throw new IllegalArgumentException(s"Malformed link: $link")
     }
 
@@ -53,16 +51,16 @@ object LinkValue {
     ListParser(links).map(parse)
 
   /** Creates LinkValue with supplied values. */
-  def apply(ref: URI, params: (String, Option[String])*): LinkValue =
+  def apply(ref: Uri, params: (String, Option[String])*): LinkValue =
     LinkValueImpl(ref, params.toMap)
 
   /** Creates LinkValue with supplied values. */
-  def apply(ref: URI, params: Map[String, Option[String]]): LinkValue =
+  def apply(ref: Uri, params: Map[String, Option[String]]): LinkValue =
     LinkValueImpl(ref, params)
 
   /** Destructures LinkValue. */
-  def unapply(link: LinkValue): Option[(URI, Map[String, Option[String]])] =
+  def unapply(link: LinkValue): Option[(Uri, Map[String, Option[String]])] =
     Some((link.ref, link.params))
 }
 
-private case class LinkValueImpl(ref: URI, params: Map[String, Option[String]]) extends LinkValue
+private case class LinkValueImpl(ref: Uri, params: Map[String, Option[String]]) extends LinkValue

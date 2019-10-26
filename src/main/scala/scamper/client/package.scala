@@ -16,7 +16,6 @@
 package scamper
 
 import java.io.File
-import java.net.URI
 
 import javax.net.ssl.TrustManager
 
@@ -233,7 +232,7 @@ package object client {
      *
      * @note To make effective use of this method, `target` must be an absolute URI.
      */
-    def get[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
+    def get[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
 
     /**
      * Sends POST request and passes response to handler.
@@ -248,7 +247,7 @@ package object client {
      *
      * @note To make effective use of this method, `target` must be an absolute URI.
      */
-    def post[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
+    def post[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
       (handler: ResponseHandler[T]): T
 
     /**
@@ -264,7 +263,7 @@ package object client {
      *
      * @note To make effective use of this method, `target` must be an absolute URI.
      */
-    def put[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
+    def put[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
       (handler: ResponseHandler[T]): T
 
     /**
@@ -280,7 +279,7 @@ package object client {
      *
      * @note To make effective use of this method, `target` must be an absolute URI.
      */
-    def patch[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
+    def patch[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
       (handler: ResponseHandler[T]): T
 
     /**
@@ -295,7 +294,7 @@ package object client {
      *
      * @note To make effective use of this method, `target` must be an absolute URI.
      */
-    def delete[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
+    def delete[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
 
     /**
      * Sends HEAD request and passes response to handler.
@@ -309,7 +308,7 @@ package object client {
      *
      * @note To make effective use of this method, `target` must be an absolute URI.
      */
-    def head[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
+    def head[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
 
     /**
      * Sends OPTIONS request and passes response to handler.
@@ -324,7 +323,7 @@ package object client {
      *
      * @note To make effective use of this method, `target` must be an absolute URI.
      */
-    def options[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
+    def options[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
       (handler: ResponseHandler[T]): T
 
     /**
@@ -338,7 +337,7 @@ package object client {
      *
      * @note To make effective use of this method, `target` must be an absolute URI.
      */
-    def trace[T](target: URI, headers: Seq[Header] = Nil)(handler: ResponseHandler[T]): T
+    def trace[T](target: Uri, headers: Seq[Header] = Nil)(handler: ResponseHandler[T]): T
   }
 
   /** Provides factory for `HttpClient`. */

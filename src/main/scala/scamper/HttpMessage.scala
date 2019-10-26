@@ -15,8 +15,6 @@
  */
 package scamper
 
-import java.net.URI
-
 /** HTTP message */
 sealed trait HttpMessage {
   /** Type of start line used in message */
@@ -108,7 +106,7 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
   def method: RequestMethod = startLine.method
 
   /** Gets request target. */
-  def target: URI = startLine.target
+  def target: Uri = startLine.target
 
   /** Gets target path. */
   def path: String
@@ -128,7 +126,7 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
    *
    * @return new request
    */
-  def withTarget(target: URI): HttpRequest
+  def withTarget(target: Uri): HttpRequest
 
   /**
    * Creates request with new target path.
@@ -173,7 +171,7 @@ object HttpRequest {
     HttpRequestImpl(requestLine, headers, body)
 
   /** Creates HttpRequest with supplied values. */
-  def apply(method: RequestMethod, target: URI = new URI("/"), headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: HttpVersion = HttpVersion(1, 1)): HttpRequest =
+  def apply(method: RequestMethod, target: Uri = Uri("/"), headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: HttpVersion = HttpVersion(1, 1)): HttpRequest =
     HttpRequestImpl(RequestLine(method, target, version), headers, body)
 }
 

@@ -15,7 +15,6 @@
  */
 package scamper
 
-import java.net.URI
 import Auxiliary.UriType
 
 private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header], body: Entity, attributes: Map[String, Any] = Map.empty) extends HttpRequest {
@@ -40,7 +39,7 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
   def withMethod(newMethod: RequestMethod): HttpRequest =
     copy(startLine = RequestLine(newMethod, target, version))
 
-  def withTarget(newTarget: URI): HttpRequest =
+  def withTarget(newTarget: Uri): HttpRequest =
     copy(startLine = RequestLine(method, newTarget, version))
 
   def withPath(newPath: String): HttpRequest =

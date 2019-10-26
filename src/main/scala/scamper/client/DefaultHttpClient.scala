@@ -16,7 +16,6 @@
 package scamper.client
 
 import java.io.File
-import java.net.URI
 
 import javax.net.SocketFactory
 import javax.net.ssl.{ SSLSocketFactory, TrustManager }
@@ -24,7 +23,7 @@ import javax.net.ssl.{ SSLSocketFactory, TrustManager }
 import scala.util.Try
 import scala.util.control.NonFatal
 
-import scamper.{ Entity, Header, HttpRequest, ListParser, RequestMethod }
+import scamper.{ Entity, Header, HttpRequest, ListParser, RequestMethod, Uri }
 import scamper.Auxiliary.UriType
 import scamper.RequestMethod.Registry._
 import scamper.cookies.{ PlainCookie, RequestCookies }
@@ -79,7 +78,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
       Header("Connection", connection)
     } : _*)
 
-    effectiveRequest = effectiveRequest.withTarget(new URI(target.toURL.getFile))
+    effectiveRequest = effectiveRequest.withTarget(Uri(target.toURL.getFile))
 
     if (! effectiveRequest.path.startsWith("/") && effectiveRequest.path != "*")
       effectiveRequest = effectiveRequest.withPath("/" + effectiveRequest.path)
@@ -97,31 +96,31 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
     finally Try(conn.close())
   }
 
-  def get[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
+  def get[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
     (handler: ResponseHandler[T]): T = send(GET, target, headers, cookies, Entity.empty)(handler)
 
-  def post[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
+  def post[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T = send(POST, target, headers, cookies, body)(handler)
 
-  def put[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
+  def put[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T = send(PUT, target, headers, cookies, body)(handler)
 
-  def patch[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
+  def patch[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T = send(PATCH, target, headers, cookies, body)(handler)
 
-  def delete[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
+  def delete[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
     (handler: ResponseHandler[T]): T = send(DELETE, target, headers, cookies, Entity.empty)(handler)
 
-  def head[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
+  def head[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
     (handler: ResponseHandler[T]): T = send(HEAD, target, headers, cookies, Entity.empty)(handler)
 
-  def options[T](target: URI, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
+  def options[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T = send(OPTIONS, target, headers, cookies, body)(handler)
 
-  def trace[T](target: URI, headers: Seq[Header] = Nil)
+  def trace[T](target: Uri, headers: Seq[Header] = Nil)
     (handler: ResponseHandler[T]): T = send(TRACE, target, headers, Nil, Entity.empty)(handler)
 
-  private def send[T](method: RequestMethod, target: URI, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T = {
+  private def send[T](method: RequestMethod, target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T = {
     val req = cookies match {
       case Nil => HttpRequest(method, target, headers, body)
       case _   => HttpRequest(method, target, headers, body).withCookies(cookies : _*)
@@ -130,7 +129,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
     send(req)(handler)
   }
 
-  private def getEffectiveHost(target: URI): String =
+  private def getEffectiveHost(target: Uri): String =
     target.getPort match {
       case -1   => target.getHost
       case port => target.getHost + ":" + port

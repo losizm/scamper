@@ -15,31 +15,29 @@
  */
 package scamper.types
 
-import java.net.URI
+import scamper.Uri
 
-import org.scalatest.FlatSpec
-
-class LinkValueSpec extends FlatSpec {
+class LinkValueSpec extends org.scalatest.FlatSpec {
   "LinkValue" should "be created" in {
-    var link = LinkValue(new URI("/assets/icon.png"))
+    var link = LinkValue(Uri("/assets/icon.png"))
     assert(link.ref.toString == "/assets/icon.png")
     assert(link.params.isEmpty)
     assert(link.toString == "</assets/icon.png>")
-    assert(link == LinkValue(new URI("/assets/icon.png")))
+    assert(link == LinkValue(Uri("/assets/icon.png")))
 
-    link = LinkValue(new URI("/assets/large-icon.png"), "size" -> Some("64x64"))
+    link = LinkValue(Uri("/assets/large-icon.png"), "size" -> Some("64x64"))
     assert(link.ref.toString == "/assets/large-icon.png")
     assert(link.params("size") == Some("64x64"))
     assert(link.toString == "</assets/large-icon.png>; size=64x64")
-    assert(link == LinkValue(new URI("/assets/large-icon.png"), "size" -> Some("64x64")))
+    assert(link == LinkValue(Uri("/assets/large-icon.png"), "size" -> Some("64x64")))
   }
 
   it should "be parsed" in {
-    assert(LinkValue.parse("</assets/icon.png>") == LinkValue(new URI("/assets/icon.png")))
-    assert(LinkValue.parse("</assets/large-icon.png>;size=64x64") == LinkValue(new URI("/assets/large-icon.png"), "size" -> Some("64x64")))
+    assert(LinkValue.parse("</assets/icon.png>") == LinkValue(Uri("/assets/icon.png")))
+    assert(LinkValue.parse("</assets/large-icon.png>;size=64x64") == LinkValue(Uri("/assets/large-icon.png"), "size" -> Some("64x64")))
     assert {
       LinkValue.parseAll("</assets/icon.png>,</assets/large-icon.png>;size=64x64") ==
-        Seq(LinkValue(new URI("/assets/icon.png")),LinkValue(new URI("/assets/large-icon.png"), "size" -> Some("64x64")))
+        Seq(LinkValue(Uri("/assets/icon.png")),LinkValue(Uri("/assets/large-icon.png"), "size" -> Some("64x64")))
     }
   }
 

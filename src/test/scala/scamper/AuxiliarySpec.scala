@@ -15,20 +15,17 @@
  */
 package scamper
 
-import java.net.URI
 import java.time.{ Instant, LocalDate }
-
-import org.scalatest.FlatSpec
 
 import Auxiliary._
 
-class AuxiliarySpec extends FlatSpec {
-  val uri = new URI("http://localhost:8080/index.html")
-  val uriPath = new URI("/index.html")
-  val uriPathWithQuery = new URI("/index.html?name=guest")
+class AuxiliarySpec extends org.scalatest.FlatSpec {
+  val uri = Uri("http://localhost:8080/index.html")
+  val uriPath = Uri("/index.html")
+  val uriPathWithQuery = Uri("/index.html?name=guest")
 
   "URI" should "be created with new path" in {
-    assert(uriPath.withPath("/home.html") == new URI("/home.html"))
+    assert(uriPath.withPath("/home.html") == Uri("/home.html"))
   }
 
   it should "be created with new query" in {

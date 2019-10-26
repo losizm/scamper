@@ -16,7 +16,7 @@
 package scamper
 
 import java.io.{ File, FileOutputStream, FileInputStream, InputStream, OutputStream }
-import java.net.{ Socket, URI, URLDecoder, URLEncoder }
+import java.net.{ Socket, URLDecoder, URLEncoder }
 import java.nio.file.{ Paths, Path }
 import java.time.Instant
 
@@ -158,7 +158,7 @@ private object Auxiliary {
 
     def toPath: Path = Paths.get(string)
 
-    def toUri: URI = new URI(string)
+    def toUri: Uri = Uri(string)
 
     def toUrlEncoded: String = URLEncoder.encode(string, "UTF-8")
 
@@ -169,23 +169,23 @@ private object Auxiliary {
     def toUrlDecoded(encoding: String): String = URLDecoder.decode(string, encoding)
   }
 
-  implicit class UriType(private val uri: URI) extends AnyVal {
-    def withScheme(scheme: String): URI =
+  implicit class UriType(private val uri: Uri) extends AnyVal {
+    def withScheme(scheme: String): Uri =
       buildUri(scheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
 
-    def withAuthority(authority: String): URI =
+    def withAuthority(authority: String): Uri =
       buildUri(uri.getScheme, authority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
 
-    def withPath(path: String): URI =
+    def withPath(path: String): Uri =
       buildUri(uri.getScheme, uri.getRawAuthority, path, uri.getRawQuery, uri.getRawFragment)
 
-    def withQuery(query: String): URI =
+    def withQuery(query: String): Uri =
       buildUri(uri.getScheme, uri.getRawAuthority, uri.getRawPath, query, uri.getRawFragment)
 
-    def withFragment(fragment: String): URI =
+    def withFragment(fragment: String): Uri =
       buildUri(uri.getScheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, fragment)
 
-    private def buildUri(scheme: String, authority: String, path: String, query: String, fragment: String): URI = {
+    private def buildUri(scheme: String, authority: String, path: String, query: String, fragment: String): Uri = {
       val uri = new StringBuilder()
 
       if (scheme != null) uri.append(scheme).append(":")
@@ -197,7 +197,7 @@ private object Auxiliary {
       if (query != null && query != "") uri.append('?').append(query)
       if (fragment != null && fragment != "") uri.append('#').append(fragment)
 
-      new URI(uri.toString)
+      Uri(uri.toString)
     }
   }
 

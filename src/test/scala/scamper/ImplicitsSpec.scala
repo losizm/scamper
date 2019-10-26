@@ -16,20 +16,17 @@
 package scamper
 
 import java.io.File
-import java.net.{ URI, URL }
 import java.time.Instant
-
-import org.scalatest.FlatSpec
 
 import RequestMethod.Registry.GET
 import ResponseStatus.Registry.Ok
 
 import Implicits._
 
-class ImplicitsSpec extends FlatSpec {
+class ImplicitsSpec extends org.scalatest.FlatSpec {
   "String" should "be converted to URI" in {
-    val uri: URI = "https://localhost:8080/index.html?q=free"
-    assert(uri == new URI("https://localhost:8080/index.html?q=free"))
+    val uri: Uri = "https://localhost:8080/index.html?q=free"
+    assert(uri == Uri("https://localhost:8080/index.html?q=free"))
   }
 
   it should "be converted to Header" in {

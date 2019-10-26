@@ -15,8 +15,6 @@
  */
 package scamper
 
-import java.net.URI
-
 import scala.util.Try
 
 /** HTTP message start line */
@@ -35,7 +33,7 @@ trait RequestLine extends StartLine {
   def method: RequestMethod
 
   /** Gets request target. */
-  def target: URI
+  def target: Uri
 
   /** Returns formatted request line. */
   override lazy val toString: String = s"$method $target HTTP/$version"
@@ -49,43 +47,43 @@ object RequestLine {
   def parse(line: String): RequestLine =
     Try {
       line match {
-        case syntax(method, target, version) => RequestLineImpl(RequestMethod(method), new URI(target), HttpVersion.parse(version))
+        case syntax(method, target, version) => RequestLineImpl(RequestMethod(method), Uri(target), HttpVersion.parse(version))
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Malformed request line: $line")
     }
 
   /** Creates RequestLine with supplied attributes. */
-  def apply(method: RequestMethod, target: URI, version: HttpVersion = HttpVersion(1, 1)): RequestLine =
+  def apply(method: RequestMethod, target: Uri, version: HttpVersion = HttpVersion(1, 1)): RequestLine =
     RequestLineImpl(method, adjustTarget(target, method.name), version)
 
   /** Destructures RequestLine. */
-  def unapply(line: RequestLine): Option[(RequestMethod, URI, HttpVersion)] =
+  def unapply(line: RequestLine): Option[(RequestMethod, Uri, HttpVersion)] =
     Some((line.method, line.target, line.version))
 
-  private def adjustTarget(target: URI, method: String): URI =
+  private def adjustTarget(target: Uri, method: String): Uri =
     target.isAbsolute match {
       case true  => target
       case false =>
         target.toString match {
           case "" =>
             if (method == "OPTIONS")
-              new URI("*")
+              Uri("*")
             else
-              new URI("/")
+              Uri("/")
 
           case uri if uri.startsWith("/") => target
           case uri if uri.startsWith("*") => target
           case uri =>
             if (method == "OPTIONS" && (uri.startsWith("?") || uri.startsWith("#")))
-              new URI("*" + uri)
+              Uri("*" + uri)
             else
-              new URI("/" + uri)
+              Uri("/" + uri)
         }
     }
 }
 
-private case class RequestLineImpl(method: RequestMethod, target: URI, version: HttpVersion) extends RequestLine
+private case class RequestLineImpl(method: RequestMethod, target: Uri, version: HttpVersion) extends RequestLine
 
 /**
  * HTTP status line

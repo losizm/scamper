@@ -16,7 +16,7 @@
 package scamper.server
 
 import java.io.{ Closeable, EOFException, File, InputStream }
-import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException, URI, URISyntaxException }
+import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException, URISyntaxException }
 import java.time.Instant
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.atomic.AtomicLong
@@ -352,9 +352,9 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
     private def readMethod(buffer: Array[Byte], offset: Int)(implicit socket: Socket): RequestMethod =
       RequestMethod(socket.getToken(" ", buffer, offset))
 
-    private def readTarget(buffer: Array[Byte])(implicit socket: Socket): URI =
+    private def readTarget(buffer: Array[Byte])(implicit socket: Socket): Uri =
       try
-        new URI(socket.getToken(" ", buffer))
+        Uri(socket.getToken(" ", buffer))
       catch {
         case _: IndexOutOfBoundsException => throw ReadError(UriTooLong)
         case _: URISyntaxException        => throw ReadError(BadRequest)

@@ -16,15 +16,14 @@
 package scamper
 
 import java.io.{ File, InputStream, OutputStream }
-import java.net.URI
 import java.time.Instant
 
 import scamper.types.MediaType
 
 /** Includes implicit converter functions. */
 object Implicits {
-  /** Converts string to `java.net.URI`. */
-  implicit val stringToUri = (uri: String) => new URI(uri)
+  /** Converts string to `Uri`. */
+  implicit val stringToUri = (uri: String) => Uri(uri)
 
   /** Converts string to [[Header]]. */
   implicit val stringToHeader = (header: String) => Header.parse(header)

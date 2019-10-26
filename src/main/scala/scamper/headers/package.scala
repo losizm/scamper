@@ -15,7 +15,6 @@
  */
 package scamper
 
-import java.net.URI
 import java.time.Instant
 
 import scala.util.Try
@@ -396,12 +395,12 @@ package object headers {
      *
      * @throws HeaderNotFound if Content-Location is not present
      */
-    def contentLocation: URI =
+    def contentLocation: Uri =
       getContentLocation.getOrElse(throw HeaderNotFound("Content-Location"))
 
     /** Gets Content-Location header value if present. */
-    def getContentLocation: Option[URI] =
-      message.getHeaderValue("Content-Location").map(new URI(_))
+    def getContentLocation: Option[Uri] =
+      message.getHeaderValue("Content-Location").map(Uri(_))
 
     /** Tests whether Content-Location header is present. */
     def hasContentLocation: Boolean = message.hasHeader("Content-Location")
@@ -409,7 +408,7 @@ package object headers {
     /**
      * Creates new message setting Content-Location header to supplied value.
      */
-    def withContentLocation(value: URI)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def withContentLocation(value: Uri)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.withHeader(Header("Content-Location", value.toString))
 
     /** Creates new message removing Content-Location header. */
@@ -887,17 +886,17 @@ package object headers {
      *
      * @throws HeaderNotFound if Location is not present
      */
-    def location: URI = getLocation.getOrElse(throw HeaderNotFound("Location"))
+    def location: Uri = getLocation.getOrElse(throw HeaderNotFound("Location"))
 
     /** Gets Location header value if present. */
-    def getLocation: Option[URI] =
-      response.getHeaderValue("Location").map(new URI(_))
+    def getLocation: Option[Uri] =
+      response.getHeaderValue("Location").map(Uri(_))
 
     /** Tests whether Location header is present. */
     def hasLocation: Boolean = response.hasHeader("Location")
 
     /** Creates new response setting Location header to supplied value. */
-    def withLocation(value: URI): HttpResponse =
+    def withLocation(value: Uri): HttpResponse =
       response.withHeader(Header("Location", value.toString))
 
     /** Creates new response removing Location header. */
@@ -1037,17 +1036,17 @@ package object headers {
      *
      * @throws HeaderNotFound if Referer is not present
      */
-    def referer: URI = getReferer.getOrElse(throw HeaderNotFound("Referer"))
+    def referer: Uri = getReferer.getOrElse(throw HeaderNotFound("Referer"))
 
     /** Gets Referer header value if present. */
-    def getReferer: Option[URI] =
-      request.getHeaderValue("Referer").map(new URI(_))
+    def getReferer: Option[Uri] =
+      request.getHeaderValue("Referer").map(Uri(_))
 
     /** Tests whether Referer header is present. */
     def hasReferer: Boolean = request.hasHeader("Referer")
 
     /** Creates new request setting Referer header to supplied value. */
-    def withReferer(value: URI): HttpRequest =
+    def withReferer(value: Uri): HttpRequest =
       request.withHeader(Header("Referer", value.toString))
 
     /** Creates new request removing Referer header. */

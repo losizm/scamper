@@ -70,4 +70,25 @@
  * printf("Body: %s%n", response.as[String])
  * }}}
  */
-package object scamper
+package object scamper {
+  /** Uniform Resource Identifier */
+  type Uri = java.net.URI
+
+  /** Provides factory methods for `Uri`. */
+  object Uri {
+    /** Creates Uri from supplied string. */
+    def apply(uri: String): Uri = new Uri(uri)
+
+    /** Creates Uri with supplied scheme, scheme-specific part, and fragment. */
+    def create(scheme: String, schemeSpecificPart: String, fragment: String = null): Uri =
+      new Uri(scheme, schemeSpecificPart, fragment)
+
+    /** Creates Uri with http scheme and supplied components. */
+    def http(authority: String, path: String = null, query: String = null, fragment: String = null): Uri =
+      new Uri("http", authority, path, query, fragment)
+
+    /** Creates Uri with https scheme and supplied components. */
+    def https(authority: String, path: String = null, query: String = null, fragment: String = null): Uri =
+      new Uri("https", authority, path, query, fragment)
+  }
+}

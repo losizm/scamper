@@ -15,11 +15,9 @@
  */
 package scamper.auth
 
-import java.net.URI
-
 import scala.util.Try
 
-import scamper.Base64
+import scamper.{ Base64, Uri }
 import AuthTypeHelper._
 
 /** Base type for authentication header types. */
@@ -82,7 +80,7 @@ trait BearerChallenge extends Challenge {
   def errorDescription: Option[String]
 
   /** Gets `error_uri` parameter. */
-  def errorUri: Option[URI]
+  def errorUri: Option[Uri]
 
   /** Tests whether `invalid_request` error. */
   def isInvalidRequest: Boolean
@@ -115,7 +113,7 @@ private case class BearerChallengeImpl(params: Map[String, String]) extends Bear
 
   lazy val error: Option[String] = params.get("error")
   lazy val errorDescription: Option[String] = params.get("error_description")
-  lazy val errorUri: Option[URI] = params.get("error_uri").map(new URI(_))
+  lazy val errorUri: Option[Uri] = params.get("error_uri").map(Uri(_))
   lazy val isInvalidRequest: Boolean = error.contains("invalid_request")
   lazy val isInvalidToken: Boolean = error.contains("invalid_token")
   lazy val isInsufficientScope: Boolean = error.contains("insufficient_scope")

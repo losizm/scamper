@@ -15,8 +15,6 @@
  */
 package scamper
 
-import java.net.URI
-
 /**
  * HTTP request method
  *
@@ -27,7 +25,7 @@ trait RequestMethod {
   def name: String
 
   /** Creates `HttpRequest` with request method and supplied target. */
-  def apply(target: URI): HttpRequest =
+  def apply(target: Uri): HttpRequest =
     HttpRequest(this, target, Nil, Entity.empty)
 
   /** Returns method name. */
