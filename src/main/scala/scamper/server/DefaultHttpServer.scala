@@ -262,12 +262,7 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
             false
         }.get
 
-      val futureFirstByte = (requestCount > 1) match {
-        case true  => Future { readByte(true) } (keepAliveContext)
-        case false => Future { readByte(false) } (serviceContext)
-      }
-
-      futureFirstByte.map { firstByte =>
+      def onBeginService(firstByte: Byte): Boolean =
         try {
           logger.info(s"$authority - Servicing request from $tag")
           socket.setSoTimeout(readTimeout)
@@ -289,7 +284,16 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
             logger.error(s"$authority - Unhandled error while servicing request from $tag", err)
             false
         }
-      } (serviceContext).onComplete {
+
+      val result = (requestCount > 1) match {
+        case true  =>
+          Future { readByte(true) } (keepAliveContext)
+            .map { onBeginService } (serviceContext)
+        case false =>
+          Future { onBeginService(readByte(false)) } (serviceContext)
+      }
+
+      result.onComplete {
         case Success(true) =>
           logger.info(s"$authority - Persisting connection to $tag")
           service(connectionId, requestCount + 1)
