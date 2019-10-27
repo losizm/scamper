@@ -726,7 +726,7 @@ app.keepAlive(5, 10)
 ```
 
 The **backlogSize** specifies the maximum number of incoming connections that
-can wait before being accepted. Incoming connections that exceed this limit are
+can wait for acceptance. Incoming connections that exceed this limit are
 refused.
 
 The **poolSize** specifies the maximum number of requests processed
@@ -745,7 +745,7 @@ times out, whereafter **408 Request Timeout** is sent to client.
 The **headerLimit** sets the maximum number of request headers allowed. Incoming
 requests that exceed this limit are sent **431 Request Header Fields Too Large**.
 
-The **keepAlive** settings enable keep-alive connections using the specified
+The **keepAlive** settings enable persistent connections using the specified
 timeout (in seconds) and max requests per connection.
 
 ### Request Handlers
@@ -873,10 +873,10 @@ app.delete("/orders/:id") { req =>
   // Get resolved parameter
   val id = req.params.getInt("id")
 
-  if (deleteOrder(id))
-    Accepted()
-  else
-    NotFound()
+  deleteOrder(id) match {
+    case true  => Accepted()
+    case false => NotFound()
+  }
 }
 
 // Match prefixed path with any request method
@@ -964,7 +964,7 @@ handlers.
 ```scala
 import scamper.ResponseStatus.Registry.{ BadRequest, InternalServerError }
 
-// Accepts `Throwable` and `HttpRequest`; returns `HttpResponse`
+// Accepts Throwable and HttpRequest; returns HttpResponse
 app.error { (err, req) =>
   def isClientError(err: Throwable): Boolean = ???
 
@@ -993,12 +993,12 @@ val app = HttpServer.app()
 app.use("/api") { router =>
   val messages = Map(1 -> "Hello, world!", 2 -> "Goodbye, cruel world!")
 
-  // Will be mapped to /api/messages
+  // Map handler to /api/messages
   router.get("/messages") { req =>
     Ok(messages.mkString("\r\n"))
   }
 
-  // Will be mapped to /api/messages/:id
+  // Map handler to /api/messages/:id
   router.get("/messages/:id") { req =>
     val id = req.params.getInt("id")
     messages.get(id)
