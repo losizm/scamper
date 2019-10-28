@@ -15,6 +15,8 @@
  */
 
 /**
+ * The HTTP library for scala.
+ *
  * === HTTP Messages ===
  *
  * At the core ''Scamper'' is [[HttpMessage]], which is a trait that defines the

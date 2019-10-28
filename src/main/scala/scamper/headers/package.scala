@@ -41,7 +41,7 @@ import scamper.types._
  *
  * // Access and print header values
  * printf("Host: %s%n", req.host)
- * printf("Accept: %s%n", req.accept.head)
+ * printf("Accept: %s%n", req.accept.mkString(", "))
  * }}}
  */
 package object headers {
