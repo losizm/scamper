@@ -45,7 +45,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 To use **Scamper**, start by adding it as a dependency to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "10.3.1"
+libraryDependencies += "com.github.losizm" %% "scamper" % "11.0.0"
 ```
 
 ## HTTP Messages
@@ -246,7 +246,7 @@ import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.ContentType
 import scamper.types.Implicits.stringToMediaType
 
-val body = Entity.fromText("""
+val body = Entity("""
 <!DOCTYPE html>
 <html>
   <head>
@@ -269,7 +269,7 @@ import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.ContentType
 import scamper.types.Implicits.stringToMediaType
 
-val body = Entity.fromFile(new File("./index.html"))
+val body = Entity(new File("./index.html"))
 val res = Ok(body).withContentType("text/html; charset=utf-8")
 ```
 

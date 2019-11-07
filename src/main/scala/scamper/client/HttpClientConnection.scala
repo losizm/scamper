@@ -102,7 +102,7 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
       headers,
       headOnly match {
         case true  => Entity.empty
-        case false => Entity.fromInputStream(socket.getInputStream())
+        case false => Entity(socket.getInputStream())
       }
     )
   }

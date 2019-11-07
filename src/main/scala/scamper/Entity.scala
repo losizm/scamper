@@ -46,54 +46,59 @@ trait Entity {
 /** Provides factory methods for `Entity`. */
 object Entity {
   /** Creates `Entity` from supplied bytes. */
-  def fromBytes(bytes: Array[Byte]): Entity =
+  def apply(bytes: Array[Byte]): Entity =
     ByteArrayEntity(bytes)
 
-  /** Creates `Entity` with bytes from supplied input stream. */
-  def fromInputStream(in: InputStream): Entity =
+  /** Creates `Entity` from supplied input stream. */
+  def apply(in: InputStream): Entity =
     InputStreamEntity(in)
 
-  /** Creates `Entity` from bytes written to output stream. */
-  def fromWriter(writer: OutputStream => Unit): Entity =
+  /**
+   * Creates `Entity` from supplied writer.
+   *
+   * An output stream is passed to `writer`, and bytes written to the output
+   * stream are used to build the entity.
+   */
+  def apply(writer: OutputStream => Unit): Entity =
     InputStreamEntity(new WriterInputStream(writer)(Auxiliary.executor))
 
-  /** Creates `Entity` with data from supplied file. */
-  def fromFile(file: File): Entity =
+  /** Creates `Entity` from supplied file. */
+  def apply(file: File): Entity =
     FileEntity(file)
 
-  /** Creates `Entity` from text using specified character encoding. */
-  def fromText(text: String, charset: String = "UTF-8"): Entity =
+  /** Creates `Entity` from supplied text. */
+  def apply(text: String, charset: String = "UTF-8"): Entity =
     ByteArrayEntity(text.getBytes(charset))
 
   /**
    * Creates `Entity` from supplied form data.
    *
-   * The form data are encoded as `application/x-www-form-urlencoded`.
+   * @note The data is encoded as `application/x-www-form-urlencoded`.
    */
-  def fromForm(data: Map[String, Seq[String]]): Entity =
-    fromText(QueryString.format(data))
+  def apply(data: Map[String, Seq[String]]): Entity =
+    apply(QueryString.format(data))
 
   /**
    * Creates `Entity` from supplied form data.
    *
-   * The form data are encoded as `application/x-www-form-urlencoded`.
+   * @note The data is encoded as `application/x-www-form-urlencoded`.
    */
-  def fromForm(data: (String, String)*): Entity =
-    fromText(QueryString.format(data))
+  def apply(data: (String, String)*): Entity =
+    apply(QueryString.format(data))
 
   /**
-   * Creates `Entity` from query string.
+   * Creates `Entity` from supplied query string.
    *
-   * The query string is encoded as `application/x-www-form-urlencoded`.
+   * @note The query string is encoded as `application/x-www-form-urlencoded`.
    */
-  def fromQuery(query: QueryString): Entity =
-    fromText(query.toString)
+  def apply(query: QueryString): Entity =
+    apply(query.toString)
 
-  /** Creates `Entity` from multipart form data using supplied boundary. */
-  def fromMultipart(multipart: Multipart, boundary: String): Entity =
+  /** Creates `Entity` from supplied multipart form data. */
+  def apply(multipart: Multipart, boundary: String): Entity =
     MultipartEntity(multipart, boundary)
 
-  /** Returns empty `Entity`. */
+  /** Gets empty `Entity`. */
   def empty: Entity = EmptyEntity
 }
 

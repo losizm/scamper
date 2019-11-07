@@ -127,7 +127,7 @@ object Implicits {
       createWithContentDisposition("inline", file)
 
     private def createWithContentDisposition(typeName: String, file: File): HttpResponse = {
-      val entity = Entity.fromFile(file)
+      val entity = Entity(file)
       val mediaType = MediaType.fromFile(file).getOrElse(Auxiliary.`application/octet-stream`)
       val disposition = DispositionType(
         typeName,

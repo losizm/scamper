@@ -350,7 +350,7 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
       val startLine = RequestLine(method, target, version)
       val headers = readHeaders(buffer)
 
-      HttpRequest(startLine, headers, Entity.fromInputStream(socket.getInputStream))
+      HttpRequest(startLine, headers, Entity(socket.getInputStream))
     }
 
     private def readMethod(buffer: Array[Byte], offset: Int)(implicit socket: Socket): RequestMethod =
