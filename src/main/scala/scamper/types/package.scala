@@ -26,11 +26,11 @@ package scamper
  * import scamper.types.{ MediaRange, MediaType, TransferCoding }
  *
  * val json = MediaRange("application", "json", 0.9f)
- * val html = MediaRange.parse("text/html; q=0.1")
+ * val html = MediaRange("text/html; q=0.1")
  *
  * val req = GET("/motd").withAccept(json, html)
  *
- * val text = MediaType.parse("text/plain")
+ * val text = MediaType("text/plain")
  * val gzip = TransferCoding("gzip")
  *
  * val res = Ok("There is an answer.").withContentType(text).withTransferEncoding(gzip)

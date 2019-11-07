@@ -58,7 +58,7 @@ package object headers {
     def getAccept: Option[Seq[MediaRange]] =
       request.getHeaderValue("Accept")
         .map(ListParser.apply)
-        .map(_.map(MediaRange.parse))
+        .map(_.map(MediaRange.apply))
 
     /** Tests whether Accept header is present. */
     def hasAccept: Boolean = request.hasHeader("Accept")
@@ -167,7 +167,7 @@ package object headers {
     def getAcceptPatch: Option[Seq[MediaType]] =
       response.getHeaderValue("Accept-Patch")
         .map(ListParser.apply)
-        .map(_.map(MediaType.parse))
+        .map(_.map(MediaType.apply))
 
     /** Tests whether Accept-Patch header is present. */
     def hasAcceptPatch: Boolean = response.hasHeader("Accept-Patch")
@@ -453,7 +453,7 @@ package object headers {
 
     /** Gets Content-Type header value if present. */
     def getContentType: Option[MediaType] =
-      message.getHeaderValue("Content-Type").map(MediaType.parse)
+      message.getHeaderValue("Content-Type").map(MediaType.apply)
 
     /** Tests whether Content-Type header is present. */
     def hasContentType: Boolean = message.hasHeader("Content-Type")

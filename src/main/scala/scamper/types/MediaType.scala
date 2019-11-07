@@ -81,7 +81,7 @@ object MediaType {
     finally Try(in.close())
 
     asScala(props).map {
-      case (key, value) => key.toLowerCase -> Try(parse(value))
+      case (key, value) => key.toLowerCase -> Try(apply(value))
     }.collect {
       case (key, Success(value)) => key -> value
     }.toMap
@@ -105,7 +105,7 @@ object MediaType {
     mappings.get(suffix.toLowerCase)
 
   /** Parses formatted media type. */
-  def parse(mediaType: String): MediaType =
+  def apply(mediaType: String): MediaType =
     ParseMediaType(mediaType) match {
       case (mainType, subtype, params) => apply(mainType, subtype, params)
     }

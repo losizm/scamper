@@ -54,10 +54,10 @@ object Implicits {
   implicit val stringToLinkValue = (link: String) => LinkValue.parse(link)
 
   /** Converts string to [[MediaType]]. */
-  implicit val stringToMediaType = (mediaType: String) => MediaType.parse(mediaType)
+  implicit val stringToMediaType = (mediaType: String) => MediaType(mediaType)
 
   /** Converts string to [[MediaRange]]. */
-  implicit val stringToMediaRange = (range: String) => MediaRange.parse(range)
+  implicit val stringToMediaRange = (range: String) => MediaRange(range)
 
   /** Converts string to [[PragmaDirective]]. */
   implicit val stringToPragmaDirective = (directive: String) => PragmaDirective.parse(directive)

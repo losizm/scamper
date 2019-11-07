@@ -122,7 +122,7 @@ private class TextBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser
 
   def parse(message: HttpMessage): String =
     message.getHeaderValue("Content-Type")
-      .map(MediaType.parse)
+      .map(MediaType.apply)
       .flatMap(_.params.get("charset"))
       .orElse(Some("UTF-8"))
       .map(charset => new String(parser.parse(message), charset)).get
@@ -202,7 +202,7 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
           }.getOrElse(throw HeaderNotFound("Content-Disposition"))
 
           val contentType = headers.collectFirst {
-            case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType.parse(value)
+            case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType(value)
           }.getOrElse(Auxiliary.`text/plain`)
 
           if (contentType.isText && disposition.params.get("filename").isEmpty) {

@@ -76,7 +76,7 @@ trait MediaRange {
 /** Provides factory methods for `MediaRange`. */
 object MediaRange {
   /** Parse formatted media range. */
-  def parse(mediaRange: String): MediaRange =
+  def apply(mediaRange: String): MediaRange =
     ParseMediaType(mediaRange) match {
       case (mainType, subtype, params) =>
         params.collectFirst {

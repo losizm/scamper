@@ -180,7 +180,7 @@ object TextPart {
     }.getOrElse(throw HeaderNotFound("Content-Disposition"))
 
     val contentType = headers.collectFirst {
-      case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType.parse(value)
+      case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType(value)
     }.getOrElse(Auxiliary.`text/plain`)
 
     apply(contentDisposition, contentType, content)
@@ -223,7 +223,7 @@ object FilePart {
     }.getOrElse(throw HeaderNotFound("Content-Disposition"))
 
     val contentType = headers.collectFirst {
-      case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType.parse(value)
+      case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType(value)
     }.getOrElse(getType(content))
 
     apply(contentDisposition, contentType, content)
