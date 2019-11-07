@@ -28,7 +28,7 @@ import scamper.types.Implicits._
 
 class BodyParserSpec extends FlatSpec {
   "BodyParser" should "parse response with text body" in {
-    implicit val bodyParser = BodyParsers.text()
+    implicit val bodyParser = BodyParser.text()
     val body = Entity("Hello, world!")
     val message = Ok(body).withContentType("text/plain").withContentLength(body.getLength.get)
 
@@ -40,7 +40,7 @@ class BodyParserSpec extends FlatSpec {
   }
 
   it should "parse response with chunked text body" in {
-    implicit val bodyParser = BodyParsers.text()
+    implicit val bodyParser = BodyParser.text()
     val body = Entity("7\r\nHello, \r\n6\r\nworld!\r\n0\r\n")
     val message = Ok(body).withContentType("text/plain; charset=utf8").withTransferEncoding("chunked")
 
@@ -48,13 +48,13 @@ class BodyParserSpec extends FlatSpec {
   }
 
   it should "detect truncation in chunked text body" in {
-    implicit val bodyParser = BodyParsers.text()
+    implicit val bodyParser = BodyParser.text()
     val message = Ok(Entity("100\r\nHello, world!")).withContentType("text/plain; charset=utf8").withTransferEncoding("chunked")
     assertThrows[EOFException](message.as[String])
   }
 
   it should "parse request with form body" in {
-    implicit val bodyParser = BodyParsers.form()
+    implicit val bodyParser = BodyParser.form()
     val body = Entity("id" -> "0", "name" -> "root")
     val request = POST("users").withBody(body).withContentLength(body.getLength.get)
     val form = request.as[Map[String, Seq[String]]]
@@ -64,7 +64,7 @@ class BodyParserSpec extends FlatSpec {
   }
 
   it should "parse request with form body as query string" in {
-    implicit val bodyParser = BodyParsers.query()
+    implicit val bodyParser = BodyParser.query()
     val body = Entity("id" -> "0", "name" -> "root")
     val request = POST("users").withBody(body).withContentLength(body.getLength.get)
     val form = request.as[QueryString]
@@ -74,7 +74,7 @@ class BodyParserSpec extends FlatSpec {
   }
 
   it should "not parse response with large body" in {
-    implicit val bodyParser = BodyParsers.text(8)
+    implicit val bodyParser = BodyParser.text(8)
     val body = Entity("Hello, world!")
     val message = Ok(body).withContentType("text/plain").withContentLength(body.getLength.get)
 
@@ -82,7 +82,7 @@ class BodyParserSpec extends FlatSpec {
   }
 
   it should "not parse response with large entity" in {
-    implicit val bodyParser = BodyParsers.text(256)
+    implicit val bodyParser = BodyParser.text(256)
     val body = Entity(getResourceBytes("/test.html.gz"))
 
     assertThrows[EntityTooLarge] {

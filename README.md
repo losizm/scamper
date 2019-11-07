@@ -289,14 +289,14 @@ val res = Ok(new File("./index.html")).withContentType("text/html; charset=utf-8
 ### Parsing Body
 
 When handling an incoming message, use an appropriate `BodyParser` to parse the
-message body. There is a set of standard parsers available in `BodyParsers`,
-such as one used for parsing text content.
+message body. There are factory methods available in the `BodyParser` object,
+such as one used for creating a text body parser.
 
 ```scala
-import scamper.{ BodyParsers, HttpMessage }
+import scamper.{ BodyParser, HttpMessage }
 
 // Create text body parser
-implicit val parser = BodyParsers.text(maxLength = 1024)
+implicit val parser = BodyParser.text(maxLength = 1024)
 
 def printText(message: HttpMessage): Unit = {
   // Parse message body to String using implicit parser
@@ -366,11 +366,11 @@ And for an incoming message with multipart form-data, there's a standard
 `BodyParser` for parsing the message content.
 
 ```scala
-import scamper.{ BodyParsers, HttpRequest, Multipart }
+import scamper.{ BodyParser, HttpRequest, Multipart }
 
 def saveTrack(req: HttpRequest): Unit = {
   // Get parser for multipart message body
-  implicit val parser = BodyParsers.multipart()
+  implicit val parser = BodyParser.multipart()
 
   // Parse message to Multipart instance
   val multipart = req.as[Multipart]
@@ -561,12 +561,12 @@ HttpClient.send(req) {
 can process the response and return whatever value warranted.
 
 ```scala
-import scamper.BodyParsers
+import scamper.BodyParser
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.GET
 import scamper.client.HttpClient
 
-implicit val parser = BodyParsers.text()
+implicit val parser = BodyParser.text()
 
 def getMessageOfTheDay(): Either[Int, String] = {
   val req = GET("http://localhost:8080/motd")
@@ -591,11 +591,11 @@ to an instance, and use it as the client. With that, you also get access to
 methods corresponding to the standard HTTP request methods.
 
 ```scala
-import scamper.BodyParsers
+import scamper.BodyParser
 import scamper.Implicits.stringToUri
 import scamper.client.HttpClient
 
-implicit val parser = BodyParsers.text()
+implicit val parser = BodyParser.text()
 
 // Create HttpClient instance
 val client = HttpClient(bufferSize = 4096, readTimeout = 3000)
@@ -615,7 +615,7 @@ And if the client is declared as an implicit value, you can make use of `send()`
 on the request itself.
 
 ```scala
-import scamper.BodyParsers
+import scamper.BodyParser
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.GET
 import scamper.client.HttpClient
@@ -624,7 +624,7 @@ import scamper.headers.{ Accept, AcceptLanguage }
 import scamper.types.Implicits.{ stringToMediaRange, stringToLanguageRange }
 
 implicit val client = HttpClient(bufferSize = 8192, readTimeout = 1000)
-implicit val parser = BodyParsers.text(4096)
+implicit val parser = BodyParser.text(4096)
 
 GET("http://localhost:8080/motd")
   .withAccept("text/plain")
@@ -833,7 +833,6 @@ And handlers can be added using methods corresponding to the standard HTTP
 request methods.
 
 ```scala
-import scamper.BodyParsers
 import scamper.Implicits.stringToUri
 import scamper.ResponseStatus.Registry.{ Created, Ok }
 import scamper.headers.Location
@@ -847,7 +846,7 @@ app.get("/about") { req =>
 app.post("/messages") { req =>
   def post(message: String): Int = ???
 
-  implicit val parser = BodyParsers.text()
+  implicit val parser = BodyParser.text()
 
   val id = post(req.as[String])
   Created().withLocation(s"/messages/$id")
