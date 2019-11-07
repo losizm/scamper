@@ -368,7 +368,7 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
       val regex = "HTTP/(.+)".r
 
       socket.getLine(buffer) match {
-        case regex(version) => HttpVersion.parse(version)
+        case regex(version) => HttpVersion(version)
         case _ => throw ReadError(BadRequest)
       }
     }
@@ -391,7 +391,7 @@ private class DefaultHttpServer private (val id: Long, val host: InetAddress, va
                 headers.update(headers.size - 1, Header(last.name, last.value + " " + line.trim()))
               case false =>
                 if (headers.size < headerLimit)
-                  headers += Header.parse(line)
+                  headers += Header(line)
                 else
                   throw ReadError(RequestHeaderFieldsTooLarge)
             }

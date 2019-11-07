@@ -33,7 +33,7 @@ private object HeaderStream {
           val last = headers.last
           headers.update(headers.length - 1, Header(last.name, last.value + " " + line.trim()))
         case false =>
-          headers += Header.parse(line)
+          headers += Header(line)
       }
 
     headers.toSeq

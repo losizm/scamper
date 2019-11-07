@@ -44,10 +44,10 @@ object RequestLine {
   private val syntax = """([\w!#$%&'*+.^`|~-]+)\h+(\p{Graph}+)\h+HTTP/(\d+(?:\.\d+)?)\h*""".r
 
   /** Parses formatted request line. */
-  def parse(line: String): RequestLine =
+  def apply(line: String): RequestLine =
     Try {
       line match {
-        case syntax(method, target, version) => RequestLineImpl(RequestMethod(method), Uri(target), HttpVersion.parse(version))
+        case syntax(method, target, version) => RequestLineImpl(RequestMethod(method), Uri(target), HttpVersion(version))
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Malformed request line: $line")
@@ -103,11 +103,11 @@ object StatusLine {
   private val syntax = """HTTP/(\d+(?:\.\d+)?)\h+(\d+)(?:\h+(\p{Print}*?))?\h*""".r
 
   /** Parses formatted status line. */
-  def parse(line: String): StatusLine =
+  def apply(line: String): StatusLine =
     Try {
       line match {
-        case syntax(version, code, null | "") => StatusLineImpl(ResponseStatus(code.toInt), HttpVersion.parse(version))
-        case syntax(version, code, reason)    => StatusLineImpl(ResponseStatus(code.toInt, reason), HttpVersion.parse(version))
+        case syntax(version, code, null | "") => StatusLineImpl(ResponseStatus(code.toInt), HttpVersion(version))
+        case syntax(version, code, reason)    => StatusLineImpl(ResponseStatus(code.toInt, reason), HttpVersion(version))
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Malformed status line: $line")

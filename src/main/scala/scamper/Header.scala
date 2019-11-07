@@ -52,7 +52,7 @@ object Header {
     apply(name, DateValue.format(value))
 
   /** Parses formatted header. */
-  def parse(header: String): Header =
+  def apply(header: String): Header =
     header.split(":", 2) match {
       case Array(name, value) => apply(name.trim, value.trim)
       case _ => throw new IllegalArgumentException(s"Malformed header: $header")

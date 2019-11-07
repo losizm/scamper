@@ -94,7 +94,7 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
 
   private def getResponse(headOnly: Boolean): HttpResponse = {
     val buffer = new Array[Byte](bufferSize)
-    val statusLine = StatusLine.parse(socket.getLine(buffer))
+    val statusLine = StatusLine(socket.getLine(buffer))
     val headers = HeaderStream.getHeaders(socket.getInputStream, buffer)
 
     HttpResponse(

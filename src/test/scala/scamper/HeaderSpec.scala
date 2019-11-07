@@ -19,7 +19,7 @@ import org.scalatest.FlatSpec
 
 class HeaderSpec extends FlatSpec {
   "Header" should "be created from formatted value" in {
-    val header = Header.parse("Content-Type: text/plain")
+    val header = Header("Content-Type: text/plain")
     assert(header.name == "Content-Type")
     assert(header.value == "text/plain")
     assert(header.toString == "Content-Type: text/plain")
@@ -48,7 +48,7 @@ class HeaderSpec extends FlatSpec {
   }
 
   it should "be destructured" in {
-    val header = Header.parse("Content-Type: text/plain")
+    val header = Header("Content-Type: text/plain")
     
     header match {
       case Header(name, value) =>
@@ -58,7 +58,7 @@ class HeaderSpec extends FlatSpec {
   }
 
   it should "not be created from malformed value" in {
-    assertThrows[IllegalArgumentException](Header.parse("text/plain"))
+    assertThrows[IllegalArgumentException](Header("text/plain"))
     assertThrows[IllegalArgumentException](Header("Cookie", "user=guest,\r\ngroup=readonly"))
   }
 }

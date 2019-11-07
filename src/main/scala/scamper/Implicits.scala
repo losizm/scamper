@@ -26,7 +26,7 @@ object Implicits {
   implicit val stringToUri = (uri: String) => Uri(uri)
 
   /** Converts string to [[Header]]. */
-  implicit val stringToHeader = (header: String) => Header.parse(header)
+  implicit val stringToHeader = (header: String) => Header(header)
 
   /** Converts tuple to [[Header]] where tuple is name-value pair. */
   implicit val tupleToHeader = (header: (String, String)) => Header(header._1, header._2)
