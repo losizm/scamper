@@ -26,7 +26,7 @@ package scamper
  *
  * {{{
  * import java.io.File
- * import scamper.BodyParsers
+ * import scamper.BodyParser
  * import scamper.Implicits.stringToEntity
  * import scamper.ResponseStatus.Registry.{ NotFound, Ok }
  * import scamper.server.HttpServer
@@ -50,7 +50,7 @@ package scamper
  * app.put("/data/:id") { req =>
  *   def update(id: Int, data: String): Boolean = ???
  *
- *   implicit val parser = BodyParsers.text()
+ *   implicit val parser = BodyParser.text()
  *
  *   // Get path parameter
  *   val id = req.params.getInt("id")

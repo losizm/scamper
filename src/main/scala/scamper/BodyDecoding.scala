@@ -21,7 +21,7 @@ import java.util.zip.{ GZIPInputStream, InflaterInputStream }
 import headers.{ ContentEncoding, ContentLength, TransferEncoding }
 import types.{ ContentCoding, TransferCoding }
 
-/** A mixin providing access to decoded message body. */
+/** Provides access to decoded message body. */
 trait BodyDecoding {
   /** Gets maximum length of message body. */
   def maxLength: Long

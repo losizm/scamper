@@ -35,12 +35,12 @@ import RequestMethod.Registry._
  * response.
  *
  * {{{
- * import scamper.BodyParsers
+ * import scamper.BodyParser
  * import scamper.Implicits.stringToUri
  * import scamper.RequestMethod.Registry.GET
  * import scamper.client.HttpClient
  *
- * implicit val parser = BodyParsers.text()
+ * implicit val parser = BodyParser.text()
  *
  * def getMessageOfTheDay(): Either[Int, String] = {
  *   val req = GET("localhost:8080/motd")
@@ -67,11 +67,11 @@ import RequestMethod.Registry._
  * methods.
  *
  * {{{
- * import scamper.BodyParsers
+ * import scamper.BodyParser
  * import scamper.Implicits.stringToUri
  * import scamper.client.HttpClient
  *
- * implicit val parser = BodyParsers.text()
+ * implicit val parser = BodyParser.text()
  *
  * // Create HttpClient instance
  * val client = HttpClient(bufferSize = 4096, readTimeout = 3000)
@@ -91,7 +91,7 @@ import RequestMethod.Registry._
  * on the request itself.
  *
  * {{{
- * import scamper.BodyParsers
+ * import scamper.BodyParser
  * import scamper.Implicits.stringToUri
  * import scamper.RequestMethod.Registry.GET
  * import scamper.client.HttpClient
@@ -100,7 +100,7 @@ import RequestMethod.Registry._
  * import scamper.types.Implicits.{ stringToMediaRange, stringToLanguageRange }
  *
  * implicit val client = HttpClient(bufferSize = 8192, readTimeout = 1000)
- * implicit val parser = BodyParsers.text(4096)
+ * implicit val parser = BodyParser.text(4096)
  *
  * GET("http://localhost:8080/motd")
  *   .withAccept("text/plain")

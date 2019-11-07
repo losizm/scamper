@@ -25,11 +25,7 @@ import scamper.types.{ DispositionType, MediaType }
 
 import Auxiliary.{ FileType, InputStreamType }
 
-/**
- * Provides utility for parsing HTTP message body.
- *
- * @see [[BodyParsers]]
- */
+/** Provides utility for parsing HTTP message body. */
 trait BodyParser[T] {
   /**
    * Parses body of supplied message and returns instance of type T.

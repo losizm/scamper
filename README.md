@@ -988,7 +988,7 @@ import scamper.server.Implicits.ServerHttpRequestType
 
 val app = HttpServer.app()
 
-// Mount path of router is /api
+// Mount router to /api
 app.use("/api") { router =>
   val messages = Map(1 -> "Hello, world!", 2 -> "Goodbye, cruel world!")
 

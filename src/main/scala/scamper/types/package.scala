@@ -16,7 +16,7 @@
 package scamper
 
 /**
- * Defines standardized types for header classes in [[scamper.headers]].
+ * Defines standardized types for header field values in [[scamper.headers]].
  *
  * {{{
  * import scamper.Implicits.{ stringToEntity, stringToUri }

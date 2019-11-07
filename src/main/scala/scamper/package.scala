@@ -15,7 +15,7 @@
  */
 
 /**
- * The HTTP library for scala.
+ * The HTTP library for Scala.
  *
  * === HTTP Messages ===
  *
@@ -34,8 +34,8 @@
  * import scamper.RequestMethod.Registry.GET
  *
  * val request = GET("/motd").withHeaders(
- *   Header("Host", "localhost:8080"),
- *   Header("Accept", "text/plain")
+ *   Header("Host: localhost:8080"),
+ *   Header("Accept: text/plain")
  * )
  *
  * printf("Request Method: %s%n", request.method)
@@ -51,13 +51,13 @@
  * builder methods to further define the response.
  *
  * {{{
- * import scamper.{ BodyParsers, Header }
+ * import scamper.{ BodyParser, Header }
  * import scamper.Implicits.stringToEntity
  * import scamper.ResponseStatus.Registry.Ok
  *
  * val response = Ok("There is an answer.").withHeaders(
- *   Header("Content-Type", "text/plain"),
- *   Header("Connection", "close")
+ *   Header("Content-Type: text/plain"),
+ *   Header("Connection: close")
  * )
  *
  * printf("Status Code: %s%n", response.status.code)
@@ -67,7 +67,7 @@
  *
  * val contentType: Option[String] = response.getHeaderValue("Content-Type")
  *
- * implicit val parser = BodyParsers.text()
+ * implicit val parser = BodyParser.text()
  *
  * printf("Body: %s%n", response.as[String])
  * }}}
