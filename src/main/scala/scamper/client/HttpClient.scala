@@ -177,6 +177,18 @@ trait HttpClient {
 
 /** Provides factory methods for creating `HttpClient`. */
 object HttpClient {
+  /** Provides utility for filtering outgoing request. */
+  trait OutboundFilter {
+    /** Filters outgoing request. */
+    def apply(req: HttpRequest): HttpRequest
+  }
+
+  /** Provides utility for filtering incoming response. */
+  trait InboundFilter {
+    /** Filters incoming response. */
+    def apply(req: HttpResponse): HttpResponse
+  }
+
   /**
    * Configures and creates `HttpClient`.
    *
@@ -191,14 +203,26 @@ object HttpClient {
    * | bufferSize      | `8192` |
    * | readTimeout     | `30000` |
    * | continueTimeout | `1000` |
-   * | truststore      | ''(Not set)'' |
-   * | trustManager    | ''(Not set)'' |
+   * | incoming        | ''(Not set)'' |
+   * | outgoing        | ''(Not set)'' |
    * <br>
    */
-  class Settings private[HttpClient]() {
+  class Settings private[HttpClient] () {
     private var _bufferSize: Int = 8192
     private var _readTimeout: Int = 30000
     private var _continueTimeout: Int = 1000
+    private var _incoming: Seq[InboundFilter] = Nil
+    private var _outgoing: Seq[OutboundFilter] = Nil
+
+    /** Resets to default settings. */
+    def reset(): this.type = synchronized {
+      _bufferSize = 8192
+      _readTimeout = 30000
+      _continueTimeout = 1000
+      _outgoing = Nil
+      _incoming = Nil
+      this
+    }
 
     /**
      * Sets buffer size.
@@ -206,7 +230,7 @@ object HttpClient {
      * The buffer size specifies the size in bytes of the socket's send/receive
      * buffer.
      */
-    def bufferSize(size: Int): this.type = {
+    def bufferSize(size: Int): this.type = synchronized {
       _bufferSize = size
       this
     }
@@ -217,7 +241,7 @@ object HttpClient {
      * The read timeout controls how long (in milliseconds) a read from a socket
      * blocks before it times out, whereafter the client throws `SocketTimeoutException`.
      */
-    def readTimeout(timeout: Int): this.type = {
+    def readTimeout(timeout: Int): this.type = synchronized {
       _readTimeout = timeout
       this
     }
@@ -231,30 +255,55 @@ object HttpClient {
      * @note This applies only to requests that include `Except: 100-Continue`
      *   header and request body.
      */
-    def continueTimeout(timeout: Int): this.type = {
+    def continueTimeout(timeout: Int): this.type = synchronized {
       _continueTimeout = timeout
       this
     }
 
+    /** Adds supplied inbound filter. */
+    def incoming(filter: InboundFilter): this.type = synchronized {
+      _incoming = _incoming :+ filter
+      this
+    }
+
+    /** Adds supplied outbound filter. */
+    def outgoing(filter: OutboundFilter): this.type = synchronized {
+      _outgoing = _outgoing :+ filter
+      this
+    }
+
     /** Creates client using current settings. */
-    def create(): HttpClient =
-      DefaultHttpClient(_bufferSize, _readTimeout, _continueTimeout)
+    def create(): HttpClient = synchronized {
+      DefaultHttpClient(freeze())
+    }
 
     /**
      * Creates client using current settings and supplied truststore.
      *
      * @param truststore used for SSL/TLS requests ''(store type must be JKS)''
      */
-    def create(truststore: File): HttpClient =
-      DefaultHttpClient(_bufferSize, _readTimeout, _continueTimeout, truststore)
+    def create(truststore: File): HttpClient = synchronized {
+      DefaultHttpClient(freeze(), truststore)
+    }
 
     /**
      * Creates client using current settings and supplied trust manager.
      *
      * @param trustManager used for SSL/TLS requests
      */
-    def create(trustManager: TrustManager): HttpClient =
-      DefaultHttpClient(_bufferSize, _readTimeout, _continueTimeout, trustManager)
+    def create(trustManager: TrustManager): HttpClient = synchronized {
+      DefaultHttpClient(freeze(), trustManager)
+    }
+
+    private def freeze(): DefaultHttpClient.Settings = synchronized {
+      DefaultHttpClient.Settings(
+        bufferSize = _bufferSize,
+        readTimeout =_readTimeout,
+        continueTimeout = _continueTimeout,
+        outgoing = _outgoing,
+        incoming = _incoming
+      )
+    }
   }
 
   /**
@@ -265,7 +314,7 @@ object HttpClient {
    * @param continueTimeout how long to wait (in milliseconds) for '''100 Continue''' before sending request body
    */
   def apply(bufferSize: Int = 8192, readTimeout: Int = 30000, continueTimeout: Int = 1000): HttpClient =
-    DefaultHttpClient(bufferSize, readTimeout, continueTimeout)
+    settings().bufferSize(bufferSize).readTimeout(readTimeout).continueTimeout(continueTimeout).create()
 
   /** Gets default client settings. */
   def settings(): Settings = new Settings()

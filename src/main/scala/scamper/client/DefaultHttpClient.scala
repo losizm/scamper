@@ -30,24 +30,41 @@ import scamper.cookies.{ PlainCookie, RequestCookies }
 import scamper.headers.{ Connection, ContentLength, Host, TE, TransferEncoding }
 import scamper.types.TransferCoding
 
+import HttpClient.{ InboundFilter, OutboundFilter }
+
 private object DefaultHttpClient {
-  def apply(bufferSize: Int, readTimeout: Int, continueTimeout: Int): DefaultHttpClient = {
-    implicit val factory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
-    new DefaultHttpClient(bufferSize.max(1024), readTimeout.max(0), continueTimeout.max(0))
+  case class Settings(
+    bufferSize: Int,
+    readTimeout: Int,
+    continueTimeout: Int,
+    incoming: Seq[InboundFilter],
+    outgoing: Seq[OutboundFilter]
+  )
+
+  def apply(settings: Settings): DefaultHttpClient = {
+    val factory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
+    new DefaultHttpClient(settings, factory)
   }
 
-  def apply(bufferSize: Int, readTimeout: Int, continueTimeout: Int, trustStore: File): DefaultHttpClient = {
-    implicit val factory = SecureSocketFactory.create(trustStore)
-    new DefaultHttpClient(bufferSize.max(1024), readTimeout.max(0), continueTimeout.max(0))
+  def apply(settings: Settings, truststore: File): DefaultHttpClient = {
+    val factory = SecureSocketFactory.create(truststore)
+    new DefaultHttpClient(settings, factory)
   }
 
-  def apply(bufferSize: Int, readTimeout: Int, continueTimeout: Int, trustManager: TrustManager): DefaultHttpClient = {
-    implicit val factory = SecureSocketFactory.create(trustManager)
-    new DefaultHttpClient(bufferSize.max(1024), readTimeout.max(0), continueTimeout.max(0))
+  def apply(settings: Settings, trustManager: TrustManager): DefaultHttpClient = {
+    val factory = SecureSocketFactory.create(trustManager)
+    new DefaultHttpClient(settings, factory)
   }
 }
 
-private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: Int, val continueTimeout: Int)(implicit secureSocketFactory: SSLSocketFactory) extends HttpClient {
+private class DefaultHttpClient private (settings: DefaultHttpClient.Settings, secureSocketFactory: SSLSocketFactory) extends HttpClient {
+  val bufferSize = settings.bufferSize.max(1024)
+  val readTimeout = settings.readTimeout.max(0)
+  val continueTimeout = settings.continueTimeout.max(0)
+
+  private val incoming = settings.incoming
+  private val outgoing = settings.outgoing
+
   def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T = {
     val target = request.target
 
@@ -56,7 +73,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
 
     val secure = target.getScheme == "https"
     val host = getEffectiveHost(target)
-    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/10.3.1")
+    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/11.0.0")
     val connection = getEffectiveConnection(request)
 
     var effectiveRequest = request.method match {
@@ -74,7 +91,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
     effectiveRequest = effectiveRequest.withHeaders({
       Header("Host", host) +:
       Header("User-Agent", userAgent) +:
-      effectiveRequest.headers.filterNot(header => header.name.matches("(?i)Host|User-Agent|Connection")) :+
+      effectiveRequest.headers.filterNot(_.name.matches("(?i)Host|User-Agent|Connection")) :+
       Header("Connection", connection)
     } : _*)
 
@@ -83,7 +100,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
     if (! effectiveRequest.path.startsWith("/") && effectiveRequest.path != "*")
       effectiveRequest = effectiveRequest.withPath("/" + effectiveRequest.path)
 
-    val conn = getClientConnection(
+    val conn = createClientConnection(
       if (secure) secureSocketFactory else SocketFactory.getDefault(),
       target.getHost,
       target.getPort match {
@@ -92,8 +109,11 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
       }
     )
 
-    try handler(conn.send(effectiveRequest))
-    finally Try(conn.close())
+    try {
+      val req = outgoing.foldLeft(effectiveRequest) { (req, filter) => filter(req) }
+      val res = incoming.foldLeft(conn.send(req))   { (res, filter) => filter(res) }
+      handler(res)
+    } finally Try(conn.close())
   }
 
   def get[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
@@ -144,7 +164,7 @@ private class DefaultHttpClient private (val bufferSize: Int, val readTimeout: I
       .map(_.mkString(", "))
       .get
 
-  private def getClientConnection(factory: SocketFactory, host: String, port: Int): HttpClientConnection = {
+  private def createClientConnection(factory: SocketFactory, host: String, port: Int): HttpClientConnection = {
     val socket = factory.createSocket(host, port)
 
     try {
