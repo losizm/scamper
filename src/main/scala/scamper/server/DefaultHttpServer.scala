@@ -57,13 +57,13 @@ private object DefaultHttpServer {
   case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
   case class ReadAborted(reason: String) extends HttpException(s"Read aborted with $reason")
 
-  def apply(host: InetAddress, port: Int)(implicit app: Application) =
-    new DefaultHttpServer(count.incrementAndGet(), host, port)
+  def apply(app: Application, host: InetAddress, port: Int) =
+    new DefaultHttpServer(host, port)(count.incrementAndGet(), app)
 }
 
 import DefaultHttpServer.{ Application, ReadAborted, ReadError }
 
-private class DefaultHttpServer private (val id: Long, val host: InetAddress, val port: Int)(implicit app: Application) extends HttpServer {
+private class DefaultHttpServer(val host: InetAddress, val port: Int)(id: Long, app: Application) extends HttpServer {
   val logger = if (app.logger == null) NullLogger else app.logger
   val backlogSize = app.backlogSize.max(1)
   val poolSize = app.poolSize.max(1)
