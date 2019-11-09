@@ -35,6 +35,7 @@ import javax.net.ssl.TrustManager
  * | bufferSize      | `8192` |
  * | readTimeout     | `30000` |
  * | continueTimeout | `1000` |
+ * | trust           | ''(Not set)'' |
  * | incoming        | ''(Not set)'' |
  * | outgoing        | ''(Not set)'' |
  * <br>
@@ -84,6 +85,28 @@ class ClientSettings {
     this
   }
 
+  /**
+   * Sets truststore.
+   *
+   * @param truststore used for HTTPS connections
+   *
+   * @note Store type must be JKS.
+   */
+  def trust(truststore: File): this.type = synchronized {
+    settings = settings.copy(secureSocketFactory = SecureSocketFactory.create(truststore))
+    this
+  }
+
+  /**
+   * Sets trust manager.
+   *
+   * @param trustManager used for HTTPS connections
+   */
+  def trust(trustManager: TrustManager): this.type = synchronized {
+    settings = settings.copy(secureSocketFactory = SecureSocketFactory.create(trustManager))
+    this
+  }
+
   /** Adds supplied request filter. */
   def outgoing(filter: RequestFilter): this.type = synchronized {
     settings = settings.copy(outgoing = settings.outgoing :+ filter)
@@ -99,24 +122,6 @@ class ClientSettings {
   /** Creates client using current settings. */
   def create(): HttpClient = synchronized {
     DefaultHttpClient(settings)
-  }
-
-  /**
-   * Creates client using current settings and supplied truststore.
-   *
-   * @param truststore used for SSL/TLS requests ''(store type must be JKS)''
-   */
-  def create(truststore: File): HttpClient = synchronized {
-    DefaultHttpClient(settings, truststore)
-  }
-
-  /**
-   * Creates client using current settings and supplied trust manager.
-   *
-   * @param trustManager used for SSL/TLS requests
-   */
-  def create(trustManager: TrustManager): HttpClient = synchronized {
-    DefaultHttpClient(settings, trustManager)
   }
 }
 

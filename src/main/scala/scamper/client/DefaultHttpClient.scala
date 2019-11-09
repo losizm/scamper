@@ -39,26 +39,14 @@ private object DefaultHttpClient {
     readTimeout: Int = 30000,
     continueTimeout: Int = 1000,
     outgoing: Seq[RequestFilter] = Nil,
-    incoming: Seq[ResponseFilter] = Nil
+    incoming: Seq[ResponseFilter] = Nil,
+    secureSocketFactory: SSLSocketFactory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
   )
 
-  def apply(settings: Settings): DefaultHttpClient = {
-    val factory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
-    new DefaultHttpClient(count.incrementAndGet, settings, factory)
-  }
-
-  def apply(settings: Settings, truststore: File): DefaultHttpClient = {
-    val factory = SecureSocketFactory.create(truststore)
-    new DefaultHttpClient(count.incrementAndGet, settings, factory)
-  }
-
-  def apply(settings: Settings, trustManager: TrustManager): DefaultHttpClient = {
-    val factory = SecureSocketFactory.create(trustManager)
-    new DefaultHttpClient(count.incrementAndGet, settings, factory)
-  }
+  def apply(settings: Settings): DefaultHttpClient = new DefaultHttpClient(count.incrementAndGet, settings)
 }
 
-private class DefaultHttpClient(id: Long, settings: DefaultHttpClient.Settings, secureSocketFactory: SSLSocketFactory) extends HttpClient {
+private class DefaultHttpClient(id: Long, settings: DefaultHttpClient.Settings) extends HttpClient {
   val bufferSize = settings.bufferSize.max(1024)
   val readTimeout = settings.readTimeout.max(0)
   val continueTimeout = settings.continueTimeout.max(0)
@@ -66,6 +54,7 @@ private class DefaultHttpClient(id: Long, settings: DefaultHttpClient.Settings, 
   private val outgoing = settings.outgoing
   private val incoming = settings.incoming
 
+  private val secureSocketFactory = settings.secureSocketFactory
   private val requestCount = new AtomicLong(0)
 
   def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T = {
