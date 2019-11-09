@@ -25,6 +25,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 - [HTTP Client](#HTTP-Client)
   - [Creating Client](#Creating-Client)
   - [Providing Truststore and Trust Manager](#Providing-Truststore-and-Trust-Manager)
+  - [Request and Response Filters](#Request-and-Response-Filters)
 - [HTTP Server](#HTTP-Server)
   - [Server Application](#Server-Application)
   - [Request Handlers](#Request-Handlers)
@@ -528,19 +529,14 @@ printf("Token: %s%n", req.bearer.token)
 
 ## HTTP Client
 
-**Scamper** includes `HttpClient`, which is used for sending requests and
-handling the responses.
-
-Here we create a POST request and send it over HTTPS. The response handler
-prints a message based on the response status using the filters defined in
-`ResponseFilter`. Also note the request must be created with an absolute URI
-to make effective use of the client.
+**Scamper** provides `HttpClient` for sending requests and handling the
+responses.
 
 ```scala
 import scamper.Implicits.{ stringToEntity, stringToUri }
 import scamper.RequestMethod.Registry.POST
 import scamper.client.HttpClient
-import scamper.client.ResponseFilter._
+import scamper.client.ResponsePredicate._
 import scamper.headers.{ ContentType, Location }
 import scamper.types.Implicits.stringToMediaType
 
@@ -548,6 +544,7 @@ val req = POST("https://localhost:8080/users")
   .withContentType("application/json")
   .withBody(s"""{ "id": 500, "name": "guest" }""")
 
+// Send request and print response status
 HttpClient.send(req) {
   case Successful(_)    => println("Successful")
   case Redirection(res) => println(s"Redirection: ${res.location}")
@@ -557,38 +554,17 @@ HttpClient.send(req) {
 }
 ```
 
-`HttpClient.send()` returns the value returned by the response handler. So you
-can process the response and return whatever value warranted.
-
-```scala
-import scamper.BodyParser
-import scamper.Implicits.stringToUri
-import scamper.RequestMethod.Registry.GET
-import scamper.client.HttpClient
-
-implicit val parser = BodyParser.text()
-
-def getMessageOfTheDay(): Either[Int, String] = {
-  val req = GET("http://localhost:8080/motd")
-
-  HttpClient.send(req) { res =>
-    res.status.isSuccessful match {
-      case true  => Right(res.as[String])
-      case false => Left(res.status.code)
-    }
-  }
-}
-```
+Note the outgoing request must be created with an absolute URI to make effective
+use of the client.
 
 ### Creating Client
 
-The examples in the previous section use the `HttpClient` object as the client.
-Behind the scenes, this actually creates an instance of `HttpClient` for
-one-time usage.
+In the previous example, the `HttpClient` object is used as the client. Behind
+the scenes, this creates an `HttpClient` instance for one-time usage.
 
 If you plan to send multiple requests, you can create and maintain a reference
-to an instance, and use it as the client. With that, you also get access to
-methods corresponding to the standard HTTP request methods.
+to a client instance. With it, you also get access to methods corresponding to
+the standard HTTP request methods.
 
 ```scala
 import scamper.BodyParser
@@ -597,7 +573,7 @@ import scamper.client.HttpClient
 
 implicit val parser = BodyParser.text()
 
-// Create HttpClient instance
+// Create client instance
 val client = HttpClient(bufferSize = 4096, readTimeout = 3000)
 
 def getMessageOfTheDay(): Either[Int, String] = {
@@ -611,8 +587,8 @@ def getMessageOfTheDay(): Either[Int, String] = {
 }
 ```
 
-And if the client is declared as an implicit value, you can make use of `send()`
-on the request itself.
+And if an implicit client is in scope, you can make use of `send()` on the
+request itself.
 
 ```scala
 import scamper.BodyParser
@@ -634,16 +610,22 @@ GET("http://localhost:8080/motd")
 
 ### Providing Truststore and Trust Manager
 
-When creating a client, you can supply the truststore used for all requests made
-via HTTPS.
+If you wish to specify the truststore used for HTTPS connections, you must build
+a client from `ClientSettings`.
 
 ```scala
 import java.io.File
 import scamper.Implicits.{ stringToEntity, stringToUri }
 import scamper.client.HttpClient
 
-// Create client that will use supplied truststore
-val client = HttpClient(trustStore = Some(new File("/path/to/truststore")))
+// Build client from settings
+val client = HttpClient.settings()
+  .bufferSize(8192)
+  .readTimeout(3000)
+  .continueTimeout(1000)
+  // Set truststore to supplied file
+  .trust(new File("/path/to/truststore"))
+  .create()
 
 client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
   if (!res.status.isSuccessful)
@@ -651,8 +633,8 @@ client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
 }
 ```
 
-Or, if greater control is required for verifying SSL connections, you may
-instead provide a trust manager.
+Or, if greater control is required for verifying connections, you may instead
+supply a trust manager.
 
 ```scala
 import javax.net.ssl.TrustManager
@@ -663,13 +645,57 @@ class SingleSiteTrustManager(address: String) extends TrustManager {
   ???
 }
 
-// Create client that trusts connections to given IP address
-val client = HttpClient(trustManager = Some(new SingleSiteTrustManager("192.168.0.2")))
+// Build client from settings
+val client = HttpClient.settings()
+  .readTimeout(5000)
+  // Use supplied trust manager
+  .trust(new SingleSiteTrustManager("192.168.0.2"))
+  .create()
 
 client.get("https://192.168.0.2:3000/messages") { res =>
   ???
 }
 ```
+
+### Request and Response Filters
+
+To perform common operations on client requests and their responses, you can add
+filters to the client.
+
+```scala
+import scamper.Uri
+import scamper.client.HttpClient
+import scamper.client.Implicits._
+import scamper.cookies._
+
+val settings = HttpClient.settings()
+
+settings.readTimeout(30 * 1000)
+
+// Add request filter
+settings.outgoing { req =>
+  def findCookies(target: Uri): Seq[PlainCookie] = ???
+
+  // Add cookies to request
+  req.withCookies { findCookies(req.absoluteTarget) : _* }
+}
+
+// Add response filter
+settings.incoming { res =>
+  def storeCookies(target: Uri, cookies: Seq[SetCookie]): Unit = ???
+
+  // Store cookies from response
+  storeCookies(res.absoluteTarget, res.cookies)
+  res
+}
+
+// Create client
+val client = settings.create()
+```
+
+Note you can add multiple request and response filters. If multiple filters are
+added, each is executed in the order it is added. That is, request filters are
+executed in order, and response filters are executed in order.
 
 ## HTTP Server
 
@@ -686,7 +712,7 @@ val server = HttpServer.create(8080) { req =>
 }
 ```
 
-This is as bare-bones as it gets. We create a server at port 8080, and, on each
+This is as bare-bones as it gets. We create a server at port 8080, and on each
 incoming request, we send a _Hello World_ message back to the client. Although
 trite, it demonstrates how easy it is to get going.
 
