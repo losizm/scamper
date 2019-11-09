@@ -16,6 +16,7 @@
 package scamper.client
 
 import java.io.File
+import java.util.concurrent.atomic.AtomicLong
 
 import javax.net.SocketFactory
 import javax.net.ssl.{ SSLSocketFactory, TrustManager }
@@ -23,7 +24,7 @@ import javax.net.ssl.{ SSLSocketFactory, TrustManager }
 import scala.util.Try
 import scala.util.control.NonFatal
 
-import scamper.{ Entity, Header, HttpRequest, ListParser, RequestMethod, Uri }
+import scamper._
 import scamper.Auxiliary.UriType
 import scamper.RequestMethod.Registry._
 import scamper.cookies.{ PlainCookie, RequestCookies }
@@ -31,6 +32,8 @@ import scamper.headers.{ Connection, ContentLength, Host, TE, TransferEncoding }
 import scamper.types.TransferCoding
 
 private object DefaultHttpClient {
+  private val count = new AtomicLong(0)
+
   case class Settings(
     bufferSize: Int = 8192,
     readTimeout: Int = 30000,
@@ -41,27 +44,29 @@ private object DefaultHttpClient {
 
   def apply(settings: Settings): DefaultHttpClient = {
     val factory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
-    new DefaultHttpClient(settings, factory)
+    new DefaultHttpClient(count.incrementAndGet, settings, factory)
   }
 
   def apply(settings: Settings, truststore: File): DefaultHttpClient = {
     val factory = SecureSocketFactory.create(truststore)
-    new DefaultHttpClient(settings, factory)
+    new DefaultHttpClient(count.incrementAndGet, settings, factory)
   }
 
   def apply(settings: Settings, trustManager: TrustManager): DefaultHttpClient = {
     val factory = SecureSocketFactory.create(trustManager)
-    new DefaultHttpClient(settings, factory)
+    new DefaultHttpClient(count.incrementAndGet, settings, factory)
   }
 }
 
-private class DefaultHttpClient(settings: DefaultHttpClient.Settings, secureSocketFactory: SSLSocketFactory) extends HttpClient {
+private class DefaultHttpClient(id: Long, settings: DefaultHttpClient.Settings, secureSocketFactory: SSLSocketFactory) extends HttpClient {
   val bufferSize = settings.bufferSize.max(1024)
   val readTimeout = settings.readTimeout.max(0)
   val continueTimeout = settings.continueTimeout.max(0)
 
   private val outgoing = settings.outgoing
   private val incoming = settings.incoming
+
+  private val requestCount = new AtomicLong(0)
 
   def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T = {
     val target = request.target
@@ -108,9 +113,15 @@ private class DefaultHttpClient(settings: DefaultHttpClient.Settings, secureSock
     )
 
     try {
-      val req = outgoing.foldLeft(effectiveRequest) { (req, filter) => filter(req) }
-      val res = incoming.foldLeft(conn.send(req))   { (res, filter) => filter(res) }
-      handler(res)
+      val correlate = createCorrelate(requestCount.incrementAndGet)
+
+      Try(addAttributes(effectiveRequest, correlate, target))
+        .map(outgoing.foldLeft(_) { (req, filter) => filter(req) })
+        .map(conn.send)
+        .map(addAttributes(_, correlate, target))
+        .map(incoming.foldLeft(_) { (res, filter) => filter(res) })
+        .map(handler.apply)
+        .get
     } finally Try(conn.close())
   }
 
@@ -177,6 +188,15 @@ private class DefaultHttpClient(settings: DefaultHttpClient.Settings, secureSock
 
     new HttpClientConnection(socket, bufferSize, continueTimeout)
   }
+
+  private def createCorrelate(requestId: Long): String =
+    f"${System.currentTimeMillis}%x-$id%04x-$requestId%04x"
+
+  private def addAttributes[T <: HttpMessage](msg: T, correlate: String, absoluteTarget: Uri)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    msg.withAttributes(
+      "scamper.client.message.correlate"      -> correlate,
+      "scamper.client.message.absoluteTarget" -> absoluteTarget
+    )
 
   private def toBodilessRequest(request: HttpRequest): HttpRequest =
     request.withBody(Entity.empty).removeContentLength().removeTransferEncoding()

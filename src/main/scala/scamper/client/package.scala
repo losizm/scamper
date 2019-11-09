@@ -60,11 +60,10 @@ import RequestMethod.Registry._
  *
  * === Creating HTTP Client ===
  *
- * When using the `HttpClient` object as the client, it creates an instance of
- * `HttpClient` for one-time usage. If you plan to send multiple requests, you
- * can create and maintain a reference to an HttpClient instance. With that,
- * you also get access to methods corresponding to the standard HTTP request
- * methods.
+ * When using the `HttpClient` object as the client, it creates an `HttpClient`
+ * instance for one-time usage. If you plan to send multiple requests, you can
+ * create and maintain a reference to a client instance. With that, you also get
+ * access to methods corresponding to the standard HTTP request methods.
  *
  * {{{
  * import scamper.BodyParser
@@ -87,8 +86,8 @@ import RequestMethod.Registry._
  * }
  * }}}
  *
- * And if the client is declared as an implicit value, you can make use of `send()`
- * on the request itself.
+ * And if an implicit client is in scope, you can make use of `send()` on the
+ * request itself.
  *
  * {{{
  * import scamper.BodyParser

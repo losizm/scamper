@@ -15,10 +15,29 @@
  */
 package scamper.client
 
-import scamper.{ Auxiliary, ContentEncoder, HttpRequest }
+import scamper._
 
 /** Includes client-side type classes. */
 object Implicits {
+  /** Adds client-side extension methods to `HttpMessage`. */
+  implicit class ClientHttpMessageType(private val msg: HttpMessage) extends AnyVal {
+    /**
+     * Gets message correlate.
+     *
+     * Each outgoing request is assigned a tag (i.e., correlate), which is later
+     * reassigned to its incoming response.
+     */
+    def correlate(): String = msg.getAttribute("scamper.client.message.correlate").get
+
+    /**
+     * Gets absolute target.
+     *
+     * The absolute target (i.e., absolute URI) is assigned to each outgoing
+     * request and later reassigned to its incoming response.
+     */
+    def absoluteTarget(): Uri = msg.getAttribute("scamper.client.message.absoluteTarget").get
+  }
+
   /** Adds client-side extension methods to `HttpRequest`. */
   implicit class ClientHttpRequestType(private val req: HttpRequest) extends AnyVal {
     /**
