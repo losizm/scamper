@@ -122,6 +122,18 @@ package object client {
     def apply(response: HttpResponse): T
   }
 
+  /** Provides utility for filtering outgoing request. */
+  trait OutboundFilter {
+    /** Filters outgoing request. */
+    def apply(req: HttpRequest): HttpRequest
+  }
+
+  /** Provides utility for filtering incoming response. */
+  trait InboundFilter extends ResponseHandler[HttpResponse] {
+    /** Filters incoming response. */
+    def apply(res: HttpResponse): HttpResponse
+  }
+
   /** Provides utility for filtering HTTP response. */
   trait ResponseFilter extends ResponseHandler[Boolean] {
     /** Tests whether response matches filter condition. */

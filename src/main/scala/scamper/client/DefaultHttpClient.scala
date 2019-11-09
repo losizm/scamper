@@ -30,15 +30,13 @@ import scamper.cookies.{ PlainCookie, RequestCookies }
 import scamper.headers.{ Connection, ContentLength, Host, TE, TransferEncoding }
 import scamper.types.TransferCoding
 
-import HttpClient.{ InboundFilter, OutboundFilter }
-
 private object DefaultHttpClient {
   case class Settings(
-    bufferSize: Int,
-    readTimeout: Int,
-    continueTimeout: Int,
-    incoming: Seq[InboundFilter],
-    outgoing: Seq[OutboundFilter]
+    bufferSize: Int = 8192,
+    readTimeout: Int = 30000,
+    continueTimeout: Int = 1000,
+    incoming: Seq[InboundFilter] = Nil,
+    outgoing: Seq[OutboundFilter] = Nil
   )
 
   def apply(settings: Settings): DefaultHttpClient = {
@@ -57,7 +55,7 @@ private object DefaultHttpClient {
   }
 }
 
-private class DefaultHttpClient private (settings: DefaultHttpClient.Settings, secureSocketFactory: SSLSocketFactory) extends HttpClient {
+private class DefaultHttpClient(settings: DefaultHttpClient.Settings, secureSocketFactory: SSLSocketFactory) extends HttpClient {
   val bufferSize = settings.bufferSize.max(1024)
   val readTimeout = settings.readTimeout.max(0)
   val continueTimeout = settings.continueTimeout.max(0)
