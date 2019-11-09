@@ -84,15 +84,15 @@ class ClientSettings {
     this
   }
 
-  /** Adds supplied inbound filter. */
-  def incoming(filter: InboundFilter): this.type = synchronized {
-    settings = settings.copy(incoming = settings.incoming :+ filter)
+  /** Adds supplied request filter. */
+  def outgoing(filter: RequestFilter): this.type = synchronized {
+    settings = settings.copy(outgoing = settings.outgoing :+ filter)
     this
   }
 
-  /** Adds supplied outbound filter. */
-  def outgoing(filter: OutboundFilter): this.type = synchronized {
-    settings = settings.copy(outgoing = settings.outgoing :+ filter)
+  /** Adds supplied response filter. */
+  def incoming(filter: ResponseFilter): this.type = synchronized {
+    settings = settings.copy(incoming = settings.incoming :+ filter)
     this
   }
 

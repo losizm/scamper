@@ -18,10 +18,10 @@ package scamper.client
 import org.scalatest.FlatSpec
 
 import scamper.ResponseStatus.Registry._
-import ResponseFilter._
+import ResponsePredicate._
 
-class ResponseFilterSpec extends FlatSpec {
-  "ResponseFilter" should "filter response based on status code" in {
+class ResponsePredicateSpec extends FlatSpec {
+  it should "test response based on status code" in {
     assert { Informational(Continue()) }
     assert { Successful(Created()) }
     assert { Redirection(MovedPermanently()) }

@@ -112,81 +112,86 @@ package object client {
   /** Indicates request was aborted. */
   case class RequestAborted(message: String) extends HttpException(message)
 
-  /** Provides utility for handling response. */
-  trait ResponseHandler[T] {
-    /**
-     * Handles response.
-     *
-     * @param response incoming response
-     */
-    def apply(response: HttpResponse): T
-  }
-
   /** Provides utility for filtering outgoing request. */
-  trait OutboundFilter {
+  trait RequestFilter {
     /** Filters outgoing request. */
     def apply(req: HttpRequest): HttpRequest
   }
 
   /** Provides utility for filtering incoming response. */
-  trait InboundFilter extends ResponseHandler[HttpResponse] {
+  trait ResponseFilter {
     /** Filters incoming response. */
     def apply(res: HttpResponse): HttpResponse
   }
 
-  /** Provides utility for filtering HTTP response. */
-  trait ResponseFilter extends ResponseHandler[Boolean] {
-    /** Tests whether response matches filter condition. */
-    def apply(response: HttpResponse): Boolean
-
+  /** Provides utility for handling response. */
+  trait ResponseHandler[T] {
     /**
-     * Returns `Some(response)` if response matches filter condition, and `None`
-     * otherwise.
+     * Handles response.
+     *
+     * @param res incoming response
      */
-    def unapply(response: HttpResponse): Option[HttpResponse] =
-      if (apply(response)) Some(response) else None
+    def apply(res: HttpResponse): T
   }
 
-  /** Includes status-based `ResponseFilter` implementations. */
-  object ResponseFilter {
+  /** Provides utility for testing response. */
+  trait ResponsePredicate extends ResponseHandler[Boolean] {
     /**
-     * Filters informational responses.
+     * Tests given response.
+     *
+     * @param res response
+     */
+    def apply(res: HttpResponse): Boolean
+
+    /**
+     * Returns `Some(res)` if response passes test, and `None` otherwise.
+     *
+     * @param res response
+     */
+    def unapply(res: HttpResponse): Option[HttpResponse] =
+      if (apply(res)) Some(res) else None
+  }
+
+  /** Provides status-based `ResponsePredicate`s. */
+  object ResponsePredicate {
+    /**
+     * Tests for informational responses.
      *
      * See [[ResponseStatus.isInformational]].
      */
-    val Informational: ResponseFilter =
+    val Informational: ResponsePredicate =
       res => res.status.isInformational
 
     /**
-     * Filters successful responses.
+     * Tests for successful responses.
      *
      * See [[ResponseStatus.isSuccessful]].
      */
-    val Successful: ResponseFilter =
+    val Successful: ResponsePredicate =
       res => res.status.isSuccessful
 
     /**
-     * Filters redirection responses.
+     * Tests for redirection responses.
      *
      * See [[ResponseStatus.isRedirection]].
      */
-    val Redirection: ResponseFilter =
+    val Redirection: ResponsePredicate =
       res => res.status.isRedirection
 
     /**
-     * Filters client error responses.
+     * Tests for client error responses.
      *
      * See [[ResponseStatus.isClientError]].
      */
-    val ClientError: ResponseFilter =
+    val ClientError: ResponsePredicate =
       res => res.status.isClientError
 
     /**
-     * Filters server error responses.
+     * Tests for server error responses.
      *
      * See [[ResponseStatus.isServerError]].
      */
-    val ServerError: ResponseFilter =
+    val ServerError: ResponsePredicate =
       res => res.status.isServerError
   }
 }

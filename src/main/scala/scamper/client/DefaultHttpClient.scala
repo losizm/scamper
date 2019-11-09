@@ -35,8 +35,8 @@ private object DefaultHttpClient {
     bufferSize: Int = 8192,
     readTimeout: Int = 30000,
     continueTimeout: Int = 1000,
-    incoming: Seq[InboundFilter] = Nil,
-    outgoing: Seq[OutboundFilter] = Nil
+    outgoing: Seq[RequestFilter] = Nil,
+    incoming: Seq[ResponseFilter] = Nil
   )
 
   def apply(settings: Settings): DefaultHttpClient = {
@@ -60,8 +60,8 @@ private class DefaultHttpClient(settings: DefaultHttpClient.Settings, secureSock
   val readTimeout = settings.readTimeout.max(0)
   val continueTimeout = settings.continueTimeout.max(0)
 
-  private val incoming = settings.incoming
   private val outgoing = settings.outgoing
+  private val incoming = settings.incoming
 
   def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T = {
     val target = request.target
