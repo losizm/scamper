@@ -32,12 +32,12 @@ private object SecureSocketFactory {
     sslContext.getSocketFactory()
   }
 
-  def create(storeFile: File): SSLSocketFactory = {
+  def create(storeFile: File, storeType: String, password: Option[String]): SSLSocketFactory = {
     val storeStream = new FileInputStream(storeFile)
 
     try {
-      val keyStore = KeyStore.getInstance("JKS")
-      keyStore.load(storeStream, null)
+      val keyStore = KeyStore.getInstance(storeType)
+      keyStore.load(storeStream, password.map(_.toCharArray).getOrElse(null))
       create(keyStore)
     } finally {
       Try(storeStream.close())

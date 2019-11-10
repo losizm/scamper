@@ -88,19 +88,19 @@ class ClientSettings {
   /**
    * Sets truststore.
    *
-   * @param truststore used for HTTPS connections
-   *
-   * @note Store type must be JKS.
+   * @param truststore truststore used for HTTPS connections
+   * @param storeType store type (e.g., JKS or PKCS12)
+   * @param password store password
    */
-  def trust(truststore: File): this.type = synchronized {
-    settings = settings.copy(secureSocketFactory = SecureSocketFactory.create(truststore))
+  def trust(truststore: File, storeType: String = "JKS", password: Option[String] = None): this.type = synchronized {
+    settings = settings.copy(secureSocketFactory = SecureSocketFactory.create(truststore, storeType, password))
     this
   }
 
   /**
    * Sets trust manager.
    *
-   * @param manager used for HTTPS connections
+   * @param manager trust manager used for HTTPS connections
    */
   def trust(manager: TrustManager): this.type = synchronized {
     settings = settings.copy(secureSocketFactory = SecureSocketFactory.create(manager))
