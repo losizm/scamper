@@ -88,7 +88,7 @@ private class DefaultHttpServer(val host: InetAddress, val port: Int)(id: Long, 
   private val errorHandler = app.errorHandler.getOrElse(new ErrorHandler {
     def apply(err: Throwable, req: HttpRequest): HttpResponse = {
       val correlate = req.getAttribute[String]("scamper.server.message.correlate").getOrElse("<unknown>")
-      logger.error(s"$authority - Error while handling request for $correlate", err)
+      logger.error(s"$authority - Error while handling request (correlate=$correlate)", err)
       InternalServerError()
     }
   })

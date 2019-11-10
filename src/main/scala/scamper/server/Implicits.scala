@@ -18,9 +18,7 @@ package scamper.server
 import java.io.File
 import java.net.Socket
 
-import scala.util.Try
-
-import scamper.{ Auxiliary, ContentEncoder, Entity, HttpException, HttpMessage, HttpRequest, HttpResponse, StatusLine }
+import scamper.{ Auxiliary, ContentEncoder, Entity, HttpMessage, HttpRequest, HttpResponse, StatusLine }
 import scamper.ResponseStatus.Registry.Continue
 import scamper.headers.{ ContentDisposition, ContentLength, ContentType, Expect }
 import scamper.logging.{ Logger, NullLogger }
@@ -35,26 +33,26 @@ object Implicits {
     /**
      * Gets message correlate.
      *
-     * Each incoming request is assigned a tag (i.e., ''correlate''), which is
-     * later assigned to its outgoing response.
+     * Each incoming request is assigned a tag (i.e., correlate), which is later
+     * reassigned to its outgoing response.
      */
-    def correlate(): String = msg.getAttributeOrElse("scamper.server.message.correlate", "")
+    def correlate(): String = msg.getAttribute("scamper.server.message.correlate").get
 
-    /** Gets socket associated with message. */
-    def socket(): Socket = msg.getAttributeOrElse("scamper.server.message.socket", throw new HttpException("Socket not available"))
+    /** Gets message socket. */
+    def socket(): Socket = msg.getAttribute("scamper.server.message.socket").get
 
     /**
-     * Gets request count associated with message.
+     * Gets request count.
      *
      * The request count is the number of requests that have been received from
      * current connection.
      */
-    def requestCount(): Int = msg.getAttributeOrElse("scamper.server.message.requestCount", 1)
+    def requestCount(): Int = msg.getAttribute("scamper.server.message.requestCount").get
 
     /**
-     * Gets logger associated with message &ndash; i.e., the server logger.
+     * Gets server logger.
      *
-     * @see [[HttpServer.logger]]
+     * @see [[HttpServer.logger HttpServer.logger()]]
      */
     def logger(): Logger = msg.getAttributeOrElse("scamper.server.message.logger", NullLogger)
   }
@@ -73,8 +71,7 @@ object Implicits {
      */
     def continue(): Boolean =
       req.getExpect
-        .filter(_.toLowerCase == "100-continue")
-        .flatMap(_ => Try(req.socket).toOption)
+        .collect { case value if value.toLowerCase == "100-continue" => req.socket }
         .map { socket =>
           socket.writeLine(StatusLine(Continue).toString)
           socket.writeLine()
