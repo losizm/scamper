@@ -51,7 +51,7 @@ private object DefaultHttpServer {
     requestHandlers: Seq[RequestHandler] = Nil,
     responseFilters: Seq[ResponseFilter] = Nil,
     errorHandler: Option[ErrorHandler] = None,
-    factory: ServerSocketFactory = ServerSocketFactory.getDefault()
+    serverSocketFactory: ServerSocketFactory = ServerSocketFactory.getDefault()
   )
 
   case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
@@ -93,7 +93,7 @@ private class DefaultHttpServer(val host: InetAddress, val port: Int)(id: Long, 
     }
   })
 
-  private val serverSocket = app.factory.createServerSocket()
+  private val serverSocket = app.serverSocketFactory.createServerSocket()
   private val chunked = TransferCoding("chunked")
   private var closed = false
 
@@ -127,7 +127,7 @@ private class DefaultHttpServer(val host: InetAddress, val port: Int)(id: Long, 
       executor.getThreadFactory.newThread(task).start()
   }
 
-  val isSecure: Boolean = app.factory.isInstanceOf[SSLServerSocketFactory]
+  val isSecure: Boolean = app.serverSocketFactory.isInstanceOf[SSLServerSocketFactory]
 
   def isClosed: Boolean = synchronized(closed)
 

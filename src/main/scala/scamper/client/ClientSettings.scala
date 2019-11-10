@@ -100,10 +100,10 @@ class ClientSettings {
   /**
    * Sets trust manager.
    *
-   * @param trustManager used for HTTPS connections
+   * @param manager used for HTTPS connections
    */
-  def trust(trustManager: TrustManager): this.type = synchronized {
-    settings = settings.copy(secureSocketFactory = SecureSocketFactory.create(trustManager))
+  def trust(manager: TrustManager): this.type = synchronized {
+    settings = settings.copy(secureSocketFactory = SecureSocketFactory.create(manager))
     this
   }
 

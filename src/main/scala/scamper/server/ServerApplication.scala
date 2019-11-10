@@ -220,7 +220,7 @@ class ServerApplication {
    * @return this application
    */
   def secure(keyStore: File, password: String, storeType: String): this.type = synchronized {
-    app = app.copy(factory = SecureServerSocketFactory.create(keyStore, password.toCharArray, storeType))
+    app = app.copy(serverSocketFactory = SecureServerSocketFactory.create(keyStore, password.toCharArray, storeType))
     this
   }
 
@@ -236,7 +236,7 @@ class ServerApplication {
    * @note The password can be discarded after invoking this method.
    */
   def secure(keyStore: File, password: Array[Char], storeType: String): this.type = synchronized {
-    app = app.copy(factory = SecureServerSocketFactory.create(keyStore, password, storeType))
+    app = app.copy(serverSocketFactory = SecureServerSocketFactory.create(keyStore, password, storeType))
     this
   }
 
@@ -249,7 +249,7 @@ class ServerApplication {
    * @return this application
    */
   def secure(key: File, certificate: File): this.type = synchronized {
-    app = app.copy(factory = SecureServerSocketFactory.create(key, certificate))
+    app = app.copy(serverSocketFactory = SecureServerSocketFactory.create(key, certificate))
     this
   }
 
