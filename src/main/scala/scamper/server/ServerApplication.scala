@@ -19,6 +19,7 @@ import java.io.File
 import java.net.InetAddress
 
 import scamper.RequestMethod
+import scamper.Validate.notNull
 import scamper.logging.{ Logger, LogWriter }
 import scamper.types.KeepAliveParameters
 import RequestMethod.Registry._
@@ -69,7 +70,7 @@ class ServerApplication {
    * @note If file exists, it is opened in append mode.
    */
   def logger(file: File): this.type = synchronized {
-    app = app.copy(logger = LogWriter(file, true))
+    app = app.copy(logger = LogWriter(notNull(file), true))
     this
   }
 
@@ -263,7 +264,7 @@ class ServerApplication {
    * @return this application
    */
   def incoming(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ handler)
+    app = app.copy(requestHandlers = app.requestHandlers :+ notNull(handler))
     this
   }
 
@@ -278,7 +279,7 @@ class ServerApplication {
    * @return this application
    */
   def incoming(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, None))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), None))
     this
   }
 
@@ -294,7 +295,7 @@ class ServerApplication {
    * @return this application
    */
   def incoming(method: RequestMethod, path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(method)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Option(method)))
     this
   }
 
@@ -309,7 +310,7 @@ class ServerApplication {
    * @return this application
    */
   def get(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(GET)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(GET)))
     this
   }
 
@@ -324,7 +325,7 @@ class ServerApplication {
    * @return this application
    */
   def head(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(HEAD)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(HEAD)))
     this
   }
 
@@ -339,7 +340,7 @@ class ServerApplication {
    * @return this application
    */
   def post(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(POST)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(POST)))
     this
   }
 
@@ -354,7 +355,7 @@ class ServerApplication {
    * @return this application
    */
   def put(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(PUT)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(PUT)))
     this
   }
 
@@ -369,7 +370,7 @@ class ServerApplication {
    * @return this application
    */
   def patch(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(PATCH)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(PATCH)))
     this
   }
 
@@ -384,7 +385,7 @@ class ServerApplication {
    * @return this application
    */
   def delete(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(DELETE)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(DELETE)))
     this
   }
 
@@ -399,7 +400,7 @@ class ServerApplication {
    * @return this application
    */
   def options(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(OPTIONS)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(OPTIONS)))
     this
   }
 
@@ -414,7 +415,7 @@ class ServerApplication {
    * @return this application
    */
   def trace(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, Some(TRACE)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(TRACE)))
     this
   }
 
@@ -519,7 +520,7 @@ class ServerApplication {
    * @return this application
    */
   def outgoing(filter: ResponseFilter): this.type = synchronized {
-    app = app.copy(responseFilters = app.responseFilters :+ filter)
+    app = app.copy(responseFilters = app.responseFilters :+ notNull(filter))
     this
   }
 

@@ -15,7 +15,14 @@
  */
 package scamper
 
+import Validate.{ noNulls, notNull }
+
 private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity, attributes: Map[String, Any] = Map.empty) extends HttpResponse {
+  notNull(startLine)
+  noNulls(headers, "headers cannot contain null header")
+  notNull(body)
+  notNull(attributes)
+
   def withStartLine(newStartLine: StatusLine) =
     copy(startLine = newStartLine)
 

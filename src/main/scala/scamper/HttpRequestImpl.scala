@@ -16,8 +16,14 @@
 package scamper
 
 import Auxiliary.UriType
+import Validate.{ noNulls, notNull }
 
 private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header], body: Entity, attributes: Map[String, Any] = Map.empty) extends HttpRequest {
+  notNull(startLine)
+  noNulls(headers, "headers cannot contain null header")
+  notNull(body)
+  notNull(attributes)
+
   lazy val path: String = target.normalize.getRawPath match {
     case "" =>
       if (method.name == "OPTIONS")

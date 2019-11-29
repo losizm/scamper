@@ -19,6 +19,8 @@ import java.io.File
 
 import javax.net.ssl.TrustManager
 
+import scamper.Validate.notNull
+
 /**
  * Configures and creates `HttpClient`.
  *
@@ -109,13 +111,13 @@ class ClientSettings {
 
   /** Adds supplied request filter. */
   def outgoing(filter: RequestFilter): this.type = synchronized {
-    settings = settings.copy(outgoing = settings.outgoing :+ filter)
+    settings = settings.copy(outgoing = settings.outgoing :+ notNull(filter))
     this
   }
 
   /** Adds supplied response filter. */
   def incoming(filter: ResponseFilter): this.type = synchronized {
-    settings = settings.copy(incoming = settings.incoming :+ filter)
+    settings = settings.copy(incoming = settings.incoming :+ notNull(filter))
     this
   }
 

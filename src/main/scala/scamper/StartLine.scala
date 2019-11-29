@@ -17,6 +17,8 @@ package scamper
 
 import scala.util.Try
 
+import Validate.notNull
+
 /** HTTP message start line */
 sealed trait StartLine {
   /** Gets HTTP version. */
@@ -55,7 +57,7 @@ object RequestLine {
 
   /** Creates RequestLine with supplied attributes. */
   def apply(method: RequestMethod, target: Uri, version: HttpVersion = HttpVersion(1, 1)): RequestLine =
-    RequestLineImpl(method, adjustTarget(target, method.name), version)
+    RequestLineImpl(notNull(method), adjustTarget(notNull(target), method.name), notNull(version))
 
   /** Destructures RequestLine. */
   def unapply(line: RequestLine): Option[(RequestMethod, Uri, HttpVersion)] =
@@ -115,7 +117,7 @@ object StatusLine {
 
   /** Creates StatusLine with supplied attributes. */
   def apply(status: ResponseStatus, version: HttpVersion = HttpVersion(1, 1)): StatusLine =
-    StatusLineImpl(status, version)
+    StatusLineImpl(notNull(status), notNull(version))
 
   /** Destructures StatusLine. */
   def unapply(line: StatusLine): Option[(ResponseStatus, HttpVersion)] =

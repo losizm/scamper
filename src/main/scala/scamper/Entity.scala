@@ -19,6 +19,7 @@ import java.io.{ ByteArrayInputStream, File, FileInputStream, InputStream, Outpu
 import java.nio.file.Path
 
 import Auxiliary.{ FileType, OutputStreamType }
+import Validate.notNull
 
 /** Representation of message body. */
 trait Entity {
@@ -47,11 +48,11 @@ trait Entity {
 object Entity {
   /** Creates `Entity` from supplied bytes. */
   def apply(bytes: Array[Byte]): Entity =
-    ByteArrayEntity(bytes)
+    ByteArrayEntity(notNull(bytes))
 
   /** Creates `Entity` from supplied input stream. */
   def apply(in: InputStream): Entity =
-    InputStreamEntity(in)
+    InputStreamEntity(notNull(in))
 
   /**
    * Creates `Entity` from supplied writer.
@@ -60,11 +61,11 @@ object Entity {
    * stream are used to build the entity.
    */
   def apply(writer: OutputStream => Unit): Entity =
-    InputStreamEntity(new WriterInputStream(writer)(Auxiliary.executor))
+    InputStreamEntity(new WriterInputStream(notNull(writer))(Auxiliary.executor))
 
   /** Creates `Entity` from supplied file. */
   def apply(file: File): Entity =
-    FileEntity(file)
+    FileEntity(notNull(file))
 
   /** Creates `Entity` from supplied text. */
   def apply(text: String, charset: String = "UTF-8"): Entity =
@@ -96,7 +97,7 @@ object Entity {
 
   /** Creates `Entity` from supplied multipart form data. */
   def apply(multipart: Multipart, boundary: String): Entity =
-    MultipartEntity(multipart, boundary)
+    MultipartEntity(notNull(multipart), notNull(boundary))
 
   /** Gets empty `Entity`. */
   def empty: Entity = EmptyEntity

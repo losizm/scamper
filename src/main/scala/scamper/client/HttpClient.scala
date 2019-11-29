@@ -16,6 +16,7 @@
 package scamper.client
 
 import scamper.{ Entity, Header, HttpRequest, Uri }
+import scamper.Validate.notNull
 import scamper.cookies.PlainCookie
 
 /**
@@ -199,6 +200,7 @@ object HttpClient {
    * @note The `continueTimeout` applies only if request includes `Except: 100-Continue`
    *  header and request body.
    */
-  def send[T](request: HttpRequest, bufferSize: Int = 8192, readTimeout: Int = 30000, continueTimeout: Int = 1000)(handler: ResponseHandler[T]): T =
-    HttpClient(bufferSize, readTimeout, continueTimeout).send(request)(handler)
+  def send[T](request: HttpRequest, bufferSize: Int = 8192, readTimeout: Int = 30000, continueTimeout: Int = 1000)(handler: ResponseHandler[T]): T = {
+    HttpClient(bufferSize, readTimeout, continueTimeout).send(request)(notNull(handler))
+  }
 }

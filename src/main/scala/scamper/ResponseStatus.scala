@@ -238,8 +238,10 @@ object ResponseStatus {
   def apply(code: Int): ResponseStatus = Registry(code)
 
   /** Creates `ResponseStatus` with supplied code and reason. */
-  def apply(code: Int, reason: String): ResponseStatus =
+  def apply(code: Int, reason: String): ResponseStatus = {
+    require(code >= 100 && code <= 599, s"code out of bounds: $code")
     ResponseStatusImpl(code, reason)
+  }
 
   /** Destructures `ResponseStatus`. */
   def unapply(status: ResponseStatus): Option[(Int, String)] =

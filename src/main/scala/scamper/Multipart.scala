@@ -17,6 +17,7 @@ package scamper
 
 import java.io.{ File, FileInputStream, InputStream }
 
+import scamper.Validate.{ noNulls, notNull }
 import scamper.types.{ DispositionType, MediaType }
 
 /**
@@ -143,7 +144,7 @@ object Multipart {
   private val charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz"
 
   /** Creates Multipart with supplied parts. */
-  def apply(parts: Part*): Multipart = MultipartImpl(parts)
+  def apply(parts: Part*): Multipart = MultipartImpl(noNulls(parts))
 
   /** Generates boundary. */
   def boundary(): String = prefix + new String(random.ints(16, 0, 62).toArray.map(charset))
@@ -183,7 +184,7 @@ object TextPart {
       case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType(value)
     }.getOrElse(Auxiliary.`text/plain`)
 
-    apply(contentDisposition, contentType, content)
+    apply(contentDisposition, contentType, notNull(content))
   }
 }
 
@@ -213,7 +214,7 @@ object FilePart {
     val name = contentDisposition.params.get("name")
       .getOrElse(throw new HttpException("Missing name parameter in content disposition"))
 
-    FilePartImpl(name, content, contentDisposition, contentType)
+    FilePartImpl(name, notNull(content), contentDisposition, contentType)
   }
 
   /** Creates FilePart from supplied headers and content. */
