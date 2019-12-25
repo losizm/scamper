@@ -19,8 +19,8 @@
  *
  * === HTTP Messages ===
  *
- * At the core ''Scamper'' is [[HttpMessage]], which is a trait that defines the
- * fundamental characteristics of an HTTP message. [[HttpRequest]] and
+ * At the core of ''Scamper'' is [[HttpMessage]], which is a trait that defines
+ * the fundamental characteristics of an HTTP message. [[HttpRequest]] and
  * [[HttpResponse]] extend the specification to define characteristics specific
  * to their respective message types.
  *

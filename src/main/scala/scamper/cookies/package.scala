@@ -24,7 +24,7 @@ import scala.util.Try
  * === Request Cookies ===
  *
  * In [[HttpRequest]], cookies are stringed together in the '''Cookie''' header.
- * You can access them using the extension methods provided by [[RequestCookies]],
+ * You can access them using extension methods provided by [[RequestCookies]],
  * with each cookie represented as [[PlainCookie]].
  *
  * {{{
