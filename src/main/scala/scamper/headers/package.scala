@@ -1182,7 +1182,7 @@ package object headers {
   }
 
   /** Provides standardized access to Upgrade header. */
-  implicit class Upgrade(private val request: HttpRequest) extends AnyVal {
+  implicit class Upgrade[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
      * Gets Upgrade header values.
      *
@@ -1192,19 +1192,20 @@ package object headers {
 
     /** Gets Upgrade header values if present. */
     def getUpgrade: Option[Seq[Protocol]] =
-      request.getHeaderValue("Upgrade")
+      message.getHeaderValue("Upgrade")
         .map(ListParser.apply)
         .map(_.map(Protocol.parse))
 
     /** Tests whether Upgrade header is present. */
-    def hasUpgrade: Boolean = request.hasHeader("Upgrade")
+    def hasUpgrade: Boolean = message.hasHeader("Upgrade")
 
-    /** Creates new request setting Upgrade header to supplied values. */
-    def withUpgrade(values: Protocol*): HttpRequest =
-      request.withHeader(Header("Upgrade", values.mkString(", ")))
+    /** Creates new message setting Upgrade header to supplied values. */
+    def withUpgrade(values: Protocol*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.withHeader(Header("Upgrade", values.mkString(", ")))
 
-    /** Creates new request removing Upgrade header. */
-    def removeUpgrade(): HttpRequest = request.removeHeaders("Upgrade")
+    /** Creates new message removing Upgrade header. */
+    def removeUpgrade()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Upgrade")
   }
 
   /** Provides standardized access to User-Agent header. */
