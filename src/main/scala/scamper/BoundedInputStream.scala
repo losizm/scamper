@@ -30,6 +30,8 @@ import java.io.{ FilterInputStream, InputStream, IOException }
 case class ReadLimitExceeded(limit: Long) extends IOException(s"Cannot read beyond $limit byte(s)")
 
 private class BoundedInputStream(in: InputStream, limit: Long, capacity: Long) extends FilterInputStream(in) {
+  def this(in: InputStream, limit: Long) = this(in, limit, limit)
+
   private var position: Long = 0
 
   override def read(): Int =
