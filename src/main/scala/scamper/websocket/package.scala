@@ -20,6 +20,9 @@ package object websocket {
   /** Globally Unique Identifier for WebSocket (258EAFA5-E914-47DA-95CA-C5AB0DC85B11) */
   val guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
+  /** Indicates error occurred on websocket with supplied status code. */
+  case class WebSocketError(status: StatusCode) extends Exception(s"${status.value} ($status)")
+
   /** Provides standardized access to Sec-WebSocket-Key header. */
   implicit class SecWebSocketKey(private val request: HttpRequest) extends AnyVal {
     /**
