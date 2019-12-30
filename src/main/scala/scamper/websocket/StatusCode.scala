@@ -23,6 +23,13 @@ package scamper.websocket
 trait StatusCode {
   /** Gets value. */
   def value: Int
+
+  /** Converts value to 2-byte data array. */
+  def toData: Array[Byte] =
+    Array[Byte](
+      { (0xff00 & value) >> 8 }.toByte,
+      { (0x00ff & value) >> 0 }.toByte
+    )
 }
 
 /**
@@ -136,6 +143,14 @@ object StatusCode {
       case _: NoSuchElementException => None
     }
 
+  /** Gets `StatusCode` for given data, if registered. */
+  def get(data: Array[Byte]): Option[StatusCode] =
+    try Some(apply(data))
+    catch {
+      case _: NoSuchElementException   => None
+      case _: IllegalArgumentException => None
+    }
+
   /**
    * Gets registered `StatusCode` for given value.
    *
@@ -159,9 +174,26 @@ object StatusCode {
       case _    => throw new NoSuchElementException()
     }
 
+  /**
+   * Gets registered `StatusCode` for given data.
+   *
+   * @throws NoSuchElementException if value not registered
+   * @throws IllegalArgumentException if `data.size != 2`
+   *
+   * @note The data is converted to two-byte unsigned integer, which is then
+   *  used to obtain status code.
+   */
+  def apply(data: Array[Byte]): StatusCode =
+    data match {
+      case Array(hi, lo) => apply((hi << 8) | lo)
+      case _             => throw new IllegalArgumentException()
+    }
+
   /** Destructures supplied status code to its `value`. */
   def unapply(code: StatusCode): Option[Int] =
     Some(code.value)
 }
 
-private case class StatusCodeImpl(value: Int) extends StatusCode
+private case class StatusCodeImpl(value: Int) extends StatusCode {
+  override lazy val toString: String = s"StatusCode($value)"
+}

@@ -83,4 +83,6 @@ object Opcode {
     Some(code.value)
 }
 
-private case class OpcodeImpl(value: Int) extends Opcode
+private case class OpcodeImpl(value: Int) extends Opcode {
+  override lazy val toString: String = s"Opcode($value)"
+}

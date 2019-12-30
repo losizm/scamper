@@ -15,7 +15,7 @@
  */
 package scamper.websocket
 
-import java.io.InputStream
+import java.io.{ ByteArrayInputStream, InputStream }
 
 import scamper.BoundedInputStream
 import Opcode.Registry._
@@ -36,6 +36,9 @@ trait WebSocketFrame {
 
   /** Gets input stream to payload data. */
   def payload: InputStream
+
+  /** Tests for presence of masking key. */
+  def isMasked: Boolean = maskingKey.isDefined
 
   /** Tests for Continuation frame. */
   def isContinuation: Boolean = opcode == Continuation
@@ -81,6 +84,35 @@ object WebSocketFrame {
       throw new NullPointerException()
 
     new WebSocketFrameImpl(isFinal, opcode, maskingKey, length, new BoundedInputStream(payload, length))
+  }
+
+  /**
+   * Creates WebSocketFrame using supplied attributes.
+   *
+   * @param isFinal indicates whether supplied frame is message final frame
+   * @param opcode frame opcode
+   * @param maskingKey payload masking key
+   * @param data unmasked payload data
+   *
+   * @note If there is `Some` masking key, it is used to mask `data`.
+   */
+  def apply(isFinal: Boolean, opcode: Opcode, maskingKey: Option[Int], data: Array[Byte]): WebSocketFrame = {
+    maskingKey.foreach(key => mask(key, data))
+    apply(isFinal, opcode, maskingKey, data.size, new ByteArrayInputStream(data))
+  }
+
+  /**
+   * Creates Close frame using supplied status code.
+   *
+   * @param statusCode status code to serve as payload
+   * @param maskingKey payload masking key
+   *
+   * @note If there is `Some` masking key, it is used to mask status code.
+   */
+  def apply(statusCode: StatusCode, maskingKey: Option[Int]): WebSocketFrame = {
+    val data = statusCode.toData
+    maskingKey.foreach(key => mask(key, data))
+    apply(true, Close, maskingKey, data.size, new ByteArrayInputStream(data))
   }
 }
 
