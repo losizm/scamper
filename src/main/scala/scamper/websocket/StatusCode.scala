@@ -77,7 +77,7 @@ object StatusCode {
      * expecting a status code to indicate that no status code was actually
      * present.
      */
-    val NoStatusReceived: StatusCode = StatusCodeImpl(1005)
+    val NoStatusPresent: StatusCode = StatusCodeImpl(1005)
 
     /**
      * 1006 is a reserved value and MUST NOT be set as a status code in a Close
@@ -163,7 +163,7 @@ object StatusCode {
       case 1002 => Registry.ProtocolError
       case 1003 => Registry.UnsupportedData
       case 1004 => Registry.Reserved
-      case 1005 => Registry.NoStatusReceived
+      case 1005 => Registry.NoStatusPresent
       case 1006 => Registry.AbnormalClosure
       case 1007 => Registry.InvalidPayload
       case 1008 => Registry.PolicyVioliation
