@@ -22,6 +22,7 @@ import scamper.RequestMethod
 import scamper.Validate.notNull
 import scamper.logging.{ Logger, LogWriter }
 import scamper.types.KeepAliveParameters
+import scamper.websocket.WebSocketSession
 import RequestMethod.Registry._
 
 /**
@@ -491,6 +492,22 @@ class ServerApplication {
    */
   def resources(mountPath: String, sourceDirectory: String, classLoader: ClassLoader): this.type = synchronized {
     app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(mountPath, sourceDirectory, classLoader))
+    this
+  }
+
+  /**
+   * Adds websocket server at given path using supplied session handler for each
+   * connection.
+   *
+   * The handler is appended to existing request handler chain.
+   *
+   * @param path websocket path
+   * @param handler websocket session handler
+   *
+   * @return this application
+   */
+  def websocket[T](path: String)(handler: WebSocketSession => T): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(WebSocketRequestHandler(notNull(handler)), notNull(path), Some(GET)))
     this
   }
 

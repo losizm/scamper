@@ -21,6 +21,7 @@ import scala.util.Try
 
 import scamper.Auxiliary.StringType
 import scamper.RequestMethod
+import scamper.websocket.WebSocketSession
 
 private class DefaultRouter(app: ServerApplication, rawMountPath: String) extends Router {
   val mountPath = normalize(rawMountPath, true)
@@ -87,6 +88,11 @@ private class DefaultRouter(app: ServerApplication, rawMountPath: String) extend
 
   def resources(mountPath: String, sourceDirectory: String, classLoader: ClassLoader): this.type = synchronized {
     app.resources(this.mountPath + normalize(mountPath), sourceDirectory, classLoader)
+    this
+  }
+
+  def websocket[T](path: String)(handler: WebSocketSession => T): this.type = synchronized {
+    app.websocket(mountPath + normalize(path))(handler)
     this
   }
 

@@ -18,6 +18,7 @@ package scamper.server
 import java.io.File
 
 import scamper.RequestMethod
+import scamper.websocket.WebSocketSession
 
 /**
  * Configures routing for `ServerApplication`.
@@ -259,5 +260,17 @@ trait Router {
    * @return this router
    */
   def resources(mountPath: String, sourceDirectory: String, classLoader: ClassLoader): this.type
-}
 
+  /**
+   * Adds websocket server at given router path using supplied session handler for each
+   * connection.
+   *
+   * The handler is appended to existing request handler chain.
+   *
+   * @param path websocket path
+   * @param handler websocket session handler
+   *
+   * @return this router
+   */
+  def websocket[T](path: String)(handler: WebSocketSession => T): this.type
+}
