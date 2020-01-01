@@ -28,23 +28,23 @@ trait WebSocketSession {
   /** Gets session identifer. */
   def id: String
 
-  /** Gets target of websocket request. */
+  /** Gets target of WebSocket request. */
   def target: Uri
 
-  /** Gets websocket protocol version. */
+  /** Gets WebSocket protocol version. */
   def protocolVersion: String
 
   /** Gets logger associated with session. */
   def logger: Logger
 
-  /** Tests whether websocket is using secure transport. */
+  /** Tests whether WebSocket is using secure transport. */
   def isSecure: Boolean
 
-  /** Tests whether websocket session is open. */
+  /** Tests whether WebSocket session is open. */
   def isOpen: Boolean
 
   /**
-   * Gets websocket idle timeout in milliseconds.
+   * Gets WebSocket idle timeout in milliseconds.
    *
    * Timeout of zero disables this option &ndash; i.e., timeout is indefinite.
    *
@@ -54,7 +54,7 @@ trait WebSocketSession {
   def idleTimeout(): Int
 
   /**
-   * Sets websocket idle timeout.
+   * Sets WebSocket idle timeout.
    *
    * Timeout of zero disables this option &ndash; i.e., timeout is indefinite.
    *
@@ -240,48 +240,48 @@ trait WebSocketSession {
 /** Provides factory methods for `WebSocketSession`. */
 object WebSocketSession {
   /**
-   * Wraps websocket session around an already established client connection.
+   * Wraps WebSocket session around an already established client connection.
    *
-   * @param conn websocket connection
-   * @param id websocket identifier
+   * @param conn WebSocket connection
+   * @param id WebSocket identifier
    * @param target target URI for which connection was established
-   * @param protocolVersion websocket protocol version
+   * @param protocolVersion WebSocket protocol version
    * @param logger optional logger
    */
   def forClient(conn: WebSocketConnection, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =
     new WebSocketSessionImpl(id, target, protocolVersion, logger.getOrElse(NullLogger))(conn, false)
 
   /**
-   * Wraps websocket session around an already established client connection.
+   * Wraps WebSocket session around an already established client connection.
    *
-   * @param socket socket from which websocket connection is constructed
-   * @param id websocket identifier
+   * @param socket socket from which WebSocket connection is constructed
+   * @param id WebSocket identifier
    * @param target target URI for which connection was established
-   * @param protocolVersion websocket protocol version
+   * @param protocolVersion WebSocket protocol version
    * @param logger optional logger
    */
   def forClient(socket: Socket, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =
     forClient(WebSocketConnection(socket), id, target, protocolVersion, logger)
 
   /**
-   * Wraps websocket session around an already established server connection.
+   * Wraps WebSocket session around an already established server connection.
    *
-   * @param conn websocket connection
-   * @param id websocket identifier
+   * @param conn WebSocket connection
+   * @param id WebSocket identifier
    * @param target target URI for which connection was established
-   * @param protocolVersion websocket protocol version
+   * @param protocolVersion WebSocket protocol version
    * @param logger optional logger
    */
   def forServer(conn: WebSocketConnection, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =
     new WebSocketSessionImpl(id, target, protocolVersion, logger.getOrElse(NullLogger))(conn, true)
 
   /**
-   * Wraps websocket session around an already established server connection.
+   * Wraps WebSocket session around an already established server connection.
    *
-   * @param socket socket from which websocket connection is constructed
-   * @param id websocket identifier
+   * @param socket socket from which WebSocket connection is constructed
+   * @param id WebSocket identifier
    * @param target target URI for which connection was established
-   * @param protocolVersion websocket protocol version
+   * @param protocolVersion WebSocket protocol version
    * @param logger optional logger
    */
   def forServer(socket: Socket, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =

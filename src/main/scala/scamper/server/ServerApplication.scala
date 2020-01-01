@@ -496,13 +496,13 @@ class ServerApplication {
   }
 
   /**
-   * Adds websocket server at given path using supplied session handler for each
+   * Adds WebSocket server at given path using supplied session handler for each
    * connection.
    *
    * The handler is appended to existing request handler chain.
    *
-   * @param path websocket path
-   * @param handler websocket session handler
+   * @param path WebSocket path
+   * @param handler WebSocket session handler
    *
    * @return this application
    */

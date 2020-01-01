@@ -53,14 +53,14 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
   private val tag = s"::websocket::$id"
 
   try {
-    logger.info(s"$tag - Starting websocket session at $target")
+    logger.info(s"$tag - Starting WebSocket session at $target")
 
     start().onComplete { _ =>
-      logger.info(s"$tag - Exiting websocket session at $target")
+      logger.info(s"$tag - Exiting WebSocket session at $target")
     }
   } catch {
     case err: Exception =>
-      logger.error(s"$tag - Exiting websocket session at $target", err)
+      logger.error(s"$tag - Exiting WebSocket session at $target", err)
       Try(conn.close())
   }
 

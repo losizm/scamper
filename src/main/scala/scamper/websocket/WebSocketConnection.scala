@@ -25,7 +25,7 @@ import javax.net.ssl.SSLSocket
 import StatusCode.Registry._
 
 /**
- * Represents endpoint of websocket connection.
+ * Represents endpoint of WebSocket connection.
  *
  * @see [[WebSocketConnection.apply]]
  */
@@ -39,14 +39,14 @@ class WebSocketConnection private (socket: Socket) {
   private val in = new DataInputStream(socket.getInputStream())
   private val out = new DataOutputStream(socket.getOutputStream())
 
-  /** Tests whether websocket connection is using secure transport. */
+  /** Tests whether WebSocket connection is using secure transport. */
   def isSecure: Boolean = socket.isInstanceOf[SSLSocket]
 
-  /** Tests whether websocket connection is open. */
+  /** Tests whether WebSocket connection is open. */
   def isOpen: Boolean = !socket.isClosed()
 
   /**
-   * Reads next frame from websocket connection.
+   * Reads next frame from WebSocket connection.
    *
    * @param timeout maximum time to wait for any read operation; `0` is
    *  interpreted as indefinitely
@@ -55,7 +55,7 @@ class WebSocketConnection private (socket: Socket) {
    * @throws EOFException if unexpected EOF occurs
    * @throws InterruptedIOException if timeout is exceeded
    *
-   * @note This method is synchronized on the websocket's input channel,
+   * @note This method is synchronized on the WebSocket's input channel,
    *  permitting only one read request at a time.
    */
   def read(timeout: Int = 0): WebSocketFrame = in.synchronized {
@@ -101,13 +101,13 @@ class WebSocketConnection private (socket: Socket) {
   }
 
   /**
-   * Writes supplied frame to websocket connection.
+   * Writes supplied frame to WebSocket connection.
    *
-   * @param frame websocket frame
+   * @param frame WebSocket frame
    *
    * @throws EOFException if payload truncation is detected
    *
-   * @note This method is synchronized on the websocket's output channel,
+   * @note This method is synchronized on the WebSocket's output channel,
    *  permitting only one write request at a time.
    */
   def write(frame: WebSocketFrame): Unit = out.synchronized {
@@ -151,7 +151,7 @@ class WebSocketConnection private (socket: Socket) {
   }
 
   /**
-   * Closes websocket connection.
+   * Closes WebSocket connection.
    *
    * @note This method does NOT send a Close frame. The user is responsible for
    *  sending an appropriate Close frame before invoking this method.
