@@ -28,8 +28,8 @@ trait WebSocketFrame {
   /** Gets opcode. */
   def opcode: Opcode
 
-  /** Gets payload masking key. */
-  def maskingKey: Option[Int]
+  /** Gets masking key. */
+  def key: Option[MaskingKey]
 
   /** Gets payload length. */
   def length: Long
@@ -38,7 +38,7 @@ trait WebSocketFrame {
   def payload: InputStream
 
   /** Tests for presence of masking key. */
-  def isMasked: Boolean = maskingKey.isDefined
+  def isMasked: Boolean = key.isDefined
 
   /** Tests for Continuation frame. */
   def isContinuation: Boolean = opcode == Continuation
@@ -66,15 +66,15 @@ object WebSocketFrame {
    *
    * @param isFinal indicates whether supplied frame is message final frame
    * @param opcode frame opcode
-   * @param maskingKey payload masking key
+   * @param key masking key
    * @param length payload length
    * @param payload input stream to payload data
    */
-  def apply(isFinal: Boolean, opcode: Opcode, maskingKey: Option[Int], length: Long, payload: InputStream): WebSocketFrame = {
+  def apply(isFinal: Boolean, opcode: Opcode, key: Option[MaskingKey], length: Long, payload: InputStream): WebSocketFrame = {
     if (opcode.isControl && !isFinal)
       throw new IllegalArgumentException("control frame must be final")
 
-    if (maskingKey == null)
+    if (key == null)
       throw new NullPointerException()
 
     if (length < 0)
@@ -83,7 +83,7 @@ object WebSocketFrame {
     if (payload == null)
       throw new NullPointerException()
 
-    new WebSocketFrameImpl(isFinal, opcode, maskingKey, length, new BoundedInputStream(payload, length))
+    new WebSocketFrameImpl(isFinal, opcode, key, length, new BoundedInputStream(payload, length))
   }
 
   /**
@@ -91,35 +91,35 @@ object WebSocketFrame {
    *
    * @param isFinal indicates whether supplied frame is message final frame
    * @param opcode frame opcode
-   * @param maskingKey payload masking key
+   * @param key masking key
    * @param data unmasked payload data
    *
    * @note If there is `Some` masking key, it is used to mask `data`.
    */
-  def apply(isFinal: Boolean, opcode: Opcode, maskingKey: Option[Int], data: Array[Byte]): WebSocketFrame = {
-    maskingKey.foreach(key => mask(key, data))
-    apply(isFinal, opcode, maskingKey, data.size, new ByteArrayInputStream(data))
+  def apply(isFinal: Boolean, opcode: Opcode, key: Option[MaskingKey], data: Array[Byte]): WebSocketFrame = {
+    key.foreach(key => key(data))
+    apply(isFinal, opcode, key, data.size, new ByteArrayInputStream(data))
   }
 
   /**
    * Creates Close frame using supplied status code.
    *
    * @param statusCode status code to serve as payload
-   * @param maskingKey payload masking key
+   * @param key masking key
    *
    * @note If there is `Some` masking key, it is used to mask status code.
    */
-  def apply(statusCode: StatusCode, maskingKey: Option[Int]): WebSocketFrame = {
+  def apply(statusCode: StatusCode, key: Option[MaskingKey]): WebSocketFrame = {
     val data = statusCode.toData
-    maskingKey.foreach(key => mask(key, data))
-    apply(true, Close, maskingKey, data.size, new ByteArrayInputStream(data))
+    key.foreach(key => key(data))
+    apply(true, Close, key, data.size, new ByteArrayInputStream(data))
   }
 }
 
 private case class WebSocketFrameImpl(
   isFinal: Boolean,
   opcode: Opcode,
-  maskingKey: Option[Int],
+  key: Option[MaskingKey],
   length: Long,
   payload: InputStream
 ) extends WebSocketFrame

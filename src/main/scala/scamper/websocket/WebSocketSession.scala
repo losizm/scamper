@@ -15,9 +15,12 @@
  */
 package scamper.websocket
 
+import java.net.Socket
+
 import scala.util.Try
 
 import scamper.Uri
+import scamper.logging.{ Logger, NullLogger }
 import StatusCode.Registry.NormalClosure
 
 /** Defines session for WebSocket connection. */
@@ -30,6 +33,9 @@ trait WebSocketSession {
 
   /** Gets websocket protocol version. */
   def protocolVersion: String
+
+  /** Gets logger associated with session. */
+  def logger: Logger
 
   /** Tests whether websocket is using secure transport. */
   def isSecure: Boolean
@@ -229,4 +235,55 @@ trait WebSocketSession {
    * @return this session
    */
   def onClose[T](handler: StatusCode => T): this.type
+}
+
+/** Provides factory methods for `WebSocketSession`. */
+object WebSocketSession {
+  /**
+   * Wraps websocket session around an already established client connection.
+   *
+   * @param conn websocket connection
+   * @param id websocket identifier
+   * @param target target URI for which connection was established
+   * @param protocolVersion websocket protocol version
+   * @param logger optional logger
+   */
+  def forClient(conn: WebSocketConnection, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =
+    new WebSocketSessionImpl(id, target, protocolVersion, logger.getOrElse(NullLogger))(conn, false)
+
+  /**
+   * Wraps websocket session around an already established client connection.
+   *
+   * @param socket socket from which websocket connection is constructed
+   * @param id websocket identifier
+   * @param target target URI for which connection was established
+   * @param protocolVersion websocket protocol version
+   * @param logger optional logger
+   */
+  def forClient(socket: Socket, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =
+    forClient(WebSocketConnection(socket), id, target, protocolVersion, logger)
+
+  /**
+   * Wraps websocket session around an already established server connection.
+   *
+   * @param conn websocket connection
+   * @param id websocket identifier
+   * @param target target URI for which connection was established
+   * @param protocolVersion websocket protocol version
+   * @param logger optional logger
+   */
+  def forServer(conn: WebSocketConnection, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =
+    new WebSocketSessionImpl(id, target, protocolVersion, logger.getOrElse(NullLogger))(conn, true)
+
+  /**
+   * Wraps websocket session around an already established server connection.
+   *
+   * @param socket socket from which websocket connection is constructed
+   * @param id websocket identifier
+   * @param target target URI for which connection was established
+   * @param protocolVersion websocket protocol version
+   * @param logger optional logger
+   */
+  def forServer(socket: Socket, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =
+    forServer(WebSocketConnection(socket), id, target, protocolVersion, logger)
 }

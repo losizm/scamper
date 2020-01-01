@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper.server
+package scamper.websocket
 
-import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, EOFException }
-import java.net.{ Socket, SocketException, SocketTimeoutException }
+import java.io.ByteArrayOutputStream
+import java.net.{ SocketException, SocketTimeoutException }
 import java.util.concurrent.atomic.AtomicBoolean
 
 import scala.concurrent.Future
-import scala.util.{ Failure, Success, Try }
+import scala.util.Try
 
-import scamper.{ Auxiliary, Uri, Validate }
+import scamper.{ Auxiliary, Uri }
 import scamper.logging.Logger
 import scamper.websocket._
 import scamper.websocket.Opcode.Registry._
 import scamper.websocket.StatusCode.Registry._
 
-private class ServerWebSocketSession private (conn: WebSocketConnection, properties: Map[String, Any]) extends WebSocketSession {
-  private type EitherHandler[T] = Either[(T, Boolean) => Any, T => Any]
+private class WebSocketSessionImpl(val id: String, val target: Uri, val protocolVersion: String, val logger: Logger)
+    (conn: WebSocketConnection, serverMode: Boolean) extends WebSocketSession {
 
-  private implicit val executor = Auxiliary.executor
+  private type EitherHandler[T] = Either[(T, Boolean) => Any, T => Any]
 
   private var _bufferCapacity: Int = Int.MaxValue
   private var _idleTimeout: Int = 0
@@ -48,57 +48,17 @@ private class ServerWebSocketSession private (conn: WebSocketConnection, propert
   private val closeSent = new AtomicBoolean(false)
   private val closeReceived = new AtomicBoolean(false)
 
-  val id: String = getProperty("session.id")
-  val target: Uri = getProperty("session.target")
-  val protocolVersion: String = getProperty("session.protocolVersion")
-  val logger: Logger = getProperty("session.logger")
+  private implicit val executor = Auxiliary.executor
 
   private val tag = s"::websocket::$id"
 
-  try
-    Future {
-      logger.info(s"$tag - Starting websocket session at $target")
+  try {
+    logger.info(s"$tag - Starting websocket session at $target")
 
-      while (isOpen) {
-        val frame = conn.read(idleTimeout)
-
-        if (frame.length > bufferCapacity())
-          throw WebSocketError(MessageTooBig)
-
-        if (!frame.isMasked && frame.length > 0)
-          throw WebSocketError(ProtocolError)
-
-        val data = getData(frame) 
-
-        frame.opcode match {
-          case Continuation => throw WebSocketError(ProtocolError)
-          case Text         => doText(data, frame.isFinal)
-          case Binary       => doBinary(data, frame.isFinal)
-          case Ping         => doPing(data)
-          case Pong         => doPong(data)
-          case Close        => doClose(data)
-        }
-      }
-    } recover {
-      case WebSocketError(statusCode) =>
-        close(statusCode)
-
-      case _: SocketTimeoutException =>
-        close(GoingAway)
-
-      case err: SocketException =>
-        if (!closeSent.get()) {
-          doError(err)
-          close(AbnormalClosure)
-        }
-
-      case err =>
-        doError(err)
-        close(AbnormalClosure)
-    } onComplete {
-      case _ => logger.info(s"$tag - Exiting websocket session at $target")
+    start().onComplete { _ =>
+      logger.info(s"$tag - Exiting websocket session at $target")
     }
-  catch {
+  } catch {
     case err: Exception =>
       logger.error(s"$tag - Exiting websocket session at $target", err)
       Try(conn.close())
@@ -155,7 +115,7 @@ private class ServerWebSocketSession private (conn: WebSocketConnection, propert
 
       try
         if (statusCode != NoStatusPresent && statusCode != AbnormalClosure && statusCode != TlsHandshakeFailure)
-          conn.write(WebSocketFrame(statusCode, None))
+          conn.write(makeFrame(statusCode.toData, Close))
       catch {
         case err: Exception => doError(err)
       } finally {
@@ -203,6 +163,42 @@ private class ServerWebSocketSession private (conn: WebSocketConnection, propert
     this
   }
 
+  private def start(): Future[Unit] =
+    Future {
+      while (isOpen) {
+        val frame = conn.read(idleTimeout)
+
+        checkFrame(frame)
+
+        val data = getData(frame)
+
+        frame.opcode match {
+          case Continuation => throw WebSocketError(ProtocolError)
+          case Text         => doText(data, frame.isFinal)
+          case Binary       => doBinary(data, frame.isFinal)
+          case Ping         => doPing(data)
+          case Pong         => doPong(data)
+          case Close        => doClose(data)
+        }
+      }
+    } recover {
+      case WebSocketError(statusCode) =>
+        close(statusCode)
+
+      case _: SocketTimeoutException =>
+        close(GoingAway)
+
+      case err: SocketException =>
+        if (!closeSent.get()) {
+          doError(err)
+          close(AbnormalClosure)
+        }
+
+      case err =>
+        doError(err)
+        close(AbnormalClosure)
+    }
+
   private def doText(data: Array[Byte], last: Boolean): Unit =
     if (last)
       textHandler match {
@@ -236,16 +232,12 @@ private class ServerWebSocketSession private (conn: WebSocketConnection, propert
     while (keepGoing) {
       val frame = conn.read(idleTimeout)
 
-      if (frame.length + buffer.size > bufferCapacity())
-        throw WebSocketError(MessageTooBig)
-
-      if (!frame.isMasked && frame.length > 0)
-        throw WebSocketError(ProtocolError)
+      checkFrame(frame)
 
       val newData = getData(frame)
 
       frame.opcode match {
-        case Continuation => 
+        case Continuation =>
           handler match {
             case Right(handle) => buffer.write(newData)
             case Left(handle)  => handle(encode(newData), frame.isFinal)
@@ -262,7 +254,7 @@ private class ServerWebSocketSession private (conn: WebSocketConnection, propert
         case Pong   => doPong(newData)
         case Close  => doClose(newData); keepGoing = false
       }
-    } 
+    }
   }
 
   private def doPing(data: Array[Byte]): Unit =
@@ -286,25 +278,35 @@ private class ServerWebSocketSession private (conn: WebSocketConnection, propert
         close(statusCode)
     }
 
-  private def getProperty[T](name: String): T =
-    try
-      Validate.notNull(properties(name).asInstanceOf[T])
-    catch {
-      case err: Exception =>
-        Try(conn.close())
-        throw err
-    }
-
   private def nullHandler[T]: (T, Boolean) => Unit = (_, _) => ()
 
-  private def makeFrame(data: Array[Byte], opcode: Opcode): WebSocketFrame =
+  private def checkFrame(frame: WebSocketFrame): Unit = {
+    if (frame.length > bufferCapacity())
+      throw WebSocketError(MessageTooBig)
+
+    frame.isMasked match {
+      case true =>
+        if (!serverMode)
+          throw WebSocketError(ProtocolError)
+
+      case false =>
+        if (serverMode)
+          throw WebSocketError(ProtocolError)
+    }
+  }
+
+
+  private def makeFrame(data: Array[Byte], opcode: Opcode): WebSocketFrame = {
     WebSocketFrame(
       true,
       opcode,
-      None,
-      data.size,
-      new ByteArrayInputStream(data)
+      serverMode match {
+        case true  => None
+        case false => Some(MaskingKey())
+      },
+      data
     )
+  }
 
   private def getData(frame: WebSocketFrame): Array[Byte] = {
     if (frame.length > Int.MaxValue)
@@ -312,11 +314,6 @@ private class ServerWebSocketSession private (conn: WebSocketConnection, propert
 
     val data = new Array[Byte](frame.length.toInt)
     frame.payload.read(data)
-    frame.maskingKey.map { key => mask(key, data) }.getOrElse(data)
+    frame.key.map { key => key(data) }.getOrElse(data)
   }
-}
-
-private object ServerWebSocketSession {
-  def apply(socket: Socket, properties: Map[String, Any]): ServerWebSocketSession =
-    new ServerWebSocketSession(WebSocketConnection(socket), properties) 
 }

@@ -41,13 +41,13 @@ private class WebSocketRequestHandler private (handler: (WebSocketSession) => An
               .withConnection("Upgrade")
               .withSecWebSocketAccept(getWebSocketAcceptValue(req))
               .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
-                val properties = Map(
-                  "session.id" -> req.correlate,
-                  "session.target" -> req.target,
-                  "session.protocolVersion" -> req.secWebSocketVersion,
-                  "session.logger" -> req.logger
+                val session = WebSocketSession.forServer(
+                  socket,
+                  req.correlate,
+                  req.target,
+                  req.secWebSocketVersion,
+                  Some(req.logger)
                 )
-                val session = ServerWebSocketSession(socket, properties)
                 handler(session)
               })
         }

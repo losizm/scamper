@@ -92,15 +92,12 @@ class WebSocketConnection private (socket: Socket) {
       case length => length
     }
 
-    val maskingKey = in.readInt() match {
-      case 0 => None
-      case n => Some(n)
-    }
+    val key = MaskingKey.get(in.readInt())
 
-    if (isMasked ^ maskingKey.isDefined)
+    if (isMasked ^ key.isDefined)
       throw WebSocketError(ProtocolError)
 
-    WebSocketFrame(isFinal, opcode, maskingKey, length, in)
+    WebSocketFrame(isFinal, opcode, key, length, in)
   }
 
   /**
@@ -119,7 +116,7 @@ class WebSocketConnection private (socket: Socket) {
       case false => 0
     }
 
-    val maskBit = frame.maskingKey.isDefined match {
+    val maskBit = frame.key.isDefined match {
       case true  => -128
       case false => 0
     }

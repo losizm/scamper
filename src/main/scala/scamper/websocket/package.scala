@@ -20,27 +20,6 @@ package object websocket {
   /** Globally Unique Identifier for WebSocket (258EAFA5-E914-47DA-95CA-C5AB0DC85B11) */
   val guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
-  /**
-   * Applies masking key to supplied data.
-   *
-   * @param key masking key
-   * @param data input data
-   *
-   * @note This method modifies input `data`.
-   */
-  def mask(key: Int, data: Array[Byte]): Array[Byte] = {
-    val keys = Array[Byte](
-      { (key & 0xff000000) >> 24 }.toByte,
-      { (key & 0x00ff0000) >> 16 }.toByte,
-      { (key & 0x0000ff00) >>  8 }.toByte,
-      { (key & 0x000000ff) >>  0 }.toByte
-    )
-
-    for (i <- 0 until data.size)
-      data(i) = { data(i) ^ keys(i % 4) }.toByte
-    data
-  }
-
   /** Indicates error occurred on websocket with supplied status code. */
   case class WebSocketError(status: StatusCode) extends Exception(s"${status.value} ($status)")
 
