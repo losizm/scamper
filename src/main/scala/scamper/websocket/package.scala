@@ -15,13 +15,94 @@
  */
 package scamper
 
+import java.security.{ MessageDigest, SecureRandom }
+
+import scala.util.Try
+
+import RequestMethod.Registry._
+import ResponseStatus.Registry._
+import headers.{ Connection, Upgrade }
+
 /** Provides specialized access to WebSocket headers and types. */
 package object websocket {
+  private val random = new SecureRandom()
+
   /** Globally Unique Identifier for WebSocket (258EAFA5-E914-47DA-95CA-C5AB0DC85B11) */
   val guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
-  /** Indicates error occurred on websocket with supplied status code. */
-  case class WebSocketError(status: StatusCode) extends Exception(s"${status.value} ($status)")
+  /** Provides reason for invalid WebSocket request. */
+  case class InvalidWebSocketRequest(reason: String) extends RuntimeException(reason)
+
+  /** Provides status code of WebSocket error. */
+  case class WebSocketError(statusCode: StatusCode) extends RuntimeException(s"${statusCode.value} ($statusCode)")
+
+  /** Gets randomly generated WebSocket key. */
+  def generateWebSocketKey(): String = {
+    val key = new Array[Byte](16)
+    random.nextBytes(key)
+    Base64.encodeToString(key)
+  }
+
+  /**
+   * Generates `Sec-WebSocket-Accept` header value using supplied WebSocket key.
+   *
+   * @param key WebSocket key
+   *
+   * @throws IllegalArgumentException if WebSocket key is invalid
+   */
+  def acceptWebSocketKey(key: String): String = {
+    checkWebSocketKeyValue(key)
+    Base64.encodeToString { hash(key + guid) }
+  }
+
+  /**
+   * Checks validity of WebSocket request.
+   *
+   * @param req WebSocket request
+   *
+   * @throws InvalidWebSocketRequest if WebSocket request is invalid
+   *
+   * @return unmodified WebSocket request
+   */
+  def checkWebSocketRequest(req: HttpRequest): HttpRequest = {
+    if (req.method != GET)
+      throw InvalidWebSocketRequest(s"Invalid method for WebSocket request: ${req.method}")
+
+    if (!checkUpgrade(req))
+      throw InvalidWebSocketRequest("Missing or invalid header: Upgrade")
+
+    if (!checkConnection(req))
+      throw InvalidWebSocketRequest("Missing or invalid header: Connection")
+
+    if (!checkWebSocketKey(req))
+      throw InvalidWebSocketRequest("Missing or invalid header: Sec-WebSocket-Key")
+
+    if (!checkWebSocketVersion(req))
+      throw InvalidWebSocketRequest("Missing or invalid header: Sec-WebSocket-Version")
+
+    req
+  }
+
+  /**
+   * Checks for successful WebSocket handshake based on supplied request and
+   * response.
+   *
+   * @param req WebSocket request
+   * @param res WebSocket response
+   *
+   * @return `true` if handshake is successful; `false` otherwise
+   *
+   * @throws InvalidWebSocketRequest if WebSocket request is invalid
+   */
+  def checkWebSocketHandshake(req: HttpRequest, res: HttpResponse): Boolean = {
+    checkWebSocketRequest(req)
+
+    res.status == SwitchingProtocols &&
+      checkUpgrade(res) &&
+      checkConnection(res) &&
+      checkWebSocketVersion(res) &&
+      checkWebSocketAccept(res, req.secWebSocketKey)
+  }
 
   /** Provides standardized access to Sec-WebSocket-Key header. */
   implicit class SecWebSocketKey(private val request: HttpRequest) extends AnyVal {
@@ -145,4 +226,36 @@ package object websocket {
     def removeSecWebSocketVersion()(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Sec-WebSocket-Version")
   }
+
+  private def checkUpgrade(msg: HttpMessage): Boolean =
+    msg.upgrade.exists { protocol =>
+      protocol.name == "websocket" && protocol.version.isEmpty
+    }
+
+  private def checkConnection(msg: HttpMessage): Boolean =
+    msg.connection.exists(_ equalsIgnoreCase "upgrade")
+
+  private def checkWebSocketKey(req: HttpRequest): Boolean =
+    req.getSecWebSocketKey
+      .map(checkWebSocketKeyValue)
+      .getOrElse(false)
+
+  private def checkWebSocketKeyValue(key: String): Boolean =
+    Try(Base64.decode(key).size == 16).getOrElse(false)
+
+  private def checkWebSocketVersion(msg: HttpMessage): Boolean =
+    msg.getSecWebSocketVersion
+      .map(_ == "13")
+      .getOrElse(false)
+
+  private def checkWebSocketAccept(res: HttpResponse, key: String): Boolean =
+    res.getSecWebSocketAccept
+      .map(checkWebSocketAcceptValue(_, key))
+      .getOrElse(false)
+
+  private def checkWebSocketAcceptValue(value: String, key: String): Boolean =
+    value == acceptWebSocketKey(key)
+
+  private def hash(value: String): Array[Byte] =
+    MessageDigest.getInstance("SHA-1").digest(value.getBytes("utf-8"))
 }
