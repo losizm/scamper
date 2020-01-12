@@ -54,7 +54,6 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
 
   try {
     logger.info(s"$tag - Starting WebSocket session at $target")
-
     start().onComplete { _ =>
       logger.info(s"$tag - Exiting WebSocket session at $target")
     }
@@ -104,7 +103,7 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
     Future(ping(data)).onComplete[T](callback)
 
   def pong(data: Array[Byte] = Array.empty): Unit =
-    conn.write(makeFrame(data, Ping))
+    conn.write(makeFrame(data, Pong))
 
   def pongAsynchronously[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit =
     Future(pong(data)).onComplete(callback)
@@ -280,6 +279,17 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
 
   private def nullHandler[T]: (T, Boolean) => Unit = (_, _) => ()
 
+  private def makeFrame(data: Array[Byte], opcode: Opcode): WebSocketFrame =
+    WebSocketFrame(
+      true,
+      opcode,
+      serverMode match {
+        case true  => None
+        case false => Some(MaskingKey())
+      },
+      data
+    )
+
   private def checkFrame(frame: WebSocketFrame): Unit = {
     if (frame.length > bufferCapacity())
       throw WebSocketError(MessageTooBig)
@@ -293,19 +303,6 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
         if (serverMode)
           throw WebSocketError(ProtocolError)
     }
-  }
-
-
-  private def makeFrame(data: Array[Byte], opcode: Opcode): WebSocketFrame = {
-    WebSocketFrame(
-      true,
-      opcode,
-      serverMode match {
-        case true  => None
-        case false => Some(MaskingKey())
-      },
-      data
-    )
   }
 
   private def getData(frame: WebSocketFrame): Array[Byte] = {
