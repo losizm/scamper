@@ -92,5 +92,13 @@ package object scamper {
     /** Creates Uri with https scheme and supplied components. */
     def https(authority: String, path: String = null, query: String = null, fragment: String = null): Uri =
       new Uri("https", authority, path, query, fragment)
+
+    /** Creates Uri with ws scheme and supplied components. */
+    def ws(authority: String, path: String = null, query: String = null): Uri =
+      new Uri("ws", authority, path, query)
+
+    /** Creates Uri with wss scheme and supplied components. */
+    def wss(authority: String, path: String = null, query: String = null): Uri =
+      new Uri("wss", authority, path, query)
   }
 }
