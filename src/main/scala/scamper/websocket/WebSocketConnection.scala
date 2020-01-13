@@ -112,42 +112,46 @@ class WebSocketConnection private (socket: Socket) {
    */
   def write(frame: WebSocketFrame): Unit = out.synchronized {
     val finBit = frame.isFinal match {
-      case true  => -128
+      case true  => 128
       case false => 0
     }
 
     val maskBit = frame.key.isDefined match {
-      case true  => -128
+      case true  => 128
       case false => 0
     }
 
     out.write(finBit + frame.opcode.value)
 
     frame.length match {
-      case length if length <= 125   =>
+      case length if length <= 125 =>
         out.write(maskBit + length.toInt)
+
       case length if length <= 65536 =>
         out.write(maskBit + 126)
         out.writeShort(length.toInt)
+
       case length =>
         out.write(maskBit + 127)
         out.writeLong(length)
     }
 
-    val buf = new Array[Byte](8192)
-    val in = frame.payload
-    var tot = 0
-    var len = 0
+    if (frame.length > 0) {
+      val buf = new Array[Byte](8192)
+      val in = frame.payload
+      var tot = 0
+      var len = 0
 
-    while ({ len = in.read(buf); len != -1 }) {
-      out.write(buf, 0, len)
-      tot += len
+      while ({ len = in.read(buf); len != -1 }) {
+        out.write(buf, 0, len)
+        tot += len
+      }
+
+      if (tot < frame.length)
+        throw new EOFException(s"Truncation dectected: Payload length ($tot) is less than declared length (${frame.length})")
     }
 
     out.flush()
-
-    if (tot < frame.length)
-      throw new EOFException(s"Truncation dectected: Payload length ($tot) is less than declared length (${frame.length})")
   }
 
   /**
