@@ -26,8 +26,23 @@ trait MaskingKey {
    * @param data bytes to which key is applied
    *
    * @return modified data
+   *
+   * @note Equivalent to: `apply(data, data.length, 0)`
    */
-  def apply(data: Array[Byte]): Array[Byte]
+  def apply(data: Array[Byte]): Array[Byte] =
+    apply(data, data.length, 0)
+
+  /**
+   * Applies key to `length` bytes of `data`, assuming first byte corresponds to
+   * `position` in payload.
+   *
+   * @param data bytes to which key is applied
+   * @param length number of bytes to which key is applied
+   * @param position offset into payload to which first byte of data corresponds
+   *
+   * @return modified data
+   */
+  def apply(data: Array[Byte], length: Int, position: Long): Array[Byte]
 }
 
 /** Provides factory methods for `MaskingKey`. */
@@ -68,7 +83,7 @@ object MaskingKey {
 private case class MaskingKeyImpl(value: Int) extends MaskingKey {
   override lazy val toString: String = s"MaskingKey($value)"
 
-  def apply(data: Array[Byte]): Array[Byte] = {
+  def apply(data: Array[Byte], length: Int, position: Long): Array[Byte] = {
     val key = Array[Byte](
       { (value & 0xff000000) >> 24 }.toByte,
       { (value & 0x00ff0000) >> 16 }.toByte,
@@ -76,8 +91,10 @@ private case class MaskingKeyImpl(value: Int) extends MaskingKey {
       { (value & 0x000000ff) >>  0 }.toByte
     )
 
-    for (i <- 0 until data.size)
-      data(i) = { data(i) ^ key(i % 4) }.toByte
+    val offset = (position % 4).toInt
+
+    for (i <- 0 until length)
+      data(i) = { data(i) ^ key((i + offset) % 4) }.toByte
     data
   }
 }
