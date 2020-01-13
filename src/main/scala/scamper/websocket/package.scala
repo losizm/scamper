@@ -31,10 +31,10 @@ package object websocket {
   val guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
   /** Provides reason for invalid WebSocket request. */
-  case class InvalidWebSocketRequest(reason: String) extends RuntimeException(reason)
+  case class InvalidWebSocketRequest(reason: String) extends HttpException(reason)
 
   /** Provides status code of WebSocket error. */
-  case class WebSocketError(statusCode: StatusCode) extends RuntimeException(s"${statusCode.value} ($statusCode)")
+  case class WebSocketError(statusCode: StatusCode) extends HttpException(s"${statusCode.value} ($statusCode)")
 
   /** Gets randomly generated WebSocket key. */
   def generateWebSocketKey(): String = {
@@ -100,7 +100,6 @@ package object websocket {
     res.status == SwitchingProtocols &&
       checkUpgrade(res) &&
       checkConnection(res) &&
-      checkWebSocketVersion(res) &&
       checkWebSocketAccept(res, req.secWebSocketKey)
   }
 
