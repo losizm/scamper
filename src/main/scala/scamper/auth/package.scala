@@ -194,7 +194,7 @@ package object auth {
 
     /** Gets basic authorization if present. */
     def getBasic: Option[BasicCredentials] =
-      getAuthorization.collect { case challenge: BasicCredentials => challenge }
+      getAuthorization.collect { case credentials: BasicCredentials => credentials }
 
     /** Tests whether basic authorization is present. */
     def hasBasic: Boolean = getBasic.isDefined
@@ -221,7 +221,7 @@ package object auth {
 
     /** Gets bearer authorization if present. */
     def getBearer: Option[BearerCredentials] =
-      getAuthorization.collect { case challenge: BearerCredentials => challenge }
+      getAuthorization.collect { case credentials: BearerCredentials => credentials }
 
     /** Tests whether bearer authorization is present. */
     def hasBearer: Boolean = getBearer.isDefined
@@ -377,7 +377,7 @@ package object auth {
 
     /** Gets basic proxy authorization if present. */
     def getProxyBasic: Option[BasicCredentials] =
-      getProxyAuthorization.collect { case challenge: BasicCredentials => challenge }
+      getProxyAuthorization.collect { case credentials: BasicCredentials => credentials }
 
     /** Tests whether basic proxy authorization is present. */
     def hasProxyBasic: Boolean = getProxyBasic.isDefined
@@ -404,7 +404,7 @@ package object auth {
 
     /** Gets bearer proxy authorization if present. */
     def getProxyBearer: Option[BearerCredentials] =
-      getProxyAuthorization.collect { case challenge: BearerCredentials => challenge }
+      getProxyAuthorization.collect { case credentials: BearerCredentials => credentials }
 
     /** Tests whether bearer proxy authorization is present. */
     def hasProxyBearer: Boolean = getProxyBearer.isDefined
