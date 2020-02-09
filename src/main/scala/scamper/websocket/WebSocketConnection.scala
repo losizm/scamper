@@ -92,7 +92,10 @@ class WebSocketConnection private (socket: Socket) {
       case length => length
     }
 
-    val key = MaskingKey.get(in.readInt())
+    val key = isMasked match {
+      case true  => MaskingKey.get(in.readInt())
+      case false => None
+    }
 
     if (isMasked ^ key.isDefined)
       throw WebSocketError(ProtocolError)
@@ -127,13 +130,17 @@ class WebSocketConnection private (socket: Socket) {
       case length if length <= 125 =>
         out.write(maskBit + length.toInt)
 
-      case length if length <= 65536 =>
+      case length if length <= 65535 =>
         out.write(maskBit + 126)
         out.writeShort(length.toInt)
 
       case length =>
         out.write(maskBit + 127)
         out.writeLong(length)
+    }
+
+    frame.key.foreach { key =>
+      out.writeInt(key.value)
     }
 
     if (frame.length > 0) {
