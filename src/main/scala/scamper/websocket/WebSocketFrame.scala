@@ -17,7 +17,7 @@ package scamper.websocket
 
 import java.io.{ ByteArrayInputStream, InputStream }
 
-import scamper.BoundedInputStream
+import scamper.{ BoundedInputStream, EmptyInputStream }
 import Opcode.Registry._
 
 /** Defines frame for WebSocket message. */
@@ -71,8 +71,13 @@ object WebSocketFrame {
    * @param payload input stream to payload data
    */
   def apply(isFinal: Boolean, opcode: Opcode, key: Option[MaskingKey], length: Long, payload: InputStream): WebSocketFrame = {
-    if (opcode.isControl && !isFinal)
-      throw new IllegalArgumentException("control frame must be final")
+    if (opcode.isControl) {
+      if (!isFinal)
+        throw new IllegalArgumentException("control frame must be final")
+
+      if (length > 125)
+        throw new IllegalArgumentException("control frame payload must not exceed 125 bytes")
+    }
 
     if (key == null)
       throw new NullPointerException()
@@ -98,7 +103,7 @@ object WebSocketFrame {
    */
   def apply(isFinal: Boolean, opcode: Opcode, key: Option[MaskingKey], data: Array[Byte]): WebSocketFrame = {
     key.foreach(key => key(data))
-    apply(isFinal, opcode, key, data.size, new ByteArrayInputStream(data))
+    apply(isFinal, opcode, key, data.size, { if (data.isEmpty) EmptyInputStream else new ByteArrayInputStream(data) })
   }
 
   /**

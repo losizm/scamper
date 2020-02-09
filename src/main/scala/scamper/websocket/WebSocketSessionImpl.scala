@@ -96,14 +96,20 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
   def sendAsynchronously[T](message: Array[Byte])(callback: Try[Unit] => T): Unit =
     Future(send(message)).onComplete(callback)
 
-  def ping(data: Array[Byte] = Array.empty): Unit =
+  def ping(data: Array[Byte] = Array.empty): Unit = {
+    if (data.size > 125)
+      throw new IllegalArgumentException("data length must not exceed 125 bytes")
     conn.write(makeFrame(data, Ping))
+  }
 
   def pingAsynchronously[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit =
     Future(ping(data)).onComplete[T](callback)
 
-  def pong(data: Array[Byte] = Array.empty): Unit =
+  def pong(data: Array[Byte] = Array.empty): Unit = {
+    if (data.size > 125)
+      throw new IllegalArgumentException("data length must not exceed 125 bytes")
     conn.write(makeFrame(data, Pong))
+  }
 
   def pongAsynchronously[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit =
     Future(pong(data)).onComplete(callback)
@@ -309,8 +315,13 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
     if (frame.length > Int.MaxValue)
       throw WebSocketError(MessageTooBig)
 
-    val data = new Array[Byte](frame.length.toInt)
-    frame.payload.read(data)
-    frame.key.map { key => key(data) }.getOrElse(data)
+    frame.length.toInt match {
+      case 0      => Array.empty
+      case length =>
+        val data = new Array[Byte](length)
+        frame.payload.read(data)
+        frame.key.map { key => key(data) }
+        data
+    }
   }
 }
