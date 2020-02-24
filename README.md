@@ -34,6 +34,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
     - [Serving Static Files](#Serving-Static-Files)
     - [Serving Static Resources](#Serving-Static-Resources)
     - [Aborting Response](#Aborting-Response)
+  - [Defining WebSocket Endpoint](#Defining-WebSocket-Endpoint)
   - [Error Handler](#Error-Handler)
   - [Router](#Router)
   - [Response Filters](#Response-Filters)
@@ -981,6 +982,41 @@ app.incoming { req =>
   req
 }
 ```
+
+### Defining WebSocket Endpoint
+
+As a special case of request handling, you can define a WebSocket endpoint and
+manage the session. The server takes care of the opening handshake and passes
+the session to your handler.
+
+```scala
+app.websocket("/hello") { session =>
+  // Send message after receiving pong message
+  session.onPong { _ =>
+    session.logger.info("Received pong message.")
+    session.send("Hello, client.")
+  }
+
+  // Send message and close session after receiving text message
+  session.onText { msg =>
+    session.logger.info(s"Received text message: $msg")
+    session.send("Goodbye.")
+    session.close()
+  }
+
+  // Log status code when session is closed
+  session.onClose { status =>
+    session.logger.info(s"Session closed: $status")
+  }
+
+  // Send ping message to client
+  session.ping()
+}
+```
+
+See [WebSocketSession](https://losizm.github.io/scamper/latest/api/scamper/websocket/WebSocketSession.html)
+in scaladoc for additional details.
+
 ### Error Handler
 
 You can define an `ErrorHandler` to handle exceptions thrown from your request
