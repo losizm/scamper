@@ -34,7 +34,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
     - [Serving Static Files](#Serving-Static-Files)
     - [Serving Static Resources](#Serving-Static-Resources)
     - [Aborting Response](#Aborting-Response)
-  - [Defining WebSocket Endpoint](#Defining-WebSocket-Endpoint)
+  - [WebSocket Endpoint](#WebSocket-Endpoint)
   - [Error Handler](#Error-Handler)
   - [Router](#Router)
   - [Response Filters](#Response-Filters)
@@ -983,7 +983,7 @@ app.incoming { req =>
 }
 ```
 
-### Defining WebSocket Endpoint
+### WebSocket Endpoint
 
 As a special case of request handling, you can define a WebSocket endpoint and
 manage the session. The server takes care of the opening handshake and passes
