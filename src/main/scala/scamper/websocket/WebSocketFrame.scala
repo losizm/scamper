@@ -82,6 +82,11 @@ object WebSocketFrame {
     if (key == null)
       throw new NullPointerException()
 
+    key.foreach { value =>
+      if (value == null)
+        throw new IllegalArgumentException("Enclosed masking key must not be null")
+    }
+
     if (length < 0)
       throw new IllegalArgumentException("length must be nonnegative")
 
