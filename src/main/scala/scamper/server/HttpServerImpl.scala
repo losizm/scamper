@@ -36,7 +36,7 @@ import scamper.headers.{ Connection, ContentLength, ContentType, Date, KeepAlive
 import scamper.logging.{ ConsoleLogger, Logger, NullLogger }
 import scamper.types.{ KeepAliveParameters, TransferCoding }
 
-private object DefaultHttpServer {
+private object HttpServerImpl {
   private val count = new AtomicLong(0)
 
   case class Application(
@@ -58,12 +58,12 @@ private object DefaultHttpServer {
   case class ReadAborted(reason: String) extends HttpException(s"Read aborted with $reason")
 
   def apply(app: Application, host: InetAddress, port: Int) =
-    new DefaultHttpServer(host, port)(count.incrementAndGet(), app)
+    new HttpServerImpl(host, port)(count.incrementAndGet(), app)
 }
 
-import DefaultHttpServer.{ Application, ReadAborted, ReadError }
+import HttpServerImpl.{ Application, ReadAborted, ReadError }
 
-private class DefaultHttpServer(val host: InetAddress, val port: Int)(id: Long, app: Application) extends HttpServer {
+private class HttpServerImpl(val host: InetAddress, val port: Int)(id: Long, app: Application) extends HttpServer {
   val logger = if (app.logger == null) NullLogger else app.logger
   val backlogSize = app.backlogSize.max(1)
   val poolSize = app.poolSize.max(1)

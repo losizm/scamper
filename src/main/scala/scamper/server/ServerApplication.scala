@@ -53,11 +53,11 @@ import RequestMethod.Registry._
  * <br>
  */
 class ServerApplication {
-  private var app = DefaultHttpServer.Application()
+  private var app = HttpServerImpl.Application()
 
   /** Resets application to default configuration. */
   def reset(): this.type = synchronized {
-    app = DefaultHttpServer.Application()
+    app = HttpServerImpl.Application()
     this
   }
 
@@ -523,7 +523,7 @@ class ServerApplication {
    * @return this application
    */
   def use[T](mountPath: String)(routing: Router => T): this.type = synchronized {
-    routing(new DefaultRouter(this, mountPath))
+    routing(new RouterImpl(this, mountPath))
     this
   }
 
@@ -585,7 +585,7 @@ class ServerApplication {
    * @return new server
    */
   def create(host: InetAddress, port: Int): HttpServer = synchronized {
-    DefaultHttpServer(app, host, port)
+    HttpServerImpl(app, host, port)
   }
 }
 

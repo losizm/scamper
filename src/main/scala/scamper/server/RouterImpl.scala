@@ -23,7 +23,7 @@ import scamper.Auxiliary.StringType
 import scamper.RequestMethod
 import scamper.websocket.WebSocketSession
 
-private class DefaultRouter(app: ServerApplication, rawMountPath: String) extends Router {
+private class RouterImpl(app: ServerApplication, rawMountPath: String) extends Router {
   val mountPath = normalize(rawMountPath, true)
 
   def incoming(handler: RequestHandler): this.type = synchronized {
