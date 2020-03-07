@@ -47,13 +47,9 @@ package object websocket {
    * Generates `Sec-WebSocket-Accept` header value using supplied WebSocket key.
    *
    * @param key WebSocket key
-   *
-   * @throws IllegalArgumentException if WebSocket key is invalid
    */
-  def acceptWebSocketKey(key: String): String = {
-    checkWebSocketKeyValue(key)
+  def acceptWebSocketKey(key: String): String =
     Base64.encodeToString { hash(key + guid) }
-  }
 
   /**
    * Checks validity of WebSocket request.
