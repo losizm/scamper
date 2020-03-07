@@ -43,11 +43,11 @@ import scamper.Validate.notNull
  * <br>
  */
 class ClientSettings {
-  private var settings = DefaultHttpClient.Settings()
+  private var settings = HttpClientImpl.Settings()
 
   /** Resets to default settings. */
   def reset(): this.type = synchronized {
-    settings = DefaultHttpClient.Settings()
+    settings = HttpClientImpl.Settings()
     this
   }
 
@@ -123,7 +123,7 @@ class ClientSettings {
 
   /** Creates client using current settings. */
   def create(): HttpClient = synchronized {
-    DefaultHttpClient(settings)
+    HttpClientImpl(settings)
   }
 }
 

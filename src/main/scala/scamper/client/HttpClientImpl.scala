@@ -31,7 +31,7 @@ import scamper.cookies.{ PlainCookie, RequestCookies }
 import scamper.headers.{ Connection, ContentLength, Host, TE, TransferEncoding }
 import scamper.types.TransferCoding
 
-private object DefaultHttpClient {
+private object HttpClientImpl {
   private val count = new AtomicLong(0)
 
   case class Settings(
@@ -43,10 +43,10 @@ private object DefaultHttpClient {
     secureSocketFactory: SSLSocketFactory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
   )
 
-  def apply(settings: Settings): DefaultHttpClient = new DefaultHttpClient(count.incrementAndGet, settings)
+  def apply(settings: Settings): HttpClientImpl = new HttpClientImpl(count.incrementAndGet, settings)
 }
 
-private class DefaultHttpClient(id: Long, settings: DefaultHttpClient.Settings) extends HttpClient {
+private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extends HttpClient {
   val bufferSize = settings.bufferSize.max(1024)
   val readTimeout = settings.readTimeout.max(0)
   val continueTimeout = settings.continueTimeout.max(0)
