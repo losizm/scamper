@@ -232,25 +232,19 @@ package object websocket {
     }
 
   private def checkConnection(msg: HttpMessage): Boolean =
-    msg.connection.exists(_ equalsIgnoreCase "upgrade")
+    msg.connection.exists("upgrade".equalsIgnoreCase)
 
   private def checkWebSocketKey(req: HttpRequest): Boolean =
-    req.getSecWebSocketKey
-      .map(checkWebSocketKeyValue)
-      .getOrElse(false)
+    req.getSecWebSocketKey.exists(checkWebSocketKeyValue)
 
   private def checkWebSocketKeyValue(key: String): Boolean =
     Try(Base64.decode(key).size == 16).getOrElse(false)
 
   private def checkWebSocketVersion(msg: HttpMessage): Boolean =
-    msg.getSecWebSocketVersion
-      .map(_ == "13")
-      .getOrElse(false)
+    msg.getSecWebSocketVersion.contains("13")
 
   private def checkWebSocketAccept(res: HttpResponse, key: String): Boolean =
-    res.getSecWebSocketAccept
-      .map(checkWebSocketAcceptValue(_, key))
-      .getOrElse(false)
+    res.getSecWebSocketAccept.exists(checkWebSocketAcceptValue(_, key))
 
   private def checkWebSocketAcceptValue(value: String, key: String): Boolean =
     value == acceptWebSocketKey(key)
