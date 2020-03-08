@@ -122,7 +122,7 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
         if (statusCode != NoStatusPresent && statusCode != AbnormalClosure && statusCode != TlsHandshakeFailure)
           conn.write(makeFrame(statusCode.toData, Close))
       catch {
-        case err: Exception => doError(err)
+        case err: Exception => if (!closeReceived.get) doError(err)
       } finally {
         Try(conn.close())
       }
