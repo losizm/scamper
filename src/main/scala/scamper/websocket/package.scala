@@ -33,6 +33,9 @@ package object websocket {
   /** Provides reason for invalid WebSocket request. */
   case class InvalidWebSocketRequest(reason: String) extends HttpException(reason)
 
+  /** Provides reason for WebSocket handshake failure. */
+  case class WebSocketHandshakeFailure(reason: String) extends HttpException(reason)
+
   /** Provides status code of WebSocket error. */
   case class WebSocketError(statusCode: StatusCode) extends HttpException(s"${statusCode.value} ($statusCode)")
 

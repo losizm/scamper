@@ -16,20 +16,22 @@
 package scamper.client
 
 import java.io.File
+import java.net.Socket
 import java.util.concurrent.atomic.AtomicLong
 
 import javax.net.SocketFactory
 import javax.net.ssl.{ SSLSocketFactory, TrustManager }
 
 import scala.util.Try
-import scala.util.control.NonFatal
 
 import scamper._
 import scamper.Auxiliary.UriType
 import scamper.RequestMethod.Registry._
+import scamper.client.Implicits.ClientHttpMessageType
 import scamper.cookies.{ PlainCookie, RequestCookies }
-import scamper.headers.{ Connection, ContentLength, Host, TE, TransferEncoding }
+import scamper.headers.{ Connection, ContentLength, Host, TE, TransferEncoding, Upgrade }
 import scamper.types.TransferCoding
+import scamper.websocket._
 
 private object HttpClientImpl {
   private val count = new AtomicLong(0)
@@ -61,12 +63,15 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     val target = request.target
 
     require(target.isAbsolute, s"Request target not absolute: $target")
-    require(target.getScheme.matches("http(s)?"), s"Invalid scheme: ${target.getScheme}")
+    require(target.getScheme.matches("(http|ws)s?"), s"Invalid scheme: ${target.getScheme}")
 
-    val secure = target.getScheme == "https"
+    val secure = target.getScheme.matches("https|wss")
     val host = getEffectiveHost(target)
     val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/12.0.0")
-    val connection = getEffectiveConnection(request)
+    val connection = target.getScheme.matches("wss?") match {
+      case true  => checkWebSocketRequest(request).connection.mkString(", ")
+      case false => getEffectiveConnection(request)
+    }
 
     var effectiveRequest = request.method match {
       case GET     => toBodilessRequest(request)
@@ -87,9 +92,9 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       Header("Connection", connection)
     } : _*)
 
-    effectiveRequest = effectiveRequest.withTarget(Uri(target.toURL.getFile))
+    effectiveRequest = effectiveRequest.withTarget(target.toTarget)
 
-    if (! effectiveRequest.path.startsWith("/") && effectiveRequest.path != "*")
+    if (!effectiveRequest.path.startsWith("/") && effectiveRequest.path != "*")
       effectiveRequest = effectiveRequest.withPath("/" + effectiveRequest.path)
 
     val conn = createClientConnection(
@@ -104,10 +109,10 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     try {
       val correlate = createCorrelate(requestCount.incrementAndGet)
 
-      Try(addAttributes(effectiveRequest, correlate, target))
+      Try(addAttributes(effectiveRequest, conn, correlate, target))
         .map(outgoing.foldLeft(_) { (req, filter) => filter(req) })
         .map(conn.send)
-        .map(addAttributes(_, correlate, target))
+        .map(addAttributes(_, conn, correlate, target))
         .map(incoming.foldLeft(_) { (res, filter) => filter(res) })
         .map(handler.apply)
         .get
@@ -137,6 +142,43 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
   def trace[T](target: Uri, headers: Seq[Header] = Nil)
     (handler: ResponseHandler[T]): T = send(TRACE, target, headers, Nil, Entity.empty)(handler)
+
+  def websocket[T](target: Uri, headers: Seq[Header] = Nil)
+    (handler: WebSocketSession => T): T = {
+
+    require(target.getScheme == "ws" || target.getScheme == "wss", s"Invalid WebSocket scheme: ${target.getScheme}")
+
+    val req = HttpRequest(
+      GET,
+      target,
+      Header("Upgrade", "websocket") +:
+      Header("Connection", "Upgrade") +:
+      Header("Sec-WebSocket-Key", generateWebSocketKey()) +:
+      Header("Sec-WebSocket-Version", "13") +:
+      headers
+    )
+
+    send(req) { res =>
+      checkWebSocketHandshake(req, res) match {
+        case true =>
+          val session = WebSocketSession.forClient(
+            res.socket,
+            res.correlate,
+            res.absoluteTarget,
+            req.secWebSocketVersion,
+            None
+          )
+          setCloseGuard(res, true)
+          try handler(session)
+          catch {
+            case cause: Throwable =>
+              setCloseGuard(res, false)
+              throw cause
+          }
+        case false => throw WebSocketHandshakeFailure(s"Connection upgrade not honored: ${res.status}")
+      }
+    }
+  }
 
   private def send[T](method: RequestMethod, target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T = {
     val req = cookies match {
@@ -170,7 +212,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       socket.setSendBufferSize(bufferSize)
       socket.setReceiveBufferSize(bufferSize)
     } catch {
-      case NonFatal(cause) =>
+      case cause: Throwable =>
         Try(socket.close())
         throw cause
     }
@@ -181,11 +223,18 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   private def createCorrelate(requestId: Long): String =
     f"${System.currentTimeMillis}%x-$id%04x-$requestId%04x"
 
-  private def addAttributes[T <: HttpMessage](msg: T, correlate: String, absoluteTarget: Uri)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  private def addAttributes[T <: HttpMessage](msg: T, conn: HttpClientConnection, correlate: String, absoluteTarget: Uri)(implicit ev: <:<[T, MessageBuilder[T]]): T =
     msg.withAttributes(
+      "scamper.client.message.connection"     -> conn,
+      "scamper.client.message.socket"         -> conn.getSocket(),
       "scamper.client.message.correlate"      -> correlate,
       "scamper.client.message.absoluteTarget" -> absoluteTarget
     )
+
+  private def setCloseGuard(msg: HttpMessage, enabled: Boolean): Unit =
+    msg.getAttribute[HttpClientConnection]("scamper.client.message.connection")
+      .map(_.setCloseGuard(enabled))
+      .getOrElse(throw new NoSuchElementException("No such attribute: scamper.client.message.connection"))
 
   private def toBodilessRequest(request: HttpRequest): HttpRequest =
     request.withBody(Entity.empty).removeContentLength().removeTransferEncoding()

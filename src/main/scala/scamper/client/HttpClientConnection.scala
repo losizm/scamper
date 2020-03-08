@@ -21,15 +21,20 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 import scala.concurrent.Future
 
-import scamper.{ Auxiliary, Compressor, Entity, Header, HeaderStream, HttpException, HttpRequest, HttpResponse, StatusLine }
+import scamper.{ Compressor, Entity, Header, HeaderStream, HttpException, HttpRequest, HttpResponse, StatusLine }
+import scamper.Auxiliary.{ SocketType, executor }
 import scamper.RequestMethod.Registry.HEAD
 import scamper.ResponseStatus.Registry.Continue
 import scamper.headers.TransferEncoding
 import scamper.types.TransferCoding
 
-import Auxiliary.SocketType
-
 private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTimeout: Int) extends AutoCloseable {
+  private val closeGuard = new AtomicBoolean(false)
+
+  def getSocket(): Socket = socket
+  def getCloseGuard(): Boolean = closeGuard.get()
+  def setCloseGuard(enable: Boolean): Unit = closeGuard.set(enable)
+
   def send(request: HttpRequest): HttpResponse = {
     socket.writeLine(request.startLine.toString)
     request.headers.map(_.toString).foreach(socket.writeLine)
@@ -45,25 +50,29 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
 
         if (continue.get)
           writeBody(request)
-      }(Auxiliary.executor)
+      }(executor)
 
     getResponse(request.method == HEAD) match {
-      case res if res.status == Continue => getResponse(request.method == HEAD)
-      case res                           =>
-        if (!res.status.isSuccessful) {
+      case res if res.status == Continue =>
+        continue.synchronized { continue.notify() }
+        getResponse(request.method == HEAD)
+
+      case res =>
+        if (!res.status.isSuccessful)
           continue.set(false)
-          continue.synchronized { continue.notify() }
-        }
+        continue.synchronized { continue.notify() }
         res
     }
   }
 
-  def close(): Unit = socket.close()
+  def close(): Unit =
+    if (!closeGuard.get())
+      socket.close()
 
   private def writeBody(request: HttpRequest): Unit =
     request.getTransferEncoding.map { encoding =>
       val buffer = new Array[Byte](bufferSize)
-      val in = encodeInputStream(request.body.getInputStream, encoding)
+      val in = encodeInputStream(request.body.getInputStream(), encoding)
       var chunkSize = 0
 
       while ({ chunkSize = in.read(buffer); chunkSize != -1 }) {
@@ -77,7 +86,7 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
       socket.flush()
     }.getOrElse {
       val buffer = new Array[Byte](bufferSize)
-      val in = request.body.getInputStream
+      val in = request.body.getInputStream()
       var length = 0
       while ({ length = in.read(buffer); length != -1 })
         socket.write(buffer, 0, length)
@@ -87,15 +96,15 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
   private def encodeInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
     encoding.foldLeft(in) { (in, enc) =>
       if (enc.isChunked) in
-      else if (enc.isGzip) Compressor.gzip(in)(Auxiliary.executor)
-      else if (enc.isDeflate) Compressor.deflate(in)(Auxiliary.executor)
+      else if (enc.isGzip) Compressor.gzip(in)(executor)
+      else if (enc.isDeflate) Compressor.deflate(in)(executor)
       else throw new HttpException(s"Unsupported transfer encoding: $enc")
     }
 
   private def getResponse(headOnly: Boolean): HttpResponse = {
     val buffer = new Array[Byte](bufferSize)
     val statusLine = StatusLine(socket.getLine(buffer))
-    val headers = HeaderStream.getHeaders(socket.getInputStream, buffer)
+    val headers = HeaderStream.getHeaders(socket.getInputStream(), buffer)
 
     HttpResponse(
       statusLine,

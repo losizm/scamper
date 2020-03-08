@@ -18,6 +18,7 @@ package scamper.client
 import scamper.{ Entity, Header, HttpRequest, Uri }
 import scamper.Validate.notNull
 import scamper.cookies.PlainCookie
+import scamper.websocket.WebSocketSession
 
 /**
  * Provides utility for sending request and handling response.
@@ -166,6 +167,22 @@ trait HttpClient {
    * @note To make effective use of this method, `target` must be an absolute URI.
    */
   def trace[T](target: Uri, headers: Seq[Header] = Nil)(handler: ResponseHandler[T]): T
+
+  /**
+   * Connects to WebSocket server at given target and passes established session
+   * to supplied handler.
+   *
+   * @param target WebSocket target
+   * @param header additional headers to include in WebSocket request
+   * @param handler WebSocket session handler
+   *
+   * @return value from session handler
+   *
+   * @note To make effective use of this method, `target` must be a WebSocket
+   *  URI. That is, it must be an absolute URI having a scheme of either `"ws"`
+   *  or `"wss"` (secure).
+   */
+  def websocket[T](target: Uri, headers: Seq[Header] = Nil)(handler: WebSocketSession => T): T
 }
 
 /** Provides factory methods for creating `HttpClient`. */

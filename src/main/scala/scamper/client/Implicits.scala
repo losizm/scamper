@@ -15,12 +15,17 @@
  */
 package scamper.client
 
+import java.net.Socket
+
 import scamper._
 
 /** Includes client-side type classes. */
 object Implicits {
   /** Adds client-side extension methods to `HttpMessage`. */
   implicit class ClientHttpMessageType(private val msg: HttpMessage) extends AnyVal {
+    /** Gets message socket. */
+    def socket(): Socket = msg.getAttribute("scamper.client.message.socket").get
+
     /**
      * Gets message correlate.
      *

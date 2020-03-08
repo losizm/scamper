@@ -170,6 +170,9 @@ private object Auxiliary {
   }
 
   implicit class UriType(private val uri: Uri) extends AnyVal {
+    def toTarget(): Uri =
+      buildUri(null, null, uri.getRawPath, uri.getRawQuery, null)
+
     def withScheme(scheme: String): Uri =
       buildUri(scheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
 
