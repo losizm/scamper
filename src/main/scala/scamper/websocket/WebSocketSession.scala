@@ -37,11 +37,24 @@ trait WebSocketSession {
   /** Gets logger associated with session. */
   def logger: Logger
 
+  /**
+   * Gets state of WebSocket session.
+   *
+   * === Lifecycle ===
+   *
+   * If session is [[ReadyState.Pending Pending]], it must be opened before
+   * incoming messages are read.
+   *
+   * If session is [[ReadyState.Open Open]], it reads each incoming message
+   * and passes it to registered message handler.
+   *
+   * If session is [[ReadyState.Closed Closed]], it can neither receive nor send
+   * messages.
+   */
+  def state: ReadyState
+
   /** Tests whether WebSocket is using secure transport. */
   def isSecure: Boolean
-
-  /** Tests whether WebSocket session is open. */
-  def isOpen: Boolean
 
   /**
    * Gets WebSocket idle timeout in milliseconds.
@@ -150,6 +163,13 @@ trait WebSocketSession {
    * @param callback result handler
    */
   def pongAsynchronously[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit
+
+  /**
+   * Opens session.
+   *
+   * @note This method becomes an effective no-op if invoked more than once.
+   */
+  def open(): Unit
 
   /**
    * Closes session with supplied status code.

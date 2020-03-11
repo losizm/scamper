@@ -45,26 +45,23 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
   private var errorHandler: Option[Throwable => Any] = None
   private var closeHandler: Option[StatusCode => Any] = None
 
+  private val openInvoked = new AtomicBoolean(false)
   private val closeSent = new AtomicBoolean(false)
   private val closeReceived = new AtomicBoolean(false)
 
   private implicit val executor = Auxiliary.executor
 
-  private val tag = s"::websocket::$id"
-
-  try {
-    logger.info(s"$tag - Starting WebSocket session at $target")
-    start().onComplete { _ =>
-      logger.info(s"$tag - Exiting WebSocket session at $target")
-    }
-  } catch {
-    case err: Exception =>
-      logger.error(s"$tag - Exiting WebSocket session at $target", err)
-      Try(conn.close())
-  }
-
   def isSecure: Boolean = conn.isSecure
-  def isOpen: Boolean = conn.isOpen
+
+  def state: ReadyState =
+    conn.isOpen match {
+      case true  =>
+        openInvoked.get match {
+          case true  => ReadyState.Open
+          case false => ReadyState.Pending
+        }
+      case false => ReadyState.Closed
+    }
 
   def idleTimeout(): Int = _idleTimeout
 
@@ -113,6 +110,10 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
 
   def pongAsynchronously[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit =
     Future(pong(data)).onComplete(callback)
+
+  def open(): Unit =
+    if (openInvoked.compareAndSet(false, true))
+      start()
 
   def close(statusCode: StatusCode = NormalClosure): Unit =
     if (closeSent.compareAndSet(false, true)) {
@@ -168,9 +169,9 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
     this
   }
 
-  private def start(): Future[Unit] =
+  private def start(): Unit =
     Future {
-      while (isOpen) {
+      while (state == ReadyState.Open) {
         val frame = conn.read(idleTimeout)
 
         checkFrame(frame)

@@ -1009,6 +1009,9 @@ app.websocket("/hello") { session =>
     session.logger.info(s"Session closed: $status")
   }
 
+  // Begin message event loop
+  session.open()
+
   // Send ping message to client
   session.ping()
 }
