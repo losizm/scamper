@@ -43,7 +43,7 @@ class WebSocketConnection private (socket: Socket) {
   def isSecure: Boolean = socket.isInstanceOf[SSLSocket]
 
   /** Tests whether WebSocket connection is open. */
-  def isOpen: Boolean = !socket.isClosed()
+  def isOpen: Boolean = socket.isConnected && !socket.isClosed
 
   /**
    * Reads next frame from WebSocket connection.
