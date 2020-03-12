@@ -190,34 +190,22 @@ object HttpClient {
   /** Gets default client settings. */
   def settings(): ClientSettings = new ClientSettings()
 
-  /**
-   * Creates `HttpClient` with supplied settings.
-   *
-   * @param bufferSize socket buffer size
-   * @param readTimeout socket read timeout
-   * @param continueTimeout how long to wait (in milliseconds) for '''100 Continue''' before sending request body
-   */
-  def apply(bufferSize: Int = 8192, readTimeout: Int = 30000, continueTimeout: Int = 1000): HttpClient =
-    settings().bufferSize(bufferSize).readTimeout(readTimeout).continueTimeout(continueTimeout).create()
+  /** Creates `HttpClient` using default settings. */
+  def apply(): HttpClient = settings().create()
 
   /**
    * Sends request and passes response to supplied handler.
    *
+   * The request is sent using an `HttpClient` created with default settings.
+   *
    * @param request HTTP request
-   * @param bufferSize socket buffer size
-   * @param readTimeout socket read timeout
-   * @param continueTimeout how long to wait (in milliseconds) for '''100 Continue''' before sending request body
    * @param handler response handler
    *
    * @return value from applied handler
    *
    * @note To make effective use of this method, `request.target` must be an
    *  absolute URI.
-   *
-   * @note The `continueTimeout` applies only if request includes `Except: 100-Continue`
-   *  header and request body.
    */
-  def send[T](request: HttpRequest, bufferSize: Int = 8192, readTimeout: Int = 30000, continueTimeout: Int = 1000)(handler: ResponseHandler[T]): T = {
-    HttpClient(bufferSize, readTimeout, continueTimeout).send(request)(notNull(handler))
-  }
+  def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T =
+    apply().send(request)(notNull(handler))
 }

@@ -73,7 +73,7 @@ import RequestMethod.Registry._
  * implicit val parser = BodyParser.text()
  *
  * // Create HttpClient instance
- * val client = HttpClient(bufferSize = 4096, readTimeout = 3000)
+ * val client = HttpClient()
  *
  * def getMessageOfTheDay(): Either[Int, String] = {
  *   // Use client instance

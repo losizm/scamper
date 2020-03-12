@@ -26,7 +26,7 @@ import scamper.Validate.notNull
  *
  * `ClientSettings` is a mutable structure. With each applied change, the
  * settings are modified and returned. After the desired settings are applied,
- * the client is created using one of several factory methods.
+ * the client is created using a factory method.
  *
  * @constructor Creates default client setttings.
  *
@@ -54,8 +54,8 @@ class ClientSettings {
   /**
    * Sets buffer size.
    *
-   * The buffer size specifies the size in bytes of socket's send/receive
-   * buffer.
+   * The buffer size specifies the size in bytes of client socket's send and
+   * receive buffers.
    */
   def bufferSize(size: Int): this.type = synchronized {
     settings = settings.copy(bufferSize = size)
@@ -65,8 +65,9 @@ class ClientSettings {
   /**
    * Sets read timeout.
    *
-   * The read timeout controls how long (in milliseconds) a read from socket
-   * blocks before it times out, whereafter the client throws `SocketTimeoutException`.
+   * The read timeout controls how long (in milliseconds) a read from client
+   * socket blocks before it times out, whereafter the client throws
+   * `SocketTimeoutException`.
    */
   def readTimeout(timeout: Int): this.type = synchronized {
     settings = settings.copy(readTimeout = timeout)
@@ -122,12 +123,10 @@ class ClientSettings {
   }
 
   /** Creates client using current settings. */
-  def create(): HttpClient = synchronized {
-    HttpClientImpl(settings)
-  }
+  def create(): HttpClient = synchronized { HttpClientImpl(settings) }
 }
 
-/** Provides factory methods for `ClientSettings`. */
+/** Provides factory method for `ClientSettings`. */
 object ClientSettings {
   /** Creates default `ClientSettings`. */
   def apply(): ClientSettings = new ClientSettings()
