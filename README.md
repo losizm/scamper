@@ -24,8 +24,9 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
   - [Bearer Authentication](#Bearer-Authentication)
 - [HTTP Client](#HTTP-Client)
   - [Creating Client](#Creating-Client)
-  - [Providing Truststore and Trust Manager](#Providing-Truststore-and-Trust-Manager)
-  - [Request and Response Filters](#Request-and-Response-Filters)
+  - [Configuring Client](#Configuring-Client)
+  - [Adding Request and Response Filters](#Adding-Request-and-Response-Filters)
+  - [Using WebSocket Client](#Using-WebSocket-Client)
 - [HTTP Server](#HTTP-Server)
   - [Server Application](#Server-Application)
   - [Request Handlers](#Request-Handlers)
@@ -565,7 +566,7 @@ the scenes, this creates an `HttpClient` instance for one-time usage.
 
 If you plan to send multiple requests, you can create and maintain a reference
 to a client instance. With it, you also get access to methods corresponding to
-the standard HTTP request methods.
+standard HTTP request methods.
 
 ```scala
 import scamper.BodyParser
@@ -575,7 +576,7 @@ import scamper.client.HttpClient
 implicit val parser = BodyParser.text()
 
 // Create client instance
-val client = HttpClient(bufferSize = 4096, readTimeout = 3000)
+val client = HttpClient()
 
 def getMessageOfTheDay(): Either[Int, String] = {
   // Use client instance
@@ -609,10 +610,10 @@ GET("http://localhost:8080/motd")
   .send(res => println(res.as[String])) // Send request and print response
 ```
 
-### Providing Truststore and Trust Manager
+### Configuring Client
 
-If you wish to specify the truststore used for HTTPS connections, you must build
-a client from `ClientSettings`.
+You can also create a client using `ClientSettings`, which allows you to
+configure the client before creating it.
 
 ```scala
 import java.io.File
@@ -624,7 +625,6 @@ val client = HttpClient.settings()
   .bufferSize(8192)
   .readTimeout(3000)
   .continueTimeout(1000)
-  // Set truststore to supplied file
   .trust(new File("/path/to/truststore"))
   .create()
 
@@ -634,8 +634,19 @@ client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
 }
 ```
 
-Or, if greater control is required for verifying connections, you may instead
-supply a trust manager.
+The `bufferSize` is the size in bytes used for the client socket's send and
+receive buffers.
+
+The `readTimeout` sets how long (in milliseconds) a read on the client socket
+blocks before a `SocketTimeoutException` is thrown.
+
+The `continueTimeout` specifies how long (in milliseconds) the client waits
+for a `100 Continue` response from the server before the client sends the
+request body. This behavior is effected only if the request includes an
+`Expect: 100-Continue` header.
+
+And, as shown, you can supply a truststore using `trust`. Or, if greater control
+is required for verifying connections, you may instead supply a trust manager.
 
 ```scala
 import javax.net.ssl.TrustManager
@@ -658,7 +669,7 @@ client.get("https://192.168.0.2:3000/messages") { res =>
 }
 ```
 
-### Request and Response Filters
+### Adding Request and Response Filters
 
 To perform common operations on client requests and their responses, you can add
 filters to the client.
@@ -697,6 +708,58 @@ val client = settings.create()
 Note you can add multiple request and response filters. If multiple filters are
 added, each is executed in the order it is added. That is, request filters are
 executed in order, and response filters are executed in order.
+
+### Using WebSocket Client
+
+The client instance can also be used as a WebSocket client.
+
+```scala
+HttpClient().websocket("ws://localhost:9090/hello") { session =>
+  session.onText { message =>
+    println(s"Received text message: $message")
+
+    if (message.equalsIgnoreCase("bye"))
+      session.close()
+  }
+
+  session.onPing { data =>
+    println(s"Received ping message.")
+    session.pong()
+  }
+
+  session.onPong { data =>
+    println(s"Received pong message.")
+  }
+
+  session.onError { err =>
+    println(s"Encountered error: $err")
+    err.printStackTrace()
+  }
+
+  session.onClose { statusCode =>
+    println(s"WebSocket connection closed: $statusCode")
+  }
+
+  session.idleTimeout(5000)
+  session.open()
+  session.send("Hello, server!")
+}
+```
+
+In the above example, the client establishes a WebSocket connection to the
+specified target URI. _(Note the `ws` scheme. For a secure connection, use `wss`
+instead.)_
+
+After the client and server perform the opening handshake, a `WebSocketSession`
+is passed to the supplied handler. The handler then applies subsequent handlers
+for various message types along with an error handler.
+
+It then sets the session's idle timeout. If no messages are received in any 5
+second span, the session will be closed automatically.
+
+Before the session begins reading incoming messages, it must first be opened.
+
+And, to kick things off, a simple text message is sent to the server.
 
 ## HTTP Server
 
