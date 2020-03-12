@@ -53,7 +53,7 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
 
   def isSecure: Boolean = conn.isSecure
 
-  def state: ReadyState =
+  def state(): ReadyState =
     conn.isOpen match {
       case true  =>
         openInvoked.get match {

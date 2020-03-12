@@ -37,10 +37,13 @@ trait WebSocketSession {
   /** Gets logger associated with session. */
   def logger: Logger
 
+  /** Tests whether WebSocket is using secure transport. */
+  def isSecure: Boolean
+
   /**
-   * Gets state of WebSocket session.
+   * Gets current state of WebSocket session.
    *
-   * === Lifecycle ===
+   * === Ready State ===
    *
    * If session is [[ReadyState.Pending Pending]], it must be opened before
    * incoming messages are read.
@@ -51,10 +54,7 @@ trait WebSocketSession {
    * If session is [[ReadyState.Closed Closed]], it can neither receive nor send
    * messages.
    */
-  def state: ReadyState
-
-  /** Tests whether WebSocket is using secure transport. */
-  def isSecure: Boolean
+  def state(): ReadyState
 
   /**
    * Gets WebSocket idle timeout in milliseconds.
