@@ -44,8 +44,7 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @note To make effective use of this method, `request.target` must be an
-   *   absolute URI.
+   * @throws IllegalArgumentException if `request.target` is not absolute
    */
   def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T
 
@@ -59,7 +58,7 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @note To make effective use of this method, `target` must be an absolute URI.
+   * @throws IllegalArgumentException if `target` is not absolute
    */
   def get[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
 
@@ -74,7 +73,7 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @note To make effective use of this method, `target` must be an absolute URI.
+   * @throws IllegalArgumentException if `target` is not absolute
    */
   def post[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T
@@ -90,7 +89,7 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @note To make effective use of this method, `target` must be an absolute URI.
+   * @throws IllegalArgumentException if `target` is not absolute
    */
   def put[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T
@@ -106,7 +105,7 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @note To make effective use of this method, `target` must be an absolute URI.
+   * @throws IllegalArgumentException if `target` is not absolute
    */
   def patch[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T
@@ -121,7 +120,7 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @note To make effective use of this method, `target` must be an absolute URI.
+   * @throws IllegalArgumentException if `target` is not absolute
    */
   def delete[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
 
@@ -135,7 +134,7 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @note To make effective use of this method, `target` must be an absolute URI.
+   * @throws IllegalArgumentException if `target` is not absolute
    */
   def head[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
 
@@ -150,7 +149,7 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @note To make effective use of this method, `target` must be an absolute URI.
+   * @throws IllegalArgumentException if `target` is not absolute
    */
   def options[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T
@@ -164,7 +163,7 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @note To make effective use of this method, `target` must be an absolute URI.
+   * @throws IllegalArgumentException if `target` is not absolute
    */
   def trace[T](target: Uri, headers: Seq[Header] = Nil)(handler: ResponseHandler[T]): T
 
@@ -179,9 +178,10 @@ trait HttpClient {
    *
    * @return value from session handler
    *
-   * @note To make effective use of this method, `target` must be a WebSocket
-   *  URI. That is, it must be an absolute URI having a scheme of either `"ws"`
-   *  or `"wss"` (secure).
+   * @throws IllegalArgumentException if `target` is not WebSocket URI (i.e.,
+   *  it must be an absolute URI having a scheme of either `"ws"` or `"wss"`)
+   *
+   * @throws WebSocketHandshakeFailure if WebSocket handshake fails
    */
   def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: WebSocketSession => T): T
 }
@@ -204,9 +204,12 @@ object HttpClient {
    *
    * @return value from applied handler
    *
-   * @note To make effective use of this method, `request.target` must be an
-   *  absolute URI.
+   * @throws IllegalArgumentException if `request.target` is not absolute
    */
-  def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T =
-    apply().send(request)(notNull(handler))
+  def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T = {
+    notNull(request)
+    notNull(handler)
+
+    apply().send(request)(handler)
+  }
 }

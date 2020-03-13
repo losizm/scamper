@@ -27,6 +27,7 @@ import scala.util.Try
 import scamper._
 import scamper.Auxiliary.UriType
 import scamper.RequestMethod.Registry._
+import scamper.Validate.notNull
 import scamper.client.Implicits.ClientHttpMessageType
 import scamper.cookies.{ PlainCookie, RequestCookies }
 import scamper.headers.{ Connection, ContentLength, Host, TE, TransferEncoding, Upgrade }
@@ -60,6 +61,8 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   private val requestCount = new AtomicLong(0)
 
   def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T = {
+    notNull(handler)
+
     val target = request.target
 
     require(target.isAbsolute, s"Request target not absolute: $target")
