@@ -101,6 +101,20 @@ trait WebSocketSession {
   def bufferCapacity(size: Int): this.type
 
   /**
+   * Opens session.
+   *
+   * @note This method becomes an effective no-op if invoked more than once.
+   */
+  def open(): Unit
+
+  /**
+   * Closes session with supplied status code.
+   *
+   * @param code status code of closure
+   */
+  def close(code: StatusCode = NormalClosure): Unit
+
+  /**
    * Sends text message.
    *
    * @param message text message
@@ -163,20 +177,6 @@ trait WebSocketSession {
    * @param callback result handler
    */
   def pongAsynchronously[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit
-
-  /**
-   * Opens session.
-   *
-   * @note This method becomes an effective no-op if invoked more than once.
-   */
-  def open(): Unit
-
-  /**
-   * Closes session with supplied status code.
-   *
-   * @param code status code of closure
-   */
-  def close(code: StatusCode = NormalClosure): Unit
 
   /**
    * Sets handler for incoming text message.

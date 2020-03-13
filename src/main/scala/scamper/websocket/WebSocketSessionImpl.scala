@@ -81,6 +81,24 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
     this
   }
 
+  def open(): Unit =
+    if (openInvoked.compareAndSet(false, true))
+      start()
+
+  def close(statusCode: StatusCode = NormalClosure): Unit =
+    if (closeSent.compareAndSet(false, true)) {
+      Try(doClose(statusCode.toData))
+
+      try
+        if (statusCode != NoStatusPresent && statusCode != AbnormalClosure && statusCode != TlsHandshakeFailure)
+          conn.write(makeFrame(statusCode.toData, Close))
+      catch {
+        case err: Exception => if (!closeReceived.get) doError(err)
+      } finally {
+        Try(conn.close())
+      }
+    }
+
   def send(message: String): Unit =
     conn.write(makeFrame(message.getBytes("UTF-8"), Text))
 
@@ -110,24 +128,6 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
 
   def pongAsynchronously[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit =
     Future(pong(data)).onComplete(callback)
-
-  def open(): Unit =
-    if (openInvoked.compareAndSet(false, true))
-      start()
-
-  def close(statusCode: StatusCode = NormalClosure): Unit =
-    if (closeSent.compareAndSet(false, true)) {
-      Try(doClose(statusCode.toData))
-
-      try
-        if (statusCode != NoStatusPresent && statusCode != AbnormalClosure && statusCode != TlsHandshakeFailure)
-          conn.write(makeFrame(statusCode.toData, Close))
-      catch {
-        case err: Exception => if (!closeReceived.get) doError(err)
-      } finally {
-        Try(conn.close())
-      }
-    }
 
   def onText[T](handler: String => T): this.type = {
     textHandler = if (handler == null) Left(nullHandler) else Right(handler)

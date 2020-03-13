@@ -15,7 +15,7 @@
  */
 package scamper.websocket
 
-/** Defines frame for WebSocket message. */
+/** Defines masking key for payload data. */
 trait MaskingKey {
   /** Gets key value. */
   def value: Int
