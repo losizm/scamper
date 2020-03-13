@@ -143,7 +143,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   def trace[T](target: Uri, headers: Seq[Header] = Nil)
     (handler: ResponseHandler[T]): T = send(TRACE, target, headers, Nil, Entity.empty)(handler)
 
-  def websocket[T](target: Uri, headers: Seq[Header] = Nil)
+  def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
     (handler: WebSocketSession => T): T = {
 
     require(target.getScheme == "ws" || target.getScheme == "wss", s"Invalid WebSocket scheme: ${target.getScheme}")
@@ -156,7 +156,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       Header("Sec-WebSocket-Key", generateWebSocketKey()) +:
       Header("Sec-WebSocket-Version", "13") +:
       headers
-    )
+    ).withCookies(cookies : _*)
 
     send(req) { res =>
       checkWebSocketHandshake(req, res) match {

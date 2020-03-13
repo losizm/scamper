@@ -53,7 +53,7 @@ trait HttpClient {
    * Sends GET request and passes response to handler.
    *
    * @param target request target
-   * @param header request headers
+   * @param headers request headers
    * @param cookies request cookies
    * @param handler response handler
    *
@@ -67,7 +67,7 @@ trait HttpClient {
    * Sends POST request and passes response to handler.
    *
    * @param target request target
-   * @param header request headers
+   * @param headers request headers
    * @param cookies request cookies
    * @param body message body
    * @param handler response handler
@@ -83,7 +83,7 @@ trait HttpClient {
    * Sends PUT request and passes response to handler.
    *
    * @param target request target
-   * @param header request headers
+   * @param headers request headers
    * @param cookies request cookies
    * @param body message body
    * @param handler response handler
@@ -99,7 +99,7 @@ trait HttpClient {
    * Sends PATCH request and passes response to handler.
    *
    * @param target request target
-   * @param header request headers
+   * @param headers request headers
    * @param cookies request cookies
    * @param body message body
    * @param handler response handler
@@ -115,7 +115,7 @@ trait HttpClient {
    * Sends DELETE request and passes response to handler.
    *
    * @param target request target
-   * @param header request headers
+   * @param headers request headers
    * @param cookies request cookies
    * @param handler response handler
    *
@@ -129,7 +129,7 @@ trait HttpClient {
    * Sends HEAD request and passes response to handler.
    *
    * @param target request target
-   * @param header request headers
+   * @param headers request headers
    * @param cookies request cookies
    * @param handler response handler
    *
@@ -143,7 +143,7 @@ trait HttpClient {
    * Sends OPTIONS request and passes response to handler.
    *
    * @param target request target
-   * @param header request headers
+   * @param headers request headers
    * @param cookies request cookies
    * @param body message body
    * @param handler response handler
@@ -159,7 +159,7 @@ trait HttpClient {
    * Sends TRACE request and passes response to handler.
    *
    * @param target request target
-   * @param header request headers
+   * @param headers request headers
    * @param handler response handler
    *
    * @return value from response handler
@@ -173,7 +173,8 @@ trait HttpClient {
    * to supplied handler.
    *
    * @param target WebSocket target
-   * @param header additional headers to include in WebSocket request
+   * @param headers additional headers to include in WebSocket request
+   * @param cookies cookies to include in WebSocket request
    * @param handler WebSocket session handler
    *
    * @return value from session handler
@@ -182,7 +183,7 @@ trait HttpClient {
    *  URI. That is, it must be an absolute URI having a scheme of either `"ws"`
    *  or `"wss"` (secure).
    */
-  def websocket[T](target: Uri, headers: Seq[Header] = Nil)(handler: WebSocketSession => T): T
+  def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: WebSocketSession => T): T
 }
 
 /** Provides factory methods for creating `HttpClient`. */
