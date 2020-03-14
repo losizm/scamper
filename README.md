@@ -35,7 +35,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
     - [Serving Static Files](#Serving-Static-Files)
     - [Serving Static Resources](#Serving-Static-Resources)
     - [Aborting Response](#Aborting-Response)
-  - [WebSocket Endpoint](#WebSocket-Endpoint)
+  - [WebSocket Session](#WebSocket-Session)
   - [Error Handler](#Error-Handler)
   - [Router](#Router)
   - [Response Filters](#Response-Filters)
@@ -48,7 +48,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 To use **Scamper**, start by adding it as a dependency to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "11.0.1"
+libraryDependencies += "com.github.losizm" %% "scamper" % "12.0.0"
 ```
 
 ## HTTP Messages
@@ -105,8 +105,8 @@ val contentType: Option[String] = req.getHeaderValue("Content-Type")
 ```
 
 This gets the job done in many cases; however, `HttpMessage` can be extended for
-specialized header access. There are extension methods provided by the many type
-classes defined in `scamper.headers`.
+specialized header access. There are extension methods provided by type classes
+defined in `scamper.headers`.
 
 For example, `ContentType` adds the following methods:
 
@@ -236,7 +236,7 @@ _**Note:** Each response cookie is presented in its own **Set-Cookie** header.
 `getHeaderValue()` retrieves first header value only._
 
 ## Message Body
-The message body is represented as `Entity`, which provides access to a
+The message body is represented as an `Entity`, which provides access to a
 `java.io.InputStream`.
 
 ### Creating Body
@@ -309,8 +309,7 @@ def printText(message: HttpMessage): Unit = {
 }
 ```
 
-And you can implement your own parser. Here's one that employs the power of
-[little-json](https://github.com/losizm/little-json):
+And you can implement your own parser. Here's one power by [little-json](https://github.com/losizm/little-json):
 
 ```scala
 import javax.json.{ JsonObject, JsonValue }
@@ -758,8 +757,8 @@ It then sets the session's idle timeout. If no messages are received in any 5
 second span, the session will be closed automatically.
 
 Before the session begins reading incoming messages, it must first be opened.
-
 And, to kick things off, a simple text message is sent to the server.
+
 
 ## HTTP Server
 
@@ -777,7 +776,7 @@ val server = HttpServer.create(8080) { req =>
 ```
 
 This is as bare-bones as it gets. We create a server at port 8080, and on each
-incoming request, we send a _Hello World_ message back to the client. Although
+incoming request, we send a simple text message back to the client. Although
 trite, it demonstrates how easy it is to get going.
 
 We'll use the remainder of this documentation to describe what goes into
@@ -1046,7 +1045,7 @@ app.incoming { req =>
 }
 ```
 
-### WebSocket Endpoint
+### WebSocket Session
 
 As a special case of request handling, you can define a WebSocket endpoint and
 manage the session. The server takes care of the opening handshake and passes
@@ -1054,10 +1053,15 @@ the session to your handler.
 
 ```scala
 app.websocket("/hello") { session =>
-  // Send message after receiving pong message
+  // Log ping message and send corresponding pong
+  session.onPing { _ =>
+    session.logger.info("Received ping message.")
+    session.pong()
+  }
+
+  // Log pong message
   session.onPong { _ =>
     session.logger.info("Received pong message.")
-    session.send("Hello, client.")
   }
 
   // Send message and close session after receiving text message
@@ -1072,10 +1076,10 @@ app.websocket("/hello") { session =>
     session.logger.info(s"Session closed: $status")
   }
 
-  // Begin message event loop
+  // Open session to incoming messages
   session.open()
 
-  // Send ping message to client
+  // Send ping message
   session.ping()
 }
 ```
