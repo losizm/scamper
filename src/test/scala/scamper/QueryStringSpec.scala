@@ -218,6 +218,30 @@ class QueryStringSpec extends FlatSpec {
     assert(query.toSimpleMap.isEmpty)
   }
 
+  it should "get Int values from QueryString" in {
+    val query = QueryString(Map("id" -> Seq("1", "2", "3"), "nan" -> Seq("a")))
+
+    assert(query.getInt("id").contains(1))
+    assert(query.getIntOrElse("id", 4) == 1)
+    assert(query.getIntOrElse("idx", 4) == 4)
+    assert(query.getIntValues("id") == Seq(1, 2, 3))
+
+    assertThrows[NumberFormatException](query.getInt("nan"))
+    assertThrows[NumberFormatException](query.getIntValues("nan"))
+  }
+
+  it should "get Long values from QueryString" in {
+    val query = QueryString(Map("id" -> Seq("1", "2", "3"), "nan" -> Seq("a")))
+
+    assert(query.getLong("id").contains(1))
+    assert(query.getLongOrElse("id", 4) == 1)
+    assert(query.getLongOrElse("idx", 4) == 4)
+    assert(query.getLongValues("id") == Seq(1, 2, 3))
+
+    assertThrows[NumberFormatException](query.getLong("nan"))
+    assertThrows[NumberFormatException](query.getLongValues("nan"))
+  }
+
   it should "throw NoSuchElementException if parameter not present" in {
     val query = QueryString("id=0&name=root&groups=wheel&groups=admin")
     assertThrows[NoSuchElementException] { query("idx") }

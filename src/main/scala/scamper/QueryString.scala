@@ -49,6 +49,50 @@ trait QueryString {
   def getOrElse(name: String, default: => String): String = get(name).getOrElse(default)
 
   /**
+   * Gets first parameter value with given name and parses it to `Int` if
+   * present.
+   *
+   * @param name parameter name
+   *
+   * @throws NumberFormatException if parameter value cannot be parsed to `Int`
+   */
+  def getInt(name: String): Option[Int] =
+    get(name).map(_.toInt)
+
+  /**
+   * Gets first parameter value with given name and parses it to `Int`;
+   * otherwise returns default if parameter not present.
+   *
+   * @param name parameter name
+   *
+   * @throws NumberFormatException if parameter value cannot be parsed to `Int`
+   */
+  def getIntOrElse(name: String, default: => Int): Int =
+    getInt(name).getOrElse(default)
+
+  /**
+   * Gets first parameter value with given name and parses it to `Long` if
+   * present.
+   *
+   * @param name parameter name
+   *
+   * @throws NumberFormatException if parameter value cannot be parsed to `Long`
+   */
+  def getLong(name: String): Option[Long] =
+    get(name).map(_.toLong)
+
+  /**
+   * Gets first parameter value with given name and parses it to `Long`;
+   * otherwise returns default if parameter not present.
+   *
+   * @param name parameter name
+   *
+   * @throws NumberFormatException if parameter value cannot be parsed to `Long`
+   */
+  def getLongOrElse(name: String, default: => Long): Long =
+    getLong(name).getOrElse(default)
+
+  /**
    * Gets all parameter values with given name.
    *
    * @param name parameter name
@@ -56,6 +100,30 @@ trait QueryString {
    * @note If parameter is not present, an empty sequence is returned.
    */
   def getValues(name: String): Seq[String]
+
+  /**
+   * Gets all parameter values with given name and parses each to `Int`.
+   *
+   * @param name parameter name
+   *
+   * @throws NumberFormatException if parameter value cannot be parsed to `Int`
+   *
+   * @note If parameter is not present, an empty sequence is returned.
+   */
+  def getIntValues(name: String): Seq[Int] =
+    getValues(name).map(_.toInt)
+
+  /**
+   * Gets all parameter values with given name and parses each to `Long`.
+   *
+   * @param name parameter name
+   *
+   * @throws NumberFormatException if parameter value cannot be parsed to `Long`
+   *
+   * @note If parameter is not present, an empty sequence is returned.
+   */
+  def getLongValues(name: String): Seq[Long] =
+    getValues(name).map(_.toLong)
 
   /**
    * Tests whether query string contains parameter with given name.
