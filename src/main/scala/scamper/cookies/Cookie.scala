@@ -114,11 +114,11 @@ object SetCookie {
   def parse(cookie: String): SetCookie =
     cookie.split(";", 2) match {
       case Array(pair, attrs) =>
-        pair.split("=") match {
+        pair.split("=", 2) match {
           case Array(name, value) => SetCookieImpl(Name(name), Value(value), CookieAttributes.parse(attrs))
         }
       case Array(pair) =>
-        pair.split("=") match {
+        pair.split("=", 2) match {
           case Array(name, value) => SetCookieImpl(Name(name), Value(value), CookieAttributes())
         }
     }
@@ -140,4 +140,69 @@ private case class SetCookieImpl(name: String, value: String, attrs: CookieAttri
   def maxAge: Option[Long] = attrs.maxAge
   def secure: Boolean = attrs.secure
   def httpOnly: Boolean = attrs.httpOnly
+}
+
+/** Persistent cookie in [[CookieStore]]. */
+sealed trait PersistentCookie extends Cookie {
+  /** Gets cookie domain. */
+  def domain: String
+
+  /** Gets cookie path. */
+  def path: String
+
+  /** Indicates whether cookie should be limited to secure channels. */
+  def secureOnly: Boolean
+
+  /** Indicates whether cookie should be limited to HTTP requests. */
+  def httpOnly: Boolean
+
+  /**
+   * Indicates whether cookie should be limited to request host.
+   *
+   * If `true`, the request host must be identical to cookie domain; otherwise,
+   * if `false`, the request host must simply "match" cookie domain.
+   */
+  def hostOnly: Boolean
+
+  /** Indicates whether cookie should be persistent after current session. */
+  def persistent: Boolean
+
+  /** Gets cookie's creation time. */
+  def creation: Instant
+
+  /** Gets cookie's last access time. */
+  def lastAccess: Instant
+
+  /** Gets cookie's expiry time. */
+  def expiry: Instant
+
+  /**
+   * Updates last access time and returns cookie.
+   *
+   * @return this cookie
+   */
+  def touch(): this.type
+
+  /** Converts to `PlainCookie`. */
+  def toPlainCookie: PlainCookie = PlainCookie(name, value)
+}
+
+private case class PersistentCookieImpl(
+  name: String,
+  value: String,
+  domain: String = "",
+  path: String = "/",
+  secureOnly: Boolean = false,
+  httpOnly: Boolean = false,
+  hostOnly: Boolean = false,
+  persistent: Boolean = false,
+  creation: Instant = Instant.now(),
+  expiry: Instant = Instant.now()) extends PersistentCookie
+{
+  private var _lastAccess: Instant = Instant.now()
+  def lastAccess = _lastAccess
+  def touch() = {
+    _lastAccess = Instant.now()
+    this
+  }
 }
