@@ -107,7 +107,7 @@ class ClientSettings {
    *
    * @param cookies cookie store
    */
-  def cookieStore(cookies: CookieStore = CookieStore()): this.type = synchronized {
+  def cookieStore(cookies: CookieStore): this.type = synchronized {
     settings = settings.copy(cookieStore = notNull(cookies))
     this
   }
