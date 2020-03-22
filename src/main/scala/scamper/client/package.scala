@@ -62,8 +62,8 @@ import RequestMethod.Registry._
  *
  * When using the `HttpClient` object as the client, it creates an `HttpClient`
  * instance for one-time usage. If you plan to send multiple requests, you can
- * create and maintain a reference to a client instance. With that, you also get
- * access to methods corresponding to the standard HTTP request methods.
+ * create and maintain a reference to a client instance. With it, you also get
+ * access to methods corresponding to standard HTTP request methods.
  *
  * {{{
  * import scamper.BodyParser
@@ -98,7 +98,7 @@ import RequestMethod.Registry._
  * import scamper.headers.{ Accept, AcceptLanguage }
  * import scamper.types.Implicits.{ stringToMediaRange, stringToLanguageRange }
  *
- * implicit val client = HttpClient(bufferSize = 8192, readTimeout = 1000)
+ * implicit val client = HttpClient()
  * implicit val parser = BodyParser.text(4096)
  *
  * GET("http://localhost:8080/motd")
@@ -106,6 +106,9 @@ import RequestMethod.Registry._
  *   .withAcceptLanguage("en-US; q=0.6", "fr-CA; q=0.4")
  *   .send(res => println(res.as[String])) // Send request and print response
  * }}}
+ *
+ * See [[ClientSettings]] for more information about configuring and creating
+ * [[HttpClient]].
  */
 package object client {
   /** Indicates request was aborted. */

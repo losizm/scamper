@@ -3,7 +3,7 @@
 writing HTTP messages, and it includes [client](#HTTP-Client) and
 [server](#HTTP-Server) implementations.
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_2.12.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_2.12%22)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_2.13.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_2.13%22)
 
 ## Table of Contents
 - [Getting Started](#Getting-Started)
@@ -48,7 +48,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 To use **Scamper**, start by adding it as a dependency to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "12.0.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "12.1.0"
 ```
 
 ## HTTP Messages
@@ -618,12 +618,16 @@ configure the client before creating it.
 import java.io.File
 import scamper.Implicits.{ stringToEntity, stringToUri }
 import scamper.client.HttpClient
+import scamper.cookies.CookieStore
+import scamper.types.Implicits.stringToContentCodingRange
 
 // Build client from settings
 val client = HttpClient.settings()
+  .acceptEncodings("gzip", "deflate")
   .bufferSize(8192)
   .readTimeout(3000)
   .continueTimeout(1000)
+  .cookieStore(CookieStore())
   .trust(new File("/path/to/truststore"))
   .create()
 
@@ -632,6 +636,9 @@ client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
     throw new Exception(s"Message not posted: ${res.status.code}")
 }
 ```
+
+The `acceptEncodings` provides a list of content coding ranges, which are used
+to set the `Accept-Encoding` header on each outgoing request.
 
 The `bufferSize` is the size in bytes used for the client socket's send and
 receive buffers.
@@ -644,8 +651,12 @@ for a `100 Continue` response from the server before the client sends the
 request body. This behavior is effected only if the request includes an
 `Expect: 100-Continue` header.
 
-And, as shown, you can supply a truststore using `trust`. Or, if greater control
-is required for verifying connections, you may instead supply a trust manager.
+The `cookieStore` is used to store cookies included in HTTP responses. Using the
+cookie store, the client automatically adds the appropriate cookies to each
+outgoing request.
+
+You can supply a truststore using `trust`. Or, if greater control is required
+for verifying secure connections, you can supply a trust manager instead.
 
 ```scala
 import javax.net.ssl.TrustManager
