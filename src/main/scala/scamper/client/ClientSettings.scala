@@ -19,15 +19,16 @@ import java.io.File
 
 import javax.net.ssl.TrustManager
 
-import scamper.Validate.notNull
+import scamper.Validate.{ noNulls, notNull }
 import scamper.cookies.CookieStore
+import scamper.types.ContentCodingRange
 
 /**
  * Configures and creates `HttpClient`.
  *
  * `ClientSettings` is a mutable structure. With each applied change, the
- * settings are modified and returned. After the desired settings are applied,
- * the client is created using a factory method.
+ * settings are modified and returned. After applying the desired settings, the
+ * client is created using a factory method.
  *
  * @constructor Creates default client setttings.
  *
@@ -35,9 +36,11 @@ import scamper.cookies.CookieStore
  *
  * | Key             | Value |
  * | --------------- | ----- |
+ * | acceptEncodings | `Nil` |
  * | bufferSize      | `8192` |
  * | readTimeout     | `30000` |
  * | continueTimeout | `1000` |
+ * | coookieStore    | `CookieStore.noop()` |
  * | trust           | ''(Not set)'' |
  * | incoming        | ''(Not set)'' |
  * | outgoing        | ''(Not set)'' |
@@ -49,6 +52,16 @@ class ClientSettings {
   /** Resets to default settings. */
   def reset(): this.type = synchronized {
     settings = HttpClientImpl.Settings()
+    this
+  }
+
+  /**
+   * Sets accepted encodings.
+   *
+   * The `Accept-Encoding` header for each outgoing request is set accordingly.
+   */
+  def acceptEncodings(ranges: ContentCodingRange*): this.type = synchronized {
+    settings = settings.copy(acceptEncodings = noNulls(ranges))
     this
   }
 

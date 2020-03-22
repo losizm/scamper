@@ -18,6 +18,7 @@ package scamper.client
 import scamper.{ Entity, Header, HttpRequest, Uri }
 import scamper.Validate.notNull
 import scamper.cookies.{ CookieStore, PlainCookie }
+import scamper.types.ContentCodingRange
 import scamper.websocket.WebSocketSession
 
 /**
@@ -27,6 +28,9 @@ import scamper.websocket.WebSocketSession
  * [[ClientSettings]].
  */
 trait HttpClient {
+  /** Gets accepted encodings. */
+  def acceptEncodings: Seq[ContentCodingRange]
+
   /** Gets buffer size. */
   def bufferSize: Int
 

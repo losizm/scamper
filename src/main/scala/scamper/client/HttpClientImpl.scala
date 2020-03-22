@@ -30,14 +30,15 @@ import scamper.RequestMethod.Registry._
 import scamper.Validate.notNull
 import scamper.client.Implicits.ClientHttpMessageType
 import scamper.cookies.{ CookieStore, PlainCookie, RequestCookies, SetCookie }
-import scamper.headers.{ Connection, ContentLength, Host, TE, TransferEncoding, Upgrade }
-import scamper.types.TransferCoding
+import scamper.headers.{ AcceptEncoding, Connection, ContentLength, Host, TE, TransferEncoding, Upgrade }
+import scamper.types.{ ContentCodingRange, TransferCoding }
 import scamper.websocket._
 
 private object HttpClientImpl {
   private val count = new AtomicLong(0)
 
   case class Settings(
+    acceptEncodings: Seq[ContentCodingRange] = Nil,
     bufferSize: Int = 8192,
     readTimeout: Int = 30000,
     continueTimeout: Int = 1000,
@@ -51,6 +52,7 @@ private object HttpClientImpl {
 }
 
 private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extends HttpClient {
+  val acceptEncodings = settings.acceptEncodings
   val bufferSize = settings.bufferSize.max(1024)
   val readTimeout = settings.readTimeout.max(0)
   val continueTimeout = settings.continueTimeout.max(0)
@@ -116,6 +118,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       val correlate = createCorrelate(requestCount.incrementAndGet)
 
       Try(addAttributes(effectiveRequest, conn, correlate, target))
+        .map(addAcceptEncoding)
         .map(outgoing.foldLeft(_) { (req, filter) => filter(req) })
         .map(conn.send)
         .map(addAttributes(_, conn, correlate, target))
@@ -242,6 +245,16 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     msg.getAttribute[HttpClientConnection]("scamper.client.message.connection")
       .map(_.setCloseGuard(enabled))
       .getOrElse(throw new NoSuchElementException("No such attribute: scamper.client.message.connection"))
+
+  private def addAcceptEncoding(req: HttpRequest): HttpRequest =
+    req.hasAcceptEncoding match {
+      case true  => req
+      case false =>
+        acceptEncodings.isEmpty match {
+          case true  => req
+          case false => req.withAcceptEncoding(acceptEncodings : _*)
+        }
+    }
 
   private def storeCookies(target: Uri, res: HttpResponse): HttpResponse = {
     res.getHeaderValues("Set-Cookie")
