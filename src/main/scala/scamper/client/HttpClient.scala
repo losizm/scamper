@@ -17,7 +17,7 @@ package scamper.client
 
 import scamper.{ Entity, Header, HttpRequest, Uri }
 import scamper.Validate.notNull
-import scamper.cookies.PlainCookie
+import scamper.cookies.{ CookieStore, PlainCookie }
 import scamper.websocket.WebSocketSession
 
 /**
@@ -33,8 +33,11 @@ trait HttpClient {
   /** Gets read timeout. */
   def readTimeout: Int
 
-  /** Gets continue timeout.  */
+  /** Gets continue timeout. */
   def continueTimeout: Int
+
+  /** Gets cookie store. */
+  def cookieStore: CookieStore
 
   /**
    * Sends request and passes response to supplied handler.

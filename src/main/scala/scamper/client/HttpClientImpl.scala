@@ -29,7 +29,7 @@ import scamper.Auxiliary.UriType
 import scamper.RequestMethod.Registry._
 import scamper.Validate.notNull
 import scamper.client.Implicits.ClientHttpMessageType
-import scamper.cookies.{ PlainCookie, RequestCookies }
+import scamper.cookies.{ CookieStore, PlainCookie, RequestCookies, SetCookie }
 import scamper.headers.{ Connection, ContentLength, Host, TE, TransferEncoding, Upgrade }
 import scamper.types.TransferCoding
 import scamper.websocket._
@@ -41,6 +41,7 @@ private object HttpClientImpl {
     bufferSize: Int = 8192,
     readTimeout: Int = 30000,
     continueTimeout: Int = 1000,
+    cookieStore: CookieStore = CookieStore.noop(),
     outgoing: Seq[RequestFilter] = Nil,
     incoming: Seq[ResponseFilter] = Nil,
     secureSocketFactory: SSLSocketFactory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
@@ -53,6 +54,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   val bufferSize = settings.bufferSize.max(1024)
   val readTimeout = settings.readTimeout.max(0)
   val continueTimeout = settings.continueTimeout.max(0)
+  val cookieStore = settings.cookieStore
 
   private val outgoing = settings.outgoing
   private val incoming = settings.incoming
@@ -70,7 +72,8 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
     val secure = target.getScheme.matches("https|wss")
     val host = getEffectiveHost(target)
-    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/12.0.0")
+    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/12.1.0")
+    val cookies = request.cookies ++ cookieStore.get(target)
     val connection = target.getScheme.matches("wss?") match {
       case true  => checkWebSocketRequest(request).connection.mkString(", ")
       case false => getEffectiveConnection(request)
@@ -91,9 +94,9 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     effectiveRequest = effectiveRequest.withHeaders({
       Header("Host", host) +:
       Header("User-Agent", userAgent) +:
-      effectiveRequest.headers.filterNot(_.name.matches("(?i)Host|User-Agent|Connection")) :+
+      effectiveRequest.headers.filterNot(_.name.matches("(?i)Host|User-Agent|Cookie|Connection")) :+
       Header("Connection", connection)
-    } : _*)
+    } : _*).withCookies(cookies : _*)
 
     effectiveRequest = effectiveRequest.withTarget(target.toTarget)
 
@@ -116,6 +119,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
         .map(outgoing.foldLeft(_) { (req, filter) => filter(req) })
         .map(conn.send)
         .map(addAttributes(_, conn, correlate, target))
+        .map(storeCookies(target, _))
         .map(incoming.foldLeft(_) { (res, filter) => filter(res) })
         .map(handler.apply)
         .get
@@ -238,6 +242,13 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     msg.getAttribute[HttpClientConnection]("scamper.client.message.connection")
       .map(_.setCloseGuard(enabled))
       .getOrElse(throw new NoSuchElementException("No such attribute: scamper.client.message.connection"))
+
+  private def storeCookies(target: Uri, res: HttpResponse): HttpResponse = {
+    res.getHeaderValues("Set-Cookie")
+      .flatMap { value => Try(SetCookie.parse(value)).toOption }
+      .foreach { cookie => cookieStore.put(target, cookie) }
+    res
+  }
 
   private def toBodilessRequest(request: HttpRequest): HttpRequest =
     request.withBody(Entity.empty).removeContentLength().removeTransferEncoding()

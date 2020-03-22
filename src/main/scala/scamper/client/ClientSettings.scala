@@ -20,6 +20,7 @@ import java.io.File
 import javax.net.ssl.TrustManager
 
 import scamper.Validate.notNull
+import scamper.cookies.CookieStore
 
 /**
  * Configures and creates `HttpClient`.
@@ -85,6 +86,16 @@ class ClientSettings {
    */
   def continueTimeout(timeout: Int): this.type = synchronized {
     settings = settings.copy(continueTimeout = timeout)
+    this
+  }
+
+  /**
+   * Sets cookie store.
+   *
+   * @param cookies cookie store
+   */
+  def cookieStore(cookies: CookieStore = CookieStore()): this.type = synchronized {
+    settings = settings.copy(cookieStore = notNull(cookies))
     this
   }
 
