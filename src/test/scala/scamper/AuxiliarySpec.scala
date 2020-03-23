@@ -19,7 +19,7 @@ import java.time.{ Instant, LocalDate }
 
 import Auxiliary._
 
-class AuxiliarySpec extends org.scalatest.FlatSpec {
+class AuxiliarySpec extends org.scalatest.flatspec.AnyFlatSpec {
   val uri = Uri("http://localhost:8080/index.html")
   val uriPath = Uri("/index.html")
   val uriPathWithQuery = Uri("/index.html?name=guest")

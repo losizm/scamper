@@ -15,10 +15,9 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
 import ViaType.{ parse => ParseVia }
 
-class ViaTypeSpec extends FlatSpec {
+class ViaTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "ViaType" should "be created" in {
     var via = ParseVia("1.1 www.hub.com:7777 (  Hub/0.1b  )")
     assert(via.protocol == Protocol.parse("HTTP/1.1"))

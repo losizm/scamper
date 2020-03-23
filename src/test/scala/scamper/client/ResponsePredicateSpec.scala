@@ -15,12 +15,10 @@
  */
 package scamper.client
 
-import org.scalatest.FlatSpec
-
 import scamper.ResponseStatus.Registry._
 import ResponsePredicate._
 
-class ResponsePredicateSpec extends FlatSpec {
+class ResponsePredicateSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "test response based on status code" in {
     assert { Informational(Continue()) }
     assert { Successful(Created()) }

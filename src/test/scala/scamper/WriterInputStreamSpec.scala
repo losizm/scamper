@@ -17,9 +17,7 @@ package scamper
 
 import java.io.IOException
 
-import org.scalatest.FlatSpec
-
-class WriterInputStreamSpec extends FlatSpec {
+class WriterInputStreamSpec extends org.scalatest.flatspec.AnyFlatSpec {
   private val buf = new Array[Byte](256)
 
   "WriterInputStream" should "read fully" in {

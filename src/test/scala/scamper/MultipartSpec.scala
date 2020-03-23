@@ -17,11 +17,9 @@ package scamper
 
 import java.io.File
 
-import org.scalatest.FlatSpec
-
 import scamper.types.{ DispositionType, MediaType }
 
-class MultipartSpec extends FlatSpec {
+class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "TextPart" should "be created" in {
     val part = TextPart("id", "root")
     assert(part.name == "id")

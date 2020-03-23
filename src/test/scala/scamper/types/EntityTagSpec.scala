@@ -15,9 +15,7 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
-
-class EntityTagSpec extends FlatSpec {
+class EntityTagSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "EntityTag" should "be created" in {
     var tag = EntityTag.parse("\"abc\"")
     assert(tag.opaque == "\"abc\"")

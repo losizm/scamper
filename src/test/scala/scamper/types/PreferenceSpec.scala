@@ -15,11 +15,9 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
-
 import Preferences._
 
-class PreferenceSpec extends FlatSpec {
+class PreferenceSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "Preference" should "be created name, value, and parameters" in {
     val pref = Preference.parse("Pref=value; param1=\"value1\"; param2=value2; param3=\"value three\"")
     assert(pref.name == "pref")

@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-class KeepAliveParametersSpec extends org.scalatest.FlatSpec {
+class KeepAliveParametersSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "parse String to KeepAliveParameters" in {
     var params = KeepAliveParameters.parse("timeout=5, max=10")
     assert { params.timeout == 5 }

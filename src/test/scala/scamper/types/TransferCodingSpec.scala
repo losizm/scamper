@@ -15,9 +15,7 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
-
-class TransferCodingSpec extends FlatSpec {
+class TransferCodingSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "TransferCoding" should "be created without parameters" in {
     var coding = TransferCoding.parse("CHUNKED")
     assert(coding.name == "chunked")

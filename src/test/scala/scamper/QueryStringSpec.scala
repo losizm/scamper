@@ -15,9 +15,7 @@
  */
 package scamper
 
-import org.scalatest.FlatSpec
-
-class QueryStringSpec extends FlatSpec {
+class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "create QueryString from map" in {
     val query = QueryString(Map("id" -> Seq("0"), "name" -> Seq("root"), "groups" -> Seq("wheel", "admin")))
 

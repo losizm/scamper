@@ -17,7 +17,7 @@ package scamper.types
 
 import scamper.Uri
 
-class LinkValueSpec extends org.scalatest.FlatSpec {
+class LinkValueSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "LinkValue" should "be created" in {
     var link = LinkValue(Uri("/assets/icon.png"))
     assert(link.ref.toString == "/assets/icon.png")

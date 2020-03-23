@@ -15,9 +15,7 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
-
-class DispositionTypeSpec extends FlatSpec {
+class DispositionTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "DispositionType" should "be created without parameters" in {
     var disposition = DispositionType.parse("INLINE")
     assert(disposition.name == "inline")

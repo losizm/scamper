@@ -17,7 +17,7 @@ package scamper
 
 import ResponseStatus.Registry._
 
-class ResponseStatusSpec extends org.scalatest.FlatSpec {
+class ResponseStatusSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "get registered status" in {
     assert { ResponseStatus(100) == Continue }
     assert { ResponseStatus.get(100).contains(Continue) }

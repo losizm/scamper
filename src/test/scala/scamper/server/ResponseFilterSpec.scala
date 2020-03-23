@@ -15,12 +15,10 @@
  */
 package scamper.server
 
-import org.scalatest.FlatSpec
-
 import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.ContentLength
 
-class ResponseFilterSpec extends FlatSpec {
+class ResponseFilterSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "ResponseFilter" should "be composed with another" in {
     val f1: ResponseFilter = _.withContentLength(10)
     val f2: ResponseFilter = _.withContentLength(20)

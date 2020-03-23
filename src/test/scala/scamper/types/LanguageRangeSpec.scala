@@ -15,9 +15,7 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
-
-class LanguageRangeSpec extends FlatSpec {
+class LanguageRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "LanguageRange" should "be created" in {
     var range = LanguageRange.parse("en")
     assert(range.tag == "en")

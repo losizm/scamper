@@ -15,10 +15,9 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
 import PragmaDirectives._
 
-class PragmaDirectiveSpec extends FlatSpec {
+class PragmaDirectiveSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "PragmaDirective" should "be created" in {
     val directive = PragmaDirective("No-Cache")
     assert(directive.name == "no-cache")

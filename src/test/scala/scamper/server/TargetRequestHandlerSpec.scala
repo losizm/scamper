@@ -15,8 +15,6 @@
  */
 package scamper.server
 
-import org.scalatest.FlatSpec
-
 import scamper.Implicits.stringToUri
 import scamper.{ HttpRequest, HttpResponse }
 import scamper.RequestMethod.Registry.{ DELETE, GET, POST, PUT }
@@ -24,7 +22,7 @@ import scamper.ResponseStatus.Registry.Ok
 
 import Implicits.ServerHttpRequestType
 
-class TargetedRequestHandlerSpec extends FlatSpec {
+class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "TargetedRequestHandler" should "respond to request" in {
     val handler = TargetedRequestHandler(req => Ok(), "/", None)
     assert { handler(GET("/")).asInstanceOf[HttpResponse].status == Ok }

@@ -15,10 +15,9 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
 import CacheDirectives._
 
-class CacheDirectiveSpec extends FlatSpec {
+class CacheDirectiveSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "CacheDirective" should "be created" in {
     var directive = CacheDirective("No-Cache")
     assert(directive.name == "no-cache")

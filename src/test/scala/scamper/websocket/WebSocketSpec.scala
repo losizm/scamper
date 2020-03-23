@@ -21,7 +21,7 @@ import scamper.ResponseStatus.Registry.SwitchingProtocols
 import scamper.headers.{ Connection, Upgrade }
 import scamper.types.Implicits._
 
-class WebSocketSpec extends org.scalatest.FlatSpec {
+class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec {
   val req = GET("/websocket/example")
     .withUpgrade("websocket")
     .withConnection("Upgrade")

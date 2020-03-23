@@ -15,9 +15,7 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
-
-class MediaRangeSpec extends FlatSpec {
+class MediaRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "MediaRange" should "be created without parameters" in {
     var range = MediaRange("text/html; q=1.0")
     assert(range.mainType == "text")

@@ -23,7 +23,7 @@ import ResponseStatus.Registry.Ok
 
 import Implicits._
 
-class ImplicitsSpec extends org.scalatest.FlatSpec {
+class ImplicitsSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "String" should "be converted to URI" in {
     val uri: Uri = "https://localhost:8080/index.html?q=free"
     assert(uri == Uri("https://localhost:8080/index.html?q=free"))

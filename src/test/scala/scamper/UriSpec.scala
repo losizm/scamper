@@ -15,7 +15,7 @@
  */
 package scamper
 
-class UriSpec extends org.scalatest.FlatSpec {
+class UriSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "create Uri from String" in {
     var uri = Uri("http://localhost:8080/index.html")
     assert { uri.getScheme == "http" }

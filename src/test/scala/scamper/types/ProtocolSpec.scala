@@ -15,9 +15,7 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
-
-class ProtocolSpec extends FlatSpec {
+class ProtocolSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "Protocol" should "be created" in {
     var protocol = Protocol.parse("HTTP/2.0")
     assert(protocol.name == "HTTP")

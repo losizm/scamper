@@ -15,10 +15,9 @@
  */
 package scamper
 
-import org.scalatest.FlatSpec
 import scamper.RequestMethod.Registry._
 
-class RequestLineSpec extends FlatSpec {
+class RequestLineSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "RequestLine" should "be created" in {
     var request = RequestLine("GET / HTTP/1.1")
     assert(request.method == GET)

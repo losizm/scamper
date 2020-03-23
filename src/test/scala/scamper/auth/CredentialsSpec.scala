@@ -15,11 +15,9 @@
  */
 package scamper.auth
 
-import org.scalatest.FlatSpec
-
 import scamper.Base64
 
-class CredentialsSpec extends FlatSpec {
+class CredentialsSpec extends org.scalatest.flatspec.AnyFlatSpec {
   private val token = Base64.encodeToString("guest:letmein")
 
   "Credentials" should "be created with basic scheme" in {

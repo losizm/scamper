@@ -15,11 +15,9 @@
  */
 package scamper.auth
 
-import org.scalatest.FlatSpec
-
 import scamper.Base64
 
-class ChallengeSpec extends FlatSpec {
+class ChallengeSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "Challenge" should "be created with basic scheme" in {
     val challenge = Challenge.parse("Basic realm=\"Admin Console\", charset=utf-8")
     assert(challenge.scheme == "Basic")

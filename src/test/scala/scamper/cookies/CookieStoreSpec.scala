@@ -20,7 +20,7 @@ import java.time.Instant
 import scamper.Implicits.stringToUri
 import scamper.Uri
 
-class CookieStoreSpec extends org.scalatest.FlatSpec {
+class CookieStoreSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "get cookies with matching host" in {
     val a = SetCookie("a", "1")
     val b = SetCookie("b", "2")

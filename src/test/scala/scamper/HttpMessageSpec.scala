@@ -15,13 +15,12 @@
  */
 package scamper
 
-import org.scalatest.FlatSpec
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry._
 import scamper.ResponseStatus.Registry._
 import scamper.headers._
 
-class HttpMessageSpec extends FlatSpec {
+class HttpMessageSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "HttpRequest" should "be created with path" in {
     val req = GET("?user=root&group=wheel").withPath("/find")
     assert(req.method.name == "GET")

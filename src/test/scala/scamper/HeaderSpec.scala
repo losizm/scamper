@@ -15,9 +15,7 @@
  */
 package scamper
 
-import org.scalatest.FlatSpec
-
-class HeaderSpec extends FlatSpec {
+class HeaderSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "Header" should "be created from formatted value" in {
     val header = Header("Content-Type: text/plain")
     assert(header.name == "Content-Type")

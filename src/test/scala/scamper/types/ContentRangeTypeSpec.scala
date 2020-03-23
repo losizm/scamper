@@ -15,10 +15,9 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
 import scamper.types.ByteContentRange._
 
-class ContentRangeTypeSpec extends FlatSpec {
+class ContentRangeTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "ByteContentRange" should "be created with satisfied response" in {
     var range = ByteContentRange.parse("bytes 8-15/1024")
     assert(range.unit == "bytes")

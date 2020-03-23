@@ -15,9 +15,7 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
-
-class CharsetRangeSpec extends FlatSpec {
+class CharsetRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "CharsetRange" should "be created" in {
     var range = CharsetRange.parse("utf-8")
     assert(range.charset == "utf-8")

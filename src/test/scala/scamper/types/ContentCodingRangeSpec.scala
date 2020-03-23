@@ -15,9 +15,7 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
-
-class ContentCodingRangeSpec extends FlatSpec {
+class ContentCodingRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "ContentCodingRange" should "be created" in {
     var range = ContentCodingRange.parse("GZIP; q=0.7")
     assert(range.name == "gzip")

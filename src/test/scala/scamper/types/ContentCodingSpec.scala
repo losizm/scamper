@@ -15,9 +15,7 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
-
-class ContentCodingSpec extends FlatSpec {
+class ContentCodingSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "ContentCoding" should "be created" in {
     var coding = ContentCoding("Compress")
     assert(coding.name == "compress")

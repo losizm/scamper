@@ -15,9 +15,7 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
-
-class MediaTypeSpec extends FlatSpec {
+class MediaTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "MediaType" should "be created without parameters" in {
     val contentType = MediaType("text/html")
     assert(contentType.mainType == "text")

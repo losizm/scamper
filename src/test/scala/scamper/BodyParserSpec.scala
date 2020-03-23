@@ -17,8 +17,6 @@ package scamper
 
 import java.io.EOFException
 
-import org.scalatest.FlatSpec
-
 import scamper.Auxiliary.InputStreamType
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry._
@@ -26,7 +24,7 @@ import scamper.ResponseStatus.Registry._
 import scamper.headers._
 import scamper.types.Implicits._
 
-class BodyParserSpec extends FlatSpec {
+class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "BodyParser" should "parse response with text body" in {
     implicit val bodyParser = BodyParser.text()
     val body = Entity("Hello, world!")

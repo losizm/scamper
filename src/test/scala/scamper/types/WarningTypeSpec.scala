@@ -15,10 +15,9 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
 import scamper.DateValue
 
-class WarningTypeSpec extends FlatSpec {
+class WarningTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
   val date = DateValue.parse("Sat, 25 Aug 2012 23:34:45 GMT")
 
   "WarningType" should "be created" in {

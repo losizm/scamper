@@ -15,10 +15,9 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
 import scamper.types.ByteRange._
 
-class RangeTypeSpec extends FlatSpec {
+class RangeTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "ByteRange" should "be created with single spec" in {
     var range = ByteRange.parse("bytes=0-9")
     assert(range.unit == "bytes")

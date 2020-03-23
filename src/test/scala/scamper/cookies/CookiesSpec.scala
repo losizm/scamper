@@ -21,7 +21,7 @@ import scamper.RequestMethod.Registry.GET
 import scamper.ResponseStatus.Registry.Ok
 import scamper.Uri
 
-class CookiesSpec extends org.scalatest.FlatSpec {
+class CookiesSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "PlainCookie" should "be created from formatted value" in {
     val cookie = PlainCookie.parse("SID=31d4d96e407aad42")
     assert(cookie.name == "SID")

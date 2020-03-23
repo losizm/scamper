@@ -15,9 +15,7 @@
  */
 package scamper.types
 
-import org.scalatest.FlatSpec
-
-class ProductTypeSpec extends FlatSpec {
+class ProductTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "ProductType" should "be created" in {
     var product = ProductType.parse("CERN-LineMode/2.15")
     assert(product.name == "CERN-LineMode")

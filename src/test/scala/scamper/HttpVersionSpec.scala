@@ -15,9 +15,7 @@
  */
 package scamper
 
-import org.scalatest.FlatSpec
-
-class HttpVersionSpec extends FlatSpec {
+class HttpVersionSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "HttpVersion" should "be created" in {
     assert(HttpVersion("1.0") == HttpVersion(1, 0))
     assert(HttpVersion("1.1") == HttpVersion(1, 1))

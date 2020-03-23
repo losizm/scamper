@@ -17,9 +17,7 @@ package scamper
 
 import java.io.{ ByteArrayInputStream, EOFException, IOException }
 
-import org.scalatest.FlatSpec
-
-class ChunkedInputStreamSpec extends FlatSpec {
+class ChunkedInputStreamSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "ChunkedInputStream" should "read bytes" in {
     val chunks = "13\r\nToo much wagonist. \r\n14\r\nToo much antagonist.\r\n0\r\n\r\n"
     var in = new ChunkedInputStream(new ByteArrayInputStream(chunks.getBytes("UTF-8")))
