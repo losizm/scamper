@@ -70,15 +70,15 @@ sealed trait CookieStore {
    * Adds cookies that are in response to request of supplied target.
    *
    * @param target request URI
-   * @param cookie response cookie
+   * @param one response cookie
    * @param more additional response cookies
    *
    * @throws IllegalArgumentException if target is not HTTP or WebSocket URI
    *
    * @return this cookie store
    */
-  def put(target: Uri, cookie: SetCookie, more: SetCookie*): this.type =
-    put(target, cookie +: more)
+  def put(target: Uri, one: SetCookie, more: SetCookie*): this.type =
+    put(target, one +: more)
 }
 
 /** Provides factory for `CookieStore`. */

@@ -117,24 +117,42 @@ package object cookies {
      * @param cookies new cookie
      */
     def withCookie(cookie: PlainCookie): HttpRequest =
-      withCookies({ cookies.filterNot(_.name == cookie.name) :+ cookie } : _*)
+      withCookies(cookies.filterNot(_.name == cookie.name) :+ cookie)
 
     /**
      * Creates copy of request with new set of cookies.
      *
      * @param cookies new set of cookies
      */
-    def withCookies(cookies: PlainCookie*): HttpRequest =
+    def withCookies(cookies: Seq[PlainCookie]): HttpRequest =
       if (cookies.isEmpty) request.removeHeaders("Cookie")
       else request.withHeader(Header("Cookie", cookies.mkString("; ")))
+
+    /**
+     * Creates copy of request with new set of cookies.
+     *
+     * @param one new cookie
+     * @param more additional new cookies
+     */
+    def withCookies(one: PlainCookie, more: PlainCookie*): HttpRequest =
+      withCookies(one +: more)
 
     /**
      * Creates copy of request excluding cookies with given names.
      *
      * @param names cookie names
      */
-    def removeCookies(names: String*): HttpRequest =
-      withCookies { cookies.filterNot { cookie => names.contains(cookie.name) } : _* }
+    def removeCookies(names: Seq[String]): HttpRequest =
+      withCookies(cookies.filterNot(cookie => names.contains(cookie.name)))
+
+    /**
+     * Creates copy of request excluding cookies with given names.
+     *
+     * @param one cookie name
+     * @param more additional cookie names
+     */
+    def removeCookies(one: String, more: String*): HttpRequest =
+      removeCookies(one +: more)
   }
 
   /** Provides access to response cookies in `Set-Cookie` headers. */
@@ -168,25 +186,43 @@ package object cookies {
      * @param cookies new cookie
      */
     def withCookie(cookie: SetCookie): HttpResponse =
-      withCookies({ cookies.filterNot(_.name == cookie.name) :+ cookie } : _*)
+      withCookies(cookies.filterNot(_.name == cookie.name) :+ cookie)
 
     /**
      * Creates copy of response with new set of cookies.
      *
      * @param cookies new set of cookies
      */
-    def withCookies(cookies: SetCookie*): HttpResponse =
+    def withCookies(cookies: Seq[SetCookie]): HttpResponse =
       response.withHeaders(
         response.headers.filterNot(_.name.equalsIgnoreCase("Set-Cookie")) ++
           cookies.map(c => Header("Set-Cookie", c.toString))
       )
 
     /**
+     * Creates copy of response with new set of cookies.
+     *
+     * @param one new cookie
+     * @param more additional new cookies
+     */
+    def withCookies(one: SetCookie, more: SetCookie*): HttpResponse =
+      withCookies(one +: more)
+
+    /**
      * Creates copy of response excluding cookies with given names.
      *
      * @param names cookie names
      */
-    def removeCookies(names: String*): HttpResponse =
-      withCookies { cookies.filterNot { cookie => names.contains(cookie.name) } : _* }
+    def removeCookies(names: Seq[String]): HttpResponse =
+      withCookies(cookies.filterNot(cookie => names.contains(cookie.name)))
+
+    /**
+     * Creates copy of response excluding cookies with given names.
+     *
+     * @param one cookie name
+     * @param more additional cookie names
+     */
+    def removeCookies(one: String, more: String*): HttpResponse =
+      removeCookies(one +: more)
   }
 }

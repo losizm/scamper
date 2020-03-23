@@ -98,7 +98,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       Header("User-Agent", userAgent) +:
       effectiveRequest.headers.filterNot(_.name.matches("(?i)Host|User-Agent|Cookie|Connection")) :+
       Header("Connection", connection)
-    ).withCookies(cookies : _*)
+    ).withCookies(cookies)
 
     effectiveRequest = effectiveRequest.withTarget(target.toTarget)
 
@@ -166,7 +166,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       Header("Sec-WebSocket-Key", generateWebSocketKey()) +:
       Header("Sec-WebSocket-Version", "13") +:
       headers
-    ).withCookies(cookies : _*)
+    ).withCookies(cookies)
 
     send(req) { res =>
       checkWebSocketHandshake(req, res) match {
@@ -193,7 +193,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   private def send[T](method: RequestMethod, target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T = {
     val req = cookies match {
       case Nil => HttpRequest(method, target, headers, body)
-      case _   => HttpRequest(method, target, headers, body).withCookies(cookies : _*)
+      case _   => HttpRequest(method, target, headers, body).withCookies(cookies)
     }
 
     send(req)(handler)

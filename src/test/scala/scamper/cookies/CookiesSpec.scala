@@ -75,7 +75,7 @@ class CookiesSpec extends org.scalatest.flatspec.AnyFlatSpec {
 
   it should "be created without cookies" in {
     val req = GET(Uri("/")).withCookies(PlainCookie("a", "123"), PlainCookie("b", "xyz"), PlainCookie("c", "XYZ"))
-    assert(req.withCookies().getHeaderValue("Cookie").isEmpty)
+    assert(req.withCookies(Nil).getHeaderValue("Cookie").isEmpty)
     assert(req.removeCookies("a", "c").cookies == Seq(PlainCookie("b", "xyz")))
   }
 
@@ -90,7 +90,7 @@ class CookiesSpec extends org.scalatest.flatspec.AnyFlatSpec {
 
   it should "be created without cookies" in {
     val res = Ok().withCookies(SetCookie("a", "123"), SetCookie("b", "xyz"), SetCookie("c", "XYZ"))
-    assert(res.withCookies().getHeaderValue("Set-Cookie").isEmpty)
+    assert(res.withCookies(Nil).getHeaderValue("Set-Cookie").isEmpty)
     assert(res.removeCookies("a", "c").cookies == Seq(SetCookie("b", "xyz")))
   }
 }
