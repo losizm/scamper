@@ -84,8 +84,8 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)(id: Long, app
 
   private val authority = s"${host.getCanonicalHostName}:$port"
 
-  private val requestHandler = RequestHandler.coalesce(app.requestHandlers : _*)
-  private val responseFilter = ResponseFilter.chain(app.responseFilters : _*)
+  private val requestHandler = RequestHandler.coalesce(app.requestHandlers)
+  private val responseFilter = ResponseFilter.chain(app.responseFilters)
   private val errorHandler = app.errorHandler.getOrElse(new ErrorHandler {
     def apply(err: Throwable, req: HttpRequest): HttpResponse = {
       val correlate = req.getAttribute[String]("scamper.server.message.correlate").getOrElse("<unknown>")

@@ -56,7 +56,7 @@ object ResponseFilter {
    * @note If `filters` is empty, a response filter is created that returns
    *   the response it receives.
    */
-  def chain(filters: ResponseFilter*): ResponseFilter = {
+  def chain(filters: Seq[ResponseFilter]): ResponseFilter = {
     @annotation.tailrec
     def filter(res: HttpResponse, filters: Seq[ResponseFilter]): HttpResponse =
       filters match {
@@ -65,4 +65,15 @@ object ResponseFilter {
       }
     filter(_, filters)
   }
+
+  /**
+   * Composes chain of response filters, with response of preceding filter
+   * passed to its successor.
+   *
+   * @param one response filter
+   * @param two another response filter
+   * @param more additional response filters
+   */
+  def chain(one: ResponseFilter, two: ResponseFilter, more: ResponseFilter*): ResponseFilter =
+    chain(one +: two +: more)
 }

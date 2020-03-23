@@ -68,7 +68,7 @@ object RequestHandler {
    * @note If `handlers` is empty, a request handler is created that returns
    *   the request it receives.
    */
-  def coalesce(handlers: RequestHandler*): RequestHandler = {
+  def coalesce(handlers: Seq[RequestHandler]): RequestHandler = {
     @annotation.tailrec
     def handle(req: HttpRequest, handlers: Seq[RequestHandler]): HttpMessage =
       handlers match {
@@ -81,4 +81,15 @@ object RequestHandler {
       }
     handle(_, handlers)
   }
+
+  /**
+   * Composes head handler with tail handlers, using tail handlers as
+   * fallbacks.
+   *
+   * @param one request handler
+   * @param two another request handler
+   * @param more additional request handlers
+   */
+  def coalesce(one: RequestHandler, two: RequestHandler, more: RequestHandler*): RequestHandler =
+    coalesce(one +: two +: more)
 }
