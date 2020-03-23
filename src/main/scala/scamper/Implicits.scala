@@ -126,8 +126,21 @@ object Implicits {
      *
      * @param data message body
      */
-    def withFormBody(data: (String, String)*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withQueryBody(QueryString(data : _*))
+    def withFormBody(data: Seq[(String, String)])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      withQueryBody(QueryString(data))
+
+    /**
+     * Creates new message with supplied form data as message body.
+     *
+     * After adding body to message, the Content-Type header is set to
+     * `application/x-www-form-urlencoded`, and Content-Length is set to length
+     * of encoded form data.
+     *
+     * @param one form datum
+     * @param more additional form data
+     */
+    def withFormBody(one: (String, String), more: (String, String)*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      withQueryBody(QueryString(one +: more))
 
     /**
      * Creates new message with supplied query string as message body.

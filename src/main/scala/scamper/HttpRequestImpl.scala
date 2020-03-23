@@ -60,8 +60,8 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
   def withQuery(params: Map[String, Seq[String]]): HttpRequest =
     withQuery(QueryString(params))
 
-  def withQuery(params: (String, String)*): HttpRequest =
-    withQuery(QueryString(params : _*))
+  def withQuery(params: Seq[(String, String)]): HttpRequest =
+    withQuery(QueryString(params))
 
   def withVersion(newVersion: HttpVersion): HttpRequest =
     copy(startLine = RequestLine(method, target, newVersion))

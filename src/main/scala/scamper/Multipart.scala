@@ -39,7 +39,7 @@ trait Multipart {
 
   /** Collects all text parts into query string. */
   lazy val toQuery: QueryString =
-    QueryString(textParts.map { part => part.name -> part.content } : _*)
+    QueryString(textParts.map(part => part.name -> part.content))
 
   /**
    * Gets first part with given name.

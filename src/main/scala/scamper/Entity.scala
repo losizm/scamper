@@ -84,8 +84,16 @@ object Entity {
    *
    * @note The data is encoded as `application/x-www-form-urlencoded`.
    */
-  def apply(data: (String, String)*): Entity =
+  def apply(data: Seq[(String, String)]): Entity =
     apply(QueryString.format(data))
+
+  /**
+   * Creates `Entity` from supplied form data.
+   *
+   * @note The data is encoded as `application/x-www-form-urlencoded`.
+   */
+  def apply(one: (String, String), more: (String, String)*): Entity =
+    apply(QueryString.format(one +: more))
 
   /**
    * Creates `Entity` from supplied query string.

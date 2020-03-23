@@ -154,7 +154,15 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
    *
    * @return new request
    */
-  def withQuery(params: (String, String)*): HttpRequest
+  def withQuery(params: Seq[(String, String)]): HttpRequest
+
+  /**
+   * Creates request with new query parameters.
+   *
+   * @return new request
+   */
+  def withQuery(one: (String, String), more: (String, String)*): HttpRequest =
+    withQuery(one +: more)
 
   /**
    * Creates request with new HTTP version.

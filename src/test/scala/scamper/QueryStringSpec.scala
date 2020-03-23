@@ -131,7 +131,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(toSimpleMap("name") == "root")
     assert(toSimpleMap("groups") == "wheel")
 
-    val empty = QueryString()
+    val empty = QueryString(Nil)
     assert(empty.isEmpty)
     assert(empty.toString == "")
   }
@@ -191,7 +191,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(toSimpleMap("name") == "root")
     assert(toSimpleMap("groups") == "wheel")
 
-    val empty = QueryString()
+    val empty = QueryString(Nil)
     assert(empty.isEmpty)
     assert(empty.toString == "")
   }
