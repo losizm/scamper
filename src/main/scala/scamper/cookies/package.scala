@@ -176,9 +176,10 @@ package object cookies {
      * @param cookies new set of cookies
      */
     def withCookies(cookies: SetCookie*): HttpResponse =
-      response.withHeaders({
-        response.headers.filterNot(_.name.equalsIgnoreCase("Set-Cookie")) ++ cookies.map(c => Header("Set-Cookie", c.toString))
-      } : _*)
+      response.withHeaders(
+        response.headers.filterNot(_.name.equalsIgnoreCase("Set-Cookie")) ++
+          cookies.map(c => Header("Set-Cookie", c.toString))
+      )
 
     /**
      * Creates copy of response excluding cookies with given names.

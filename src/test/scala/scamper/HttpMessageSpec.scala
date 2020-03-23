@@ -71,9 +71,9 @@ class HttpMessageSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(req.getAttribute[String]("name").contains("request"))
     assert(req.getAttributeOrElse("success", false))
     assert(req.getAttributeOrElse("answer", 45) == 45)
-    assert(req.withAttributes().attributes.size == 0)
+    assert(req.withAttributes(Map.empty[String, Any]).attributes.size == 0)
 
-    req = req.removeAttribute("name")
+    req = req.removeAttributes("name")
     assert(req.attributes.size == 2)
     assert(req.attributes.contains("id"))
     assert(req.attributes.contains("success"))
@@ -112,9 +112,9 @@ class HttpMessageSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(res.getAttribute[String]("name").contains("response"))
     assert(res.getAttributeOrElse("success", false))
     assert(res.getAttributeOrElse("answer", 45) == 45)
-    assert(res.withAttributes().attributes.size == 0)
+    assert(res.withAttributes(Map.empty[String, Any]).attributes.size == 0)
 
-    res = res.removeAttribute("name")
+    res = res.removeAttributes("name")
     assert(res.attributes.size == 2)
     assert(res.attributes.contains("id"))
     assert(res.attributes.contains("success"))

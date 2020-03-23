@@ -32,17 +32,17 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
   def withVersion(newVersion: HttpVersion): HttpResponse =
     copy(startLine = StatusLine(status, newVersion))
 
-  def withHeaders(newHeaders: Header*): HttpResponse =
+  def withHeaders(newHeaders: Seq[Header]): HttpResponse =
     copy(headers = newHeaders)
 
-  def addHeaders(newHeaders: Header*): HttpResponse =
-    withHeaders(headers ++ newHeaders : _*)
+  def addHeaders(newHeaders: Seq[Header]): HttpResponse =
+    withHeaders(headers ++ newHeaders)
 
-  def removeHeaders(names: String*): HttpResponse =
-    withHeaders(headers.filterNot(header => names.exists(header.name.equalsIgnoreCase)) : _*)
+  def removeHeaders(names: Seq[String]): HttpResponse =
+    withHeaders(headers.filterNot(header => names.exists(header.name.equalsIgnoreCase)))
 
   def withHeader(header: Header): HttpResponse =
-    withHeaders(headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header : _*)
+    withHeaders(headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header)
 
   def withBody(newBody: Entity): HttpResponse =
     copy(body = newBody)
@@ -53,6 +53,6 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
   def withAttribute(attribute: (String, Any)): HttpResponse =
     copy(attributes = attributes + attribute)
 
-  def removeAttribute(name: String): HttpResponse =
-    copy(attributes = attributes - name)
+  def removeAttributes(names: Seq[String]): HttpResponse =
+    copy(attributes = attributes.filterNot(x => names.contains(x._1)))
 }

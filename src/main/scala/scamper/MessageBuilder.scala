@@ -33,16 +33,38 @@ trait MessageBuilder[T <: HttpMessage] {
    *
    * @return new message
    */
-  def withHeaders(headers: Header*): T
+  def withHeaders(headers: Seq[Header]): T
+
+  /**
+   * Creates message with supplied headers. All previous headers are removed.
+   *
+   * @param one message header
+   * @param more additional message headers
+   *
+   * @return new message
+   */
+  def withHeaders(one: Header, more: Header*): T =
+    withHeaders(one +: more)
 
   /**
    * Creates message with additional headers.
    *
-   * @param headers additional message headers
+   * @param headers message headers
    *
    * @return new message
    */
-  def addHeaders(headers: Header*): T
+  def addHeaders(headers: Seq[Header]): T
+
+  /**
+   * Creates message with additional headers.
+   *
+   * @param one message header
+   * @param more additional message headers
+   *
+   * @return new message
+   */
+  def addHeaders(one: Header, more: Header*): T =
+    addHeaders(one +: more)
 
   /**
    * Creates message excluding headers with given field names.
@@ -51,7 +73,18 @@ trait MessageBuilder[T <: HttpMessage] {
    *
    * @return new message
    */
-  def removeHeaders(names: String*): T
+  def removeHeaders(names: Seq[String]): T
+
+  /**
+   * Creates message excluding headers with given field names.
+   *
+   * @param one header field name
+   * @param more additional header field names
+   *
+   * @return new message
+   */
+  def removeHeaders(one: String, more: String*): T =
+    removeHeaders(one +: more)
 
   /**
    * Creates message with supplied header. All previous headers with same field
@@ -86,12 +119,33 @@ trait MessageBuilder[T <: HttpMessage] {
    * Creates message with supplied attributes. All previous attributes are
    * removed.
    *
-   * @param attributes message attributes
+   * @param one message attribute
+   * @param more additional message attributes
    *
    * @return new message
    */
-  def withAttributes(attributes: (String, Any)*): T =
-    withAttributes(attributes.toMap)
+  def withAttributes(one: (String, Any), more: (String, Any)*): T =
+    withAttributes((one +: more).toMap)
+
+  /**
+   * Creates message excluding attribute with given names.
+   *
+   * @param name attribute names
+   *
+   * @return new message
+   */
+  def removeAttributes(names: Seq[String]): T
+
+  /**
+   * Creates message excluding attribute with given name.
+   *
+   * @param one attribute name
+   * @param more additional attribute names
+   *
+   * @return new message
+   */
+  def removeAttributes(one: String, names: String*): T =
+    removeAttributes(one +: names)
 
   /**
    * Creates message with supplied attribute, replacing existing value, if any.
@@ -101,13 +155,4 @@ trait MessageBuilder[T <: HttpMessage] {
    * @return new message
    */
   def withAttribute(attribute: (String, Any)): T
-
-  /**
-   * Creates message excluding attribute with given name.
-   *
-   * @param name attribute name
-   *
-   * @return new message
-   */
-  def removeAttribute(name: String): T
 }

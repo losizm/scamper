@@ -74,7 +74,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
     val secure = target.getScheme.matches("https|wss")
     val host = getEffectiveHost(target)
-    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/12.1.0")
+    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/13.0.0")
     val cookies = request.cookies ++ cookieStore.get(target)
     val connection = target.getScheme.matches("wss?") match {
       case true  => checkWebSocketRequest(request).connection.mkString(", ")
@@ -93,12 +93,12 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       case _       => request
     }
 
-    effectiveRequest = effectiveRequest.withHeaders({
+    effectiveRequest = effectiveRequest.withHeaders(
       Header("Host", host) +:
       Header("User-Agent", userAgent) +:
       effectiveRequest.headers.filterNot(_.name.matches("(?i)Host|User-Agent|Cookie|Connection")) :+
       Header("Connection", connection)
-    } : _*).withCookies(cookies : _*)
+    ).withCookies(cookies : _*)
 
     effectiveRequest = effectiveRequest.withTarget(target.toTarget)
 
