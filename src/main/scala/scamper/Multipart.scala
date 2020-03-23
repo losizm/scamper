@@ -144,10 +144,16 @@ object Multipart {
   private val charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz"
 
   /** Creates Multipart with supplied parts. */
-  def apply(parts: Part*): Multipart = MultipartImpl(noNulls(parts))
+  def apply(parts: Seq[Part]): Multipart =
+    MultipartImpl(noNulls(parts))
+
+  /** Creates Multipart with supplied parts. */
+  def apply(one: Part, more: Part*): Multipart =
+    apply(one +: more)
 
   /** Generates boundary. */
-  def boundary(): String = prefix + new String(random.ints(16, 0, 62).toArray.map(charset))
+  def boundary(): String =
+    prefix + new String(random.ints(16, 0, 62).toArray.map(charset))
 }
 
 /** Provides factory methods for `TextPart`. */
@@ -245,4 +251,3 @@ private case class TextPartImpl(name: String, content: String, contentDispositio
 private case class FilePartImpl(name: String, content: File, contentDisposition: DispositionType, contentType: MediaType) extends FilePart {
   val getFileName: Option[String] = contentDisposition.params.get("filename")
 }
-

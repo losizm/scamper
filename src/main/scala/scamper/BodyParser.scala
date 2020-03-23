@@ -213,9 +213,9 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
           }
         }
 
-        Multipart(parts.toSeq : _*)
+        Multipart(parts.toSeq)
 
-      case line if line.startsWith(new String(status.end)) => Multipart()
+      case line if line.startsWith(new String(status.end)) => Multipart(Nil)
 
       case line => throw new HttpException("Invalid start of mulitpart")
     }

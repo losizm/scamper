@@ -183,7 +183,21 @@ object Implicits {
      *
      * @param parts message body
      */
-    def withMultipartBody(parts: Part*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withMultipartBody(Multipart(parts : _*))
+    def withMultipartBody(parts: Seq[Part])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      withMultipartBody(Multipart(parts))
+
+    /**
+     * Creates new message with supplied parts as message body, with the parts
+     * encoded as multipart form data.
+     *
+     * Before adding body to message, the Content-Type header is set to
+     * `multipart/form-data` with a boundary parameter whose value is used
+     * to delimit parts in encoded message body.
+     *
+     * @param one part
+     * @param more additional parts
+     */
+    def withMultipartBody(one: Part, more: Part*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      withMultipartBody(Multipart(one +: more))
   }
 }
