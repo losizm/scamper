@@ -48,7 +48,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 To use **Scamper**, start by adding it as a dependency to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "12.1.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "13.0.0"
 ```
 
 ## HTTP Messages
@@ -699,7 +699,7 @@ settings.outgoing { req =>
   def findCookies(target: Uri): Seq[PlainCookie] = ???
 
   // Add cookies to request
-  req.withCookies { findCookies(req.absoluteTarget) : _* }
+  req.withCookies { findCookies(req.absoluteTarget) }
 }
 
 // Add response filter
