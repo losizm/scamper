@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-import scamper.{ ListParser, Uri }
+import scamper.{ HeaderParams, ListParser, Uri }
 
 /**
  * Standardized type for Link header value.
@@ -31,7 +31,7 @@ trait LinkValue {
 
   /** Returns formatted link. */
   override lazy val toString: String =
-    s"<$ref>${LinkParams.format(params)}"
+    s"<$ref>${HeaderParams.format(params)}"
 }
 
 /** Provides factory methods for `LinkValue`. */
@@ -42,7 +42,7 @@ object LinkValue {
   def parse(link: String): LinkValue =
     link match {
       case syntax(ref, null)   => apply(Uri(ref))
-      case syntax(ref, params) => apply(Uri(ref), LinkParams.parse(params))
+      case syntax(ref, params) => apply(Uri(ref), HeaderParams.parse(params))
       case _ => throw new IllegalArgumentException(s"Malformed link: $link")
     }
 

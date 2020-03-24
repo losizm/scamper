@@ -30,6 +30,9 @@ package object websocket {
   /** Globally Unique Identifier for WebSocket (258EAFA5-E914-47DA-95CA-C5AB0DC85B11) */
   val guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
+  /** Converts string to [[WebSocketExtension]]. */
+  implicit val stringToWebSocketExtension = (ext: String) => WebSocketExtension.parse(ext)
+
   /** Provides reason for invalid WebSocket request. */
   case class InvalidWebSocketRequest(reason: String) extends HttpException(reason)
 
@@ -45,6 +48,7 @@ package object websocket {
     random.nextBytes(key)
     Base64.encodeToString(key)
   }
+
 
   /**
    * Generates `Sec-WebSocket-Accept` header value using supplied WebSocket key.
@@ -129,22 +133,29 @@ package object websocket {
   /** Provides standardized access to Sec-WebSocket-Extensions header. */
   implicit class SecWebSocketExtensions[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
-     * Gets Sec-WebSocket-Extensions header value.
+     * Gets Sec-WebSocket-Extensions header values.
      *
      * @throws HeaderNotFound if Sec-WebSocket-Extensions is not present
      */
-    def secWebSocketExtensions: String = getSecWebSocketExtensions.getOrElse(throw HeaderNotFound("Sec-WebSocket-Extensions"))
+    def secWebSocketExtensions: Seq[WebSocketExtension] =
+      getSecWebSocketExtensions.getOrElse(Nil)
 
-    /** Gets Sec-WebSocket-Extensions header value if present. */
-    def getSecWebSocketExtensions: Option[String] =
-      message.getHeaderValue("Sec-WebSocket-Extensions")
+    /** Gets Sec-WebSocket-Extensions header values if present. */
+    def getSecWebSocketExtensions: Option[Seq[WebSocketExtension]] =
+      message.getHeaderValues("Sec-WebSocket-Extensions")
+        .map(WebSocketExtension.parseAll)
+        .reduceLeftOption(_ ++ _)
 
     /** Tests whether Sec-WebSocket-Extensions header is present. */
     def hasSecWebSocketExtensions: Boolean = message.hasHeader("Sec-WebSocket-Extensions")
 
-    /** Creates new message setting Sec-WebSocket-Extensions header to supplied value. */
-    def withSecWebSocketExtensions(value: String)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      message.withHeader(Header("Sec-WebSocket-Extensions", value))
+    /** Creates new message setting Sec-WebSocket-Extensions header to supplied values. */
+    def withSecWebSocketExtensions(values: Seq[WebSocketExtension])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.withHeader(Header("Sec-WebSocket-Extensions", values.mkString(", ")))
+
+    /** Creates new message setting Sec-WebSocket-Extensions header to supplied values. */
+    def withSecWebSocketExtensions(one: WebSocketExtension, more: WebSocketExtension*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      withSecWebSocketExtensions(one +: more)
 
     /** Creates new message removing Sec-WebSocket-Extensions header. */
     def removeSecWebSocketExtensions()(implicit ev: <:<[T, MessageBuilder[T]]): T =
@@ -178,22 +189,27 @@ package object websocket {
   /** Provides standardized access to Sec-WebSocket-Protocol header. */
   implicit class SecWebSocketProtocol[T <: HttpMessage](private val message: T) extends AnyVal {
     /**
-     * Gets Sec-WebSocket-Protocol header value.
+     * Gets Sec-WebSocket-Protocol header values.
      *
      * @throws HeaderNotFound if Sec-WebSocket-Protocol is not present
      */
-    def secWebSocketProtocol: String = getSecWebSocketProtocol.getOrElse(throw HeaderNotFound("Sec-WebSocket-Protocol"))
+    def secWebSocketProtocol: Seq[String] =
+      getSecWebSocketProtocol.getOrElse(Nil)
 
-    /** Gets Sec-WebSocket-Protocol header value if present. */
-    def getSecWebSocketProtocol: Option[String] =
-      message.getHeaderValue("Sec-WebSocket-Protocol")
+    /** Gets Sec-WebSocket-Protocol header values if present. */
+    def getSecWebSocketProtocol: Option[Seq[String]] =
+      message.getHeaderValue("Sec-WebSocket-Protocol").map(ListParser.apply)
 
     /** Tests whether Sec-WebSocket-Protocol header is present. */
     def hasSecWebSocketProtocol: Boolean = message.hasHeader("Sec-WebSocket-Protocol")
 
-    /** Creates new message setting Sec-WebSocket-Protocol header to supplied value. */
-    def withSecWebSocketProtocol(value: String)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      message.withHeader(Header("Sec-WebSocket-Protocol", value))
+    /** Creates new message setting Sec-WebSocket-Protocol header to supplied values. */
+    def withSecWebSocketProtocol(values: Seq[String])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.withHeader(Header("Sec-WebSocket-Protocol", values.mkString(", ")))
+
+    /** Creates new message setting Sec-WebSocket-Protocol header to supplied values. */
+    def withSecWebSocketProtocol(one: String, more: String*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      withSecWebSocketProtocol(one +: more)
 
     /** Creates new message removing Sec-WebSocket-Protocol header. */
     def removeSecWebSocketProtocol()(implicit ev: <:<[T, MessageBuilder[T]]): T =

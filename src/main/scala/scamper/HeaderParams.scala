@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper.types
+package scamper
 
-import scamper.Grammar._
-import scamper.ListParser
+import Grammar._
 
-private object LinkParams {
+private object HeaderParams {
   private val NoValue     = """\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val TokenValue  = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val QuotedValue = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*"([^"]*)"\s*""".r
@@ -30,7 +29,7 @@ private object LinkParams {
       case TokenValue(name, value)  => name -> Some(value)
       case QuotedValue(name, value) => name -> Some(value)
       case BadValue(name, value)    => name -> Some(value)
-      case param => throw new IllegalArgumentException(s"Malformed link parameters: $param")
+      case param => throw new IllegalArgumentException(s"Malformed parameters: $param")
     }.toMap
 
   def format(params: Map[String, Option[String]]): String =
