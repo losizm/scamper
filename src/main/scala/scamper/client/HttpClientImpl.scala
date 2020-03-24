@@ -252,7 +252,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       case false =>
         acceptEncodings.isEmpty match {
           case true  => req
-          case false => req.withAcceptEncoding(acceptEncodings : _*)
+          case false => req.withAcceptEncoding(acceptEncodings)
         }
     }
 
@@ -268,7 +268,8 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
   private def toBodyRequest(request: HttpRequest): HttpRequest =
     request.getTransferEncoding.map { encoding =>
-      request.withTransferEncoding(encoding.filterNot(_.isChunked) :+ TransferCoding("chunked") : _*).removeContentLength
+      request.withTransferEncoding(encoding.filterNot(_.isChunked) :+ TransferCoding("chunked"))
+        .removeContentLength
     }.orElse {
       request.getContentLength.map {
         case 0          => request.withBody(Entity.empty)
