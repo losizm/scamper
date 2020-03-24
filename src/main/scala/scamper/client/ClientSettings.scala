@@ -60,10 +60,18 @@ class ClientSettings {
    *
    * The `Accept-Encoding` header for each outgoing request is set accordingly.
    */
-  def acceptEncodings(ranges: ContentCodingRange*): this.type = synchronized {
+  def acceptEncodings(ranges: Seq[ContentCodingRange]): this.type = synchronized {
     settings = settings.copy(acceptEncodings = noNulls(ranges))
     this
   }
+
+  /**
+   * Sets accepted encodings.
+   *
+   * The `Accept-Encoding` header for each outgoing request is set accordingly.
+   */
+  def acceptEncodings(one: ContentCodingRange, more: ContentCodingRange*): this.type =
+    acceptEncodings(one +: more)
 
   /**
    * Sets buffer size.

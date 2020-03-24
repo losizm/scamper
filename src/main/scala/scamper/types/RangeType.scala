@@ -63,12 +63,16 @@ object ByteRange {
   def parse(range: String): ByteRange =
     range match {
       case syntax(set) => ByteRangeImpl(parseSet(set))
-      case _ => throw new IllegalArgumentException(s"Malformed byte range: $range")
+      case _           => throw new IllegalArgumentException(s"Malformed byte range: $range")
     }
 
   /** Creates ByteRange from supplied specs. */
-  def apply(specs: ByteRangeSpec*): ByteRange =
+  def apply(specs: Seq[ByteRangeSpec]): ByteRange =
     ByteRangeImpl(specs)
+
+  /** Creates ByteRange from supplied specs. */
+  def apply(one: ByteRangeSpec, more: ByteRangeSpec*): ByteRange =
+    ByteRangeImpl(one +: more)
 
   /** Destructures ByteRange. */
   def unapply(range: ByteRange): Option[(String, Seq[ByteRangeSpec])] =
@@ -78,7 +82,7 @@ object ByteRange {
     ListParser(set).map {
       case slice(first, null) => Slice(first.toLong, None)
       case slice(first, last) => Slice(first.toLong, Some(last.toLong))
-      case suffix(length) => Suffix(length.toLong)
+      case suffix(length)     => Suffix(length.toLong)
     }
 
   /**
@@ -95,4 +99,6 @@ object ByteRange {
   case class Suffix(length: Long) extends ByteRangeSpec
 }
 
-private case class ByteRangeImpl(set: Seq[ByteRange.ByteRangeSpec]) extends ByteRange
+private case class ByteRangeImpl(set: Seq[ByteRange.ByteRangeSpec]) extends ByteRange {
+  require(set.nonEmpty, "Invalid byte range: set is empty")
+}
