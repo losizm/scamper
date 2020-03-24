@@ -66,10 +66,7 @@ class ChallengeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     }
 
     Challenge.parse("Bearer realm=\"example\", error=invalid_token, scope=\"user profile\"") match {
-      case BearerChallenge(Some(realm), scope, Some(error), params) =>
-        assert(realm == "example")
-        assert(scope == Seq("user", "profile"))
-        assert(error == "invalid_token")
+      case BearerChallenge(params) =>
         assert(params.size == 3)
         assert(params("realm") == "example")
         assert(params("scope") == "user profile")
