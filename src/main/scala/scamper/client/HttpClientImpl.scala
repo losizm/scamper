@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Carlos Conyers
+ * Copyright 2017-2020 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
     val secure = target.getScheme.matches("https|wss")
     val host = getEffectiveHost(target)
-    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/13.0.0")
+    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/13.0.1")
     val cookies = request.cookies ++ cookieStore.get(target)
     val connection = target.getScheme.matches("wss?") match {
       case true  => checkWebSocketRequest(request).connection.mkString(", ")
