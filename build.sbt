@@ -1,6 +1,6 @@
 organization := "com.github.losizm"
 name := "scamper"
-version := "13.0.1"
+version := "13.1.0-SNAPSHOT"
 
 description := "The HTTP library for Scala"
 homepage := Some(url("https://github.com/losizm/scamper"))
