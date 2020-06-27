@@ -19,7 +19,7 @@ import java.net.Socket
 
 import scala.util.Try
 
-import scamper.Uri
+import scamper.{ Entity, HttpRequest, Uri }
 import scamper.logging.{ Logger, NullLogger }
 import StatusCode.Registry.NormalClosure
 
@@ -306,4 +306,14 @@ object WebSocketSession {
    */
   def forServer(socket: Socket, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =
     forServer(WebSocketConnection(socket), id, target, protocolVersion, logger)
+
+  private[scamper] def forServer(req: HttpRequest): WebSocketSession = {
+    val conn = WebSocketConnection(req.getAttribute[Socket]("scamper.server.message.socket").get)
+    val id = req.getAttribute[String]("scamper.server.message.correlate").get
+    val target = req.target
+    val protocolVersion = req.secWebSocketVersion
+    val logger = req.getAttribute[Logger]("scamper.server.message.logger").get
+
+    new WebSocketSessionImpl(id, target, protocolVersion, logger)(conn, true, Some(req))
+  }
 }

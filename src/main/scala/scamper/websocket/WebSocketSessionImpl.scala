@@ -22,14 +22,14 @@ import java.util.concurrent.atomic.AtomicBoolean
 import scala.concurrent.Future
 import scala.util.Try
 
-import scamper.{ Auxiliary, Uri }
+import scamper.{ Auxiliary, HttpRequest, Uri }
 import scamper.logging.Logger
 import scamper.websocket._
 import scamper.websocket.Opcode.Registry._
 import scamper.websocket.StatusCode.Registry._
 
-private class WebSocketSessionImpl(val id: String, val target: Uri, val protocolVersion: String, val logger: Logger)
-    (conn: WebSocketConnection, serverMode: Boolean) extends WebSocketSession {
+private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val protocolVersion: String, val logger: Logger)
+    (conn: WebSocketConnection, serverMode: Boolean, request: Option[HttpRequest] = None) extends WebSocketSession {
 
   private type EitherHandler[T] = Either[(T, Boolean) => Any, T => Any]
 
@@ -168,6 +168,8 @@ private class WebSocketSessionImpl(val id: String, val target: Uri, val protocol
     closeHandler = Option(handler)
     this
   }
+
+  private[scamper] def getRequest(): HttpRequest = request.get
 
   private def start(): Unit =
     Future {

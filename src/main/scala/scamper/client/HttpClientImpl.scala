@@ -74,7 +74,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
     val secure = target.getScheme.matches("https|wss")
     val host = getEffectiveHost(target)
-    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/13.0.1")
+    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/13.1.0")
     val cookies = request.cookies ++ cookieStore.get(target)
     val connection = target.getScheme.matches("wss?") match {
       case true  => checkWebSocketRequest(request).connection.mkString(", ")
@@ -185,7 +185,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
               setCloseGuard(res, false)
               throw cause
           }
-        case false => throw WebSocketHandshakeFailure(s"Connection upgrade not honored: ${res.status}")
+        case false => throw WebSocketHandshakeFailure(s"Connection upgrade not accepted: ${res.status}")
       }
     }
   }

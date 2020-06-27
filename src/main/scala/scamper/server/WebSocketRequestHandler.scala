@@ -17,7 +17,7 @@ package scamper.server
 
 import java.net.Socket
 
-import scamper.{ HttpMessage, HttpRequest }
+import scamper.{ Entity, HttpMessage, HttpRequest }
 import scamper.Implicits.stringToEntity
 import scamper.RequestMethod.Registry.GET
 import scamper.ResponseStatus.Registry.{ BadRequest, SwitchingProtocols }
@@ -38,14 +38,9 @@ private class WebSocketRequestHandler private (handler: (WebSocketSession) => An
             .withConnection("Upgrade")
             .withSecWebSocketAccept(acceptWebSocketKey(req.secWebSocketKey))
             .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
-              val session = WebSocketSession.forServer(
-                socket,
-                req.correlate,
-                req.target,
-                req.secWebSocketVersion,
-                Some(req.logger)
-              )
-              handler(session)
+              val sessionRequest = req.withBody(Entity.empty)
+                .withAttribute("scamper.server.message.socket", socket)
+              handler(WebSocketSession.forServer(sessionRequest))
             })
         } catch {
           case InvalidWebSocketRequest(message) => BadRequest(message)
