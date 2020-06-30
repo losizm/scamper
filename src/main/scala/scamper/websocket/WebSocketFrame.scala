@@ -64,7 +64,7 @@ object WebSocketFrame {
   /**
    * Creates WebSocketFrame using supplied attributes.
    *
-   * @param isFinal indicates whether supplied frame is message final frame
+   * @param isFinal indicates final frame of message
    * @param opcode frame opcode
    * @param key masking key
    * @param length payload length
@@ -99,17 +99,31 @@ object WebSocketFrame {
   /**
    * Creates WebSocketFrame using supplied attributes.
    *
-   * @param isFinal indicates whether supplied frame is message final frame
+   * @param isFinal indicates final frame of message
+   * @param opcode frame opcode
+   * @param key masking key
+   * @param length payload length
+   * @param data unmasked payload data
+   *
+   * @note If there is `Some` masking key, it is used to mask `data`.
+   */
+  def apply(isFinal: Boolean, opcode: Opcode, key: Option[MaskingKey], length: Int, data: Array[Byte]): WebSocketFrame = {
+    key.foreach(key => key(data, length, 0))
+    apply(isFinal, opcode, key, length, { if (length == 0) EmptyInputStream else new ByteArrayInputStream(data, 0, length) })
+  }
+
+  /**
+   * Creates WebSocketFrame using supplied attributes.
+   *
+   * @param isFinal indicates final frame of message
    * @param opcode frame opcode
    * @param key masking key
    * @param data unmasked payload data
    *
    * @note If there is `Some` masking key, it is used to mask `data`.
    */
-  def apply(isFinal: Boolean, opcode: Opcode, key: Option[MaskingKey], data: Array[Byte]): WebSocketFrame = {
-    key.foreach(key => key(data))
-    apply(isFinal, opcode, key, data.size, { if (data.isEmpty) EmptyInputStream else new ByteArrayInputStream(data) })
-  }
+  def apply(isFinal: Boolean, opcode: Opcode, key: Option[MaskingKey], data: Array[Byte]): WebSocketFrame =
+    apply(isFinal, opcode, key, data.size, data)
 
   /**
    * Creates Close frame using supplied status code.

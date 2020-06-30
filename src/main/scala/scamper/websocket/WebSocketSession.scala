@@ -15,6 +15,7 @@
  */
 package scamper.websocket
 
+import java.io.InputStream
 import java.net.Socket
 
 import scala.util.Try
@@ -145,6 +146,38 @@ trait WebSocketSession {
    * @param callback result handler
    */
   def sendAsynchronously[T](message: Array[Byte])(callback: Try[Unit] => T): Unit
+
+  /**
+   * Sends text message.
+   *
+   * @param message input stream to text message
+   */
+  def sendText(message: InputStream): Unit
+
+  /**
+   * Sends text message asynchronously and on completion passes result to
+   * supplied callback.
+   *
+   * @param message input stream to text message
+   * @param callback result handler
+   */
+  def sendTextAsynchronously[T](message: InputStream)(callback: Try[Unit] => T): Unit
+
+  /**
+   * Sends binary message.
+   *
+   * @param message input stream to binary message
+   */
+  def sendBinary(message: InputStream): Unit
+
+  /**
+   * Sends binary message asynchronously and on completion passes result to
+   * supplied callback.
+   *
+   * @param message input stream to binary message
+   * @param callback result handler
+   */
+  def sendBinaryAsynchronously[T](message: InputStream)(callback: Try[Unit] => T): Unit
 
   /**
    * Sends ping message.

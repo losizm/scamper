@@ -15,7 +15,7 @@
  */
 package scamper.websocket
 
-import java.io.ByteArrayOutputStream
+import java.io.{ ByteArrayOutputStream, InputStream }
 import java.net.{ SocketException, SocketTimeoutException }
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -33,6 +33,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   private type EitherHandler[T] = Either[(T, Boolean) => Any, T => Any]
 
+  private var _bufferSize: Int = 8192
   private var _bufferCapacity: Int = Int.MaxValue
   private var _idleTimeout: Int = 0
 
@@ -69,6 +70,15 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     if (milliseconds < 0)
       throw new IllegalArgumentException()
     _idleTimeout = milliseconds
+    this
+  }
+
+  def bufferSize(): Int = _bufferSize
+
+  def bufferSize(size: Int): this.type = {
+    if (size < 0)
+      throw new IllegalArgumentException()
+    _bufferSize = size
     this
   }
 
@@ -110,6 +120,18 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   def sendAsynchronously[T](message: Array[Byte])(callback: Try[Unit] => T): Unit =
     Future(send(message)).onComplete(callback)
+
+  def sendText(message: InputStream): Unit =
+    sendData(message, false)
+
+  def sendTextAsynchronously[T](message: InputStream)(callback: Try[Unit] => T): Unit =
+    Future(sendText(message)).onComplete(callback)
+
+  def sendBinary(message: InputStream): Unit =
+    sendData(message, true)
+
+  def sendBinaryAsynchronously[T](message: InputStream)(callback: Try[Unit] => T): Unit =
+    Future(sendBinary(message)).onComplete(callback)
 
   def ping(data: Array[Byte] = Array.empty): Unit = {
     if (data.size > 125)
@@ -288,14 +310,30 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   private def nullHandler[T]: (T, Boolean) => Unit = (_, _) => ()
 
+  private def sendData(payload: InputStream, binary: Boolean): Unit = {
+    val buf = new Array[Byte](bufferSize)
+    var len = payload.read(buf)
+
+    conn.write(makeFrame(buf, len, if (binary) Binary else Text, false))
+
+    while ({ len = payload.read(buf); len != -1 })
+      conn.write(makeFrame(buf, len, Continuation, false))
+
+    conn.write(makeFrame(buf, 0, Continuation, true))
+  }
+
   private def makeFrame(data: Array[Byte], opcode: Opcode): WebSocketFrame =
+    makeFrame(data, data.size, opcode, true)
+
+  private def makeFrame(data: Array[Byte], length: Int, opcode: Opcode, isFinal: Boolean): WebSocketFrame =
     WebSocketFrame(
-      true,
+      isFinal,
       opcode,
       serverMode match {
         case true  => None
         case false => Some(MaskingKey())
       },
+      length,
       data
     )
 
