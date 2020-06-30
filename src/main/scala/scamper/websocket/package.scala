@@ -42,6 +42,27 @@ package object websocket {
   /** Provides status code of WebSocket error. */
   case class WebSocketError(statusCode: StatusCode) extends HttpException(s"${statusCode.value} ($statusCode)")
 
+
+  /**
+   * Test whether request is WebSocket upgrade.
+   *
+   * @param req request
+   */
+  def isWebSocketUpgrade(req: HttpRequest): Boolean =
+    req.method == GET && req.upgrade.exists { protocol =>
+      protocol.name == "websocket" && protocol.version.isEmpty
+    }
+
+  /**
+   * Test whether response is WebSocket upgrade.
+   *
+   * @param res response
+   */
+  def isWebSocketUpgrade(res: HttpResponse): Boolean =
+    res.status == SwitchingProtocols && res.upgrade.exists { protocol =>
+      protocol.name == "websocket" && protocol.version.isEmpty
+    }
+
   /** Gets randomly generated WebSocket key. */
   def generateWebSocketKey(): String = {
     val key = new Array[Byte](16)

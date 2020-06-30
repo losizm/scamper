@@ -26,33 +26,12 @@ import scamper.server.Implicits.ServerHttpMessageType
 import scamper.types.Implicits.stringToProtocol
 import scamper.websocket._
 
-private class WebSocketRequestHandler private (handler: (WebSocketSession) => Any) extends RequestHandler {
+private class WebSocketRequestHandler private (handler: WebSocketSession => Any) extends RequestHandler {
   def apply(req: HttpRequest): HttpMessage =
     isWebSocketUpgrade(req) match {
-      case true  =>
-        try {
-          checkWebSocketRequest(req)
-
-          SwitchingProtocols()
-            .withUpgrade("websocket")
-            .withConnection("Upgrade")
-            .withSecWebSocketAccept(acceptWebSocketKey(req.secWebSocketKey))
-            .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
-              val sessionRequest = req.withBody(Entity.empty)
-                .withAttribute("scamper.server.message.socket", socket)
-              handler(WebSocketSession.forServer(sessionRequest))
-            })
-        } catch {
-          case InvalidWebSocketRequest(message) => BadRequest(message)
-        }
+      case true  => upgradeToWebSocket(req)(handler)
       case false => req
     }
-
-  private def isWebSocketUpgrade(req: HttpRequest): Boolean =
-    req.method == GET &&
-      req.upgrade.exists { protocol =>
-        protocol.name == "websocket" && protocol.version.isEmpty
-      }
 }
 
 private object WebSocketRequestHandler {
