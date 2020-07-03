@@ -48,7 +48,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 To use **Scamper**, start by adding it as a dependency to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "13.2.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "13.2.1"
 ```
 
 ## HTTP Messages
