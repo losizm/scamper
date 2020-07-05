@@ -16,7 +16,7 @@
 package scamper
 
 /**
- * HTTP request method
+ * Defines HTTP request method.
  *
  * @see [[RequestMethod.Registry]]
  */
@@ -63,6 +63,9 @@ object RequestMethod {
 
     /** TRACE request method */
     val TRACE: RequestMethod = RequestMethodImpl("TRACE")
+
+    /** CONNECT request method */
+    val CONNECT: RequestMethod = RequestMethodImpl("CONNECT")
   }
   import Registry._
 
@@ -77,6 +80,7 @@ object RequestMethod {
       case "DELETE"  => DELETE
       case "OPTIONS" => OPTIONS
       case "TRACE"   => TRACE
+      case "CONNECT" => CONNECT
       case _         => Grammar.Token(name).map(RequestMethodImpl).getOrElse {
         throw new IllegalArgumentException(s"Invalid request method name: $name")
       }
