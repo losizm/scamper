@@ -234,12 +234,11 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     f"${System.currentTimeMillis}%x-$id%04x-$requestId%04x"
 
   private def addAttributes[T <: HttpMessage](msg: T, conn: HttpClientConnection, correlate: String, absoluteTarget: Uri)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    msg.withAttributes(
-      "scamper.client.message.connection"     -> conn,
-      "scamper.client.message.socket"         -> conn.getSocket(),
-      "scamper.client.message.correlate"      -> correlate,
-      "scamper.client.message.absoluteTarget" -> absoluteTarget
-    )
+    msg
+      .withAttribute("scamper.client.message.connection"     -> conn)
+      .withAttribute("scamper.client.message.socket"         -> conn.getSocket())
+      .withAttribute("scamper.client.message.correlate"      -> correlate)
+      .withAttribute("scamper.client.message.absoluteTarget" -> absoluteTarget)
 
   private def setCloseGuard(msg: HttpMessage, enabled: Boolean): Unit =
     msg.getAttribute[HttpClientConnection]("scamper.client.message.connection")
