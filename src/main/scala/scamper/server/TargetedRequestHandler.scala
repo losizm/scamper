@@ -34,7 +34,7 @@ private object TargetedRequestHandler {
     new TargetedRequestHandler(handler, new Target(path.toUri.normalize.toString), method)
 }
 
-private class TargetedRequestParameters(params: Map[String, String]) extends RequestParameters {
+private class TargetedPathParameters(params: Map[String, String]) extends PathParameters {
   def getString(name: String): String = params.getOrElse(name, throw ParameterNotFound(name))
 
   def getInt(name: String): Int = {
@@ -52,7 +52,7 @@ private class Target(path: String) {
   if (!path.matchesAny("/", "\\*", """(/:\w+|/[\w+\-.~%]+)+""", """(/:\w+|/[\w+\-.~%]+)*/\*\w*"""))
     throw new IllegalArgumentException(s"Invalid target path: $path")
 
-  private val segments = segment(path)
+  private val segments = segmentize(path)
 
   private val regex = path match {
     case "/" => "/"
@@ -70,17 +70,18 @@ private class Target(path: String) {
   }
 
   def getParams(path: String): Map[String, String] =
-    if (params.isEmpty) Map.empty
-    else {
-      val segments = segment(path)
-      params.map {
-        case (name, getValue) => name -> getValue(segments)
-      }.toMap
+    params.isEmpty match {
+      case true  => Map.empty
+      case false =>
+        val segments = segmentize(path)
+        params.map {
+          case (name, getValue) => name -> getValue(segments)
+        }.toMap
     }
 
   def matches(path: String): Boolean = path.matches(regex)
 
-  private def segment(path: String): Seq[String] =
+  private def segmentize(path: String): Seq[String] =
     path match {
       case "/" => Nil
       case "*" => Nil

@@ -15,10 +15,10 @@
  */
 package scamper.server
 
-/** Provides access to server-side request parameters. */
-trait RequestParameters {
+/** Provides access to path parameters. */
+trait PathParameters {
   /**
-   * Gets named parameter as `String`.
+   * Gets parameter value as `String`.
    *
    * @param name parameter name
    *
@@ -27,7 +27,7 @@ trait RequestParameters {
   def getString(name: String): String
 
   /**
-   * Gets named parameter as `Int`.
+   * Gets parameter value as `Int`.
    *
    * @param name parameter name
    *
@@ -37,7 +37,7 @@ trait RequestParameters {
   def getInt(name: String): Int
 
   /**
-   * Gets named parameter as `Long`.
+   * Gets parameter value as `Long`.
    *
    * @param name parameter name
    *

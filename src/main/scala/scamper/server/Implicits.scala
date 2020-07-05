@@ -60,9 +60,9 @@ object Implicits {
 
   /** Adds server-side extension methods to `HttpRequest`. */
   implicit class ServerHttpRequestType(private val req: HttpRequest) extends AnyVal {
-    /** Gets request parameters. */
-    def params(): RequestParameters =
-      new TargetedRequestParameters(req.getAttributeOrElse("scamper.server.request.parameters", Map.empty[String, String]))
+    /** Gets path parameters. */
+    def params(): PathParameters =
+      new TargetedPathParameters(req.getAttributeOrElse("scamper.server.request.parameters", Map.empty[String, String]))
 
     /**
      * Sends interim `100 Continue` response if request includes `Expect` header
