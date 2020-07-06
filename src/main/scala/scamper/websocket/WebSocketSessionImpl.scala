@@ -112,26 +112,20 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
   def send(message: String): Unit =
     conn.write(makeFrame(message.getBytes("UTF-8"), Text))
 
-  def sendAsynchronously[T](message: String)(callback: Try[Unit] => T): Unit =
+  def sendAsync[T](message: String)(callback: Try[Unit] => T): Unit =
     Future(send(message)).onComplete(callback)
 
   def send(message: Array[Byte]): Unit =
     conn.write(makeFrame(message, Binary))
 
-  def sendAsynchronously[T](message: Array[Byte])(callback: Try[Unit] => T): Unit =
+  def sendAsync[T](message: Array[Byte])(callback: Try[Unit] => T): Unit =
     Future(send(message)).onComplete(callback)
 
-  def sendText(message: InputStream): Unit =
-    sendData(message, false)
+  def send(message: InputStream, binary: Boolean = false): Unit =
+    sendData(message, binary)
 
-  def sendTextAsynchronously[T](message: InputStream)(callback: Try[Unit] => T): Unit =
-    Future(sendText(message)).onComplete(callback)
-
-  def sendBinary(message: InputStream): Unit =
-    sendData(message, true)
-
-  def sendBinaryAsynchronously[T](message: InputStream)(callback: Try[Unit] => T): Unit =
-    Future(sendBinary(message)).onComplete(callback)
+  def sendAsync[T](message: InputStream, binary: Boolean = false)(callback: Try[Unit] => T): Unit =
+    Future(send(message, binary)).onComplete(callback)
 
   def ping(data: Array[Byte] = Array.empty): Unit = {
     if (data.size > 125)
@@ -139,7 +133,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     conn.write(makeFrame(data, Ping))
   }
 
-  def pingAsynchronously[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit =
+  def pingAsync[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit =
     Future(ping(data)).onComplete[T](callback)
 
   def pong(data: Array[Byte] = Array.empty): Unit = {
@@ -148,7 +142,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     conn.write(makeFrame(data, Pong))
   }
 
-  def pongAsynchronously[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit =
+  def pongAsync[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit =
     Future(pong(data)).onComplete(callback)
 
   def onText[T](handler: String => T): this.type = {

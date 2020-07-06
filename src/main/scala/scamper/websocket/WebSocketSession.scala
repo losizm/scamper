@@ -129,7 +129,7 @@ trait WebSocketSession {
    * @param message text message
    * @param callback result handler
    */
-  def sendAsynchronously[T](message: String)(callback: Try[Unit] => T): Unit
+  def sendAsync[T](message: String)(callback: Try[Unit] => T): Unit
 
   /**
    * Sends binary message.
@@ -145,39 +145,31 @@ trait WebSocketSession {
    * @param message binary message
    * @param callback result handler
    */
-  def sendAsynchronously[T](message: Array[Byte])(callback: Try[Unit] => T): Unit
+  def sendAsync[T](message: Array[Byte])(callback: Try[Unit] => T): Unit
 
   /**
-   * Sends text message.
+   * Sends message.
    *
-   * @param message input stream to text message
+   * If `binary` is `true`, then binary message is sent; otherwise, text message
+   * is sent.
+   *
+   * @param message input stream to message
+   * @param binary indicator for binary message
    */
-  def sendText(message: InputStream): Unit
+  def send(message: InputStream, binary: Boolean = false): Unit
 
   /**
-   * Sends text message asynchronously and on completion passes result to
-   * supplied callback.
+   * Sends message asynchronously and on completion passes result to supplied
+   * callback.
    *
-   * @param message input stream to text message
+   * If `binary` is `true`, then binary message is sent; otherwise, text message
+   * is sent.
+   *
+   * @param message input stream to message
+   * @param binary indicator for binary message
    * @param callback result handler
    */
-  def sendTextAsynchronously[T](message: InputStream)(callback: Try[Unit] => T): Unit
-
-  /**
-   * Sends binary message.
-   *
-   * @param message input stream to binary message
-   */
-  def sendBinary(message: InputStream): Unit
-
-  /**
-   * Sends binary message asynchronously and on completion passes result to
-   * supplied callback.
-   *
-   * @param message input stream to binary message
-   * @param callback result handler
-   */
-  def sendBinaryAsynchronously[T](message: InputStream)(callback: Try[Unit] => T): Unit
+  def sendAsync[T](message: InputStream, binary: Boolean = false)(callback: Try[Unit] => T): Unit
 
   /**
    * Sends ping message.
@@ -193,7 +185,7 @@ trait WebSocketSession {
    * @param data application data to accompany ping message
    * @param callback result handler
    */
-  def pingAsynchronously[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit
+  def pingAsync[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit
 
   /**
    * Sends pong message.
@@ -209,7 +201,7 @@ trait WebSocketSession {
    * @param data application data to accompany pong message
    * @param callback result handler
    */
-  def pongAsynchronously[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit
+  def pongAsync[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit
 
   /**
    * Sets handler for incoming text message.
