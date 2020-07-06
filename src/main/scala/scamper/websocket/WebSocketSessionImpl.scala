@@ -15,7 +15,7 @@
  */
 package scamper.websocket
 
-import java.io.{ ByteArrayOutputStream, InputStream }
+import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, InputStream }
 import java.net.{ SocketException, SocketTimeoutException }
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -33,8 +33,8 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   private type EitherHandler[T] = Either[(T, Boolean) => Any, T => Any]
 
-  private var _bufferSize: Int = 8192
-  private var _bufferCapacity: Int = Int.MaxValue
+  private var _payloadLimit: Int = 64 * 1024
+  private var _bufferCapacity: Int = 8 * 1024 * 1024
   private var _idleTimeout: Int = 0
 
   private var textHandler: EitherHandler[String] = Left(nullHandler)
@@ -73,21 +73,21 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     this
   }
 
-  def bufferSize(): Int = _bufferSize
+  def payloadLimit(): Int = _payloadLimit
 
-  def bufferSize(size: Int): this.type = {
-    if (size < 0)
+  def payloadLimit(length: Int): this.type = {
+    if (length < 0)
       throw new IllegalArgumentException()
-    _bufferSize = size
+    _payloadLimit = length
     this
   }
 
   def bufferCapacity(): Int = _bufferCapacity
 
-  def bufferCapacity(size: Int): this.type = {
-    if (size < 0)
+  def bufferCapacity(length: Int): this.type = {
+    if (length < 0)
       throw new IllegalArgumentException()
-    _bufferCapacity = size
+    _bufferCapacity = length
     this
   }
 
@@ -110,13 +110,13 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     }
 
   def send(message: String): Unit =
-    conn.write(makeFrame(message.getBytes("UTF-8"), Text))
+    sendData(message.getBytes("UTF-8"), false)
 
   def sendAsync[T](message: String)(callback: Try[Unit] => T): Unit =
     Future(send(message)).onComplete(callback)
 
   def send(message: Array[Byte]): Unit =
-    conn.write(makeFrame(message, Binary))
+    sendData(message, true)
 
   def sendAsync[T](message: Array[Byte])(callback: Try[Unit] => T): Unit =
     Future(send(message)).onComplete(callback)
@@ -256,7 +256,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     while (keepGoing) {
       val frame = conn.read(idleTimeout)
 
-      checkFrame(frame)
+      checkFrame(frame, buffer.size)
 
       val newData = getData(frame)
 
@@ -304,8 +304,20 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   private def nullHandler[T]: (T, Boolean) => Unit = (_, _) => ()
 
-  private def sendData(payload: InputStream, binary: Boolean): Unit = {
-    val buf = new Array[Byte](bufferSize)
+  private def sendData(payload: Array[Byte], binary: Boolean): Unit =
+    (payload.length > payloadLimit) match {
+      case true  =>
+        sendData(new ByteArrayInputStream(payload), binary)
+
+      case false =>
+        val opcode = if (binary) Binary else Text
+        val frame = makeFrame(payload, payload.length, opcode, true)
+
+        synchronized(conn.write(frame))
+    }
+
+  private def sendData(payload: InputStream, binary: Boolean): Unit = synchronized {
+    val buf = new Array[Byte](payloadLimit)
     var len = payload.read(buf)
 
     conn.write(makeFrame(buf, len, if (binary) Binary else Text, false))
@@ -331,8 +343,8 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
       data
     )
 
-  private def checkFrame(frame: WebSocketFrame): Unit = {
-    if (frame.length > bufferCapacity())
+  private def checkFrame(frame: WebSocketFrame, bufferSize: Int = 0): Unit = {
+    if ((bufferSize + frame.length) > bufferCapacity)
       throw WebSocketError(MessageTooBig)
 
     frame.isMasked match {
@@ -346,10 +358,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     }
   }
 
-  private def getData(frame: WebSocketFrame): Array[Byte] = {
-    if (frame.length > Int.MaxValue)
-      throw WebSocketError(MessageTooBig)
-
+  private def getData(frame: WebSocketFrame): Array[Byte] =
     frame.length.toInt match {
       case 0      => Array.empty
       case length =>
@@ -358,5 +367,4 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
         frame.key.map { key => key(data) }
         data
     }
-  }
 }

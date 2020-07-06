@@ -74,32 +74,56 @@ trait WebSocketSession {
    *
    * @param milliseconds idle timeout
    *
+   * @return this session
+   *
    * @note If no activity transpires for specified duration, then session is
    *  closed with status code [[StatusCode.Registry.GoingAway GoingAway]].
-   *
-   * @return this session
    */
   def idleTimeout(milliseconds: Int): this.type
 
   /**
-   * Gets buffer capacity (in bytes) of message.
+   * Gets payload limit of outgoing message.
    *
-   * @note If incoming message or message part exceeds specified capacity, then
-   *  session is closed with status code [[StatusCode.Registry.MessageTooBig MessageTooBig]].
+   * @note If outgoing message exceeds specified limit, then the message is
+   * sent over multiple frames.
+   */
+  def payloadLimit(): Int
+
+  /**
+   * Gets payload limit of outgoing message.
+   *
+   * @param length payload limit (in bytes)
+   *
+   * @return this session
+   *
+   * @note If outgoing message exceeds specified limit, then the message is
+   * sent over multiple frames.
+   */
+  def payloadLimit(length: Int): this.type
+
+  /**
+   * Gets buffer capacity of incoming message.
+   *
+   * @note If message buffer exceeds specified capacity, then session is closed
+   * with status code [[StatusCode.Registry.MessageTooBig MessageTooBig]]. When
+   * handling message parts, the buffer is cleared on each part; otherwise, when
+   * handling a full message, the buffer grows on each part.
    */
   def bufferCapacity(): Int
 
   /**
-   * Sets buffer capacity (in bytes) of message.
+   * Sets buffer capacity of incoming message.
    *
-   * @param size buffer capacity in bytes
-   *
-   * @note If incoming message or message part exceeds specified capacity, then
-   *  session is closed with status code [[StatusCode.Registry.MessageTooBig MessageTooBig]].
+   * @param length buffer capacity (in bytes)
    *
    * @return this session
+   *
+   * @note If message buffer exceeds specified capacity, then session is closed
+   * with status code [[StatusCode.Registry.MessageTooBig MessageTooBig]]. When
+   * handling message parts, the buffer is cleared on each part; otherwise, when
+   * handling a full message, the buffer grows on each part.
    */
-  def bufferCapacity(size: Int): this.type
+  def bufferCapacity(length: Int): this.type
 
   /**
    * Opens session.
