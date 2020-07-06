@@ -48,7 +48,7 @@ trait HttpServer {
   /** Gets header limit. */
   def headerLimit: Int
 
-  /** Gets Keep-Alive parameters. */
+  /** Gets keep-alive parameters. */
   def keepAlive: Option[KeepAliveParameters]
 
   /** Gets host address. */
@@ -77,7 +77,7 @@ trait HttpServer {
 
 /** Provides factory methods for creating `HttpServer`. */
 object HttpServer {
-  /** Gets default server application. */
+  /** Gets new instance of server application. */
   def app(): ServerApplication = new ServerApplication()
 
   /**
@@ -92,6 +92,21 @@ object HttpServer {
     create("0.0.0.0", port)(handler)
 
   /**
+   * Creates secure `HttpServer` at given port using supplied handler.
+   *
+   * The SSL/TLS server connection is created with supplied key and certificate.
+   *
+   * @param port port number
+   * @param key private key
+   * @param cert public key certificate
+   * @param handler request handler
+   *
+   * @return server
+   */
+  def create(port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
+    create("0.0.0.0", port, key, cert)(handler)
+
+  /**
    * Creates `HttpServer` at given host and port using supplied handler.
    *
    * @param host host address
@@ -104,6 +119,22 @@ object HttpServer {
     create(InetAddress.getByName(host), port)(handler)
 
   /**
+   * Creates secure `HttpServer` at given host and port using supplied handler.
+   *
+   * The SSL/TLS server connection is created with supplied key and certificate.
+   *
+   * @param host host address
+   * @param port port number
+   * @param key private key
+   * @param cert public key certificate
+   * @param handler request handler
+   *
+   * @return server
+   */
+  def create(host: String, port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
+    create(InetAddress.getByName(host), port, key, cert)(handler)
+
+  /**
    * Creates `HttpServer` at given host and port using supplied handler.
    *
    * @param host host address
@@ -114,4 +145,20 @@ object HttpServer {
    */
   def create(host: InetAddress, port: Int)(handler: RequestHandler): HttpServer =
     app().incoming(handler).create(host, port)
+
+  /**
+   * Creates secure `HttpServer` at given host and port using supplied handler.
+   *
+   * The SSL/TLS server connection is created with supplied key and certificate.
+   *
+   * @param host host address
+   * @param port port number
+   * @param key private key
+   * @param cert public key certificate
+   * @param handler request handler
+   *
+   * @return server
+   */
+  def create(host: InetAddress, port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
+    app().secure(key, cert).incoming(handler).create(host, port)
 }
