@@ -32,9 +32,9 @@ import RequestMethod.Registry._
  * application is modified and returned. After the desired settings are applied,
  * the server is created using one of several factory methods.
  *
- * @constructor Creates default server application.
+ * @constructor Creates server application.
  *
- * === Default Application ===
+ * === Default Configuration ===
  *
  * | Key         | Value |
  * | ---------   | ----- |
@@ -591,6 +591,6 @@ class ServerApplication {
 
 /** Provides factory methods for `ServerApplication`. */
 object ServerApplication {
-  /** Creates default `ServerApplication`. */
+  /** Gets new instance of `ServerApplication`. */
   def apply(): ServerApplication = new ServerApplication()
 }

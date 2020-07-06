@@ -109,6 +109,8 @@ object Implicits {
      * accordingly.
      *
      * @param file attachment
+     *
+     * @return new response
      */
     def withAttachment(file: File): HttpResponse =
       createWithContentDisposition("attachment", file)
@@ -120,6 +122,8 @@ object Implicits {
      * accordingly.
      *
      * @param file inline content
+     *
+     * @return new response
      */
     def withInline(file: File): HttpResponse =
       createWithContentDisposition("inline", file)

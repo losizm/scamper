@@ -19,7 +19,7 @@ import java.time.Instant
 
 import HeaderHelper._
 
-/** HTTP header */
+/** Defines HTTP header. */
 trait Header {
   /** Gets header name. */
   def name: String
@@ -30,7 +30,7 @@ trait Header {
   /** Gets header value as `Instant`. */
   def dateValue: Instant = DateValue.parse(value)
 
-  /** Gets header value as Long. */
+  /** Gets header value as `Long`. */
   def longValue: Long = value.toLong
 
   /** Returns formatted header. */

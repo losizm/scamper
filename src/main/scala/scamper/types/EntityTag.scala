@@ -28,7 +28,7 @@ trait EntityTag {
   /** Gets entity tag's opaque value. */
   def opaque: String
 
-  /** Test whether entity tag is weak validator. */
+  /** Tests for weak validator. */
   def weak: Boolean
 
   /** Returns formatted entity tag. */

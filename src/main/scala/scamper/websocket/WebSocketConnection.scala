@@ -22,7 +22,7 @@ import java.net.Socket
 
 import javax.net.ssl.SSLSocket
 
-import StatusCode.Registry._
+import StatusCode.Registry.{ MessageTooBig, ProtocolError }
 
 /**
  * Represents endpoint of WebSocket connection.
@@ -39,7 +39,7 @@ class WebSocketConnection private (socket: Socket) {
   private val in = new DataInputStream(socket.getInputStream())
   private val out = new DataOutputStream(socket.getOutputStream())
 
-  /** Tests whether WebSocket connection is using secure transport. */
+  /** Tests for secure WebSocket connection. */
   def isSecure: Boolean = socket.isInstanceOf[SSLSocket]
 
   /** Tests whether WebSocket connection is open. */

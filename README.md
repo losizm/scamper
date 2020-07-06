@@ -48,7 +48,7 @@ writing HTTP messages, and it includes [client](#HTTP-Client) and
 To use **Scamper**, start by adding it as a dependency to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "13.2.1"
+libraryDependencies += "com.github.losizm" %% "scamper" % "14.0.0"
 ```
 
 ## HTTP Messages
@@ -92,7 +92,7 @@ val res = Ok("There is an answer.")
 ## Specialized Header Access
 
 There is a set of methods in `HttpMessage` that provides generalized header
-access. With these methods, the header field name is a `String`, which is
+access. With these methods, the header name is a `String`, which is
 case-insensitive, and the header value is a `String`.
 
 ```scala
@@ -117,7 +117,7 @@ def contentType: MediaType
 /** Gets Content-Type header value if present. */
 def getContentType: Option[MediaType]
 
-/** Tests whether Content-Type header is present. */
+/** Tests for Content-Type header. */
 def hasContentType: Boolean
 
 /** Creates message with Content-Type header set to supplied value. */
@@ -292,8 +292,8 @@ val res = Ok(new File("./index.html")).withContentType("text/html; charset=utf-8
 ### Parsing Body
 
 When handling an incoming message, use an appropriate `BodyParser` to parse the
-message body. There are factory methods available in the `BodyParser` object,
-such as one used for creating a text body parser.
+message body. There are factory methods available, such as one used for creating
+a text body parser.
 
 ```scala
 import scamper.{ BodyParser, HttpMessage }
@@ -319,7 +319,7 @@ import scamper.{ BodyParser, HttpMessage }
 
 case class User(id: Int, name: String)
 
-implicit object UserBodyParser extends BodyParser[User] {
+implicit object UserParser extends BodyParser[User] {
   // Define how to convert JsonObject to User
   implicit val userInput: JsonInput[User] = {
     case json: JsonObject => User(json.getInt("id"), json.getString("name"))
@@ -332,7 +332,7 @@ implicit object UserBodyParser extends BodyParser[User] {
 }
 
 def printUser(message: HttpMessage): Unit = {
-  // Parse message body to User using UserBodyParser implicitly
+  // Parse message body to User (implicitly using UserParser)
   val user = message.as[User]
 
   println(s"uid=${user.id}(${user.name})")
@@ -357,7 +357,7 @@ val formData = Multipart(
   TextPart("title", "Form Of Intellect"),
   TextPart("artist", "Gang Starr"),
   TextPart("album", "Step In The Arena"),
-  FilePart("track", new File("/music/gangstarr/form_of_intellect.m4a"))
+  FilePart("media", new File("/music/gang_starr/form_of_intellect.m4a"))
 )
 
 // Create request with multipart body
@@ -381,7 +381,7 @@ def saveTrack(req: HttpRequest): Unit = {
   val title = multipart.getText("title")
   val artist = multipart.getText("artist")
   val album = multipart.getText("album")
-  val track = multipart.getFile("track")
+  val track = multipart.getFile("media")
 
   ...
 }
@@ -649,7 +649,7 @@ blocks before a `SocketTimeoutException` is thrown.
 The `continueTimeout` specifies how long (in milliseconds) the client waits
 for a `100 Continue` response from the server before the client sends the
 request body. This behavior is effected only if the request includes an
-`Expect: 100-Continue` header.
+`Expect` header set to `100-Continue`.
 
 The `cookieStore` is used to store cookies included in HTTP responses. Using the
 cookie store, the client automatically adds the appropriate cookies to each
@@ -770,6 +770,8 @@ second span, the session will be closed automatically.
 Before the session begins reading incoming messages, it must first be opened.
 And, to kick things off, a simple text message is sent to the server.
 
+See [WebSocketSession](https://losizm.github.io/scamper/latest/api/scamper/websocket/WebSocketSession.html)
+in scaladoc for additional details.
 
 ## HTTP Server
 
@@ -883,7 +885,7 @@ app.incoming { req =>
 
 Note the order in which handlers are applied matters. For instance, in the
 example above, you'd swap the order of handlers if you wanted to log GET and
-HEAD requests only, which means all other requests would immediately be sent
+HEAD requests only, and all other requests would immediately be sent
 **405 Method Not Allowed** and never make it to the request logger.
 
 Also note a request handler is not restricted to returning the same request it
@@ -1065,19 +1067,19 @@ the session to your handler.
 ```scala
 app.websocket("/hello") { session =>
   // Log ping message and send corresponding pong
-  session.onPing { _ =>
+  session.onPing { data =>
     session.logger.info("Received ping message.")
     session.pong()
   }
 
   // Log pong message
-  session.onPong { _ =>
+  session.onPong { data =>
     session.logger.info("Received pong message.")
   }
 
-  // Send message and close session after receiving text message
-  session.onText { msg =>
-    session.logger.info(s"Received text message: $msg")
+  // Log text message and close session after sending reply
+  session.onText { message =>
+    session.logger.info(s"Received text message: $message")
     session.send("Goodbye.")
     session.close()
   }

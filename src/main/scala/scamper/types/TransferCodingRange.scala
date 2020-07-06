@@ -32,22 +32,22 @@ trait TransferCodingRange {
   /** Gets coding parameters. */
   def params: Map[String, String]
 
-  /** Tests whether name is chunked. */
+  /** Tests for chunked. */
   def isChunked: Boolean = name == "chunked"
 
-  /** Tests whether name is compress. */
+  /** Tests for compress. */
   def isCompress: Boolean = name == "compress"
 
-  /** Tests whether name is deflate. */
+  /** Tests for deflate. */
   def isDeflate: Boolean = name == "deflate"
 
-  /** Tests whether name is gzip. */
+  /** Tests for gzip. */
   def isGzip: Boolean = name == "gzip"
 
-  /** Tests whether name is {@code trailers}. */
+  /** Tests for trailers. */
   def isTrailers: Boolean = name == "trailers"
 
-  /** Tests whether supplied transfer coding matches range. */
+  /** Tests whether range matches supplied transfer coding. */
   def matches(coding: TransferCoding): Boolean
 
   /** Returns formatted transfer coding range. */

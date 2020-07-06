@@ -19,14 +19,14 @@ import scala.util.Try
 
 import Validate.notNull
 
-/** HTTP message start line */
+/** Defines HTTP message start line. */
 sealed trait StartLine {
   /** Gets HTTP version. */
   def version: HttpVersion
 }
 
 /**
- * HTTP request line
+ * Defines HTTP request line.
  *
  * @see [[StatusLine]]
  */
@@ -88,7 +88,7 @@ object RequestLine {
 private case class RequestLineImpl(method: RequestMethod, target: Uri, version: HttpVersion) extends RequestLine
 
 /**
- * HTTP status line
+ * Defines HTTP status line.
  *
  * @see [[RequestLine]]
  */

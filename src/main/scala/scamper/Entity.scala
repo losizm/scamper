@@ -26,7 +26,7 @@ trait Entity {
   /** Gets length in bytes if known. */
   def getLength(): Option[Long]
 
-  /** Tests whether entity is known empty. */
+  /** Tests for empty (if known). */
   def isKnownEmpty(): Boolean =
     getLength().contains(0)
 

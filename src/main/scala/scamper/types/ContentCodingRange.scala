@@ -29,22 +29,22 @@ trait ContentCodingRange {
   /** Gets coding weight. */
   def weight: Float
 
-  /** Tests whether name is compress. */
+  /** Tests for compress. */
   def isCompress: Boolean = name == "compress"
 
-  /** Tests whether name is deflate. */
+  /** Tests for deflate. */
   def isDeflate: Boolean = name == "deflate"
 
-  /** Tests whether name is gzip. */
+  /** Tests for gzip. */
   def isGzip: Boolean = name == "gzip"
 
-  /** Tests whether name is identity. */
+  /** Tests for identity. */
   def isIdentity: Boolean = name == "identity"
 
-  /** Tests whether name is wildcard (*). */
+  /** Tests for wildcard (*). */
   def isWildcard: Boolean = name == "*"
 
-  /** Tests whether supplied content coding matches range. */
+  /** Tests whether range matches supplied content coding. */
   def matches(coding: ContentCoding): Boolean
 
   /** Returns formatted content coding range. */

@@ -27,10 +27,10 @@ trait LanguageRange {
   /** Gets language weight. */
   def weight: Float
 
-  /** Tests whether language tag is wildcard (*). */
+  /** Tests for wildcard (*). */
   def isWildcard: Boolean = tag == "*"
 
-  /** Tests whether supplied language tag matches range. */
+  /** Tests whether range matches supplied language tag. */
   def matches(tag: LanguageTag): Boolean
 
   /** Returns formatted language range. */

@@ -29,10 +29,10 @@ trait CharsetRange {
   /** Gets charset weight. */
   def weight: Float
 
-  /** Tests whether charset is wildcard (*). */
+  /** Tests for wildcard (*). */
   def isWildcard: Boolean = charset == "*"
 
-  /** Tests whether supplied charset matches range. */
+  /** Tests whether range matches supplied charset. */
   def matches(charset: String): Boolean
 
   /** Returns formatted charset range. */

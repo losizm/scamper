@@ -87,6 +87,7 @@ import websocket._
  * printf("Host: %s%n", server.host)
  * printf("Port: %d%n", server.port)
  *
+ * // Run server for 60 seconds
  * Thread.sleep(60 * 1000)
  *
  * // Close server when done

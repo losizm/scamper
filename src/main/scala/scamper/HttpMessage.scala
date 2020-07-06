@@ -15,7 +15,7 @@
  */
 package scamper
 
-/** HTTP message */
+/** Defines HTTP message. */
 sealed trait HttpMessage {
   /** Type of start line used in message */
   type LineType <: StartLine
@@ -35,8 +35,8 @@ sealed trait HttpMessage {
   /**
    * Gets message attributes.
    *
-   * Attributes are arbitrary values associated with message and are not part of
-   * transmitted message.
+   * @note Attributes are arbitrary values associated with message and are not
+   * part of transmitted message.
    */
   def attributes: Map[String, Any]
 
@@ -44,7 +44,7 @@ sealed trait HttpMessage {
   def as[T](implicit parser: BodyParser[T]): T =
     parser.parse(this)
 
-  /** Tests whether header with given name is present. */
+  /** Tests for header with given name. */
   def hasHeader(name: String): Boolean =
     headers.exists(_.name.equalsIgnoreCase(name))
 
@@ -71,7 +71,7 @@ sealed trait HttpMessage {
   def getHeaders(name: String): Seq[Header] =
     headers.filter(_.name.equalsIgnoreCase(name))
 
-  /** Gets value of all headers with given name. */
+  /** Gets values of all headers with given name. */
   def getHeaderValues(name: String): Seq[String] =
     getHeaders(name).map(_.value)
 
@@ -95,7 +95,7 @@ sealed trait HttpMessage {
 }
 
 /**
- * HTTP request
+ * Defines HTTP request.
  *
  * @see [[HttpResponse]]
  */
@@ -143,21 +143,21 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
   def withQuery(query: QueryString): HttpRequest
 
   /**
-   * Creates request with new query parameters.
+   * Creates request with new query using supplied parameters.
    *
    * @return new request
    */
   def withQuery(params: Map[String, Seq[String]]): HttpRequest
 
   /**
-   * Creates request with new query parameters.
+   * Creates request with new query using supplied parameters.
    *
    * @return new request
    */
   def withQuery(params: Seq[(String, String)]): HttpRequest
 
   /**
-   * Creates request with new query parameters.
+   * Creates request with new query using supplied parameters.
    *
    * @return new request
    */
@@ -184,7 +184,7 @@ object HttpRequest {
 }
 
 /**
- * HTTP response
+ * Defines HTTP response.
  *
  * @see [[HttpRequest]]
  */
@@ -195,7 +195,7 @@ trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse] {
   def status: ResponseStatus = startLine.status
 
   /**
-   * Creates response with new response status.
+   * Creates response with new status.
    *
    * @return new response
    */

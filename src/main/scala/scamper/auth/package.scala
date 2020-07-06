@@ -146,7 +146,7 @@ package object auth {
     def getAuthenticationInfo: Option[Map[String, String]] =
       response.getHeaderValue("Authentication-Info").map(AuthParams.parse)
 
-    /** Tests whether Authentication-Info header is present. */
+    /** Tests for Authentication-Info header. */
     def hasAuthenticationInfo: Boolean = response.hasHeader("Authentication-Info")
 
     /** Creates new response setting Authentication-Info header to supplied values. */
@@ -175,7 +175,7 @@ package object auth {
     def getAuthorization: Option[Credentials] =
       request.getHeaderValue("Authorization").map(Credentials.parse)
 
-    /** Tests whether Authorization header is present. */
+    /** Tests for Authorization header. */
     def hasAuthorization: Boolean = request.hasHeader("Authorization")
 
     /** Creates new request setting Authorization header to supplied value. */
@@ -197,7 +197,7 @@ package object auth {
     def getBasic: Option[BasicCredentials] =
       getAuthorization.collect { case credentials: BasicCredentials => credentials }
 
-    /** Tests whether basic authorization is present. */
+    /** Tests for basic authorization. */
     def hasBasic: Boolean = getBasic.isDefined
 
     /** Creates new request with basic authorization. */
@@ -224,7 +224,7 @@ package object auth {
     def getBearer: Option[BearerCredentials] =
       getAuthorization.collect { case credentials: BearerCredentials => credentials }
 
-    /** Tests whether bearer authorization is present. */
+    /** Tests for bearer authorization. */
     def hasBearer: Boolean = getBearer.isDefined
 
     /** Creates new request with bearer authorization. */
@@ -253,7 +253,7 @@ package object auth {
           case seq => Some(seq)
         }
 
-    /** Tests whether Proxy-Authenticate header is present. */
+    /** Tests for Proxy-Authenticate. */
     def hasProxyAuthenticate: Boolean = response.hasHeader("Proxy-Authenticate")
 
     /** Creates new response setting Proxy-Authenticate header to supplied values. */
@@ -279,7 +279,7 @@ package object auth {
     def getProxyBasic: Option[BasicChallenge] =
       proxyAuthenticate.collectFirst { case challenge: BasicChallenge => challenge }
 
-    /** Tests whether basic proxy authentication is present. */
+    /** Tests for basic proxy authentication. */
     def hasProxyBasic: Boolean = getProxyBasic.isDefined
 
     /** Creates new response with basic proxy authentication. */
@@ -306,7 +306,7 @@ package object auth {
     def getProxyBearer: Option[BearerChallenge] =
       proxyAuthenticate.collectFirst { case challenge: BearerChallenge => challenge }
 
-    /** Tests whether bearer proxy authentication is present. */
+    /** Tests for bearer proxy authentication. */
     def hasProxyBearer: Boolean = getProxyBearer.isDefined
 
     /** Creates new response with bearer proxy authentication. */
@@ -336,7 +336,7 @@ package object auth {
     def getProxyAuthenticationInfo: Option[Map[String, String]] =
       response.getHeaderValue("Proxy-Authentication-Info").map(AuthParams.parse)
 
-    /** Tests whether Proxy-Authentication-Info header is present. */
+    /** Tests for Proxy-Authentication-Info header. */
     def hasProxyAuthenticationInfo: Boolean = response.hasHeader("Proxy-Authentication-Info")
 
     /** Creates new response setting Proxy-Authentication-Info header to supplied values. */
@@ -366,7 +366,7 @@ package object auth {
     def getProxyAuthorization: Option[Credentials] =
       request.getHeaderValue("Proxy-Authorization").map(Credentials.parse)
 
-    /** Tests whether Proxy-Authorization header is present. */
+    /** Tests for Proxy-Authorization header. */
     def hasProxyAuthorization: Boolean = request.hasHeader("Proxy-Authorization")
 
     /**
@@ -390,7 +390,7 @@ package object auth {
     def getProxyBasic: Option[BasicCredentials] =
       getProxyAuthorization.collect { case credentials: BasicCredentials => credentials }
 
-    /** Tests whether basic proxy authorization is present. */
+    /** Tests for basic proxy authorization. */
     def hasProxyBasic: Boolean = getProxyBasic.isDefined
 
     /** Creates new request with basic proxy authorization. */
@@ -417,7 +417,7 @@ package object auth {
     def getProxyBearer: Option[BearerCredentials] =
       getProxyAuthorization.collect { case credentials: BearerCredentials => credentials }
 
-    /** Tests whether bearer proxy authorization is present. */
+    /** Tests for bearer proxy authorization. */
     def hasProxyBearer: Boolean = getProxyBearer.isDefined
 
     /** Creates new request with bearer proxy authorization. */
@@ -446,7 +446,7 @@ package object auth {
           case seq => Some(seq)
         }
 
-    /** Tests whether WWW-Authenticate header is present. */
+    /** Tests for WWW-Authenticate header. */
     def hasWwwAuthenticate: Boolean = response.hasHeader("WWW-Authenticate")
 
     /** Creates new response setting WWW-Authenticate header to supplied values. */
@@ -472,7 +472,7 @@ package object auth {
     def getBasic: Option[BasicChallenge] =
       wwwAuthenticate.collectFirst { case challenge: BasicChallenge => challenge }
 
-    /** Tests whether basic authentication is present. */
+    /** Tests for basic authentication. */
     def hasBasic: Boolean = getBasic.isDefined
 
     /** Creates new response with basic authentication. */
@@ -499,7 +499,7 @@ package object auth {
     def getBearer: Option[BearerChallenge] =
       wwwAuthenticate.collectFirst { case challenge: BearerChallenge => challenge }
 
-    /** Tests whether bearer authentication is present. */
+    /** Tests for bearer authentication. */
     def hasBearer: Boolean = getBearer.isDefined
 
     /** Creates new response with bearer authentication. */

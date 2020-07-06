@@ -38,7 +38,7 @@ trait WebSocketSession {
   /** Gets logger associated with session. */
   def logger: Logger
 
-  /** Tests whether WebSocket is using secure transport. */
+  /** Tests for secure WebSocket session. */
   def isSecure: Boolean
 
   /**

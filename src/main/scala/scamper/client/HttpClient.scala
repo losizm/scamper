@@ -195,16 +195,17 @@ trait HttpClient {
 
 /** Provides factory methods for creating `HttpClient`. */
 object HttpClient {
-  /** Gets default client settings. */
+  /** Gets new instance of client settings. */
   def settings(): ClientSettings = new ClientSettings()
 
-  /** Creates `HttpClient` using default settings. */
+  /** Creates `HttpClient` using default configuration. */
   def apply(): HttpClient = settings().create()
 
   /**
    * Sends request and passes response to supplied handler.
    *
-   * The request is sent using an `HttpClient` created with default settings.
+   * The request is sent using an `HttpClient` created with default
+   * configuration.
    *
    * @param request HTTP request
    * @param handler response handler

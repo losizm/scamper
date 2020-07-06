@@ -86,13 +86,13 @@ trait BearerChallenge extends Challenge {
   /** Gets `error_uri` parameter. */
   def errorUri: Option[Uri]
 
-  /** Tests whether `invalid_request` error. */
+  /** Tests for `invalid_request` error. */
   def isInvalidRequest: Boolean
 
-  /** Tests whether `invalid_token` error. */
+  /** Tests for `invalid_token` error. */
   def isInvalidToken: Boolean
 
-  /** Test whether `insufficient_scope` error. */
+  /** Tests for `insufficient_scope` error. */
   def isInsufficientScope: Boolean
 }
 

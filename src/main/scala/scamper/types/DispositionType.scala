@@ -29,13 +29,13 @@ trait DispositionType {
   /** Gets disposition parameters. */
   def params: Map[String, String]
 
-  /** Tests whether disposition type is attachment. */
+  /** Tests for attachment. */
   def isAttachment: Boolean = name == "attachment"
 
-  /** Tests whether disposition type is inline. */
+  /** Tests for inline. */
   def isInline: Boolean = name == "inline"
 
-  /** Tests whether disposition type is form-data. */
+  /** Tests for form-data. */
   def isFormData: Boolean = name == "form-data"
 
   /** Returns formatted content disposition type and parameters. */

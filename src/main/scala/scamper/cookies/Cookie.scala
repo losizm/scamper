@@ -21,7 +21,7 @@ import scamper.DateValue
 
 import CookieGrammar._
 
-/** HTTP Cookie */
+/** Defines HTTP cookie. */
 sealed trait Cookie {
   /** Gets cookie name. */
   def name: String
@@ -31,7 +31,7 @@ sealed trait Cookie {
 }
 
 /**
- * HTTP request cookie
+ * Defines HTTP request cookie.
  *
  * @see [[SetCookie]]
  */
@@ -61,7 +61,7 @@ object PlainCookie {
 private case class PlainCookieImpl(name: String, value: String) extends PlainCookie
 
 /**
- * HTTP response cookie
+ * Defines HTTP response cookie.
  *
  * @see [[PlainCookie]]
  */
@@ -81,10 +81,10 @@ trait SetCookie extends Cookie {
    */
   def maxAge: Option[Long]
 
-  /** Tests whether cookie should be limited to secure channels. */
+  /** Tests for secure cookie. */
   def secure: Boolean
 
-  /** Tests whether cookie should be limited to HTTP requests. */
+  /** Tests HTTP only cookie. */
   def httpOnly: Boolean
 
   /** Converts to PlainCookie using name-value pair. */

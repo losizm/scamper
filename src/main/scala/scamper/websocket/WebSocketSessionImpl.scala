@@ -24,7 +24,6 @@ import scala.util.Try
 
 import scamper.{ Auxiliary, HttpRequest, Uri }
 import scamper.logging.Logger
-import scamper.websocket._
 import scamper.websocket.Opcode.Registry._
 import scamper.websocket.StatusCode.Registry._
 

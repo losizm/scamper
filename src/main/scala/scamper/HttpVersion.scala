@@ -17,7 +17,7 @@ package scamper
 
 import scala.util.Try
 
-/** HTTP version */
+/** Defines HTTP version. */
 trait HttpVersion {
   /** Gets version major. */
   def major: Int

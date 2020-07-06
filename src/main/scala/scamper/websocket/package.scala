@@ -42,9 +42,8 @@ package object websocket {
   /** Provides status code of WebSocket error. */
   case class WebSocketError(statusCode: StatusCode) extends HttpException(statusCode.toString)
 
-
   /**
-   * Test whether request is WebSocket upgrade.
+   * Tests request for WebSocket upgrade.
    *
    * @param req request
    */
@@ -54,7 +53,7 @@ package object websocket {
     }
 
   /**
-   * Test whether response is WebSocket upgrade.
+   * Tests response for WebSocket upgrade.
    *
    * @param res response
    */
@@ -69,7 +68,6 @@ package object websocket {
     random.nextBytes(key)
     Base64.encodeToString(key)
   }
-
 
   /**
    * Generates `Sec-WebSocket-Accept` header value using supplied WebSocket key.
@@ -141,7 +139,7 @@ package object websocket {
     def getSecWebSocketAccept: Option[String] =
       response.getHeaderValue("Sec-WebSocket-Accept")
 
-    /** Tests whether Sec-WebSocket-Accept header is present. */
+    /** Tests for Sec-WebSocket-Accept header. */
     def hasSecWebSocketAccept: Boolean =
       response.hasHeader("Sec-WebSocket-Accept")
 
@@ -170,7 +168,7 @@ package object websocket {
         .map(WebSocketExtension.parseAll)
         .reduceLeftOption(_ ++ _)
 
-    /** Tests whether Sec-WebSocket-Extensions header is present. */
+    /** Tests for Sec-WebSocket-Extensions header. */
     def hasSecWebSocketExtensions: Boolean =
       message.hasHeader("Sec-WebSocket-Extensions")
 
@@ -201,7 +199,7 @@ package object websocket {
     def getSecWebSocketKey: Option[String] =
       request.getHeaderValue("Sec-WebSocket-Key")
 
-    /** Tests whether Sec-WebSocket-Key header is present. */
+    /** Tests for Sec-WebSocket-Key header. */
     def hasSecWebSocketKey: Boolean = request.hasHeader("Sec-WebSocket-Key")
 
     /** Creates new request setting Sec-WebSocket-Key header to supplied value. */
@@ -227,7 +225,7 @@ package object websocket {
     def getSecWebSocketProtocol: Option[Seq[String]] =
       message.getHeaderValue("Sec-WebSocket-Protocol").map(ListParser.apply)
 
-    /** Tests whether Sec-WebSocket-Protocol header is present. */
+    /** Tests for Sec-WebSocket-Protocol header. */
     def hasSecWebSocketProtocol: Boolean =
       message.hasHeader("Sec-WebSocket-Protocol")
 
@@ -258,7 +256,7 @@ package object websocket {
     def getSecWebSocketProtocolClient: Option[String] =
       request.getHeaderValue("Sec-WebSocket-Protocol-Client")
 
-    /** Tests whether Sec-WebSocket-Protocol-Client header is present. */
+    /** Tests for Sec-WebSocket-Protocol-Client header. */
     def hasSecWebSocketProtocolClient: Boolean =
       request.hasHeader("Sec-WebSocket-Protocol-Client")
 
@@ -285,7 +283,7 @@ package object websocket {
     def getSecWebSocketProtocolServer: Option[String] =
       response.getHeaderValue("Sec-WebSocket-Protocol-Server")
 
-    /** Tests whether Sec-WebSocket-Protocol-Server header is present. */
+    /** Tests for Sec-WebSocket-Protocol-Server header. */
     def hasSecWebSocketProtocolServer: Boolean =
       response.hasHeader("Sec-WebSocket-Protocol-Server")
 
@@ -312,7 +310,7 @@ package object websocket {
     def getSecWebSocketVersion: Option[String] =
       message.getHeaderValue("Sec-WebSocket-Version")
 
-    /** Tests whether Sec-WebSocket-Version header is present. */
+    /** Tests for Sec-WebSocket-Version header. */
     def hasSecWebSocketVersion: Boolean = message.hasHeader("Sec-WebSocket-Version")
 
     /** Creates new message setting Sec-WebSocket-Version header to supplied value. */
@@ -339,7 +337,7 @@ package object websocket {
       request.getHeaderValue("Sec-WebSocket-Version-Client")
         .map(ListParser.apply)
 
-    /** Tests whether Sec-WebSocket-Version-Client header is present. */
+    /** Tests for Sec-WebSocket-Version-Client header. */
     def hasSecWebSocketVersionClient: Boolean =
       request.hasHeader("Sec-WebSocket-Version-Client")
 
@@ -371,7 +369,7 @@ package object websocket {
       response.getHeaderValue("Sec-WebSocket-Version-Server")
         .map(ListParser.apply)
 
-    /** Tests whether Sec-WebSocket-Version-Server header is present. */
+    /** Tests for Sec-WebSocket-Version-Server header. */
     def hasSecWebSocketVersionServer: Boolean =
       response.hasHeader("Sec-WebSocket-Version-Server")
 

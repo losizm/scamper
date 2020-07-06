@@ -126,13 +126,13 @@ trait QueryString {
     getValues(name).map(_.toLong)
 
   /**
-   * Tests whether query string contains parameter with given name.
+   * Tests for parameter with given name.
    *
    * @param name parameter name
    */
   def contains(name: String): Boolean
 
-  /** Tests whether query string is empty. */
+  /** Tests for empty. */
   def isEmpty: Boolean
 
   /**

@@ -39,28 +39,28 @@ trait MediaType {
   /** Gets media type parameters. */
   def params: Map[String, String]
 
-  /** Tests whether main type is text. */
+  /** Tests main type for text. */
   def isText: Boolean = mainType == "text"
 
-  /** Tests whether main type is audio. */
+  /** Tests main type for audio. */
   def isAudio: Boolean = mainType == "audio"
 
-  /** Tests whether main type is video. */
+  /** Tests main type for video. */
   def isVideo: Boolean = mainType == "video"
 
-  /** Tests whether main type is image. */
+  /** Tests main type for image. */
   def isImage: Boolean = mainType == "image"
 
-  /** Tests whether main type is font. */
+  /** Tests main type for font. */
   def isFont: Boolean = mainType == "font"
 
-  /** Tests whether main type is application. */
+  /** Tests main type for application. */
   def isApplication: Boolean = mainType == "application"
 
-  /** Tests whether main type is multipart. */
+  /** Tests main type for multipart. */
   def isMultipart: Boolean = mainType == "multipart"
 
-  /** Tests whether main type is message. */
+  /** Tests main type for message. */
   def isMessage: Boolean = mainType == "message"
 
   /** Converts to MediaRange with supplied weight. */

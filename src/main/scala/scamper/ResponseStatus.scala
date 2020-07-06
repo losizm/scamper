@@ -18,7 +18,7 @@ package scamper
 import scala.collection.mutable.TreeMap
 
 /**
- * HTTP response status
+ * Defines HTTP response status.
  *
  * @see [[ResponseStatus.Registry]]
  */

@@ -60,7 +60,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(MediaRange.apply))
 
-    /** Tests whether Accept header is present. */
+    /** Tests for Accept header. */
     def hasAccept: Boolean = request.hasHeader("Accept")
 
     /** Creates new request setting Accept header to supplied values. */
@@ -90,7 +90,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(CharsetRange.parse))
 
-    /** Tests whether Accept-Charset header is present. */
+    /** Tests for Accept-Charset header. */
     def hasAcceptCharset: Boolean = request.hasHeader("AcceptCharset")
 
     /** Creates new request setting Accept-Charset header to supplied values. */
@@ -120,7 +120,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(ContentCodingRange.parse))
 
-    /** Tests whether Accept-Encoding header is present. */
+    /** Tests for Accept-Encoding header. */
     def hasAcceptEncoding: Boolean = message.hasHeader("Accept-Encoding")
 
     /** Creates new message setting Accept-Encoding header to supplied values. */
@@ -151,7 +151,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(LanguageRange.parse))
 
-    /** Tests whether Accept-Language header is present. */
+    /** Tests for Accept-Language header. */
     def hasAcceptLanguage: Boolean = request.hasHeader("Accept-Language")
 
     /** Creates new request setting Accept-Language header to supplied values. */
@@ -181,7 +181,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(MediaType.apply))
 
-    /** Tests whether Accept-Patch header is present. */
+    /** Tests for Accept-Patch header. */
     def hasAcceptPatch: Boolean = response.hasHeader("Accept-Patch")
 
     /** Creates new response setting Accept-Patch header to supplied values. */
@@ -209,7 +209,7 @@ package object headers {
     def getAcceptRanges: Option[Seq[String]] =
       response.getHeaderValue("Accept-Ranges").map(ListParser.apply)
 
-    /** Tests whether Accept-Ranges header is present. */
+    /** Tests for Accept-Ranges header. */
     def hasAcceptRanges: Boolean = response.hasHeader("Accept-Ranges")
 
     /** Creates new response setting Accept-Ranges header to supplied values. */
@@ -237,7 +237,7 @@ package object headers {
     def getAge: Option[Long] =
       response.getHeader("Age").map(_.longValue)
 
-    /** Tests whether Age header is present. */
+    /** Tests for Age header. */
     def hasAge: Boolean = response.hasHeader("Age")
 
     /** Creates new response setting Age header to supplied value. */
@@ -263,7 +263,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(RequestMethod.apply))
 
-    /** Tests whether Allow header is present. */
+    /** Tests for Allow header. */
     def hasAllow: Boolean = response.hasHeader("Allow")
 
     /** Creates new response setting Allow header to supplied values. */
@@ -291,7 +291,7 @@ package object headers {
     def getCacheControl: Option[Seq[CacheDirective]] =
       message.getHeaderValue("Cache-Control").map(CacheDirective.parseAll)
 
-    /** Tests whether Cache-Control header is present. */
+    /** Tests for Cache-Control header. */
     def hasCacheControl: Boolean = message.hasHeader("Cache-Control")
 
     /** Creates new message setting Cache-Control header to supplied values. */
@@ -321,7 +321,7 @@ package object headers {
     def getContentDisposition: Option[DispositionType] =
       response.getHeaderValue("Content-Disposition").map(DispositionType.parse)
 
-    /** Tests whether Content-Disposition header is present. */
+    /** Tests for Content-Disposition header. */
     def hasContentDisposition: Boolean = response.hasHeader("Content-Disposition")
 
     /** Creates new response setting Content-Disposition header to supplied value. */
@@ -347,7 +347,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(ContentCoding.apply))
 
-    /** Tests whether Content-Encoding header is present. */
+    /** Tests for Content-Encoding header. */
     def hasContentEncoding: Boolean = message.hasHeader("Content-Encoding")
 
     /** Creates new message setting Content-Encoding header to supplied values. */
@@ -378,7 +378,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(LanguageTag.parse))
 
-    /** Tests whether Content-Language header is present. */
+    /** Tests for Content-Language header. */
     def hasContentLanguage: Boolean = message.hasHeader("Content-Language")
 
     /** Creates new message setting Content-Language header to supplied values. */
@@ -407,7 +407,7 @@ package object headers {
     def getContentLength: Option[Long] =
       message.getHeader("Content-Length").map(_.longValue)
 
-    /** Tests whether Content-Length header is present. */
+    /** Tests for Content-Length header. */
     def hasContentLength: Boolean = message.hasHeader("Content-Length")
 
     /** Creates new message setting Content-Length header to supplied value. */
@@ -433,7 +433,7 @@ package object headers {
     def getContentLocation: Option[Uri] =
       message.getHeaderValue("Content-Location").map(Uri(_))
 
-    /** Tests whether Content-Location header is present. */
+    /** Tests for Content-Location header. */
     def hasContentLocation: Boolean = message.hasHeader("Content-Location")
 
     /** Creates new message setting Content-Location header to supplied value. */
@@ -459,7 +459,7 @@ package object headers {
     def getContentRange: Option[ByteContentRange] =
       message.getHeaderValue("Content-Range").map(ByteContentRange.parse)
 
-    /** Tests whether Content-Range header is present. */
+    /** Tests for Content-Range header. */
     def hasContentRange: Boolean = message.hasHeader("Content-Range")
 
     /** Creates new message setting Content-Range header to supplied value. */
@@ -484,7 +484,7 @@ package object headers {
     def getContentType: Option[MediaType] =
       message.getHeaderValue("Content-Type").map(MediaType.apply)
 
-    /** Tests whether Content-Type header is present. */
+    /** Tests for Content-Type header. */
     def hasContentType: Boolean = message.hasHeader("Content-Type")
 
     /** Creates new message setting Content-Type header to supplied value. */
@@ -509,7 +509,7 @@ package object headers {
     def getConnection: Option[Seq[String]] =
       message.getHeaderValue("Connection").map(ListParser.apply)
 
-    /** Tests whether Connection header is present. */
+    /** Tests for Connection header. */
     def hasConnection: Boolean = message.hasHeader("Connection")
 
     /** Creates new message setting Connection header to supplied values. */
@@ -538,7 +538,7 @@ package object headers {
     def getDate: Option[Instant] =
       message.getHeader("Date").map(_.dateValue)
 
-    /** Tests whether Date header is present. */
+    /** Tests for Date header. */
     def hasDate: Boolean = message.hasHeader("Date")
 
     /** Creates new message setting Date header to supplied value. */
@@ -563,7 +563,7 @@ package object headers {
     def getETag: Option[EntityTag] =
       response.getHeaderValue("ETag").map(EntityTag.parse)
 
-    /** Tests whether ETag header is present. */
+    /** Tests for ETag header. */
     def hasETag: Boolean = response.hasHeader("ETag")
 
     /** Creates new response setting ETag header to supplied value. */
@@ -587,7 +587,7 @@ package object headers {
     def getEarlyData: Option[Int] =
       request.getHeaderValue("Early-Data").map(_.toInt)
 
-    /** Tests whether Early-Data header is present. */
+    /** Tests for Early-Data header. */
     def hasEarlyData: Boolean = request.hasHeader("Early-Data")
 
     /** Creates new request setting Early-Data header to supplied value. */
@@ -611,7 +611,7 @@ package object headers {
     def getExpect: Option[String] =
       request.getHeaderValue("Expect")
 
-    /** Tests whether Expect header is present. */
+    /** Tests for Expect header. */
     def hasExpect: Boolean = request.hasHeader("Expect")
 
     /** Creates new request setting Expect header to supplied value. */
@@ -635,7 +635,7 @@ package object headers {
     def getExpires: Option[Instant] =
       response.getHeader("Expires").map(_.dateValue)
 
-    /** Tests whether Expires header is present. */
+    /** Tests for Expires header. */
     def hasExpires: Boolean = response.hasHeader("Expires")
 
     /** Creates new response setting Expires header to supplied value. */
@@ -659,7 +659,7 @@ package object headers {
     def getFrom: Option[String] =
       request.getHeaderValue("From")
 
-    /** Tests whether From header is present. */
+    /** Tests for From header. */
     def hasFrom: Boolean = request.hasHeader("From")
 
     /** Creates new request setting From header to supplied value. */
@@ -683,7 +683,7 @@ package object headers {
     def getHost: Option[String] =
       request.getHeaderValue("Host")
 
-    /** Tests whether Host header is present. */
+    /** Tests for Host header. */
     def hasHost: Boolean = request.hasHeader("Host")
 
     /** Creates new request setting Host header to supplied value. */
@@ -709,7 +709,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(EntityTag.parse))
 
-    /** Tests whether If-Match header is present. */
+    /** Tests for If-Match header. */
     def hasIfMatch: Boolean = request.hasHeader("If-Match")
 
     /** Creates new request setting If-Match header to supplied values. */
@@ -738,7 +738,7 @@ package object headers {
     def getIfModifiedSince: Option[Instant] =
       request.getHeader("If-Modified-Since").map(_.dateValue)
 
-    /** Tests whether If-Modified-Since header is present. */
+    /** Tests for If-Modified-Since header. */
     def hasIfModifiedSince: Boolean = request.hasHeader("If-Modified-Since")
 
     /** Creates new request setting If-Modified-Since header to supplied value. */
@@ -764,7 +764,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(EntityTag.parse))
 
-    /** Tests whether If-None-Match header is present. */
+    /** Tests for If-None-Match header. */
     def hasIfNoneMatch: Boolean = request.hasHeader("If-None-Match")
 
     /** Creates new request setting If-None-Match header to supplied values. */
@@ -799,7 +799,7 @@ package object headers {
         }.get
       }
 
-    /** Tests whether If-Range header is present. */
+    /** Tests for If-Range header. */
     def hasIfRange: Boolean = request.hasHeader("If-Range")
 
     /** Creates new request setting If-Range header to supplied value. */
@@ -832,7 +832,7 @@ package object headers {
     def getIfUnmodifiedSince: Option[Instant] =
       request.getHeader("If-Unmodified-Since").map(_.dateValue)
 
-    /** Tests whether If-Unmodified-Since header is present. */
+    /** Tests for If-Unmodified-Since header. */
     def hasIfUnmodifiedSince: Boolean = request.hasHeader("If-Unmodified-Since")
 
     /**
@@ -859,7 +859,7 @@ package object headers {
     def getKeepAlive: Option[KeepAliveParameters] =
       message.getHeaderValue("Keep-Alive").map(KeepAliveParameters.parse)
 
-    /** Tests whether Keep-Alive header is present. */
+    /** Tests for Keep-Alive header. */
     def hasKeepAlive: Boolean = message.hasHeader("Keep-Alive")
 
     /** Creates new message setting Keep-Alive header to supplied value. */
@@ -885,7 +885,7 @@ package object headers {
     def getLastModified: Option[Instant] =
       response.getHeader("Last-Modified").map(_.dateValue)
 
-    /** Tests whether Last-Modified header is present. */
+    /** Tests for Last-Modified header. */
     def hasLastModified: Boolean = response.hasHeader("Last-Modified")
 
     /** Creates new response setting Last-Modified header to supplied value. */
@@ -909,7 +909,7 @@ package object headers {
     def getLink: Option[Seq[LinkValue]] =
       response.getHeaderValue("Link").map(LinkValue.parseAll)
 
-    /** Tests whether Link header is present. */
+    /** Tests for Link header. */
     def hasLink: Boolean = response.hasHeader("Link")
 
     /** Creates new response setting Link header to supplied values. */
@@ -937,7 +937,7 @@ package object headers {
     def getLocation: Option[Uri] =
       response.getHeaderValue("Location").map(Uri(_))
 
-    /** Tests whether Location header is present. */
+    /** Tests for Location header. */
     def hasLocation: Boolean = response.hasHeader("Location")
 
     /** Creates new response setting Location header to supplied value. */
@@ -961,7 +961,7 @@ package object headers {
     def getMaxForwards: Option[Long] =
       request.getHeader("Max-Forwards").map(_.longValue)
 
-    /** Tests whether Max-Forwards header is present. */
+    /** Tests for Max-Forwards header. */
     def hasMaxForwards: Boolean = request.hasHeader("Max-Forwards")
 
     /** Creates new request setting Max-Forwards header to supplied value. */
@@ -985,7 +985,7 @@ package object headers {
     def getPragma: Option[Seq[PragmaDirective]] =
       request.getHeaderValue("Pragma").map(PragmaDirective.parseAll)
 
-    /** Tests whether Pragma header is present. */
+    /** Tests for Pragma header. */
     def hasPragma: Boolean = request.hasHeader("Pragma")
 
     /** Creates new request setting Pragma header to supplied values. */
@@ -1017,7 +1017,7 @@ package object headers {
           case seq => Some(seq)
         }
 
-    /** Tests whether Prefer header is present. */
+    /** Tests for Prefer header. */
     def hasPrefer: Boolean = request.hasHeader("Prefer")
 
     /** Creates new request setting Prefer header to supplied values. */
@@ -1047,7 +1047,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(Preference.apply))
 
-    /** Tests whether Preference-Applied header is present. */
+    /** Tests for Preference-Applied header. */
     def hasPreferenceApplied: Boolean = response.hasHeader("Preference-Applied")
 
     /** Creates new response setting Preference-Applied header to supplied values. */
@@ -1075,7 +1075,7 @@ package object headers {
     def getRange: Option[ByteRange] =
       request.getHeaderValue("Range").map(ByteRange.parse)
 
-    /** Tests whether Range header is present. */
+    /** Tests for Range header. */
     def hasRange: Boolean = request.hasHeader("Range")
 
     /** Creates new request setting Range header to supplied value. */
@@ -1099,7 +1099,7 @@ package object headers {
     def getReferer: Option[Uri] =
       request.getHeaderValue("Referer").map(Uri(_))
 
-    /** Tests whether Referer header is present. */
+    /** Tests for Referer header. */
     def hasReferer: Boolean = request.hasHeader("Referer")
 
     /** Creates new request setting Referer header to supplied value. */
@@ -1123,7 +1123,7 @@ package object headers {
     def getRetryAfter: Option[Instant] =
       response.getHeader("Retry-After").map(_.dateValue)
 
-    /** Tests whether Retry-After header is present. */
+    /** Tests for Retry-After header. */
     def hasRetryAfter: Boolean = response.hasHeader("Retry-After")
 
     /** Creates new response setting Retry-After header to supplied value. */
@@ -1147,7 +1147,7 @@ package object headers {
     def getServer: Option[Seq[ProductType]] =
       response.getHeaderValue("Server").map(ProductType.parseAll)
 
-    /** Tests whether Server header is present. */
+    /** Tests for Server header. */
     def hasServer: Boolean = response.hasHeader("Server")
 
     /** Creates new response setting Server header to supplied values. */
@@ -1177,7 +1177,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(TransferCodingRange.parse))
 
-    /** Tests whether TE header is present. */
+    /** Tests for TE header. */
     def hasTE: Boolean = request.hasHeader("TE")
 
     /** Creates new request setting TE header to supplied values. */
@@ -1205,7 +1205,7 @@ package object headers {
     def getTrailer: Option[Seq[String]] =
       message.getHeaderValue("Trailer").map(ListParser.apply)
 
-    /** Tests whether Trailer header is present. */
+    /** Tests for Trailer header. */
     def hasTrailer: Boolean = message.hasHeader("Trailer")
 
     /** Creates new message setting Trailer header to supplied values. */
@@ -1236,7 +1236,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(TransferCoding.parse))
 
-    /** Tests whether Transfer-Encoding header is present. */
+    /** Tests for Transfer-Encoding header. */
     def hasTransferEncoding: Boolean = message.hasHeader("Transfer-Encoding")
 
     /** Creates new message setting Transfer-Encoding header to supplied values. */
@@ -1267,7 +1267,7 @@ package object headers {
         .map(ListParser.apply)
         .map(_.map(Protocol.parse))
 
-    /** Tests whether Upgrade header is present. */
+    /** Tests for Upgrade header. */
     def hasUpgrade: Boolean = message.hasHeader("Upgrade")
 
     /** Creates new message setting Upgrade header to supplied values. */
@@ -1296,7 +1296,7 @@ package object headers {
     def getUserAgent: Option[Seq[ProductType]] =
       request.getHeaderValue("User-Agent").map(ProductType.parseAll)
 
-    /** Tests whether User-Agent header is present. */
+    /** Tests for User-Agent header. */
     def hasUserAgent: Boolean = request.hasHeader("User-Agent")
 
     /** Creates new request setting User-Agent header to supplied value. */
@@ -1324,7 +1324,7 @@ package object headers {
     def getVary: Option[Seq[String]] =
       response.getHeaderValue("Vary").map(ListParser.apply)
 
-    /** Tests whether Vary header is present. */
+    /** Tests for Vary header. */
     def hasVary: Boolean = response.hasHeader("Vary")
 
     /** Creates new response setting Vary header to supplied values. */
@@ -1352,7 +1352,7 @@ package object headers {
     def getVia: Option[Seq[ViaType]] =
       response.getHeaderValue("Via").map(ViaType.parseAll)
 
-    /** Tests whether Via header is present. */
+    /** Tests for Via header. */
     def hasVia: Boolean = response.hasHeader("Via")
 
     /** Creates new response setting Via header to supplied values. */
@@ -1380,7 +1380,7 @@ package object headers {
     def getWarning: Option[Seq[WarningType]] =
       response.getHeaderValue("Warning").map(WarningType.parseAll)
 
-    /** Tests whether Warning header is present. */
+    /** Tests for Warning header. */
     def hasWarning: Boolean = response.hasHeader("Warning")
 
     /** Creates new response setting Warning header to supplied values. */
