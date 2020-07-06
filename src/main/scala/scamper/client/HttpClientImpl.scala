@@ -42,7 +42,7 @@ private object HttpClientImpl {
     bufferSize: Int = 8192,
     readTimeout: Int = 30000,
     continueTimeout: Int = 1000,
-    cookieStore: CookieStore = CookieStore.noop(),
+    cookieStore: CookieStore = CookieStore.alwaysEmpty(),
     outgoing: Seq[RequestFilter] = Nil,
     incoming: Seq[ResponseFilter] = Nil,
     secureSocketFactory: SSLSocketFactory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]

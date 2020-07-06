@@ -30,9 +30,9 @@ import scamper.types.ContentCodingRange
  * settings are modified and returned. After applying the desired settings, the
  * client is created using a factory method.
  *
- * @constructor Creates default client setttings.
+ * @constructor Creates client settings.
  *
- * === Default Settings ===
+ * === Default Configuration ===
  *
  * | Key             | Value |
  * | --------------- | ----- |
@@ -40,7 +40,7 @@ import scamper.types.ContentCodingRange
  * | bufferSize      | `8192` |
  * | readTimeout     | `30000` |
  * | continueTimeout | `1000` |
- * | coookieStore    | `CookieStore.noop()` |
+ * | coookieStore    | `CookieStore.alwaysEmpty()` |
  * | trust           | ''(Not set)'' |
  * | incoming        | ''(Not set)'' |
  * | outgoing        | ''(Not set)'' |
@@ -49,7 +49,7 @@ import scamper.types.ContentCodingRange
 class ClientSettings {
   private var settings = HttpClientImpl.Settings()
 
-  /** Resets to default settings. */
+  /** Resets to default configuration. */
   def reset(): this.type = synchronized {
     settings = HttpClientImpl.Settings()
     this
@@ -154,12 +154,12 @@ class ClientSettings {
     this
   }
 
-  /** Creates client using current settings. */
+  /** Creates client using current configuration. */
   def create(): HttpClient = synchronized { HttpClientImpl(settings) }
 }
 
 /** Provides factory method for `ClientSettings`. */
 object ClientSettings {
-  /** Creates default `ClientSettings`. */
+  /** Gets new instance of `ClientSettings`. */
   def apply(): ClientSettings = new ClientSettings()
 }

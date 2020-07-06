@@ -27,7 +27,7 @@ import scamper.Uri
  * Provides utilities for persistent cookies.
  *
  * @see [[CookieStore$.apply CookieStore.apply]],
- *  [[CookieStore$.noop CookieStore.noop]]
+ *  [[CookieStore$.alwaysEmpty CookieStore.alwaysEmpty]]
  */
 sealed trait CookieStore {
   /** Gets number of cookies in cookie store. */
@@ -89,7 +89,7 @@ object CookieStore {
    * The cookie store never adds any cookies in `put`, nor does it retrieve any
    * in `get`.
    */
-  def noop(): CookieStore = NoopCookieStore
+  def alwaysEmpty(): CookieStore = AlwaysEmptyCookieStore
 
   /**
    * Creates `CookieStore` with initial collection of cookies.
@@ -100,7 +100,7 @@ object CookieStore {
     new DefaultCookieStore(new ArrayBuffer ++= cookies)
 }
 
-private object NoopCookieStore extends CookieStore {
+private object AlwaysEmptyCookieStore extends CookieStore {
   val size = 0
   def clear(expiredOnly: Boolean) =  this
   def list(): Seq[PersistentCookie] = Nil
