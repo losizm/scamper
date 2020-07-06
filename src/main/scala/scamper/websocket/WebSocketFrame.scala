@@ -34,7 +34,7 @@ trait WebSocketFrame {
   /** Gets payload length. */
   def length: Long
 
-  /** Gets input stream to payload data. */
+  /** Gets input stream to payload. */
   def payload: InputStream
 
   /** Tests for presence of masking key. */
@@ -68,30 +68,30 @@ object WebSocketFrame {
    * @param opcode frame opcode
    * @param key masking key
    * @param length payload length
-   * @param payload input stream to payload data
+   * @param payload input stream to payload
    */
   def apply(isFinal: Boolean, opcode: Opcode, key: Option[MaskingKey], length: Long, payload: InputStream): WebSocketFrame = {
     if (opcode.isControl) {
       if (!isFinal)
-        throw new IllegalArgumentException("control frame must be final")
+        throw new IllegalArgumentException("isFinal not set for control frame")
 
       if (length > 125)
-        throw new IllegalArgumentException("control frame payload must not exceed 125 bytes")
+        throw new IllegalArgumentException("length greater than 125 bytes for control frame")
     }
 
     if (key == null)
-      throw new NullPointerException()
+      throw new NullPointerException("key")
 
     key.foreach { value =>
       if (value == null)
-        throw new IllegalArgumentException("Enclosed masking key must not be null")
+        throw new NullPointerException("key")
     }
 
     if (length < 0)
-      throw new IllegalArgumentException("length must be nonnegative")
+      throw new IllegalArgumentException("length less than zero")
 
     if (payload == null)
-      throw new NullPointerException()
+      throw new NullPointerException("payload")
 
     new WebSocketFrameImpl(isFinal, opcode, key, length, new BoundedInputStream(payload, length))
   }
@@ -133,11 +133,8 @@ object WebSocketFrame {
    *
    * @note If there is `Some` masking key, it is used to mask status code.
    */
-  def apply(statusCode: StatusCode, key: Option[MaskingKey]): WebSocketFrame = {
-    val data = statusCode.toData
-    key.foreach(key => key(data))
-    apply(true, Close, key, data.size, new ByteArrayInputStream(data))
-  }
+  def apply(statusCode: StatusCode, key: Option[MaskingKey]): WebSocketFrame =
+    apply(true, Close, key, 2, statusCode.toData)
 }
 
 private case class WebSocketFrameImpl(

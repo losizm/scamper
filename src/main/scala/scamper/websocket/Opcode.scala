@@ -24,6 +24,9 @@ trait Opcode {
   /** Gets value. */
   def value: Int
 
+  /** Gets meaning. */
+  def meaning: String
+
   /** Tests for control frame opcode. */
   def isControl: Boolean = value >= 8
 }
@@ -37,22 +40,22 @@ object Opcode {
   /** Contains registered WebSocket opcodes. */
   object Registry {
     /** 0 &ndash; Continuation Frame */
-    val Continuation: Opcode = OpcodeImpl(0)
+    val Continuation: Opcode = OpcodeImpl(0, "Continuation")
 
     /** 1 &ndash; Text Frame */
-    val Text: Opcode = OpcodeImpl(1)
+    val Text: Opcode = OpcodeImpl(1, "Text")
 
     /** 2 &ndash; Binary Frame */
-    val Binary: Opcode = OpcodeImpl(2)
+    val Binary: Opcode = OpcodeImpl(2, "Binary")
 
     /** 8 &ndash; Close Frame */
-    val Close: Opcode = OpcodeImpl(8)
+    val Close: Opcode = OpcodeImpl(8, "Close")
 
     /** 9 &ndash; Ping Frame */
-    val Ping: Opcode = OpcodeImpl(9)
+    val Ping: Opcode = OpcodeImpl(9, "Ping")
 
     /** 10 &ndash; Pong Frame */
-    val Pong: Opcode = OpcodeImpl(10)
+    val Pong: Opcode = OpcodeImpl(10, "Pong")
   }
 
   /** Gets `Opcode` for given value, if registered. */
@@ -83,6 +86,6 @@ object Opcode {
     Some(code.value)
 }
 
-private case class OpcodeImpl(value: Int) extends Opcode {
-  override lazy val toString: String = s"Opcode($value)"
+private case class OpcodeImpl(value: Int, meaning: String) extends Opcode {
+  override lazy val toString: String = s"$value ($meaning)"
 }

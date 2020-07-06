@@ -67,7 +67,7 @@ object MaskingKey {
    */
   def apply(value: Int): MaskingKey = {
     if (value == 0)
-      throw new IllegalArgumentException("value cannot be 0")
+      throw new IllegalArgumentException("value is 0")
     new MaskingKeyImpl(value)
   }
 
@@ -81,10 +81,10 @@ object MaskingKey {
 }
 
 private case class MaskingKeyImpl(value: Int) extends MaskingKey {
-  override lazy val toString: String = s"MaskingKey($value)"
+  override lazy val toString: String = f"MaskingKey(0x$value%08x)"
 
   def apply(data: Array[Byte], length: Int, position: Long): Array[Byte] = {
-    val key = Array[Byte](
+    val key = Array(
       { (value & 0xff000000) >> 24 }.toByte,
       { (value & 0x00ff0000) >> 16 }.toByte,
       { (value & 0x0000ff00) >>  8 }.toByte,

@@ -100,7 +100,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
       Try(doClose(statusCode.toData))
 
       try
-        if (statusCode != NoStatusPresent && statusCode != AbnormalClosure && statusCode != TlsHandshakeFailure)
+        if (statusCode != NoStatusReceived && statusCode != AbnormalClosure && statusCode != TlsHandshake)
           conn.write(makeFrame(statusCode.toData, Close))
       catch {
         case err: Exception => if (!closeReceived.get) doError(err)
@@ -206,8 +206,11 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
         }
       }
     } recover {
-      case WebSocketError(statusCode) =>
-        close(statusCode)
+      case err: WebSocketError =>
+        if (!closeSent.get()) {
+          doError(err)
+          close(err.statusCode)
+        }
 
       case _: SocketTimeoutException =>
         close(GoingAway)
@@ -292,7 +295,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   private def doClose(data: Array[Byte]): Unit =
     if (closeReceived.compareAndSet(false, true)) {
-      val statusCode = StatusCode.get(data.take(2)).getOrElse(NoStatusPresent)
+      val statusCode = StatusCode.get(data.take(2)).getOrElse(NoStatusReceived)
 
       try
         closeHandler.foreach { handle =>
@@ -311,7 +314,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
       case false =>
         val opcode = if (binary) Binary else Text
-        val frame = makeFrame(payload, payload.length, opcode, true)
+        val frame = makeFrame(payload, opcode)
 
         synchronized(conn.write(frame))
     }

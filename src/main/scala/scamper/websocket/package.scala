@@ -40,7 +40,7 @@ package object websocket {
   case class WebSocketHandshakeFailure(reason: String) extends HttpException(reason)
 
   /** Provides status code of WebSocket error. */
-  case class WebSocketError(statusCode: StatusCode) extends HttpException(s"${statusCode.value} ($statusCode)")
+  case class WebSocketError(statusCode: StatusCode) extends HttpException(statusCode.toString)
 
 
   /**
