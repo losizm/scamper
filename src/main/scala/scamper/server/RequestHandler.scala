@@ -22,9 +22,9 @@ trait RequestHandler {
   /**
    * Handles incoming request.
    *
-   * If handler satisfies the request, then it returns an HttpResponse.
-   * Otherwise, it returns an HttpRequest, which can be either the
-   * original request or an alternate one.
+   * If handler satisfies the request, then it returns a response. Otherwise, it
+   * returns a request, which can be either the original request or an alternate
+   * one.
    */
   def apply(request: HttpRequest): HttpMessage
 
@@ -87,9 +87,8 @@ object RequestHandler {
    * fallbacks.
    *
    * @param one request handler
-   * @param two another request handler
    * @param more additional request handlers
    */
-  def coalesce(one: RequestHandler, two: RequestHandler, more: RequestHandler*): RequestHandler =
-    coalesce(one +: two +: more)
+  def coalesce(one: RequestHandler, more: RequestHandler*): RequestHandler =
+    coalesce(one +: more)
 }

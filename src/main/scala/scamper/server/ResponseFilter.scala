@@ -71,9 +71,8 @@ object ResponseFilter {
    * passed to its successor.
    *
    * @param one response filter
-   * @param two another response filter
    * @param more additional response filters
    */
-  def chain(one: ResponseFilter, two: ResponseFilter, more: ResponseFilter*): ResponseFilter =
-    chain(one +: two +: more)
+  def chain(one: ResponseFilter, more: ResponseFilter*): ResponseFilter =
+    chain(one +: more)
 }
