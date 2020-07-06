@@ -150,7 +150,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     this
   }
 
-  def onPartialText[T](handler: (String, Boolean) => T): this.type = {
+  def onTextPart[T](handler: (String, Boolean) => T): this.type = {
     textHandler = if (handler == null) Left(nullHandler) else Left(handler)
     this
   }
@@ -160,7 +160,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     this
   }
 
-  def onPartialBinary[T](handler: (Array[Byte], Boolean) => T): this.type = {
+  def onBinaryPart[T](handler: (Array[Byte], Boolean) => T): this.type = {
     binaryHandler = if (handler == null) Left(nullHandler) else Left(handler)
     this
   }

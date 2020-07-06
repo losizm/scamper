@@ -239,14 +239,13 @@ trait WebSocketSession {
   /**
    * Sets handler for incoming text message part.
    *
-   * The handler accepts a partial message and an indicator specifying if it's
-   * the last part.
+   * The handler accepts a message part and an indicator for the last part.
    *
    * @param handler text message handler
    *
    * @return this session
    */
-  def onPartialText[T](handler: (String, Boolean) => T): this.type
+  def onTextPart[T](handler: (String, Boolean) => T): this.type
 
   /**
    * Sets handler for incoming binary message.
@@ -260,14 +259,13 @@ trait WebSocketSession {
   /**
    * Sets handler for incoming binary message part.
    *
-   * The handler accepts a partial message and an indicator specifying if it's
-   * the last part.
+   * The handler accepts a message part and an indicator for the last part.
    *
    * @param handler binary message handler
    *
    * @return this session
    */
-  def onPartialBinary[T](handler: (Array[Byte], Boolean) => T): this.type
+  def onBinaryPart[T](handler: (Array[Byte], Boolean) => T): this.type
 
   /**
    * Sets handler for incoming ping message.
