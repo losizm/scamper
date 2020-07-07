@@ -53,7 +53,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   def isSecure: Boolean = conn.isSecure
 
-  def state(): ReadyState =
+  def state: ReadyState =
     conn.isOpen match {
       case true  =>
         openInvoked.get match {
@@ -63,7 +63,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
       case false => ReadyState.Closed
     }
 
-  def idleTimeout(): Int = _idleTimeout
+  def idleTimeout: Int = _idleTimeout
 
   def idleTimeout(milliseconds: Int): this.type = {
     if (milliseconds < 0)
@@ -72,7 +72,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     this
   }
 
-  def payloadLimit(): Int = _payloadLimit
+  def payloadLimit: Int = _payloadLimit
 
   def payloadLimit(length: Int): this.type = {
     if (length < 0)
@@ -81,7 +81,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     this
   }
 
-  def bufferCapacity(): Int = _bufferCapacity
+  def bufferCapacity: Int = _bufferCapacity
 
   def bufferCapacity(length: Int): this.type = {
     if (length < 0)

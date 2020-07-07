@@ -83,7 +83,7 @@ private class ChunkedInputStream(in: InputStream) extends InputStream {
 
     val regex = "(\\p{XDigit}+)(\\s*;\\s*.+=.+)*".r
 
-    readLine match {
+    readLine() match {
       case regex(size, _) =>
         Integer.parseInt(size, 16) match {
           case 0 => readLine(); 0

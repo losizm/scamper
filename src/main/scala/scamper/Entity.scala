@@ -24,14 +24,14 @@ import Validate.notNull
 /** Representation of message body. */
 trait Entity {
   /** Gets length in bytes if known. */
-  def getLength(): Option[Long]
+  def getLength: Option[Long]
 
   /** Tests for empty (if known). */
-  def isKnownEmpty(): Boolean =
-    getLength().contains(0)
+  def isKnownEmpty: Boolean =
+    getLength.contains(0)
 
   /** Gets input stream to entity. */
-  def getInputStream(): InputStream
+  def getInputStream: InputStream
 
   /**
    * Gets input stream and passes it to supplied function.

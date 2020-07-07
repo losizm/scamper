@@ -54,7 +54,7 @@ trait ResponseStatus {
     HttpResponse(this, Nil, body)
 
   /** Returns formatted response status. */
-  override def toString(): String = s"$code $reason"
+  override lazy val toString: String = s"$code $reason"
 }
 
 /**

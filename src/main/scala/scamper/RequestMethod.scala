@@ -29,7 +29,7 @@ trait RequestMethod {
     HttpRequest(this, target, Nil, Entity.empty)
 
   /** Returns method name. */
-  override def toString(): String = name
+  override lazy val toString: String = name
 }
 
 /**

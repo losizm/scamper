@@ -42,7 +42,7 @@ private object HttpClientImpl {
     bufferSize: Int = 8192,
     readTimeout: Int = 30000,
     continueTimeout: Int = 1000,
-    cookieStore: CookieStore = CookieStore.alwaysEmpty(),
+    cookieStore: CookieStore = CookieStore.alwaysEmpty,
     outgoing: Seq[RequestFilter] = Nil,
     incoming: Seq[ResponseFilter] = Nil,
     secureSocketFactory: SSLSocketFactory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
@@ -268,7 +268,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   private def toBodyRequest(request: HttpRequest): HttpRequest =
     request.getTransferEncoding.map { encoding =>
       request.withTransferEncoding(encoding.filterNot(_.isChunked) :+ TransferCoding("chunked"))
-        .removeContentLength
+        .removeContentLength()
     }.orElse {
       request.getContentLength.map {
         case 0          => request.withBody(Entity.empty)

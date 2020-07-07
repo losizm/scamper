@@ -37,10 +37,10 @@ object Implicits {
      * Each incoming request is assigned a tag (i.e., correlate), which is later
      * reassigned to its outgoing response.
      */
-    def correlate(): String = msg.getAttribute("scamper.server.message.correlate").get
+    def correlate: String = msg.getAttribute("scamper.server.message.correlate").get
 
     /** Gets message socket. */
-    def socket(): Socket = msg.getAttribute("scamper.server.message.socket").get
+    def socket: Socket = msg.getAttribute("scamper.server.message.socket").get
 
     /**
      * Gets request count.
@@ -48,20 +48,20 @@ object Implicits {
      * The request count is the number of requests that have been received from
      * current connection.
      */
-    def requestCount(): Int = msg.getAttribute("scamper.server.message.requestCount").get
+    def requestCount: Int = msg.getAttribute("scamper.server.message.requestCount").get
 
     /**
      * Gets server logger.
      *
      * @see [[HttpServer.logger HttpServer.logger()]]
      */
-    def logger(): Logger = msg.getAttributeOrElse("scamper.server.message.logger", NullLogger)
+    def logger: Logger = msg.getAttributeOrElse("scamper.server.message.logger", NullLogger)
   }
 
   /** Adds server-side extension methods to `HttpRequest`. */
   implicit class ServerHttpRequestType(private val req: HttpRequest) extends AnyVal {
     /** Gets path parameters. */
-    def params(): PathParameters =
+    def params: PathParameters =
       new TargetedPathParameters(req.getAttributeOrElse("scamper.server.request.parameters", Map.empty[String, String]))
 
     /**
@@ -147,7 +147,7 @@ object Implicits {
   /** Adds server-side extension methods to `WebSocketSession`. */
   implicit class ServerWebSocketSessionType(private val session: WebSocketSession) extends AnyVal {
     /** Gets request from which WebSocket session was created. */
-    def request(): HttpRequest =
+    def request: HttpRequest =
       session.asInstanceOf[WebSocketSessionImpl].getRequest()
   }
 }

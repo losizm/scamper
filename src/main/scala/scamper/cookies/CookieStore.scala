@@ -31,7 +31,10 @@ import scamper.Uri
  */
 sealed trait CookieStore {
   /** Gets number of cookies in cookie store. */
-  def size(): Int
+  def size: Int
+
+  /** Lists all persistent cookies. */
+  def list: Seq[PersistentCookie]
 
   /**
    * Clears all persistent cookies.
@@ -41,9 +44,6 @@ sealed trait CookieStore {
    * @return this cookie store
    */
   def clear(expiredOnly: Boolean = false): this.type
-
-  /** Lists all persistent cookies. */
-  def list(): Seq[PersistentCookie]
 
   /**
    * Gets cookies that should be used in request to supplied target.
@@ -89,7 +89,7 @@ object CookieStore {
    * The cookie store never adds any cookies in `put`, nor does it retrieve any
    * in `get`.
    */
-  def alwaysEmpty(): CookieStore = AlwaysEmptyCookieStore
+  def alwaysEmpty: CookieStore = AlwaysEmptyCookieStore
 
   /**
    * Creates `CookieStore` with initial collection of cookies.
@@ -102,8 +102,8 @@ object CookieStore {
 
 private object AlwaysEmptyCookieStore extends CookieStore {
   val size = 0
+  def list: Seq[PersistentCookie] = Nil
   def clear(expiredOnly: Boolean) =  this
-  def list(): Seq[PersistentCookie] = Nil
   def get(target: Uri): Seq[PlainCookie] = Nil
   def put(target: Uri, cookies: Seq[SetCookie]) = this
 }
@@ -114,7 +114,11 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
   private val ordering: Ordering[PersistentCookie] =
     Ordering.by(cookie => (-cookie.path.length, cookie.creation))
 
-  def size(): Int = synchronized { collection.size }
+  def size: Int = synchronized { collection.size }
+
+  def list: Seq[PersistentCookie] = synchronized {
+    collection.toSeq
+  }
 
   def clear(expiredOnly: Boolean = false): this.type = synchronized {
     expiredOnly match {
@@ -122,10 +126,6 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
       case false => collection.clear()
     }
     this
-  }
-
-  def list(): Seq[PersistentCookie] = synchronized {
-    collection.toSeq
   }
 
   def get(target: Uri): Seq[PlainCookie] = synchronized {

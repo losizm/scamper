@@ -24,7 +24,7 @@ object Implicits {
   /** Adds client-side extension methods to `HttpMessage`. */
   implicit class ClientHttpMessageType(private val msg: HttpMessage) extends AnyVal {
     /** Gets message socket. */
-    def socket(): Socket = msg.getAttribute("scamper.client.message.socket").get
+    def socket: Socket = msg.getAttribute("scamper.client.message.socket").get
 
     /**
      * Gets message correlate.
@@ -32,7 +32,7 @@ object Implicits {
      * Each outgoing request is assigned a tag (i.e., correlate), which is later
      * reassigned to its incoming response.
      */
-    def correlate(): String = msg.getAttribute("scamper.client.message.correlate").get
+    def correlate: String = msg.getAttribute("scamper.client.message.correlate").get
 
     /**
      * Gets absolute target.
@@ -40,7 +40,7 @@ object Implicits {
      * The absolute target (i.e., absolute URI) is assigned to each outgoing
      * request and later reassigned to its incoming response.
      */
-    def absoluteTarget(): Uri = msg.getAttribute("scamper.client.message.absoluteTarget").get
+    def absoluteTarget: Uri = msg.getAttribute("scamper.client.message.absoluteTarget").get
   }
 
   /** Adds client-side extension methods to `HttpRequest`. */

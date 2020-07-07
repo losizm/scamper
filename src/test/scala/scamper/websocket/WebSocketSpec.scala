@@ -33,10 +33,10 @@ class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(checkWebSocketRequest(req) == req)
 
     assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.withMethod(POST)) }
-    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.removeUpgrade) }
-    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.removeConnection) }
-    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.removeSecWebSocketKey) }
-    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.removeSecWebSocketVersion) }
+    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.removeUpgrade()) }
+    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.removeConnection()) }
+    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.removeSecWebSocketKey()) }
+    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.removeSecWebSocketVersion()) }
 
     assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.withUpgrade("no-websocket")) }
     assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.withConnection("no-upgrade")) }
@@ -51,8 +51,8 @@ class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec {
       .withSecWebSocketAccept(acceptWebSocketKey(req.secWebSocketKey))
 
     assert(checkWebSocketHandshake(req, res))
-    assert(!checkWebSocketHandshake(req, res.removeUpgrade))
-    assert(!checkWebSocketHandshake(req, res.removeSecWebSocketAccept))
+    assert(!checkWebSocketHandshake(req, res.removeUpgrade()))
+    assert(!checkWebSocketHandshake(req, res.removeSecWebSocketAccept()))
 
     assert(!checkWebSocketHandshake(req, res.withUpgrade("no-websocket")))
     assert(!checkWebSocketHandshake(req, res.withSecWebSocketAccept("123")))

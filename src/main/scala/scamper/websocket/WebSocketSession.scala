@@ -55,7 +55,7 @@ trait WebSocketSession {
    * If session is [[ReadyState.Closed Closed]], it can neither receive nor send
    * messages.
    */
-  def state(): ReadyState
+  def state: ReadyState
 
   /**
    * Gets WebSocket idle timeout in milliseconds.
@@ -65,7 +65,7 @@ trait WebSocketSession {
    * @note If no activity transpires for specified duration, then session is
    *  closed with status code [[StatusCode.Registry.GoingAway GoingAway]].
    */
-  def idleTimeout(): Int
+  def idleTimeout: Int
 
   /**
    * Sets WebSocket idle timeout.
@@ -87,7 +87,7 @@ trait WebSocketSession {
    * @note If outgoing message exceeds specified limit, then the message is
    * sent over multiple frames.
    */
-  def payloadLimit(): Int
+  def payloadLimit: Int
 
   /**
    * Gets payload limit of outgoing message.
@@ -109,7 +109,7 @@ trait WebSocketSession {
    * handling message parts, the buffer is cleared on each part; otherwise, when
    * handling a full message, the buffer grows on each part.
    */
-  def bufferCapacity(): Int
+  def bufferCapacity: Int
 
   /**
    * Sets buffer capacity of incoming message.

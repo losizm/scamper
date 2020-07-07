@@ -485,7 +485,7 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)(id: Long, app
     private def prepare(res: HttpResponse): HttpResponse =
       if (res.hasTransferEncoding)
         res.withTransferEncoding(res.transferEncoding.filterNot(_.isChunked) :+ chunked)
-          .removeContentLength
+          .removeContentLength()
       else if (res.hasContentLength)
         res
       else
