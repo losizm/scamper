@@ -15,7 +15,7 @@
  */
 package scamper.websocket
 
-import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, InputStream }
+import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, EOFException, InputStream }
 import java.net.{ SocketException, SocketTimeoutException }
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -365,7 +365,17 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
       case 0      => Array.empty
       case length =>
         val data = new Array[Byte](length)
-        frame.payload.read(data)
+        var position = 0
+
+        while (position < length) {
+          val count = frame.payload.read(data, position, length - position)
+
+          if (count == -1)
+            throw new EOFException(s"Truncation dectected: Payload length ($position) is less than declared length ($length)")
+
+          position += count
+        }
+
         frame.key.map { key => key(data) }
         data
     }
