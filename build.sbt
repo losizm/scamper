@@ -1,6 +1,6 @@
 organization := "com.github.losizm"
 name := "scamper"
-version := "14.0.0"
+version := "14.0.1"
 
 description := "The HTTP library for Scala"
 homepage := Some(url("https://github.com/losizm/scamper"))
@@ -44,4 +44,3 @@ publishTo := {
     case false => Some("releases" at s"$nexus/service/local/staging/deploy/maven2")
   }
 }
-
