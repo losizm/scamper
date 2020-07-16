@@ -99,7 +99,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
       Try(doClose(statusCode.toData))
 
       try
-        if (statusCode != NoStatusReceived && statusCode != AbnormalClosure && statusCode != TlsHandshake)
+        if (!statusCode.reserved)
           conn.write(makeFrame(statusCode.toData, Close))
       catch {
         case err: Exception => if (!closeReceived.get) doError(err)
@@ -214,15 +214,11 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
       case _: SocketTimeoutException =>
         close(GoingAway)
 
-      case err: SocketException =>
+      case err =>
         if (!closeSent.get()) {
           doError(err)
           close(AbnormalClosure)
         }
-
-      case err =>
-        doError(err)
-        close(AbnormalClosure)
     }
 
   private def doText(data: Array[Byte], last: Boolean): Unit =
