@@ -27,6 +27,9 @@ trait StatusCode {
   /** Gets meaning. */
   def meaning: String
 
+  /** Indicator for reserved value. */
+  def reserved: Boolean
+
   /** Converts value to 2-byte data array. */
   def toData: Array[Byte] =
     Array(
@@ -47,19 +50,19 @@ object StatusCode {
      * 1000 indicates a normal closure, meaning that the purpose for which the
      * connection was established has been fulfilled.
      */
-    val NormalClosure: StatusCode = StatusCodeImpl(1000, "Normal Closure")
+    val NormalClosure: StatusCode = StatusCodeImpl(1000, "Normal Closure", false)
 
     /**
      * 1001 indicates that an endpoint is "going away", such as a server going
      * down or a browser having navigated away from a page.
      */
-    val GoingAway: StatusCode = StatusCodeImpl(1001, "Going Away")
+    val GoingAway: StatusCode = StatusCodeImpl(1001, "Going Away", false)
 
     /**
      * 1002 indicates that an endpoint is terminating the connection due to a
      * protocol error.
      */
-    val ProtocolError: StatusCode = StatusCodeImpl(1002, "Protocol Error")
+    val ProtocolError: StatusCode = StatusCodeImpl(1002, "Protocol Error", false)
 
     /**
      * 1003 indicates that an endpoint is terminating the connection because it
@@ -67,12 +70,12 @@ object StatusCode {
      * understands only text data MAY send this if it receives a binary
      * message).
      */
-    val UnsupportedData: StatusCode = StatusCodeImpl(1003, "Unsupported Data")
+    val UnsupportedData: StatusCode = StatusCodeImpl(1003, "Unsupported Data", false)
 
     /**
      * 1004 is reserved. The specific meaning might be defined in the future.
      */
-    val Reserved: StatusCode = StatusCodeImpl(1004, "Reserved")
+    val Reserved: StatusCode = StatusCodeImpl(1004, "Reserved", true)
 
     /**
      * 1005 is a reserved value and MUST NOT be set as a status code in a Close
@@ -80,7 +83,7 @@ object StatusCode {
      * expecting a status code to indicate that no status code was actually
      * present.
      */
-    val NoStatusReceived: StatusCode = StatusCodeImpl(1005, "No Status Received")
+    val NoStatusReceived: StatusCode = StatusCodeImpl(1005, "No Status Received", true)
 
     /**
      * 1006 is a reserved value and MUST NOT be set as a status code in a Close
@@ -88,14 +91,14 @@ object StatusCode {
      * expecting a status code to indicate that the connection was closed
      * abnormally, e.g., without sending or receiving a Close control frame.
      */
-    val AbnormalClosure: StatusCode = StatusCodeImpl(1006, "Abnormal Closure")
+    val AbnormalClosure: StatusCode = StatusCodeImpl(1006, "Abnormal Closure", true)
 
     /**
      * 1007 indicates that an endpoint is terminating the connection because it
      * has received data within a message that was not consistent with the type
      * of the message (e.g., non-UTF-8 data within a text message).
      */
-    val InvalidFramePayload: StatusCode = StatusCodeImpl(1007, "Invalid Frame Payload Data")
+    val InvalidFramePayload: StatusCode = StatusCodeImpl(1007, "Invalid Frame Payload Data", false)
 
     /**
      * 1008 indicates that an endpoint is terminating the connection because it
@@ -104,13 +107,13 @@ object StatusCode {
      * code (e.g., 1003 or 1009) or if there is a need to hide specific details
      * about the policy.
      */
-    val PolicyVioliation: StatusCode = StatusCodeImpl(1008, "Policy Violation")
+    val PolicyVioliation: StatusCode = StatusCodeImpl(1008, "Policy Violation", false)
 
     /**
      * 1009 indicates that an endpoint is terminating the connection because it
      * has received a message that is too big for it to process.
      */
-    val MessageTooBig: StatusCode = StatusCodeImpl(1009, "Message Too Big")
+    val MessageTooBig: StatusCode = StatusCodeImpl(1009, "Message Too Big", false)
 
     /**
      * 1010 indicates that an endpoint (client) is terminating the connection
@@ -120,14 +123,14 @@ object StatusCode {
      * in the reason part of the Close frame. Note that this status code is not
      * used by the server, because it can fail the WebSocket handshake instead.
      */
-    val MandatoryExtension: StatusCode = StatusCodeImpl(1010, "Mandatory Extension")
+    val MandatoryExtension: StatusCode = StatusCodeImpl(1010, "Mandatory Extension", false)
 
     /**
      * 1011 indicates that a server is terminating the connection because it
      * encountered an unexpected condition that prevented it from fulfilling the
      * request.
      */
-    val InternalError: StatusCode = StatusCodeImpl(1011, "Internal Server Error")
+    val InternalError: StatusCode = StatusCodeImpl(1011, "Internal Server Error", false)
 
     /**
      * 1015 is a reserved value and MUST NOT be set as a status code in a Close
@@ -136,7 +139,7 @@ object StatusCode {
      * a failure to perform a TLS handshake (e.g., the server certificate can't
      * be verified).
      */
-    val TlsHandshake: StatusCode = StatusCodeImpl(1015, "TLS Handshake")
+    val TlsHandshake: StatusCode = StatusCodeImpl(1015, "TLS Handshake", true)
   }
 
   /** Gets `StatusCode` for given value, if registered. */
@@ -202,6 +205,6 @@ object StatusCode {
     Some(code.value)
 }
 
-private case class StatusCodeImpl(value: Int, meaning: String) extends StatusCode {
+private case class StatusCodeImpl(value: Int, meaning: String, reserved: Boolean) extends StatusCode {
   override lazy val toString: String = s"$value ($meaning)"
 }
