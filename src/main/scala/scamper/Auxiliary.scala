@@ -107,6 +107,23 @@ private object Auxiliary {
 
       length
     }
+
+    def readMostly(buffer: Array[Byte]): Int =
+      readMostly(buffer, 0, buffer.length)
+
+    def readMostly(buffer: Array[Byte], offset: Int, length: Int): Int = {
+      var total = in.read(buffer, offset, length)
+
+      if (total != -1) {
+        var count = 0
+        while (count != -1 && total < length) {
+          total += count
+          count = in.read(buffer, offset + total, length - total)
+        }
+      }
+
+      total
+    }
   }
 
   implicit class OutputStreamType(private val out: OutputStream) extends AnyVal {

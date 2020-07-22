@@ -27,6 +27,8 @@ import scamper.logging.Logger
 import scamper.websocket.Opcode.Registry._
 import scamper.websocket.StatusCode.Registry._
 
+import Auxiliary.InputStreamType
+
 private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val protocolVersion: String, val logger: Logger)
     (conn: WebSocketConnection, serverMode: Boolean, request: Option[HttpRequest] = None) extends WebSocketSession {
 
@@ -316,11 +318,11 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   private def sendData(payload: InputStream, binary: Boolean): Unit = synchronized {
     val buf = new Array[Byte](payloadLimit)
-    var len = payload.read(buf)
+    var len = payload.readMostly(buf)
 
     conn.write(makeFrame(buf, len, if (binary) Binary else Text, false))
 
-    while ({ len = payload.read(buf); len != -1 })
+    while ({ len = payload.readMostly(buf); len != -1 })
       conn.write(makeFrame(buf, len, Continuation, false))
 
     conn.write(makeFrame(buf, 0, Continuation, true))
