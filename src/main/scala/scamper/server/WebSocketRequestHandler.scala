@@ -17,6 +17,8 @@ package scamper.server
 
 import java.net.Socket
 
+import scala.util.Try
+
 import scamper.{ Entity, HttpMessage, HttpRequest }
 import scamper.Implicits.stringToEntity
 import scamper.RequestMethod.Registry.GET
@@ -29,7 +31,15 @@ import scamper.websocket._
 private class WebSocketRequestHandler private (handler: WebSocketSession => Any) extends RequestHandler {
   def apply(req: HttpRequest): HttpMessage =
     isWebSocketUpgrade(req) match {
-      case true  => upgradeToWebSocket(req)(handler)
+      case true  =>
+        upgradeToWebSocket(req) { session =>
+          try handler(session)
+          catch {
+            case err: Exception =>
+              Try(session.logger.error(s"Error in session handler: $err", err))
+              Try(session.close(StatusCode.Registry.InternalError))
+          }
+        }
       case false => req
     }
 }

@@ -207,14 +207,14 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
         }
       }
     } recover {
+      case _: SocketTimeoutException =>
+        close(GoingAway)
+
       case err: WebSocketError =>
         if (!closeSent.get()) {
           doError(err)
           close(err.statusCode)
         }
-
-      case _: SocketTimeoutException =>
-        close(GoingAway)
 
       case err =>
         if (!closeSent.get()) {
