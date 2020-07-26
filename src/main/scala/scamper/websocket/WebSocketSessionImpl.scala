@@ -16,7 +16,7 @@
 package scamper.websocket
 
 import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, EOFException, InputStream }
-import java.net.{ SocketException, SocketTimeoutException }
+import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 
 import scala.concurrent.Future
@@ -32,18 +32,14 @@ import Auxiliary.InputStreamType
 private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val protocolVersion: String, val logger: Logger)
     (conn: WebSocketConnection, serverMode: Boolean, request: Option[HttpRequest] = None) extends WebSocketSession {
 
-  private type EitherHandler[T] = Either[(T, Boolean) => Any, T => Any]
-
+  private var _idleTimeout: Int = 0
   private var _payloadLimit: Int = 64 * 1024
   private var _bufferCapacity: Int = 8 * 1024 * 1024
-  private var _idleTimeout: Int = 0
 
-  private var textHandler: EitherHandler[String] = Left(nullHandler)
-  private var binaryHandler: EitherHandler[Array[Byte]] = Left(nullHandler)
-
+  private var textHandler: Option[String => Any] = None
+  private var binaryHandler: Option[Array[Byte] => Any] = None
   private var pingHandler: Option[Array[Byte] => Any] = None
   private var pongHandler: Option[Array[Byte] => Any] = None
-
   private var errorHandler: Option[Throwable => Any] = None
   private var closeHandler: Option[StatusCode => Any] = None
 
@@ -68,27 +64,21 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
   def idleTimeout: Int = _idleTimeout
 
   def idleTimeout(milliseconds: Int): this.type = {
-    if (milliseconds < 0)
-      throw new IllegalArgumentException()
-    _idleTimeout = milliseconds
+    _idleTimeout = milliseconds.max(0)
     this
   }
 
   def payloadLimit: Int = _payloadLimit
 
   def payloadLimit(length: Int): this.type = {
-    if (length < 0)
-      throw new IllegalArgumentException()
-    _payloadLimit = length
+    _payloadLimit = length.max(1024)
     this
   }
 
   def bufferCapacity: Int = _bufferCapacity
 
   def bufferCapacity(length: Int): this.type = {
-    if (length < 0)
-      throw new IllegalArgumentException()
-    _bufferCapacity = length
+    _bufferCapacity = length.max(8192)
     this
   }
 
@@ -129,8 +119,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     Future(send(message, binary)).onComplete(callback)
 
   def ping(data: Array[Byte] = Array.empty): Unit = {
-    if (data.size > 125)
-      throw new IllegalArgumentException("data length must not exceed 125 bytes")
+    require(data.size <= 125, "data length must not exceed 125 bytes")
     conn.write(makeFrame(data, Ping))
   }
 
@@ -138,8 +127,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     Future(ping(data)).onComplete[T](callback)
 
   def pong(data: Array[Byte] = Array.empty): Unit = {
-    if (data.size > 125)
-      throw new IllegalArgumentException("data length must not exceed 125 bytes")
+    require(data.size <= 125, "data length must not exceed 125 bytes")
     conn.write(makeFrame(data, Pong))
   }
 
@@ -147,22 +135,12 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     Future(pong(data)).onComplete(callback)
 
   def onText[T](handler: String => T): this.type = {
-    textHandler = if (handler == null) Left(nullHandler) else Right(handler)
-    this
-  }
-
-  def onTextPart[T](handler: (String, Boolean) => T): this.type = {
-    textHandler = if (handler == null) Left(nullHandler) else Left(handler)
+    textHandler = Option(handler)
     this
   }
 
   def onBinary[T](handler: Array[Byte] => T): this.type = {
-    binaryHandler = if (handler == null) Left(nullHandler) else Right(handler)
-    this
-  }
-
-  def onBinaryPart[T](handler: (Array[Byte], Boolean) => T): this.type = {
-    binaryHandler = if (handler == null) Left(nullHandler) else Left(handler)
+    binaryHandler = Option(handler)
     this
   }
 
@@ -225,9 +203,8 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   private def doText(data: Array[Byte], last: Boolean): Unit =
     if (last)
-      textHandler match {
-        case Right(handle) => handle(new String(data, "UTF-8"))
-        case Left(handle)  => handle(new String(data, "UTF-8"), true)
+      textHandler.foreach { handle =>
+        handle(new String(data, "UTF-8"))
       }
     else
       doContinuation(textHandler, data) { data =>
@@ -236,47 +213,38 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   private def doBinary(data: Array[Byte], last: Boolean): Unit =
     if (last)
-      binaryHandler match {
-        case Right(handle) => handle(data)
-        case Left(handle)  => handle(data, true)
-      }
+      binaryHandler.foreach(handle => handle(data))
     else
       doContinuation(binaryHandler, data)(identity)
 
-  private def doContinuation[T](handler: EitherHandler[T], data: Array[Byte])(encode: Array[Byte] => T): Unit = {
+  private def doContinuation[T](handler: Option[T => Any], data: Array[Byte])(encode: Array[Byte] => T): Unit = {
     val buffer = new ByteArrayOutputStream()
 
-    handler match {
-      case Right(handle) => buffer.write(data)
-      case Left(handle)  => handle(encode(data), false)
-    }
+    buffer.write(data)
 
-    var keepGoing = true
+    var continue = true
 
-    while (keepGoing) {
+    while (continue) {
       val frame = conn.read(idleTimeout)
 
       checkFrame(frame, buffer.size)
 
-      val newData = getData(frame)
+      val moreData = getData(frame)
 
       frame.opcode match {
         case Continuation =>
-          handler match {
-            case Right(handle) => buffer.write(newData)
-            case Left(handle)  => handle(encode(newData), frame.isFinal)
-          }
+          buffer.write(moreData)
 
           if (frame.isFinal) {
-            handler.foreach { handle => handle(encode(buffer.toByteArray)) }
-            keepGoing = false
+            handler.foreach(handle => handle(encode(buffer.toByteArray)))
+            continue = false
           }
 
         case Text   => throw WebSocketError(ProtocolError)
         case Binary => throw WebSocketError(ProtocolError)
-        case Ping   => doPing(newData)
-        case Pong   => doPong(newData)
-        case Close  => doClose(newData); keepGoing = false
+        case Ping   => doPing(moreData)
+        case Pong   => doPong(moreData)
+        case Close  => doClose(moreData); continue = false
       }
     }
   }
@@ -301,8 +269,6 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
       finally
         close(statusCode)
     }
-
-  private def nullHandler[T]: (T, Boolean) => Unit = (_, _) => ()
 
   private def sendData(payload: Array[Byte], binary: Boolean): Unit =
     (payload.length > payloadLimit) match {
@@ -374,7 +340,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
           position += count
         }
 
-        frame.key.map { key => key(data) }
+        frame.key.map(key => key(data))
         data
     }
 }

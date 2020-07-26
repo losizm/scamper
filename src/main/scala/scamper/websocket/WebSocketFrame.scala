@@ -22,7 +22,7 @@ import Opcode.Registry._
 
 /** Defines frame for WebSocket message. */
 trait WebSocketFrame {
-  /** Tests for message final frame. */
+  /** Tests for final frame. */
   def isFinal: Boolean
 
   /** Gets opcode. */

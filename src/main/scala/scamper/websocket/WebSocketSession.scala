@@ -105,9 +105,7 @@ trait WebSocketSession {
    * Gets buffer capacity of incoming message.
    *
    * @note If message buffer exceeds specified capacity, then session is closed
-   * with status code [[StatusCode.Registry.MessageTooBig MessageTooBig]]. When
-   * handling message parts, the buffer is cleared on each part; otherwise, when
-   * handling a full message, the buffer grows on each part.
+   * with status code [[StatusCode.Registry.MessageTooBig MessageTooBig]].
    */
   def bufferCapacity: Int
 
@@ -119,9 +117,7 @@ trait WebSocketSession {
    * @return this session
    *
    * @note If message buffer exceeds specified capacity, then session is closed
-   * with status code [[StatusCode.Registry.MessageTooBig MessageTooBig]]. When
-   * handling message parts, the buffer is cleared on each part; otherwise, when
-   * handling a full message, the buffer grows on each part.
+   * with status code [[StatusCode.Registry.MessageTooBig MessageTooBig]].
    */
   def bufferCapacity(length: Int): this.type
 
@@ -237,17 +233,6 @@ trait WebSocketSession {
   def onText[T](handler: String => T): this.type
 
   /**
-   * Sets handler for incoming text message part.
-   *
-   * The handler accepts a message part and an indicator for the last part.
-   *
-   * @param handler text message handler
-   *
-   * @return this session
-   */
-  def onTextPart[T](handler: (String, Boolean) => T): this.type
-
-  /**
    * Sets handler for incoming binary message.
    *
    * @param handler binary message handler
@@ -255,17 +240,6 @@ trait WebSocketSession {
    * @return this session
    */
   def onBinary[T](handler: Array[Byte] => T): this.type
-
-  /**
-   * Sets handler for incoming binary message part.
-   *
-   * The handler accepts a message part and an indicator for the last part.
-   *
-   * @param handler binary message handler
-   *
-   * @return this session
-   */
-  def onBinaryPart[T](handler: (Array[Byte], Boolean) => T): this.type
 
   /**
    * Sets handler for incoming ping message.
