@@ -25,6 +25,9 @@ trait WebSocketFrame {
   /** Tests for final frame. */
   def isFinal: Boolean
 
+  /** Tests for compression. */
+  def isCompressed: Boolean
+
   /** Gets opcode. */
   def opcode: Opcode
 
@@ -65,12 +68,13 @@ object WebSocketFrame {
    * Creates WebSocketFrame using supplied attributes.
    *
    * @param isFinal indicates final frame of message
+   * @param isCompressed indicates compression
    * @param opcode frame opcode
    * @param key masking key
    * @param length payload length
    * @param payload input stream to payload
    */
-  def apply(isFinal: Boolean, opcode: Opcode, key: Option[MaskingKey], length: Long, payload: InputStream): WebSocketFrame = {
+  def apply(isFinal: Boolean, isCompressed: Boolean, opcode: Opcode, key: Option[MaskingKey], length: Long, payload: InputStream): WebSocketFrame = {
     if (opcode.isControl) {
       if (!isFinal)
         throw new IllegalArgumentException("isFinal not set for control frame")
@@ -78,6 +82,9 @@ object WebSocketFrame {
       if (length > 125)
         throw new IllegalArgumentException("length greater than 125 bytes for control frame")
     }
+
+    if (isCompressed && opcode != Text && opcode != Binary)
+      throw new IllegalArgumentException("isCompressed set for non data frame")
 
     if (key == null)
       throw new NullPointerException("key")
@@ -93,13 +100,14 @@ object WebSocketFrame {
     if (payload == null)
       throw new NullPointerException("payload")
 
-    new WebSocketFrameImpl(isFinal, opcode, key, length, new BoundedInputStream(payload, length))
+    new WebSocketFrameImpl(isFinal, isCompressed, opcode, key, length, new BoundedInputStream(payload, length))
   }
 
   /**
    * Creates WebSocketFrame using supplied attributes.
    *
    * @param isFinal indicates final frame of message
+   * @param isCompressed indicates compression
    * @param opcode frame opcode
    * @param key masking key
    * @param length payload length
@@ -107,23 +115,24 @@ object WebSocketFrame {
    *
    * @note If there is `Some` masking key, it is used to mask `data`.
    */
-  def apply(isFinal: Boolean, opcode: Opcode, key: Option[MaskingKey], length: Int, data: Array[Byte]): WebSocketFrame = {
+  def apply(isFinal: Boolean, isCompressed: Boolean, opcode: Opcode, key: Option[MaskingKey], length: Int, data: Array[Byte]): WebSocketFrame = {
     key.foreach(key => key(data, length, 0))
-    apply(isFinal, opcode, key, length, { if (length == 0) EmptyInputStream else new ByteArrayInputStream(data, 0, length) })
+    apply(isFinal, isCompressed, opcode, key, length, { if (length == 0) EmptyInputStream else new ByteArrayInputStream(data, 0, length) })
   }
 
   /**
    * Creates WebSocketFrame using supplied attributes.
    *
    * @param isFinal indicates final frame of message
+   * @param isCompressed indicates compression
    * @param opcode frame opcode
    * @param key masking key
    * @param data unmasked payload data
    *
    * @note If there is `Some` masking key, it is used to mask `data`.
    */
-  def apply(isFinal: Boolean, opcode: Opcode, key: Option[MaskingKey], data: Array[Byte]): WebSocketFrame =
-    apply(isFinal, opcode, key, data.size, data)
+  def apply(isFinal: Boolean, isCompressed: Boolean, opcode: Opcode, key: Option[MaskingKey], data: Array[Byte]): WebSocketFrame =
+    apply(isFinal, isCompressed, opcode, key, data.size, data)
 
   /**
    * Creates Close frame using supplied status code.
@@ -134,11 +143,12 @@ object WebSocketFrame {
    * @note If there is `Some` masking key, it is used to mask status code.
    */
   def apply(statusCode: StatusCode, key: Option[MaskingKey]): WebSocketFrame =
-    apply(true, Close, key, 2, statusCode.toData)
+    apply(true, false, Close, key, 2, statusCode.toData)
 }
 
 private case class WebSocketFrameImpl(
   isFinal: Boolean,
+  isCompressed: Boolean,
   opcode: Opcode,
   key: Option[MaskingKey],
   length: Long,

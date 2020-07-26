@@ -22,6 +22,7 @@ import java.net.Socket
 
 import javax.net.ssl.SSLSocket
 
+import Opcode.Registry.{ Binary, Text }
 import StatusCode.Registry.{ MessageTooBig, ProtocolError }
 
 /**
@@ -31,7 +32,8 @@ import StatusCode.Registry.{ MessageTooBig, ProtocolError }
  */
 class WebSocketConnection private (socket: Socket) {
   private val finBits      = 0x80
-  private val reservedBits = 0x70
+  private val compressBits = 0x40
+  private val reservedBits = 0x30
   private val opcodeBits   = 0x0f
   private val maskBits     = 0x80
   private val lengthBits   = 0x7f
@@ -63,6 +65,7 @@ class WebSocketConnection private (socket: Socket) {
 
     val byte0 = in.readUnsignedByte()
     val isFinal = (byte0 & finBits) != 0
+    val isCompressed = (byte0 & compressBits) != 0
 
     if ((byte0 & reservedBits) != 0)
       throw WebSocketError(ProtocolError)
@@ -70,6 +73,9 @@ class WebSocketConnection private (socket: Socket) {
     val opcode = Opcode.get(byte0 & opcodeBits).getOrElse {
       throw WebSocketError(ProtocolError)
     }
+
+    if (isCompressed && opcode != Text && opcode != Binary)
+      throw WebSocketError(ProtocolError)
 
     if (opcode.isControl && !isFinal)
       throw WebSocketError(ProtocolError)
@@ -100,7 +106,7 @@ class WebSocketConnection private (socket: Socket) {
     if (isMasked ^ key.isDefined)
       throw WebSocketError(ProtocolError)
 
-    WebSocketFrame(isFinal, opcode, key, length, in)
+    WebSocketFrame(isFinal, isCompressed, opcode, key, length, in)
   }
 
   /**
@@ -119,12 +125,17 @@ class WebSocketConnection private (socket: Socket) {
       case false => 0
     }
 
+    val compressBit = frame.isCompressed match {
+      case true  => 64
+      case false => 0
+    }
+
+    out.write(finBit + compressBit + frame.opcode.value)
+
     val maskBit = frame.key.isDefined match {
       case true  => 128
       case false => 0
     }
-
-    out.write(finBit + frame.opcode.value)
 
     frame.length match {
       case length if length <= 125 =>

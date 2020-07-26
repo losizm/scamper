@@ -300,6 +300,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
   private def makeFrame(data: Array[Byte], length: Int, opcode: Opcode, isFinal: Boolean): WebSocketFrame =
     WebSocketFrame(
       isFinal,
+      false,
       opcode,
       serverMode match {
         case true  => None
