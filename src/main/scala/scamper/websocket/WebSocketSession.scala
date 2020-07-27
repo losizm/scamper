@@ -304,6 +304,9 @@ object WebSocketSession {
   def forClient(socket: Socket, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =
     forClient(WebSocketConnection(socket), id, target, protocolVersion, logger)
 
+  private [scamper] def forClient(socket: Socket, id: String, target: Uri, protocolVersion: String, logger: Option[Logger], enableCompression: Boolean): WebSocketSession =
+    new WebSocketSessionImpl(id, target, protocolVersion, logger.getOrElse(NullLogger))(WebSocketConnection(socket), false, enableCompression)
+
   /**
    * Wraps WebSocket session around an already established server connection.
    *

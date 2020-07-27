@@ -165,6 +165,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       Header("Connection", "Upgrade") +:
       Header("Sec-WebSocket-Key", generateWebSocketKey()) +:
       Header("Sec-WebSocket-Version", "13") +:
+      Header("Sec-WebSocket-Extensions", "permessage-deflate; client_no_context_takeover; server_no_context_takeover") +:
       headers
     ).withCookies(cookies)
 
@@ -176,7 +177,8 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
             res.correlate,
             res.absoluteTarget,
             req.secWebSocketVersion,
-            None
+            None,
+            enablePermessageDeflate(res)
           )
           setCloseGuard(res, true)
           try handler(session)
