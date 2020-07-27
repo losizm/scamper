@@ -420,6 +420,14 @@ package object websocket {
       }
     }
 
+  private[scamper] def enableWebkitDeflateFrame(msg: HttpMessage): Boolean =
+    msg.secWebSocketExtensions.exists { ext =>
+      ext.identifier == "x-webkit-deflate-frame" && ext.params.forall {
+        case ("no_context_takeover", None) => true
+        case _ => false
+      }
+    }
+
   private def checkWebSocketAccept(res: HttpResponse, key: String): Boolean =
     res.getSecWebSocketAccept.exists(checkWebSocketAcceptValue(_, key))
 
