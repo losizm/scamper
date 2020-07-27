@@ -339,6 +339,9 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
         if (serverMode)
           throw WebSocketError(ProtocolError)
     }
+
+    if (frame.isCompressed && !compressMode)
+      throw WebSocketError(ProtocolError)
   }
 
   private def getData(frame: WebSocketFrame): Array[Byte] =
