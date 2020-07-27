@@ -147,15 +147,30 @@ package object server {
     try {
       checkWebSocketRequest(req)
 
-      SwitchingProtocols()
-        .withUpgrade("websocket")
-        .withConnection("Upgrade")
-        .withSecWebSocketAccept(acceptWebSocketKey(req.secWebSocketKey))
-        .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
-          val sessionRequest = req.withBody(Entity.empty)
-            .withAttribute("scamper.server.message.socket", socket)
-          handler(WebSocketSession.forServer(sessionRequest))
-        })
+      enablePermessageDeflate(req) match {
+        case true  =>
+          SwitchingProtocols()
+            .withUpgrade("websocket")
+            .withConnection("Upgrade")
+            .withSecWebSocketAccept(acceptWebSocketKey(req.secWebSocketKey))
+            .withSecWebSocketExtensions("permessage-deflate; client_no_context_takeover; server_no_context_takeover")
+            .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
+              val sessionRequest = req.withBody(Entity.empty)
+                .withAttribute("scamper.server.message.socket", socket)
+              handler(WebSocketSession.forServer(sessionRequest, true))
+            })
+
+        case false =>
+          SwitchingProtocols()
+            .withUpgrade("websocket")
+            .withConnection("Upgrade")
+            .withSecWebSocketAccept(acceptWebSocketKey(req.secWebSocketKey))
+            .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
+              val sessionRequest = req.withBody(Entity.empty)
+                .withAttribute("scamper.server.message.socket", socket)
+              handler(WebSocketSession.forServer(sessionRequest, false))
+            })
+      }
     } catch {
       case InvalidWebSocketRequest(message) => BadRequest(message)
     }

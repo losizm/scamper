@@ -102,6 +102,9 @@ package object websocket {
     if (!checkWebSocketVersion(req))
       throw InvalidWebSocketRequest("Missing or invalid header: Sec-WebSocket-Version")
 
+    //if (!checkWebSocketExtensions(req))
+    //  throw InvalidWebSocketRequest("Invalid header: Sec-WebSocket-Extensions")
+
     req
   }
 
@@ -402,6 +405,20 @@ package object websocket {
 
   private def checkWebSocketVersion(msg: HttpMessage): Boolean =
     msg.getSecWebSocketVersion.contains("13")
+
+  private def checkWebSocketExtensions(msg: HttpMessage): Boolean =
+    msg.secWebSocketExtensions.forall { ext =>
+      ext.identifier.matches("permessage-deflate|x-webkit-deflate-frame")
+    }
+
+  private[scamper] def enablePermessageDeflate(msg: HttpMessage): Boolean =
+    msg.secWebSocketExtensions.exists { ext =>
+      ext.identifier == "permessage-deflate" && ext.params.forall {
+        case ("client_no_context_takeover", None) => true
+        case ("server_no_context_takeover", None) => true
+        case _ => false
+      }
+    }
 
   private def checkWebSocketAccept(res: HttpResponse, key: String): Boolean =
     res.getSecWebSocketAccept.exists(checkWebSocketAcceptValue(_, key))

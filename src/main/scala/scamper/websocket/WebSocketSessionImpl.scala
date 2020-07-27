@@ -30,7 +30,7 @@ import scamper.websocket.StatusCode.Registry._
 import Auxiliary.InputStreamType
 
 private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val protocolVersion: String, val logger: Logger)
-    (conn: WebSocketConnection, serverMode: Boolean, request: Option[HttpRequest] = None) extends WebSocketSession {
+    (conn: WebSocketConnection, serverMode: Boolean, compressMode: Boolean, request: Option[HttpRequest] = None) extends WebSocketSession {
 
   private var _idleTimeout: Int = 0
   private var _payloadLimit: Int = 64 * 1024
@@ -177,8 +177,8 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
         frame.opcode match {
           case Continuation => throw WebSocketError(ProtocolError)
-          case Text         => doText(data, frame.isFinal)
-          case Binary       => doBinary(data, frame.isFinal)
+          case Text         => doText(data, frame.isFinal, frame.isCompressed)
+          case Binary       => doBinary(data, frame.isFinal, frame.isCompressed)
           case Ping         => doPing(data)
           case Pong         => doPong(data)
           case Close        => doClose(data)
@@ -201,26 +201,37 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
         }
     }
 
-  private def doText(data: Array[Byte], last: Boolean): Unit =
+  private def doText(data: Array[Byte], last: Boolean, compressed: Boolean): Unit =
     if (last)
       textHandler.foreach { handle =>
-        handle(new String(data, "UTF-8"))
+        compressed match {
+          case true  => handle(new String(PermessageDeflate.decompress(data), "UTF-8"))
+          case false => handle(new String(data, "UTF-8"))
+        }
       }
     else
-      doContinuation(textHandler, data) { data =>
+      doContinuation(textHandler, data, compressed) { data =>
         new String(data, "UTF-8")
       }
 
-  private def doBinary(data: Array[Byte], last: Boolean): Unit =
+  private def doBinary(data: Array[Byte], last: Boolean, compressed: Boolean): Unit =
     if (last)
-      binaryHandler.foreach(handle => handle(data))
+      binaryHandler.foreach { handle =>
+        compressed match {
+          case true  => handle(PermessageDeflate.decompress(data))
+          case false => handle(data)
+        }
+      }
     else
-      doContinuation(binaryHandler, data)(identity)
+      doContinuation(binaryHandler, data, compressed)(identity)
 
-  private def doContinuation[T](handler: Option[T => Any], data: Array[Byte])(encode: Array[Byte] => T): Unit = {
-    val buffer = new ByteArrayOutputStream()
+  private def doContinuation[T](handler: Option[T => Any], data: Array[Byte], compressed: Boolean)(decode: Array[Byte] => T): Unit = {
+    val buffer = compressed match {
+      case true  => new InflaterBuffer
+      case false => new IdentityBuffer
+    }
 
-    buffer.write(data)
+    buffer.add(data)
 
     var continue = true
 
@@ -233,10 +244,10 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
       frame.opcode match {
         case Continuation =>
-          buffer.write(moreData)
+          buffer.add(moreData)
 
           if (frame.isFinal) {
-            handler.foreach(handle => handle(encode(buffer.toByteArray)))
+            handler.foreach(handle => handle(decode(buffer.get)))
             continue = false
           }
 
@@ -270,37 +281,42 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
         close(statusCode)
     }
 
-  private def sendData(payload: Array[Byte], binary: Boolean): Unit =
-    (payload.length > payloadLimit) match {
+  private def sendData(data: Array[Byte], binary: Boolean): Unit =
+    (!compressMode && data.length <= payloadLimit) match {
       case true  =>
-        sendData(new ByteArrayInputStream(payload), binary)
-
-      case false =>
         val opcode = if (binary) Binary else Text
-        val frame = makeFrame(payload, opcode)
+        val frame = makeFrame(data, opcode)
 
         synchronized(conn.write(frame))
+
+      case false =>
+        sendData(new ByteArrayInputStream(data), binary)
     }
 
-  private def sendData(payload: InputStream, binary: Boolean): Unit = synchronized {
+  private def sendData(data: InputStream, binary: Boolean): Unit = synchronized {
+    val in = compressMode match {
+      case true  => PermessageDeflate.compress(data)
+      case false => data
+    }
+
     val buf = new Array[Byte](payloadLimit)
-    var len = payload.readMostly(buf)
+    var len = in.readMostly(buf)
 
-    conn.write(makeFrame(buf, len, if (binary) Binary else Text, false))
+    conn.write(makeFrame(buf, len, if (binary) Binary else Text, false, compressMode))
 
-    while ({ len = payload.readMostly(buf); len != -1 })
-      conn.write(makeFrame(buf, len, Continuation, false))
+    while ({ len = in.readMostly(buf); len != -1 })
+      conn.write(makeFrame(buf, len, Continuation, false, false))
 
-    conn.write(makeFrame(buf, 0, Continuation, true))
+    conn.write(makeFrame(buf, 0, Continuation, true, false))
   }
 
   private def makeFrame(data: Array[Byte], opcode: Opcode): WebSocketFrame =
-    makeFrame(data, data.size, opcode, true)
+    makeFrame(data, data.size, opcode, true, false)
 
-  private def makeFrame(data: Array[Byte], length: Int, opcode: Opcode, isFinal: Boolean): WebSocketFrame =
+  private def makeFrame(data: Array[Byte], length: Int, opcode: Opcode, isFinal: Boolean, isCompressed: Boolean): WebSocketFrame =
     WebSocketFrame(
       isFinal,
-      false,
+      isCompressed,
       opcode,
       serverMode match {
         case true  => None
