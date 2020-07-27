@@ -411,8 +411,18 @@ package object websocket {
       ext.identifier.matches("permessage-deflate|x-webkit-deflate-frame")
     }
 
-  private[scamper] def enablePermessageDeflate(msg: HttpMessage): Boolean =
-    msg.secWebSocketExtensions.exists { ext =>
+  private[scamper] def enablePermessageDeflate(req: HttpRequest): Boolean =
+    req.secWebSocketExtensions.exists { ext =>
+      ext.identifier == "permessage-deflate" && ext.params.forall {
+        case ("client_no_context_takeover", None) => true
+        case ("server_no_context_takeover", None) => true
+        case ("client_max_window_bits", _       ) => true
+        case _ => false
+      }
+    }
+
+  private[scamper] def enablePermessageDeflate(res: HttpResponse): Boolean =
+    res.secWebSocketExtensions.exists { ext =>
       ext.identifier == "permessage-deflate" && ext.params.forall {
         case ("client_no_context_takeover", None) => true
         case ("server_no_context_takeover", None) => true
