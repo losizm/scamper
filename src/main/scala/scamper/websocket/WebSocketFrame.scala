@@ -83,7 +83,7 @@ object WebSocketFrame {
         throw new IllegalArgumentException("length greater than 125 bytes for control frame")
     }
 
-    if (isCompressed && opcode != Text && opcode != Binary)
+    if (isCompressed && opcode != Text && opcode != Binary && opcode != Continuation)
       throw new IllegalArgumentException("isCompressed set for non data frame")
 
     if (key == null)

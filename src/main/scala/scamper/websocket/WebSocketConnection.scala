@@ -22,7 +22,7 @@ import java.net.Socket
 
 import javax.net.ssl.SSLSocket
 
-import Opcode.Registry.{ Binary, Text }
+import Opcode.Registry.{ Binary, Continuation, Text }
 import StatusCode.Registry.{ MessageTooBig, ProtocolError }
 
 /**
@@ -74,7 +74,7 @@ class WebSocketConnection private (socket: Socket) {
       throw WebSocketError(ProtocolError)
     }
 
-    if (isCompressed && opcode != Text && opcode != Binary)
+    if (isCompressed && opcode != Text && opcode != Binary && opcode != Continuation)
       throw WebSocketError(ProtocolError)
 
     if (opcode.isControl && !isFinal)

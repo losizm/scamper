@@ -156,7 +156,7 @@ package object server {
           .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
             val sessionRequest = req.withBody(Entity.empty)
               .withAttribute("scamper.server.message.socket", socket)
-            handler(WebSocketSession.forServer(sessionRequest, true))
+            handler(WebSocketSession.forServer(sessionRequest, DeflateMode.Message))
           })
 
       else if (enableWebkitDeflateFrame(req))
@@ -168,7 +168,7 @@ package object server {
           .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
             val sessionRequest = req.withBody(Entity.empty)
               .withAttribute("scamper.server.message.socket", socket)
-            handler(WebSocketSession.forServer(sessionRequest, true))
+            handler(WebSocketSession.forServer(sessionRequest, DeflateMode.Frame))
           })
 
       else
@@ -179,7 +179,7 @@ package object server {
           .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
             val sessionRequest = req.withBody(Entity.empty)
               .withAttribute("scamper.server.message.socket", socket)
-            handler(WebSocketSession.forServer(sessionRequest, false))
+            handler(WebSocketSession.forServer(sessionRequest, DeflateMode.None))
           })
     } catch {
       case InvalidWebSocketRequest(message) => BadRequest(message)

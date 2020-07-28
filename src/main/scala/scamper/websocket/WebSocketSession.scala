@@ -290,7 +290,7 @@ object WebSocketSession {
    * @param logger optional logger
    */
   def forClient(conn: WebSocketConnection, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =
-    new WebSocketSessionImpl(id, target, protocolVersion, logger.getOrElse(NullLogger))(conn, false, false)
+    new WebSocketSessionImpl(id, target, protocolVersion, logger.getOrElse(NullLogger))(conn, false, DeflateMode.None)
 
   /**
    * Wraps WebSocket session around an already established client connection.
@@ -304,8 +304,8 @@ object WebSocketSession {
   def forClient(socket: Socket, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =
     forClient(WebSocketConnection(socket), id, target, protocolVersion, logger)
 
-  private [scamper] def forClient(socket: Socket, id: String, target: Uri, protocolVersion: String, logger: Option[Logger], enableCompression: Boolean): WebSocketSession =
-    new WebSocketSessionImpl(id, target, protocolVersion, logger.getOrElse(NullLogger))(WebSocketConnection(socket), false, enableCompression)
+  private [scamper] def forClient(socket: Socket, id: String, target: Uri, protocolVersion: String, logger: Option[Logger], deflate: DeflateMode): WebSocketSession =
+    new WebSocketSessionImpl(id, target, protocolVersion, logger.getOrElse(NullLogger))(WebSocketConnection(socket), false, deflate)
 
   /**
    * Wraps WebSocket session around an already established server connection.
@@ -317,7 +317,7 @@ object WebSocketSession {
    * @param logger optional logger
    */
   def forServer(conn: WebSocketConnection, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =
-    new WebSocketSessionImpl(id, target, protocolVersion, logger.getOrElse(NullLogger))(conn, true, false)
+    new WebSocketSessionImpl(id, target, protocolVersion, logger.getOrElse(NullLogger))(conn, true, DeflateMode.None)
 
   /**
    * Wraps WebSocket session around an already established server connection.
@@ -331,13 +331,13 @@ object WebSocketSession {
   def forServer(socket: Socket, id: String, target: Uri, protocolVersion: String, logger: Option[Logger]): WebSocketSession =
     forServer(WebSocketConnection(socket), id, target, protocolVersion, logger)
 
-  private[scamper] def forServer(req: HttpRequest, enableCompression: Boolean): WebSocketSession = {
+  private[scamper] def forServer(req: HttpRequest, deflate: DeflateMode): WebSocketSession = {
     val conn = WebSocketConnection(req.getAttribute[Socket]("scamper.server.message.socket").get)
     val id = req.getAttribute[String]("scamper.server.message.correlate").get
     val target = req.target
     val protocolVersion = req.secWebSocketVersion
     val logger = new SessionLogger(id, req.getAttribute[Logger]("scamper.server.message.logger").get)
 
-    new WebSocketSessionImpl(id, target, protocolVersion, logger)(conn, true, enableCompression, Some(req))
+    new WebSocketSessionImpl(id, target, protocolVersion, logger)(conn, true, deflate, Some(req))
   }
 }

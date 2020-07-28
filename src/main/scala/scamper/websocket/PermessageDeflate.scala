@@ -25,14 +25,33 @@ private object PermessageDeflate {
       new ByteArrayInputStream(new Array[Byte](1))
     )
 
+  def compress(message: Array[Byte]): Array[Byte] =
+    compress(message, 0, message.length)
+
+  def compress(message: Array[Byte], offset: Int, length: Int): Array[Byte] = {
+    val buffer = new ByteArrayOutputStream()
+    val compressor = new DeflaterOutputStream(buffer, new Deflater(Deflater.DEFAULT_COMPRESSION, true))
+
+    compressor.write(message, offset, length)
+    compressor.finish()
+    compressor.flush()
+    compressor.close()
+
+    buffer.write(0)
+    buffer.toByteArray()
+  }
+
   def decompress(message: InputStream): InputStream =
     new InflaterInputStream(message, new Inflater(true))
 
-  def decompress(message: Array[Byte]): Array[Byte] = {
+  def decompress(message: Array[Byte]): Array[Byte] =
+    decompress(message, 0, message.length)
+
+  def decompress(message: Array[Byte], offset: Int, length: Int): Array[Byte] = {
     val buffer = new ByteArrayOutputStream()
     val decompressor = new InflaterOutputStream(buffer, new Inflater(true))
 
-    decompressor.write(message)
+    decompressor.write(message, offset, length)
     decompressor.finish()
     decompressor.flush()
     decompressor.close()
