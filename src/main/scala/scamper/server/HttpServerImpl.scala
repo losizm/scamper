@@ -54,16 +54,20 @@ private object HttpServerImpl {
     serverSocketFactory: ServerSocketFactory = ServerSocketFactory.getDefault()
   )
 
-  case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
-  case class ReadAborted(reason: String) extends HttpException(s"Read aborted with $reason")
-
-  def apply(app: Application, host: InetAddress, port: Int) =
+  def apply(host: InetAddress, port: Int, app: Application) =
     new HttpServerImpl(host, port)(count.incrementAndGet(), app)
 }
 
-import HttpServerImpl.{ Application, ReadAborted, ReadError }
+private class HttpServerImpl(val host: InetAddress, val port: Int)
+    (id: Long, app: HttpServerImpl.Application) extends HttpServer {
+  private case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
+  private case class ReadAborted(reason: String) extends HttpException(s"Read aborted with $reason")
 
-private class HttpServerImpl(val host: InetAddress, val port: Int)(id: Long, app: Application) extends HttpServer {
+  private sealed trait ConnectionManagement
+  private case object CloseConnection extends ConnectionManagement
+  private case object PersistConnection extends ConnectionManagement
+  private case class UpgradeConnection(upgrade: Socket => Unit) extends ConnectionManagement
+
   val logger = if (app.logger == null) NullLogger else app.logger
   val backlogSize = app.backlogSize.max(1)
   val poolSize = app.poolSize.max(1)
@@ -161,7 +165,7 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)(id: Long, app
     logger.info(s"$authority - Keep-Alive: ${keepAlive.getOrElse("disabled")}")
 
     serverSocket.bind(new InetSocketAddress(host, port), backlogSize)
-    Service.start()
+    ServiceManager.start()
 
     logger.info(s"$authority - Server is up and running")
   } catch {
@@ -170,12 +174,6 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)(id: Long, app
       close()
       throw e
   }
-
-  private sealed trait ConnectionManagement
-
-  private case object CloseConnection extends ConnectionManagement
-  private case object PersistConnection extends ConnectionManagement
-  private case class UpgradeConnection(upgrade: Socket => Unit) extends ConnectionManagement
 
   private object ConnectionManager {
     private val keepAliveHeader = Header("Keep-Alive", s"timeout=$keepAliveTimeout, max=$keepAliveMax")
@@ -214,7 +212,7 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)(id: Long, app
         res.connection.exists(_ equalsIgnoreCase "upgrade")
   }
 
-  private object Service extends Thread(threadGroup, s"scamper-server-$id-service") {
+  private object ServiceManager extends Thread(threadGroup, s"scamper-server-$id-service-manager") {
     private val connectionCount = new AtomicLong(0)
     private val serviceCount = new AtomicLong(0)
 
@@ -223,9 +221,10 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)(id: Long, app
 
     override def run(): Unit =
       while (!isClosed)
-        try
-          service(connectionCount.incrementAndGet, 1)(serverSocket.accept())
-        catch {
+        try {
+          implicit val socket = serverSocket.accept()
+          service(connectionCount.incrementAndGet, 1)
+        } catch {
           case e: Exception if serverSocket.isClosed => close() // Ensure server is closed
           case e: Exception => logger.warn(s"$authority - Error while waiting for connection: $e")
         }
@@ -251,12 +250,13 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)(id: Long, app
           InternalServerError()
       }
 
-      def onHandleError(req: HttpRequest): PartialFunction[Throwable, HttpResponse] = {
-        case err: SocketTimeoutException => RequestTimeout()
-        case err: ResponseAborted        => throw err
-        case err: SSLException           => throw err
-        case err                         => errorHandler(err, req)
-      }
+      def onHandleRequest(req: HttpRequest): Try[HttpResponse] =
+        Try(handle(req)).recover {
+          case err: SocketTimeoutException => RequestTimeout()
+          case err: ResponseAborted        => throw err
+          case err: SSLException           => throw err
+          case err                         => errorHandler(err, req)
+        }
 
       def onHandleResponse(res: HttpResponse): ConnectionManagement =
         Try(filter(res)).recover {
@@ -291,7 +291,7 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)(id: Long, app
 
           Try(read(firstByte))
             .map(req => addAttributes(req, socket, requestCount, correlate))
-            .fold(err => Try(onReadError(err)), req => Try(handle(req)).recover { case err => onHandleError(req)(err) })
+            .fold(err => Try(onReadError(err)), req => onHandleRequest(req))
             .map(res => addAttributes(res, socket, requestCount, correlate))
             .map(onHandleResponse)
             .get
@@ -495,7 +495,8 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)(id: Long, app
           case None    => res.withTransferEncoding(chunked)
         }
 
-    private def addAttributes[T <: HttpMessage](msg: T, socket: Socket, requestCount: Int, correlate: String)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    private def addAttributes[T <: HttpMessage](msg: T, socket: Socket, requestCount: Int, correlate: String)
+        (implicit ev: <:<[T, MessageBuilder[T]]): T =
       msg
         .withAttribute("scamper.server.message.socket"       -> socket)
         .withAttribute("scamper.server.message.requestCount" -> requestCount)

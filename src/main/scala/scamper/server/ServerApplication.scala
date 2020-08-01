@@ -585,7 +585,7 @@ class ServerApplication {
    * @return new server
    */
   def create(host: InetAddress, port: Int): HttpServer = synchronized {
-    HttpServerImpl(app, host, port)
+    HttpServerImpl(host, port, app)
   }
 }
 

@@ -46,7 +46,7 @@ object Implicits {
      * Gets request count.
      *
      * The request count is the number of requests that have been received from
-     * current connection.
+     * connection.
      */
     def requestCount: Int = msg.getAttribute("scamper.server.message.requestCount").get
 
