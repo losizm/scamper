@@ -1,6 +1,6 @@
 organization := "com.github.losizm"
 name := "scamper"
-version := "15.0.2"
+version := "16.0.0"
 
 description := "The HTTP library for Scala"
 homepage := Some(url("https://github.com/losizm/scamper"))
@@ -9,7 +9,7 @@ licenses := List("Apache License, Version 2" -> url("http://www.apache.org/licen
 scalaVersion := "2.13.3"
 scalacOptions ++= Seq("-deprecation", "-feature", "-Xcheckinit")
 
-crossScalaVersions := Seq("2.12.11")
+crossScalaVersions := Seq("2.12.12")
 
 unmanagedSourceDirectories in Compile += {
   (sourceDirectory in Compile).value / s"scala-${scalaBinaryVersion.value}"
