@@ -106,7 +106,10 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       effectiveRequest = effectiveRequest.withPath("/" + effectiveRequest.path)
 
     val conn = createClientConnection(
-      if (secure) secureSocketFactory else SocketFactory.getDefault(),
+      secure match {
+        case true  => secureSocketFactory
+        case false => SocketFactory.getDefault()
+      },
       target.getHost,
       target.getPort match {
         case -1   => if (secure) 443 else 80
@@ -195,7 +198,8 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     }
   }
 
-  private def send[T](method: RequestMethod, target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T = {
+  private def send[T](method: RequestMethod, target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)
+      (handler: ResponseHandler[T]): T = {
     val req = cookies match {
       case Nil => HttpRequest(method, target, headers, body)
       case _   => HttpRequest(method, target, headers, body).withCookies(cookies)
@@ -238,7 +242,8 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   private def createCorrelate(requestId: Long): String =
     f"${System.currentTimeMillis}%x-$id%04x-$requestId%04x"
 
-  private def addAttributes[T <: HttpMessage](msg: T, conn: HttpClientConnection, correlate: String, absoluteTarget: Uri)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  private def addAttributes[T <: HttpMessage](msg: T, conn: HttpClientConnection, correlate: String, absoluteTarget: Uri)
+      (implicit ev: <:<[T, MessageBuilder[T]]): T =
     msg
       .withAttribute("scamper.client.message.connection"     -> conn)
       .withAttribute("scamper.client.message.socket"         -> conn.getSocket())

@@ -40,7 +40,7 @@ import scamper.types.ContentCodingRange
  * | bufferSize      | `8192` |
  * | readTimeout     | `30000` |
  * | continueTimeout | `1000` |
- * | coookieStore    | `CookieStore.alwaysEmpty()` |
+ * | coookieStore    | `CookieStore.alwaysEmpty` |
  * | trust           | ''(Not set)'' |
  * | incoming        | ''(Not set)'' |
  * | outgoing        | ''(Not set)'' |
@@ -115,7 +115,7 @@ class ClientSettings {
    *
    * @param cookies cookie store
    */
-  def cookieStore(cookies: CookieStore): this.type = synchronized {
+  def cookieStore(cookies: CookieStore = CookieStore()): this.type = synchronized {
     settings = settings.copy(cookieStore = notNull(cookies))
     this
   }
