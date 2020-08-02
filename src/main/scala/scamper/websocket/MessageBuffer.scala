@@ -18,13 +18,13 @@ package scamper.websocket
 import java.io.ByteArrayOutputStream
 import java.util.zip.{ Inflater, InflaterOutputStream }
 
-private trait Buffer {
+private trait MessageBuffer {
   def add(data: Array[Byte]): Unit
   def size: Int
   def get: Array[Byte] 
 }
 
-private class IdentityBuffer extends Buffer {
+private class IdentityMessageBuffer extends MessageBuffer {
   private val buffer = new ByteArrayOutputStream()
 
   def add(data: Array[Byte]): Unit = buffer.write(data)
@@ -32,7 +32,7 @@ private class IdentityBuffer extends Buffer {
   def get: Array[Byte] = buffer.toByteArray
 }
 
-private class InflaterBuffer extends Buffer {
+private class InflaterMessageBuffer extends MessageBuffer {
   private val buffer = new ByteArrayOutputStream()
   private val decompressor = new InflaterOutputStream(buffer, new Inflater(true))
 

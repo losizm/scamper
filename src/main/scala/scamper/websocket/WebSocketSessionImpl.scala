@@ -227,8 +227,8 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   private def doContinuation[T](handler: Option[T => Any], data: Array[Byte], compressed: Boolean)(decode: Array[Byte] => T): Unit = {
     val message = compressed match {
-      case true  => new InflaterBuffer
-      case false => new IdentityBuffer
+      case true  => new InflaterMessageBuffer
+      case false => new IdentityMessageBuffer
     }
 
     message.add(data)
