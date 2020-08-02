@@ -1,7 +1,13 @@
 # Scamper
-**Scamper** is the HTTP library for Scala. It defines the API for reading and
-writing HTTP messages, and it includes [client](#HTTP-Client) and
-[server](#HTTP-Server) implementations.
+**Scamper** is the HTTP library for Scala. It defines a clean interface for
+reading and writing HTTP messages. In addition, it provides [client](#HTTP-Client)
+and [server](#HTTP-Server) implementations, both of which support WebSockets with
+`permessage-deflate`.
+
+The client handles content and transfer encoding, as well as manages cookies.
+
+The server is integrated into a lightweight web framework, which allows
+developers to create web applications as pipelines of request handlers.
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_2.13.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_2.13%22)
 
