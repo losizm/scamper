@@ -89,24 +89,24 @@ trait WebSocketSession {
   def payloadLimit(length: Int): this.type
 
   /**
-   * Gets buffer capacity of incoming message.
+   * Gets capacity of incoming message.
    *
-   * @note If message buffer exceeds specified capacity, then session is closed
+   * @note If message exceeds specified capacity, then session is closed
    * with status code [[StatusCode.Registry.MessageTooBig MessageTooBig]].
    */
-  def bufferCapacity: Int
+  def messageCapacity: Int
 
   /**
-   * Sets buffer capacity of incoming message.
+   * Sets capacity of incoming message.
    *
-   * @param length buffer capacity (in bytes)
+   * @param size message capacity (in bytes)
    *
    * @return this session
    *
-   * @note If message buffer exceeds specified capacity, then session is closed
+   * @note If message exceeds specified capacity, then session is closed
    * with status code [[StatusCode.Registry.MessageTooBig MessageTooBig]].
    */
-  def bufferCapacity(length: Int): this.type
+  def messageCapacity(size: Int): this.type
 
   /**
    * Opens session.

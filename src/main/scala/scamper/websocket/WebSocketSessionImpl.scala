@@ -34,7 +34,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   private var _idleTimeout: Int = 0
   private var _payloadLimit: Int = 64 * 1024
-  private var _bufferCapacity: Int = 8 * 1024 * 1024
+  private var _messageCapacity: Int = 8 * 1024 * 1024
 
   private var textHandler: Option[String => Any] = None
   private var binaryHandler: Option[Array[Byte] => Any] = None
@@ -75,10 +75,10 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     this
   }
 
-  def bufferCapacity: Int = _bufferCapacity
+  def messageCapacity: Int = _messageCapacity
 
-  def bufferCapacity(length: Int): this.type = {
-    _bufferCapacity = length.max(8192)
+  def messageCapacity(size: Int): this.type = {
+    _messageCapacity = size.max(8192)
     this
   }
 
@@ -119,7 +119,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     Future(send(message, binary)).onComplete(callback)
 
   def ping(data: Array[Byte] = Array.empty): Unit = {
-    require(data.size <= 125, "data length must not exceed 125 bytes")
+    require(data.length <= 125, "data length must not exceed 125 bytes")
     conn.write(makeFrame(data, Ping))
   }
 
@@ -127,7 +127,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     Future(ping(data)).onComplete(callback)
 
   def pong(data: Array[Byte] = Array.empty): Unit = {
-    require(data.size <= 125, "data length must not exceed 125 bytes")
+    require(data.length <= 125, "data length must not exceed 125 bytes")
     conn.write(makeFrame(data, Pong))
   }
 
@@ -226,28 +226,28 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
       doContinuation(binaryHandler, data, compressed)(identity)
 
   private def doContinuation[T](handler: Option[T => Any], data: Array[Byte], compressed: Boolean)(decode: Array[Byte] => T): Unit = {
-    val buffer = compressed match {
+    val message = compressed match {
       case true  => new InflaterBuffer
       case false => new IdentityBuffer
     }
 
-    buffer.add(data)
+    message.add(data)
 
     var continue = true
 
     while (continue) {
       val frame = conn.read(idleTimeout)
 
-      checkFrame(frame, buffer.size)
+      checkFrame(frame, message.size)
 
       val moreData = getData(frame)
 
       frame.opcode match {
         case Continuation =>
-          buffer.add(moreData)
+          message.add(moreData)
 
           if (frame.isFinal) {
-            handler.foreach(handle => handle(decode(buffer.get)))
+            handler.foreach(handle => handle(decode(message.get)))
             continue = false
           }
 
@@ -305,7 +305,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     (deflate == DeflateMode.Frame) match {
       case true =>
         val payload = PermessageDeflate.compress(buf, 0, len)
-        conn.write(makeFrame(payload, payload.size, if (binary) Binary else Text, false, true))
+        conn.write(makeFrame(payload, payload.length, if (binary) Binary else Text, false, true))
 
       case false =>
         conn.write(makeFrame(buf, len, if (binary) Binary else Text, false, deflate != DeflateMode.None))
@@ -315,7 +315,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
       (deflate == DeflateMode.Frame) match {
         case true =>
           val payload = PermessageDeflate.compress(buf, 0, len)
-          conn.write(makeFrame(payload, payload.size, Continuation, false, true))
+          conn.write(makeFrame(payload, payload.length, Continuation, false, true))
 
         case false =>
           conn.write(makeFrame(buf, len, Continuation, false, false))
@@ -326,7 +326,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
   }
 
   private def makeFrame(data: Array[Byte], opcode: Opcode): WebSocketFrame =
-    makeFrame(data, data.size, opcode, true, false)
+    makeFrame(data, data.length, opcode, true, false)
 
   private def makeFrame(data: Array[Byte], length: Int, opcode: Opcode, isFinal: Boolean, isCompressed: Boolean): WebSocketFrame =
     WebSocketFrame(
@@ -341,8 +341,8 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
       data
     )
 
-  private def checkFrame(frame: WebSocketFrame, bufferSize: Int = 0): Unit = {
-    if ((bufferSize + frame.length) > bufferCapacity)
+  private def checkFrame(frame: WebSocketFrame, messageSize: Int = 0): Unit = {
+    if ((messageSize + frame.length) > messageCapacity)
       throw WebSocketError(MessageTooBig)
 
     frame.isMasked match {
