@@ -51,14 +51,14 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   def isSecure: Boolean = conn.isSecure
 
-  def state: ReadyState =
+  def state: SessionState =
     conn.isOpen match {
       case true  =>
         openInvoked.get match {
-          case true  => ReadyState.Open
-          case false => ReadyState.Pending
+          case true  => SessionState.Open
+          case false => SessionState.Pending
         }
-      case false => ReadyState.Closed
+      case false => SessionState.Closed
     }
 
   def idleTimeout: Int = _idleTimeout
@@ -168,7 +168,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
 
   private def start(): Unit =
     Future {
-      while (state == ReadyState.Open) {
+      while (state == SessionState.Open) {
         val frame = conn.read(idleTimeout)
 
         checkFrame(frame)

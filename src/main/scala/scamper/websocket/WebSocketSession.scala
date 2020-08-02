@@ -41,22 +41,8 @@ trait WebSocketSession {
   /** Tests for secure WebSocket session. */
   def isSecure: Boolean
 
-  /**
-   * Gets current state of WebSocket session.
-   *
-   * === Ready State ===
-   *
-   * If [[ReadyState.Pending Pending]], the session does not read incoming
-   * messages; however, the session can send messages.
-   *
-   * If [[ReadyState.Open Open]], the session reads incoming messages and passes
-   * them to the registered message handlers. The session can also send
-   * messages.
-   *
-   * If [[ReadyState.Closed Closed]], the session can neither receive nor send
-   * messages.
-   */
-  def state: ReadyState
+  /** Gets current state of WebSocket session. */
+  def state: SessionState
 
   /**
    * Gets WebSocket idle timeout in milliseconds.
