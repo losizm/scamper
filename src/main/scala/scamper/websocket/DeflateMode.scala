@@ -17,10 +17,8 @@ package scamper.websocket
 
 private[scamper] sealed trait DeflateMode
 
-object DeflateMode {
+private[scamper] object DeflateMode {
   case object Message extends DeflateMode
-
   case object Frame extends DeflateMode
-
   case object None extends DeflateMode
 }

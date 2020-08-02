@@ -46,13 +46,14 @@ trait WebSocketSession {
    *
    * === Ready State ===
    *
-   * If session is [[ReadyState.Pending Pending]], it must be opened before
-   * incoming messages are read.
+   * If [[ReadyState.Pending Pending]], the session does not read incoming
+   * messages; however, the session can send messages.
    *
-   * If session is [[ReadyState.Open Open]], it reads each incoming message
-   * and passes it to registered message handler.
+   * If [[ReadyState.Open Open]], the session reads incoming messages and passes
+   * them to the registered message handlers. The session can also send
+   * messages.
    *
-   * If session is [[ReadyState.Closed Closed]], it can neither receive nor send
+   * If [[ReadyState.Closed Closed]], the session can neither receive nor send
    * messages.
    */
   def state: ReadyState
@@ -84,8 +85,8 @@ trait WebSocketSession {
   /**
    * Gets payload limit of outgoing message.
    *
-   * @note If outgoing message exceeds specified limit, then the message is
-   * sent over multiple frames.
+   * @note If outgoing message exceeds specified limit, then message is sent
+   * over multiple frames.
    */
   def payloadLimit: Int
 
@@ -96,8 +97,8 @@ trait WebSocketSession {
    *
    * @return this session
    *
-   * @note If outgoing message exceeds specified limit, then the message is
-   * sent over multiple frames.
+   * @note If outgoing message exceeds specified limit, then message is sent
+   * over multiple frames.
    */
   def payloadLimit(length: Int): this.type
 

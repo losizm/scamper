@@ -124,7 +124,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
   }
 
   def pingAsync[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit =
-    Future(ping(data)).onComplete[T](callback)
+    Future(ping(data)).onComplete(callback)
 
   def pong(data: Array[Byte] = Array.empty): Unit = {
     require(data.size <= 125, "data length must not exceed 125 bytes")
@@ -294,10 +294,9 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     }
 
   private def sendData(data: InputStream, binary: Boolean): Unit = synchronized {
-    val in = deflate match {
-      case DeflateMode.Message => PermessageDeflate.compress(data)
-      case DeflateMode.Frame   => data
-      case DeflateMode.None    => data
+    val in = (deflate == DeflateMode.Message) match {
+      case true  => PermessageDeflate.compress(data)
+      case false => data
     }
 
     val buf = new Array[Byte](payloadLimit)
