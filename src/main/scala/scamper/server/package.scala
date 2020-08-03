@@ -15,15 +15,6 @@
  */
 package scamper
 
-import java.net.Socket
-
-import Implicits.stringToEntity
-import RequestMethod.Registry.GET
-import ResponseStatus.Registry.{ BadRequest, SwitchingProtocols }
-import headers.{ Connection, Upgrade }
-import types.Implicits.stringToProtocol
-import websocket._
-
 /**
  * Provides HTTP server implementation.
  *
@@ -99,7 +90,7 @@ package object server {
    * Indicates response was aborted.
    *
    * A `RequestHandler` throws `ResponseAborted` if no response should be sent
-   * for the handled request.
+   * for the request.
    */
   case class ResponseAborted(message: String) extends HttpException(message)
 
@@ -108,80 +99,4 @@ package object server {
 
   /** Indicates parameter cannot be converted. */
   case class ParameterNotConvertible(name: String, value: String) extends HttpException(s"$name=$value")
-
-  /**
-   * Upgrades request to WebSocket connection.
-   *
-   * If the request is a valid WebSocket upgrade, the supplied handler will be
-   * used for the WebSocket session after the connection is established.
-   *
-   * @param req request
-   * @param handler WebSocket session handler
-   *
-   * @return '''101 SwitchingProtocols''' if valid WebSocket upgrade request;
-   * otherwise, '''400 Bad Request'''
-   *
-   * @example
-   * {{{
-   * import scamper.HttpRequest
-   * import scamper.ResponseStatus.Registry.Unauthorized
-   * import scamper.server.{ ServerApplication, upgradeToWebSocket }
-   *
-   * val app = ServerApplication()
-   *
-   * app.get("/chat/:roomId") { req =>
-   *   def authorize(req: HttpRequest): Boolean = ???
-   *
-   *   authorize(req) match {
-   *     case true  =>
-   *       upgradeToWebSocket(req) { session =>
-   *         // Set up chat session
-   *         ???
-   *       }
-   *     case false => Unauthorized()
-   *   }
-   * }
-   * }}}
-   */
-  def upgradeToWebSocket[T](req: HttpRequest)(handler: WebSocketSession => T): HttpResponse =
-    try {
-      checkWebSocketRequest(req)
-
-      if (enablePermessageDeflate(req))
-        SwitchingProtocols()
-          .withUpgrade("websocket")
-          .withConnection("Upgrade")
-          .withSecWebSocketAccept(acceptWebSocketKey(req.secWebSocketKey))
-          .withSecWebSocketExtensions("permessage-deflate; client_no_context_takeover; server_no_context_takeover")
-          .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
-            val sessionRequest = req.withBody(Entity.empty)
-              .withAttribute("scamper.server.message.socket", socket)
-            handler(WebSocketSession.forServer(sessionRequest, DeflateMode.Message))
-          })
-
-      else if (enableWebkitDeflateFrame(req))
-        SwitchingProtocols()
-          .withUpgrade("websocket")
-          .withConnection("Upgrade")
-          .withSecWebSocketAccept(acceptWebSocketKey(req.secWebSocketKey))
-          .withSecWebSocketExtensions("x-webkit-deflate-frame; no_context_takeover")
-          .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
-            val sessionRequest = req.withBody(Entity.empty)
-              .withAttribute("scamper.server.message.socket", socket)
-            handler(WebSocketSession.forServer(sessionRequest, DeflateMode.Frame))
-          })
-
-      else
-        SwitchingProtocols()
-          .withUpgrade("websocket")
-          .withConnection("Upgrade")
-          .withSecWebSocketAccept(acceptWebSocketKey(req.secWebSocketKey))
-          .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
-            val sessionRequest = req.withBody(Entity.empty)
-              .withAttribute("scamper.server.message.socket", socket)
-            handler(WebSocketSession.forServer(sessionRequest, DeflateMode.None))
-          })
-    } catch {
-      case InvalidWebSocketRequest(message) => BadRequest(message)
-    }
 }

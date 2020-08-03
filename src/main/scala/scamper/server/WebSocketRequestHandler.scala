@@ -15,24 +15,16 @@
  */
 package scamper.server
 
-import java.net.Socket
-
 import scala.util.Try
 
-import scamper.{ Entity, HttpMessage, HttpRequest }
-import scamper.Implicits.stringToEntity
-import scamper.RequestMethod.Registry.GET
-import scamper.ResponseStatus.Registry.{ BadRequest, SwitchingProtocols }
-import scamper.headers.{ Connection, Upgrade }
-import scamper.server.Implicits.ServerHttpMessageType
-import scamper.types.Implicits.stringToProtocol
-import scamper.websocket._
+import scamper.{ HttpMessage, HttpRequest }
+import scamper.websocket.{ StatusCode, WebSocketSession, isWebSocketUpgrade }
 
 private class WebSocketRequestHandler private (handler: WebSocketSession => Any) extends RequestHandler {
   def apply(req: HttpRequest): HttpMessage =
     isWebSocketUpgrade(req) match {
       case true  =>
-        upgradeToWebSocket(req) { session =>
+        UpgradeToWebSocket(req) { session =>
           try handler(session)
           catch {
             case err: Exception =>
