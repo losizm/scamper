@@ -215,9 +215,6 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
     private val connectionCount = new AtomicLong(0)
     private val serviceCount = new AtomicLong(0)
 
-    private def createCorrelate(serviceId: Long, connectionId: Long, requestCount: Int): String =
-      f"${System.currentTimeMillis}%x-$serviceId%04x-$connectionId%04x-$requestCount%02x"
-
     override def run(): Unit =
       while (!isClosed)
         try {
@@ -225,17 +222,17 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
           service(connectionCount.incrementAndGet, 1)
         } catch {
           case e: Exception if serverSocket.isClosed => close() // Ensure server is closed
-          case e: Exception => logger.warn(s"$authority - Error while waiting for connection: $e")
+          case e: Exception => logger.warn(s"$authority - Error caught in service loop: $e")
         }
+
+    private def createCorrelate(serviceId: Long, connectionId: Long, requestCount: Int): String =
+      f"${System.currentTimeMillis}%x-$serviceId%04x-$connectionId%04x-$requestCount%02x"
 
     private def service(connectionId: Long, requestCount: Int)(implicit socket: Socket): Unit = {
       val serviceId = serviceCount.incrementAndGet
-      val connection = socket.getInetAddress.getHostAddress + ":" + socket.getPort
       val correlate = createCorrelate(serviceId, connectionId, requestCount)
+      val connection = socket.getInetAddress.getHostAddress + ":" + socket.getPort
       val tag = connection + " (correlate=" + correlate + ")"
-
-      if (requestCount == 1)
-        logger.info(s"$authority - Connection accepted from $tag")
 
       def onReadError: PartialFunction[Throwable, HttpResponse] = {
         case ReadError(status)              => status()
@@ -298,20 +295,24 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
           case err: ResponseAborted =>
             logger.warn(s"$authority - Response aborted while servicing request from $tag", err)
             CloseConnection
+
           case err: SSLException =>
             logger.warn(s"$authority - SSL error while servicing request from $tag", err)
             CloseConnection
+
           case err: Exception =>
             logger.error(s"$authority - Unhandled error while servicing request from $tag", err)
             CloseConnection
         }
 
-      val result = (requestCount > 1) match {
-        case true  =>
-          Future { readByte(true) } (keepAliveContext)
-            .map { onBeginService } (serviceContext)
+      val result = (requestCount == 1) match {
+        case true =>
+          logger.info(s"$authority - Connection accepted from $tag")
+          Future(onBeginService(readByte(false))) { serviceContext }
+
         case false =>
-          Future { onBeginService(readByte(false)) } (serviceContext)
+          Future(readByte(true)) { keepAliveContext }
+            .map(onBeginService) { serviceContext }
       }
 
       result.onComplete {
@@ -325,7 +326,7 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
 
         case Success(UpgradeConnection(upgrade)) =>
           logger.info(s"$authority - Upgrading connection to $tag")
-          Future(upgrade(socket))(upgradeContext)
+          Future(upgrade(socket)) { upgradeContext }
 
         case Failure(err: ReadAborted) =>
           (requestCount > 1) match {
@@ -345,7 +346,7 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
         case Failure(err) =>
           logger.info(s"$authority - Closing connection to $tag")
           Try(socket.close())
-      } (closerContext)
+      } { closerContext }
     }
 
     private def readByte(keepingAlive: Boolean)(implicit socket: Socket): Byte = {
@@ -461,8 +462,8 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
     private def encode(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
       encoding.foldLeft(in) { (in, enc) =>
         if (enc.isChunked) in
-        else if (enc.isGzip) Compressor.gzip(in, bufferSize)(encoderContext)
-        else if (enc.isDeflate) Compressor.deflate(in, bufferSize)(encoderContext)
+        else if (enc.isGzip) Compressor.gzip(in, bufferSize) { encoderContext }
+        else if (enc.isDeflate) Compressor.deflate(in, bufferSize) { encoderContext }
         else throw new HttpException(s"Unsupported transfer encoding: $enc")
       }
 
