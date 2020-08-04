@@ -19,7 +19,7 @@ import java.io.{ Closeable, EOFException, File, InputStream }
 import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException, URISyntaxException }
 import java.time.Instant
 import java.util.concurrent.RejectedExecutionException
-import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.{ AtomicBoolean, AtomicLong }
 
 import javax.net.ServerSocketFactory
 import javax.net.ssl.{ SSLException, SSLServerSocketFactory }
@@ -100,7 +100,7 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
 
   private val serverSocket = app.serverSocketFactory.createServerSocket()
   private val chunked = TransferCoding("chunked")
-  private var closed = false
+  private var closed = new AtomicBoolean(false)
 
   private val threadGroup = new ThreadGroup(s"scamper-server-$id")
 
@@ -135,10 +135,10 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
 
   val isSecure: Boolean = app.serverSocketFactory.isInstanceOf[SSLServerSocketFactory]
 
-  def isClosed: Boolean = synchronized(closed)
+  def isClosed: Boolean = closed.get()
 
-  def close(): Unit = synchronized {
-    if (!closed) {
+  def close(): Unit =
+    if (closed.compareAndSet(false, true)) {
       Try(logger.info(s"$authority - Shutting down server"))
       Try(serverSocket.close())
       Try(keepAliveContext.shutdownNow())
@@ -147,9 +147,7 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
       Try(serviceContext.shutdownNow())
       Try(closerContext.shutdownNow())
       Try(logger.asInstanceOf[Closeable].close())
-      closed = true
     }
-  }
 
   override def toString(): String = s"HttpServer(host=$host, port=$port, isSecure=$isSecure, isClosed=$isClosed)"
 
