@@ -75,7 +75,7 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
   val bufferSize = app.bufferSize.max(1024)
   val readTimeout = app.readTimeout.max(100)
   val headerLimit = app.headerLimit.max(10)
-  val keepAlive = app.keepAlive.map(params => KeepAliveParameters(params.timeout.max(1), params.max.max(2)))
+  val keepAlive = app.keepAlive.map(params => KeepAliveParameters(params.timeout.max(1), params.max.max(1)))
 
   private val keepAliveEnabled = keepAlive.isDefined
   private val keepAliveMax = keepAlive.map(_.max).getOrElse(1)
