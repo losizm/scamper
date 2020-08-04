@@ -345,15 +345,8 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     if ((messageSize + frame.length) > messageCapacity)
       throw WebSocketError(MessageTooBig)
 
-    frame.isMasked match {
-      case true =>
-        if (!serverMode)
-          throw WebSocketError(ProtocolError)
-
-      case false =>
-        if (serverMode)
-          throw WebSocketError(ProtocolError)
-    }
+    if (frame.isMasked ^ serverMode)
+      throw WebSocketError(ProtocolError)
 
     if (frame.isCompressed && deflate == DeflateMode.None)
       throw WebSocketError(ProtocolError)

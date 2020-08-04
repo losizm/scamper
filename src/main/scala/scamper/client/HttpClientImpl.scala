@@ -256,13 +256,9 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       .getOrElse(throw new NoSuchElementException("No such attribute: scamper.client.message.connection"))
 
   private def addAcceptEncoding(req: HttpRequest): HttpRequest =
-    req.hasAcceptEncoding match {
+    (req.hasAcceptEncoding || acceptEncodings.isEmpty) match {
       case true  => req
-      case false =>
-        acceptEncodings.isEmpty match {
-          case true  => req
-          case false => req.withAcceptEncoding(acceptEncodings)
-        }
+      case false => req.withAcceptEncoding(acceptEncodings)
     }
 
   private def storeCookies(target: Uri, res: HttpResponse): HttpResponse = {
