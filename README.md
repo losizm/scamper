@@ -54,7 +54,7 @@ developers to create web applications as pipelines of request handlers.
 To use **Scamper**, start by adding it as a dependency to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "16.0.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "17.0.0"
 ```
 
 ## HTTP Messages
