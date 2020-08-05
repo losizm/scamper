@@ -15,10 +15,35 @@
  */
 package scamper.websocket
 
-private[scamper] sealed trait DeflateMode
+import java.io.InputStream
+
+private[scamper] sealed trait DeflateMode {
+  def compressed: Boolean
+  def continuation: Boolean
+  def prepare(data: InputStream): InputStream
+  def apply(payload: Array[Byte], length: Int): (Array[Byte], Int)
+}
 
 private[scamper] object DeflateMode {
-  case object Message extends DeflateMode
-  case object Frame extends DeflateMode
-  case object None extends DeflateMode
+  case object Message extends DeflateMode {
+    val compressed = true
+    val continuation = false
+    def prepare(data: InputStream) = PermessageDeflate.compress(data)
+    def apply(payload: Array[Byte], length: Int) = (payload, length)
+  }
+  case object Frame extends DeflateMode {
+    val compressed = true
+    val continuation = true
+    def prepare(data: InputStream) = data
+    def apply(payload: Array[Byte], length: Int) = {
+      val deflated = PermessageDeflate.compress(payload, 0, length)
+      (deflated, deflated.length)
+    }
+  }
+  case object None extends DeflateMode {
+    val compressed = false
+    val continuation = false
+    def prepare(data: InputStream) = data
+    def apply(payload: Array[Byte], length: Int) = (payload, length)
+  }
 }

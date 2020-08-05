@@ -282,11 +282,9 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     }
 
   private def sendData(data: Array[Byte], binary: Boolean): Unit =
-    (deflate == DeflateMode.None && data.length <= payloadLimit) match {
+    (!deflate.compressed && data.length <= payloadLimit) match {
       case true  =>
-        val opcode = if (binary) Binary else Text
-        val frame = makeFrame(data, opcode)
-
+        val frame = makeFrame(data, if (binary) Binary else Text)
         synchronized(conn.write(frame))
 
       case false =>
@@ -294,31 +292,17 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     }
 
   private def sendData(data: InputStream, binary: Boolean): Unit = synchronized {
-    val in = (deflate == DeflateMode.Message) match {
-      case true  => PermessageDeflate.compress(data)
-      case false => data
-    }
-
+    val in  = deflate.prepare(data)
     val buf = new Array[Byte](payloadLimit)
     var len = in.readMostly(buf)
 
-    (deflate == DeflateMode.Frame) match {
-      case true =>
-        val payload = PermessageDeflate.compress(buf, 0, len)
-        conn.write(makeFrame(payload, payload.length, if (binary) Binary else Text, false, true))
-
-      case false =>
-        conn.write(makeFrame(buf, len, if (binary) Binary else Text, false, deflate != DeflateMode.None))
+    deflate(buf, len) match {
+      case (buf, len) => conn.write(makeFrame(buf, len, if (binary) Binary else Text, false, deflate.compressed))
     }
 
     while ({ len = in.readMostly(buf); len != -1 }) {
-      (deflate == DeflateMode.Frame) match {
-        case true =>
-          val payload = PermessageDeflate.compress(buf, 0, len)
-          conn.write(makeFrame(payload, payload.length, Continuation, false, true))
-
-        case false =>
-          conn.write(makeFrame(buf, len, Continuation, false, false))
+      deflate(buf, len) match {
+        case (buf, len) => conn.write(makeFrame(buf, len, Continuation, false, deflate.continuation))
       }
     }
 
@@ -348,7 +332,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     if (frame.isMasked ^ serverMode)
       throw WebSocketError(ProtocolError)
 
-    if (frame.isCompressed && deflate == DeflateMode.None)
+    if (frame.isCompressed && !deflate.compressed)
       throw WebSocketError(ProtocolError)
   }
 
