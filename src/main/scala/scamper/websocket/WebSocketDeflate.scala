@@ -18,7 +18,7 @@ package scamper.websocket
 import java.io._
 import java.util.zip._
 
-private object PermessageDeflate {
+private object WebSocketDeflate {
   def compress(message: InputStream): InputStream =
     new SequenceInputStream(
       new DeflaterInputStream(message, new Deflater(Deflater.DEFAULT_COMPRESSION, true)),

@@ -28,7 +28,7 @@ private[scamper] object DeflateMode {
   case object Message extends DeflateMode {
     val compressed = true
     val continuation = false
-    def prepare(data: InputStream) = PermessageDeflate.compress(data)
+    def prepare(data: InputStream) = WebSocketDeflate.compress(data)
     def apply(payload: Array[Byte], length: Int) = (payload, length)
   }
   case object Frame extends DeflateMode {
@@ -36,7 +36,7 @@ private[scamper] object DeflateMode {
     val continuation = true
     def prepare(data: InputStream) = data
     def apply(payload: Array[Byte], length: Int) = {
-      val deflated = PermessageDeflate.compress(payload, 0, length)
+      val deflated = WebSocketDeflate.compress(payload, 0, length)
       (deflated, deflated.length)
     }
   }

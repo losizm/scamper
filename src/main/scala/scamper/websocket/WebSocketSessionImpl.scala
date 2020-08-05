@@ -205,7 +205,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     if (last)
       textHandler.foreach { handle =>
         compressed match {
-          case true  => handle(new String(PermessageDeflate.decompress(data), "UTF-8"))
+          case true  => handle(new String(WebSocketDeflate.decompress(data), "UTF-8"))
           case false => handle(new String(data, "UTF-8"))
         }
       }
@@ -218,7 +218,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     if (last)
       binaryHandler.foreach { handle =>
         compressed match {
-          case true  => handle(PermessageDeflate.decompress(data))
+          case true  => handle(WebSocketDeflate.decompress(data))
           case false => handle(data)
         }
       }
