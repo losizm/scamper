@@ -284,8 +284,9 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
   private def sendData(data: Array[Byte], binary: Boolean): Unit =
     (!deflate.compressed && data.length <= payloadLimit) match {
       case true  =>
-        val frame = makeFrame(data, if (binary) Binary else Text)
-        synchronized(conn.write(frame))
+        synchronized {
+          conn.write(makeFrame(data, if (binary) Binary else Text))
+        }
 
       case false =>
         sendData(new ByteArrayInputStream(data), binary)

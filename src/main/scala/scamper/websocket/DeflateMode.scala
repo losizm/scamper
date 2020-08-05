@@ -25,13 +25,21 @@ private[scamper] sealed trait DeflateMode {
 }
 
 private[scamper] object DeflateMode {
-  case object Message extends DeflateMode {
+  object None extends DeflateMode {
+    val compressed = false
+    val continuation = false
+    def prepare(data: InputStream) = data
+    def apply(payload: Array[Byte], length: Int) = (payload, length)
+  }
+
+  object Message extends DeflateMode {
     val compressed = true
     val continuation = false
     def prepare(data: InputStream) = WebSocketDeflate.compress(data)
     def apply(payload: Array[Byte], length: Int) = (payload, length)
   }
-  case object Frame extends DeflateMode {
+
+  object Frame extends DeflateMode {
     val compressed = true
     val continuation = true
     def prepare(data: InputStream) = data
@@ -39,11 +47,5 @@ private[scamper] object DeflateMode {
       val deflated = WebSocketDeflate.compress(payload, 0, length)
       (deflated, deflated.length)
     }
-  }
-  case object None extends DeflateMode {
-    val compressed = false
-    val continuation = false
-    def prepare(data: InputStream) = data
-    def apply(payload: Array[Byte], length: Int) = (payload, length)
   }
 }
