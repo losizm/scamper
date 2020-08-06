@@ -133,7 +133,7 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(i
    *
    * @throws IOException if an I/O error occurs
    */
-  override def read(buffer: Array[Byte], offset: Int, length: Int): Int = {
+  override def read(buffer: Array[Byte], offset: Int, length: Int): Int = propose {
     var eof = false
     var count = 0
 
@@ -156,7 +156,7 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(i
   }
 
   @inline
-  private def propose[T](value: T): T =
+  private def propose[T](value: => T): T =
     error.get match {
       case null  => value
       case cause => throw new IOException("Writer exception", cause)
