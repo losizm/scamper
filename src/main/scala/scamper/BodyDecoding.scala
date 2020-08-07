@@ -65,7 +65,7 @@ trait BodyDecoding {
    * @note The decoded input stream throws [[ReadLimitExceeded]] if it attempts
    *   to read beyond `maxLength` of message body.
    */
-  def withDecoded[T](message: HttpMessage)(f: InputStream => T): T =
+  def withDecode[T](message: HttpMessage)(f: InputStream => T): T =
     f { decode(message) }
 
   private def transferInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =

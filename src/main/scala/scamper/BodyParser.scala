@@ -101,7 +101,7 @@ object BodyParser {
 
 private class ByteArrayBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[Array[Byte]] with BodyDecoding {
   def parse(message: HttpMessage): Array[Byte] =
-    withDecoded(message) { in =>
+    withDecode(message) { in =>
       val out = new ArrayBuffer[Byte](bufferSize)
       val buf = new Array[Byte](bufferSize)
       var len = 0
@@ -144,7 +144,7 @@ private class FormBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser
 
 private class FileBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[File] with BodyDecoding {
   def parse(message: HttpMessage): File =
-    withDecoded(message) { in =>
+    withDecode(message) { in =>
       val destFile = getDestFile()
 
       destFile.withOutputStream { out =>
