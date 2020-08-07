@@ -115,7 +115,7 @@ object Implicits {
      * @param data message body
      */
     def withFormBody(data: Map[String, Seq[String]])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withQueryBody(QueryString(data))
+      withFormBody(QueryString(data))
 
     /**
      * Creates new message with supplied form data as message body.
@@ -127,7 +127,7 @@ object Implicits {
      * @param data message body
      */
     def withFormBody(data: Seq[(String, String)])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withQueryBody(QueryString(data))
+      withFormBody(QueryString(data))
 
     /**
      * Creates new message with supplied form data as message body.
@@ -136,11 +136,11 @@ object Implicits {
      * `application/x-www-form-urlencoded`, and Content-Length is set to length
      * of encoded form data.
      *
-     * @param one form datum
+     * @param one form data
      * @param more additional form data
      */
     def withFormBody(one: (String, String), more: (String, String)*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withQueryBody(QueryString(one +: more))
+      withFormBody(QueryString(one +: more))
 
     /**
      * Creates new message with supplied query string as message body.
@@ -151,7 +151,7 @@ object Implicits {
      *
      * @param query message body
      */
-    def withQueryBody(query: QueryString)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+    def withFormBody(query: QueryString)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
       val entity = Entity(query)
       message.withBody(entity)
         .withHeader(Header("Content-Type", "application/x-www-form-urlencoded"))
