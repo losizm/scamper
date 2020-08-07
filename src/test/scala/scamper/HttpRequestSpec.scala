@@ -17,11 +17,10 @@ package scamper
 
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry._
-import scamper.ResponseStatus.Registry._
 import scamper.headers._
 
-class HttpMessageSpec extends org.scalatest.flatspec.AnyFlatSpec {
-  "HttpRequest" should "be created with path" in {
+class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
+  it should "create HttpRequest with path" in {
     val req = GET("?user=root&group=wheel").withPath("/find")
     assert(req.method.name == "GET")
     assert(req.target.toString == "/find?user=root&group=wheel")
@@ -30,7 +29,7 @@ class HttpMessageSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(req.query.get("group").contains("wheel"))
   }
 
-  it should "be created with empty path" in {
+  it should "create HttpRequest with empty path" in {
     assert(GET("").path == "/")
     assert(GET("http://localhost:8080").path == "/")
     assert(GET("http://localhost:8080/index.html").withPath("").path == "/")
@@ -42,7 +41,7 @@ class HttpMessageSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(OPTIONS("http://localhost:8080/index.html").withPath("").path == "*")
   }
 
-  it should "be created with query parameters" in {
+  it should "create HttpRequest with query parameters" in {
     val req = GET("/find").withQuery("user" -> "root", "group" -> "wheel")
     assert(req.method.name == "GET")
     assert(req.target.toString == "/find?user=root&group=wheel")
@@ -52,7 +51,7 @@ class HttpMessageSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(req.attributes.isEmpty)
   }
 
-  it should "be created with host" in {
+  it should "create HttpRequest with host" in {
     val req = GET("/find?user=root&group=wheel").withHost("localhost:8080")
     assert(req.method.name == "GET")
     assert(req.target.toString == "/find?user=root&group=wheel")
@@ -63,7 +62,7 @@ class HttpMessageSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(req.attributes.isEmpty)
   }
 
-  it should "be created with attributes" in {
+  it should "create HttpRequest with attributes" in {
     var req = GET("/").withAttributes("id" -> 1, "name" -> "request").withAttribute("success" -> true)
     assert(req.method == GET)
     assert(req.attributes.size == 3)
@@ -96,46 +95,5 @@ class HttpMessageSpec extends org.scalatest.flatspec.AnyFlatSpec {
     val req = GET("/find?user=root&group=wheel")
     assertThrows[HeaderNotFound](req.getHeaderOrElse("User-Agent", throw HeaderNotFound("User-Agent")))
     assertThrows[HeaderNotFound](req.getHeaderValueOrElse("User-Agent", throw HeaderNotFound("User-Agent")))
-  }
-
-  "HttpResponse" should "be created with location" in {
-    val res = SeeOther().withLocation("/find")
-    assert(res.status == SeeOther)
-    assert(res.location.toString == "/find")
-  }
-
-  it should "be created with attributes" in {
-    var res = Ok().withAttributes("id" -> 1, "name" -> "response").withAttribute("success" -> true)
-    assert(res.status == Ok)
-    assert(res.attributes.size == 3)
-    assert(res.getAttribute[Int]("id").contains(1))
-    assert(res.getAttribute[String]("name").contains("response"))
-    assert(res.getAttributeOrElse("success", false))
-    assert(res.getAttributeOrElse("answer", 45) == 45)
-    assert(res.withAttributes(Map.empty[String, Any]).attributes.size == 0)
-
-    res = res.removeAttributes("name")
-    assert(res.attributes.size == 2)
-    assert(res.attributes.contains("id"))
-    assert(res.attributes.contains("success"))
-    assert(!res.attributes.contains("name"))
-  }
-
-  it should "get default value if header not found" in {
-    val server = Header("Server", "Scamper/x.x")
-    val location = Header("Location", "/find")
-    val res = SeeOther().withHeader(server)
-
-    assert(res.getHeaderOrElse("Server", throw HeaderNotFound("Server")) == server)
-    assert(res.getHeaderValueOrElse("Server", throw HeaderNotFound("Server")) == server.value)
-
-    assert(res.getHeaderOrElse("Location", location) == location)
-    assert(res.getHeaderValueOrElse("Location", location.value) == location.value)
-  }
-
-  it should "throw exception if header not found" in {
-    val res = SeeOther()
-    assertThrows[HeaderNotFound](res.getHeaderOrElse("Server", throw HeaderNotFound("Server")))
-    assertThrows[HeaderNotFound](res.getHeaderValueOrElse("Server", throw HeaderNotFound("Server")))
   }
 }
