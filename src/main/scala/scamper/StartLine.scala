@@ -55,7 +55,7 @@ object RequestLine {
       throw new IllegalArgumentException(s"Malformed request line: $line")
     }
 
-  /** Creates RequestLine with supplied attributes. */
+  /** Creates RequestLine with supplied parts. */
   def apply(method: RequestMethod, target: Uri, version: HttpVersion = HttpVersion(1, 1)): RequestLine =
     RequestLineImpl(notNull(method), adjustTarget(notNull(target), method.name), notNull(version))
 
@@ -115,7 +115,7 @@ object StatusLine {
       throw new IllegalArgumentException(s"Malformed status line: $line")
     }
 
-  /** Creates StatusLine with supplied attributes. */
+  /** Creates StatusLine with supplied parts. */
   def apply(status: ResponseStatus, version: HttpVersion = HttpVersion(1, 1)): StatusLine =
     StatusLineImpl(notNull(status), notNull(version))
 

@@ -20,7 +20,7 @@ import java.time.Instant
 
 import scamper.types.MediaType
 
-/** Includes implicit converter functions. */
+/** Includes implicit converter functions and type classes. */
 object Implicits {
   /** Converts string to `Uri`. */
   implicit val stringToUri = (uri: String) => Uri(uri)
@@ -177,7 +177,7 @@ object Implicits {
      * Creates new message with supplied parts as message body, with the parts
      * encoded as multipart form data.
      *
-     * Before adding body to message, the Content-Type header is set to
+     * After adding body to message, the Content-Type header is set to
      * `multipart/form-data` with a boundary parameter whose value is used
      * to delimit parts in encoded message body.
      *
@@ -190,7 +190,7 @@ object Implicits {
      * Creates new message with supplied parts as message body, with the parts
      * encoded as multipart form data.
      *
-     * Before adding body to message, the Content-Type header is set to
+     * After adding body to message, the Content-Type header is set to
      * `multipart/form-data` with a boundary parameter whose value is used
      * to delimit parts in encoded message body.
      *

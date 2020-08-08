@@ -49,7 +49,7 @@ trait ResponseStatus {
   def isServerError: Boolean =
     code >= 500 && code <= 599
 
-  /** Creates `HttpResponse` with supplied body. */
+  /** Creates `HttpResponse` with response status and supplied body. */
   def apply(body: Entity = Entity.empty): HttpResponse =
     HttpResponse(this, Nil, body)
 

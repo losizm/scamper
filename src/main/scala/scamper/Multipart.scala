@@ -200,11 +200,11 @@ object FilePart {
   def apply(name: String, content: File): FilePart =
     apply(getDisposition(name, Some(content.getName)), getType(content), content)
 
-  /** Creates FilePart with given name, file name, and content. */
+  /** Creates FilePart with given name, content, and file name. */
   def apply(name: String, content: File, fileName: String): FilePart =
     apply(getDisposition(name, Some(fileName)), getType(content), content)
 
-  /** Creates FilePart with given name and content. */
+  /** Creates FilePart with given name, content, and optional file name. */
   def apply(name: String, content: File, fileName: Option[String]): FilePart =
     apply(getDisposition(name, fileName), getType(content), content)
 
