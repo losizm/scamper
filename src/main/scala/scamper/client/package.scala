@@ -120,13 +120,7 @@ package object client {
     def apply(req: HttpRequest): HttpRequest
   }
 
-  /** Provides utility for filtering incoming response. */
-  trait ResponseFilter {
-    /** Filters incoming response. */
-    def apply(res: HttpResponse): HttpResponse
-  }
-
-  /** Provides utility for handling response. */
+  /** Provides utility for handling incoming response. */
   trait ResponseHandler[T] {
     /**
      * Handles response.
@@ -136,64 +130,6 @@ package object client {
     def apply(res: HttpResponse): T
   }
 
-  /** Provides utility for testing response. */
-  trait ResponsePredicate extends ResponseHandler[Boolean] {
-    /**
-     * Tests given response.
-     *
-     * @param res response
-     */
-    def apply(res: HttpResponse): Boolean
-
-    /**
-     * Returns `Some(res)` if response passes test, and `None` otherwise.
-     *
-     * @param res response
-     */
-    def unapply(res: HttpResponse): Option[HttpResponse] =
-      if (apply(res)) Some(res) else None
-  }
-
-  /** Provides status-based `ResponsePredicate`s. */
-  object ResponsePredicate {
-    /**
-     * Tests for informational responses.
-     *
-     * See [[HttpResponse.isInformational]].
-     */
-    val Informational: ResponsePredicate =
-      res => res.isInformational
-
-    /**
-     * Tests for successful responses.
-     *
-     * See [[HttpResponse.isSuccessful]].
-     */
-    val Successful: ResponsePredicate =
-      res => res.isSuccessful
-
-    /**
-     * Tests for redirection responses.
-     *
-     * See [[HttpResponse.isRedirection]].
-     */
-    val Redirection: ResponsePredicate =
-      res => res.isRedirection
-
-    /**
-     * Tests for client error responses.
-     *
-     * See [[HttpResponse.isClientError]].
-     */
-    val ClientError: ResponsePredicate =
-      res => res.isClientError
-
-    /**
-     * Tests for server error responses.
-     *
-     * See [[HttpResponse.isServerError]].
-     */
-    val ServerError: ResponsePredicate =
-      res => res.isServerError
-  }
+  /** Provides utility for filtering incoming response. */
+  trait ResponseFilter extends ResponseHandler[HttpResponse]
 }

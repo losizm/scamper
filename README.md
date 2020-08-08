@@ -543,8 +543,7 @@ responses.
 import scamper.Implicits.{ stringToEntity, stringToUri }
 import scamper.RequestMethod.Registry.POST
 import scamper.client.HttpClient
-import scamper.client.ResponsePredicate._
-import scamper.headers.{ ContentType, Location }
+import scamper.headers.ContentType
 import scamper.types.Implicits.stringToMediaType
 
 val req = POST("https://localhost:8080/users")
@@ -552,12 +551,8 @@ val req = POST("https://localhost:8080/users")
   .withBody(s"""{ "id": 500, "name": "guest" }""")
 
 // Send request and print response status
-HttpClient.send(req) {
-  case Successful(_)    => println("Successful")
-  case Redirection(res) => println(s"Redirection: ${res.location}")
-  case ClientError(res) => println(s"Client error: ${res.status}")
-  case ServerError(res) => println(s"Server error: ${res.status}")
-  case Informational(_) => println("Informational")
+HttpClient.send(req) { res =>
+  println(res.status)
 }
 ```
 
@@ -611,7 +606,7 @@ implicit val parser = BodyParser.text(4096)
 
 GET("http://localhost:8080/motd")
   .withAccept("text/plain")
-  .withAcceptLanguage("en-US; q=0.6", "fr-CA; q=0.4")
+  .withAcceptLanguage("fr-CA; q=0.6", "en-CA; q=0.4")
   .send(res => println(res.as[String])) // Send request and print response
 ```
 
@@ -638,8 +633,7 @@ val client = HttpClient.settings()
   .create()
 
 client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
-  if (!res.isSuccessful)
-    throw new Exception(s"Message not posted: ${res.status.code}")
+  assert(res.isSuccessful, s"Message not posted: ${res.status.code}")
 }
 ```
 
