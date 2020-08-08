@@ -194,6 +194,21 @@ trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse] {
   /** Gets response status. */
   def status: ResponseStatus = startLine.status
 
+  /** Tests for informational status. */
+  def isInformational: Boolean = status.isInformational
+
+  /** Tests for successful status. */
+  def isSuccessful: Boolean = status.isSuccessful
+
+  /** Tests for redirection status. */
+  def isRedirection: Boolean = status.isRedirection
+
+  /** Tests for client error status. */
+  def isClientError: Boolean = status.isClientError
+
+  /** Tests for server error status. */
+  def isServerError: Boolean = status.isServerError
+
   /**
    * Creates response with new status.
    *

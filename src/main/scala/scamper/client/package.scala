@@ -47,7 +47,7 @@ import RequestMethod.Registry._
  *
  *   // Send request and handle response
  *   HttpClient.send(req) { res =>
- *     res.status.isSuccessful match {
+ *     res.isSuccessful match {
  *       case true  => Right(res.as[String])
  *       case false => Left(res.status.code)
  *     }
@@ -78,7 +78,7 @@ import RequestMethod.Registry._
  * def getMessageOfTheDay(): Either[Int, String] = {
  *   // Use client instance
  *   client.get("http://localhost:8080/motd") { res =>
- *     res.status.isSuccessful match {
+ *     res.isSuccessful match {
  *       case true  => Right(res.as[String])
  *       case false => Left(res.status.code)
  *     }
@@ -159,41 +159,41 @@ package object client {
     /**
      * Tests for informational responses.
      *
-     * See [[ResponseStatus.isInformational]].
+     * See [[HttpResponse.isInformational]].
      */
     val Informational: ResponsePredicate =
-      res => res.status.isInformational
+      res => res.isInformational
 
     /**
      * Tests for successful responses.
      *
-     * See [[ResponseStatus.isSuccessful]].
+     * See [[HttpResponse.isSuccessful]].
      */
     val Successful: ResponsePredicate =
-      res => res.status.isSuccessful
+      res => res.isSuccessful
 
     /**
      * Tests for redirection responses.
      *
-     * See [[ResponseStatus.isRedirection]].
+     * See [[HttpResponse.isRedirection]].
      */
     val Redirection: ResponsePredicate =
-      res => res.status.isRedirection
+      res => res.isRedirection
 
     /**
      * Tests for client error responses.
      *
-     * See [[ResponseStatus.isClientError]].
+     * See [[HttpResponse.isClientError]].
      */
     val ClientError: ResponsePredicate =
-      res => res.status.isClientError
+      res => res.isClientError
 
     /**
      * Tests for server error responses.
      *
-     * See [[ResponseStatus.isServerError]].
+     * See [[HttpResponse.isServerError]].
      */
     val ServerError: ResponsePredicate =
-      res => res.status.isServerError
+      res => res.isServerError
   }
 }

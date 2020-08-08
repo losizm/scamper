@@ -203,8 +203,8 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
         .getOrElse(false)
 
     private def isKeepAliveSafe(req: HttpRequest, res: HttpResponse): Boolean =
-      res.status.isSuccessful ||
-        ((req.method == GET || req.method == HEAD) && res.status.isRedirection)
+      res.isSuccessful ||
+        ((req.method == GET || req.method == HEAD) && res.isRedirection)
 
     private def isUpgrade(res: HttpResponse): Boolean =
       res.status == SwitchingProtocols && res.hasUpgrade &&

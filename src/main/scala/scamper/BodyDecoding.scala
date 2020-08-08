@@ -39,9 +39,9 @@ trait BodyDecoding {
       EmptyInputStream
     else
       message match {
-        case res: HttpResponse if res.status.isInformational => EmptyInputStream
-        case res: HttpResponse if res.status.code == 204     => EmptyInputStream
-        case res: HttpResponse if res.status.code == 304     => EmptyInputStream
+        case res: HttpResponse if res.isInformational    => EmptyInputStream
+        case res: HttpResponse if res.status.code == 204 => EmptyInputStream
+        case res: HttpResponse if res.status.code == 304 => EmptyInputStream
         case _ =>
           message.body.withInputStream { in =>
             val transferIn = message.transferEncoding match {

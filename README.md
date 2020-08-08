@@ -586,7 +586,7 @@ val client = HttpClient()
 def getMessageOfTheDay(): Either[Int, String] = {
   // Use client instance
   client.get("http://localhost:8080/motd") { res =>
-    res.status.isSuccessful match {
+    res.isSuccessful match {
       case true  => Right(res.as[String])
       case false => Left(res.status.code)
     }
@@ -638,7 +638,7 @@ val client = HttpClient.settings()
   .create()
 
 client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
-  if (!res.status.isSuccessful)
+  if (!res.isSuccessful)
     throw new Exception(s"Message not posted: ${res.status.code}")
 }
 ```

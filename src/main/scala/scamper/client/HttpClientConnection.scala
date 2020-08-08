@@ -58,7 +58,7 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
         getResponse(request.method == HEAD)
 
       case res =>
-        if (!res.status.isSuccessful)
+        if (!res.isSuccessful)
           continue.set(false)
         continue.synchronized { continue.notify() }
         res
