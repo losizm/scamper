@@ -20,18 +20,26 @@ class StatusLineSpec extends org.scalatest.flatspec.AnyFlatSpec {
     var response = StatusLine("HTTP/1.1 200 OK")
     assert(response.version == HttpVersion(1, 1))
     assert(response.status == ResponseStatus(200, "OK"))
+    assert(response.status eq ResponseStatus(200, "OK"))
+    assert(response.status ne ResponseStatus(200, "ok"))
 
     response = StatusLine("HTTP/1.1 400 Bad Request")
     assert(response.version == HttpVersion(1, 1))
     assert(response.status == ResponseStatus(400, "Bad Request"))
+    assert(response.status eq ResponseStatus(400, "Bad Request"))
+    assert(response.status ne ResponseStatus(400, "bad request"))
 
     response = StatusLine("HTTP/1.1 500 Internal Server Error")
     assert(response.version == HttpVersion(1, 1))
     assert(response.status == ResponseStatus(500, "Internal Server Error"))
+    assert(response.status eq ResponseStatus(500, "Internal Server Error"))
+    assert(response.status ne ResponseStatus(500, "internal server error"))
 
     response = StatusLine("HTTP/2 200")
     assert(response.version == HttpVersion(2, 0))
     assert(response.status == ResponseStatus(200, "OK"))
+    assert(response.status eq ResponseStatus(200, "OK"))
+    assert(response.status ne ResponseStatus(200, "ok"))
   }
 
   it should "not be created" in {
