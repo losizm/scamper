@@ -50,7 +50,7 @@ trait BasicChallenge extends Challenge {
   def realm: String
 }
 
-/** Provides factory methods for `BasicChallenge`. */
+/** Provides factory for `BasicChallenge`. */
 object BasicChallenge {
   /** Creates BasicChallenge with realm and supplied parameters. */
   def apply(realm: String, params: Map[String, String]): BasicChallenge =
@@ -96,7 +96,7 @@ trait BearerChallenge extends Challenge {
   def isInsufficientScope: Boolean
 }
 
-/** Provides factory methods for `BearerChallenge`. */
+/** Provides factory for `BearerChallenge`. */
 object BearerChallenge {
   /** Creates BearerChallenge with supplied parameters. */
   def apply(params: Map[String, String]): BearerChallenge =
@@ -127,7 +127,7 @@ private case class BearerChallengeImpl(params: Map[String, String]) extends Bear
   lazy val isInsufficientScope: Boolean = error.contains("insufficient_scope")
 }
 
-/** Provides factory methods for `Challenge`. */
+/** Provides factory for `Challenge`. */
 object Challenge {
   /** Parses formatted challenge. */
   def parse(challenge: String): Challenge =
@@ -196,7 +196,7 @@ trait BasicCredentials extends Credentials {
   def password: String
 }
 
-/** Provides factory methods for `BasicCredentials`. */
+/** Provides factory for `BasicCredentials`. */
 object BasicCredentials {
   /** Creates BasicCredentials with supplied token. */
   def apply(token: String): BasicCredentials = {
@@ -229,7 +229,7 @@ trait BearerCredentials extends Credentials {
   val scheme: String = "Bearer"
 }
 
-/** Provides factory methods for `BearerCredentials`. */
+/** Provides factory for `BearerCredentials`. */
 object BearerCredentials {
   /** Creates BearerCredentials with supplied token. */
   def apply(token: String): BearerCredentials =
@@ -242,7 +242,7 @@ object BearerCredentials {
 
 private case class BearerCredentialsImpl(token: String) extends BearerCredentials
 
-/** Provides factory methods for `Credentials`. */
+/** Provides factory for `Credentials`. */
 object Credentials {
   /** Parses formatted credentials. */
   def parse(credentials: String): Credentials =

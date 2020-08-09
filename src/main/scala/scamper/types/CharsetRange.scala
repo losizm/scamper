@@ -41,7 +41,7 @@ trait CharsetRange {
     else charset + "; q=" + weight
 }
 
-/** Provides factory methods for `CharsetRange`. */
+/** Provides factory for `CharsetRange`. */
 object CharsetRange {
   private val syntax = """([^\s;=]+)(?:\s*;\s*q\s*=\s*(\d+(?:\.\d*)?))?""".r
 

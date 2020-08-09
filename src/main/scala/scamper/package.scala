@@ -76,7 +76,7 @@ package object scamper {
   /** Uniform Resource Identifier */
   type Uri = java.net.URI
 
-  /** Provides factory methods for `Uri`. */
+  /** Provides factory for `Uri`. */
   object Uri {
     /** Creates Uri from supplied string. */
     def apply(uri: String): Uri = new Uri(uri)

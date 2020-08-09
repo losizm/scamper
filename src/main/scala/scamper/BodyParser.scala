@@ -36,7 +36,7 @@ trait BodyParser[T] {
   def parse(message: HttpMessage): T
 }
 
-/** Provides factory methods for `BodyParser`. */
+/** Provides factory for `BodyParser`. */
 object BodyParser {
   /**
    * Gets body parser for collecting raw bytes.

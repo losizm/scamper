@@ -62,7 +62,7 @@ trait WebSocketFrame {
   def isPong: Boolean = opcode == Pong
 }
 
-/** Provides factory methods for `WebSocketFrame`. */
+/** Provides factory for `WebSocketFrame`. */
 object WebSocketFrame {
   /**
    * Creates WebSocketFrame using supplied attributes.

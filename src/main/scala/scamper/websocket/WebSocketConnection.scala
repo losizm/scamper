@@ -181,7 +181,7 @@ class WebSocketConnection private (socket: Socket) {
   def close(): Unit = Try(socket.close())
 }
 
-/** Provides factory methods for `WebSocketConnection`. */
+/** Provides factory for `WebSocketConnection`. */
 object WebSocketConnection {
   /**
    * Creates WebSocketConnection using supplied socket.

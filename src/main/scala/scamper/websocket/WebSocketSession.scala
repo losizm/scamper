@@ -265,7 +265,7 @@ trait WebSocketSession {
   def onClose[T](handler: StatusCode => T): this.type
 }
 
-/** Provides factory methods for `WebSocketSession`. */
+/** Provides factory for `WebSocketSession`. */
 object WebSocketSession {
   /**
    * Wraps WebSocket session around an already established client connection.

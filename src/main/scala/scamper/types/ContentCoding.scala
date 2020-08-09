@@ -46,7 +46,7 @@ trait ContentCoding {
   override val toString: String = name
 }
 
-/** Provides factory methods for `ContentCoding`. */
+/** Provides factory for `ContentCoding`. */
 object ContentCoding {
   /** Creates ContentCoding with supplied name. */
   def apply(name: String): ContentCoding =

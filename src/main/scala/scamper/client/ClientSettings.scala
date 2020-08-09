@@ -27,7 +27,7 @@ import scamper.types.ContentCodingRange
  * Configures and creates `HttpClient`.
  *
  * `ClientSettings` is a mutable structure. With each applied change, the
- * settings are modified and returned. After applying the desired settings, the
+ * settings are modified and returned. After applying the desired settings, a
  * client is created using a factory method.
  *
  * @constructor Creates client settings.

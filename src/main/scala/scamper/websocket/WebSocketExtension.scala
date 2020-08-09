@@ -35,7 +35,7 @@ trait WebSocketExtension {
     s"${identifier}${HeaderParams.format(params)}"
 }
 
-/** Provides factory methods for `WebSocketExtension`. */
+/** Provides factory for `WebSocketExtension`. */
 object WebSocketExtension {
   private val syntax = """\s*([^,;\s]+)\s*(;.+)?\s*""".r
 

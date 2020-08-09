@@ -42,7 +42,7 @@ trait DispositionType {
   override lazy val toString: String = name + FormatParams(params)
 }
 
-/** Provides factory methods for `DispositionType`. */
+/** Provides factory for `DispositionType`. */
 object DispositionType {
   /** Parses formatted content disposition type and optional parameters. */
   def parse(disposition: String): DispositionType =

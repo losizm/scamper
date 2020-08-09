@@ -30,7 +30,7 @@ import RequestMethod.Registry._
  *
  * `ServerApplication` is a mutable structure. With each applied change, the
  * application is modified and returned. After the desired settings are applied,
- * the server is created using one of several factory methods.
+ * a server is created using one of several factory methods.
  *
  * @constructor Creates server application.
  *
@@ -589,7 +589,7 @@ class ServerApplication {
   }
 }
 
-/** Provides factory methods for `ServerApplication`. */
+/** Provides factory for `ServerApplication`. */
 object ServerApplication {
   /** Gets new instance of `ServerApplication`. */
   def apply(): ServerApplication = new ServerApplication()

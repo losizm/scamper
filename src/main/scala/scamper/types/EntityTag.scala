@@ -36,11 +36,11 @@ trait EntityTag {
     if (weak) "W/" + opaque else opaque
 }
 
-/** Provides factory methods for `EntityTag`. */
+/** Provides factory for `EntityTag`. */
 object EntityTag {
   private val syntax = """\s*(W/)?("[^"]*")\s*""".r
 
-  /** Parse formatted entity tag. */
+  /** Parses formatted entity tag. */
   def parse(tag: String): EntityTag =
     tag match {
       case syntax(weak, opaque) => EntityTagImpl(opaque, weak != null)

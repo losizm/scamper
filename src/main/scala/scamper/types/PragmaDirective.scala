@@ -35,7 +35,7 @@ trait PragmaDirective {
     name + value.map(x => "=" + Token(x).getOrElse(s"""\"$x\"""")).getOrElse("")
 }
 
-/** Provides factory methods for `PragmaDirective`. */
+/** Provides factory for `PragmaDirective`. */
 object PragmaDirective {
   import PragmaDirectives._
 
@@ -43,7 +43,7 @@ object PragmaDirective {
   private val syntax2 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val syntax3 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*"([^"]*)"\s*""".r
 
-  /** Parse formatted pragma directive. */
+  /** Parses formatted pragma directive. */
   def parse(directive: String): PragmaDirective =
     directive match {
       case syntax1(name) => apply(name)
@@ -52,7 +52,7 @@ object PragmaDirective {
       case _ => throw new IllegalArgumentException(s"Malformed pragma directive: $directive")
     }
 
-  /** Parse formatted list of pragma directives. */
+  /** Parses formatted list of pragma directives. */
   def parseAll(directives: String): Seq[PragmaDirective] =
     ListParser(directives).map(parse)
 

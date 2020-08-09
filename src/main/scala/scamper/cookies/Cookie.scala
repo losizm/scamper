@@ -40,7 +40,7 @@ trait PlainCookie extends Cookie {
   override lazy val toString: String = s"$name=$value"
 }
 
-/** Provides factory methods for `PlainCookie`. */
+/** Provides factory for `PlainCookie`. */
 object PlainCookie {
   /** Parses formatted cookie. */
   def parse(cookie: String): PlainCookie =
@@ -108,7 +108,7 @@ trait SetCookie extends Cookie {
   }
 }
 
-/** Provides factory methods for `SetCookie`. */
+/** Provides factory for `SetCookie`. */
 object SetCookie {
   /** Parses formatted cookie. */
   def parse(cookie: String): SetCookie =

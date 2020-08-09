@@ -94,7 +94,7 @@ trait BodyDecoding {
     message.getContentLength.orElse(message.body.getLength).getOrElse(0)
 }
 
-/** Provides factory methods for `BodyDecoding`. */
+/** Provides factory for `BodyDecoding`. */
 object BodyDecoding {
   /** Creates instance of `BodyDecoding` that enforces specified max length. */
   def apply(maxLength: Long): BodyDecoding =

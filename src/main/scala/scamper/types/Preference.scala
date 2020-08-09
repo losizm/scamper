@@ -92,7 +92,7 @@ object Preferences {
 }
 import Preferences._
 
-/** Provides factory methods for `Preference`. */
+/** Provides factory for `Preference`. */
 object Preference {
   /** Parses formatted preference. */
   def parse(preference: String): Preference = {

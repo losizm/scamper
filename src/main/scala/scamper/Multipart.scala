@@ -137,7 +137,7 @@ trait FilePart extends Part {
   def getFileName: Option[String]
 }
 
-/** Provides factory methods for `Multipart`. */
+/** Provides factory for `Multipart`. */
 object Multipart {
   private val random = new java.security.SecureRandom()
   private val prefix = "----ScamperMultipartBoundary_"
@@ -156,7 +156,7 @@ object Multipart {
     prefix + new String(random.ints(16, 0, 62).toArray.map(charset))
 }
 
-/** Provides factory methods for `TextPart`. */
+/** Provides factory for `TextPart`. */
 object TextPart {
   /** Creates TextPart with given name and content. */
   def apply(name: String, content: String): TextPart =
@@ -194,7 +194,7 @@ object TextPart {
   }
 }
 
-/** Provides factory methods for `FilePart`. */
+/** Provides factory for `FilePart`. */
 object FilePart {
   /** Creates FilePart with given name and content. */
   def apply(name: String, content: File): FilePart =

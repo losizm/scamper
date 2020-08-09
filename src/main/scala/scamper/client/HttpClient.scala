@@ -193,7 +193,7 @@ trait HttpClient {
   def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: WebSocketSession => T): T
 }
 
-/** Provides factory methods for creating `HttpClient`. */
+/** Provides factory for creating `HttpClient`. */
 object HttpClient {
   /** Gets new instance of client settings. */
   def settings(): ClientSettings = new ClientSettings()

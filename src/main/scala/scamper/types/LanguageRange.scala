@@ -39,7 +39,7 @@ trait LanguageRange {
     else tag + "; q=" + weight
 }
 
-/** Provides factory methods for `LanguageRange`. */
+/** Provides factory for `LanguageRange`. */
 object LanguageRange {
   private val syntax = """([\w*-]+)(?i:\s*;\s*q=(\d+(?:\.\d*)?))?""".r
 

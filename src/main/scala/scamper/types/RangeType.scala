@@ -53,7 +53,7 @@ trait ByteRange extends RangeType {
     } mkString ",")
 }
 
-/** Provides factory methods for `ByteRange`. */
+/** Provides factory for `ByteRange`. */
 object ByteRange {
   private val syntax = """(?i:bytes)\s*=\s*(.+)""".r
   private val slice = """(\d+)-(\d+)?""".r

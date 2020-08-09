@@ -41,7 +41,7 @@ trait RequestLine extends StartLine {
   override lazy val toString: String = s"$method $target HTTP/$version"
 }
 
-/** Provides factory methods for `RequestLine`. */
+/** Provides factory for `RequestLine`. */
 object RequestLine {
   private val syntax = """([\w!#$%&'*+.^`|~-]+)\h+(\p{Graph}+)\h+HTTP/(\d+(?:\.\d+)?)\h*""".r
 
@@ -100,7 +100,7 @@ trait StatusLine extends StartLine {
   override lazy val toString: String = s"HTTP/$version ${status.code} ${status.reason}"
 }
 
-/** Provides factory methods for `StatusLine`. */
+/** Provides factory for `StatusLine`. */
 object StatusLine {
   private val syntax = """HTTP/(\d+(?:\.\d+)?)\h+(\d+)(?:\h+(\p{Print}*?))?\h*""".r
 

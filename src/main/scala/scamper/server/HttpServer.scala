@@ -75,7 +75,7 @@ trait HttpServer {
   def close(): Unit
 }
 
-/** Provides factory methods for creating `HttpServer`. */
+/** Provides factory for creating `HttpServer`. */
 object HttpServer {
   /** Gets new instance of server application. */
   def app(): ServerApplication = new ServerApplication()

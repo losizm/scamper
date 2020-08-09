@@ -58,7 +58,7 @@ trait ResponseStatus {
 }
 
 /**
- * Provides factory methods for `ResponseStatus`.
+ * Provides factory for `ResponseStatus`.
  *
  * @see [[ResponseStatus.Registry]]
  */

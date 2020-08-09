@@ -111,7 +111,7 @@ import RequestMethod.Registry._
  * [[HttpClient]].
  */
 package object client {
-  /** Indicates request was aborted. */
+  /** Indicates request is aborted. */
   case class RequestAborted(message: String) extends HttpException(message)
 
   /** Provides utility for filtering outgoing request. */
@@ -122,11 +122,7 @@ package object client {
 
   /** Provides utility for handling incoming response. */
   trait ResponseHandler[T] {
-    /**
-     * Handles response.
-     *
-     * @param res incoming response
-     */
+    /** Handles response. */
     def apply(res: HttpResponse): T
   }
 

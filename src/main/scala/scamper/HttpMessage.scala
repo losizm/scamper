@@ -172,7 +172,7 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
   def withVersion(version: HttpVersion): HttpRequest
 }
 
-/** Provides factory methods for `HttpRequest`. */
+/** Provides factory for `HttpRequest`. */
 object HttpRequest {
   /** Creates HttpRequest with supplied message parts. */
   def apply(requestLine: RequestLine, headers: Seq[Header], body: Entity): HttpRequest =
@@ -224,7 +224,7 @@ trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse] {
   def withVersion(version: HttpVersion): HttpResponse
 }
 
-/** Provides factory methods for `HttpResponse`. */
+/** Provides factory for `HttpResponse`. */
 object HttpResponse {
   /** Creates HttpResponse with supplied message parts. */
   def apply(statusLine: StatusLine, headers: Seq[Header], body: Entity): HttpResponse =

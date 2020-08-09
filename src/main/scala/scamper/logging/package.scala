@@ -200,7 +200,7 @@ package object logging {
   /**
    * Provides logger to nothing.
    *
-   * @note Each logger method is effectively a noop.
+   * @note Each logger method is effectively noop.
    */
   object NullLogger extends Logger {
     def trace(message: String): Unit = ()
@@ -290,12 +290,12 @@ package object logging {
     }
   }
 
-  /** Provides factory methods for `LogWriter`. */
+  /** Provides factory for `LogWriter`. */
   object LogWriter {
     /**
      * Creates log writer.
      *
-     * @param writer writer to which log files are written
+     * @param writer writer to which logs are written
      */
     def apply(writer: Writer) =
       writer match {

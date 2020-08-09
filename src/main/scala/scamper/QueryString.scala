@@ -224,7 +224,7 @@ trait QueryString {
   def toSimpleMap: Map[String, String]
 }
 
-/** Provides factory methods for `QueryString`. */
+/** Provides factory for `QueryString`. */
 object QueryString {
   /** Gets empty QueryString. */
   def empty: QueryString = EmptyQueryString

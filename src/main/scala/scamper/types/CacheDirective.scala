@@ -35,7 +35,7 @@ trait CacheDirective {
     name + value.map(x => "=" + Token(x).getOrElse(s"""\"$x\"""")).getOrElse("")
 }
 
-/** Provides factory methods for `CacheDirective`. */
+/** Provides factory for `CacheDirective`. */
 object CacheDirective {
   import CacheDirectives._
 
@@ -43,7 +43,7 @@ object CacheDirective {
   private val syntax2 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val syntax3 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*"([^"]*)"\s*""".r
 
-  /** Parse formatted cache directive. */
+  /** Parses formatted cache directive. */
   def parse(directive: String): CacheDirective =
     directive match {
       case syntax1(name) => apply(name)
@@ -52,7 +52,7 @@ object CacheDirective {
       case _ => throw new IllegalArgumentException(s"Malformed cache directive: $directive")
     }
 
-  /** Parse formatted list of cache directives. */
+  /** Parses formatted list of cache directives. */
   def parseAll(directives: String): Seq[CacheDirective] =
     ListParser(directives).map(parse)
 

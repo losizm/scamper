@@ -75,7 +75,7 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(i
   /**
    * Gets number of bytes available in input stream.
    *
-   * @throws IOException if an I/O error occurs
+   * @throws IOException if I/O error occurs
    */
   override def available(): Int = propose { in.available() }
 
@@ -86,7 +86,7 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(i
    *
    * @return actually number of bytes skipped
    *
-   * @throws IOException if an I/O error occurs
+   * @throws IOException if I/O error occurs
    */
   override def skip(length: Long): Long = propose { in.skip(length) }
 
@@ -112,7 +112,7 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(i
    *
    * @return next byte or `-1` if end of stream
    *
-   * @throws IOException if an I/O error occurs
+   * @throws IOException if I/O error occurs
    */
   override def read(): Int = propose { in.read() }
 
@@ -121,7 +121,7 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(i
    *
    * @return number of bytes read or `-1` if end of stream
    *
-   * @throws IOException if an I/O error occurs
+   * @throws IOException if I/O error occurs
    */
   override def read(buffer: Array[Byte]): Int = read(buffer, 0, buffer.length)
 
@@ -131,7 +131,7 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(i
    *
    * @return number of bytes read or `-1` if end of stream
    *
-   * @throws IOException if an I/O error occurs
+   * @throws IOException if I/O error occurs
    */
   override def read(buffer: Array[Byte], offset: Int, length: Int): Int = propose {
     var eof = false
@@ -162,4 +162,3 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(i
       case cause => throw new IOException("Writer exception", cause)
     }
 }
-

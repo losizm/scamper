@@ -53,7 +53,7 @@ trait ContentCodingRange {
     else name + "; q=" + weight
 }
 
-/** Provides factory methods for `ContentCodingRange`. */
+/** Provides factory for `ContentCodingRange`. */
 object ContentCodingRange {
   private val syntax = """([^\s;=]+)(?:\s*;\s*q\s*=\s*(\d+(?:\.\d*)?))?""".r
 

@@ -71,7 +71,7 @@ trait MediaType {
   override lazy val toString: String = mainType + '/' + subtype + FormatParams(params)
 }
 
-/** Provides factory methods for `MediaType`. */
+/** Provides factory for `MediaType`. */
 object MediaType {
   private val mappings: Map[String, MediaType] = Try {
     val props = new Properties()

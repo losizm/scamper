@@ -45,7 +45,7 @@ trait MaskingKey {
   def apply(data: Array[Byte], length: Int, position: Long): Array[Byte]
 }
 
-/** Provides factory methods for `MaskingKey`. */
+/** Provides factory for `MaskingKey`. */
 object MaskingKey {
   private val random = new java.security.SecureRandom()
 
