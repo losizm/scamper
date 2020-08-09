@@ -20,7 +20,7 @@ import java.net.URL
 import scala.io.Source
 import scala.util.Try
 
-import scamper.Auxiliary.getBooleanProperty
+import scamper.RuntimeProperties.cookies._
 
 /** Checks domains for public suffix. */
 private object PublicSuffixList {
@@ -49,14 +49,9 @@ private object PublicSuffixList {
     includes.exists(domain.matches) && !excludes.exists(domain.matches)
 
   private def getRemoteList(): Seq[String] = {
-    getBooleanProperty("scamper.cookies.getRemotePublicSuffixList", false) match {
-      case true =>
-        val url = System.getProperty("scamper.cookies.publicSuffixListUrl",
-            "https://publicsuffix.org/list/public_suffix_list.dat")
-        getLines(new URL(url))
-
-      case false =>
-        throw new UnsupportedOperationException()
+    getRemotePublicSuffixList match {
+      case true  => getLines(new URL(publicSuffixListUrl))
+      case false => throw new UnsupportedOperationException()
     }
   }
 

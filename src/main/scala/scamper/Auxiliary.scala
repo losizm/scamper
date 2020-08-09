@@ -24,6 +24,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
 import scamper.types.MediaType
+import RuntimeProperties.auxiliary._
 
 private object Auxiliary {
   private val crlf = "\r\n".getBytes("UTF-8")
@@ -221,25 +222,14 @@ private object Auxiliary {
     }
   }
 
-  def getBooleanProperty(name: String, default: => Boolean): Boolean =
-    Try(sys.props(name).toBoolean).getOrElse(default)
-
-  def getIntProperty(name: String, default: => Int): Int =
-    Try(sys.props(name).toInt).getOrElse(default)
-
-  def getLongProperty(name: String, default: => Long): Long =
-    Try(sys.props(name).toLong).getOrElse(default)
-
-  private val showWarning = getBooleanProperty("scamper.auxiliary.executor.showWarning", false)
-
   lazy val executor = ThreadPoolExecutorService.dynamic(
     "scamper-auxiliary",
-    getIntProperty("scamper.auxiliary.executor.corePoolSize", 0),
-    getIntProperty("scamper.auxiliary.executor.maxPoolSize", Runtime.getRuntime.availableProcessors * 2),
-    getLongProperty("scamper.auxiliary.executor.keepAliveSeconds", 60),
-    getIntProperty("scamper.auxiliary.executor.queueSize", 0),
+    executorCorePoolSize,
+    executorMaxPoolSize,
+    executorKeepAliveSeconds,
+    executorQueueSize
   ) { (task, executor) =>
-    if (showWarning)
+    if (executorShowWarning)
       System.err.println(s"[WARNING] Running rejected scamper-auxiliary task on dedicated thread.")
     executor.getThreadFactory.newThread(task).start()
   }

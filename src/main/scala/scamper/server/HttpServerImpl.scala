@@ -29,12 +29,14 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
 
 import scamper._
-import scamper.Auxiliary.{ SocketType, getIntProperty }
-import scamper.RequestMethod.Registry._
-import scamper.ResponseStatus.Registry._
-import scamper.headers.{ Connection, ContentLength, ContentType, Date, KeepAlive, RetryAfter, TransferEncoding, Upgrade }
+import scamper.headers._
 import scamper.logging.{ ConsoleLogger, Logger, NullLogger }
 import scamper.types.{ KeepAliveParameters, TransferCoding }
+
+import Auxiliary.SocketType
+import RequestMethod.Registry._
+import ResponseStatus.Registry._
+import RuntimeProperties.server._
 
 private object HttpServerImpl {
   private val count = new AtomicLong(0)
@@ -80,11 +82,6 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
   private val keepAliveEnabled = keepAlive.isDefined
   private val keepAliveMax = keepAlive.map(_.max).getOrElse(1)
   private val keepAliveTimeout = keepAlive.map(_.timeout).getOrElse(0)
-
-  private val keepAlivePoolSizeFactor = getIntProperty("scamper.server.keepAlive.poolSizeFactor", 2).max(1)
-  private val upgradePoolSizeFactor = getIntProperty("scamper.server.upgrade.poolSizeFactor", 2).max(1)
-  private val encoderPoolSizeFactor = getIntProperty("scamper.server.encoder.poolSizeFactor", 2).max(1)
-  private val closerPoolSizeFactor = getIntProperty("scamper.server.closer.poolSizeFactor", 2).max(1)
 
   private val authority = s"${host.getCanonicalHostName}:$port"
 
