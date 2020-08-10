@@ -43,10 +43,10 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
     copy(startLine = newStartLine)
 
   def withMethod(newMethod: RequestMethod): HttpRequest =
-    copy(startLine = RequestLine(newMethod, target, version))
+    withStartLine(RequestLine(newMethod, target, version))
 
   def withTarget(newTarget: Uri): HttpRequest =
-    copy(startLine = RequestLine(method, newTarget, version))
+    withStartLine(RequestLine(method, newTarget, version))
 
   def withPath(newPath: String): HttpRequest =
     newPath match {
@@ -64,16 +64,22 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
     withQuery(QueryString(params))
 
   def withVersion(newVersion: HttpVersion): HttpRequest =
-    copy(startLine = RequestLine(method, target, newVersion))
+    withStartLine(RequestLine(method, target, newVersion))
 
   def withHeaders(newHeaders: Seq[Header]): HttpRequest =
     copy(headers = newHeaders)
 
   def addHeaders(newHeaders: Seq[Header]): HttpRequest =
-    withHeaders(headers ++ newHeaders)
+    newHeaders.isEmpty match {
+      case true  => this
+      case false => withHeaders(headers ++ newHeaders)
+    }
 
   def removeHeaders(names: Seq[String]): HttpRequest =
-    withHeaders(headers.filterNot(header => names.exists(header.name.equalsIgnoreCase)))
+    names.isEmpty match {
+      case true  => this
+      case false => withHeaders(headers.filterNot(h => names.exists(h.name.equalsIgnoreCase)))
+    }
 
   def withHeader(header: Header): HttpRequest =
     withHeaders(headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header)
@@ -90,8 +96,11 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
     copy(attributes = newAttributes)
 
   def withAttribute(attribute: (String, Any)): HttpRequest =
-    copy(attributes = attributes + attribute)
+    withAttributes(attributes + attribute)
 
   def removeAttributes(names: Seq[String]): HttpRequest =
-    copy(attributes = attributes.filterNot(x => names.contains(x._1)))
+    names.isEmpty match {
+      case true  => this
+      case false => withAttributes(attributes.filterNot(a => names.contains(a._1)))
+    }
 }

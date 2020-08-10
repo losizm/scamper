@@ -27,19 +27,25 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
     copy(startLine = newStartLine)
 
   def withStatus(newStatus: ResponseStatus): HttpResponse =
-    copy(startLine = StatusLine(newStatus, version))
+    withStartLine(StatusLine(newStatus, version))
 
   def withVersion(newVersion: HttpVersion): HttpResponse =
-    copy(startLine = StatusLine(status, newVersion))
+    withStartLine(StatusLine(status, newVersion))
 
   def withHeaders(newHeaders: Seq[Header]): HttpResponse =
     copy(headers = newHeaders)
 
   def addHeaders(newHeaders: Seq[Header]): HttpResponse =
-    withHeaders(headers ++ newHeaders)
+    newHeaders.isEmpty match {
+      case true  => this
+      case false => withHeaders(headers ++ newHeaders)
+    }
 
   def removeHeaders(names: Seq[String]): HttpResponse =
-    withHeaders(headers.filterNot(header => names.exists(header.name.equalsIgnoreCase)))
+    names.isEmpty match {
+      case true  => this
+      case false => withHeaders(headers.filterNot(h => names.exists(h.name.equalsIgnoreCase)))
+    }
 
   def withHeader(header: Header): HttpResponse =
     withHeaders(headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header)
@@ -56,8 +62,11 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
     copy(attributes = newAttributes)
 
   def withAttribute(attribute: (String, Any)): HttpResponse =
-    copy(attributes = attributes + attribute)
+    withAttributes(attributes + attribute)
 
   def removeAttributes(names: Seq[String]): HttpResponse =
-    copy(attributes = attributes.filterNot(x => names.contains(x._1)))
+    names.isEmpty match {
+      case true  => this
+      case false => withAttributes(attributes.filterNot(a => names.contains(a._1)))
+    }
 }
