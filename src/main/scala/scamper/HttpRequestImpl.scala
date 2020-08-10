@@ -78,6 +78,11 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
   def withHeader(header: Header): HttpRequest =
     withHeaders(headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header)
 
+  def addOptionalHeader(name: String, value: Option[String]): HttpRequest =
+    value.map(value => Header(name, value))
+      .map(addHeaders(_))
+      .getOrElse(this)
+
   def withBody(newBody: Entity): HttpRequest =
     copy(body = newBody)
 
