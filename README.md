@@ -408,7 +408,7 @@ def send(req: HttpRequest): HttpResponse = ???
 val req = GET("/motd").withAttribute("send-before" -> (Deadline.now + 1.minute))
 
 val res = req.getAttribute[Deadline]("send-before")
-  .filter(_.hasTimeLeft)
+  .filter(_.hasTimeLeft())
   .map(_ => send(req))
 ```
 
@@ -601,7 +601,7 @@ import scamper.client.Implicits.ClientHttpRequestType // Adds send method to req
 import scamper.headers.{ Accept, AcceptLanguage }
 import scamper.types.Implicits.{ stringToMediaRange, stringToLanguageRange }
 
-implicit val client = HttpClient(bufferSize = 8192, readTimeout = 1000)
+implicit val client = HttpClient()
 implicit val parser = BodyParser.text(4096)
 
 GET("http://localhost:8080/motd")
@@ -724,6 +724,9 @@ executed in order, and response filters are executed in order.
 The client instance can also be used as a WebSocket client.
 
 ```scala
+import scamper.Implicits.stringToUri
+import scamper.client.HttpClient
+
 HttpClient().websocket("ws://localhost:9090/hello") { session =>
   session.onText { message =>
     println(s"Received text message: $message")
