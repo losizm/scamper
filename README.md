@@ -54,7 +54,7 @@ developers to create web applications as pipelines of request handlers.
 To use **Scamper**, start by adding it as a dependency to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "18.0.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "19.0.0"
 ```
 
 ## HTTP Messages
@@ -583,7 +583,7 @@ def getMessageOfTheDay(): Either[Int, String] = {
   client.get("http://localhost:8080/motd") { res =>
     res.isSuccessful match {
       case true  => Right(res.as[String])
-      case false => Left(res.status.code)
+      case false => Left(res.statusCode)
     }
   }
 }
@@ -633,7 +633,7 @@ val client = HttpClient.settings()
   .create()
 
 client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
-  assert(res.isSuccessful, s"Message not posted: ${res.status.code}")
+  assert(res.isSuccessful, s"Message not posted: ${res.statusCode}")
 }
 ```
 

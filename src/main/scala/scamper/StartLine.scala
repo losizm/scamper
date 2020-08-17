@@ -97,7 +97,7 @@ trait StatusLine extends StartLine {
   def status: ResponseStatus
 
   /** Returns formatted status line. */
-  override lazy val toString: String = s"HTTP/$version ${status.code} ${status.reason}"
+  override lazy val toString: String = s"HTTP/$version ${status.statusCode} ${status.reasonPhrase}"
 }
 
 /** Provides factory for `StatusLine`. */
@@ -108,8 +108,11 @@ object StatusLine {
   def apply(line: String): StatusLine =
     Try {
       line match {
-        case syntax(version, code, null | "") => StatusLineImpl(ResponseStatus(code.toInt), HttpVersion(version))
-        case syntax(version, code, reason)    => StatusLineImpl(ResponseStatus(code.toInt, reason), HttpVersion(version))
+        case syntax(version, statusCode, null | "")    =>
+          StatusLineImpl(ResponseStatus(statusCode.toInt), HttpVersion(version))
+
+        case syntax(version, statusCode, reasonPhrase) =>
+          StatusLineImpl(ResponseStatus(statusCode.toInt, reasonPhrase), HttpVersion(version))
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Malformed status line: $line")

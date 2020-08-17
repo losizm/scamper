@@ -62,7 +62,7 @@ private object HttpServerImpl {
 
 private class HttpServerImpl(val host: InetAddress, val port: Int)
     (id: Long, app: HttpServerImpl.Application) extends HttpServer {
-  private case class ReadError(status: ResponseStatus) extends HttpException(status.reason)
+  private case class ReadError(status: ResponseStatus) extends HttpException(status.reasonPhrase)
   private case class ReadAborted(reason: String) extends HttpException(s"Read aborted with $reason")
 
   private sealed trait ConnectionManagement

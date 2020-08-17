@@ -60,8 +60,8 @@
  *   Header("Connection: close")
  * )
  *
- * printf("Status Code: %s%n", response.status.code)
- * printf("Reason Phrase: %s%n", response.status.reason)
+ * printf("Status Code: %s%n", response.statusCode)
+ * printf("Reason Phrase: %s%n", response.reasonPhrase)
  *
  * response.headers.foreach(println)
  *

@@ -49,7 +49,7 @@ import RequestMethod.Registry._
  *   HttpClient.send(req) { res =>
  *     res.isSuccessful match {
  *       case true  => Right(res.as[String])
- *       case false => Left(res.status.code)
+ *       case false => Left(res.statusCode)
  *     }
  *   }
  * }
@@ -80,7 +80,7 @@ import RequestMethod.Registry._
  *   client.get("http://localhost:8080/motd") { res =>
  *     res.isSuccessful match {
  *       case true  => Right(res.as[String])
- *       case false => Left(res.status.code)
+ *       case false => Left(res.statusCode)
  *     }
  *   }
  * }

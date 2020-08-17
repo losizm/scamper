@@ -24,37 +24,37 @@ import scala.collection.mutable.TreeMap
  */
 trait ResponseStatus {
   /** Gets status code. */
-  def code: Int
+  def statusCode: Int
 
   /** Gets reason phrase. */
-  def reason: String
+  def reasonPhrase: String
 
   /** Tests for informational status code. */
   def isInformational: Boolean =
-    code >= 100 && code <= 199
+    statusCode >= 100 && statusCode <= 199
 
   /** Tests for successful status code. */
   def isSuccessful: Boolean =
-    code >= 200 && code <= 299
+    statusCode >= 200 && statusCode <= 299
 
   /** Tests for redirection status code. */
   def isRedirection: Boolean =
-    code >= 300 && code <= 399
+    statusCode >= 300 && statusCode <= 399
 
   /** Tests for client error status code. */
   def isClientError: Boolean =
-    code >= 400 && code <= 499
+    statusCode >= 400 && statusCode <= 499
 
   /** Tests for server error status code. */
   def isServerError: Boolean =
-    code >= 500 && code <= 599
+    statusCode >= 500 && statusCode <= 599
 
   /** Creates `HttpResponse` with this status and supplied body. */
   def apply(body: Entity = Entity.empty): HttpResponse =
     HttpResponse(this, Nil, body)
 
   /** Returns formatted response status. */
-  override lazy val toString: String = s"$code $reason"
+  override lazy val toString: String = s"$statusCode $reasonPhrase"
 }
 
 /**
@@ -217,36 +217,36 @@ object ResponseStatus {
     /** 511 Network Authentication Required */
     val NetworkAuthenticationRequired = add(511, "Network Authentication Required")
 
-    private def add(code: Int, reason: String): ResponseStatus = {
-      val status = ResponseStatusImpl(code, reason)
-      registry += { code -> status }
+    private def add(statusCode: Int, reasonPhrase: String): ResponseStatus = {
+      val status = ResponseStatusImpl(statusCode, reasonPhrase)
+      registry += { statusCode -> status }
       status
     }
 
-    private[ResponseStatus] def apply(code: Int): ResponseStatus = registry(code)
-    private[ResponseStatus] def get(code: Int): Option[ResponseStatus] = registry.get(code)
+    private[ResponseStatus] def apply(statusCode: Int): ResponseStatus = registry(statusCode)
+    private[ResponseStatus] def get(statusCode: Int): Option[ResponseStatus] = registry.get(statusCode)
   }
 
   /** Gets response status for given status code, if registered. */
-  def get(code: Int): Option[ResponseStatus] = Registry.get(code)
+  def get(statusCode: Int): Option[ResponseStatus] = Registry.get(statusCode)
 
   /**
    * Gets registered response status for given status code.
    *
    * Throws `NoSuchElementException` if status code is not registered.
    */
-  def apply(code: Int): ResponseStatus = Registry(code)
+  def apply(statusCode: Int): ResponseStatus = Registry(statusCode)
 
   /** Creates response status with supplied status code and reason phrase. */
-  def apply(code: Int, reason: String): ResponseStatus =
-    Registry.get(code).filter(_.reason == reason).getOrElse {
-      require(code >= 100 && code <= 599, s"code out of bounds: $code")
-      ResponseStatusImpl(code, reason)
+  def apply(statusCode: Int, reasonPhrase: String): ResponseStatus =
+    Registry.get(statusCode).filter(_.reasonPhrase == reasonPhrase).getOrElse {
+      require(statusCode >= 100 && statusCode <= 599, s"status code out of bounds: $statusCode")
+      ResponseStatusImpl(statusCode, reasonPhrase)
     }
 
   /** Destructures response status. */
   def unapply(status: ResponseStatus): Option[(Int, String)] =
-    Some((status.code, status.reason))
+    Some((status.statusCode, status.reasonPhrase))
 }
 
-private case class ResponseStatusImpl(code: Int, reason: String) extends ResponseStatus
+private case class ResponseStatusImpl(statusCode: Int, reasonPhrase: String) extends ResponseStatus

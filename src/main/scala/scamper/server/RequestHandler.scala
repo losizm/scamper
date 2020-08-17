@@ -83,7 +83,7 @@ object RequestHandler {
   }
 
   /**
-   * Composes head handler with tail handlers, using tail handlers as
+   * Composes `one` handler with `more` handlers, using `more` handlers as
    * fallbacks.
    *
    * @param one request handler
