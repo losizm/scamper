@@ -15,19 +15,7 @@
  */
 package scamper
 
-import java.io.{ FilterInputStream, InputStream, IOException }
-
-/**
- * Indicates attempt to read beyond an `InputStream`'s established limit.
- *
- * `ReadLimitExceeded` is a complement to `EntityTooLarge`. Whereas
- * `ReadLimitExceeded` applies to the raw bytes of an input stream,
- * `EntityTooLarge` pertains to the entity itself, potentially subjected to
- * decompression.
- *
- * @see [[EntityTooLarge]]
- */
-case class ReadLimitExceeded(limit: Long) extends IOException(s"Cannot read beyond $limit byte(s)")
+import java.io.{ FilterInputStream, InputStream }
 
 private class BoundedInputStream(in: InputStream, limit: Long, capacity: Long) extends FilterInputStream(in) {
   def this(in: InputStream, limit: Long) = this(in, limit, limit)
@@ -56,4 +44,3 @@ private class BoundedInputStream(in: InputStream, limit: Long, capacity: Long) e
   private def maxRead: Int =
     (capacity - position).min(Int.MaxValue).toInt
 }
-

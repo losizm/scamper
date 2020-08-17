@@ -15,6 +15,8 @@
  */
 package scamper
 
+import java.io.IOException
+
 /**
  * Indicates exception in HTTP processing.
  *
@@ -46,14 +48,25 @@ class HttpException(message: String, cause: Throwable) extends RuntimeException(
 case class HeaderNotFound(name: String) extends HttpException(name)
 
 /**
- * Indicates entity exceeds established limit.
+ * Indicates read of input stream exceeds established limit.
+ *
+ * `ReadLimitExceeded` is a complement to `EntityTooLarge`. Whereas
+ * `ReadLimitExceeded` applies to raw bytes of an input stream, `EntityTooLarge`
+ * applies to a constructed entity, which is potentially subject to
+ * decompression.
+ *
+ * @see [[EntityTooLarge]]
+ */
+case class ReadLimitExceeded(limit: Long) extends IOException(s"Read exceeds $limit byte(s)")
+
+/**
+ * Indicates entity larger than established maximum length.
  *
  * `EntityTooLarge` is a complement to `ReadLimitExceeded`. Whereas
- * `ReadLimitExceeded` applies to the raw bytes of an input stream,
- * `EntityTooLarge` pertains to the entity itself, potentially subjected to
+ * `ReadLimitExceeded` applies to raw bytes of an input stream, `EntityTooLarge`
+ * applies to a constructed entity, which is potentially subject to
  * decompression.
  *
  * @see [[ReadLimitExceeded]]
  */
-case class EntityTooLarge(limit: Long) extends HttpException(s"Entity cannot exceed $limit byte(s)")
-
+case class EntityTooLarge(maxLength: Long) extends IOException(s"Entity larger than $maxLength byte(s)")
