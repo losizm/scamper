@@ -49,7 +49,7 @@ trait ResponseStatus {
   def isServerError: Boolean =
     code >= 500 && code <= 599
 
-  /** Creates `HttpResponse` with response status and supplied body. */
+  /** Creates `HttpResponse` with this status and supplied body. */
   def apply(body: Entity = Entity.empty): HttpResponse =
     HttpResponse(this, Nil, body)
 
@@ -63,9 +63,9 @@ trait ResponseStatus {
  * @see [[ResponseStatus.Registry]]
  */
 object ResponseStatus {
-  /** Contains registered HTTP status codes. */
+  /** Contains registered response statuses. */
   object Registry {
-    private val statuses = new TreeMap[Int, ResponseStatus]
+    private val registry = new TreeMap[Int, ResponseStatus]
 
     /** 100 Continue */
     val Continue = add(100, "Continue")
@@ -219,32 +219,32 @@ object ResponseStatus {
 
     private def add(code: Int, reason: String): ResponseStatus = {
       val status = ResponseStatusImpl(code, reason)
-      statuses += { code -> status }
+      registry += { code -> status }
       status
     }
 
-    private[ResponseStatus] def apply(code: Int): ResponseStatus = statuses(code)
-    private[ResponseStatus] def get(code: Int): Option[ResponseStatus] = statuses.get(code)
+    private[ResponseStatus] def apply(code: Int): ResponseStatus = registry(code)
+    private[ResponseStatus] def get(code: Int): Option[ResponseStatus] = registry.get(code)
   }
 
-  /** Gets `ResponseStatus` for given status code, if registered. */
+  /** Gets response status for given status code, if registered. */
   def get(code: Int): Option[ResponseStatus] = Registry.get(code)
 
   /**
-   * Gets registered `ResponseStatus` for given status code.
+   * Gets registered response status for given status code.
    *
    * Throws `NoSuchElementException` if status code is not registered.
    */
   def apply(code: Int): ResponseStatus = Registry(code)
 
-  /** Creates `ResponseStatus` with supplied code and reason. */
+  /** Creates response status with supplied status code and reason phrase. */
   def apply(code: Int, reason: String): ResponseStatus =
     Registry.get(code).filter(_.reason == reason).getOrElse {
       require(code >= 100 && code <= 599, s"code out of bounds: $code")
       ResponseStatusImpl(code, reason)
     }
 
-  /** Destructures `ResponseStatus`. */
+  /** Destructures response status. */
   def unapply(status: ResponseStatus): Option[(Int, String)] =
     Some((status.code, status.reason))
 }

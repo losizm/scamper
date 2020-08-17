@@ -40,7 +40,7 @@ trait QueryString {
   def get(name: String): Option[String]
 
   /**
-   * Gets first parameter value with given name if present, otherwise returns
+   * Gets first parameter value with given name if present; otherwise, returns
    * default value.
    *
    * @param name parameter name
@@ -61,7 +61,7 @@ trait QueryString {
 
   /**
    * Gets first parameter value with given name and parses it to `Int`;
-   * otherwise returns default if parameter not present.
+   * otherwise, returns default if parameter not present.
    *
    * @param name parameter name
    *
@@ -83,7 +83,7 @@ trait QueryString {
 
   /**
    * Gets first parameter value with given name and parses it to `Long`;
-   * otherwise returns default if parameter not present.
+   * otherwise, returns default if parameter not present.
    *
    * @param name parameter name
    *
@@ -93,7 +93,7 @@ trait QueryString {
     getLong(name).getOrElse(default)
 
   /**
-   * Gets all parameter values with given name.
+   * Gets parameter values with given name.
    *
    * @param name parameter name
    *
@@ -102,7 +102,7 @@ trait QueryString {
   def getValues(name: String): Seq[String]
 
   /**
-   * Gets all parameter values with given name and parses each to `Int`.
+   * Gets parameter values with given name and parses each to `Int`.
    *
    * @param name parameter name
    *
@@ -114,7 +114,7 @@ trait QueryString {
     getValues(name).map(_.toInt)
 
   /**
-   * Gets all parameter values with given name and parses each to `Long`.
+   * Gets parameter values with given name and parses each to `Long`.
    *
    * @param name parameter name
    *
@@ -138,10 +138,10 @@ trait QueryString {
   /**
    * Adds supplied values to parameter with given name.
    *
-   * If the parameter with given name already exists, the newly supplied values
+   * If a parameter with given name already exists, the newly supplied values
    * are appended to the existing values.
    *
-   * If the parameter does not exist, it is added with the supplied values.
+   * If a parameter does not exist, it is added with supplied values.
    *
    * @param name parameter name
    * @param values parameter values
@@ -153,10 +153,10 @@ trait QueryString {
   /**
    * Adds supplied values to parameter with given name.
    *
-   * If the parameter with given name already exists, the newly supplied values
+   * If a parameter with given name already exists, the newly supplied values
    * are appended to the existing values.
    *
-   * If the parameter does not exist, it is added with the supplied values.
+   * If a parameter does not exist, it is added with supplied values.
    *
    * @param name parameter name
    * @param one parameter value
@@ -170,10 +170,10 @@ trait QueryString {
   /**
    * Updates parameter with given name to supplied values.
    *
-   * If the parameter with given name already exists, its values are replaced
+   * If a parameter with given name already exists, its values are replaced
    * with the newly supplied values.
    *
-   * If the parameter does not exist, it is added with the supplied values.
+   * If a parameter does not exist, it is added with supplied values.
    *
    * @param name parameter name
    * @param values parameter values
@@ -188,7 +188,7 @@ trait QueryString {
    * If the parameter with given name already exists, its values are replaced
    * with the newly supplied values.
    *
-   * If the parameter does not exist, it is added with the supplied values.
+   * If the parameter does not exist, it is added with supplied values.
    *
    * @param name parameter name
    * @param one parameter value
@@ -208,19 +208,16 @@ trait QueryString {
    */
   def remove(name: String): QueryString
 
-  /** Gets query string as `Seq` of name-value pairs. */
+  /** Gets `Seq` of name-value pairs from query string. */
   def toSeq: Seq[(String, String)]
 
   /**
-   * Gets query string as `Map` with each parameter mapped to its sequence of
+   * Gets `Map` of query string mapping each parameter to its sequence of
    * values.
    */
   def toMap: Map[String, Seq[String]]
 
-  /**
-   * Gets query string as `Map` with each parameter mapped to its first value
-   * only.
-   */
+  /** Gets `Map` of query string mapping each parameter to its first value. */
   def toSimpleMap: Map[String, String]
 }
 
@@ -257,7 +254,7 @@ object QueryString {
     apply(one +: more)
 
   /**
-   * Creates QueryString from encoded query string.
+   * Creates QueryString from urlencoded query string.
    *
    * @param query encoded query string
    */

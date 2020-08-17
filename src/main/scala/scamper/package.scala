@@ -78,26 +78,26 @@ package object scamper {
 
   /** Provides factory for `Uri`. */
   object Uri {
-    /** Creates Uri from supplied string. */
+    /** Creates URI from supplied string. */
     def apply(uri: String): Uri = new Uri(uri)
 
-    /** Creates Uri with supplied scheme, scheme-specific part, and fragment. */
+    /** Creates URI with supplied scheme, scheme-specific part, and fragment. */
     def create(scheme: String, schemeSpecificPart: String, fragment: String = null): Uri =
       new Uri(scheme, schemeSpecificPart, fragment)
 
-    /** Creates Uri with http scheme and supplied components. */
+    /** Creates URI with `http` scheme and supplied components. */
     def http(authority: String, path: String = null, query: String = null, fragment: String = null): Uri =
       new Uri("http", authority, path, query, fragment)
 
-    /** Creates Uri with https scheme and supplied components. */
+    /** Creates URI with `https` scheme and supplied components. */
     def https(authority: String, path: String = null, query: String = null, fragment: String = null): Uri =
       new Uri("https", authority, path, query, fragment)
 
-    /** Creates Uri with ws scheme and supplied components. */
+    /** Creates URI with `ws` scheme and supplied components. */
     def ws(authority: String, path: String = null, query: String = null): Uri =
       new Uri("ws", authority, path, query)
 
-    /** Creates Uri with wss scheme and supplied components. */
+    /** Creates URI with `wss` scheme and supplied components. */
     def wss(authority: String, path: String = null, query: String = null): Uri =
       new Uri("wss", authority, path, query)
   }

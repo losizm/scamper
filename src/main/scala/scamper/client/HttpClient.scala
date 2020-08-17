@@ -210,7 +210,7 @@ object HttpClient {
    * @param request HTTP request
    * @param handler response handler
    *
-   * @return value from applied handler
+   * @return value from supplied handler
    *
    * @throws IllegalArgumentException if `request.target` is not absolute
    */

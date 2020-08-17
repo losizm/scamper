@@ -27,7 +27,7 @@ trait BodyDecoding {
   def maxLength: Long
 
   /**
-   * Gets input stream to decoded message body.
+   * Gets decoded message body.
    *
    * @param message HTTP message
    *
@@ -54,13 +54,12 @@ trait BodyDecoding {
       }
 
   /**
-   * Gets input stream to decoded message body and passes it to supplied
-   * function.
+   * Passes decoded message body to supplied function.
    *
    * @param message HTTP message
    * @param f function
    *
-   * @return value from applied function
+   * @return value from supplied function
    *
    * @note The decoded input stream throws [[ReadLimitExceeded]] if it attempts
    *   to read beyond `maxLength` of message body.

@@ -28,10 +28,11 @@ import Auxiliary.{ FileType, InputStreamType }
 /** Provides utility for parsing HTTP message body. */
 trait BodyParser[T] {
   /**
-   * Parses body of supplied message and returns instance of type T.
+   * Parses body of supplied message.
    *
-   * @throws ReadLimitExceeded if message body is too large
-   * @throws EntityTooLarge if constructed entity is too large
+   * @return instance of `T`
+   *
+   * @throws IOException if error occurs while parsing
    */
   def parse(message: HttpMessage): T
 }
@@ -39,7 +40,7 @@ trait BodyParser[T] {
 /** Provides factory for `BodyParser`. */
 object BodyParser {
   /**
-   * Gets body parser for collecting raw bytes.
+   * Gets body parser for byte array.
    *
    * @param maxLength maximum length
    * @param bufferSize buffer size in bytes
@@ -48,7 +49,7 @@ object BodyParser {
     new ByteArrayBodyParser(maxLength.max(0), bufferSize.max(8192))
 
   /**
-   * Gets body parser for collecting text.
+   * Gets body parser for text.
    *
    * @param maxLength maximum length in bytes
    * @param bufferSize buffer size in bytes
@@ -57,7 +58,7 @@ object BodyParser {
     new TextBodyParser(maxLength.max(0), bufferSize.max(8192))
 
   /**
-   * Gets body parser for collecting form data.
+   * Gets body parser for form data.
    *
    * @param maxLength maximum length in bytes
    * @param bufferSize buffer size in bytes
@@ -66,7 +67,7 @@ object BodyParser {
     new FormBodyParser(maxLength.max(0), bufferSize.max(8192))
 
   /**
-   * Gets body parser for collecting form data as query string.
+   * Gets body parser for query string.
    *
    * @param maxLength maximum length in bytes
    * @param bufferSize buffer size in bytes
@@ -75,7 +76,7 @@ object BodyParser {
     new QueryBodyParser(maxLength.max(0), bufferSize.max(8192))
 
   /**
-   * Gets body parser for collecting multipart form data.
+   * Gets body parser for multipart form data.
    *
    * @param dest destination directory in which file content is stored
    * @param maxLength maximum length in bytes

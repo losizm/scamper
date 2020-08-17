@@ -21,24 +21,24 @@ import java.nio.file.Path
 import Auxiliary.{ FileType, OutputStreamType }
 import Validate.notNull
 
-/** Representation of message body. */
+/** Provides input stream to HTTP entity. */
 trait Entity {
   /** Gets length in bytes if known. */
   def getLength: Option[Long]
 
-  /** Tests for empty (if known). */
+  /** Tests for known emptiness. */
   def isKnownEmpty: Boolean =
     getLength.contains(0)
 
-  /** Gets input stream to entity. */
+  /** Gets input stream. */
   def getInputStream: InputStream
 
   /**
    * Gets input stream and passes it to supplied function.
    *
-   * @param f stream handler
+   * @param f function
    *
-   * @return value from applied handler
+   * @return value from supplied function
    */
   def withInputStream[T](f: InputStream => T): T =
     f(getInputStream)
@@ -46,16 +46,16 @@ trait Entity {
 
 /** Provides factory for `Entity`. */
 object Entity {
-  /** Creates `Entity` from supplied bytes. */
+  /** Creates entity from supplied bytes. */
   def apply(bytes: Array[Byte]): Entity =
     ByteArrayEntity(notNull(bytes))
 
-  /** Creates `Entity` from supplied input stream. */
+  /** Creates entity from supplied input stream. */
   def apply(in: InputStream): Entity =
     InputStreamEntity(notNull(in))
 
   /**
-   * Creates `Entity` from supplied writer.
+   * Creates entity from supplied writer.
    *
    * An output stream is passed to `writer`, and bytes written to the output
    * stream are used to build the entity.
@@ -63,16 +63,16 @@ object Entity {
   def apply(writer: OutputStream => Unit): Entity =
     InputStreamEntity(new WriterInputStream(notNull(writer))(Auxiliary.executor))
 
-  /** Creates `Entity` from supplied file. */
+  /** Creates entity from supplied file. */
   def apply(file: File): Entity =
     FileEntity(notNull(file))
 
-  /** Creates `Entity` from supplied text. */
+  /** Creates entity from supplied text. */
   def apply(text: String, charset: String = "UTF-8"): Entity =
     ByteArrayEntity(text.getBytes(charset))
 
   /**
-   * Creates `Entity` from supplied form data.
+   * Creates entity from supplied form data.
    *
    * @note The data is encoded as `application/x-www-form-urlencoded`.
    */
@@ -80,7 +80,7 @@ object Entity {
     apply(QueryString.format(data))
 
   /**
-   * Creates `Entity` from supplied form data.
+   * Creates entity from supplied form data.
    *
    * @note The data is encoded as `application/x-www-form-urlencoded`.
    */
@@ -88,7 +88,7 @@ object Entity {
     apply(QueryString.format(data))
 
   /**
-   * Creates `Entity` from supplied form data.
+   * Creates entity from supplied form data.
    *
    * @note The data is encoded as `application/x-www-form-urlencoded`.
    */
@@ -96,18 +96,18 @@ object Entity {
     apply(QueryString.format(one +: more))
 
   /**
-   * Creates `Entity` from supplied query string.
+   * Creates entity from supplied query string.
    *
    * @note The query string is encoded as `application/x-www-form-urlencoded`.
    */
   def apply(query: QueryString): Entity =
     apply(query.toString)
 
-  /** Creates `Entity` from supplied multipart form data. */
+  /** Creates entity from supplied multipart form data. */
   def apply(multipart: Multipart, boundary: String): Entity =
     MultipartEntity(notNull(multipart), notNull(boundary))
 
-  /** Gets empty `Entity`. */
+  /** Gets empty entity. */
   def empty: Entity = EmptyEntity
 }
 

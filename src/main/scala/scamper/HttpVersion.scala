@@ -48,7 +48,7 @@ object HttpVersion {
       throw new IllegalArgumentException(s"Invalid HTTP version: $version")
     }
 
-  /** Creates HttpVersion with supplied major and minor. */
+  /** Creates HTTP version with supplied major and minor. */
   def apply(major: Int, minor: Int): HttpVersion =
     (major, minor) match {
       case (1, 1) => `HTTP/1.1`
@@ -57,7 +57,7 @@ object HttpVersion {
       case (_, _) => HttpVersionImpl(major, minor)
     }
 
-  /** Destructures HttpVersion. */
+  /** Destructures HTTP version. */
   def unapply(version: HttpVersion): Option[(Int, Int)] =
     Some((version.major, version.minor))
 }

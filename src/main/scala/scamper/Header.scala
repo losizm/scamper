@@ -39,15 +39,15 @@ trait Header {
 
 /** Provides factory for `Header`. */
 object Header {
-  /** Creates `Header` using supplied name and value. */
+  /** Creates header using supplied name and value. */
   def apply(name: String, value: String): Header =
     HeaderImpl(Name(name), Value(value))
 
-  /** Creates `Header` using supplied name and value. */
+  /** Creates header using supplied name and value. */
   def apply(name: String, value: Long): Header =
     apply(name, value.toString)
 
-  /** Creates `Header` using supplied name and value. */
+  /** Creates header using supplied name and value. */
   def apply(name: String, value: Instant): Header =
     apply(name, DateValue.format(value))
 
@@ -58,7 +58,7 @@ object Header {
       case _ => throw new IllegalArgumentException(s"Malformed header: $header")
     }
 
-  /** Destructures `Header`. */
+  /** Destructures header. */
   def unapply(header: Header): Option[(String, String)] =
     Some(header.name -> header.value)
 }

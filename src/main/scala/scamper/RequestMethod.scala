@@ -24,11 +24,11 @@ trait RequestMethod {
   /** Gets method name. */
   def name: String
 
-  /** Creates `HttpRequest` with request method and supplied target. */
+  /** Creates `HttpRequest` with this request method and supplied target. */
   def apply(target: Uri): HttpRequest =
     HttpRequest(this, target, Nil, Entity.empty)
 
-  /** Returns method name. */
+  /** Returns formatted request method. */
   override lazy val toString: String = name
 }
 
@@ -38,38 +38,38 @@ trait RequestMethod {
  * @see [[RequestMethod.Registry]]
  */
 object RequestMethod {
-  /** Contains registered HTTP request methods. */
+  /** Contains registered request methods. */
   object Registry {
-    /** GET request method */
+    /** GET */
     val GET: RequestMethod = RequestMethodImpl("GET")
 
-    /** HEAD request method */
+    /** HEAD */
     val HEAD: RequestMethod = RequestMethodImpl("HEAD")
 
-    /** POST request method */
+    /** POST */
     val POST: RequestMethod = RequestMethodImpl("POST")
 
-    /** PUT request method */
+    /** PUT */
     val PUT: RequestMethod = RequestMethodImpl("PUT")
 
-    /** PATCH request method */
+    /** PATCH */
     val PATCH: RequestMethod = RequestMethodImpl("PATCH")
 
-    /** DELETE request method */
+    /** DELETE */
     val DELETE: RequestMethod = RequestMethodImpl("DELETE")
 
-    /** OPTIONS request method */
+    /** OPTIONS */
     val OPTIONS: RequestMethod = RequestMethodImpl("OPTIONS")
 
-    /** TRACE request method */
+    /** TRACE */
     val TRACE: RequestMethod = RequestMethodImpl("TRACE")
 
-    /** CONNECT request method */
+    /** CONNECT */
     val CONNECT: RequestMethod = RequestMethodImpl("CONNECT")
   }
   import Registry._
 
-  /** Gets `RequestMethod` for given name. */
+  /** Gets request method for given name. */
   def apply(name: String): RequestMethod =
     name match {
       case "GET"     => GET
@@ -86,7 +86,7 @@ object RequestMethod {
       }
     }
 
-  /** Destructures `RequestMethod`. */
+  /** Destructures request method. */
   def unapply(method: RequestMethod): Option[String] = Some(method.name)
 }
 

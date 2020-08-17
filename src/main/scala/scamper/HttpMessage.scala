@@ -56,27 +56,27 @@ sealed trait HttpMessage {
   def getHeaderOrElse(name: String, default: => Header): Header =
     getHeader(name).getOrElse(default)
 
-  /** Gets value of first header with given name. */
+  /** Gets first header value with given name. */
   def getHeaderValue(name: String): Option[String] =
     getHeader(name).map(_.value)
 
   /**
-   * Gets value of first header with given name, or returns default if header not
+   * Gets first header value with given name, or returns default if header not
    * present.
    */
   def getHeaderValueOrElse(name: String, default: => String): String =
     getHeaderValue(name).getOrElse(default)
 
-  /** Gets all headers with given name. */
+  /** Gets headers with given name. */
   def getHeaders(name: String): Seq[Header] =
     headers.filter(_.name.equalsIgnoreCase(name))
 
-  /** Gets values of all headers with given name. */
+  /** Gets header values with given name. */
   def getHeaderValues(name: String): Seq[String] =
     getHeaders(name).map(_.value)
 
   /**
-   * Gets value of attribute with given name.
+   * Gets attribute value with given name.
    *
    * @param name attribute name
    */
@@ -84,8 +84,8 @@ sealed trait HttpMessage {
     attributes.get(name).map(_.asInstanceOf[T])
 
   /**
-   * Gets value of attribute with given name, or returns default if attribute
-   * not present.
+   * Gets attribute value with given name, or returns default if attribute not
+   * present.
    *
    * @param name attribute name
    * @param default default value
