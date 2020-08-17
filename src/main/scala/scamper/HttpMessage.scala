@@ -40,7 +40,11 @@ sealed trait HttpMessage {
    */
   def attributes: Map[String, Any]
 
-  /** Parses message body to instance of type T. */
+  /**
+   * Gets message body as instance of `T`.
+   *
+   * @param parser body parser
+   */
   def as[T](implicit parser: BodyParser[T]): T =
     parser.parse(this)
 

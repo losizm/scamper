@@ -22,7 +22,7 @@ import headers.{ ContentEncoding, ContentLength, TransferEncoding }
 import types.{ ContentCoding, TransferCoding }
 
 /** Provides access to decoded message body. */
-trait BodyDecoding {
+trait BodyDecoder {
   /** Gets maximum length of message body. */
   def maxLength: Long
 
@@ -93,11 +93,11 @@ trait BodyDecoding {
     message.getContentLength.orElse(message.body.getLength).getOrElse(0)
 }
 
-/** Provides factory for `BodyDecoding`. */
-object BodyDecoding {
-  /** Creates instance of `BodyDecoding` that enforces specified max length. */
-  def apply(maxLength: Long): BodyDecoding =
+/** Provides factory for `BodyDecoder`. */
+object BodyDecoder {
+  /** Creates instance of `BodyDecoder` that enforces specified max length. */
+  def apply(maxLength: Long): BodyDecoder =
     maxLength match {
-      case length => new BodyDecoding { val maxLength = length }
+      case length => new BodyDecoder { val maxLength = length }
     }
 }

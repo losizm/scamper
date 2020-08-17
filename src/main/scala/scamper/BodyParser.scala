@@ -25,7 +25,7 @@ import scamper.types.{ DispositionType, MediaType }
 
 import Auxiliary.{ FileType, InputStreamType }
 
-/** Provides utility for parsing HTTP message body. */
+/** Provides utility for parsing message body. */
 trait BodyParser[T] {
   /**
    * Parses body of supplied message.
@@ -100,7 +100,7 @@ object BodyParser {
     new FileBodyParser(dest, maxLength.max(0), bufferSize.max(8192))
 }
 
-private class ByteArrayBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[Array[Byte]] with BodyDecoding {
+private class ByteArrayBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[Array[Byte]] with BodyDecoder {
   def parse(message: HttpMessage): Array[Byte] =
     withDecode(message) { in =>
       val out = new ArrayBuffer[Byte](bufferSize)
@@ -126,7 +126,8 @@ private class TextBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser
       .map(MediaType.apply)
       .flatMap(_.params.get("charset"))
       .orElse(Some("UTF-8"))
-      .map(charset => new String(parser.parse(message), charset)).get
+      .map(charset => new String(parser.parse(message), charset))
+      .get
 }
 
 private class QueryBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser[QueryString] {
@@ -143,7 +144,7 @@ private class FormBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser
     parser.parse(message).toMap
 }
 
-private class FileBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[File] with BodyDecoding {
+private class FileBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[File] with BodyDecoder {
   def parse(message: HttpMessage): File =
     withDecode(message) { in =>
       val destFile = getDestFile()
@@ -170,7 +171,7 @@ private class FileBodyParser(dest: File, val maxLength: Long, bufferSize: Int) e
     }
 }
 
-private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[Multipart] with BodyDecoding {
+private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[Multipart] with BodyDecoder {
   private class Status(val boundary: String) {
     val start = ("--" + boundary).getBytes("UTF-8")
     val end = ("--" + boundary + "--").getBytes("UTF-8")
@@ -218,7 +219,7 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
 
       case line if line.startsWith(new String(status.end)) => Multipart(Nil)
 
-      case line => throw new HttpException("Invalid start of mulitpart")
+      case line => throw new HttpException("Invalid start of multipart")
     }
   }
 
