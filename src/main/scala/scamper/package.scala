@@ -82,7 +82,7 @@ package object scamper {
     def apply(uri: String): Uri = new Uri(uri)
 
     /** Creates URI with supplied scheme, scheme-specific part, and fragment. */
-    def create(scheme: String, schemeSpecificPart: String, fragment: String = null): Uri =
+    def apply(scheme: String, schemeSpecificPart: String, fragment: String = null): Uri =
       new Uri(scheme, schemeSpecificPart, fragment)
 
     /** Creates URI with `http` scheme and supplied components. */
