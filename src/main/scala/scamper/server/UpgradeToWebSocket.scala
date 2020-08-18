@@ -64,12 +64,12 @@ object UpgradeToWebSocket {
    */
   def apply[T](req: HttpRequest)(handler: WebSocketSession => T): HttpResponse =
     try {
-      checkWebSocketRequest(req)
+      WebSocket.validate(req)
 
-      if (enablePermessageDeflate(req))
+      if (WebSocket.enablePermessageDeflate(req))
         createResponse(req, handler, DeflateMode.Message)
           .withSecWebSocketExtensions("permessage-deflate; client_no_context_takeover; server_no_context_takeover")
-      else if (enableWebkitDeflateFrame(req))
+      else if (WebSocket.enableWebkitDeflateFrame(req))
         createResponse(req, handler, DeflateMode.Frame)
           .withSecWebSocketExtensions("x-webkit-deflate-frame; no_context_takeover")
       else
@@ -82,7 +82,7 @@ object UpgradeToWebSocket {
     SwitchingProtocols()
       .withUpgrade("websocket")
       .withConnection("Upgrade")
-      .withSecWebSocketAccept(acceptWebSocketKey(req.secWebSocketKey))
+      .withSecWebSocketAccept(WebSocket.acceptKey(req.secWebSocketKey))
       .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
         val sessionRequest = req.withBody(Entity.empty)
           .withAttribute("scamper.server.message.socket", socket)

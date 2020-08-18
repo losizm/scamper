@@ -77,7 +77,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/19.0.0")
     val cookies = request.cookies ++ cookieStore.get(target)
     val connection = target.getScheme.matches("wss?") match {
-      case true  => checkWebSocketRequest(request).connection.mkString(", ")
+      case true  => WebSocket.validate(request).connection.mkString(", ")
       case false => getEffectiveConnection(request)
     }
 
@@ -166,21 +166,21 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       target,
       Header("Upgrade", "websocket") +:
       Header("Connection", "Upgrade") +:
-      Header("Sec-WebSocket-Key", generateWebSocketKey()) +:
+      Header("Sec-WebSocket-Key", WebSocket.generateKey()) +:
       Header("Sec-WebSocket-Version", "13") +:
       Header("Sec-WebSocket-Extensions", "permessage-deflate; client_no_context_takeover; server_no_context_takeover") +:
       headers
     ).withCookies(cookies)
 
     send(req) { res =>
-      checkWebSocketHandshake(req, res) match {
+      WebSocket.checkHandshake(req, res) match {
         case true =>
           val session = WebSocketSession.forClient(
             res.socket,
             res.correlate,
             res.absoluteTarget,
             req.secWebSocketVersion,
-            enablePermessageDeflate(res),
+            WebSocket.enablePermessageDeflate(res),
             None
           )
           setCloseGuard(res, true)

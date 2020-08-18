@@ -25,37 +25,37 @@ class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec {
   val req = Get("/websocket/example")
     .withUpgrade("websocket")
     .withConnection("Upgrade")
-    .withSecWebSocketKey(generateWebSocketKey())
+    .withSecWebSocketKey(WebSocket.generateKey())
     .withSecWebSocketVersion("13")
 
   it should "check WebSocket request" in {
-    assert(checkWebSocketRequest(req) == req)
-    assert(checkWebSocketRequest(req) == req)
+    assert(WebSocket.validate(req) == req)
+    assert(WebSocket.validate(req) == req)
 
-    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.withMethod(Post)) }
-    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.removeUpgrade()) }
-    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.removeConnection()) }
-    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.removeSecWebSocketKey()) }
-    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.removeSecWebSocketVersion()) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.withMethod(Post)) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.removeUpgrade()) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.removeConnection()) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.removeSecWebSocketKey()) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.removeSecWebSocketVersion()) }
 
-    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.withUpgrade("no-websocket")) }
-    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.withConnection("no-upgrade")) }
-    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.withSecWebSocketKey("123456789012345")) }
-    assertThrows[InvalidWebSocketRequest] { checkWebSocketRequest(req.withSecWebSocketVersion("14")) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.withUpgrade("no-websocket")) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.withConnection("no-upgrade")) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.withSecWebSocketKey("123456789012345")) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.withSecWebSocketVersion("14")) }
   }
 
   it should "check WebSocket response" in {
     val res = SwitchingProtocols()
       .withUpgrade("websocket")
       .withConnection("Upgrade")
-      .withSecWebSocketAccept(acceptWebSocketKey(req.secWebSocketKey))
+      .withSecWebSocketAccept(WebSocket.acceptKey(req.secWebSocketKey))
 
-    assert(checkWebSocketHandshake(req, res))
-    assert(!checkWebSocketHandshake(req, res.removeUpgrade()))
-    assert(!checkWebSocketHandshake(req, res.removeSecWebSocketAccept()))
+    assert(WebSocket.checkHandshake(req, res))
+    assert(!WebSocket.checkHandshake(req, res.removeUpgrade()))
+    assert(!WebSocket.checkHandshake(req, res.removeSecWebSocketAccept()))
 
-    assert(!checkWebSocketHandshake(req, res.withUpgrade("no-websocket")))
-    assert(!checkWebSocketHandshake(req, res.withSecWebSocketAccept("123")))
+    assert(!WebSocket.checkHandshake(req, res.withUpgrade("no-websocket")))
+    assert(!WebSocket.checkHandshake(req, res.withSecWebSocketAccept("123")))
   }
 
   it should "parse WebSocket extension" in {

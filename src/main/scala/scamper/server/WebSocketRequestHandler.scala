@@ -18,11 +18,11 @@ package scamper.server
 import scala.util.Try
 
 import scamper.{ HttpMessage, HttpRequest }
-import scamper.websocket.{ StatusCode, WebSocketSession, isWebSocketUpgrade }
+import scamper.websocket.{ StatusCode, WebSocket, WebSocketSession }
 
 private class WebSocketRequestHandler private (handler: WebSocketSession => Any) extends RequestHandler {
   def apply(req: HttpRequest): HttpMessage =
-    isWebSocketUpgrade(req) match {
+    WebSocket.isUpgrade(req) match {
       case true  =>
         UpgradeToWebSocket(req) { session =>
           try handler(session)

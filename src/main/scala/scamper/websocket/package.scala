@@ -15,21 +15,8 @@
  */
 package scamper
 
-import java.security.{ MessageDigest, SecureRandom }
-
-import scala.util.Try
-
-import RequestMethod.Registry._
-import ResponseStatus.Registry._
-import headers.{ Connection, Upgrade }
-
 /** Provides WebSocket implementation. */
 package object websocket {
-  private val random = new SecureRandom()
-
-  /** Globally Unique Identifier for WebSocket (258EAFA5-E914-47DA-95CA-C5AB0DC85B11) */
-  val guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-
   /** Converts string to [[WebSocketExtension]]. */
   implicit val stringToWebSocketExtension = (ext: String) => WebSocketExtension.parse(ext)
 
@@ -41,92 +28,6 @@ package object websocket {
 
   /** Provides status code of WebSocket error. */
   case class WebSocketError(statusCode: StatusCode) extends HttpException(statusCode.toString)
-
-  /**
-   * Tests request for WebSocket upgrade.
-   *
-   * @param req request
-   */
-  def isWebSocketUpgrade(req: HttpRequest): Boolean =
-    req.method == Get && req.upgrade.exists { protocol =>
-      protocol.name == "websocket" && protocol.version.isEmpty
-    }
-
-  /**
-   * Tests response for WebSocket upgrade.
-   *
-   * @param res response
-   */
-  def isWebSocketUpgrade(res: HttpResponse): Boolean =
-    res.status == SwitchingProtocols && res.upgrade.exists { protocol =>
-      protocol.name == "websocket" && protocol.version.isEmpty
-    }
-
-  /** Gets randomly generated WebSocket key. */
-  def generateWebSocketKey(): String = {
-    val key = new Array[Byte](16)
-    random.nextBytes(key)
-    Base64.encodeToString(key)
-  }
-
-  /**
-   * Generates `Sec-WebSocket-Accept` header value using supplied WebSocket key.
-   *
-   * @param key WebSocket key
-   */
-  def acceptWebSocketKey(key: String): String =
-    Base64.encodeToString { hash(key + guid) }
-
-  /**
-   * Checks validity of WebSocket request.
-   *
-   * @param req WebSocket request
-   *
-   * @throws InvalidWebSocketRequest if WebSocket request is invalid
-   *
-   * @return unmodified WebSocket request
-   */
-  def checkWebSocketRequest(req: HttpRequest): HttpRequest = {
-    if (req.method != Get)
-      throw InvalidWebSocketRequest(s"Invalid method for WebSocket request: ${req.method}")
-
-    if (!checkUpgrade(req))
-      throw InvalidWebSocketRequest("Missing or invalid header: Upgrade")
-
-    if (!checkConnection(req))
-      throw InvalidWebSocketRequest("Missing or invalid header: Connection")
-
-    if (!checkWebSocketKey(req))
-      throw InvalidWebSocketRequest("Missing or invalid header: Sec-WebSocket-Key")
-
-    if (!checkWebSocketVersion(req))
-      throw InvalidWebSocketRequest("Missing or invalid header: Sec-WebSocket-Version")
-
-    //if (!checkWebSocketExtensions(req))
-    //  throw InvalidWebSocketRequest("Invalid header: Sec-WebSocket-Extensions")
-
-    req
-  }
-
-  /**
-   * Checks for successful WebSocket handshake based on supplied request and
-   * response.
-   *
-   * @param req WebSocket request
-   * @param res WebSocket response
-   *
-   * @return `true` if handshake is successful; `false` otherwise
-   *
-   * @throws InvalidWebSocketRequest if WebSocket request is invalid
-   */
-  def checkWebSocketHandshake(req: HttpRequest, res: HttpResponse): Boolean = {
-    checkWebSocketRequest(req)
-
-    res.status == SwitchingProtocols &&
-      checkUpgrade(res) &&
-      checkConnection(res) &&
-      checkWebSocketAccept(res, req.secWebSocketKey)
-  }
 
   /** Provides standardized access to Sec-WebSocket-Accept header. */
   implicit class SecWebSocketAccept(private val response: HttpResponse) extends AnyVal {
@@ -388,62 +289,4 @@ package object websocket {
     def removeSecWebSocketVersionServer(): HttpResponse =
       response.removeHeaders("Sec-WebSocket-Version-Server")
   }
-
-  private def checkUpgrade(msg: HttpMessage): Boolean =
-    msg.upgrade.exists { protocol =>
-      protocol.name == "websocket" && protocol.version.isEmpty
-    }
-
-  private def checkConnection(msg: HttpMessage): Boolean =
-    msg.connection.exists("upgrade".equalsIgnoreCase)
-
-  private def checkWebSocketKey(req: HttpRequest): Boolean =
-    req.getSecWebSocketKey.exists(checkWebSocketKeyValue)
-
-  private def checkWebSocketKeyValue(key: String): Boolean =
-    Try(Base64.decode(key).size == 16).getOrElse(false)
-
-  private def checkWebSocketVersion(msg: HttpMessage): Boolean =
-    msg.getSecWebSocketVersion.contains("13")
-
-  private def checkWebSocketExtensions(msg: HttpMessage): Boolean =
-    msg.secWebSocketExtensions.forall { ext =>
-      ext.identifier.matches("permessage-deflate|x-webkit-deflate-frame")
-    }
-
-  private[scamper] def enablePermessageDeflate(req: HttpRequest): Boolean =
-    req.secWebSocketExtensions.exists { ext =>
-      ext.identifier == "permessage-deflate" && ext.params.forall {
-        case ("client_no_context_takeover", None) => true
-        case ("server_no_context_takeover", None) => true
-        case ("client_max_window_bits", _       ) => true
-        case _ => false
-      }
-    }
-
-  private[scamper] def enablePermessageDeflate(res: HttpResponse): Boolean =
-    res.secWebSocketExtensions.exists { ext =>
-      ext.identifier == "permessage-deflate" && ext.params.forall {
-        case ("client_no_context_takeover", None) => true
-        case ("server_no_context_takeover", None) => true
-        case _ => false
-      }
-    }
-
-  private[scamper] def enableWebkitDeflateFrame(msg: HttpMessage): Boolean =
-    msg.secWebSocketExtensions.exists { ext =>
-      ext.identifier == "x-webkit-deflate-frame" && ext.params.forall {
-        case ("no_context_takeover", None) => true
-        case _ => false
-      }
-    }
-
-  private def checkWebSocketAccept(res: HttpResponse, key: String): Boolean =
-    res.getSecWebSocketAccept.exists(checkWebSocketAcceptValue(_, key))
-
-  private def checkWebSocketAcceptValue(value: String, key: String): Boolean =
-    value == acceptWebSocketKey(key)
-
-  private def hash(value: String): Array[Byte] =
-    MessageDigest.getInstance("SHA-1").digest(value.getBytes("utf-8"))
 }
