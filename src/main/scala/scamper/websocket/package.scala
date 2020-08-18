@@ -48,7 +48,7 @@ package object websocket {
    * @param req request
    */
   def isWebSocketUpgrade(req: HttpRequest): Boolean =
-    req.method == GET && req.upgrade.exists { protocol =>
+    req.method == Get && req.upgrade.exists { protocol =>
       protocol.name == "websocket" && protocol.version.isEmpty
     }
 
@@ -87,7 +87,7 @@ package object websocket {
    * @return unmodified WebSocket request
    */
   def checkWebSocketRequest(req: HttpRequest): HttpRequest = {
-    if (req.method != GET)
+    if (req.method != Get)
       throw InvalidWebSocketRequest(s"Invalid method for WebSocket request: ${req.method}")
 
     if (!checkUpgrade(req))

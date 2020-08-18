@@ -37,13 +37,13 @@ import RequestMethod.Registry._
  * {{{
  * import scamper.BodyParser
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethod.Registry.GET
+ * import scamper.RequestMethod.Registry.Get
  * import scamper.client.HttpClient
  *
  * implicit val parser = BodyParser.text()
  *
  * def getMessageOfTheDay(): Either[Int, String] = {
- *   val req = GET("localhost:8080/motd")
+ *   val req = Get("localhost:8080/motd")
  *
  *   // Send request and handle response
  *   HttpClient.send(req) { res =>
@@ -92,7 +92,7 @@ import RequestMethod.Registry._
  * {{{
  * import scamper.BodyParser
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethod.Registry.GET
+ * import scamper.RequestMethod.Registry.Get
  * import scamper.client.HttpClient
  * import scamper.client.Implicits.ClientHttpRequestType // Adds send method to request
  * import scamper.headers.{ Accept, AcceptLanguage }
@@ -101,7 +101,7 @@ import RequestMethod.Registry._
  * implicit val client = HttpClient()
  * implicit val parser = BodyParser.text(4096)
  *
- * GET("http://localhost:8080/motd")
+ * Get("http://localhost:8080/motd")
  *   .withAccept("text/plain")
  *   .withAcceptLanguage("en-US; q=0.6", "fr-CA; q=0.4")
  *   .send(res => println(res.as[String])) // Send request and print response

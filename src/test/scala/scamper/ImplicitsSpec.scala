@@ -18,7 +18,7 @@ package scamper
 import java.io.File
 import java.time.Instant
 
-import RequestMethod.Registry.GET
+import RequestMethod.Registry.Get
 import ResponseStatus.Registry.Ok
 
 import Implicits._
@@ -41,7 +41,7 @@ class ImplicitsSpec extends org.scalatest.flatspec.AnyFlatSpec {
 
   it should "be converted to RequestMethod" in {
     val method: RequestMethod = "GET"
-    assert(method == GET)
+    assert(method == Get)
   }
 
   "Int" should "be converted to ResponseStatus" in {

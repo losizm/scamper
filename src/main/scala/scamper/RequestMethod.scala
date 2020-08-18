@@ -41,46 +41,46 @@ object RequestMethod {
   /** Contains registered request methods. */
   object Registry {
     /** GET */
-    val GET: RequestMethod = RequestMethodImpl("GET")
+    val Get: RequestMethod = RequestMethodImpl("GET")
 
     /** HEAD */
-    val HEAD: RequestMethod = RequestMethodImpl("HEAD")
+    val Head: RequestMethod = RequestMethodImpl("HEAD")
 
     /** POST */
-    val POST: RequestMethod = RequestMethodImpl("POST")
+    val Post: RequestMethod = RequestMethodImpl("POST")
 
     /** PUT */
-    val PUT: RequestMethod = RequestMethodImpl("PUT")
+    val Put: RequestMethod = RequestMethodImpl("PUT")
 
     /** PATCH */
-    val PATCH: RequestMethod = RequestMethodImpl("PATCH")
+    val Patch: RequestMethod = RequestMethodImpl("PATCH")
 
     /** DELETE */
-    val DELETE: RequestMethod = RequestMethodImpl("DELETE")
+    val Delete: RequestMethod = RequestMethodImpl("DELETE")
 
     /** OPTIONS */
-    val OPTIONS: RequestMethod = RequestMethodImpl("OPTIONS")
+    val Options: RequestMethod = RequestMethodImpl("OPTIONS")
 
     /** TRACE */
-    val TRACE: RequestMethod = RequestMethodImpl("TRACE")
+    val Trace: RequestMethod = RequestMethodImpl("TRACE")
 
     /** CONNECT */
-    val CONNECT: RequestMethod = RequestMethodImpl("CONNECT")
+    val Connect: RequestMethod = RequestMethodImpl("CONNECT")
   }
   import Registry._
 
   /** Gets request method for given name. */
   def apply(name: String): RequestMethod =
     name match {
-      case "GET"     => GET
-      case "HEAD"    => HEAD
-      case "POST"    => POST
-      case "PUT"     => PUT
-      case "PATCH"   => PATCH
-      case "DELETE"  => DELETE
-      case "OPTIONS" => OPTIONS
-      case "TRACE"   => TRACE
-      case "CONNECT" => CONNECT
+      case "GET"     => Get
+      case "HEAD"    => Head
+      case "POST"    => Post
+      case "PUT"     => Put
+      case "PATCH"   => Patch
+      case "DELETE"  => Delete
+      case "OPTIONS" => Options
+      case "TRACE"   => Trace
+      case "CONNECT" => Connect
       case _         => Grammar.Token(name).map(RequestMethodImpl).getOrElse {
         throw new IllegalArgumentException(s"Invalid request method name: $name")
       }

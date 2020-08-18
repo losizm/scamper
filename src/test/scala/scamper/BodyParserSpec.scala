@@ -54,7 +54,7 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "parse request with form body" in {
     implicit val bodyParser = BodyParser.form()
     val body = Entity("id" -> "0", "name" -> "root")
-    val request = POST("users").withBody(body).withContentLength(body.getLength.get)
+    val request = Post("users").withBody(body).withContentLength(body.getLength.get)
     val form = request.as[Map[String, Seq[String]]]
 
     assert(form("id").head == "0")
@@ -64,7 +64,7 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "parse request with form body as query string" in {
     implicit val bodyParser = BodyParser.query()
     val body = Entity("id" -> "0", "name" -> "root")
-    val request = POST("users").withBody(body).withContentLength(body.getLength.get)
+    val request = Post("users").withBody(body).withContentLength(body.getLength.get)
     val form = request.as[QueryString]
 
     assert(form.get("id").contains("0"))

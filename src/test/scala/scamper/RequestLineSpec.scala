@@ -20,22 +20,22 @@ import scamper.RequestMethod.Registry._
 class RequestLineSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "RequestLine" should "be created" in {
     var request = RequestLine("GET / HTTP/1.1")
-    assert(request.method == GET)
+    assert(request.method == Get)
     assert(request.target.toString == "/")
     assert(request.version == HttpVersion(1, 1))
 
     request = RequestLine("GET /index.html HTTP/1.1")
-    assert(request.method == GET)
+    assert(request.method == Get)
     assert(request.target.toString == "/index.html")
     assert(request.version == HttpVersion(1, 1))
 
     request = RequestLine("GET /index.html?offset=25&limit=5 HTTP/1.1")
-    assert(request.method == GET)
+    assert(request.method == Get)
     assert(request.target.toString == "/index.html?offset=25&limit=5")
     assert(request.version == HttpVersion(1, 1))
 
     request = RequestLine("POST https://localhost:8787/admin/user/create HTTP/1.1")
-    assert(request.method == POST)
+    assert(request.method == Post)
     assert(request.target.toString == "https://localhost:8787/admin/user/create")
     assert(request.version == HttpVersion(1, 1))
   }

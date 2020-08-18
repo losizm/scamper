@@ -32,12 +32,12 @@ import scamper.types._
  *
  * {{{
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethod.Registry.GET
+ * import scamper.RequestMethod.Registry.Get
  * import scamper.headers.{ Accept, Host }
  * import scamper.types.Implicits.stringToMediaRange
  *
  * // Build request using 'Host' and 'Accept' headers
- * val req = GET("/motd").withHost("localhost:8080").withAccept("text/plain")
+ * val req = Get("/motd").withHost("localhost:8080").withAccept("text/plain")
  *
  * // Access and print header values
  * printf("Host: %s%n", req.host)

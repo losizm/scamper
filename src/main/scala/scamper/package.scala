@@ -31,9 +31,9 @@
  * {{{
  * import scamper.Header
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethod.Registry.GET
+ * import scamper.RequestMethod.Registry.Get
  *
- * val request = GET("/motd").withHeaders(
+ * val request = Get("/motd").withHeaders(
  *   Header("Host: localhost:8080"),
  *   Header("Accept: text/plain")
  * )

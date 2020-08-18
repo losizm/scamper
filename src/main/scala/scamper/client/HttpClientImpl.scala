@@ -82,14 +82,14 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     }
 
     var effectiveRequest = request.method match {
-      case GET     => toBodilessRequest(request)
-      case POST    => toBodyRequest(request)
-      case PUT     => toBodyRequest(request)
-      case PATCH   => toBodyRequest(request)
-      case DELETE  => toBodilessRequest(request)
-      case HEAD    => toBodilessRequest(request)
-      case TRACE   => toBodilessRequest(request)
-      case OPTIONS => toBodyRequest(request)
+      case Get     => toBodilessRequest(request)
+      case Post    => toBodyRequest(request)
+      case Put     => toBodyRequest(request)
+      case Patch   => toBodyRequest(request)
+      case Delete  => toBodilessRequest(request)
+      case Head    => toBodilessRequest(request)
+      case Trace   => toBodilessRequest(request)
+      case Options => toBodyRequest(request)
       case _       => request
     }
 
@@ -133,28 +133,28 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   }
 
   def get[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
-    (handler: ResponseHandler[T]): T = send(GET, target, headers, cookies, Entity.empty)(handler)
+    (handler: ResponseHandler[T]): T = send(Get, target, headers, cookies, Entity.empty)(handler)
 
   def post[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
-    (handler: ResponseHandler[T]): T = send(POST, target, headers, cookies, body)(handler)
+    (handler: ResponseHandler[T]): T = send(Post, target, headers, cookies, body)(handler)
 
   def put[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
-    (handler: ResponseHandler[T]): T = send(PUT, target, headers, cookies, body)(handler)
+    (handler: ResponseHandler[T]): T = send(Put, target, headers, cookies, body)(handler)
 
   def patch[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
-    (handler: ResponseHandler[T]): T = send(PATCH, target, headers, cookies, body)(handler)
+    (handler: ResponseHandler[T]): T = send(Patch, target, headers, cookies, body)(handler)
 
   def delete[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
-    (handler: ResponseHandler[T]): T = send(DELETE, target, headers, cookies, Entity.empty)(handler)
+    (handler: ResponseHandler[T]): T = send(Delete, target, headers, cookies, Entity.empty)(handler)
 
   def head[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
-    (handler: ResponseHandler[T]): T = send(HEAD, target, headers, cookies, Entity.empty)(handler)
+    (handler: ResponseHandler[T]): T = send(Head, target, headers, cookies, Entity.empty)(handler)
 
   def options[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
-    (handler: ResponseHandler[T]): T = send(OPTIONS, target, headers, cookies, body)(handler)
+    (handler: ResponseHandler[T]): T = send(Options, target, headers, cookies, body)(handler)
 
   def trace[T](target: Uri, headers: Seq[Header] = Nil)
-    (handler: ResponseHandler[T]): T = send(TRACE, target, headers, Nil, Entity.empty)(handler)
+    (handler: ResponseHandler[T]): T = send(Trace, target, headers, Nil, Entity.empty)(handler)
 
   def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
     (handler: WebSocketSession => T): T = {
@@ -162,7 +162,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     require(target.getScheme == "ws" || target.getScheme == "wss", s"Invalid WebSocket scheme: ${target.getScheme}")
 
     val req = HttpRequest(
-      GET,
+      Get,
       target,
       Header("Upgrade", "websocket") +:
       Header("Connection", "Upgrade") +:

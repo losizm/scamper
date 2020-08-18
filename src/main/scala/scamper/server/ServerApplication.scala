@@ -311,7 +311,7 @@ class ServerApplication {
    * @return this application
    */
   def get(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(GET)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Get)))
     this
   }
 
@@ -326,7 +326,7 @@ class ServerApplication {
    * @return this application
    */
   def head(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(HEAD)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Head)))
     this
   }
 
@@ -341,7 +341,7 @@ class ServerApplication {
    * @return this application
    */
   def post(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(POST)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Post)))
     this
   }
 
@@ -356,7 +356,7 @@ class ServerApplication {
    * @return this application
    */
   def put(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(PUT)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Put)))
     this
   }
 
@@ -371,7 +371,7 @@ class ServerApplication {
    * @return this application
    */
   def patch(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(PATCH)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Patch)))
     this
   }
 
@@ -386,7 +386,7 @@ class ServerApplication {
    * @return this application
    */
   def delete(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(DELETE)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Delete)))
     this
   }
 
@@ -401,7 +401,7 @@ class ServerApplication {
    * @return this application
    */
   def options(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(OPTIONS)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Options)))
     this
   }
 
@@ -416,7 +416,7 @@ class ServerApplication {
    * @return this application
    */
   def trace(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(TRACE)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Trace)))
     this
   }
 
@@ -507,7 +507,7 @@ class ServerApplication {
    * @return this application
    */
   def websocket[T](path: String)(handler: WebSocketSession => T): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(WebSocketRequestHandler(notNull(handler)), notNull(path), Some(GET)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(WebSocketRequestHandler(notNull(handler)), notNull(path), Some(Get)))
     this
   }
 

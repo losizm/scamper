@@ -23,7 +23,7 @@ import scala.concurrent.Future
 
 import scamper.{ Compressor, Entity, Header, HeaderStream, HttpException, HttpRequest, HttpResponse, StatusLine }
 import scamper.Auxiliary.{ SocketType, executor }
-import scamper.RequestMethod.Registry.HEAD
+import scamper.RequestMethod.Registry.Head
 import scamper.ResponseStatus.Registry.Continue
 import scamper.headers.TransferEncoding
 import scamper.types.TransferCoding
@@ -52,10 +52,10 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
           writeBody(request)
       }(executor)
 
-    getResponse(request.method == HEAD) match {
+    getResponse(request.method == Head) match {
       case res if res.status == Continue =>
         continue.synchronized { continue.notify() }
-        getResponse(request.method == HEAD)
+        getResponse(request.method == Head)
 
       case res =>
         if (!res.isSuccessful)

@@ -16,6 +16,7 @@
 package scamper
 
 import Auxiliary.UriType
+import RequestMethod.Registry.Options
 import Validate.{ noNulls, notNull }
 
 private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header], body: Entity, attributes: Map[String, Any] = Map.empty) extends HttpRequest {
@@ -26,7 +27,7 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
 
   lazy val path: String = target.normalize.getRawPath match {
     case "" =>
-      if (method.name == "OPTIONS")
+      if (method == Options)
         "*"
       else
         "/"
@@ -50,7 +51,7 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
 
   def withPath(newPath: String): HttpRequest =
     newPath match {
-      case "*" if method.name == "OPTIONS" => withTarget(target.withPath(""))
+      case "*" if method == Options => withTarget(target.withPath(""))
       case _   => withTarget(target.withPath(newPath))
     }
 

@@ -70,11 +70,11 @@ methods to further define the request.
 
 ```scala
 import scamper.Implicits.stringToUri
-import scamper.RequestMethod.Registry.GET
+import scamper.RequestMethod.Registry.Get
 import scamper.headers.{ Accept, Host}
 import scamper.types.Implicits.stringToMediaRange
 
-val req = GET("/motd")
+val req = Get("/motd")
   .withHost("localhost:8080")
   .withAccept("text/plain", "*/*; q=0.5")
 ```
@@ -103,9 +103,9 @@ case-insensitive, and the header value is a `String`.
 
 ```scala
 import scamper.Implicits.{ stringToUri, tupleToHeader }
-import scamper.RequestMethod.Registry.POST
+import scamper.RequestMethod.Registry.Post
 
-val req = POST("/api/users").withHeader("Content-Type" -> "application/json")
+val req = Post("/api/users").withHeader("Content-Type" -> "application/json")
 
 val contentType: Option[String] = req.getHeaderValue("Content-Type")
 ```
@@ -137,11 +137,11 @@ So you can work with the header in a type-safe manner.
 
 ```scala
 import scamper.Implicits.stringToUri
-import scamper.RequestMethod.Registry.POST
+import scamper.RequestMethod.Registry.Post
 import scamper.headers.ContentType
 import scamper.types.MediaType
 
-val req = POST("/api/users").withContentType(MediaType("application", "json"))
+val req = Post("/api/users").withContentType(MediaType("application", "json"))
 println(req.contentType.mainType) // application
 println(req.contentType.subtype) // json
 ```
@@ -151,11 +151,11 @@ convert to specialized header types.
 
 ```scala
 import scamper.Implicits.stringToUri
-import scamper.RequestMethod.Registry.POST
+import scamper.RequestMethod.Registry.Post
 import scamper.headers.ContentType
 import scamper.types.Implicits.stringToMediaType
 
-val req = POST("/api/users").withContentType("application/json")
+val req = Post("/api/users").withContentType("application/json")
 println(req.contentType.mainType) // application
 println(req.contentType.subtype) // json
 ```
@@ -175,10 +175,10 @@ with each cookie represented as `PlainCookie`.
 
 ```scala
 import scamper.Implicits.stringToUri
-import scamper.RequestMethod.Registry.GET
+import scamper.RequestMethod.Registry.Get
 import scamper.cookies.{ PlainCookie, RequestCookies }
 
-val req = GET("https://localhost:8080/motd").withCookies(
+val req = Get("https://localhost:8080/motd").withCookies(
   PlainCookie("ID", "bG9zCg"), PlainCookie("Region", "SE-US")
 )
 
@@ -356,7 +356,7 @@ boundary parameter whose value is used to delimit parts in the encoded body.
 import java.io.File
 import scamper.{ Multipart, TextPart, FilePart }
 import scamper.Implicits.{ HttpMessageType, stringToUri }
-import scamper.RequestMethod.Registry.POST
+import scamper.RequestMethod.Registry.Post
 
 // Build multipart form-data with text and file content
 val formData = Multipart(
@@ -367,7 +367,7 @@ val formData = Multipart(
 )
 
 // Create request with multipart body
-val req = POST("https://upload.musiclibrary.com/songs").withMultipartBody(formData)
+val req = Post("https://upload.musiclibrary.com/songs").withMultipartBody(formData)
 ```
 
 And for an incoming message with multipart form-data, there's a standard
@@ -401,11 +401,11 @@ Attributes are arbitrary key-value pairs associated with a message.
 import scala.concurrent.duration.{ Deadline, DurationInt }
 import scamper.Implicits.stringToUri
 import scamper.{ HttpRequest, HttpResponse }
-import scamper.RequestMethod.Registry.GET
+import scamper.RequestMethod.Registry.Get
 
 def send(req: HttpRequest): HttpResponse = ???
 
-val req = GET("/motd").withAttribute("send-before" -> (Deadline.now + 1.minute))
+val req = Get("/motd").withAttribute("send-before" -> (Deadline.now + 1.minute))
 
 val res = req.getAttribute[Deadline]("send-before")
   .filter(_.hasTimeLeft())
@@ -427,7 +427,7 @@ associated with either a token or a set of parameters.
 
 ```scala
 import scamper.Implicits.stringToUri
-import scamper.RequestMethod.Registry.GET
+import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Unauthorized
 import scamper.auth.{ Authorization, Challenge, Credentials, WwwAuthenticate }
 
@@ -437,7 +437,7 @@ val res = Unauthorized().withWwwAuthenticate(challenge)
 
 // Present request credentials (scheme and token)
 val credentials = Credentials("Bearer", "QWxsIEFjY2VzcyEhIQo=")
-val req = GET("/dev/projects").withAuthorization(credentials)
+val req = Get("/dev/projects").withAuthorization(credentials)
 ```
 
 _**Note:** The `Authorization` and `WwwAuthenticate` header classes are for
@@ -454,7 +454,7 @@ There are subclasses defined for Basic authentication: `BasicChallenge` and
 
 ```scala
 import scamper.Implicits.stringToUri
-import scamper.RequestMethod.Registry.GET
+import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Unauthorized
 import scamper.auth.{ Authorization, BasicChallenge, BasicCredentials, WwwAuthenticate }
 
@@ -464,7 +464,7 @@ val res = Unauthorized().withWwwAuthenticate(challenge)
 
 // Provide user and password
 val credentials = BasicCredentials("sa", "l3tm31n")
-val req = GET("/admin/users").withAuthorization(credentials)
+val req = Get("/admin/users").withAuthorization(credentials)
 ```
 
 In addition, there are methods for Basic authentication defined in the header
@@ -472,7 +472,7 @@ classes.
 
 ```scala
 import scamper.Implicits.stringToUri
-import scamper.RequestMethod.Registry.GET
+import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Unauthorized
 import scamper.auth.{ Authorization, WwwAuthenticate }
 
@@ -484,7 +484,7 @@ printf(s"Realm: %s%n", res.basic.realm)
 printf(s"Title: %s%n", res.basic.params("title"))
 
 // Provide user and password
-val req = GET("/admin/users").withBasic("sa", "l3tm3m1n")
+val req = Get("/admin/users").withBasic("sa", "l3tm3m1n")
 
 // Access basic auth in request
 printf(s"User: %s%n", req.basic.user)
@@ -499,7 +499,7 @@ available in the header classes.
 
 ```scala
 import scamper.Implicits.stringToUri
-import scamper.RequestMethod.Registry.GET
+import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Unauthorized
 import scamper.auth.{ Authorization, WwwAuthenticate }
 
@@ -528,7 +528,7 @@ println(res.bearer.isInvalidRequest)
 println(res.bearer.isInsufficientScope)
 
 // Create request with Bearer token
-val req = GET("/users").withBearer("R290IDUgb24gaXQhCg==")
+val req = Get("/users").withBearer("R290IDUgb24gaXQhCg==")
 
 // Access bearer auth in request
 printf("Token: %s%n", req.bearer.token)
@@ -541,12 +541,12 @@ responses.
 
 ```scala
 import scamper.Implicits.{ stringToEntity, stringToUri }
-import scamper.RequestMethod.Registry.POST
+import scamper.RequestMethod.Registry.Post
 import scamper.client.HttpClient
 import scamper.headers.ContentType
 import scamper.types.Implicits.stringToMediaType
 
-val req = POST("https://localhost:8080/users")
+val req = Post("https://localhost:8080/users")
   .withContentType("application/json")
   .withBody(s"""{ "id": 500, "name": "guest" }""")
 
@@ -595,7 +595,7 @@ request itself.
 ```scala
 import scamper.BodyParser
 import scamper.Implicits.stringToUri
-import scamper.RequestMethod.Registry.GET
+import scamper.RequestMethod.Registry.Get
 import scamper.client.HttpClient
 import scamper.client.Implicits.ClientHttpRequestType // Adds send method to request
 import scamper.headers.{ Accept, AcceptLanguage }
@@ -604,7 +604,7 @@ import scamper.types.Implicits.{ stringToMediaRange, stringToLanguageRange }
 implicit val client = HttpClient()
 implicit val parser = BodyParser.text(4096)
 
-GET("http://localhost:8080/motd")
+Get("http://localhost:8080/motd")
   .withAccept("text/plain")
   .withAcceptLanguage("fr-CA; q=0.6", "en-CA; q=0.4")
   .send(res => println(res.as[String])) // Send request and print response
@@ -863,7 +863,7 @@ its turn. Otherwise, it returns an `HttpResponse`, and any remaining handlers
 are effectively ignored.
 
 ```scala
-import scamper.RequestMethod.Registry.{ GET, HEAD }
+import scamper.RequestMethod.Registry.{ Get, Head }
 import scamper.ResponseStatus.Registry.MethodNotAllowed
 import scamper.headers.Allow
 
@@ -877,11 +877,11 @@ app.incoming { req =>
 
 // Add handler to allow GET and HEAD requests only
 app.incoming { req =>
-  (req.method == GET || req.method == HEAD) match {
+  (req.method == Get || req.method == Head) match {
     // Return request for next handler
     case true  => req
     // Otherwise return response to end request chain
-    case false => MethodNotAllowed().withAllow(GET, HEAD)
+    case false => MethodNotAllowed().withAllow(Get, Head)
   }
 }
 ```
@@ -897,7 +897,7 @@ accepted.
 ```scala
 import scamper.BodyParser
 import scamper.Implicits.stringToEntity
-import scamper.RequestMethod.Registry.POST
+import scamper.RequestMethod.Registry.Post
 import scamper.headers.ContentLanguage
 import scamper.types.LanguageTag
 import scamper.types.Implicits.stringToLanguageTag
@@ -906,7 +906,7 @@ import scamper.types.Implicits.stringToLanguageTag
 app.incoming { req =>
   val translator: BodyParser[String] = ???
 
-  (req.method == POST && req.contentLanguage.contains("fr")) match {
+  (req.method == Post && req.contentLanguage.contains("fr")) match {
     case true  => req.withBody(translator.parse(req)).withContentLanguage("en")
     case false => req
   }
@@ -920,11 +920,11 @@ method.
 
 ```scala
 import scamper.Implicits.stringToEntity
-import scamper.RequestMethod.Registry.GET
+import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.{ Forbidden, Ok }
 
 // Match request method and exact path
-app.incoming(GET, "/about") { req =>
+app.incoming(Get, "/about") { req =>
   Ok("This server is powered by Scamper.")
 }
 

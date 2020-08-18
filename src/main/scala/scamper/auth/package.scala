@@ -26,7 +26,7 @@ package scamper
  *
  * {{{
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethod.Registry.GET
+ * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Unauthorized
  * import scamper.auth.{ Authorization, Challenge, Credentials, WwwAuthenticate }
  *
@@ -36,7 +36,7 @@ package scamper
  *
  * // Present request credentials (scheme and token)
  * val credentials = Credentials("Bearer", "QWxsIEFjY2VzcyEhIQo=")
- * val req = GET("/dev/projects").withAuthorization(credentials)
+ * val req = Get("/dev/projects").withAuthorization(credentials)
  * }}}
  *
  * === Basic Authentication ===
@@ -46,7 +46,7 @@ package scamper
  *
  * {{{
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethod.Registry.GET
+ * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Unauthorized
  * import scamper.auth.{ Authorization, BasicChallenge, BasicCredentials, WwwAuthenticate }
  *
@@ -56,7 +56,7 @@ package scamper
  *
  * // Provide user and password
  * val credentials = BasicCredentials("sa", "l3tm31n")
- * val req = GET("/admin/users").withAuthorization(credentials)
+ * val req = Get("/admin/users").withAuthorization(credentials)
  * }}}
  *
  * In addition, there are methods for Basic authentication defined in the header
@@ -64,7 +64,7 @@ package scamper
  *
  * {{{
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethod.Registry.GET
+ * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Unauthorized
  * import scamper.auth.{ Authorization, WwwAuthenticate }
  *
@@ -76,7 +76,7 @@ package scamper
  * printf(s"Title: %s%n", res.basic.params("title"))
  *
  * // Provide user and password
- * val req = GET("/admin/users").withBasic("sa", "l3tm3m1n")
+ * val req = Get("/admin/users").withBasic("sa", "l3tm3m1n")
  *
  * // Access basic auth in request
  * printf(s"User: %s%n", req.basic.user)
@@ -91,7 +91,7 @@ package scamper
  *
  * {{{
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethod.Registry.GET
+ * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Unauthorized
  * import scamper.auth.{ Authorization, WwwAuthenticate }
  *
@@ -120,7 +120,7 @@ package scamper
  * println(res.bearer.isInsufficientScope)
  *
  * // Create request with Bearer token
- * val req = GET("/users").withBearer("R290IDUgb24gaXQhCg==")
+ * val req = Get("/users").withBearer("R290IDUgb24gaXQhCg==")
  *
  * // Access bearer auth in request
  * printf("Token: %s%n", req.bearer.token)

@@ -17,12 +17,12 @@ package scamper.server
 
 import scamper.Implicits.{ tupleToHeader, stringToUri }
 import scamper.{ HttpRequest, HttpResponse }
-import scamper.RequestMethod.Registry.GET
+import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Ok
 
 class RequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "RequestHandler" should "be composed with another" in {
-    val req = GET("/")
+    val req = Get("/")
     val filter: RequestHandler = _.withHeader("foo" -> "bar")
     val processor: RequestHandler = req => Ok().withHeader(req.getHeader("foo").getOrElse("foo" -> "baz"))
 

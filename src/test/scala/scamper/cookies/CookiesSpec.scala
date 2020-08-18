@@ -17,7 +17,7 @@ package scamper.cookies
 
 import java.time.OffsetDateTime
 
-import scamper.RequestMethod.Registry.GET
+import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Ok
 import scamper.Uri
 
@@ -66,7 +66,7 @@ class CookiesSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   "HttpRequest" should "be created with cookies" in {
-    val req = GET(Uri("/")).withCookies(PlainCookie("a", "123"), PlainCookie("b", "xyz")).withCookie(PlainCookie("c", "XYZ"))
+    val req = Get(Uri("/")).withCookies(PlainCookie("a", "123"), PlainCookie("b", "xyz")).withCookie(PlainCookie("c", "XYZ"))
     assert(req.getHeaderValue("Cookie").contains("a=123; b=xyz; c=XYZ"))
     assert(req.getCookieValue("a").contains("123"))
     assert(req.getCookieValue("b").contains("xyz"))
@@ -74,7 +74,7 @@ class CookiesSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "be created without cookies" in {
-    val req = GET(Uri("/")).withCookies(PlainCookie("a", "123"), PlainCookie("b", "xyz"), PlainCookie("c", "XYZ"))
+    val req = Get(Uri("/")).withCookies(PlainCookie("a", "123"), PlainCookie("b", "xyz"), PlainCookie("c", "XYZ"))
     assert(req.withCookies(Nil).getHeaderValue("Cookie").isEmpty)
     assert(req.removeCookies("a", "c").cookies == Seq(PlainCookie("b", "xyz")))
   }

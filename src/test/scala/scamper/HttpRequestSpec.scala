@@ -21,8 +21,8 @@ import scamper.headers._
 
 class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "create HttpRequest with path" in {
-    val req = GET("?user=root&group=wheel").withPath("/find")
-    assert(req.method.name == "GET")
+    val req = Get("?user=root&group=wheel").withPath("/find")
+    assert(req.method == Get)
     assert(req.target.toString == "/find?user=root&group=wheel")
     assert(req.path == "/find")
     assert(req.query.get("user").contains("root"))
@@ -30,20 +30,20 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "create HttpRequest with empty path" in {
-    assert(GET("").path == "/")
-    assert(GET("http://localhost:8080").path == "/")
-    assert(GET("http://localhost:8080/index.html").withPath("").path == "/")
+    assert(Get("").path == "/")
+    assert(Get("http://localhost:8080").path == "/")
+    assert(Get("http://localhost:8080/index.html").withPath("").path == "/")
 
-    assert(OPTIONS("").path == "*")
-    assert(OPTIONS("http://localhost:8080").path == "*")
-    assert(OPTIONS("http://localhost:8080/index.html").withPath("/").path == "/")
-    assert(OPTIONS("http://localhost:8080/index.html").withPath("*").path == "*")
-    assert(OPTIONS("http://localhost:8080/index.html").withPath("").path == "*")
+    assert(Options("").path == "*")
+    assert(Options("http://localhost:8080").path == "*")
+    assert(Options("http://localhost:8080/index.html").withPath("/").path == "/")
+    assert(Options("http://localhost:8080/index.html").withPath("*").path == "*")
+    assert(Options("http://localhost:8080/index.html").withPath("").path == "*")
   }
 
   it should "create HttpRequest with query parameters" in {
-    val req = GET("/find").withQuery("user" -> "root", "group" -> "wheel")
-    assert(req.method.name == "GET")
+    val req = Get("/find").withQuery("user" -> "root", "group" -> "wheel")
+    assert(req.method == Get)
     assert(req.target.toString == "/find?user=root&group=wheel")
     assert(req.path == "/find")
     assert(req.query.get("user").contains("root"))
@@ -52,8 +52,8 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "create HttpRequest with host" in {
-    val req = GET("/find?user=root&group=wheel").withHost("localhost:8080")
-    assert(req.method.name == "GET")
+    val req = Get("/find?user=root&group=wheel").withHost("localhost:8080")
+    assert(req.method == Get)
     assert(req.target.toString == "/find?user=root&group=wheel")
     assert(req.path == "/find")
     assert(req.query.get("user").contains("root"))
@@ -63,8 +63,8 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "create HttpRequest with attributes" in {
-    var req = GET("/").withAttributes("id" -> 1, "name" -> "request").withAttribute("success" -> true)
-    assert(req.method == GET)
+    var req = Get("/").withAttributes("id" -> 1, "name" -> "request").withAttribute("success" -> true)
+    assert(req.method == Get)
     assert(req.attributes.size == 3)
     assert(req.getAttribute[Int]("id").contains(1))
     assert(req.getAttribute[String]("name").contains("request"))
@@ -80,7 +80,7 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "create HttpRequest with optional header" in {
-    var req1 = GET("/").withHeaders("Fixed: 0 ", "Sequence: 1", "Sequence: 2")
+    var req1 = Get("/").withHeaders("Fixed: 0 ", "Sequence: 1", "Sequence: 2")
 
     val req2 = req1.withOptionalHeader("Sequence", Some("3"))
     assert(req2.headers.size == 2)
@@ -106,7 +106,7 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "get default value if header not found" in {
     val userAgent = Header("User-Agent", "Scamper/x.x")
     val host = Header("Host", "localhost:8080")
-    val req = GET("/find?user=root&group=wheel").withHeader(userAgent)
+    val req = Get("/find?user=root&group=wheel").withHeader(userAgent)
 
     assert(req.getHeaderOrElse("User-Agent", throw HeaderNotFound("User-Agent")) == userAgent)
     assert(req.getHeaderValueOrElse("User-Agent", throw HeaderNotFound("User-Agent")) == userAgent.value)
@@ -116,7 +116,7 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "throw exception if header not found" in {
-    val req = GET("/find?user=root&group=wheel")
+    val req = Get("/find?user=root&group=wheel")
     assertThrows[HeaderNotFound](req.getHeaderOrElse("User-Agent", throw HeaderNotFound("User-Agent")))
     assertThrows[HeaderNotFound](req.getHeaderValueOrElse("User-Agent", throw HeaderNotFound("User-Agent")))
   }

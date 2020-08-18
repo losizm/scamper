@@ -20,7 +20,7 @@ package scamper
  *
  * {{{
  * import scamper.Implicits.{ stringToEntity, stringToUri }
- * import scamper.RequestMethod.Registry.GET
+ * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Ok
  * import scamper.headers.{ Accept, ContentType, TransferEncoding }
  * import scamper.types.{ MediaRange, MediaType, TransferCoding }
@@ -28,7 +28,7 @@ package scamper
  * val json = MediaRange("application", "json", 0.9f)
  * val html = MediaRange("text/html; q=0.1")
  *
- * val req = GET("/motd").withAccept(json, html)
+ * val req = Get("/motd").withAccept(json, html)
  *
  * val text = MediaType("text/plain")
  * val gzip = TransferCoding("gzip")
@@ -41,12 +41,12 @@ package scamper
  *
  * {{{
  * import scamper.Implicits.{ stringToEntity, stringToUri }
- * import scamper.RequestMethod.Registry.GET
+ * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Ok
  * import scamper.headers.{ Accept, ContentType, TransferEncoding }
  * import scamper.types.Implicits._
  *
- * val req = GET("/motd").withAccept("application/json; q=0.9", "text/html; q=0.1")
+ * val req = Get("/motd").withAccept("application/json; q=0.9", "text/html; q=0.1")
  *
  * val res = Ok("There is an answer.").withContentType("text/plain").withTransferEncoding("gzip")
  * }}}

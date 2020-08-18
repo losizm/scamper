@@ -29,11 +29,11 @@ import scala.util.Try
  *
  * {{{
  * import scamper.Implicits.stringToUri
- * import scamper.RequestMethod.Registry.GET
+ * import scamper.RequestMethod.Registry.Get
  * import scamper.cookies.{ PlainCookie, RequestCookies }
  *
  * // Build request with cookies
- * val req = GET("https://localhost:8080/motd").withCookies(
+ * val req = Get("https://localhost:8080/motd").withCookies(
  *   PlainCookie("ID", "bG9zCg"), PlainCookie("Region", "SE-US")
  * )
  *

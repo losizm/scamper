@@ -25,7 +25,7 @@ import scala.util.{ Success, Try }
 import scamper.{ HttpMessage, HttpRequest, HttpResponse }
 import scamper.Auxiliary.{ StringType, `application/octet-stream` }
 import scamper.Implicits.fileToEntity
-import scamper.RequestMethod.Registry.{ GET, HEAD, OPTIONS }
+import scamper.RequestMethod.Registry.{ Get, Head, Options }
 import scamper.ResponseStatus.Registry.{ MethodNotAllowed, NotAcceptable, NotModified, Ok }
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
@@ -38,15 +38,15 @@ private class StaticFileServer(mountPath: Path, sourceDirectory: Path) extends R
       .filter(exists)
       .map { path =>
         req.method match {
-          case method @ (GET | HEAD) =>
+          case method @ (Get | Head) =>
             val mediaType = getMediaType(path)
 
             if (getAccept(req).exists { range => range.matches(mediaType) })
-              getResponse(path, mediaType, getIfModifiedSince(req), method == HEAD)
+              getResponse(path, mediaType, getIfModifiedSince(req), method == Head)
             else
               NotAcceptable()
-          case OPTIONS => Ok().withAllow(GET, HEAD, OPTIONS).withContentLength(0)
-          case _ => MethodNotAllowed().withAllow(GET, HEAD, OPTIONS)
+          case Options => Ok().withAllow(Get, Head, Options).withContentLength(0)
+          case _ => MethodNotAllowed().withAllow(Get, Head, Options)
         }
       }.getOrElse(req)
 
