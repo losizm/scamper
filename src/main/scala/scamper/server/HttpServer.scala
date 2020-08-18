@@ -88,8 +88,8 @@ object HttpServer {
    *
    * @return server
    */
-  def create(port: Int)(handler: RequestHandler): HttpServer =
-    create("0.0.0.0", port)(handler)
+  def apply(port: Int)(handler: RequestHandler): HttpServer =
+    apply("0.0.0.0", port)(handler)
 
   /**
    * Creates secure server at given port using supplied handler.
@@ -103,8 +103,8 @@ object HttpServer {
    *
    * @return server
    */
-  def create(port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
-    create("0.0.0.0", port, key, cert)(handler)
+  def apply(port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
+    apply("0.0.0.0", port, key, cert)(handler)
 
   /**
    * Creates server at given host and port using supplied handler.
@@ -115,8 +115,8 @@ object HttpServer {
    *
    * @return server
    */
-  def create(host: String, port: Int)(handler: RequestHandler): HttpServer =
-    create(InetAddress.getByName(host), port)(handler)
+  def apply(host: String, port: Int)(handler: RequestHandler): HttpServer =
+    apply(InetAddress.getByName(host), port)(handler)
 
   /**
    * Creates secure server at given host and port using supplied handler.
@@ -131,8 +131,8 @@ object HttpServer {
    *
    * @return server
    */
-  def create(host: String, port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
-    create(InetAddress.getByName(host), port, key, cert)(handler)
+  def apply(host: String, port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
+    apply(InetAddress.getByName(host), port, key, cert)(handler)
 
   /**
    * Creates server at given host and port using supplied handler.
@@ -143,7 +143,7 @@ object HttpServer {
    *
    * @return server
    */
-  def create(host: InetAddress, port: Int)(handler: RequestHandler): HttpServer =
+  def apply(host: InetAddress, port: Int)(handler: RequestHandler): HttpServer =
     app().incoming(handler).create(host, port)
 
   /**
@@ -159,6 +159,6 @@ object HttpServer {
    *
    * @return server
    */
-  def create(host: InetAddress, port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
+  def apply(host: InetAddress, port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
     app().secure(key, cert).incoming(handler).create(host, port)
 }

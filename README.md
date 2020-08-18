@@ -786,7 +786,7 @@ import scamper.Implicits.stringToEntity
 import scamper.ResponseStatus.Registry.Ok
 import scamper.server.HttpServer
 
-val server = HttpServer.create(8080) { req =>
+val server = HttpServer(8080) { req =>
   Ok("Hello, world!")
 }
 ```
