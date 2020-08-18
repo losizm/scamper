@@ -15,7 +15,7 @@
  */
 
 /**
- * The HTTP library for Scala.
+ * Defines library's core types.
  *
  * === HTTP Messages ===
  *

@@ -9,6 +9,12 @@ licenses := List("Apache License, Version 2" -> url("http://www.apache.org/licen
 scalaVersion := "2.13.3"
 scalacOptions ++= Seq("-deprecation", "-feature", "-Xcheckinit")
 
+Compile / doc / scalacOptions ++= Seq(
+  "-doc-title", "Scamper",
+  "-doc-version", "19.0.0",
+  "-doc-root-content", "src/main/scala/root.scala"
+)
+
 crossScalaVersions := Seq("2.12.12")
 
 unmanagedSourceDirectories in Compile += {
