@@ -23,7 +23,7 @@ import RequestMethod.Registry._
 import ResponseStatus.Registry._
 import headers.{ Connection, Upgrade }
 
-/** Provides specialized access to WebSocket headers and types. */
+/** Provides WebSocket implementation. */
 package object websocket {
   private val random = new SecureRandom()
 

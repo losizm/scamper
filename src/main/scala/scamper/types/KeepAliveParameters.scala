@@ -27,7 +27,7 @@ trait KeepAliveParameters {
   /** Gets max requests. */
   def max: Int
 
-  /** Returns formatted Keep-Alive parameters. */
+  /** Returns formatted keep-alive parameters. */
   override lazy val toString: String = s"timeout=$timeout, max=$max"
 }
 

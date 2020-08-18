@@ -16,7 +16,7 @@
 package scamper
 
 /**
- * Provides access to authethentication types and headers.
+ * Provides specialized access to authethentication headers.
  *
  * === Challenges and Credentials ===
  *

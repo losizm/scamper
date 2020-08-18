@@ -42,7 +42,7 @@ trait ContentCoding {
   def toRange(weight: Float = 1.0f): ContentCodingRange =
     ContentCodingRange(name, weight)
 
-  /** Returns content coding name. */
+  /** Returns formatted content coding. */
   override val toString: String = name
 }
 

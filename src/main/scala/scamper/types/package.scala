@@ -16,7 +16,7 @@
 package scamper
 
 /**
- * Defines standardized types for header values in [[scamper.headers]].
+ * Defines standardized types for header values.
  *
  * {{{
  * import scamper.Implicits.{ stringToEntity, stringToUri }
@@ -50,5 +50,7 @@ package scamper
  *
  * val res = Ok("There is an answer.").withContentType("text/plain").withTransferEncoding("gzip")
  * }}}
+ *
+ * @see [[scamper.headers]]
  */
 package object types
