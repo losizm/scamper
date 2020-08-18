@@ -44,7 +44,12 @@ trait StatusCode {
  * @see [[StatusCode.Registry]]
  */
 object StatusCode {
-  /** Contains registered WebSocket status codes. */
+  /**
+   * Contains registered WebSocket status codes.
+   *
+   * @note The status code descriptions are taken in part from those provided in
+   * [[https://tools.ietf.org/rfc/rfc6455.txt RFC 6455]].
+   */
   object Registry {
     /**
      * 1000 indicates a normal closure, meaning that the purpose for which the
@@ -78,18 +83,19 @@ object StatusCode {
     val Reserved: StatusCode = StatusCodeImpl(1004, "Reserved", true)
 
     /**
-     * 1005 is a reserved value and MUST NOT be set as a status code in a Close
-     * control frame by an endpoint. It is designated for use in applications
-     * expecting a status code to indicate that no status code was actually
-     * present.
+     * 1005 is a reserved value and ''must not'' be set as a status code in a
+     * Close control frame by an endpoint. It is designated for use in
+     * applications expecting a status code to indicate that no status code was
+     * actually present.
      */
     val NoStatusReceived: StatusCode = StatusCodeImpl(1005, "No Status Received", true)
 
     /**
-     * 1006 is a reserved value and MUST NOT be set as a status code in a Close
-     * control frame by an endpoint. It is designated for use in applications
-     * expecting a status code to indicate that the connection was closed
-     * abnormally, e.g., without sending or receiving a Close control frame.
+     * 1006 is a reserved value and ''must not'' be set as a status code in a
+     * Close control frame by an endpoint. It is designated for use in
+     * applications expecting a status code to indicate that the connection was
+     * closed abnormally, e.g., without sending or receiving a Close control
+     * frame.
      */
     val AbnormalClosure: StatusCode = StatusCodeImpl(1006, "Abnormal Closure", true)
 
@@ -133,11 +139,11 @@ object StatusCode {
     val InternalError: StatusCode = StatusCodeImpl(1011, "Internal Server Error", false)
 
     /**
-     * 1015 is a reserved value and MUST NOT be set as a status code in a Close
-     * control frame by an endpoint. It is designated for use in applications
-     * expecting a status code to indicate that the connection was closed due to
-     * a failure to perform a TLS handshake (e.g., the server certificate can't
-     * be verified).
+     * 1015 is a reserved value and ''must not'' be set as a status code in a
+     * Close control frame by an endpoint. It is designated for use in
+     * applications expecting a status code to indicate that the connection was
+     * closed due to a failure to perform a TLS handshake (e.g., the server
+     * certificate can't be verified).
      */
     val TlsHandshake: StatusCode = StatusCodeImpl(1015, "TLS Handshake", true)
   }

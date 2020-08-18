@@ -274,7 +274,7 @@ object WebSocketSession {
    * @param id WebSocket identifier
    * @param target target URI for which connection was established
    * @param version WebSocket protocol version
-   * @param deflate indicates whether `permessage-deflate` is be enabled
+   * @param deflate indicates whether `permessage-deflate` is enabled
    * @param logger optional logger
    */
   def forClient(conn: WebSocketConnection, id: String, target: Uri, version: String, deflate: Boolean, logger: Option[Logger]): WebSocketSession =
@@ -287,7 +287,7 @@ object WebSocketSession {
    * @param id WebSocket identifier
    * @param target target URI for which connection was established
    * @param version WebSocket protocol version
-   * @param deflate indicates whether `permessage-deflate` is be enabled
+   * @param deflate indicates whether `permessage-deflate` is enabled
    * @param logger optional logger
    */
   def forClient(socket: Socket, id: String, target: Uri, version: String, deflate: Boolean, logger: Option[Logger]): WebSocketSession =
@@ -300,7 +300,7 @@ object WebSocketSession {
    * @param id WebSocket identifier
    * @param target target URI for which connection was established
    * @param version WebSocket protocol version
-   * @param deflate indicates whether `permessage-deflate` is be enabled
+   * @param deflate indicates whether `permessage-deflate` is enabled
    * @param logger optional logger
    */
   def forServer(conn: WebSocketConnection, id: String, target: Uri, version: String, deflate: Boolean, logger: Option[Logger]): WebSocketSession =
@@ -313,7 +313,7 @@ object WebSocketSession {
    * @param id WebSocket identifier
    * @param target target URI for which connection was established
    * @param version WebSocket protocol version
-   * @param deflate indicates whether `permessage-deflate` is be enabled
+   * @param deflate indicates whether `permessage-deflate` is enabled
    * @param logger optional logger
    */
   def forServer(socket: Socket, id: String, target: Uri, version: String, deflate: Boolean, logger: Option[Logger]): WebSocketSession =

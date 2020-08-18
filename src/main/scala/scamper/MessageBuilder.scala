@@ -109,7 +109,7 @@ trait MessageBuilder[T <: HttpMessage] {
    *
    * @return new message
    *
-   * @note All previous headers with same name are removed. If no value is
+   * @note All previous headers with same name are removed; if no value is
    * supplied, then no header is added.
    */
   def withOptionalHeader(name: String, value: Option[String]): T =
@@ -118,7 +118,7 @@ trait MessageBuilder[T <: HttpMessage] {
       .getOrElse(removeHeaders(name))
 
   /**
-   * Creates message with additional header, if supplied value.
+   * Creates message with additional header, if value supplied.
    *
    * @param name header name
    * @param value optional header value

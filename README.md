@@ -1,7 +1,7 @@
 # Scamper
-**Scamper** is the HTTP library for Scala. It defines a clean interface for
-reading and writing HTTP messages. In addition, it provides [client](#HTTP-Client)
-and [server](#HTTP-Server) implementations, both of which support WebSockets with
+**Scamper** is the HTTP library for Scala. It defines the interface for reading
+and writing HTTP messages. In addition, it provides [client](#HTTP-Client) and
+[server](#HTTP-Server) implementations, both of which support WebSockets with
 `permessage-deflate`.
 
 The client handles content and transfer encoding, as well as manages cookies.
@@ -64,9 +64,9 @@ extend the specification to define characteristics specific to their respective
 message types.
 
 ### Building Requests
-An `HttpRequest` can be created using one of the factory methods defined in its
-companion object. Or you can start with a `RequestMethod` and use builder
-methods to further define the request.
+An `HttpRequest` can be created using a factory method defined in its companion
+object. Or you can start with a `RequestMethod` and use builder methods to
+further define the request.
 
 ```scala
 import scamper.Implicits.stringToUri
@@ -80,9 +80,9 @@ val req = Get("/motd")
 ```
 
 ### Building Responses
-An `HttpResponse` can be created using one of the factory methods defined in its
-companion object. Or you can start with a `ResponseStatus` and use builder
-methods to further define the response.
+An `HttpResponse` can be created using a factory method defined in its companion
+object. Or you can start with a `ResponseStatus` and use builder methods to
+further define the response.
 
 ```scala
 import scamper.Implicits.stringToEntity
@@ -133,7 +133,7 @@ def withContentType(value: MediaType): HttpMessage
 def removeContentType(): HttpMessage
 ```
 
-So you can work with the header in a type-safe manner.
+So you can work with the header using specialized header types.
 
 ```scala
 import scamper.Implicits.stringToUri
@@ -146,8 +146,8 @@ println(req.contentType.mainType) // application
 println(req.contentType.subtype) // json
 ```
 
-And with utilities defined in `scamper.types.Implicits`, you can implicitly
-convert to specialized header types.
+And, with utilities defined in `scamper.types.Implicits`, you can implicitly
+convert values to header types.
 
 ```scala
 import scamper.Implicits.stringToUri
@@ -171,7 +171,7 @@ the case for cookies. Specialized access is provided by classes in
 In `HttpRequest`, cookies are stringed together in the **Cookie** header. You
 may access the cookies in their _unbaked_ form using generalized header access.
 Or you can access them using the extension methods provided by `RequestCookies`,
-with each cookie represented as `PlainCookie`.
+with each cookie presented as `PlainCookie`.
 
 ```scala
 import scamper.Implicits.stringToUri
@@ -201,7 +201,7 @@ assert(req.getHeaderValue("Cookie").contains("ID=bG9zCg; Region=SE-US"))
 
 In `HttpResponse`, the cookies are a collection of **Set-Cookie** header values.
 Specialized access is provided by `ResponseCookies`, with each cookie
-represented as `SetCookie`.
+presented as `SetCookie`.
 
 Along with name and value, `SetCookie` provides additional attributes, such as
 the path to which the cookie is valid, when the cookie expires, whether the
@@ -238,12 +238,12 @@ assert(res.getHeaderValues("Set-Cookie").size == 2)
 ```
 
 _**Note:** Each response cookie is presented in its own **Set-Cookie** header.
-`getHeaderValues()` collects all header values into `Seq[String]`; whereas,
-`getHeaderValue()` retrieves first header value only._
+Whereas `getHeaderValue()` retrieves the first header value only,
+`getHeaderValues()` collects all header values into a `Seq[String]`._
 
 ## Message Body
-The message body is represented as an `Entity`, which provides access to a
-`java.io.InputStream`.
+The message body is represented as an `Entity`, which provides access to an
+`InputStream`.
 
 ### Creating Body
 When building a message, use the `Entity` factory to create the body. For
@@ -315,7 +315,7 @@ def printText(message: HttpMessage): Unit = {
 }
 ```
 
-And you can implement your own parser. Here's one power by [little-json](https://github.com/losizm/little-json):
+And you can implement your own parser. Here's one powered by [little-json](https://github.com/losizm/little-json):
 
 ```scala
 import javax.json.{ JsonObject, JsonValue }
@@ -412,12 +412,12 @@ val res = req.getAttribute[Deadline]("send-before")
   .map(_ => send(req))
 ```
 
-Note attributes are not included in the transmitted message.
+_**Note:** Attributes are not included in the transmitted message._
 
 ## HTTP Authentication
 
 **Scamper** includes a separate package (i.e., `scamper.auth`) for working with
-authentication types and headers.
+authentication headers.
 
 ### Challenges and Credentials
 
@@ -494,8 +494,8 @@ printf(s"Password: %s%n", req.basic.password)
 ### Bearer Authentication
 
 There are subclasses defined for Bearer authentication: `BearerChallenge` and
-`BearerCredentials`. And, similar to Basic, there are Bearer-specific methods
-available in the header classes.
+`BearerCredentials`. In addition, there are Bearer-specific methods available in
+the header classes.
 
 ```scala
 import scamper.Implicits.stringToUri
@@ -556,8 +556,8 @@ HttpClient.send(req) { res =>
 }
 ```
 
-Note the outgoing request must be created with an absolute URI to make effective
-use of the client.
+_**Note:** The outgoing request must be created with an absolute URI to make
+effective use of the client._
 
 ### Creating Client
 
@@ -565,8 +565,8 @@ In the previous example, the `HttpClient` object is used as the client. Behind
 the scenes, this creates an `HttpClient` instance for one-time usage.
 
 If you plan to send multiple requests, you can create and maintain a reference
-to a client instance. With it, you also get access to methods corresponding to
-standard HTTP request methods.
+to a client. With it, you also get access to methods corresponding to standard
+HTTP request methods.
 
 ```scala
 import scamper.BodyParser
@@ -589,7 +589,7 @@ def getMessageOfTheDay(): Either[Int, String] = {
 }
 ```
 
-And if an implicit client is in scope, you can make use of `send()` on the
+And, if an implicit client is in scope, you can make use of `send()` on the
 request itself.
 
 ```scala
@@ -655,8 +655,9 @@ The `cookieStore` is used to store cookies included in HTTP responses. Using the
 cookie store, the client automatically adds the appropriate cookies to each
 outgoing request.
 
-You can supply a truststore using `trust`. Or, if greater control is required
-for verifying secure connections, you can supply a trust manager instead.
+You can supply a truststore using `trust`, as demonstrated in the previous
+example. Or, if greater control is required for securing connections, you can
+supply a trust manager instead.
 
 ```scala
 import javax.net.ssl.TrustManager
@@ -715,7 +716,7 @@ settings.incoming { res =>
 val client = settings.create()
 ```
 
-Note you can add multiple request and response filters. If multiple filters are
+You can add multiple request and response filters. If multiple filters are
 added, each is executed in the order it is added. That is, request filters are
 executed in order, and response filters are executed in order.
 
@@ -760,7 +761,7 @@ HttpClient().websocket("ws://localhost:9090/hello") { session =>
 ```
 
 In the above example, the client establishes a WebSocket connection to the
-specified target URI. _(Note the `ws` scheme. For a secure connection, use `wss`
+specified target URI. _(Note `ws` scheme. For secure connections, use `wss`
 instead.)_
 
 After the client and server perform the opening handshake, a `WebSocketSession`
@@ -886,12 +887,12 @@ app.incoming { req =>
 }
 ```
 
-Note the order in which handlers are applied matters. For instance, in the
-example above, you'd swap the order of handlers if you wanted to log GET and
-HEAD requests only, and all other requests would immediately be sent
+The order in which handlers are applied matters. For instance, in the example
+above, you'd swap the order of handlers if you wanted to log GET and HEAD
+requests only, and all other requests would immediately be sent
 **405 Method Not Allowed** and never make it to the request logger.
 
-Also note a request handler is not restricted to returning the same request it
+And a request handler is not restricted to returning the same request it
 accepted.
 
 ```scala
@@ -994,8 +995,8 @@ app.get("/archive/*path") { req =>
 }
 ```
 
-Note there can be at most one __*param__, which must be specified as the the
-last segment in the path; however, there can be multiple __:param__ instances
+There can be at most one __*param__, which must be specified as the the last
+segment in the path; however, there can be multiple __:param__ instances
 specified.
 
 ```scala
@@ -1158,8 +1159,8 @@ app.use("/api") { router =>
 ### Response Filters
 
 Response filtering is performed by adding instances of `ResponseFilter` to the
-application. They are applied, in order, after one of the request handlers
-generates a response.
+application. They are applied, in order, after a request handler generates a
+response.
 
 ```scala
 app.outgoing { res =>

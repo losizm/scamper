@@ -34,7 +34,7 @@ trait Entity {
   def getInputStream: InputStream
 
   /**
-   * Gets input stream and passes it to supplied function.
+   * Passes input stream to supplied function.
    *
    * @param f function
    *
@@ -57,8 +57,8 @@ object Entity {
   /**
    * Creates entity from supplied writer.
    *
-   * An output stream is passed to `writer`, and bytes written to the output
-   * stream are used to build the entity.
+   * @note An output stream is passed to `writer`, and bytes written to the
+   * output stream are used to build entity.
    */
   def apply(writer: OutputStream => Unit): Entity =
     InputStreamEntity(new WriterInputStream(notNull(writer))(Auxiliary.executor))

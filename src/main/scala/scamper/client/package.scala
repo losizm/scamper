@@ -31,8 +31,8 @@ import RequestMethod.Registry._
  *
  * === Using HTTP Client ===
  *
- * The `HttpClient` object can be used to send a request and handle the
- * response.
+ * The [[HttpClient$ HttpClient]] object can be used to send a request and handle
+ * the response.
  *
  * {{{
  * import scamper.BodyParser
@@ -60,10 +60,10 @@ import RequestMethod.Registry._
  *
  * === Creating HTTP Client ===
  *
- * When using the `HttpClient` object as the client, it creates an `HttpClient`
- * instance for one-time usage. If you plan to send multiple requests, you can
- * create and maintain a reference to a client instance. With it, you also get
- * access to methods corresponding to standard HTTP request methods.
+ * When using the `HttpClient` object as the client, it creates an
+ * [[HttpClient]] instance for one-time usage. If you plan to send multiple
+ * requests, you can create and maintain a reference to a client. With it, you
+ * also get access to methods corresponding to standard HTTP request methods.
  *
  * {{{
  * import scamper.BodyParser
@@ -86,7 +86,7 @@ import RequestMethod.Registry._
  * }
  * }}}
  *
- * And if an implicit client is in scope, you can make use of `send()` on the
+ * And, if an implicit client is in scope, you can make use of `send()` on the
  * request itself.
  *
  * {{{
@@ -107,8 +107,8 @@ import RequestMethod.Registry._
  *   .send(res => println(res.as[String])) // Send request and print response
  * }}}
  *
- * See [[ClientSettings]] for more information about configuring and creating
- * [[HttpClient]].
+ * See also [[ClientSettings]] for information about configuring the HTTP
+ * client before it is created.
  */
 package object client {
   /** Indicates request is aborted. */

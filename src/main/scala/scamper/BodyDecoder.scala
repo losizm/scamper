@@ -95,7 +95,7 @@ trait BodyDecoder {
 
 /** Provides factory for `BodyDecoder`. */
 object BodyDecoder {
-  /** Creates decoder that enforces specified maximum length. */
+  /** Creates decoder with specified maximum length. */
   def apply(maxLength: Long): BodyDecoder =
     maxLength match {
       case length => new BodyDecoder { val maxLength = length }

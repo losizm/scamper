@@ -86,8 +86,8 @@ package scamper
  * === Bearer Authentication ===
  *
  * There are subclasses defined for Bearer authentication: `BearerChallenge` and
- * `BearerCredentials`. And, similar to Basic, there are Bearer-specific methods
- * available in the header classes.
+ * `BearerCredentials`. In addition, there are Bearer-specific methods available
+ * in the header classes.
  *
  * {{{
  * import scamper.Implicits.stringToUri

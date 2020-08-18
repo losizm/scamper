@@ -17,7 +17,7 @@ package scamper
 
 /** Defines HTTP message. */
 sealed trait HttpMessage {
-  /** Type of start line used in message */
+  /** Type of start line in message */
   type LineType <: StartLine
 
   /** Gets message start line. */

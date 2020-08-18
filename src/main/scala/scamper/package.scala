@@ -24,9 +24,9 @@
  * [[HttpResponse]] extend the specification to define characteristics specific
  * to their respective message types.
  *
- * An [[HttpRequest]] is created using one of the factory methods defined in its
- * companion object. Or you can start with a [[RequestMethod]] and use builder
- * methods to further define the request.
+ * An [[HttpRequest]] is created using a factory method defined in its companion
+ * object. Or you can start with a [[RequestMethod]] and use builder methods to
+ * further define the request.
  *
  * {{{
  * import scamper.Header
@@ -46,9 +46,9 @@
  * val host: Option[String] = request.getHeaderValue("Host")
  * }}}
  *
- * An [[HttpResponse]] is created using one of the factory methods defined in
- * its companion object. Or you can start with a [[ResponseStatus]] and use
- * builder methods to further define the response.
+ * An [[HttpResponse]] is created using a factory method defined in its
+ * companion object. Or you can start with a [[ResponseStatus]] and use builder
+ * methods to further define the response.
  *
  * {{{
  * import scamper.{ BodyParser, Header }
