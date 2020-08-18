@@ -180,11 +180,8 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
             res.correlate,
             res.absoluteTarget,
             req.secWebSocketVersion,
-            None,
-            enablePermessageDeflate(res) match {
-              case true  => DeflateMode.Message
-              case false => DeflateMode.None
-            }
+            enablePermessageDeflate(res),
+            None
           )
           setCloseGuard(res, true)
           try handler(session)
