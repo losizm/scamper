@@ -66,15 +66,15 @@ object ByteRange {
       case _           => throw new IllegalArgumentException(s"Malformed byte range: $range")
     }
 
-  /** Creates ByteRange from supplied specs. */
+  /** Creates byte range from supplied specs. */
   def apply(specs: Seq[ByteRangeSpec]): ByteRange =
     ByteRangeImpl(specs)
 
-  /** Creates ByteRange from supplied specs. */
+  /** Creates byte range from supplied specs. */
   def apply(one: ByteRangeSpec, more: ByteRangeSpec*): ByteRange =
     ByteRangeImpl(one +: more)
 
-  /** Destructures ByteRange. */
+  /** Destructures byte range. */
   def unapply(range: ByteRange): Option[(String, Seq[ByteRangeSpec])] =
     Some((range.unit, range.set))
 

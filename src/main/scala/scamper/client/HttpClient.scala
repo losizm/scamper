@@ -198,14 +198,13 @@ object HttpClient {
   /** Gets new instance of client settings. */
   def settings(): ClientSettings = new ClientSettings()
 
-  /** Creates `HttpClient` using default configuration. */
+  /** Creates client using default settings. */
   def apply(): HttpClient = settings().create()
 
   /**
    * Sends request and passes response to supplied handler.
    *
-   * The request is sent using an `HttpClient` created with default
-   * configuration.
+   * The request is sent using a client created with default settings.
    *
    * @param request HTTP request
    * @param handler response handler

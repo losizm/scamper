@@ -143,11 +143,11 @@ object Multipart {
   private val prefix = "----ScamperMultipartBoundary_"
   private val charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz"
 
-  /** Creates Multipart with supplied parts. */
+  /** Creates multipart with supplied parts. */
   def apply(parts: Seq[Part]): Multipart =
     MultipartImpl(noNulls(parts))
 
-  /** Creates Multipart with supplied parts. */
+  /** Creates multipart with supplied parts. */
   def apply(one: Part, more: Part*): Multipart =
     apply(one +: more)
 
@@ -158,15 +158,15 @@ object Multipart {
 
 /** Provides factory for `TextPart`. */
 object TextPart {
-  /** Creates TextPart with given name and content. */
+  /** Creates text part with given name and content. */
   def apply(name: String, content: String): TextPart =
     apply(DispositionType("form-data", "name" -> name), content)
 
-  /** Creates TextPart with supplied disposition and content. */
+  /** Creates text part with supplied disposition and content. */
   def apply(contentDisposition: DispositionType, content: String): TextPart =
     apply(contentDisposition, Auxiliary.`text/plain`, content)
 
-  /** Creates TextPart with supplied disposition, content type, and content. */
+  /** Creates text part with supplied disposition, content type, and content. */
   def apply(contentDisposition: DispositionType, contentType: MediaType, content: String): TextPart = {
     if (!contentDisposition.isFormData)
       throw new HttpException("Content disposition is not form-data")
@@ -180,7 +180,7 @@ object TextPart {
     TextPartImpl(name, content, contentDisposition, contentType)
   }
 
-  /** Creates TextPart with supplied headers and content. */
+  /** Creates text part with supplied headers and content. */
   def apply(headers: Seq[Header], content: String): TextPart = {
     val contentDisposition = headers.collectFirst {
       case Header(name, value) if name.equalsIgnoreCase("Content-Disposition") => DispositionType.parse(value)
@@ -196,23 +196,23 @@ object TextPart {
 
 /** Provides factory for `FilePart`. */
 object FilePart {
-  /** Creates FilePart with given name and content. */
+  /** Creates file part with given name and content. */
   def apply(name: String, content: File): FilePart =
     apply(getDisposition(name, Some(content.getName)), getType(content), content)
 
-  /** Creates FilePart with given name, content, and file name. */
+  /** Creates file part with given name, content, and file name. */
   def apply(name: String, content: File, fileName: String): FilePart =
     apply(getDisposition(name, Some(fileName)), getType(content), content)
 
-  /** Creates FilePart with given name, content, and optional file name. */
+  /** Creates file part with given name, content, and optional file name. */
   def apply(name: String, content: File, fileName: Option[String]): FilePart =
     apply(getDisposition(name, fileName), getType(content), content)
 
-  /** Creates FilePart from supplied disposition and content. */
+  /** Creates file part from supplied disposition and content. */
   def apply(contentDisposition: DispositionType, content: File): FilePart =
     apply(contentDisposition, getType(content), content)
 
-  /** Creates FilePart from supplied disposition, content type, and content. */
+  /** Creates file part from supplied disposition, content type, and content. */
   def apply(contentDisposition: DispositionType, contentType: MediaType, content: File): FilePart = {
     if (!contentDisposition.isFormData)
       throw new HttpException("Content disposition is not form-data")
@@ -223,7 +223,7 @@ object FilePart {
     FilePartImpl(name, notNull(content), contentDisposition, contentType)
   }
 
-  /** Creates FilePart from supplied headers and content. */
+  /** Creates file part from supplied headers and content. */
   def apply(headers: Seq[Header], content: File): FilePart = {
     val contentDisposition = headers.collectFirst {
       case Header(name, value) if name.equalsIgnoreCase("Content-Disposition") => DispositionType.parse(value)

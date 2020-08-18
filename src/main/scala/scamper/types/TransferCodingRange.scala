@@ -50,7 +50,7 @@ trait TransferCodingRange {
   /** Tests whether range matches supplied transfer coding. */
   def matches(coding: TransferCoding): Boolean
 
-  /** Returns formatted transfer coding range. */
+  /** Returns formatted range. */
   override lazy val toString: String = {
     val range = new StringBuilder
     range.append(name)
@@ -62,7 +62,7 @@ trait TransferCodingRange {
 
 /** Provides factory for `TransferCodingRange`. */
 object TransferCodingRange {
-  /** Parses formatted transfer coding range. */
+  /** Parses formatted range. */
   def parse(range: String): TransferCodingRange =
     ParseTransferCoding(range) match {
       case (name, params) =>
@@ -75,11 +75,11 @@ object TransferCodingRange {
         }
     }
 
-  /** Creates TransferCodingRange with supplied values. */
+  /** Creates range with supplied values. */
   def apply(name: String, weight: Float = 1.0f, params: Map[String, String] = Map.empty): TransferCodingRange =
     TransferCodingRangeImpl(Name(name), QValue(weight), Params(params))
 
-  /** Destructures TransferCodingRange. */
+  /** Destructures range. */
   def unapply(range: TransferCodingRange): Option[(String, Float, Map[String, String])] =
     Some((range.name, range.weight, range.params))
 }

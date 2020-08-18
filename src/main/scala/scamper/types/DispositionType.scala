@@ -23,10 +23,10 @@ import DispositionTypeHelper._
  * @see [[scamper.headers.ContentDisposition]]
  */
 trait DispositionType {
-  /** Gets disposition type name. */
+  /** Gets name. */
   def name: String
 
-  /** Gets disposition parameters. */
+  /** Gets parameters. */
   def params: Map[String, String]
 
   /** Tests for attachment. */
@@ -38,27 +38,27 @@ trait DispositionType {
   /** Tests for form-data. */
   def isFormData: Boolean = name == "form-data"
 
-  /** Returns formatted content disposition type and parameters. */
+  /** Returns formatted disposition. */
   override lazy val toString: String = name + FormatParams(params)
 }
 
 /** Provides factory for `DispositionType`. */
 object DispositionType {
-  /** Parses formatted content disposition type and optional parameters. */
+  /** Parses formatted disposition. */
   def parse(disposition: String): DispositionType =
     ParseContentDisposition(disposition) match {
       case (name, params) => apply(name, params)
     }
 
-  /** Creates DispositionType with supplied name and parameters. */
+  /** Creates disposition with supplied name and parameters. */
   def apply(name: String, params: Map[String, String]): DispositionType =
     DispositionTypeImpl(Name(name), Params(params))
 
-  /** Creates DispositionType with supplied name and paramaters. */
+  /** Creates disposition with supplied name and paramaters. */
   def apply(name: String, params: (String, String)*): DispositionType =
     apply(name, params.toMap)
 
-  /** Destructures DispositionType. */
+  /** Destructures disposition. */
   def unapply(disposition: DispositionType): Option[(String, Map[String, String])] =
     Some((disposition.name, disposition.params))
 }

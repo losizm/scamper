@@ -50,11 +50,11 @@ object ProductType {
   def parseAll(products: String): Seq[ProductType] =
     syntax.findAllIn(products).map(parse).toSeq
 
-  /** Creates ProductType with supplied values. */
+  /** Creates product with supplied values. */
   def apply(name: String, version: Option[String]): ProductType =
     ProductTypeImpl(CheckToken(name), version.map(CheckToken))
 
-  /** Destructures ProductType. */
+  /** Destructures product. */
   def unapply(product: ProductType): Option[(String, Option[String])] =
     Some((product.name, product.version))
 

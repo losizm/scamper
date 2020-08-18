@@ -45,11 +45,11 @@ object Protocol {
       case _ => throw new IllegalArgumentException(s"Malformed protocol: $protocol")
     }
 
-  /** Creates Protocol with supplied values. */
+  /** Creates protocol with supplied values. */
   def apply(name: String, version: Option[String]): Protocol =
     ProtocolImpl(CheckToken(name), version.map(CheckToken))
 
-  /** Destructures Protocol. */
+  /** Destructures protocol. */
   def unapply(protocol: Protocol): Option[(String, Option[String])] =
     Some((protocol.name, protocol.version))
 

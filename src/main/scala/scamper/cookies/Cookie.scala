@@ -49,11 +49,11 @@ object PlainCookie {
       case _ => throw new IllegalArgumentException(s"Malformed cookie: $cookie")
     }
 
-  /** Creates PlainCookie with supplied name-value pair. */
+  /** Creates cookie with supplied name and value. */
   def apply(name: String, value: String): PlainCookie =
     PlainCookieImpl(Name(name), Value(value))
 
-  /** Destructures PlainCookie. */
+  /** Destructures cookie. */
   def unapply(cookie: PlainCookie): Option[(String, String)] =
     Some((cookie.name, cookie.value))
 }
@@ -87,7 +87,7 @@ trait SetCookie extends Cookie {
   /** Tests HTTP only cookie. */
   def httpOnly: Boolean
 
-  /** Converts to PlainCookie using name-value pair. */
+  /** Converts to `PlainCookie`. */
   def toPlainCookie: PlainCookie = PlainCookie(name, value)
 
   /** Returns formatted cookie. */
@@ -123,12 +123,12 @@ object SetCookie {
         }
     }
 
-  /** Creates SetCookie with supplied name, value, and attributes. */
+  /** Creates cookie with supplied name, value, and attributes. */
   def apply(name: String, value: String, domain: Option[String] = None, path: Option[String] = None, expires: Option[Instant] = None,
       maxAge: Option[Long] = None, secure: Boolean = false, httpOnly: Boolean = false): SetCookie =
     SetCookieImpl(Name(name), Value(value), CookieAttributes(domain, path, expires, maxAge, secure, httpOnly))
 
-  /** Destructures SetCookie. */
+  /** Destructures cookie. */
   def unapply(cookie: SetCookie): Option[(String, String, Option[String], Option[String], Option[Instant], Option[Long], Boolean, Boolean)] =
     Some((cookie.name, cookie.value, cookie.domain, cookie.path, cookie.expires, cookie.maxAge, cookie.secure, cookie.httpOnly))
 }

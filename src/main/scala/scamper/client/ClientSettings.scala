@@ -32,7 +32,7 @@ import scamper.types.ContentCodingRange
  *
  * @constructor Creates client settings.
  *
- * === Default Configuration ===
+ * === Default Settings ===
  *
  * | Key             | Value |
  * | --------------- | ----- |
@@ -49,7 +49,7 @@ import scamper.types.ContentCodingRange
 class ClientSettings {
   private var settings = HttpClientImpl.Settings()
 
-  /** Resets to default configuration. */
+  /** Resets to default settings. */
   def reset(): this.type = synchronized {
     settings = HttpClientImpl.Settings()
     this
@@ -154,12 +154,12 @@ class ClientSettings {
     this
   }
 
-  /** Creates client using current configuration. */
+  /** Creates client using current settings. */
   def create(): HttpClient = synchronized { HttpClientImpl(settings) }
 }
 
 /** Provides factory method for `ClientSettings`. */
 object ClientSettings {
-  /** Gets new instance of `ClientSettings`. */
+  /** Gets new instance of client settings. */
   def apply(): ClientSettings = new ClientSettings()
 }

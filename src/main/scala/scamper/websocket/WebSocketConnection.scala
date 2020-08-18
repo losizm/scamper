@@ -184,7 +184,7 @@ class WebSocketConnection private (socket: Socket) {
 /** Provides factory for `WebSocketConnection`. */
 object WebSocketConnection {
   /**
-   * Creates WebSocketConnection using supplied socket.
+   * Creates WebSocket connection using supplied socket.
    *
    * @param socket socket connection
    */

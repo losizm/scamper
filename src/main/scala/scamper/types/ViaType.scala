@@ -53,11 +53,11 @@ object ViaType {
   def parseAll(vias: String): Seq[ViaType] =
     ListParser(vias).map(parse)
 
-  /** Creates ViaType with supplied values. */
+  /** Creates via type with supplied values. */
   def apply(protocol: Protocol, by: String, comment: Option[String] = None): ViaType =
     ViaTypeImpl(protocol, by, comment.map(_.trim))
 
-  /** Destructures ViaType. */
+  /** Destructures via type. */
   def unapply(via: ViaType): Option[(Protocol, String, Option[String])] =
     Some((via.protocol, via.by, via.comment))
 }

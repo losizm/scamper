@@ -27,17 +27,17 @@ trait KeepAliveParameters {
   /** Gets max requests. */
   def max: Int
 
-  /** Returns formatted keep-alive parameters. */
+  /** Returns formatted parameters. */
   override lazy val toString: String = s"timeout=$timeout, max=$max"
 }
 
 /** Provides factory for `KeepAliveParameters`. */
 object KeepAliveParameters {
-  /** Creates KeepLiveParameters with supplied timeout and max. */
+  /** Creates parameters with supplied timeout and max. */
   def apply(timeout: Int, max: Int): KeepAliveParameters =
     KeepAliveParametersImpl(timeout, max)
 
-  /** Creates KeepLiveParameters from formatted parameters. */
+  /** Parse formatted parameters. */
   def parse(params: String): KeepAliveParameters = {
     val keepAlive = params.split(",")
       .map { _.split("=").map(_.trim) }
@@ -53,9 +53,9 @@ object KeepAliveParameters {
     )
   }
 
-  /** Destructures KeepLiveParameters to `timeout` and `max`. */
-  def unapply(keepAlive: KeepAliveParameters): Option[(Int, Int)] =
-    Some(keepAlive.timeout, keepAlive.max)
+  /** Destructures parameters to `timeout` and `max`. */
+  def unapply(params: KeepAliveParameters): Option[(Int, Int)] =
+    Some(params.timeout, params.max)
 }
 
 private case class KeepAliveParametersImpl(timeout: Int, max: Int) extends KeepAliveParameters

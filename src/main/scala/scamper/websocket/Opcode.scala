@@ -58,7 +58,7 @@ object Opcode {
     val Pong: Opcode = OpcodeImpl(10, "Pong")
   }
 
-  /** Gets `Opcode` for given value, if registered. */
+  /** Gets opcode for given value, if registered. */
   def get(value: Int): Option[Opcode] =
     try Some(apply(value))
     catch {
@@ -66,7 +66,7 @@ object Opcode {
     }
 
   /**
-   * Gets registered `Opcode` for given value.
+   * Gets registered opcode for given value.
    *
    * @throws NoSuchElementException if value not registered
    */

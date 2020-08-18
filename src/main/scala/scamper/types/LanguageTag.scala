@@ -27,11 +27,11 @@ trait LanguageTag {
   /** Gets other subtags. */
   def others: Seq[String]
 
-  /** Converts to LanguageRange with supplied weight. */ 
+  /** Converts to range with supplied weight. */
   def toRange(weight: Float): LanguageRange =
     LanguageRange(toString, weight)
 
-  /** Returns formatted language tag. */
+  /** Returns formatted tag. */
   override lazy val toString: String =
     primary + others.foldLeft("")((sum, it) => sum + "-" + it)
 }
@@ -42,7 +42,7 @@ object LanguageTag {
   private val primary = "(\\p{Alpha}{1,8})".r
   private val other = "(\\p{Alnum}{1,8})".r
 
-  /** Parses formatted language tag. */
+  /** Parses formatted tag. */
   def parse(tag: String): LanguageTag =
     tag match {
       case syntax(primary, "")   => apply(primary, Nil)
@@ -50,12 +50,12 @@ object LanguageTag {
       case _ => throw new IllegalArgumentException(s"Malformed language tag: $tag")
     }
 
-  /** Creates LanguageTag with primary subtag and additional subtags. */
+  /** Creates tag with primary and additional subtags. */
   def apply(primary: String, others: Seq[String]): LanguageTag =
     LanguageTagImpl(Primary(primary), others.collect(Other))
 
 
-  /** Destructures LanguageTag. */
+  /** Destructures tag. */
   def unapply(tag: LanguageTag): Option[(String, Seq[String])] =
     Some((tag.primary, tag.others))
 
@@ -63,7 +63,7 @@ object LanguageTag {
     case primary(value) => value
     case value => throw new IllegalArgumentException(s"Invalid primary subtag: $value")
   }
-  
+
   private def Other: PartialFunction[String, String] = {
     case other(value) => value
     case value => throw new IllegalArgumentException(s"Invalid subtag: $value")

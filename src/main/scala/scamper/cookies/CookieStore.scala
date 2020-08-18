@@ -84,7 +84,7 @@ sealed trait CookieStore {
 /** Provides factory for `CookieStore`. */
 object CookieStore {
   /**
-   * Gets `CookieStore` that is always empty.
+   * Gets cookie store that is always empty.
    *
    * The cookie store never adds any cookies in `put`, nor does it retrieve any
    * in `get`.
@@ -92,7 +92,7 @@ object CookieStore {
   def alwaysEmpty: CookieStore = AlwaysEmptyCookieStore
 
   /**
-   * Creates `CookieStore` with initial collection of cookies.
+   * Creates cookie store with initial collection of cookies.
    *
    * @param cookies initial collection of cookies
    */

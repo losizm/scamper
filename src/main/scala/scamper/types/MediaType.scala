@@ -63,7 +63,7 @@ trait MediaType {
   /** Tests main type for message. */
   def isMessage: Boolean = mainType == "message"
 
-  /** Converts to MediaRange with supplied weight. */
+  /** Converts to range with supplied weight. */
   def toRange(weight: Float = 1.0f): MediaRange =
     MediaRange(mainType, subtype, weight, params)
 
@@ -89,18 +89,18 @@ object MediaType {
 
   private val fileNamePattern = ".+\\.(\\w+)".r
 
-  /** Gets MediaType for given file. */
+  /** Gets media type for given file. */
   def fromFile(file: File): Option[MediaType] =
     fromFileName(file.getName)
 
-  /** Gets MediaType for given file name. */
+  /** Gets media type for given file name. */
   def fromFileName(fileName: String): Option[MediaType] =
     fileName match {
       case fileNamePattern(suffix) => fromSuffix(suffix)
       case _ => None
     }
 
-  /** Gets MediaType for given file name suffix. */
+  /** Gets media type for given file name suffix. */
   def fromSuffix(suffix: String): Option[MediaType] =
     mappings.get(suffix.toLowerCase)
 
@@ -110,15 +110,15 @@ object MediaType {
       case (mainType, subtype, params) => apply(mainType, subtype, params)
     }
 
-  /** Creates MediaType with supplied values. */
+  /** Creates media type with supplied values. */
   def apply(mainType: String, subtype: String, params: Map[String, String]): MediaType =
     MediaTypeImpl(MainType(mainType), Subtype(subtype), Params(params))
 
-  /** Creates MediaType with supplied values. */
+  /** Creates media type with supplied values. */
   def apply(mainType: String, subtype: String, params: (String, String)*): MediaType =
     apply(mainType, subtype, params.toMap)
 
-  /** Destructures MediaType. */
+  /** Destructures media type. */
   def unapply(mediaType: MediaType): Option[(String, String, Map[String, String])] =
     Some((mediaType.mainType, mediaType.subtype, mediaType.params))
 }

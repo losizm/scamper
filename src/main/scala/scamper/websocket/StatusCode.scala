@@ -142,7 +142,7 @@ object StatusCode {
     val TlsHandshake: StatusCode = StatusCodeImpl(1015, "TLS Handshake", true)
   }
 
-  /** Gets `StatusCode` for given value, if registered. */
+  /** Gets status code for given value, if registered. */
   def get(value: Int): Option[StatusCode] =
     try Some(apply(value))
     catch {
@@ -150,7 +150,7 @@ object StatusCode {
     }
 
   /**
-   * Gets `StatusCode` for supplied data, if registered.
+   * Gets status code for supplied data, if registered.
    *
    * @note The data is converted to two-byte unsigned integer, which is then
    *  used to obtain status code.
@@ -163,7 +163,7 @@ object StatusCode {
     }
 
   /**
-   * Gets registered `StatusCode` for given value.
+   * Gets registered status code for given value.
    *
    * @throws NoSuchElementException if value not registered
    */
@@ -186,7 +186,7 @@ object StatusCode {
     }
 
   /**
-   * Gets registered `StatusCode` for supplied data.
+   * Gets registered status code for supplied data.
    *
    * @throws NoSuchElementException if value not registered
    * @throws IllegalArgumentException if `data.size != 2`
@@ -200,7 +200,7 @@ object StatusCode {
       case _ => throw new IllegalArgumentException()
     }
 
-  /** Destructures supplied status code to its `value`. */
+  /** Destructures supplied status code to its value. */
   def unapply(code: StatusCode): Option[Int] =
     Some(code.value)
 }

@@ -81,7 +81,7 @@ object HttpServer {
   def app(): ServerApplication = new ServerApplication()
 
   /**
-   * Creates `HttpServer` at given port using supplied handler.
+   * Creates server at given port using supplied handler.
    *
    * @param port port number
    * @param handler request handler
@@ -92,7 +92,7 @@ object HttpServer {
     create("0.0.0.0", port)(handler)
 
   /**
-   * Creates secure `HttpServer` at given port using supplied handler.
+   * Creates secure server at given port using supplied handler.
    *
    * The SSL/TLS server connection is created with supplied key and certificate.
    *
@@ -107,7 +107,7 @@ object HttpServer {
     create("0.0.0.0", port, key, cert)(handler)
 
   /**
-   * Creates `HttpServer` at given host and port using supplied handler.
+   * Creates server at given host and port using supplied handler.
    *
    * @param host host address
    * @param port port number
@@ -119,7 +119,7 @@ object HttpServer {
     create(InetAddress.getByName(host), port)(handler)
 
   /**
-   * Creates secure `HttpServer` at given host and port using supplied handler.
+   * Creates secure server at given host and port using supplied handler.
    *
    * The SSL/TLS server connection is created with supplied key and certificate.
    *
@@ -135,7 +135,7 @@ object HttpServer {
     create(InetAddress.getByName(host), port, key, cert)(handler)
 
   /**
-   * Creates `HttpServer` at given host and port using supplied handler.
+   * Creates server at given host and port using supplied handler.
    *
    * @param host host address
    * @param port port number
@@ -147,7 +147,7 @@ object HttpServer {
     app().incoming(handler).create(host, port)
 
   /**
-   * Creates secure `HttpServer` at given host and port using supplied handler.
+   * Creates secure server at given host and port using supplied handler.
    *
    * The SSL/TLS server connection is created with supplied key and certificate.
    *

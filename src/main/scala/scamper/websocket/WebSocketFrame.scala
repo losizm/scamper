@@ -65,7 +65,7 @@ trait WebSocketFrame {
 /** Provides factory for `WebSocketFrame`. */
 object WebSocketFrame {
   /**
-   * Creates WebSocketFrame using supplied attributes.
+   * Creates WebSocket frame using supplied attributes.
    *
    * @param isFinal indicates final frame of message
    * @param isCompressed indicates compression
@@ -104,7 +104,7 @@ object WebSocketFrame {
   }
 
   /**
-   * Creates WebSocketFrame using supplied attributes.
+   * Creates WebSocket frame using supplied attributes.
    *
    * @param isFinal indicates final frame of message
    * @param isCompressed indicates compression
@@ -121,7 +121,7 @@ object WebSocketFrame {
   }
 
   /**
-   * Creates WebSocketFrame using supplied attributes.
+   * Creates WebSocket frame using supplied attributes.
    *
    * @param isFinal indicates final frame of message
    * @param isCompressed indicates compression

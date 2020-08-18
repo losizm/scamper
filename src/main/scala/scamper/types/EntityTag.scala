@@ -40,7 +40,7 @@ trait EntityTag {
 object EntityTag {
   private val syntax = """\s*(W/)?("[^"]*")\s*""".r
 
-  /** Parses formatted entity tag. */
+  /** Parses formatted tag. */
   def parse(tag: String): EntityTag =
     tag match {
       case syntax(weak, opaque) => EntityTagImpl(opaque, weak != null)
@@ -48,7 +48,7 @@ object EntityTag {
     }
 
   /**
-   * Creates EntityTag with supplied values.
+   * Creates tag with supplied values.
    *
    * @note The opaque tag is automatically enclosed in double-quotes if not
    * already supplied as such.
@@ -58,7 +58,7 @@ object EntityTag {
     else if (opaque.matches("[^\"]*")) EntityTagImpl("\"" + opaque + "\"", weak)
     else throw new IllegalArgumentException(s"Invalid opaque tag: $opaque")
 
-  /** Destructures EntityTag. */
+  /** Destructures tag. */
   def unapply(tag: EntityTag): Option[(String, Boolean)] =
     Some((tag.opaque, tag.weak))
 }

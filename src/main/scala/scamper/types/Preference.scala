@@ -116,23 +116,23 @@ object Preference {
   def parseAll(preferences: String): Seq[Preference] =
     ListParser(preferences).map(parse)
 
-  /** Creates Preference with supplied name. */
+  /** Creates preference with supplied name. */
   def apply(name: String): Preference =
     apply(name, None, Map.empty[String, Option[String]])
 
-  /** Creates Preference with supplied name and value. */
+  /** Creates preference with supplied name and value. */
   def apply(name: String, value: String): Preference =
     apply(name, Some(value), Map.empty[String, Option[String]])
 
-  /** Creates Preference with supplied name and params. */
+  /** Creates preference with supplied name and params. */
   def apply(name: String, params: Map[String, Option[String]]): Preference =
     apply(name, None, params)
 
-  /** Creates Preference with supplied name, value, and parameters. */
+  /** Creates preference with supplied name, value, and parameters. */
   def apply(name: String, value: String, params: Map[String, Option[String]]): Preference =
     apply(name, Some(value), params)
 
-  /** Creates Preference with supplied name, optional value, and parameters. */
+  /** Creates preference with supplied name, optional value, and parameters. */
   def apply(name: String, value: Option[String], params: Map[String, Option[String]]): Preference =
     name.toLowerCase match {
       case "wait" if value.exists(_ matches "\\d+")     => `wait=duration`(value.get.toLong)
@@ -144,7 +144,7 @@ object Preference {
       case name => PreferenceImpl(Name(name), value.filterNot(_.isEmpty).map(Value), Params(params))
     }
 
-  /** Destructures Preference. */
+  /** Destructures preference. */
   def unapply(preference: Preference): Option[(String, Option[String], Map[String, Option[String]])] =
     Some((preference.name, preference.value, preference.params))
 

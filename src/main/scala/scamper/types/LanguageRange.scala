@@ -33,7 +33,7 @@ trait LanguageRange {
   /** Tests whether range matches supplied language tag. */
   def matches(tag: LanguageTag): Boolean
 
-  /** Returns formatted language range. */
+  /** Returns formatted range. */
   override lazy val toString: String =
     if (weight == 1.0f) tag
     else tag + "; q=" + weight
@@ -43,7 +43,7 @@ trait LanguageRange {
 object LanguageRange {
   private val syntax = """([\w*-]+)(?i:\s*;\s*q=(\d+(?:\.\d*)?))?""".r
 
-  /** Parses formatted language range. */
+  /** Parses formatted range. */
   def parse(range: String): LanguageRange =
     range match {
       case syntax(tag, null)   => apply(tag, 1.0f)
@@ -51,11 +51,11 @@ object LanguageRange {
       case _ => throw new IllegalArgumentException(s"Malformed language range: $range")
     }
 
-  /** Creates LanguageRange with supplied language tag and weight. */
+  /** Creates range with supplied language tag and weight. */
   def apply(tag: String, weight: Float): LanguageRange =
     LanguageRangeImpl(tag, QValue(weight))
 
-  /** Destructures LanguageRange. */
+  /** Destructures range. */
   def unapply(range: LanguageRange): Option[(String, Float)] =
     Some((range.tag, range.weight))
 }

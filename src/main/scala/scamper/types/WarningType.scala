@@ -58,11 +58,11 @@ object WarningType {
   def parseAll(warnings: String): Seq[WarningType] =
     ListParser(warnings).map(parse)
 
-  /** Creates WarningType with supplied values. */
+  /** Creates warning with supplied values. */
   def apply(code: Int, agent: String, text: String, date: Option[Instant] = None): WarningType =
     WarningTypeImpl(code, agent, text, date)
 
-  /** Destructures WarningType. */
+  /** Destructures warning. */
   def unapply(warning: WarningType): Option[(Int, String, String, Option[Instant])] =
     Some((warning.code, warning.agent, warning.text, warning.date))
 }

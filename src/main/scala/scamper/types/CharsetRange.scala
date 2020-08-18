@@ -35,7 +35,7 @@ trait CharsetRange {
   /** Tests whether range matches supplied charset. */
   def matches(charset: String): Boolean
 
-  /** Returns formatted charset range. */
+  /** Returns formatted range. */
   override lazy val toString: String =
     if (weight == 1.0f) charset
     else charset + "; q=" + weight
@@ -45,7 +45,7 @@ trait CharsetRange {
 object CharsetRange {
   private val syntax = """([^\s;=]+)(?:\s*;\s*q\s*=\s*(\d+(?:\.\d*)?))?""".r
 
-  /** Parses formatted charset range. */
+  /** Parses formatted range. */
   def parse(range: String): CharsetRange =
     range match {
       case syntax(charset, null) => apply(charset, 1.0f)
@@ -53,13 +53,13 @@ object CharsetRange {
       case _ => throw new IllegalArgumentException(s"Malformed charset range: $range")
     }
 
-  /** Creates CharsetRange with supplied charset and weight. */
+  /** Creates range with supplied charset and weight. */
   def apply(charset: String, weight: Float): CharsetRange =
     Token(charset).map(charset => CharsetRangeImpl(charset, QValue(weight))).getOrElse {
       throw new IllegalArgumentException(s"Invalid charset: $charset")
     }
 
-  /** Destructures CharsetRange. */
+  /** Destructures range. */
   def unapply(range: CharsetRange): Option[(String, Float)] =
     Some((range.charset, range.weight))
 }

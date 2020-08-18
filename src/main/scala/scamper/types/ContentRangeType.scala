@@ -42,7 +42,7 @@ trait ByteContentRange extends ContentRangeType {
   /** Gets byte range response. */
   def resp: ByteRangeResp
 
-  /** Gets formatted byte content range. */
+  /** Gets formatted range. */
   lazy override val toString: String =
     unit + ' ' + (resp match {
       case Satisfied(first, last, length) => s"$first-$last/${length.getOrElse('*')}"
@@ -56,18 +56,18 @@ object ByteContentRange {
   private val satisfied = """(\d+)-(\d+)/(\*|\d+)""".r
   private val unsatisfied = """\*/(\d+)""".r
 
-  /** Parses formatted byte content range. */
+  /** Parses formatted range. */
   def parse(range: String): ByteContentRange =
     range match {
       case syntax(resp) => ByteContentRangeImpl(parseResp(resp))
       case _ => throw new IllegalArgumentException(s"Malformed byte content range: $range")
     }
 
-  /** Creates ByteContentRange from supplied response. */
+  /** Creates range from supplied response. */
   def apply(resp: ByteRangeResp): ByteContentRange =
     ByteContentRangeImpl(resp)
 
-  /** Destructures ByteContentRange. */
+  /** Destructures range. */
   def unapply(range: ByteContentRange): Option[(String, ByteRangeResp)] =
     Some((range.unit, range.resp))
 

@@ -39,11 +39,11 @@ trait WebSocketExtension {
 object WebSocketExtension {
   private val syntax = """\s*([^,;\s]+)\s*(;.+)?\s*""".r
 
-  /** Creates WebSocketExtension from supplied values. */
+  /** Creates WebSocket extension from supplied values. */
   def apply(identifier: String, params: Map[String, Option[String]]): WebSocketExtension =
     WebSocketExtensionImpl(checkIdentifier(identifier), checkParams(params))
 
-  /** Creates WebSocketExtension from supplied values. */
+  /** Creates WebSocket extension from supplied values. */
   def apply(identifier: String, params: (String, Option[String])*): WebSocketExtension =
     apply(identifier, params.toMap)
 
@@ -58,7 +58,7 @@ object WebSocketExtension {
   def parseAll(extensions: String): Seq[WebSocketExtension] =
     ListParser(extensions).map(parse)
 
-  /** Destructures WebSocketExtension. */
+  /** Destructures WebSocket extension. */
   def unapply(extension: WebSocketExtension): Option[(String, Map[String, Option[String]])] =
     Some((extension.identifier, extension.params))
 

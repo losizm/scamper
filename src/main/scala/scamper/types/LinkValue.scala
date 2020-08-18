@@ -50,15 +50,15 @@ object LinkValue {
   def parseAll(links: String): Seq[LinkValue] =
     ListParser(links).map(parse)
 
-  /** Creates LinkValue with supplied values. */
+  /** Creates link with supplied values. */
   def apply(ref: Uri, params: (String, Option[String])*): LinkValue =
     LinkValueImpl(ref, params.toMap)
 
-  /** Creates LinkValue with supplied values. */
+  /** Creates link with supplied values. */
   def apply(ref: Uri, params: Map[String, Option[String]]): LinkValue =
     LinkValueImpl(ref, params)
 
-  /** Destructures LinkValue. */
+  /** Destructures link. */
   def unapply(link: LinkValue): Option[(Uri, Map[String, Option[String]])] =
     Some((link.ref, link.params))
 }

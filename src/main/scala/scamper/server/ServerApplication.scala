@@ -554,7 +554,7 @@ class ServerApplication {
   }
 
   /**
-   * Creates `HttpServer` at given port.
+   * Creates server at given port.
    *
    * @param port port number
    *
@@ -565,7 +565,7 @@ class ServerApplication {
   }
 
   /**
-   * Creates `HttpServer` at given host and port.
+   * Creates server at given host and port.
    *
    * @param host host address
    * @param port port number
@@ -577,7 +577,7 @@ class ServerApplication {
   }
 
   /**
-   * Creates `HttpServer` at given host and port.
+   * Creates server at given host and port.
    *
    * @param host host address
    * @param port port number

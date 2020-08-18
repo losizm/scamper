@@ -31,8 +31,8 @@ trait BodyDecoder {
    *
    * @param message HTTP message
    *
-   * @note The decoded input stream throws [[ReadLimitExceeded]] if it attempts
-   *   to read beyond `maxLength` of message body.
+   * @note The input stream throws [[ReadLimitExceeded]] if the decoder reads
+   * beyond `maxLength` of message body.
    */
   def decode(message: HttpMessage): InputStream =
     if (message.body.isKnownEmpty)
@@ -61,8 +61,8 @@ trait BodyDecoder {
    *
    * @return value from supplied function
    *
-   * @note The decoded input stream throws [[ReadLimitExceeded]] if it attempts
-   *   to read beyond `maxLength` of message body.
+   * @note The input stream throws [[ReadLimitExceeded]] if the decoder reads
+   * beyond `maxLength` of message body.
    */
   def withDecode[T](message: HttpMessage)(f: InputStream => T): T =
     f { decode(message) }
@@ -95,7 +95,7 @@ trait BodyDecoder {
 
 /** Provides factory for `BodyDecoder`. */
 object BodyDecoder {
-  /** Creates instance of `BodyDecoder` that enforces specified max length. */
+  /** Creates decoder that enforces specified maximum length. */
   def apply(maxLength: Long): BodyDecoder =
     maxLength match {
       case length => new BodyDecoder { val maxLength = length }

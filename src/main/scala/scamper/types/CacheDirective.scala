@@ -30,7 +30,7 @@ trait CacheDirective {
   /** Gets optional directive value. */
   def value: Option[String]
 
-  /** Returns formatted cache directive. */
+  /** Returns formatted directive. */
   override lazy val toString: String =
     name + value.map(x => "=" + Token(x).getOrElse(s"""\"$x\"""")).getOrElse("")
 }
@@ -43,7 +43,7 @@ object CacheDirective {
   private val syntax2 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val syntax3 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*"([^"]*)"\s*""".r
 
-  /** Parses formatted cache directive. */
+  /** Parses formatted directive. */
   def parse(directive: String): CacheDirective =
     directive match {
       case syntax1(name) => apply(name)
@@ -52,11 +52,11 @@ object CacheDirective {
       case _ => throw new IllegalArgumentException(s"Malformed cache directive: $directive")
     }
 
-  /** Parses formatted list of cache directives. */
+  /** Parses formatted list of directives. */
   def parseAll(directives: String): Seq[CacheDirective] =
     ListParser(directives).map(parse)
 
-  /** Creates CacheDirective with supplied name and value. */
+  /** Creates directive with supplied name and value. */
   def apply(name: String, value: Option[String] = None): CacheDirective =
     Token(name.toLowerCase) map {
       case "immutable"              => `immutable`
@@ -79,7 +79,7 @@ object CacheDirective {
       throw new IllegalArgumentException(s"Invalid cache directive name: $name")
     }
 
-  /** Destructures CacheDirective. */
+  /** Destructures directive. */
   def unapply(directive: CacheDirective): Option[(String, Option[String])] =
     Some(directive.name -> directive.value)
 }

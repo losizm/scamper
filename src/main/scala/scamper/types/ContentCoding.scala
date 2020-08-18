@@ -38,7 +38,7 @@ trait ContentCoding {
   /** Tests for identity. */
   def isIdentity: Boolean = name == "identity"
 
-  /** Converts to ContentCodingRange with supplied weight. */
+  /** Converts to range with supplied weight. */
   def toRange(weight: Float = 1.0f): ContentCodingRange =
     ContentCodingRange(name, weight)
 
@@ -48,11 +48,11 @@ trait ContentCoding {
 
 /** Provides factory for `ContentCoding`. */
 object ContentCoding {
-  /** Creates ContentCoding with supplied name. */
+  /** Creates content coding with supplied name. */
   def apply(name: String): ContentCoding =
     ContentCodingImpl(Name(name))
 
-  /** Destructures ContentCoding. */
+  /** Destructures content coding. */
   def unapply(coding: ContentCoding): Option[String] =
     Some(coding.name)
 }

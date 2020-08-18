@@ -47,7 +47,7 @@ trait ContentCodingRange {
   /** Tests whether range matches supplied content coding. */
   def matches(coding: ContentCoding): Boolean
 
-  /** Returns formatted content coding range. */
+  /** Returns formatted range. */
   override lazy val toString: String =
     if (weight == 1.0f) name
     else name + "; q=" + weight
@@ -57,7 +57,7 @@ trait ContentCodingRange {
 object ContentCodingRange {
   private val syntax = """([^\s;=]+)(?:\s*;\s*q\s*=\s*(\d+(?:\.\d*)?))?""".r
 
-  /** Parses formatted content coding range. */
+  /** Parses formatted range. */
   def parse(range: String): ContentCodingRange =
     range match {
       case syntax(name, null) => apply(name, 1.0f)
@@ -65,11 +65,11 @@ object ContentCodingRange {
       case _ => throw new IllegalArgumentException(s"Malformed content coding range: $range")
     }
 
-  /** Creates ContentCodingRange with supplied name and weight. */
+  /** Creates range with supplied name and weight. */
   def apply(name: String, weight: Float): ContentCodingRange =
     ContentCodingRangeImpl(Name(name), QValue(weight))
 
-  /** Destructures ContentCodingRange. */
+  /** Destructures range. */
   def unapply(range: ContentCodingRange): Option[(String, Float)] =
     Some((range.name, range.weight))
 }

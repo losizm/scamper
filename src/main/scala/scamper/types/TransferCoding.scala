@@ -53,15 +53,15 @@ object TransferCoding {
       case (name, params) => apply(name, params)
     }
 
-  /** Creates TransferCoding with supplied values. */
+  /** Creates transfer coding with supplied values. */
   def apply(name: String, params: Map[String, String]): TransferCoding =
     TransferCodingImpl(Name(name), Params(params))
 
-  /** Creates TransferCoding with supplied values. */
+  /** Creates transfer coding with supplied values. */
   def apply(name: String, params: (String, String)*): TransferCoding =
     apply(name, params.toMap)
 
-  /** Destructures TransferCoding. */
+  /** Destructures transfer coding. */
   def unapply(coding: TransferCoding): Option[(String, Map[String, String])] =
     Some((coding.name, coding.params))
 }

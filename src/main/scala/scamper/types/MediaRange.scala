@@ -67,7 +67,7 @@ trait MediaRange {
   /** Tests whether range matches supplied media type. */
   def matches(mediaType: MediaType): Boolean
 
-  /** Returns formatted media range. */
+  /** Returns formatted range. */
   override lazy val toString: String =
     if (weight == 1.0f) mainType + '/' + subtype + FormatParams(params)
     else mainType + '/' + subtype + "; q=" + weight + FormatParams(params)
@@ -75,7 +75,7 @@ trait MediaRange {
 
 /** Provides factory for `MediaRange`. */
 object MediaRange {
-  /** Parses formatted media range. */
+  /** Parses formatted range. */
   def apply(mediaRange: String): MediaRange =
     ParseMediaType(mediaRange) match {
       case (mainType, subtype, params) =>
@@ -88,11 +88,11 @@ object MediaRange {
         }
     }
 
-  /** Creates MediaRange with supplied values. */
+  /** Creates range with supplied values. */
   def apply(mainType: String, subtype: String, weight: Float = 1.0f, params: Map[String, String] = Map.empty): MediaRange =
     MediaRangeImpl(MainType(mainType), Subtype(subtype), QValue(weight), Params(params))
 
-  /** Destructures MediaRange. */
+  /** Destructures range. */
   def unapply(mediaRange: MediaRange): Option[(String, String, Float, Map[String, String])] =
     Some((mediaRange.mainType, mediaRange.subtype, mediaRange.weight, mediaRange.params))
 }

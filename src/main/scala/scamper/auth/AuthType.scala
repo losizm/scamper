@@ -52,15 +52,15 @@ trait BasicChallenge extends Challenge {
 
 /** Provides factory for `BasicChallenge`. */
 object BasicChallenge {
-  /** Creates BasicChallenge with realm and supplied parameters. */
+  /** Creates challenge with realm and supplied parameters. */
   def apply(realm: String, params: Map[String, String]): BasicChallenge =
     BasicChallengeImpl(realm, Params(("realm" -> realm) +: params.toSeq))
 
-  /** Creates BasicChallenge with realm and supplied parameters. */
+  /** Creates challenge with realm and supplied parameters. */
   def apply(realm: String, params: (String, String)*): BasicChallenge =
     BasicChallengeImpl(realm, Params(("realm" -> realm) +: params))
 
-  /** Destructures BasicChallenge. */
+  /** Destructures challenge. */
   def unapply(challenge: BasicChallenge): Option[(String, Map[String, String])] =
     Some(challenge.realm -> challenge.params)
 }
@@ -98,15 +98,15 @@ trait BearerChallenge extends Challenge {
 
 /** Provides factory for `BearerChallenge`. */
 object BearerChallenge {
-  /** Creates BearerChallenge with supplied parameters. */
+  /** Creates challenge with supplied parameters. */
   def apply(params: Map[String, String]): BearerChallenge =
     BearerChallengeImpl(Params(params.toSeq))
 
-  /** Creates BearerChallenge with supplied parameters. */
+  /** Creates challenge with supplied parameters. */
   def apply(params: (String, String)*): BearerChallenge =
     BearerChallengeImpl(Params(params))
 
-  /** Destructures BearerChallenge. */
+  /** Destructures challenge. */
   def unapply(challenge: BearerChallenge): Option[Map[String, String]] =
     Some(challenge.params)
 }
@@ -139,11 +139,11 @@ object Challenge {
   def parseAll(challenges: String): Seq[Challenge] =
     SplitAuthTypes(challenges).map(parse)
 
-  /** Creates Challenge with supplied scheme and parameters. */
+  /** Creates challenge with supplied scheme and parameters. */
   def apply(scheme: String, params: Map[String, String]): Challenge =
     apply(scheme, None, Params(params.toSeq))
 
-  /** Creates Challenge with supplied scheme and parameters. */
+  /** Creates challenge with supplied scheme and parameters. */
   def apply(scheme: String, params: (String, String)*): Challenge =
     apply(scheme, None, Params(params))
 
@@ -162,7 +162,7 @@ object Challenge {
         DefaultChallenge(scheme, params)
     }
 
-  /** Destructures Challenge. */
+  /** Destructures challenge. */
   def unapply(challenge: Challenge): Option[(String, Map[String, String])] =
     Some((challenge.scheme, challenge.params))
 }
@@ -198,7 +198,7 @@ trait BasicCredentials extends Credentials {
 
 /** Provides factory for `BasicCredentials`. */
 object BasicCredentials {
-  /** Creates BasicCredentials with supplied token. */
+  /** Creates credentials with supplied token. */
   def apply(token: String): BasicCredentials = {
     val valid = "(.+):(.*)".r
 
@@ -207,11 +207,11 @@ object BasicCredentials {
       .getOrElse { throw new IllegalArgumentException(s"Invalid token: $token") }
   }
 
-  /** Creates BasicCredentials with supplied user and password. */
+  /** Creates credentials with supplied user and password. */
   def apply(user: String, password: String): BasicCredentials =
     BasicCredentialsImpl(Base64.encodeToString(user + ":" + password))
 
-  /** Destructures BasicCredentials. */
+  /** Destructures credentials. */
   def unapply(credentials: BasicCredentials): Option[(String, String)] =
     Some(credentials.user -> credentials.password)
 }
@@ -231,11 +231,11 @@ trait BearerCredentials extends Credentials {
 
 /** Provides factory for `BearerCredentials`. */
 object BearerCredentials {
-  /** Creates BearerCredentials with supplied token. */
+  /** Creates credentials with supplied token. */
   def apply(token: String): BearerCredentials =
     BearerCredentialsImpl(Token(token))
 
-  /** Destructures BearerCredentials. */
+  /** Destructures credentials. */
   def unapply(credentials: BearerCredentials): Option[String] =
     Some(credentials.token)
 }
@@ -250,7 +250,7 @@ object Credentials {
       case (scheme, token, params) => apply(scheme, token, params)
     }
 
-  /** Creates Credentials with supplied scheme and token. */
+  /** Creates credentials with supplied scheme and token. */
   def apply(scheme: String, token: String): Credentials =
     apply(scheme, Some(Token(token)), Map.empty[String, String])
 
@@ -270,7 +270,7 @@ object Credentials {
           .getOrElse(throw new IllegalArgumentException("Token required for credentials"))
     }
 
-  /** Destructures Credentials. */
+  /** Destructures credentials. */
   def unapply(credentials: Credentials): Option[(String, String)] =
     Some((credentials.scheme, credentials.token))
 }

@@ -223,11 +223,11 @@ trait QueryString {
 
 /** Provides factory for `QueryString`. */
 object QueryString {
-  /** Gets empty QueryString. */
+  /** Gets empty query string. */
   def empty: QueryString = EmptyQueryString
 
   /**
-   * Creates QueryString from parameters.
+   * Creates query string from parameters.
    *
    * @param params parameters
    */
@@ -236,7 +236,7 @@ object QueryString {
     else MapQueryString(params)
 
   /**
-   * Creates QueryString from parameters.
+   * Creates query string from parameters.
    *
    * @param params parameters
    */
@@ -245,7 +245,7 @@ object QueryString {
     else SeqQueryString(params)
 
   /**
-   * Creates QueryString from parameters.
+   * Creates query string from parameters.
    *
    * @param one parameter
    * @param more parameters
@@ -254,7 +254,7 @@ object QueryString {
     apply(one +: more)
 
   /**
-   * Creates QueryString from urlencoded query string.
+   * Creates query string from urlencoded query string.
    *
    * @param query encoded query string
    */
