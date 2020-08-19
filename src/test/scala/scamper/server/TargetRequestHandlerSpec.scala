@@ -20,7 +20,7 @@ import scamper.{ HttpRequest, HttpResponse }
 import scamper.RequestMethod.Registry.{ Delete, Get, Post, Put }
 import scamper.ResponseStatus.Registry.Ok
 
-import Implicits.ServerHttpRequestType
+import Implicits.ServerHttpRequest
 
 class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "TargetedRequestHandler" should "respond to request" in {

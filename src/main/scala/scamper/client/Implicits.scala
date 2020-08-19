@@ -22,7 +22,7 @@ import scamper._
 /** Includes client-side type classes. */
 object Implicits {
   /** Adds client-side extension methods to `HttpMessage`. */
-  implicit class ClientHttpMessageType(private val msg: HttpMessage) extends AnyVal {
+  implicit class ClientHttpMessage(private val msg: HttpMessage) extends AnyVal {
     /** Gets message socket. */
     def socket: Socket = msg.getAttribute("scamper.client.message.socket").get
 
@@ -44,7 +44,7 @@ object Implicits {
   }
 
   /** Adds client-side extension methods to `HttpRequest`. */
-  implicit class ClientHttpRequestType(private val req: HttpRequest) extends AnyVal {
+  implicit class ClientHttpRequest(private val req: HttpRequest) extends AnyVal {
     /**
      * Sends request and passes response to given handler.
      *
