@@ -29,8 +29,8 @@ import RuntimeProperties.auxiliary._
 private object Auxiliary {
   private val crlf = "\r\n".getBytes("UTF-8")
 
-  val `application/octet-stream` = MediaType("application", "octet-stream")
-  val `text/plain` = MediaType("text", "plain")
+  val applicationOctetStream = MediaType("application", "octet-stream")
+  val textPlain = MediaType("text", "plain")
 
   implicit class FileType(private val file: File) extends AnyVal {
     def withOutputStream[T](f: OutputStream => T): T = {

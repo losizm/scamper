@@ -205,7 +205,7 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
 
           val contentType = headers.collectFirst {
             case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType(value)
-          }.getOrElse(Auxiliary.`text/plain`)
+          }.getOrElse(Auxiliary.textPlain)
 
           if (contentType.isText && disposition.params.get("filename").isEmpty) {
             val charset = contentType.params.getOrElse("charset", "UTF-8")

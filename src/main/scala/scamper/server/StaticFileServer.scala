@@ -23,7 +23,7 @@ import java.time.Instant
 import scala.util.{ Success, Try }
 
 import scamper.{ HttpMessage, HttpRequest, HttpResponse }
-import scamper.Auxiliary.{ StringType, `application/octet-stream` }
+import scamper.Auxiliary.{ StringType, applicationOctetStream }
 import scamper.Implicits.fileToEntity
 import scamper.RequestMethod.Registry.{ Get, Head, Options }
 import scamper.ResponseStatus.Registry.{ MethodNotAllowed, NotAcceptable, NotModified, Ok }
@@ -82,17 +82,16 @@ private class StaticFileServer(mountPath: Path, sourceDirectory: Path) extends R
   }
 
   private def getAccept(req: HttpRequest): Seq[MediaRange] =
-    Try(req.accept) match {
-      case Success(accept) if accept.nonEmpty => accept
-      case _ => Seq(`*/*`)
-    }
+    Try(req.accept)
+      .filter(_.nonEmpty)
+      .getOrElse(Seq(`*/*`))
 
   private def getIfModifiedSince(req: HttpRequest): Instant =
     Try(req.ifModifiedSince).getOrElse(Instant.MIN)
 
   private def getMediaType(path: Path): MediaType =
     MediaType.fromFileName(path.getFileName.toString)
-      .getOrElse(`application/octet-stream`)
+      .getOrElse(applicationOctetStream)
 }
 
 private object StaticFileServer {

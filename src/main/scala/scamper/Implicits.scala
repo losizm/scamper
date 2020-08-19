@@ -99,7 +99,7 @@ object Implicits {
      */
     def withFileBody(file: File)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
       val entity = Entity(file)
-      val mediaType = MediaType.fromFile(file).getOrElse(Auxiliary.`application/octet-stream`)
+      val mediaType = MediaType.fromFile(file).getOrElse(Auxiliary.applicationOctetStream)
       message.withBody(entity)
         .withHeader(Header("Content-Type", mediaType.toString))
         .withHeader(Header("Content-Length", entity.getLength.get))
