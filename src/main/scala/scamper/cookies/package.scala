@@ -37,7 +37,7 @@ import scala.util.Try
  *   PlainCookie("ID", "bG9zCg"), PlainCookie("Region", "SE-US")
  * )
  *
- * // Access and print all cookies
+ * // Print all cookies
  * req.cookies.foreach(println)
  *
  * // Get cookies by name
@@ -66,7 +66,7 @@ import scala.util.Try
  *   SetCookie("Region", "SE-US")
  * )
  *
- * // Access and print all cookies
+ * // Print all cookies
  * res.cookies.foreach(println)
  *
  * // Get cookies by name

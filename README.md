@@ -597,7 +597,7 @@ import scamper.BodyParser
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Get
 import scamper.client.HttpClient
-import scamper.client.Implicits.ClientHttpRequestType // Adds send method to request
+import scamper.client.Implicits.ClientHttpRequest // Adds send method to request
 import scamper.headers.{ Accept, AcceptLanguage }
 import scamper.types.Implicits.{ stringToMediaRange, stringToLanguageRange }
 
@@ -969,7 +969,7 @@ remaining segments, including intervening path separators (i.e., **/**).
 ```scala
 import scamper.Implicits.fileToEntity
 import scamper.ResponseStatus.Registry.{ Accepted, NotFound, Ok }
-import scamper.server.Implicits.ServerHttpRequestType
+import scamper.server.Implicits.ServerHttpRequest
 
 // Match request method and parameterized path
 app.delete("/orders/:id") { req =>
@@ -1003,7 +1003,7 @@ specified.
 import scamper.BodyParser
 import scamper.Implicits.stringToEntity
 import scamper.ResponseStatus.Registry.Ok
-import scamper.server.Implicits.ServerHttpRequestType
+import scamper.server.Implicits.ServerHttpRequest
 
 // Match path with two parameters
 app.post("/translate/:in/to/:out") { req =>
@@ -1133,7 +1133,7 @@ handling only, and all router paths are relative to its mount path.
 import scamper.Implicits.stringToEntity
 import scamper.ResponseStatus.Registry.{ NotFound, Ok }
 import scamper.server.HttpServer
-import scamper.server.Implicits.ServerHttpRequestType
+import scamper.server.Implicits.ServerHttpRequest
 
 val app = HttpServer.app()
 
@@ -1177,7 +1177,7 @@ This is pretty much the same as the request logger from earlier, only instead of
 And the filter is not restricted to returning the same response it accepts.
 
 ```scala
-import scamper.server.Implicits.ServerHttpResponseType
+import scamper.server.Implicits.ServerHttpResponse
 
 // Gzip response body if not empty
 app.outgoing { res =>
@@ -1194,7 +1194,7 @@ The last piece of configuration is whether to secure the server using SSL/TLS.
 To use a secure transport, you must supply an appropriate key and certificate.
 
 ```scala
-app.secure(new File("/path/to/private.key"), new File("/path/to/public.cert"))
+app.secure(new File("/path/to/private.key"), new File("/path/to/public.crt"))
 ```
 
 Or, if you have them tucked away in a keystore, you can supply the keystore
@@ -1207,8 +1207,7 @@ app.secure(new File("/path/to/keystore"), "s3cr3t", "pkcs12")
 
 ### Creating Server
 
-When the desired application has been configured, you're ready to create the
-server.
+When the application has been configured, you can create the server.
 
 ```scala
 val server = app.create(8080)
