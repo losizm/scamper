@@ -95,9 +95,13 @@ trait BodyDecoder {
 
 /** Provides factory for `BodyDecoder`. */
 object BodyDecoder {
-  /** Creates decoder with specified maximum length. */
+  /**
+   * Creates decoder with specified maximum length.
+   *
+   * @param maxLength maximum length of message body
+   */
   def apply(maxLength: Long): BodyDecoder =
-    maxLength match {
-      case length => new BodyDecoder { val maxLength = length }
-    }
+    new BodyDecoderImpl(maxLength)
 }
+
+private class BodyDecoderImpl(val maxLength: Long) extends BodyDecoder
