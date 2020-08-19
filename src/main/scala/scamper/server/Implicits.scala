@@ -23,7 +23,6 @@ import scamper.ResponseStatus.Registry.Continue
 import scamper.headers.{ ContentDisposition, ContentLength, ContentType, Expect }
 import scamper.logging.{ Logger, NullLogger }
 import scamper.types.{ DispositionType, MediaType }
-import scamper.websocket.{ WebSocketSession, WebSocketSessionImpl }
 
 import Auxiliary.{ SocketType, StringType }
 
@@ -142,12 +141,5 @@ object Implicits {
         .withContentLength(entity.getLength.get)
         .withContentDisposition(disposition)
     }
-  }
-
-  /** Adds server-side extension methods to `WebSocketSession`. */
-  implicit class ServerWebSocketSession(private val session: WebSocketSession) extends AnyVal {
-    /** Gets request from which WebSocket session was created. */
-    def request: HttpRequest =
-      session.asInstanceOf[WebSocketSessionImpl].getRequest()
   }
 }

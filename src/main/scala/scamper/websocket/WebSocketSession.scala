@@ -326,6 +326,6 @@ object WebSocketSession {
     val version = req.secWebSocketVersion
     val logger = new SessionLogger(id, req.getAttribute[Logger]("scamper.server.message.logger").get)
 
-    new WebSocketSessionImpl(id, target, version, logger)(conn, true, deflate, Some(req))
+    new WebSocketSessionImpl(id, target, version, logger)(conn, true, deflate)
   }
 }

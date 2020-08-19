@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import scala.concurrent.Future
 import scala.util.Try
 
-import scamper.{ Auxiliary, HttpRequest, Uri }
+import scamper.{ Auxiliary, Uri }
 import scamper.logging.Logger
 import scamper.websocket.Opcode.Registry._
 import scamper.websocket.StatusCode.Registry._
@@ -30,7 +30,7 @@ import scamper.websocket.StatusCode.Registry._
 import Auxiliary.InputStreamType
 
 private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val protocolVersion: String, val logger: Logger)
-    (conn: WebSocketConnection, serverMode: Boolean, deflate: DeflateMode, request: Option[HttpRequest] = None) extends WebSocketSession {
+    (conn: WebSocketConnection, serverMode: Boolean, deflate: DeflateMode) extends WebSocketSession {
 
   private var _idleTimeout: Int = 0
   private var _payloadLimit: Int = 64 * 1024
@@ -163,8 +163,6 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     closeHandler = Option(handler)
     this
   }
-
-  private[scamper] def getRequest(): HttpRequest = request.get
 
   private def start(): Unit =
     Future {
