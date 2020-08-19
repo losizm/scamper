@@ -89,7 +89,7 @@ object Implicits {
      * @return new response
      */
     def withGzipContentEncoding(bufferSize: Int = 8192): HttpResponse =
-      ContentEncoder.gzip(res, bufferSize)(Auxiliary.executor)
+      ContentEncoder.gzip(res, bufferSize) { Auxiliary.executor }
 
     /**
      * Adds `deflate` to `Content-Encoding` header and encodes message body.
@@ -99,7 +99,7 @@ object Implicits {
      * @return new response
      */
     def withDeflateContentEncoding(bufferSize: Int = 8192): HttpResponse =
-      ContentEncoder.deflate(res, bufferSize)(Auxiliary.executor)
+      ContentEncoder.deflate(res, bufferSize) { Auxiliary.executor }
 
     /**
      * Creates new response with supplied file as attachment.

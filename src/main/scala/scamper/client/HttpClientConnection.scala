@@ -50,7 +50,7 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
 
         if (continue.get)
           writeBody(request)
-      }(executor)
+      } { executor }
 
     getResponse(request.method == Head) match {
       case res if res.status == Continue =>
@@ -96,8 +96,8 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
   private def encodeInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
     encoding.foldLeft(in) { (in, enc) =>
       if (enc.isChunked) in
-      else if (enc.isGzip) Compressor.gzip(in)(executor)
-      else if (enc.isDeflate) Compressor.deflate(in)(executor)
+      else if (enc.isGzip) Compressor.gzip(in) { executor }
+      else if (enc.isDeflate) Compressor.deflate(in) { executor }
       else throw new HttpException(s"Unsupported transfer encoding: $enc")
     }
 
