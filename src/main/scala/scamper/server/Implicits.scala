@@ -55,6 +55,9 @@ object Implicits {
      * @see [[HttpServer.logger HttpServer.logger()]]
      */
     def logger: Logger = msg.getAttributeOrElse("scamper.server.message.logger", NullLogger)
+
+    /** Gets server to which this message belongs. */
+    def server: HttpServer = msg.getAttribute("scamper.server.message.server").get
   }
 
   /** Adds server-side extension methods to `HttpRequest`. */

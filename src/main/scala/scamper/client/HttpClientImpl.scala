@@ -242,6 +242,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   private def addAttributes[T <: HttpMessage](msg: T, conn: HttpClientConnection, correlate: String, absoluteTarget: Uri)
       (implicit ev: <:<[T, MessageBuilder[T]]): T =
     msg
+      .withAttribute("scamper.client.message.client"         -> this)
       .withAttribute("scamper.client.message.connection"     -> conn)
       .withAttribute("scamper.client.message.socket"         -> conn.getSocket())
       .withAttribute("scamper.client.message.correlate"      -> correlate)

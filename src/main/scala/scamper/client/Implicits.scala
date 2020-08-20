@@ -41,6 +41,9 @@ object Implicits {
      * request and later reassigned to its incoming response.
      */
     def absoluteTarget: Uri = msg.getAttribute("scamper.client.message.absoluteTarget").get
+
+    /** Gets client to which this message belongs. */
+    def client: HttpClient = msg.getAttribute("scamper.client.message.client").get
   }
 
   /** Adds client-side extension methods to `HttpRequest`. */

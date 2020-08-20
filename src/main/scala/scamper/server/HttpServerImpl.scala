@@ -61,7 +61,7 @@ private object HttpServerImpl {
 }
 
 private class HttpServerImpl(val host: InetAddress, val port: Int)
-    (id: Long, app: HttpServerImpl.Application) extends HttpServer {
+    (id: Long, app: HttpServerImpl.Application) extends HttpServer { server =>
   private case class ReadError(status: ResponseStatus) extends HttpException(status.reasonPhrase)
   private case class ReadAborted(reason: String) extends HttpException(s"Read aborted with $reason")
 
@@ -495,6 +495,7 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
     private def addAttributes[T <: HttpMessage](msg: T, socket: Socket, requestCount: Int, correlate: String)
         (implicit ev: <:<[T, MessageBuilder[T]]): T =
       msg
+        .withAttribute("scamper.server.message.server"       -> server)
         .withAttribute("scamper.server.message.socket"       -> socket)
         .withAttribute("scamper.server.message.requestCount" -> requestCount)
         .withAttribute("scamper.server.message.correlate"    -> correlate)
