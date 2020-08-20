@@ -193,6 +193,18 @@ trait Router {
   def trace(path: String)(handler: RequestHandler): this.type
 
   /**
+   * Adds supplied handler for CONNECT requests to given router path.
+   *
+   * The handler is appended to existing request handler chain.
+   *
+   * @param path router path
+   * @param handler request handler
+   *
+   * @return this router
+   */
+  def connect(path: String)(handler: RequestHandler): this.type
+
+  /**
    * Adds request handler at mount path to serve files from given source directory.
    *
    * The mount path is stripped from the router path, and the remaining path is

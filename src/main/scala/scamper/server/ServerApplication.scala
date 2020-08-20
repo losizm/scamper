@@ -421,6 +421,21 @@ class ServerApplication {
   }
 
   /**
+   * Adds supplied handler for CONNECT requests to given path.
+   *
+   * The handler is appended to existing request handler chain.
+   *
+   * @param path request path
+   * @param handler request handler
+   *
+   * @return this application
+   */
+  def connect(path: String)(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Connect)))
+    this
+  }
+
+  /**
    * Adds request handler at mount path to serve files from given source directory.
    *
    * The mount path is stripped from the request path, and the remaining path is

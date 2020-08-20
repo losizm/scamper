@@ -81,6 +81,11 @@ private class RouterImpl(app: ServerApplication, rawMountPath: String) extends R
     this
   }
 
+  def connect(path: String)(handler: RequestHandler): this.type = synchronized {
+    app.connect(mountPath + normalize(path))(handler)
+    this
+  }
+
   def files(mountPath: String, sourceDirectory: File): this.type = synchronized {
     app.files(this.mountPath + normalize(mountPath), sourceDirectory)
     this
