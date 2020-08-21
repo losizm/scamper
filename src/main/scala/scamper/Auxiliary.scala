@@ -32,6 +32,18 @@ private object Auxiliary {
   val applicationOctetStream = MediaType("application", "octet-stream")
   val textPlain = MediaType("text", "plain")
 
+  lazy val executor = ThreadPoolExecutorService.dynamic(
+    "scamper-auxiliary",
+    executorCorePoolSize,
+    executorMaxPoolSize,
+    executorKeepAliveSeconds,
+    executorQueueSize
+  ) { (task, executor) =>
+    if (executorShowWarning)
+      System.err.println(s"[WARNING] Running rejected scamper-auxiliary task on dedicated thread.")
+    executor.getThreadFactory.newThread(task).start()
+  }
+
   implicit class FileType(private val file: File) extends AnyVal {
     def withOutputStream[T](f: OutputStream => T): T = {
       val out = new FileOutputStream(file)
@@ -91,18 +103,17 @@ private object Auxiliary {
     def readLine(buffer: Array[Byte], offset: Int = 0): Int = {
       val bufferSize = buffer.size
       var length = offset
-      var byte = -1
       var continue = length < bufferSize
 
       while (continue) {
-        val byte = in.read()
+        in.read() match {
+          case -1 =>
+            continue = false
 
-        if (byte == -1)
-          continue = false
-        else {
-          buffer(length) = byte.toByte
-          length += 1
-          continue = length < bufferSize && byte != '\n'
+          case byte =>
+            buffer(length) = byte.toByte
+            length += 1
+            continue = length < bufferSize && byte != '\n'
         }
       }
 
@@ -115,12 +126,12 @@ private object Auxiliary {
     def readMostly(buffer: Array[Byte], offset: Int, length: Int): Int = {
       var total = in.read(buffer, offset, length)
 
-      if (total != -1) {
+      if (total != -1 && total < length) {
         var count = 0
-        while (count != -1 && total < length) {
+        do {
           total += count
           count = in.read(buffer, offset + total, length - total)
-        }
+        } while (count != -1 && total < length)
       }
 
       total
@@ -220,17 +231,5 @@ private object Auxiliary {
 
       Uri(uri.toString)
     }
-  }
-
-  lazy val executor = ThreadPoolExecutorService.dynamic(
-    "scamper-auxiliary",
-    executorCorePoolSize,
-    executorMaxPoolSize,
-    executorKeepAliveSeconds,
-    executorQueueSize
-  ) { (task, executor) =>
-    if (executorShowWarning)
-      System.err.println(s"[WARNING] Running rejected scamper-auxiliary task on dedicated thread.")
-    executor.getThreadFactory.newThread(task).start()
   }
 }
