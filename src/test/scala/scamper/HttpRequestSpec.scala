@@ -120,4 +120,16 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[HeaderNotFound](req.getHeaderOrElse("User-Agent", throw HeaderNotFound("User-Agent")))
     assertThrows[HeaderNotFound](req.getHeaderValueOrElse("User-Agent", throw HeaderNotFound("User-Agent")))
   }
+
+  it should "test request method" in {
+    assert(Get("/").isGet)
+    assert(Post("/").isPost)
+    assert(Put("/").isPut)
+    assert(Patch("/").isPatch)
+    assert(Delete("/").isDelete)
+    assert(Head("/").isHead)
+    assert(Options("/").isOptions)
+    assert(Trace("/").isTrace)
+    assert(Connect("/").isConnect)
+  }
 }

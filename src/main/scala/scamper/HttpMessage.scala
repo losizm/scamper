@@ -109,6 +109,42 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
   /** Gets request method. */
   def method: RequestMethod = startLine.method
 
+  /** Tests for GET method. */
+  def isGet: Boolean =
+    method == RequestMethod.Registry.Get
+
+  /** Tests for POST method. */
+  def isPost: Boolean =
+    method == RequestMethod.Registry.Post
+
+  /** Tests for PUT method. */
+  def isPut: Boolean =
+    method == RequestMethod.Registry.Put
+
+  /** Tests for PATCH method. */
+  def isPatch: Boolean =
+    method == RequestMethod.Registry.Patch
+
+  /** Tests for DELETE method. */
+  def isDelete: Boolean =
+    method == RequestMethod.Registry.Delete
+
+  /** Tests for HEAD method. */
+  def isHead: Boolean =
+    method == RequestMethod.Registry.Head
+
+  /** Tests for OPTIONS method. */
+  def isOptions: Boolean =
+    method == RequestMethod.Registry.Options
+
+  /** Tests for TRACE method. */
+  def isTrace: Boolean =
+    method == RequestMethod.Registry.Trace
+
+  /** Tests for CONNECT method. */
+  def isConnect: Boolean =
+    method == RequestMethod.Registry.Connect
+
   /** Gets request target. */
   def target: Uri = startLine.target
 

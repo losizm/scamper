@@ -38,11 +38,11 @@ private class StaticFileServer(mountPath: Path, sourceDirectory: Path) extends R
       .filter(exists)
       .map { path =>
         req.method match {
-          case method @ (Get | Head) =>
+          case Get | Head =>
             val mediaType = getMediaType(path)
 
             if (getAccept(req).exists { range => range.matches(mediaType) })
-              getResponse(path, mediaType, getIfModifiedSince(req), method == Head)
+              getResponse(path, mediaType, getIfModifiedSince(req), req.isHead)
             else
               NotAcceptable()
           case Options => Ok().withAllow(Get, Head, Options).withContentLength(0)

@@ -880,7 +880,7 @@ app.incoming { req =>
 
 // Add handler to allow GET and HEAD requests only
 app.incoming { req =>
-  (req.method == Get || req.method == Head) match {
+  (req.isGet || req.isHead) match {
     // Return request for next handler
     case true  => req
     // Otherwise return response to end request chain
@@ -900,7 +900,6 @@ accepted.
 ```scala
 import scamper.BodyParser
 import scamper.Implicits.stringToEntity
-import scamper.RequestMethod.Registry.Post
 import scamper.headers.ContentLanguage
 import scamper.types.LanguageTag
 import scamper.types.Implicits.stringToLanguageTag
@@ -909,7 +908,7 @@ import scamper.types.Implicits.stringToLanguageTag
 app.incoming { req =>
   val translator: BodyParser[String] = ???
 
-  (req.method == Post && req.contentLanguage.contains("fr")) match {
+  (req.isPost && req.contentLanguage.contains("fr")) match {
     case true  => req.withBody(translator.parse(req)).withContentLanguage("en")
     case false => req
   }

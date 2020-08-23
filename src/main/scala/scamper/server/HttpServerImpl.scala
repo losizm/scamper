@@ -34,7 +34,6 @@ import scamper.logging.{ ConsoleLogger, Logger, NullLogger }
 import scamper.types.{ KeepAliveParameters, TransferCoding }
 
 import Auxiliary.SocketType
-import RequestMethod.Registry._
 import ResponseStatus.Registry._
 import RuntimeProperties.server._
 
@@ -200,8 +199,7 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
         .getOrElse(false)
 
     private def isKeepAliveSafe(req: HttpRequest, res: HttpResponse): Boolean =
-      res.isSuccessful ||
-        ((req.method == Get || req.method == Head) && res.isRedirection)
+      res.isSuccessful || ((req.isGet || req.isHead) && res.isRedirection)
 
     private def isUpgrade(res: HttpResponse): Boolean =
       res.status == SwitchingProtocols && res.hasUpgrade &&

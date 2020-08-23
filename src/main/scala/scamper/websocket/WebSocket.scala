@@ -20,7 +20,6 @@ import java.security.{ MessageDigest, SecureRandom }
 import scala.util.Try
 
 import scamper.{ Base64, HttpMessage, HttpRequest, HttpResponse }
-import scamper.RequestMethod.Registry._
 import scamper.ResponseStatus.Registry._
 import scamper.headers.{ Connection, Upgrade }
 
@@ -53,7 +52,7 @@ object WebSocket {
    * @param req request
    */
   def isUpgrade(req: HttpRequest): Boolean =
-    req.method == Get && checkUpgrade(req)
+    req.isGet && checkUpgrade(req)
 
   /**
    * Tests response for WebSocket upgrade.
@@ -87,7 +86,7 @@ object WebSocket {
    * @return unmodified WebSocket request
    */
   def validate(req: HttpRequest): HttpRequest = {
-    if (req.method != Get)
+    if (!req.isGet)
       throw InvalidWebSocketRequest(s"Invalid method for WebSocket request: ${req.method}")
 
     if (!checkUpgrade(req))
