@@ -97,7 +97,7 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
     encoding.foldLeft(in) { (in, enc) =>
       if (enc.isChunked) in
       else if (enc.isGzip) Compressor.gzip(in) { executor }
-      else if (enc.isDeflate) Compressor.deflate(in) { executor }
+      else if (enc.isDeflate) Compressor.deflate(in)
       else throw new HttpException(s"Unsupported transfer encoding: $enc")
     }
 

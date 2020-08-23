@@ -79,6 +79,6 @@ object Implicits {
      * @return new request
      */
     def withDeflateContentEncoding(bufferSize: Int = 8192): HttpRequest =
-      ContentEncoder.deflate(req, bufferSize) { Auxiliary.executor }
+      ContentEncoder.deflate(req, bufferSize)
   }
 }

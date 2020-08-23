@@ -102,7 +102,7 @@ object Implicits {
      * @return new response
      */
     def withDeflateContentEncoding(bufferSize: Int = 8192): HttpResponse =
-      ContentEncoder.deflate(res, bufferSize) { Auxiliary.executor }
+      ContentEncoder.deflate(res, bufferSize)
 
     /**
      * Creates new response with supplied file as attachment.

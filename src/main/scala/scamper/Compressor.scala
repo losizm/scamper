@@ -16,7 +16,7 @@
 package scamper
 
 import java.io.InputStream
-import java.util.zip.{ DeflaterOutputStream, GZIPOutputStream }
+import java.util.zip.{ DeflaterInputStream, GZIPOutputStream }
 
 import scala.concurrent.ExecutionContext
 
@@ -24,10 +24,10 @@ private object Compressor {
   def gzip(in: InputStream, bufferSize: Int = 8192)(implicit ec: ExecutionContext): InputStream =
     new WriterInputStream(out => write(in, new GZIPOutputStream(out), bufferSize))
 
-  def deflate(in: InputStream, bufferSize: Int = 8192)(implicit ec: ExecutionContext): InputStream =
-    new WriterInputStream(out => write(in, new DeflaterOutputStream(out), bufferSize))
+  def deflate(in: InputStream, bufferSize: Int = 8192): InputStream =
+    new DeflaterInputStream(in)
 
-  private def write(in: InputStream, out: DeflaterOutputStream, bufferSize: Int): Unit = {
+  private def write(in: InputStream, out: GZIPOutputStream, bufferSize: Int): Unit = {
     val buffer = new Array[Byte](bufferSize)
     var length = 0
 

@@ -70,7 +70,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     val target = request.target
 
     require(target.isAbsolute, s"Request target not absolute: $target")
-    require(target.getScheme.matches("(http|ws)s?"), s"Invalid scheme: ${target.getScheme}")
+    require(target.getScheme.matches("(http|ws)s?"), s"Unsupported scheme: ${target.getScheme}")
 
     val secure = target.getScheme.matches("https|wss")
     val host = getEffectiveHost(target)

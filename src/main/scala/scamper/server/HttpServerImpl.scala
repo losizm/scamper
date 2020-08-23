@@ -460,7 +460,7 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
       encoding.foldLeft(in) { (in, enc) =>
         if (enc.isChunked) in
         else if (enc.isGzip) Compressor.gzip(in, bufferSize) { encoderContext }
-        else if (enc.isDeflate) Compressor.deflate(in, bufferSize) { encoderContext }
+        else if (enc.isDeflate) Compressor.deflate(in)
         else throw new HttpException(s"Unsupported transfer encoding: $enc")
       }
 
