@@ -56,11 +56,10 @@ private object HttpServerImpl {
   )
 
   def apply(host: InetAddress, port: Int, app: Application) =
-    new HttpServerImpl(host, port)(count.incrementAndGet(), app)
+    new HttpServerImpl(count.incrementAndGet(), new InetSocketAddress(host, port), app)
 }
 
-private class HttpServerImpl(val host: InetAddress, val port: Int)
-    (id: Long, app: HttpServerImpl.Application) extends HttpServer { server =>
+private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: HttpServerImpl.Application) extends HttpServer { server =>
   private case class ReadError(status: ResponseStatus) extends HttpException(status.reasonPhrase)
   private case class ReadAborted(reason: String) extends HttpException(s"Read aborted with $reason")
 
@@ -78,11 +77,18 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
   val headerLimit = app.headerLimit.max(10)
   val keepAlive = app.keepAlive.map(params => KeepAliveParameters(params.timeout.max(1), params.max.max(1)))
 
+  private val serverSocket = app.serverSocketFactory.createServerSocket()
+
+  serverSocket.bind(socketAddress, backlogSize)
+
+  val host = serverSocket.getInetAddress
+  val port = serverSocket.getLocalPort
+
+  private val authority = s"${host.getCanonicalHostName}:$port"
+
   private val keepAliveEnabled = keepAlive.isDefined
   private val keepAliveMax = keepAlive.map(_.max).getOrElse(1)
   private val keepAliveTimeout = keepAlive.map(_.timeout).getOrElse(0)
-
-  private val authority = s"${host.getCanonicalHostName}:$port"
 
   private val requestHandler = RequestHandler.coalesce(app.requestHandlers)
   private val responseFilter = ResponseFilter.chain(app.responseFilters)
@@ -94,7 +100,6 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
     }
   })
 
-  private val serverSocket = app.serverSocketFactory.createServerSocket()
   private val chunked = TransferCoding("chunked")
   private var closed = new AtomicBoolean(false)
 
@@ -159,13 +164,12 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
     logger.info(s"$authority - Header Limit: $headerLimit")
     logger.info(s"$authority - Keep-Alive: ${keepAlive.getOrElse("disabled")}")
 
-    serverSocket.bind(new InetSocketAddress(host, port), backlogSize)
     ServiceManager.start()
 
     logger.info(s"$authority - Server is up and running")
   } catch {
     case e: Exception =>
-      logger.error(s"$authority - Failed to start server", e)
+      Try(logger.error(s"$authority - Failed to start server", e))
       close()
       throw e
   }
@@ -458,7 +462,7 @@ private class HttpServerImpl(val host: InetAddress, val port: Int)
       encoding.foldLeft(in) { (in, enc) =>
         if (enc.isChunked) in
         else if (enc.isGzip) Compressor.gzip(in, bufferSize) { encoderContext }
-        else if (enc.isDeflate) Compressor.deflate(in)
+        else if (enc.isDeflate) Compressor.deflate(in, bufferSize)
         else throw new HttpException(s"Unsupported transfer encoding: $enc")
       }
 
