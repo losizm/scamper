@@ -87,9 +87,9 @@ class ClientSettings {
   /**
    * Sets read timeout.
    *
-   * The read timeout controls how long (in milliseconds) a read from client
-   * socket blocks before it times out, whereafter the client throws
-   * `SocketTimeoutException`.
+   * The read timeout specifies how long (in milliseconds) a read from client
+   * socket blocks before it times out, whereafter `SocketTimeoutException` is
+   * thrown.
    */
   def readTimeout(timeout: Int): this.type = synchronized {
     settings = settings.copy(readTimeout = timeout)
@@ -99,7 +99,7 @@ class ClientSettings {
   /**
    * Sets continue timeout.
    *
-   * The continue timeout specifies how long to wait (in milliseconds) for a
+   * The continue timeout specifies how long to wait (in milliseconds) for
    * '''100 Continue''' response before sending the request body.
    *
    * @note This applies only to requests that include `Except: 100-Continue`

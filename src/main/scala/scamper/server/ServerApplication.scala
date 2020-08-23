@@ -159,7 +159,7 @@ class ServerApplication {
   /**
    * Sets read timeout.
    *
-   * The `readTimeout` controls how long a read from a socket blocks before it
+   * The `readTimeout` specifies how long a read from a socket blocks before it
    * times out, whereafter '''408 Request Timeout''' is sent to client.
    *
    * @param timeout read timeout (in milliseconds)
