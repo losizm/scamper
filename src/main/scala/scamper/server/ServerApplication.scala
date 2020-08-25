@@ -264,10 +264,8 @@ class ServerApplication {
    *
    * @return this application
    */
-  def incoming(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ notNull(handler))
-    this
-  }
+  def incoming(handler: RequestHandler): this.type =
+    incoming("*") { handler }
 
   /**
    * Adds supplied handler for requests with given path.
@@ -280,7 +278,10 @@ class ServerApplication {
    * @return this application
    */
   def incoming(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), None))
+    app = (path == "*") match {
+      case true  => app.copy(requestHandlers = app.requestHandlers :+ notNull(handler))
+      case false => app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), None))
+    }
     this
   }
 
@@ -310,10 +311,8 @@ class ServerApplication {
    *
    * @return this application
    */
-  def get(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Get)))
-    this
-  }
+  def get(path: String)(handler: RequestHandler): this.type =
+    incoming(Get, path) { handler }
 
   /**
    * Adds supplied handler for HEAD requests to given path.
@@ -325,10 +324,8 @@ class ServerApplication {
    *
    * @return this application
    */
-  def head(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Head)))
-    this
-  }
+  def head(path: String)(handler: RequestHandler): this.type =
+    incoming(Head, path) { handler }
 
   /**
    * Adds supplied handler for POST requests to given path.
@@ -340,10 +337,8 @@ class ServerApplication {
    *
    * @return this application
    */
-  def post(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Post)))
-    this
-  }
+  def post(path: String)(handler: RequestHandler): this.type =
+    incoming(Post, path) { handler }
 
   /**
    * Adds supplied handler for PUT requests to given path.
@@ -355,10 +350,8 @@ class ServerApplication {
    *
    * @return this application
    */
-  def put(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Put)))
-    this
-  }
+  def put(path: String)(handler: RequestHandler): this.type =
+    incoming(Put, path) { handler }
 
   /**
    * Adds supplied handler for PATCH requests to given path.
@@ -370,10 +363,8 @@ class ServerApplication {
    *
    * @return this application
    */
-  def patch(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Patch)))
-    this
-  }
+  def patch(path: String)(handler: RequestHandler): this.type =
+    incoming(Patch, path) { handler }
 
   /**
    * Adds supplied handler for DELETE requests to given path.
@@ -385,10 +376,8 @@ class ServerApplication {
    *
    * @return this application
    */
-  def delete(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Delete)))
-    this
-  }
+  def delete(path: String)(handler: RequestHandler): this.type =
+    incoming(Delete, path) { handler }
 
   /**
    * Adds supplied handler for OPTIONS requests to given path.
@@ -400,10 +389,8 @@ class ServerApplication {
    *
    * @return this application
    */
-  def options(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Options)))
-    this
-  }
+  def options(path: String)(handler: RequestHandler): this.type =
+    incoming(Options, path) { handler }
 
   /**
    * Adds supplied handler for TRACE requests to given path.
@@ -415,10 +402,8 @@ class ServerApplication {
    *
    * @return this application
    */
-  def trace(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Trace)))
-    this
-  }
+  def trace(path: String)(handler: RequestHandler): this.type =
+    incoming(Trace, path) { handler }
 
   /**
    * Adds supplied handler for CONNECT requests to given path.
@@ -430,10 +415,8 @@ class ServerApplication {
    *
    * @return this application
    */
-  def connect(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Some(Connect)))
-    this
-  }
+  def connect(path: String)(handler: RequestHandler): this.type =
+    incoming(Connect, path) { handler }
 
   /**
    * Adds request handler at mount path to serve files from given source directory.
@@ -521,10 +504,8 @@ class ServerApplication {
    *
    * @return this application
    */
-  def websocket[T](path: String)(handler: WebSocketSession => T): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(WebSocketRequestHandler(notNull(handler)), notNull(path), Some(Get)))
-    this
-  }
+  def websocket[T](path: String)(handler: WebSocketSession => T): this.type =
+    incoming(Get, path) { WebSocketRequestHandler(notNull(handler)) }
 
   /**
    * Adds routing application at given mount path.
