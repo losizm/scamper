@@ -24,7 +24,7 @@ import scamper.types.MediaType
 
 import Implicits._
 
-class ServerHttpResponseTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class ServerHttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec {
   val file = new File("./src/test/resources/test.html")
   val encodedFileName = s"utf-8''${file.getName.toUrlEncoded("utf-8")}"
 
@@ -50,4 +50,3 @@ class ServerHttpResponseTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert { res.contentDisposition.params("filename*") == encodedFileName }
   }
 }
-
