@@ -31,7 +31,7 @@ private class TargetedRequestHandler private (handler: RequestHandler, target: T
 
 private object TargetedRequestHandler {
   def apply(handler: RequestHandler, path: String, method: Option[RequestMethod]): TargetedRequestHandler =
-    new TargetedRequestHandler(handler, new Target(path.toUri.normalize.toString), method)
+    new TargetedRequestHandler(handler, new Target(NormalizePath(path)), method)
 }
 
 private class TargetedPathParameters(params: Map[String, String]) extends PathParameters {
@@ -56,7 +56,7 @@ private class Target(path: String) {
 
   private val regex = path match {
     case "/" => "/"
-    case "*" => "\\*"
+    case "*" => ".*"
     case _   => "/" + segments.map {
       case s if s.matches("(:\\w+)")   => """[\w+\-.~%]+"""
       case s if s.matches("(\\*\\w*)") => """[\w+\-.~%/]*"""

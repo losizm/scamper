@@ -21,91 +21,95 @@ import scala.util.Try
 
 import scamper.Auxiliary.StringType
 import scamper.RequestMethod
+import scamper.RequestMethod.Registry._
 import scamper.websocket.WebSocketSession
 
 private class RouterImpl(app: ServerApplication, rawMountPath: String) extends Router {
   val mountPath = normalize(rawMountPath, true)
 
-  def incoming(handler: RequestHandler): this.type = synchronized {
-    app.incoming(TargetedRequestHandler(handler, mountPath + "/*", None))
+  def incoming(handler: RequestHandler): this.type =
+    applyIncoming("*", handler)
+
+  def incoming(path: String)(handler: RequestHandler): this.type =
+    applyIncoming(path, handler)
+
+  def incoming(method: RequestMethod, path: String)(handler: RequestHandler): this.type =
+    applyIncoming(method, path, handler)
+
+  def head(path: String)(handler: RequestHandler): this.type =
+    applyIncoming(Head, path, handler)
+
+  def get(path: String)(handler: RequestHandler): this.type =
+    applyIncoming(Get, path, handler)
+
+  def post(path: String)(handler: RequestHandler): this.type =
+    applyIncoming(Post, path, handler)
+
+  def put(path: String)(handler: RequestHandler): this.type =
+    applyIncoming(Put, path, handler)
+
+  def patch(path: String)(handler: RequestHandler): this.type =
+    applyIncoming(Patch, path, handler)
+
+  def delete(path: String)(handler: RequestHandler): this.type =
+    applyIncoming(Delete, path, handler)
+
+  def options(path: String)(handler: RequestHandler): this.type =
+    applyIncoming(Options, path, handler)
+
+  def trace(path: String)(handler: RequestHandler): this.type =
+    applyIncoming(Trace, path, handler)
+
+  def connect(path: String)(handler: RequestHandler): this.type =
+    applyIncoming(Connect, path, handler)
+
+  def files(path: String, sourceDirectory: File): this.type = synchronized {
+    app.files(mountPath + normalize(path), sourceDirectory)
     this
   }
 
-  def incoming(path: String)(handler: RequestHandler): this.type = synchronized {
-    app.incoming(mountPath + normalize(path))(handler)
-    this
-  }
-
-  def incoming(method: RequestMethod, path: String)(handler: RequestHandler): this.type = synchronized {
-    app.incoming(method, mountPath + normalize(path))(handler)
-    this
-  }
-
-  def head(path: String)(handler: RequestHandler): this.type = synchronized {
-    app.head(mountPath + normalize(path))(handler)
-    this
-  }
-
-  def get(path: String)(handler: RequestHandler): this.type = synchronized {
-    app.get(mountPath + normalize(path))(handler)
-    this
-  }
-
-  def post(path: String)(handler: RequestHandler): this.type = synchronized {
-    app.post(mountPath + normalize(path))(handler)
-    this
-  }
-
-  def put(path: String)(handler: RequestHandler): this.type = synchronized {
-    app.put(mountPath + normalize(path))(handler)
-    this
-  }
-
-  def patch(path: String)(handler: RequestHandler): this.type = synchronized {
-    app.patch(mountPath + normalize(path))(handler)
-    this
-  }
-
-  def delete(path: String)(handler: RequestHandler): this.type = synchronized {
-    app.delete(mountPath + normalize(path))(handler)
-    this
-  }
-
-  def options(path: String)(handler: RequestHandler): this.type = synchronized {
-    app.options(mountPath + normalize(path))(handler)
-    this
-  }
-
-  def trace(path: String)(handler: RequestHandler): this.type = synchronized {
-    app.trace(mountPath + normalize(path))(handler)
-    this
-  }
-
-  def connect(path: String)(handler: RequestHandler): this.type = synchronized {
-    app.connect(mountPath + normalize(path))(handler)
-    this
-  }
-
-  def files(mountPath: String, sourceDirectory: File): this.type = synchronized {
-    app.files(this.mountPath + normalize(mountPath), sourceDirectory)
-    this
-  }
-
-  def resources(mountPath: String, sourceDirectory: String, classLoader: ClassLoader): this.type = synchronized {
-    app.resources(this.mountPath + normalize(mountPath), sourceDirectory, classLoader)
+  def resources(path: String, sourceDirectory: String, classLoader: ClassLoader): this.type = synchronized {
+    app.resources(mountPath + normalize(path), sourceDirectory, classLoader)
     this
   }
 
   def websocket[T](path: String)(handler: WebSocketSession => T): this.type = synchronized {
-    app.websocket(mountPath + normalize(path))(handler)
+    normalize(path) match {
+      case "*" =>
+        app.websocket(mountPath)(handler)
+        app.websocket(mountPath + "/*")(handler)
+      case path =>
+        app.websocket(mountPath + path)(handler)
+    }
+    this
+  }
+
+  private def applyIncoming(path: String, handler: RequestHandler): this.type = synchronized {
+    (path == "*") match {
+      case true =>
+        app.incoming(mountPath) { handler }
+        app.incoming(mountPath + "/*") { handler }
+      case false =>
+        app.incoming(mountPath + normalize(path)) { handler }
+    }
+    this
+  }
+
+  private def applyIncoming(method: RequestMethod, path: String, handler: RequestHandler): this.type = synchronized {
+    (path == "*") match {
+      case true =>
+        app.incoming(method, mountPath) { handler }
+        app.incoming(method, mountPath + "/*") { handler }
+      case false =>
+        app.incoming(method, mountPath + normalize(path)) { handler }
+    }
     this
   }
 
   private def normalize(path: String, isMountPath: Boolean = false): String =
-    path.toUri.normalize.toString match {
+    NormalizePath(path) match {
       case "/" => if (isMountPath) "/" else ""
       case path if path.matches("/\\.\\.(/.*)?") => throw new IllegalArgumentException(s"Invalid path: $path")
-      case path if path.matches("//+.*") => throw new IllegalArgumentException(s"Invalid path: $path")
       case path if path.startsWith("/") => path
       case path => throw new IllegalArgumentException(s"Invalid path: $path")
     }
