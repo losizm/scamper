@@ -15,7 +15,7 @@
  */
 
 /**
- * Defines library's core types.
+ * Defines core types.
  *
  * === HTTP Messages ===
  *
