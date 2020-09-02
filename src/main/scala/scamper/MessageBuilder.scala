@@ -16,7 +16,7 @@
 package scamper
 
 /** Provides builder pattern for HTTP message. */
-trait MessageBuilder[T <: HttpMessage] {
+trait MessageBuilder[T <: HttpMessage] { self: T =>
   /**
    * Creates message with supplied start line.
    *
@@ -57,7 +57,11 @@ trait MessageBuilder[T <: HttpMessage] {
    *
    * @return new message
    */
-  def addHeaders(headers: Seq[Header]): T
+  def addHeaders(headers: Seq[Header]): T =
+    headers.isEmpty match {
+      case true  => this
+      case false => withHeaders(this.headers ++ headers)
+    }
 
   /**
    * Creates message with additional headers.
@@ -77,7 +81,14 @@ trait MessageBuilder[T <: HttpMessage] {
    *
    * @return new message
    */
-  def removeHeaders(names: Seq[String]): T
+  def removeHeaders(names: Seq[String]): T =
+    names.isEmpty match {
+      case true  => this
+      case false =>
+        withHeaders {
+          headers.filterNot(h => names.exists(h.name.equalsIgnoreCase))
+        }
+    }
 
   /**
    * Creates message excluding headers with given names.
@@ -99,7 +110,10 @@ trait MessageBuilder[T <: HttpMessage] {
    *
    * @note All previous headers with same name are removed.
    */
-  def withHeader(header: Header): T
+  def withHeader(header: Header): T =
+    withHeaders {
+      headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header
+    }
 
   /**
    * Creates message with optional header.
@@ -125,7 +139,10 @@ trait MessageBuilder[T <: HttpMessage] {
    *
    * @return new message
    */
-  def addOptionalHeader(name: String, value: Option[String]): T
+  def addOptionalHeader(name: String, value: Option[String]): T =
+    value.map(value => Header(name, value))
+      .map(addHeaders(_))
+      .getOrElse(this)
 
   /**
    * Creates message with supplied body.
@@ -167,7 +184,14 @@ trait MessageBuilder[T <: HttpMessage] {
    *
    * @return new message
    */
-  def removeAttributes(names: Seq[String]): T
+  def removeAttributes(names: Seq[String]): T =
+    names.isEmpty match {
+      case true  => this
+      case false =>
+        withAttributes {
+          attributes.filterNot(a => names.contains(a._1))
+        }
+    }
 
   /**
    * Creates message excluding attributes with given names.
@@ -189,5 +213,6 @@ trait MessageBuilder[T <: HttpMessage] {
    *
    * @note If attribute already exists, its value is replaced.
    */
-  def withAttribute(attribute: (String, Any)): T
+  def withAttribute(attribute: (String, Any)): T =
+    withAttributes(attributes + attribute)
 }

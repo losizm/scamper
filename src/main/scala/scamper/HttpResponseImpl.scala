@@ -35,38 +35,9 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
   def withHeaders(newHeaders: Seq[Header]): HttpResponse =
     copy(headers = newHeaders)
 
-  def addHeaders(newHeaders: Seq[Header]): HttpResponse =
-    newHeaders.isEmpty match {
-      case true  => this
-      case false => withHeaders(headers ++ newHeaders)
-    }
-
-  def removeHeaders(names: Seq[String]): HttpResponse =
-    names.isEmpty match {
-      case true  => this
-      case false => withHeaders(headers.filterNot(h => names.exists(h.name.equalsIgnoreCase)))
-    }
-
-  def withHeader(header: Header): HttpResponse =
-    withHeaders(headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header)
-
-  def addOptionalHeader(name: String, value: Option[String]): HttpResponse =
-    value.map(value => Header(name, value))
-      .map(addHeaders(_))
-      .getOrElse(this)
-
   def withBody(newBody: Entity): HttpResponse =
     copy(body = newBody)
 
   def withAttributes(newAttributes: Map[String, Any]): HttpResponse =
     copy(attributes = newAttributes)
-
-  def withAttribute(attribute: (String, Any)): HttpResponse =
-    withAttributes(attributes + attribute)
-
-  def removeAttributes(names: Seq[String]): HttpResponse =
-    names.isEmpty match {
-      case true  => this
-      case false => withAttributes(attributes.filterNot(a => names.contains(a._1)))
-    }
 }
