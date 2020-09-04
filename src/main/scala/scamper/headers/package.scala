@@ -106,7 +106,7 @@ package object headers {
   }
 
   /** Provides standardized access to Accept-Encoding header. */
-  implicit class AcceptEncoding[T <: HttpMessage](private val message: T) extends AnyVal {
+  implicit class AcceptEncoding(private val request: HttpRequest) extends AnyVal {
     /**
      * Gets Accept-Encoding header values.
      *
@@ -116,24 +116,24 @@ package object headers {
 
     /** Gets Accept-Encoding header values if present. */
     def getAcceptEncoding: Option[Seq[ContentCodingRange]] =
-      message.getHeaderValue("Accept-Encoding")
+      request.getHeaderValue("Accept-Encoding")
         .map(ListParser.apply)
         .map(_.map(ContentCodingRange.parse))
 
     /** Tests for Accept-Encoding header. */
-    def hasAcceptEncoding: Boolean = message.hasHeader("Accept-Encoding")
+    def hasAcceptEncoding: Boolean = request.hasHeader("Accept-Encoding")
 
-    /** Creates new message setting Accept-Encoding header to supplied values. */
-    def withAcceptEncoding(values: Seq[ContentCodingRange])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      message.withHeader(Header("Accept-Encoding", values.mkString(", ")))
+    /** Creates new request setting Accept-Encoding header to supplied values. */
+    def withAcceptEncoding(values: Seq[ContentCodingRange]): HttpRequest =
+      request.withHeader(Header("Accept-Encoding", values.mkString(", ")))
 
-    /** Creates new message setting Accept-Encoding header to supplied values. */
-    def withAcceptEncoding(one: ContentCodingRange, more: ContentCodingRange*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    /** Creates new request setting Accept-Encoding header to supplied values. */
+    def withAcceptEncoding(one: ContentCodingRange, more: ContentCodingRange*): HttpRequest =
       withAcceptEncoding(one +: more)
 
-    /** Creates new message removing Accept-Encoding header. */
-    def removeAcceptEncoding()(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      message.removeHeaders("Accept-Encoding")
+    /** Creates new request removing Accept-Encoding header. */
+    def removeAcceptEncoding(): HttpRequest =
+      request.removeHeaders("Accept-Encoding")
   }
 
   /** Provides standardized access to Accept-Language header. */
