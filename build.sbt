@@ -1,6 +1,6 @@
 organization := "com.github.losizm"
 name := "scamper"
-version := "18.0.0"
+version := "19.0.0"
 
 description := "The HTTP library for Scala"
 homepage := Some(url("https://github.com/losizm/scamper"))
@@ -11,7 +11,7 @@ scalacOptions ++= Seq("-deprecation", "-feature", "-Xcheckinit")
 
 Compile / doc / scalacOptions ++= Seq(
   "-doc-title", "Scamper",
-  "-doc-version", "19.0.0",
+  "-doc-version", version.value,
   "-doc-root-content", "src/main/scala/root.scala"
 )
 
