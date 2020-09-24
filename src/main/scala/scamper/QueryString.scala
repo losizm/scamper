@@ -208,6 +208,59 @@ trait QueryString {
    */
   def remove(name: String): QueryString
 
+  /**
+   * Creates new query string by concatenating supplied query string.
+   *
+   * @param that query string
+   *
+   * @return new query string
+   *
+   * @note The new query string contains all values from both query strings with
+   * parameter values in `that` appended to those in `this`.
+   */
+  def concat(that: QueryString): QueryString =
+    that.isEmpty match {
+      case true  => this
+      case false => QueryString(toSeq ++ that.toSeq)
+    }
+
+  /**
+   * Creates new query string by merging supplied query string.
+   *
+   * @param that query string
+   *
+   * @return new query string
+   *
+   * @note The new query string contains values from both query strings with
+   * parameter values in `that` overriding those in `this`.
+   */
+  def merge(that: QueryString): QueryString =
+    that.isEmpty match {
+      case true  => this
+      case false => QueryString(toMap ++ that.toMap)
+    }
+
+  /**
+   * Creates new query string by filtering parameters with supplied predicate.
+   *
+   * @param pred predicate
+   *
+   * @param new query string
+   */
+  def filter(pred: ((String, String)) => Boolean): QueryString =
+    QueryString(toSeq.filter(pred))
+
+  /**
+   * Creates new query string by filtering parameter names with supplied
+   * predicate.
+   *
+   * @param pred predicate
+   *
+   * @param new query string
+   */
+  def filterNames(pred: String => Boolean): QueryString =
+    filter(param => pred(param._1))
+
   /** Gets `Seq` of name-value pairs from query string. */
   def toSeq: Seq[(String, String)]
 
@@ -219,6 +272,28 @@ trait QueryString {
 
   /** Gets `Map` of query string mapping each parameter to its first value. */
   def toSimpleMap: Map[String, String]
+
+  /**
+   * Creates new query string by concatenating supplied query string.
+   *
+   * @param that query string
+   *
+   * @return new query string
+   *
+   * @note Alias to `concat`.
+   */
+  def ++(that: QueryString): QueryString = concat(that)
+
+  /**
+   * Creates new query string by merging supplied query string.
+   *
+   * @param that query string
+   *
+   * @return new query string
+   *
+   * @note Alias to `merge`.
+   */
+  def <<(that: QueryString): QueryString = merge(that)
 }
 
 /** Provides factory for `QueryString`. */
@@ -232,8 +307,10 @@ object QueryString {
    * @param params parameters
    */
   def apply(params: Map[String, Seq[String]]): QueryString =
-    if (params.isEmpty) EmptyQueryString
-    else MapQueryString(params)
+    params.isEmpty match {
+      case true  => EmptyQueryString
+      case false => MapQueryString(params)
+    }
 
   /**
    * Creates query string from parameters.
@@ -241,8 +318,10 @@ object QueryString {
    * @param params parameters
    */
   def apply(params: Seq[(String, String)]): QueryString =
-    if (params.isEmpty) EmptyQueryString
-    else SeqQueryString(params)
+    params.isEmpty match {
+      case true  => EmptyQueryString
+      case false => SeqQueryString(params)
+    }
 
   /**
    * Creates query string from parameters.
@@ -298,6 +377,11 @@ private object EmptyQueryString extends QueryString {
     SeqQueryString(values.map(value => name -> value))
 
   def remove(name: String) = this
+
+  override def concat(other: QueryString) = other
+  override def merge(other: QueryString) = other
+  override def filter(pred: ((String, String)) => Boolean) = this
+  override def filterNames(pred: String => Boolean) = this
 
   override val toString = ""
 }

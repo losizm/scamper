@@ -216,6 +216,77 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(query.toSimpleMap.isEmpty)
   }
 
+  it should "concatenate query strings" in {
+    val q1 = QueryString(Map("a" -> Seq("1"), "b" -> Seq("2", "3")))
+    val q2 = QueryString("b" -> "4", "b" -> "5", "c" -> "6")
+    val q3 = q1 ++ q2
+    val q4 = q2 ++ q1
+
+    assert(q3("a") == "1")
+    assert(q3.getValues("a") == Seq("1"))
+    assert(q3("b") == "2")
+    assert(q3.getValues("b") == Seq("2", "3", "4", "5"))
+    assert(q3("c") == "6")
+    assert(q3.getValues("c") == Seq("6"))
+
+    assert(q4("a") == "1")
+    assert(q4.getValues("a") == Seq("1"))
+    assert(q4("b") == "4")
+    assert(q4.getValues("b") == Seq("4", "5", "2", "3"))
+    assert(q4("c") == "6")
+    assert(q4.getValues("c") == Seq("6"))
+
+    assert(q1 ++ QueryString.empty == q1)
+    assert(QueryString.empty ++ q1 == q1)
+    assert(QueryString.empty ++ QueryString.empty == QueryString.empty)
+  }
+
+  it should "merge query strings" in {
+    val q1 = QueryString(Map("a" -> Seq("1"), "b" -> Seq("2", "3")))
+    val q2 = QueryString("b" -> "4", "b" -> "5", "c" -> "6")
+    val q3 = q1 << q2
+    val q4 = q2 << q1
+
+    assert(q3("a") == "1")
+    assert(q3.getValues("a") == Seq("1"))
+    assert(q3("b") == "4")
+    assert(q3.getValues("b") == Seq("4", "5"))
+    assert(q3("c") == "6")
+    assert(q3.getValues("c") == Seq("6"))
+
+    assert(q4("a") == "1")
+    assert(q4.getValues("a") == Seq("1"))
+    assert(q4("b") == "2")
+    assert(q4.getValues("b") == Seq("2", "3"))
+    assert(q4("c") == "6")
+    assert(q4.getValues("c") == Seq("6"))
+
+    assert(q1 << QueryString.empty == q1)
+    assert(QueryString.empty << q1 == q1)
+    assert(QueryString.empty << QueryString.empty == QueryString.empty)
+  }
+
+  it should "filter query strings" in {
+    val q1 = QueryString(
+      "a" -> "1",
+      "b" -> "2",
+      "b" -> "3",
+      "b" -> "4",
+      "c" -> "5",
+      "c" -> "6"
+    )
+
+    val q2 = q1.filter { case (_, value) => value.toInt % 2 == 0 }
+    assert(q2.getValues("a").isEmpty)
+    assert(q2.getValues("b") == Seq("2", "4"))
+    assert(q2.getValues("c") == Seq("6"))
+
+    val q3 = q1.filterNames(Seq("a", "c").contains)
+    assert(q3.getValues("a") == Seq("1"))
+    assert(q3.getValues("b").isEmpty)
+    assert(q3.getValues("c") == Seq("5", "6"))
+  }
+
   it should "get Int values from QueryString" in {
     val query = QueryString(Map("id" -> Seq("1", "2", "3"), "nan" -> Seq("a")))
 
