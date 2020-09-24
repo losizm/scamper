@@ -21,7 +21,7 @@ import scamper.{ HeaderParams, ListParser }
 /**
  * Standardized type for `Sec-WebSocket-Extensions` header value.
  *
- * @see [[Sec-WebSocket-Extensions]]
+ * @see [[SecWebSocketExtensions]]
  */
 trait WebSocketExtension {
   /** Gets extension identifier. */
