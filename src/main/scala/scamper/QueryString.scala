@@ -225,6 +225,26 @@ trait QueryString {
     }
 
   /**
+   * Creates new query string by concatenating supplied parameters.
+   *
+   * @param params parameters
+   *
+   * @return new query string
+   */
+  def concat(params: Map[String, Seq[String]]): QueryString =
+    concat(QueryString(params))
+
+  /**
+   * Creates new query string by concatenating supplied parameters.
+   *
+   * @param params parameters
+   *
+   * @return new query string
+   */
+  def concat(params: Seq[(String, String)]): QueryString =
+    concat(QueryString(params))
+
+  /**
    * Creates new query string by merging supplied query string.
    *
    * @param that query string
@@ -239,6 +259,26 @@ trait QueryString {
       case true  => this
       case false => QueryString(toMap ++ that.toMap)
     }
+
+  /**
+   * Creates new query string by merging supplied parameters.
+   *
+   * @param params parameters
+   *
+   * @return new query string
+   */
+  def merge(params: Map[String, Seq[String]]): QueryString =
+    merge(QueryString(params))
+
+  /**
+   * Creates new query string by merging supplied parameters.
+   *
+   * @param params parameters
+   *
+   * @return new query string
+   */
+  def merge(params: Seq[(String, String)]): QueryString =
+    merge(QueryString(params))
 
   /**
    * Creates new query string by filtering parameters with supplied predicate.
@@ -285,6 +325,28 @@ trait QueryString {
   def ++(that: QueryString): QueryString = concat(that)
 
   /**
+   * Creates new query string by concatenating supplied parameters.
+   *
+   * @param params parameters
+   *
+   * @return new query string
+   *
+   * @note Alias to `concat`.
+   */
+  def ++(params: Map[String, Seq[String]]): QueryString = concat(params)
+
+  /**
+   * Creates new query string by concatenating supplied parameters.
+   *
+   * @param params parameters
+   *
+   * @return new query string
+   *
+   * @note Alias to `concat`.
+   */
+  def ++(params: Seq[(String, String)]): QueryString = concat(params)
+
+  /**
    * Creates new query string by merging supplied query string.
    *
    * @param that query string
@@ -294,6 +356,28 @@ trait QueryString {
    * @note Alias to `merge`.
    */
   def <<(that: QueryString): QueryString = merge(that)
+
+  /**
+   * Creates new query string by merging supplied parameters.
+   *
+   * @param params parameters
+   *
+   * @return new query string
+   *
+   * @note Alias to `merge`.
+   */
+  def <<(params: Map[String, Seq[String]]): QueryString = merge(params)
+
+  /**
+   * Creates new query string by merging supplied parameters.
+   *
+   * @param params parameters
+   *
+   * @return new query string
+   *
+   * @note Alias to `merge`.
+   */
+  def <<(params: Seq[(String, String)]): QueryString = merge(params)
 }
 
 /** Provides factory for `QueryString`. */

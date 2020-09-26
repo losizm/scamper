@@ -217,10 +217,15 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "concatenate query strings" in {
-    val q1 = QueryString(Map("a" -> Seq("1"), "b" -> Seq("2", "3")))
-    val q2 = QueryString("b" -> "4", "b" -> "5", "c" -> "6")
+    val toMap = Map("a" -> Seq("1"), "b" -> Seq("2", "3"))
+    val toSeq = Seq("b" -> "4", "b" -> "5", "c" -> "6")
+
+    val q1 = QueryString(toMap)
+    val q2 = QueryString(toSeq)
     val q3 = q1 ++ q2
     val q4 = q2 ++ q1
+    val q5 = q1 ++ toSeq
+    val q6 = q2 ++ toMap
 
     assert(q3("a") == "1")
     assert(q3.getValues("a") == Seq("1"))
@@ -236,16 +241,35 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(q4("c") == "6")
     assert(q4.getValues("c") == Seq("6"))
 
+    assert(q5("a") == "1")
+    assert(q5.getValues("a") == Seq("1"))
+    assert(q5("b") == "2")
+    assert(q5.getValues("b") == Seq("2", "3", "4", "5"))
+    assert(q5("c") == "6")
+    assert(q5.getValues("c") == Seq("6"))
+
+    assert(q6("a") == "1")
+    assert(q6.getValues("a") == Seq("1"))
+    assert(q6("b") == "4")
+    assert(q6.getValues("b") == Seq("4", "5", "2", "3"))
+    assert(q6("c") == "6")
+    assert(q6.getValues("c") == Seq("6"))
+
     assert(q1 ++ QueryString.empty == q1)
     assert(QueryString.empty ++ q1 == q1)
     assert(QueryString.empty ++ QueryString.empty == QueryString.empty)
   }
 
   it should "merge query strings" in {
-    val q1 = QueryString(Map("a" -> Seq("1"), "b" -> Seq("2", "3")))
-    val q2 = QueryString("b" -> "4", "b" -> "5", "c" -> "6")
+    val toMap = Map("a" -> Seq("1"), "b" -> Seq("2", "3"))
+    val toSeq = Seq("b" -> "4", "b" -> "5", "c" -> "6")
+
+    val q1 = QueryString(toMap)
+    val q2 = QueryString(toSeq)
     val q3 = q1 << q2
     val q4 = q2 << q1
+    val q5 = q1 << toSeq
+    val q6 = q2 << toMap
 
     assert(q3("a") == "1")
     assert(q3.getValues("a") == Seq("1"))
@@ -260,6 +284,20 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(q4.getValues("b") == Seq("2", "3"))
     assert(q4("c") == "6")
     assert(q4.getValues("c") == Seq("6"))
+
+    assert(q5("a") == "1")
+    assert(q5.getValues("a") == Seq("1"))
+    assert(q5("b") == "4")
+    assert(q5.getValues("b") == Seq("4", "5"))
+    assert(q5("c") == "6")
+    assert(q5.getValues("c") == Seq("6"))
+
+    assert(q6("a") == "1")
+    assert(q6.getValues("a") == Seq("1"))
+    assert(q6("b") == "2")
+    assert(q6.getValues("b") == Seq("2", "3"))
+    assert(q6("c") == "6")
+    assert(q6.getValues("c") == Seq("6"))
 
     assert(q1 << QueryString.empty == q1)
     assert(QueryString.empty << q1 == q1)
