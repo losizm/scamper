@@ -140,7 +140,7 @@ trait FilePart extends Part {
 /** Provides factory for `Multipart`. */
 object Multipart {
   private val random = new java.security.SecureRandom()
-  private val prefix = "----ScamperMultipartBoundary_"
+  private val prefix = "----MultipartBoundary_"
   private val charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz"
 
   /** Creates multipart with supplied parts. */
