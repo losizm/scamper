@@ -57,7 +57,7 @@ import scamper.websocket.WebSocketSession
  * @see [[ServerApplication.use]]
  */
 trait Router {
-  /** Gets router mount path. */
+  /** Gets mount path. */
   def mountPath: String
 
   /**
@@ -200,7 +200,7 @@ trait Router {
    * Adds request handler at mount path to serve files from given source directory.
    *
    * The mount path is stripped from the router path, and the remaining path is
-   * used to locate files within source directory.
+   * used to locate files within the source directory.
    *
    * === File Mapping Examples ===
    *
@@ -208,14 +208,13 @@ trait Router {
    * | ---------- | ---------------- | ------------------------- | ------- |
    * | /images    | /tmp             | /images/logo.png          | /tmp/logo.png |
    * | /images    | /tmp             | /images/icons/warning.png | /tmp/icons/warning.png |
-   * | /images    | /tmp             | /styles/main.css          | ''Doesn't map to anything'' |
    *
-   * @param mountPath router path at which directory is mounted
-   * @param sourceDirectory source directory from which files are served
+   * @param path router path at which directory is mounted
+   * @param source base directory from which files are served
    *
    * @return this router
    */
-  def files(mountPath: String, sourceDirectory: File): this.type
+  def files(path: String, source: File): this.type
 
   /**
    * Adds request handler at mount path to serve resources from given source
@@ -226,21 +225,20 @@ trait Router {
    *
    * === Resource Mapping Examples ===
    *
-   * | Mount Path | Source Directory | Request Path              | Maps to |
+   * | Mount Path | Source Directory | Router Path               | Maps to |
    * | ---------- | ---------------- | ------------------------- | ------- |
    * | /images    | assets           | /images/logo.png          | assets/logo.png |
    * | /images    | assets           | /images/icons/warning.png | assets/icons/warning.png |
-   * | /images    | assets           | /styles/main.css          | ''Doesn't map to anything'' |
    *
-   * @param mountPath router path at which directory is mounted
-   * @param sourceDirectory source directory from which resources are served
+   * @param path router path at which directory is mounted
+   * @param source base directory from which resources are served
    *
    * @return this router
    *
    * @note The current thread's context class loader is used to load resources.
    */
-  def resources(mountPath: String, sourceDirectory: String): this.type =
-    resources(mountPath, sourceDirectory, Thread.currentThread.getContextClassLoader)
+  def resources(path: String, source: String): this.type =
+    resources(path, source, Thread.currentThread.getContextClassLoader)
 
   /**
    * Adds request handler at mount path to serve resources from given source
@@ -251,19 +249,18 @@ trait Router {
    *
    * === Resource Mapping Examples ===
    *
-   * | Mount Path | Source Directory | Request Path              | Maps to |
+   * | Mount Path | Source Directory | Router Path               | Maps to |
    * | ---------- | ---------------- | ------------------------- | ------- |
    * | /images    | assets           | /images/logo.png          | assets/logo.png |
    * | /images    | assets           | /images/icons/warning.png | assets/icons/warning.png |
-   * | /images    | assets           | /styles/main.css          | ''Doesn't map to anything'' |
    *
-   * @param mountPath router path at which directory is mounted
-   * @param sourceDirectory source directory from which resources are served
-   * @param classLoader class loader from which resources are loaded
+   * @param path router path at which directory is mounted
+   * @param source base directory from which resources are served
+   * @param loader class loader with which resources are loaded
    *
    * @return this router
    */
-  def resources(mountPath: String, sourceDirectory: String, classLoader: ClassLoader): this.type
+  def resources(path: String, source: String, loader: ClassLoader): this.type
 
   /**
    * Adds WebSocket server at given router path using supplied session handler for each
