@@ -72,29 +72,21 @@ trait Router {
   def incoming(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied handler for requests with given router path.
+   * Adds supplied handler for requests with given router path and any of
+   * specified request methods.
    *
    * The handler is appended to existing request handler chain.
    *
    * @param path router path
+   * @param methods request methods
    * @param handler request handler
    *
    * @return this router
+   *
+   * @note If no request methods are specified, then matches are limited to path
+   * only.
    */
-  def incoming(path: String)(handler: RequestHandler): this.type
-
-  /**
-   * Adds supplied handler for requests with given method and router path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param method request method
-   * @param path router path
-   * @param handler request handler
-   *
-   * @return this router
-   */
-  def incoming(method: RequestMethod, path: String)(handler: RequestHandler): this.type
+  def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type
 
   /**
    * Adds supplied handler for HEAD requests to given router path.

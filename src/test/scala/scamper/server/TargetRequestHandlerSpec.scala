@@ -24,7 +24,7 @@ import Implicits.ServerHttpRequest
 
 class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "TargetedRequestHandler" should "respond to request" in {
-    val handler = TargetedRequestHandler(req => Ok(), "/", None)
+    val handler = TargetedRequestHandler(req => Ok(), "/", Nil)
     assert { handler(Get("/")).asInstanceOf[HttpResponse].status == Ok }
     assert { handler(Post("/")).asInstanceOf[HttpResponse].status == Ok }
     assert { handler(Put("/")).asInstanceOf[HttpResponse].status == Ok }
@@ -32,7 +32,7 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "respond to request with certain request method" in {
-    val handler = TargetedRequestHandler(req => Ok(), "/", Some(Put))
+    val handler = TargetedRequestHandler(req => Ok(), "/", Seq(Put))
     assert { handler(Get("/")).isInstanceOf[HttpRequest] }
     assert { handler(Post("/")).isInstanceOf[HttpRequest] }
     assert { handler(Put("/")).asInstanceOf[HttpResponse].status == Ok }
@@ -40,7 +40,7 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "respond to request with certain path" in {
-    val handler = TargetedRequestHandler(req => Ok(), "/a/b/c", None)
+    val handler = TargetedRequestHandler(req => Ok(), "/a/b/c", Nil)
     assert { handler(Get("http://localhost:8080//a//b/../../a/b////c")).asInstanceOf[HttpResponse].status == Ok }
     assert { handler(Post("/a/.//b/c")).asInstanceOf[HttpResponse].status == Ok }
     assert { handler(Put("/a/b/c")).asInstanceOf[HttpResponse].status == Ok }
@@ -48,10 +48,10 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "respond to request with certain path and request method" in {
-    val handler = TargetedRequestHandler(req => Ok(), "/a/b/c", Some(Post))
+    val handler = TargetedRequestHandler(req => Ok(), "/a/b/c", Seq(Post, Put))
     assert { handler(Get("/a/b/c")).isInstanceOf[HttpRequest] }
     assert { handler(Post("/a/b/c")).asInstanceOf[HttpResponse].status == Ok }
-    assert { handler(Put("/a/b/c")).isInstanceOf[HttpRequest] }
+    assert { handler(Put("/a/b/c")).asInstanceOf[HttpResponse].status == Ok }
     assert { handler(Delete("/a/b/c")).isInstanceOf[HttpRequest] }
   }
 
@@ -64,7 +64,7 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
         Ok()
       },
       "/A/B/C/:a/:b/:c/d",
-      None
+      Nil
     )
 
     assert { h1(Get("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
@@ -83,7 +83,7 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
         Ok()
       },
       "/A/B/C/*abc",
-      None
+      Nil
     )
 
     assert { h2(Get("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
@@ -103,7 +103,7 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
         Ok()
       },
       "/A/B/C/:a/:b/*",
-      None
+      Nil
     )
 
     assert { h3(Get("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
@@ -118,17 +118,17 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "not have access to non-convertible parameter" in {
-    val h1 = TargetedRequestHandler({ req => req.params.getInt("id"); Ok() }, "/:id", None)
-    val h2 = TargetedRequestHandler({ req => req.params.getLong("id"); Ok() }, "/:id", None)
+    val h1 = TargetedRequestHandler({ req => req.params.getInt("id"); Ok() }, "/:id", Nil)
+    val h2 = TargetedRequestHandler({ req => req.params.getLong("id"); Ok() }, "/:id", Nil)
 
     assertThrows[ParameterNotConvertible](h1(Get("/a")))
     assertThrows[ParameterNotConvertible](h2(Get("/a")))
   }
 
   it should "not have access to missing parameter" in {
-    val h1 = TargetedRequestHandler({ req => req.params.getString("id"); Ok() }, "/:identifier", None)
-    val h2 = TargetedRequestHandler({ req => req.params.getInt("id"); Ok() }, "/:identifier", None)
-    val h3 = TargetedRequestHandler({ req => req.params.getLong("id"); Ok() }, "/:identifier", None)
+    val h1 = TargetedRequestHandler({ req => req.params.getString("id"); Ok() }, "/:identifier", Nil)
+    val h2 = TargetedRequestHandler({ req => req.params.getInt("id"); Ok() }, "/:identifier", Nil)
+    val h3 = TargetedRequestHandler({ req => req.params.getLong("id"); Ok() }, "/:identifier", Nil)
 
     assertThrows[ParameterNotFound](h1(Get("/a")))
     assertThrows[ParameterNotFound](h2(Get("/a")))
@@ -136,7 +136,7 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "have invalid path" in {
-    assertThrows[IllegalArgumentException](TargetedRequestHandler(req => Ok(), "a/b/c", None))
-    assertThrows[IllegalArgumentException](TargetedRequestHandler(req => Ok(), "/a/*b/c", None))
+    assertThrows[IllegalArgumentException](TargetedRequestHandler(req => Ok(), "a/b/c", Nil))
+    assertThrows[IllegalArgumentException](TargetedRequestHandler(req => Ok(), "/a/*b/c", Nil))
   }
 }

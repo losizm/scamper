@@ -21,17 +21,20 @@ import scala.util.matching.Regex
 import scamper.{ HttpMessage, HttpRequest, RequestMethod }
 import scamper.Auxiliary.StringType
 
-private class TargetedRequestHandler private (handler: RequestHandler, target: Target, method: Option[RequestMethod]) extends RequestHandler {
+private class TargetedRequestHandler private (handler: RequestHandler, target: Target, methods: Seq[RequestMethod]) extends RequestHandler {
   def apply(req: HttpRequest): HttpMessage =
-    if (method.forall(req.method.==) && target.matches(req.path))
-      handler(req.withAttribute("scamper.server.request.parameters" -> target.getParams(req.path)))
-    else
-      req
+    target.matches(req.path) && (methods.isEmpty || methods.contains(req.method)) match {
+      case true  =>
+        handler(req.withAttribute("scamper.server.request.parameters" -> target.getParams(req.path)))
+
+      case false =>
+        req
+    }
 }
 
 private object TargetedRequestHandler {
-  def apply(handler: RequestHandler, path: String, method: Option[RequestMethod]): TargetedRequestHandler =
-    new TargetedRequestHandler(handler, new Target(NormalizePath(path)), method)
+  def apply(handler: RequestHandler, path: String, methods: Seq[RequestMethod]): TargetedRequestHandler =
+    new TargetedRequestHandler(handler, new Target(NormalizePath(path)), methods)
 }
 
 private class TargetedPathParameters(params: Map[String, String]) extends PathParameters {

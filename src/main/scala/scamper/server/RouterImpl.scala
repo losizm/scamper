@@ -28,40 +28,40 @@ private class RouterImpl(app: ServerApplication, rawMountPath: String) extends R
   val mountPath = normalize(rawMountPath, true)
 
   def incoming(handler: RequestHandler): this.type =
-    applyIncoming("*", handler)
+    applyIncoming("*", Nil, handler)
 
   def incoming(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(path, handler)
+    applyIncoming(path, Nil, handler)
 
-  def incoming(method: RequestMethod, path: String)(handler: RequestHandler): this.type =
-    applyIncoming(method, path, handler)
+  def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type =
+    applyIncoming(path, methods, handler)
 
   def head(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(Head, path, handler)
+    applyIncoming(path, Seq(Head), handler)
 
   def get(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(Get, path, handler)
+    applyIncoming(path, Seq(Get), handler)
 
   def post(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(Post, path, handler)
+    applyIncoming(path, Seq(Post), handler)
 
   def put(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(Put, path, handler)
+    applyIncoming(path, Seq(Put), handler)
 
   def patch(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(Patch, path, handler)
+    applyIncoming(path, Seq(Patch), handler)
 
   def delete(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(Delete, path, handler)
+    applyIncoming(path, Seq(Delete), handler)
 
   def options(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(Options, path, handler)
+    applyIncoming(path, Seq(Options), handler)
 
   def trace(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(Trace, path, handler)
+    applyIncoming(path, Seq(Trace), handler)
 
   def connect(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(Connect, path, handler)
+    applyIncoming(path, Seq(Connect), handler)
 
   def files(path: String, sourceDirectory: File): this.type = synchronized {
     app.files(mountPath + normalize(path), sourceDirectory)
@@ -84,24 +84,13 @@ private class RouterImpl(app: ServerApplication, rawMountPath: String) extends R
     this
   }
 
-  private def applyIncoming(path: String, handler: RequestHandler): this.type = synchronized {
+  private def applyIncoming(path: String, methods: Seq[RequestMethod], handler: RequestHandler): this.type = synchronized {
     (path == "*") match {
       case true =>
-        app.incoming(mountPath) { handler }
-        app.incoming(mountPath + "/*") { handler }
+        app.incoming(mountPath, methods : _*) { handler }
+        app.incoming(mountPath + "/*", methods : _*) { handler }
       case false =>
-        app.incoming(mountPath + normalize(path)) { handler }
-    }
-    this
-  }
-
-  private def applyIncoming(method: RequestMethod, path: String, handler: RequestHandler): this.type = synchronized {
-    (path == "*") match {
-      case true =>
-        app.incoming(method, mountPath) { handler }
-        app.incoming(method, mountPath + "/*") { handler }
-      case false =>
-        app.incoming(method, mountPath + normalize(path)) { handler }
+        app.incoming(mountPath + normalize(path), methods : _*) { handler }
     }
     this
   }

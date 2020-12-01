@@ -268,36 +268,22 @@ class ServerApplication {
     incoming("*") { handler }
 
   /**
-   * Adds supplied handler for requests with given path.
+   * Adds supplied handler for requests with given path and any of supplied
+   * request methods.
    *
    * The handler is appended to existing request handler chain.
    *
    * @param path request path
+   * @param methods request methods
    * @param handler request handler
    *
    * @return this application
+   *
+   * @note If no request methods are specified, then matches are limited to path
+   * only.
    */
-  def incoming(path: String)(handler: RequestHandler): this.type = synchronized {
-    app = (path == "*") match {
-      case true  => app.copy(requestHandlers = app.requestHandlers :+ notNull(handler))
-      case false => app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), None))
-    }
-    this
-  }
-
-  /**
-   * Adds supplied handler for requests with given method and path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param method request method
-   * @param path request path
-   * @param handler request handler
-   *
-   * @return this application
-   */
-  def incoming(method: RequestMethod, path: String)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), Option(method)))
+  def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), methods))
     this
   }
 
@@ -312,7 +298,7 @@ class ServerApplication {
    * @return this application
    */
   def get(path: String)(handler: RequestHandler): this.type =
-    incoming(Get, path) { handler }
+    incoming(path, Get) { handler }
 
   /**
    * Adds supplied handler for HEAD requests to given path.
@@ -325,7 +311,7 @@ class ServerApplication {
    * @return this application
    */
   def head(path: String)(handler: RequestHandler): this.type =
-    incoming(Head, path) { handler }
+    incoming(path, Head) { handler }
 
   /**
    * Adds supplied handler for POST requests to given path.
@@ -338,7 +324,7 @@ class ServerApplication {
    * @return this application
    */
   def post(path: String)(handler: RequestHandler): this.type =
-    incoming(Post, path) { handler }
+    incoming(path, Post) { handler }
 
   /**
    * Adds supplied handler for PUT requests to given path.
@@ -351,7 +337,7 @@ class ServerApplication {
    * @return this application
    */
   def put(path: String)(handler: RequestHandler): this.type =
-    incoming(Put, path) { handler }
+    incoming(path, Put) { handler }
 
   /**
    * Adds supplied handler for PATCH requests to given path.
@@ -364,7 +350,7 @@ class ServerApplication {
    * @return this application
    */
   def patch(path: String)(handler: RequestHandler): this.type =
-    incoming(Patch, path) { handler }
+    incoming(path, Patch) { handler }
 
   /**
    * Adds supplied handler for DELETE requests to given path.
@@ -377,7 +363,7 @@ class ServerApplication {
    * @return this application
    */
   def delete(path: String)(handler: RequestHandler): this.type =
-    incoming(Delete, path) { handler }
+    incoming(path, Delete) { handler }
 
   /**
    * Adds supplied handler for OPTIONS requests to given path.
@@ -390,7 +376,7 @@ class ServerApplication {
    * @return this application
    */
   def options(path: String)(handler: RequestHandler): this.type =
-    incoming(Options, path) { handler }
+    incoming(path, Options) { handler }
 
   /**
    * Adds supplied handler for TRACE requests to given path.
@@ -403,7 +389,7 @@ class ServerApplication {
    * @return this application
    */
   def trace(path: String)(handler: RequestHandler): this.type =
-    incoming(Trace, path) { handler }
+    incoming(path, Trace) { handler }
 
   /**
    * Adds supplied handler for CONNECT requests to given path.
@@ -416,7 +402,7 @@ class ServerApplication {
    * @return this application
    */
   def connect(path: String)(handler: RequestHandler): this.type =
-    incoming(Connect, path) { handler }
+    incoming(path, Connect) { handler }
 
   /**
    * Adds request handler at mount path to serve files from given source directory.
@@ -505,7 +491,7 @@ class ServerApplication {
    * @return this application
    */
   def websocket[T](path: String)(handler: WebSocketSession => T): this.type =
-    incoming(Get, path) { WebSocketRequestHandler(notNull(handler)) }
+    incoming(path, Get) { WebSocketRequestHandler(notNull(handler)) }
 
   /**
    * Adds routing application at given mount path.
