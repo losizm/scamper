@@ -301,19 +301,6 @@ class ServerApplication {
     incoming(path, Get) { handler }
 
   /**
-   * Adds supplied handler for HEAD requests to given path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path request path
-   * @param handler request handler
-   *
-   * @return this application
-   */
-  def head(path: String)(handler: RequestHandler): this.type =
-    incoming(path, Head) { handler }
-
-  /**
    * Adds supplied handler for POST requests to given path.
    *
    * The handler is appended to existing request handler chain.
@@ -340,19 +327,6 @@ class ServerApplication {
     incoming(path, Put) { handler }
 
   /**
-   * Adds supplied handler for PATCH requests to given path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path request path
-   * @param handler request handler
-   *
-   * @return this application
-   */
-  def patch(path: String)(handler: RequestHandler): this.type =
-    incoming(path, Patch) { handler }
-
-  /**
    * Adds supplied handler for DELETE requests to given path.
    *
    * The handler is appended to existing request handler chain.
@@ -364,45 +338,6 @@ class ServerApplication {
    */
   def delete(path: String)(handler: RequestHandler): this.type =
     incoming(path, Delete) { handler }
-
-  /**
-   * Adds supplied handler for OPTIONS requests to given path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path request path
-   * @param handler request handler
-   *
-   * @return this application
-   */
-  def options(path: String)(handler: RequestHandler): this.type =
-    incoming(path, Options) { handler }
-
-  /**
-   * Adds supplied handler for TRACE requests to given path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path request path
-   * @param handler request handler
-   *
-   * @return this application
-   */
-  def trace(path: String)(handler: RequestHandler): this.type =
-    incoming(path, Trace) { handler }
-
-  /**
-   * Adds supplied handler for CONNECT requests to given path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path request path
-   * @param handler request handler
-   *
-   * @return this application
-   */
-  def connect(path: String)(handler: RequestHandler): this.type =
-    incoming(path, Connect) { handler }
 
   /**
    * Adds request handler at mount path to serve files from given source directory.

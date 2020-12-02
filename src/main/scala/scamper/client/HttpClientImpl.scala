@@ -141,20 +141,8 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   def put[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T = send(Put, target, headers, cookies, body)(handler)
 
-  def patch[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
-    (handler: ResponseHandler[T]): T = send(Patch, target, headers, cookies, body)(handler)
-
   def delete[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
     (handler: ResponseHandler[T]): T = send(Delete, target, headers, cookies, Entity.empty)(handler)
-
-  def head[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
-    (handler: ResponseHandler[T]): T = send(Head, target, headers, cookies, Entity.empty)(handler)
-
-  def options[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
-    (handler: ResponseHandler[T]): T = send(Options, target, headers, cookies, body)(handler)
-
-  def trace[T](target: Uri, headers: Seq[Header] = Nil)
-    (handler: ResponseHandler[T]): T = send(Trace, target, headers, Nil, Entity.empty)(handler)
 
   def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
     (handler: WebSocketSession => T): T = {

@@ -89,18 +89,6 @@ trait Router {
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied handler for HEAD requests to given router path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path router path
-   * @param handler request handler
-   *
-   * @return this router
-   */
-  def head(path: String)(handler: RequestHandler): this.type
-
-  /**
    * Adds supplied handler for GET requests to given router path.
    *
    * The handler is appended to existing request handler chain.
@@ -137,18 +125,6 @@ trait Router {
   def put(path: String)(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied handler for PATCH requests to given router path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path router path
-   * @param handler request handler
-   *
-   * @return this router
-   */
-  def patch(path: String)(handler: RequestHandler): this.type
-
-  /**
    * Adds supplied handler for DELETE requests to given router path.
    *
    * The handler is appended to existing request handler chain.
@@ -159,42 +135,6 @@ trait Router {
    * @return this router
    */
   def delete(path: String)(handler: RequestHandler): this.type
-
-  /**
-   * Adds supplied handler for OPTIONS requests to given router path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path router path
-   * @param handler request handler
-   *
-   * @return this router
-   */
-  def options(path: String)(handler: RequestHandler): this.type
-
-  /**
-   * Adds supplied handler for TRACE requests to given router path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path router path
-   * @param handler request handler
-   *
-   * @return this router
-   */
-  def trace(path: String)(handler: RequestHandler): this.type
-
-  /**
-   * Adds supplied handler for CONNECT requests to given router path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path router path
-   * @param handler request handler
-   *
-   * @return this router
-   */
-  def connect(path: String)(handler: RequestHandler): this.type
 
   /**
    * Adds request handler at mount path to serve files from given source directory.

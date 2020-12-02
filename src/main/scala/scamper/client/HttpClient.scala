@@ -102,22 +102,6 @@ trait HttpClient {
     (handler: ResponseHandler[T]): T
 
   /**
-   * Sends PATCH request and passes response to handler.
-   *
-   * @param target request target
-   * @param headers request headers
-   * @param cookies request cookies
-   * @param body message body
-   * @param handler response handler
-   *
-   * @return value from response handler
-   *
-   * @throws IllegalArgumentException if `target` is not absolute
-   */
-  def patch[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
-    (handler: ResponseHandler[T]): T
-
-  /**
    * Sends DELETE request and passes response to handler.
    *
    * @param target request target
@@ -130,49 +114,6 @@ trait HttpClient {
    * @throws IllegalArgumentException if `target` is not absolute
    */
   def delete[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
-
-  /**
-   * Sends HEAD request and passes response to handler.
-   *
-   * @param target request target
-   * @param headers request headers
-   * @param cookies request cookies
-   * @param handler response handler
-   *
-   * @return value from response handler
-   *
-   * @throws IllegalArgumentException if `target` is not absolute
-   */
-  def head[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
-
-  /**
-   * Sends OPTIONS request and passes response to handler.
-   *
-   * @param target request target
-   * @param headers request headers
-   * @param cookies request cookies
-   * @param body message body
-   * @param handler response handler
-   *
-   * @return value from response handler
-   *
-   * @throws IllegalArgumentException if `target` is not absolute
-   */
-  def options[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
-    (handler: ResponseHandler[T]): T
-
-  /**
-   * Sends TRACE request and passes response to handler.
-   *
-   * @param target request target
-   * @param headers request headers
-   * @param handler response handler
-   *
-   * @return value from response handler
-   *
-   * @throws IllegalArgumentException if `target` is not absolute
-   */
-  def trace[T](target: Uri, headers: Seq[Header] = Nil)(handler: ResponseHandler[T]): T
 
   /**
    * Connects to WebSocket server at given target and passes established session

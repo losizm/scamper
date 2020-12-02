@@ -36,9 +36,6 @@ private class RouterImpl(app: ServerApplication, rawMountPath: String) extends R
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type =
     applyIncoming(path, methods, handler)
 
-  def head(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(path, Seq(Head), handler)
-
   def get(path: String)(handler: RequestHandler): this.type =
     applyIncoming(path, Seq(Get), handler)
 
@@ -48,20 +45,8 @@ private class RouterImpl(app: ServerApplication, rawMountPath: String) extends R
   def put(path: String)(handler: RequestHandler): this.type =
     applyIncoming(path, Seq(Put), handler)
 
-  def patch(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(path, Seq(Patch), handler)
-
   def delete(path: String)(handler: RequestHandler): this.type =
     applyIncoming(path, Seq(Delete), handler)
-
-  def options(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(path, Seq(Options), handler)
-
-  def trace(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(path, Seq(Trace), handler)
-
-  def connect(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(path, Seq(Connect), handler)
 
   def files(path: String, sourceDirectory: File): this.type = synchronized {
     app.files(mountPath + normalize(path), sourceDirectory)
