@@ -323,30 +323,25 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(q3.getValues("a") == Seq("1"))
     assert(q3.getValues("b").isEmpty)
     assert(q3.getValues("c") == Seq("5", "6"))
+
+    val q4 = q1.filterNot { case (_, value) => value.toInt % 2 == 0 }
+    assert(q4.getValues("a") == Seq("1"))
+    assert(q4.getValues("b") == Seq("3"))
+    assert(q4.getValues("c") == Seq("5"))
   }
 
   it should "get Int values from QueryString" in {
     val query = QueryString(Map("id" -> Seq("1", "2", "3"), "nan" -> Seq("a")))
 
     assert(query.getInt("id").contains(1))
-    assert(query.getIntOrElse("id", 4) == 1)
-    assert(query.getIntOrElse("idx", 4) == 4)
-    assert(query.getIntValues("id") == Seq(1, 2, 3))
-
     assertThrows[NumberFormatException](query.getInt("nan"))
-    assertThrows[NumberFormatException](query.getIntValues("nan"))
   }
 
   it should "get Long values from QueryString" in {
     val query = QueryString(Map("id" -> Seq("1", "2", "3"), "nan" -> Seq("a")))
 
     assert(query.getLong("id").contains(1))
-    assert(query.getLongOrElse("id", 4) == 1)
-    assert(query.getLongOrElse("idx", 4) == 4)
-    assert(query.getLongValues("id") == Seq(1, 2, 3))
-
     assertThrows[NumberFormatException](query.getLong("nan"))
-    assertThrows[NumberFormatException](query.getLongValues("nan"))
   }
 
   it should "throw NoSuchElementException if parameter not present" in {

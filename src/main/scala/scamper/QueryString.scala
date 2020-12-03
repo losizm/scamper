@@ -60,17 +60,6 @@ trait QueryString {
     get(name).map(_.toInt)
 
   /**
-   * Gets first parameter value with given name and parses it to `Int`;
-   * otherwise, returns default if parameter not present.
-   *
-   * @param name parameter name
-   *
-   * @throws NumberFormatException if parameter value cannot be parsed to `Int`
-   */
-  def getIntOrElse(name: String, default: => Int): Int =
-    getInt(name).getOrElse(default)
-
-  /**
    * Gets first parameter value with given name and parses it to `Long` if
    * present.
    *
@@ -82,17 +71,6 @@ trait QueryString {
     get(name).map(_.toLong)
 
   /**
-   * Gets first parameter value with given name and parses it to `Long`;
-   * otherwise, returns default if parameter not present.
-   *
-   * @param name parameter name
-   *
-   * @throws NumberFormatException if parameter value cannot be parsed to `Long`
-   */
-  def getLongOrElse(name: String, default: => Long): Long =
-    getLong(name).getOrElse(default)
-
-  /**
    * Gets parameter values with given name.
    *
    * @param name parameter name
@@ -100,30 +78,6 @@ trait QueryString {
    * @note If parameter is not present, an empty sequence is returned.
    */
   def getValues(name: String): Seq[String]
-
-  /**
-   * Gets parameter values with given name and parses each to `Int`.
-   *
-   * @param name parameter name
-   *
-   * @throws NumberFormatException if parameter value cannot be parsed to `Int`
-   *
-   * @note If parameter is not present, an empty sequence is returned.
-   */
-  def getIntValues(name: String): Seq[Int] =
-    getValues(name).map(_.toInt)
-
-  /**
-   * Gets parameter values with given name and parses each to `Long`.
-   *
-   * @param name parameter name
-   *
-   * @throws NumberFormatException if parameter value cannot be parsed to `Long`
-   *
-   * @note If parameter is not present, an empty sequence is returned.
-   */
-  def getLongValues(name: String): Seq[Long] =
-    getValues(name).map(_.toLong)
 
   /**
    * Tests for parameter with given name.
@@ -281,7 +235,8 @@ trait QueryString {
     merge(QueryString(params))
 
   /**
-   * Creates new query string by filtering parameters with supplied predicate.
+   * Creates new query string by selecting parameters which satisfy supplied
+   * predicate.
    *
    * @param pred predicate
    *
@@ -291,8 +246,19 @@ trait QueryString {
     QueryString(toSeq.filter(pred))
 
   /**
-   * Creates new query string by filtering parameter names with supplied
-   * predicate.
+   * Creates new query string by selecting parameters which do not satisfy
+   * supplied predicate.
+   *
+   * @param pred predicate
+   *
+   * @param new query string
+   */
+  def filterNot(pred: ((String, String)) => Boolean): QueryString =
+    QueryString(toSeq.filterNot(pred))
+
+  /**
+   * Creates new query string by selecting parameters whose names satisfy
+   * supplied predicate.
    *
    * @param pred predicate
    *
