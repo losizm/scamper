@@ -36,10 +36,12 @@ object Implicits {
      * Each incoming request is assigned a tag (i.e., correlate), which is later
      * reassigned to its outgoing response.
      */
-    def correlate: String = msg.getAttribute("scamper.server.message.correlate").get
+    def correlate: String =
+      msg.getAttribute("scamper.server.message.correlate").get
 
     /** Gets message socket. */
-    def socket: Socket = msg.getAttribute("scamper.server.message.socket").get
+    def socket: Socket =
+      msg.getAttribute("scamper.server.message.socket").get
 
     /**
      * Gets request count.
@@ -47,24 +49,27 @@ object Implicits {
      * The request count is the number of requests that have been received from
      * connection.
      */
-    def requestCount: Int = msg.getAttribute("scamper.server.message.requestCount").get
+    def requestCount: Int =
+      msg.getAttribute("scamper.server.message.requestCount").get
 
     /**
      * Gets server logger.
      *
      * @see [[HttpServer.logger HttpServer.logger()]]
      */
-    def logger: Logger = msg.getAttributeOrElse("scamper.server.message.logger", NullLogger)
+    def logger: Logger =
+      msg.getAttributeOrElse("scamper.server.message.logger", NullLogger)
 
     /** Gets server to which this message belongs. */
-    def server: HttpServer = msg.getAttribute("scamper.server.message.server").get
+    def server: HttpServer =
+      msg.getAttribute("scamper.server.message.server").get
   }
 
   /** Adds server-side extension methods to `HttpRequest`. */
   implicit class ServerHttpRequest(private val req: HttpRequest) extends AnyVal {
     /** Gets path parameters. */
     def params: PathParameters =
-      new TargetedPathParameters(req.getAttributeOrElse("scamper.server.request.parameters", Map.empty[String, String]))
+      req.getAttributeOrElse("scamper.server.request.parameters", new TargetedPathParameters(Map.empty))
 
     /**
      * Sends interim `100 Continue` response if request includes `Expect` header

@@ -25,7 +25,8 @@ private class TargetedRequestHandler private (handler: RequestHandler, target: T
   def apply(req: HttpRequest): HttpMessage =
     target.matches(req.path) && (methods.isEmpty || methods.contains(req.method)) match {
       case true  =>
-        handler(req.withAttribute("scamper.server.request.parameters" -> target.getParams(req.path)))
+        val params = new TargetedPathParameters(target.getParams(req.path))
+        handler(req.withAttribute("scamper.server.request.parameters" -> params))
 
       case false =>
         req
