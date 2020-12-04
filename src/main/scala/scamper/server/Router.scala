@@ -21,11 +21,11 @@ import scamper.RequestMethod
 import scamper.websocket.WebSocketSession
 
 /**
- * Configures routing for `ServerApplication`.
+ * Used for routing request handlers.
  *
- * `Router` works in much the same way as [[ServerApplication]], except it is
- * configured for request handling only, and all router paths are relative to a
- * mount path defined in the owner application.
+ * The routing mechanics work in much the same way as those of
+ * [[ServerApplication]], except all paths are relative to the router's mount
+ * path.
  *
  * {{{
  * import scamper.Implicits.stringToEntity
@@ -36,7 +36,7 @@ import scamper.websocket.WebSocketSession
  * val app = HttpServer.app()
  *
  * // Mount router to /api
- * app.use("/api") { router =>
+ * app.route("/api") { router =>
  *   val messages = Map(1 -> "Hello, world!", 2 -> "Goodbye, cruel world!")
  *
  *   // Map handler to /api/messages
@@ -54,7 +54,7 @@ import scamper.websocket.WebSocketSession
  * }
  * }}}
  *
- * @see [[ServerApplication.use]]
+ * @see [[ServerApplication.route]]
  */
 trait Router {
   /** Gets mount path. */
@@ -137,10 +137,11 @@ trait Router {
   def delete(path: String)(handler: RequestHandler): this.type
 
   /**
-   * Adds request handler at mount path to serve files from given source directory.
+   * Mounts file server at given path.
    *
-   * The mount path is stripped from the router path, and the remaining path is
-   * used to locate files within the source directory.
+   * At request time, the mount path is stripped from the router path, and the
+   * remaining path is used to locate a file in the source directory or one of
+   * its subdirectories.
    *
    * === File Mapping Examples ===
    *
@@ -157,11 +158,11 @@ trait Router {
   def files(path: String, source: File): this.type
 
   /**
-   * Adds request handler at mount path to serve resources from given source
-   * directory.
+   * Mounts file server (for resources) at given path.
    *
-   * The mount path is stripped from the router path, and the remaining path is
-   * used to locate resources within the source directory.
+   * At request time, the mount path is stripped from the router path, and the
+   * remaining path is used to locate a resource in the source directory or one
+   * of its subdirectories.
    *
    * === Resource Mapping Examples ===
    *
@@ -181,11 +182,11 @@ trait Router {
     resources(path, source, Thread.currentThread.getContextClassLoader)
 
   /**
-   * Adds request handler at mount path to serve resources from given source
-   * directory.
+   * Mounts file server (for resources) at given path.
    *
-   * The mount path is stripped from the router path, and the remaining path is
-   * used to locate resources within the source directory.
+   * At request time, the mount path is stripped from the router path, and the
+   * remaining path is used to locate a resource in the source directory or one
+   * of its subdirectories.
    *
    * === Resource Mapping Examples ===
    *

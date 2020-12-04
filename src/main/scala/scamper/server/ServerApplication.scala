@@ -340,10 +340,11 @@ class ServerApplication {
     incoming(path, Delete) { handler }
 
   /**
-   * Adds request handler at mount path to serve files from given source directory.
+   * Mounts file server at given path.
    *
-   * The mount path is stripped from the request path, and the remaining path is
-   * used to locate files within the source directory.
+   * At request time, the mount path is stripped from the request path, and the
+   * remaining path is used to locate a file in the source directory or one of
+   * its subdirectories.
    *
    * === File Mapping Examples ===
    *
@@ -363,11 +364,11 @@ class ServerApplication {
   }
 
   /**
-   * Adds request handler at mount path to serve resources from given source
-   * directory.
+   * Mounts file server (for resources) at given path.
    *
-   * The mount path is stripped from the request path, and the remaining path is
-   * used to locate resources within the source directory
+   * At request time, the mount path is stripped from the request path, and the
+   * remaining path is used to locate a resource in the source directory or one
+   * of its subdirectories.
    *
    * === Resource Mapping Examples ===
    *
@@ -387,11 +388,11 @@ class ServerApplication {
     resources(path, source, Thread.currentThread.getContextClassLoader)
 
   /**
-   * Adds request handler at mount path to serve resources from given source
-   * directory.
+   * Mounts file server (for resources) at given path.
    *
-   * The mount path is stripped from the request path, and the remaining path is
-   * used to locate resources within the source directory
+   * At request time, the mount path is stripped from the request path, and the
+   * remaining path is used to locate a resource in the source directory or one
+   * of its subdirectories.
    *
    * === Resource Mapping Examples ===
    *
@@ -426,17 +427,17 @@ class ServerApplication {
     incoming(path, Get) { WebSocketRequestHandler(notNull(handler)) }
 
   /**
-   * Adds routing application at given mount path.
+   * Adds router at given path.
    *
-   * A router is created and passed to routing application, and the routing
-   * application adds request handlers to router.
+   * A router is created and passed to the routing application so that it may
+   * add request handlers.
    *
-   * @param path request path at which routing application is mounted
+   * @param path request path at which router is mounted
    * @param routing routing application
    *
    * @return this application
    */
-  def use[T](path: String)(routing: Router => T): this.type = synchronized {
+  def route[T](path: String)(routing: Router => T): this.type = synchronized {
     routing(new RouterImpl(this, path))
     this
   }
