@@ -30,9 +30,6 @@ private class RouterImpl(app: ServerApplication, rawMountPath: String) extends R
   def incoming(handler: RequestHandler): this.type =
     applyIncoming("*", Nil, handler)
 
-  def incoming(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(path, Nil, handler)
-
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type =
     applyIncoming(path, methods, handler)
 
