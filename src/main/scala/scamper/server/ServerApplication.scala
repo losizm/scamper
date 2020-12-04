@@ -19,7 +19,7 @@ import java.io.File
 import java.net.InetAddress
 
 import scamper.RequestMethod
-import scamper.Validate.notNull
+import scamper.Validate._
 import scamper.logging.{ Logger, LogWriter }
 import scamper.types.KeepAliveParameters
 import scamper.websocket.WebSocketSession
@@ -283,7 +283,7 @@ class ServerApplication {
    * only.
    */
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), methods))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), noNulls(methods)))
     this
   }
 
