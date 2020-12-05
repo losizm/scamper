@@ -19,7 +19,7 @@ import java.io.File
 import java.net.InetAddress
 
 import scamper.RequestMethod
-import scamper.Validate._
+import scamper.Validate.notNull
 import scamper.logging.{ Logger, LogWriter }
 import scamper.types.KeepAliveParameters
 import scamper.websocket.WebSocketSession
@@ -71,7 +71,7 @@ class ServerApplication {
    * @note If file exists, it is opened in append mode.
    */
   def logger(file: File): this.type = synchronized {
-    app = app.copy(logger = LogWriter(notNull(file), true))
+    app = app.copy(logger = LogWriter(file, true))
     this
   }
 
@@ -283,7 +283,7 @@ class ServerApplication {
    * only.
    */
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(notNull(handler), notNull(path), noNulls(methods)))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, methods))
     this
   }
 
@@ -424,7 +424,7 @@ class ServerApplication {
    * @return this application
    */
   def websocket[T](path: String)(handler: WebSocketSession => T): this.type =
-    incoming(path, Get) { WebSocketRequestHandler(notNull(handler)) }
+    incoming(path, Get) { WebSocketRequestHandler(handler) }
 
   /**
    * Adds router at given path.
@@ -463,7 +463,7 @@ class ServerApplication {
    *
    * @return this application
    */
-  def error(handler: ErrorHandler): this.type = {
+  def error(handler: ErrorHandler): this.type = synchronized {
     app = app.copy(errorHandler = Option(handler))
     this
   }
@@ -507,5 +507,6 @@ class ServerApplication {
 /** Provides factory for `ServerApplication`. */
 object ServerApplication {
   /** Gets new instance of `ServerApplication`. */
-  def apply(): ServerApplication = new ServerApplication()
+  def apply(): ServerApplication =
+    new ServerApplication()
 }

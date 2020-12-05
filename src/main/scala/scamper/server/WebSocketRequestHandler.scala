@@ -18,6 +18,7 @@ package scamper.server
 import scala.util.Try
 
 import scamper.{ HttpMessage, HttpRequest }
+import scamper.Validate.notNull
 import scamper.websocket.{ StatusCode, WebSocket, WebSocketSession }
 
 private class WebSocketRequestHandler private (handler: WebSocketSession => Any) extends RequestHandler {
@@ -37,5 +38,6 @@ private class WebSocketRequestHandler private (handler: WebSocketSession => Any)
 }
 
 private object WebSocketRequestHandler {
-  def apply(handler: (WebSocketSession) => Any) = new WebSocketRequestHandler(handler)
+  def apply(handler: WebSocketSession => Any) =
+    new WebSocketRequestHandler(notNull(handler))
 }

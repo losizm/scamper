@@ -231,6 +231,8 @@ package object logging {
    * @param writer writer to which logs are written
    */
   class LogWriter(writer: PrintWriter) extends Logger with Closeable {
+    require(writer != null)
+
     def trace(message: String): Unit =
       log("trace", message)
 

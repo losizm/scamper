@@ -20,6 +20,7 @@ import scala.util.matching.Regex
 
 import scamper.{ HttpMessage, HttpRequest, RequestMethod }
 import scamper.Auxiliary.StringType
+import scamper.Validate._
 
 private class TargetedRequestHandler private (handler: RequestHandler, target: Target, methods: Seq[RequestMethod]) extends RequestHandler {
   def apply(req: HttpRequest): HttpMessage =
@@ -35,11 +36,16 @@ private class TargetedRequestHandler private (handler: RequestHandler, target: T
 
 private object TargetedRequestHandler {
   def apply(handler: RequestHandler, path: String, methods: Seq[RequestMethod]): TargetedRequestHandler =
-    new TargetedRequestHandler(handler, new Target(NormalizePath(path)), methods)
+    new TargetedRequestHandler(
+      notNull(handler),
+      new Target(NormalizePath(notNull(path))),
+      noNulls(methods)
+    )
 }
 
 private class TargetedPathParameters(params: Map[String, String]) extends PathParameters {
-  def getString(name: String): String = params.getOrElse(name, throw ParameterNotFound(name))
+  def getString(name: String): String =
+    params.getOrElse(name, throw ParameterNotFound(name))
 
   def getInt(name: String): Int = {
     val value = getString(name)
