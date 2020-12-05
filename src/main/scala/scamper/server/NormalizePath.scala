@@ -15,9 +15,11 @@
  */
 package scamper.server
 
-import scamper.Auxiliary.StringType
+import scamper.Uri
 
 private object NormalizePath {
   def apply(path: String): String =
-    path.replaceAll("//+", "/").toUri.normalize.toString
+    Uri(path.replaceAll("//+", "/"))
+      .normalize()
+      .toString
 }

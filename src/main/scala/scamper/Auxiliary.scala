@@ -144,13 +144,16 @@ private object Auxiliary {
       out.write(crlf)
     }
 
-    def writeLine(): Unit = out.write(crlf)
+    def writeLine(): Unit =
+      out.write(crlf)
   }
 
   implicit class SocketType(private val socket: Socket) extends AnyVal {
-    def read(): Int = socket.getInputStream().read()
+    def read(): Int =
+      socket.getInputStream().read()
 
-    def read(buffer: Array[Byte]): Int = socket.getInputStream().read(buffer)
+    def read(buffer: Array[Byte]): Int =
+      socket.getInputStream().read(buffer)
 
     def read(buffer: Array[Byte], offset: Int, length: Int): Int =
       socket.getInputStream().read(buffer, offset, length)
@@ -164,38 +167,34 @@ private object Auxiliary {
     def getLine(buffer: Array[Byte], offset: Int = 0): String =
       socket.getInputStream().getLine(buffer, offset)
 
-    def write(byte: Int): Unit = socket.getOutputStream().write(byte)
+    def write(byte: Int): Unit =
+      socket.getOutputStream().write(byte)
 
-    def write(buffer: Array[Byte]): Unit = socket.getOutputStream().write(buffer)
+    def write(buffer: Array[Byte]): Unit =
+      socket.getOutputStream().write(buffer)
 
     def write(buffer: Array[Byte], offset: Int, length: Int): Unit =
       socket.getOutputStream().write(buffer, offset, length)
 
-    def writeLine(text: String): Unit = socket.getOutputStream().writeLine(text)
+    def writeLine(text: String): Unit =
+      socket.getOutputStream().writeLine(text)
 
-    def writeLine(): Unit = socket.getOutputStream().writeLine()
+    def writeLine(): Unit =
+      socket.getOutputStream().writeLine()
 
-    def flush(): Unit = socket.getOutputStream().flush()
+    def flush(): Unit =
+      socket.getOutputStream().flush()
   }
 
   implicit class StringType(private val string: String) extends AnyVal {
-    def matchesAny(regexes: String*): Boolean = regexes.exists(string.matches)
+    def matchesAny(regexes: String*): Boolean =
+      regexes.exists(string.matches)
 
-    def toInstant: Instant = Try(Instant.parse(string)).getOrElse(DateValue.parse(string))
+    def toUrlEncoded(charset: String): String =
+      URLEncoder.encode(string, charset)
 
-    def toFile: File = new File(string)
-
-    def toPath: Path = Paths.get(string)
-
-    def toUri: Uri = Uri(string)
-
-    def toUrlEncoded: String = URLEncoder.encode(string, "UTF-8")
-
-    def toUrlEncoded(encoding: String): String = URLEncoder.encode(string, encoding)
-
-    def toUrlDecoded: String = URLDecoder.decode(string, "UTF-8")
-
-    def toUrlDecoded(encoding: String): String = URLDecoder.decode(string, encoding)
+    def toUrlDecoded(charset: String): String =
+      URLDecoder.decode(string, charset)
   }
 
   implicit class UriType(private val uri: Uri) extends AnyVal {
@@ -220,14 +219,20 @@ private object Auxiliary {
     private def buildUri(scheme: String, authority: String, path: String, query: String, fragment: String): Uri = {
       val uri = new StringBuilder()
 
-      if (scheme != null) uri.append(scheme).append(":")
-      if (authority != null) uri.append("//").append(authority)
+      if (scheme != null)
+        uri.append(scheme).append(":")
+
+      if (authority != null)
+        uri.append("//").append(authority)
 
       if (path != null && path != "")
         uri.append('/').append(path.dropWhile(_ == '/'))
 
-      if (query != null && query != "") uri.append('?').append(query)
-      if (fragment != null && fragment != "") uri.append('#').append(fragment)
+      if (query != null && query != "")
+        uri.append('?').append(query)
+
+      if (fragment != null && fragment != "")
+        uri.append('#').append(fragment)
 
       Uri(uri.toString)
     }
