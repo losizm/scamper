@@ -15,6 +15,8 @@
  */
 package scamper.server
 
+import scala.util.Try
+
 /** Provides access to path parameters. */
 trait PathParameters {
   /**
@@ -45,4 +47,19 @@ trait PathParameters {
    * @throws ParameterNotConvertible if parameter cannot be converted
    */
   def getLong(name: String): Long
+}
+
+private class MapPathParameters(params: Map[String, String]) extends PathParameters {
+  def getString(name: String): String =
+    params.getOrElse(name, throw ParameterNotFound(name))
+
+  def getInt(name: String): Int = {
+    val value = getString(name)
+    Try(value.toInt).getOrElse(throw ParameterNotConvertible(name, value))
+  }
+
+  def getLong(name: String): Long = {
+    val value = getString(name)
+    Try(value.toLong).getOrElse(throw ParameterNotConvertible(name, value))
+  }
 }

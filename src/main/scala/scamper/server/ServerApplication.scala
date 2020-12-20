@@ -283,7 +283,7 @@ class ServerApplication {
    * only.
    */
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetedRequestHandler(handler, path, methods))
+    app = app.copy(requestHandlers = app.requestHandlers :+ new TargetedRequestHandler(handler, path, methods))
     this
   }
 
