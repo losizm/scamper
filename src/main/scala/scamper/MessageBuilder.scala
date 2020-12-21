@@ -16,7 +16,7 @@
 package scamper
 
 /** Provides builder pattern for HTTP message. */
-trait MessageBuilder[T <: HttpMessage] { self: T =>
+trait MessageBuilder[T <: HttpMessage] { this: T =>
   /**
    * Creates message with supplied start line.
    *
