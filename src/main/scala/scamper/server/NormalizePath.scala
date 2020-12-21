@@ -19,7 +19,8 @@ import scamper.Uri
 
 private object NormalizePath {
   def apply(path: String): String =
-    Uri(path.replaceAll("//+", "/"))
-      .normalize()
-      .toString
+    Uri(path.replaceAll("//+", "/")).normalize().toString match {
+      case "/"  => "/"
+      case path => if (path.last == '/') path.init else path
+    }
 }
