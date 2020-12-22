@@ -96,12 +96,11 @@ private class StaticFileServer(mountPath: Path, sourceDirectory: Path) extends R
 
 private object StaticFileServer {
   def apply(mountPath: String, sourceDirectory: File): StaticFileServer = {
-    val path = Paths.get(mountPath).normalize()
+    val path = MountPath(mountPath)
     val directory = sourceDirectory.toPath.toAbsolutePath.normalize()
 
-    require(path.startsWith("/"), s"Invalid mount path ($path)")
     require(Files.isDirectory(directory), s"Not a directory ($directory)")
 
-    new StaticFileServer(path, directory)
+    new StaticFileServer(Paths.get(path.value), directory)
   }
 }

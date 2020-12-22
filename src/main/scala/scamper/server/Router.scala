@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2020 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,11 @@ package scamper.server
 import java.io.File
 
 import scamper.RequestMethod
+import scamper.RequestMethod.Registry.{ Delete, Get, Post, Put }
 import scamper.websocket.WebSocketSession
 
 /**
  * Used for routing request handlers.
- *
- * The routing mechanics work in much the same way as those of
- * [[ServerApplication]], except all paths are relative to the router's mount
- * path.
  *
  * {{{
  * import scamper.Implicits.stringToEntity
@@ -98,7 +95,8 @@ trait Router {
    *
    * @return this router
    */
-  def get(path: String)(handler: RequestHandler): this.type
+  def get(path: String)(handler: RequestHandler): this.type =
+    incoming(path, Get)(handler)
 
   /**
    * Adds supplied handler for POST requests to given router path.
@@ -110,7 +108,8 @@ trait Router {
    *
    * @return this router
    */
-  def post(path: String)(handler: RequestHandler): this.type
+  def post(path: String)(handler: RequestHandler): this.type =
+    incoming(path, Post)(handler)
 
   /**
    * Adds supplied handler for PUT requests to given router path.
@@ -122,7 +121,8 @@ trait Router {
    *
    * @return this router
    */
-  def put(path: String)(handler: RequestHandler): this.type
+  def put(path: String)(handler: RequestHandler): this.type =
+    incoming(path, Put)(handler)
 
   /**
    * Adds supplied handler for DELETE requests to given router path.
@@ -134,7 +134,8 @@ trait Router {
    *
    * @return this router
    */
-  def delete(path: String)(handler: RequestHandler): this.type
+  def delete(path: String)(handler: RequestHandler): this.type =
+    incoming(path, Delete)(handler)
 
   /**
    * Mounts file server at given path.
@@ -155,7 +156,8 @@ trait Router {
    *
    * @return this router
    */
-  def files(path: String, source: File): this.type
+  def files(path: String, source: File): this.type =
+    incoming(StaticFileServer(mountPath + MountPath.normalize(path), source))
 
   /**
    * Mounts file server (for resources) at given path.
@@ -201,7 +203,8 @@ trait Router {
    *
    * @return this router
    */
-  def resources(path: String, source: String, loader: ClassLoader): this.type
+  def resources(path: String, source: String, loader: ClassLoader): this.type =
+    incoming(StaticResourceServer(mountPath + MountPath.normalize(path), source, loader))
 
   /**
    * Adds WebSocket server at given router path using supplied session handler for each
@@ -214,5 +217,22 @@ trait Router {
    *
    * @return this router
    */
-  def websocket[T](path: String)(handler: WebSocketSession => T): this.type
+  def websocket[T](path: String)(handler: WebSocketSession => T): this.type =
+    incoming(path, Get)(WebSocketRequestHandler(handler))
+
+  /**
+   * Adds new router at given path.
+   *
+   * A new router is created and passed to routing application.
+   *
+   * @param path router path at which new router is mounted
+   * @param routing routing application
+   *
+   * @return this router
+   */
+  def route[T](path: String)(routing: Router => T): this.type = {
+    val router = RouterImpl(mountPath + MountPath.normalize(path))
+    routing(router)
+    incoming(MountRequestHandler(router.mountPath, router.createRequestHandler()))
+  }
 }

@@ -19,15 +19,10 @@ import scala.util.matching.Regex
 
 import scamper.Auxiliary.StringType
 
-private class Target(rawPath: String) {
-  private val path = NormalizePath(rawPath)
+private class TargetPath private (val value: String) {
+  private val segments = segmentize(value)
 
-  if (!path.matchesAny("/", "\\*", """(/:\w+|/[\w+\-.~%]+)+""", """(/:\w+|/[\w+\-.~%]+)*/\*\w*"""))
-    throw new IllegalArgumentException(s"Invalid target path: $path")
-
-  private val segments = segmentize(path)
-
-  private val regex = path match {
+  private val regex = value match {
     case "/" => "/"
     case "*" => ".*"
     case _   => "/" + segments.map {
@@ -61,4 +56,18 @@ private class Target(rawPath: String) {
       case "*" => Nil
       case p   => p.tail.split("/").toSeq
     }
+}
+
+private object TargetPath {
+  def apply(value: String): TargetPath =
+    new TargetPath(normalize(value))
+
+  def normalize(value: String): String = {
+    val path = NormalizePath(value)
+
+    if (!path.matchesAny("/", "\\*", """(/:\w+|/[\w+\-.~%]+)+""", """(/:\w+|/[\w+\-.~%]+)*/\*\w*"""))
+      throw new IllegalArgumentException(s"Invalid target path: $path")
+
+    path
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2020 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import scamper.RequestMethod
 import scamper.Validate.notNull
 import scamper.logging.{ Logger, LogWriter }
 import scamper.types.KeepAliveParameters
-import scamper.websocket.WebSocketSession
-import RequestMethod.Registry._
 
 /**
  * Configures and creates `HttpServer`.
@@ -52,8 +50,16 @@ import RequestMethod.Registry._
  * | error       | ''(Sends `500 Internal Server Error`)'' |
  * <br>
  */
-class ServerApplication {
+class ServerApplication extends Router {
   private var app = HttpServerImpl.Application()
+
+  /**
+   * @inheritdoc
+   *
+   * @note Mount path is always `"/"`.
+   */
+  def mountPath: String =
+    "/"
 
   /** Resets application to default configuration. */
   def reset(): this.type = synchronized {
@@ -264,8 +270,10 @@ class ServerApplication {
    *
    * @return this application
    */
-  def incoming(handler: RequestHandler): this.type =
-    incoming("*") { handler }
+  def incoming(handler: RequestHandler): this.type = synchronized {
+    app = app.copy(requestHandlers = app.requestHandlers :+ handler)
+    this
+  }
 
   /**
    * Adds supplied handler for requests with given path and any of supplied
@@ -283,162 +291,7 @@ class ServerApplication {
    * only.
    */
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ new TargetedRequestHandler(handler, path, methods))
-    this
-  }
-
-  /**
-   * Adds supplied handler for GET requests to given path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path request path
-   * @param handler request handler
-   *
-   * @return this application
-   */
-  def get(path: String)(handler: RequestHandler): this.type =
-    incoming(path, Get) { handler }
-
-  /**
-   * Adds supplied handler for POST requests to given path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path request path
-   * @param handler request handler
-   *
-   * @return this application
-   */
-  def post(path: String)(handler: RequestHandler): this.type =
-    incoming(path, Post) { handler }
-
-  /**
-   * Adds supplied handler for PUT requests to given path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path request path
-   * @param handler request handler
-   *
-   * @return this application
-   */
-  def put(path: String)(handler: RequestHandler): this.type =
-    incoming(path, Put) { handler }
-
-  /**
-   * Adds supplied handler for DELETE requests to given path.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path request path
-   * @param handler request handler
-   *
-   * @return this application
-   */
-  def delete(path: String)(handler: RequestHandler): this.type =
-    incoming(path, Delete) { handler }
-
-  /**
-   * Mounts file server at given path.
-   *
-   * At request time, the mount path is stripped from the request path, and the
-   * remaining path is used to locate a file in the source directory or one of
-   * its subdirectories.
-   *
-   * === File Mapping Examples ===
-   *
-   * | Mount Path | Source Directory | Request Path              | Maps to |
-   * | ---------- | ---------------- | ------------------------- | ------- |
-   * | /images    | /tmp             | /images/logo.png          | /tmp/logo.png |
-   * | /images    | /tmp             | /images/icons/warning.png | /tmp/icons/warning.png |
-   *
-   * @param path request path at which directory is mounted
-   * @param source base directory from which files are served
-   *
-   * @return this application
-   */
-  def files(path: String, source: File): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ StaticFileServer(path, source))
-    this
-  }
-
-  /**
-   * Mounts file server (for resources) at given path.
-   *
-   * At request time, the mount path is stripped from the request path, and the
-   * remaining path is used to locate a resource in the source directory or one
-   * of its subdirectories.
-   *
-   * === Resource Mapping Examples ===
-   *
-   * | Mount Path | Source Directory | Request Path              | Maps to |
-   * | ---------- | ---------------- | ------------------------- | ------- |
-   * | /images    | assets           | /images/logo.png          | assets/logo.png |
-   * | /images    | assets           | /images/icons/warning.png | assets/icons/warning.png |
-   *
-   * @param path request path at which directory is mounted
-   * @param source base directory from which resources are served
-   *
-   * @return this application
-   *
-   * @note The current thread's context class loader is used to load resources.
-   */
-  def resources(path: String, source: String): this.type =
-    resources(path, source, Thread.currentThread.getContextClassLoader)
-
-  /**
-   * Mounts file server (for resources) at given path.
-   *
-   * At request time, the mount path is stripped from the request path, and the
-   * remaining path is used to locate a resource in the source directory or one
-   * of its subdirectories.
-   *
-   * === Resource Mapping Examples ===
-   *
-   * | Mount Path | Source Directory | Request Path              | Maps to |
-   * | ---------- | ---------------- | ------------------------- | ------- |
-   * | /images    | assets           | /images/logo.png          | assets/logo.png |
-   * | /images    | assets           | /images/icons/warning.png | assets/icons/warning.png |
-   *
-   * @param path request path at which directory is mounted
-   * @param source base directory from which resources are served
-   * @param loader class loader with which resources are loaded
-   *
-   * @return this application
-   */
-  def resources(path: String, source: String, loader: ClassLoader): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ StaticResourceServer(path, source, loader))
-    this
-  }
-
-  /**
-   * Adds WebSocket server at given path using supplied session handler for each
-   * connection.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path WebSocket path
-   * @param handler WebSocket session handler
-   *
-   * @return this application
-   */
-  def websocket[T](path: String)(handler: WebSocketSession => T): this.type =
-    incoming(path, Get) { WebSocketRequestHandler(handler) }
-
-  /**
-   * Adds router at given path.
-   *
-   * A router is created and passed to the routing application so that it may
-   * add request handlers.
-   *
-   * @param path request path at which router is mounted
-   * @param routing routing application
-   *
-   * @return this application
-   */
-  def route[T](path: String)(routing: Router => T): this.type = synchronized {
-    routing(new RouterImpl(this, path))
+    app = app.copy(requestHandlers = app.requestHandlers :+ TargetRequestHandler(path, methods, handler))
     this
   }
 
@@ -475,9 +328,8 @@ class ServerApplication {
    *
    * @return new server
    */
-  def create(port: Int): HttpServer = synchronized {
+  def create(port: Int): HttpServer =
     create("0.0.0.0", port)
-  }
 
   /**
    * Creates server at given host and port.
@@ -487,9 +339,8 @@ class ServerApplication {
    *
    * @return new server
    */
-  def create(host: String, port: Int): HttpServer = synchronized {
+  def create(host: String, port: Int): HttpServer =
     create(InetAddress.getByName(host), port)
-  }
 
   /**
    * Creates server at given host and port.

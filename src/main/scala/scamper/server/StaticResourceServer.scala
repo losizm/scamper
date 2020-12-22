@@ -61,15 +61,13 @@ private class StaticResourceServer(mountPath: Path, sourceDirectory: Path, class
 
 private object StaticResourceServer {
   def apply(mountPath: String, sourceDirectory: String, classLoader: ClassLoader): StaticResourceServer = {
-    val path = Paths.get(mountPath).normalize()
+    val path = MountPath(mountPath)
     val directory = Paths.get(sourceDirectory).normalize()
     val loader = if (classLoader == null) Thread.currentThread.getContextClassLoader else classLoader
-
-    require(mountPath.startsWith("/"), s"Invalid mount path: $mountPath")
 
     if (directory != Paths.get(""))
       require(loader.getResource(s"$directory/") != null, s"Invalid source directory: $sourceDirectory")
 
-    new StaticResourceServer(path, directory, loader)
+    new StaticResourceServer(Paths.get(path.value), directory, loader)
   }
 }

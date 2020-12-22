@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2020 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,73 +15,40 @@
  */
 package scamper.server
 
-import java.io.File
+import scala.collection.mutable.ListBuffer
 
-import scala.util.Try
-
-import scamper.Auxiliary.StringType
 import scamper.RequestMethod
-import scamper.RequestMethod.Registry._
-import scamper.websocket.WebSocketSession
 
-private class RouterImpl(app: ServerApplication, rawMountPath: String) extends Router {
-  val mountPath = normalize(rawMountPath, true)
+private class RouterImpl private (val mountPath: String) extends Router {
+  private val handlers = new ListBuffer[RequestHandler]
 
-  def incoming(handler: RequestHandler): this.type =
-    applyIncoming("*", Nil, handler)
-
-  def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type =
-    applyIncoming(path, methods, handler)
-
-  def get(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(path, Seq(Get), handler)
-
-  def post(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(path, Seq(Post), handler)
-
-  def put(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(path, Seq(Put), handler)
-
-  def delete(path: String)(handler: RequestHandler): this.type =
-    applyIncoming(path, Seq(Delete), handler)
-
-  def files(path: String, sourceDirectory: File): this.type = synchronized {
-    app.files(mountPath + normalize(path), sourceDirectory)
+  def incoming(handler: RequestHandler): this.type = synchronized {
+    handlers += handler
     this
   }
 
-  def resources(path: String, sourceDirectory: String, classLoader: ClassLoader): this.type = synchronized {
-    app.resources(mountPath + normalize(path), sourceDirectory, classLoader)
+  def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type = synchronized {
+    handlers += TargetRequestHandler(toFullPath(path), methods, handler)
     this
   }
 
-  def websocket[T](path: String)(handler: WebSocketSession => T): this.type = synchronized {
-    normalize(path) match {
-      case "*" =>
-        app.websocket(mountPath)(handler)
-        app.websocket(mountPath + "/*")(handler)
-      case path =>
-        app.websocket(mountPath + path)(handler)
-    }
-    this
+  private[server] def createRequestHandler(): RequestHandler = synchronized {
+    RequestHandler.coalesce(handlers.toSeq)
   }
 
-  private def applyIncoming(path: String, methods: Seq[RequestMethod], handler: RequestHandler): this.type = synchronized {
-    (path == "*") match {
-      case true =>
-        app.incoming(mountPath, methods : _*) { handler }
-        app.incoming(mountPath + "/*", methods : _*) { handler }
-      case false =>
-        app.incoming(mountPath + normalize(path), methods : _*) { handler }
-    }
-    this
-  }
-
-  private def normalize(path: String, isMountPath: Boolean = false): String =
+  private def toFullPath(path: String): String =
     NormalizePath(path) match {
-      case "/" => if (isMountPath) "/" else ""
-      case path if path.matches("/\\.\\.(/.*)?") => throw new IllegalArgumentException(s"Invalid path: $path")
-      case path if path.startsWith("/") => path
-      case path => throw new IllegalArgumentException(s"Invalid path: $path")
+      case ""   => mountPath
+      case "*"  => "*"
+      case "/"  => mountPath
+      case path =>
+        if (!path.startsWith("/") || path.matches("/\\.\\.(/.*)?"))
+          throw new IllegalArgumentException(s"Invalid router path: $path")
+        mountPath + path
     }
+}
+
+private object RouterImpl {
+  def apply(mountPath: String): RouterImpl =
+    new RouterImpl(MountPath.normalize(mountPath))
 }

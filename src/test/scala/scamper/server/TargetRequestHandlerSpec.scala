@@ -22,9 +22,9 @@ import scamper.ResponseStatus.Registry.Ok
 
 import Implicits.ServerHttpRequest
 
-class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
-  "TargetedRequestHandler" should "respond to request" in {
-    val handler = TargetedRequestHandler(req => Ok(), "/", Nil)
+class TargetRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
+  "TargetRequestHandler" should "respond to request" in {
+    val handler = TargetRequestHandler("/", Nil, req => Ok())
     assert { handler(Get("/")).asInstanceOf[HttpResponse].status == Ok }
     assert { handler(Post("/")).asInstanceOf[HttpResponse].status == Ok }
     assert { handler(Put("/")).asInstanceOf[HttpResponse].status == Ok }
@@ -32,7 +32,7 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "respond to request with certain request method" in {
-    val handler = TargetedRequestHandler(req => Ok(), "/", Seq(Put))
+    val handler = TargetRequestHandler("/", Seq(Put), req => Ok())
     assert { handler(Get("/")).isInstanceOf[HttpRequest] }
     assert { handler(Post("/")).isInstanceOf[HttpRequest] }
     assert { handler(Put("/")).asInstanceOf[HttpResponse].status == Ok }
@@ -40,7 +40,7 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "respond to request with certain path" in {
-    val handler = TargetedRequestHandler(req => Ok(), "/a/b/c", Nil)
+    val handler = TargetRequestHandler("/a/b/c", Nil, req => Ok())
     assert { handler(Get("http://localhost:8080//a//b/../../a/b////c")).asInstanceOf[HttpResponse].status == Ok }
     assert { handler(Post("/a/.//b/c")).asInstanceOf[HttpResponse].status == Ok }
     assert { handler(Put("/a/b/c")).asInstanceOf[HttpResponse].status == Ok }
@@ -48,7 +48,7 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "respond to request with certain path and request method" in {
-    val handler = TargetedRequestHandler(req => Ok(), "/a/b/c", Seq(Post, Put))
+    val handler = TargetRequestHandler("/a/b/c", Seq(Post, Put), req => Ok())
     assert { handler(Get("/a/b/c")).isInstanceOf[HttpRequest] }
     assert { handler(Post("/a/b/c")).asInstanceOf[HttpResponse].status == Ok }
     assert { handler(Put("/a/b/c")).asInstanceOf[HttpResponse].status == Ok }
@@ -56,15 +56,15 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "have access to request parameters" in {
-    val h1 = TargetedRequestHandler(
+    val h1 = TargetRequestHandler(
+      "/A/B/C/:a/:b/:c/d",
+      Nil,
       { req =>
         assert(req.params.getString("a") == "One")
         assert(req.params.getInt("b") == 200)
         assert(req.params.getLong("c") == 3000)
         Ok()
-      },
-      "/A/B/C/:a/:b/:c/d",
-      Nil
+      }
     )
 
     assert { h1(Get("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
@@ -77,13 +77,13 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert { h1(Put("/A/B/c/One/200/3000/d")).isInstanceOf[HttpRequest] }
     assert { h1(Delete("/a/b/c/One/200/3000/d")).isInstanceOf[HttpRequest] }
 
-    val h2 = TargetedRequestHandler(
+    val h2 = TargetRequestHandler(
+      "/A/B/C/*abc",
+      Nil,
       { req =>
         assert(req.params.getString("abc") == "One/200/3000/d")
         Ok()
-      },
-      "/A/B/C/*abc",
-      Nil
+      }
     )
 
     assert { h2(Get("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
@@ -96,14 +96,14 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert { h2(Put("/A/B/c/One/200/3000/d")).isInstanceOf[HttpRequest] }
     assert { h2(Delete("/a/b/c/One/200/3000/d")).isInstanceOf[HttpRequest] }
 
-    val h3 = TargetedRequestHandler(
+    val h3 = TargetRequestHandler(
+      "/A/B/C/:a/:b/*",
+      Nil,
       { req =>
         assert(req.params.getString("a") == "One")
         assert(req.params.getInt("b") == 200)
         Ok()
-      },
-      "/A/B/C/:a/:b/*",
-      Nil
+      }
     )
 
     assert { h3(Get("/A/B/C/One/200/3000/d")).isInstanceOf[HttpResponse] }
@@ -118,17 +118,17 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "not have access to non-convertible parameter" in {
-    val h1 = TargetedRequestHandler({ req => req.params.getInt("id"); Ok() }, "/:id", Nil)
-    val h2 = TargetedRequestHandler({ req => req.params.getLong("id"); Ok() }, "/:id", Nil)
+    val h1 = TargetRequestHandler("/:id", Nil, { req => req.params.getInt("id"); Ok() })
+    val h2 = TargetRequestHandler("/:id", Nil, { req => req.params.getLong("id"); Ok() })
 
     assertThrows[ParameterNotConvertible](h1(Get("/a")))
     assertThrows[ParameterNotConvertible](h2(Get("/a")))
   }
 
   it should "not have access to missing parameter" in {
-    val h1 = TargetedRequestHandler({ req => req.params.getString("id"); Ok() }, "/:identifier", Nil)
-    val h2 = TargetedRequestHandler({ req => req.params.getInt("id"); Ok() }, "/:identifier", Nil)
-    val h3 = TargetedRequestHandler({ req => req.params.getLong("id"); Ok() }, "/:identifier", Nil)
+    val h1 = TargetRequestHandler("/:identifier", Nil, { req => req.params.getString("id"); Ok() })
+    val h2 = TargetRequestHandler("/:identifier", Nil, { req => req.params.getInt("id"); Ok() })
+    val h3 = TargetRequestHandler("/:identifier", Nil, { req => req.params.getLong("id"); Ok() })
 
     assertThrows[ParameterNotFound](h1(Get("/a")))
     assertThrows[ParameterNotFound](h2(Get("/a")))
@@ -136,7 +136,7 @@ class TargetedRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "have invalid path" in {
-    assertThrows[IllegalArgumentException](TargetedRequestHandler(req => Ok(), "a/b/c", Nil))
-    assertThrows[IllegalArgumentException](TargetedRequestHandler(req => Ok(), "/a/*b/c", Nil))
+    assertThrows[IllegalArgumentException](TargetRequestHandler("a/b/c", Nil, req => Ok()))
+    assertThrows[IllegalArgumentException](TargetRequestHandler("/a/*b/c", Nil, req => Ok()))
   }
 }

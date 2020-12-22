@@ -15,15 +15,28 @@
  */
 package scamper.server
 
-import scamper.Uri
+import scala.util.matching.Regex
 
-private object NormalizePath {
-  def apply(path: String): String =
-    Uri(path.replaceAll("//+", "/"))
-      .normalize()
-      .toString match {
-        case ""   => ""
-        case "/"  => "/"
-        case path => if (path.last == '/') path.init else path
-      }
+private class MountPath private (val value: String) {
+  private val regex = value match {
+    case "/" => "/.*"
+    case _   => s"${Regex.quote(value)}(/.*)?"
+  }
+
+  def matches(path: String): Boolean =
+    path.matches(regex)
+}
+
+private object MountPath {
+  def apply(value: String): MountPath =
+    new MountPath(normalize(value))
+
+  def normalize(value: String): String = {
+    val path = NormalizePath(value)
+
+    if (!path.matches("""/|(/[\w+\-.~%]+)+""") || path.matches("""/\.\.(/.*)?"""))
+      throw new IllegalArgumentException(s"Invalid mount path: $path")
+
+    path
+  }
 }

@@ -15,15 +15,18 @@
  */
 package scamper.server
 
-import scamper.Uri
+import scamper.{ HttpMessage, HttpRequest }
+import scamper.Validate.notNull
 
-private object NormalizePath {
-  def apply(path: String): String =
-    Uri(path.replaceAll("//+", "/"))
-      .normalize()
-      .toString match {
-        case ""   => ""
-        case "/"  => "/"
-        case path => if (path.last == '/') path.init else path
-      }
+private class MountRequestHandler private (path: MountPath, handler: RequestHandler) extends RequestHandler {
+  def apply(req: HttpRequest): HttpMessage =
+    path.matches(req.path) match {
+      case true  => handler(req)
+      case false => req
+    }
+}
+
+private object MountRequestHandler {
+  def apply(path: String, handler: RequestHandler): MountRequestHandler =
+    new MountRequestHandler(MountPath(path), notNull(handler))
 }
