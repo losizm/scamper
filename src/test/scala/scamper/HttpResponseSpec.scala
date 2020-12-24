@@ -27,7 +27,7 @@ class HttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "create with attributes" in {
-    var res = Ok().withAttributes("id" -> 1, "name" -> "response").withAttribute("success" -> true)
+    var res = Ok().withAttributes("id" -> 1, "name" -> "response").putAttributes("success" -> true)
     assert(res.status == Ok)
     assert(res.attributes.size == 3)
     assert(res.getAttribute[Int]("id").contains(1))
@@ -46,7 +46,7 @@ class HttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "get default value if header not found" in {
     val server = Header("Server", "Scamper/x.x")
     val location = Header("Location", "/find")
-    val res = SeeOther().withHeader(server)
+    val res = SeeOther().putHeaders(server)
 
     assert(res.getHeaderOrElse("Server", throw HeaderNotFound("Server")) == server)
     assert(res.getHeaderValueOrElse("Server", throw HeaderNotFound("Server")) == server.value)

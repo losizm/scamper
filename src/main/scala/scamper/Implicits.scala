@@ -85,8 +85,10 @@ object Implicits {
     def withTextBody(text: String, charset: String = "UTF-8")(implicit ev: <:<[T, MessageBuilder[T]]): T = {
       val entity = Entity(text, charset)
       message.withBody(entity)
-        .withHeader(Header("Content-Type", s"text/plain; charset=$charset"))
-        .withHeader(Header("Content-Length", entity.getLength.get))
+        .putHeaders(
+          Header("Content-Type", s"text/plain; charset=$charset"),
+          Header("Content-Length", entity.getLength.get)
+        )
     }
 
     /**
@@ -101,8 +103,10 @@ object Implicits {
       val entity = Entity(file)
       val mediaType = MediaType.fromFile(file).getOrElse(Auxiliary.applicationOctetStream)
       message.withBody(entity)
-        .withHeader(Header("Content-Type", mediaType.toString))
-        .withHeader(Header("Content-Length", entity.getLength.get))
+        .putHeaders(
+          Header("Content-Type", mediaType.toString),
+          Header("Content-Length", entity.getLength.get)
+        )
     }
 
     /**
@@ -154,8 +158,10 @@ object Implicits {
     def withFormBody(query: QueryString)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
       val entity = Entity(query)
       message.withBody(entity)
-        .withHeader(Header("Content-Type", "application/x-www-form-urlencoded"))
-        .withHeader(Header("Content-Length", entity.getLength.get))
+        .putHeaders(
+          Header("Content-Type", "application/x-www-form-urlencoded"),
+          Header("Content-Length", entity.getLength.get)
+        )
     }
 
     /**
@@ -170,7 +176,7 @@ object Implicits {
     def withMultipartBody(multipart: Multipart)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
       val boundary = Multipart.boundary()
       message.withBody(Entity(multipart, boundary))
-        .withHeader(Header("Content-Type", s"multipart/form-data; boundary=$boundary"))
+        .putHeaders(Header("Content-Type", s"multipart/form-data; boundary=$boundary"))
     }
 
     /**

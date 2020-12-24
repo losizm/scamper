@@ -66,7 +66,7 @@ class CookiesSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   "HttpRequest" should "be created with cookies" in {
-    val req = Get(Uri("/")).withCookies(PlainCookie("a", "123"), PlainCookie("b", "xyz")).withCookie(PlainCookie("c", "XYZ"))
+    val req = Get(Uri("/")).withCookies(PlainCookie("a", "123"), PlainCookie("b", "xyz")).putCookies(PlainCookie("c", "XYZ"))
     assert(req.getHeaderValue("Cookie").contains("a=123; b=xyz; c=XYZ"))
     assert(req.getCookieValue("a").contains("123"))
     assert(req.getCookieValue("b").contains("xyz"))
@@ -80,7 +80,7 @@ class CookiesSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   "HttpResponse" should "be created with cookies" in {
-    val res = Ok().withCookies(SetCookie("a", "123"), SetCookie("b", "xyz")).withCookie(SetCookie("c", "XYZ"))
+    val res = Ok().withCookies(SetCookie("a", "123"), SetCookie("b", "xyz")).putCookies(SetCookie("c", "XYZ"))
     assert(res.getHeaderValue("Set-Cookie").contains("a=123"))
     assert(res.getHeaderValues("Set-Cookie").sameElements(Seq("a=123", "b=xyz", "c=XYZ")))
     assert(res.getCookieValue("a").contains("123"))

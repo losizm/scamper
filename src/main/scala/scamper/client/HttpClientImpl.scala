@@ -74,7 +74,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
     val secure = target.getScheme.matches("https|wss")
     val host = getEffectiveHost(target)
-    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/19.2.0")
+    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/20.0.0")
     val cookies = request.cookies ++ cookieStore.get(target)
     val connection = target.getScheme.matches("wss?") match {
       case true  => WebSocket.validate(request).connection.mkString(", ")
@@ -229,12 +229,13 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
   private def addAttributes[T <: HttpMessage](msg: T, conn: HttpClientConnection, correlate: String, absoluteTarget: Uri)
       (implicit ev: <:<[T, MessageBuilder[T]]): T =
-    msg
-      .withAttribute("scamper.client.message.client"         -> this)
-      .withAttribute("scamper.client.message.connection"     -> conn)
-      .withAttribute("scamper.client.message.socket"         -> conn.getSocket())
-      .withAttribute("scamper.client.message.correlate"      -> correlate)
-      .withAttribute("scamper.client.message.absoluteTarget" -> absoluteTarget)
+    msg.putAttributes(
+      "scamper.client.message.client"         -> this,
+      "scamper.client.message.connection"     -> conn,
+      "scamper.client.message.socket"         -> conn.getSocket(),
+      "scamper.client.message.correlate"      -> correlate,
+      "scamper.client.message.absoluteTarget" -> absoluteTarget
+    )
 
   private def setCloseGuard(msg: HttpMessage, enabled: Boolean): Unit =
     msg.getAttribute[HttpClientConnection]("scamper.client.message.connection")

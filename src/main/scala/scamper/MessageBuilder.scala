@@ -75,6 +75,36 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
     addHeaders(one +: more)
 
   /**
+   * Creates message with supplied headers.
+   *
+   * @param headers message headers
+   *
+   * @return new message
+   *
+   * @note All previous headers with same name are removed.
+   */
+  def putHeaders(headers: Seq[Header]): T =
+    headers.isEmpty match {
+      case true  => this
+      case false =>
+        val names = headers.map(_.name).distinct
+        withHeaders { this.headers.filterNot(h => names.exists(h.name.equalsIgnoreCase)) ++ headers }
+    }
+
+  /**
+   * Creates message with supplied headers.
+   *
+   * @param one header
+   * @param more additional headers
+   *
+   * @return new message
+   *
+   * @note All previous headers with same name are removed.
+   */
+  def putHeaders(one: Header, more: Header*): T =
+    putHeaders(one +: more)
+
+  /**
    * Creates message excluding headers with given names.
    *
    * @param names header names
@@ -84,10 +114,7 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
   def removeHeaders(names: Seq[String]): T =
     names.isEmpty match {
       case true  => this
-      case false =>
-        withHeaders {
-          headers.filterNot(h => names.exists(h.name.equalsIgnoreCase))
-        }
+      case false => withHeaders { headers.filterNot(h => names.exists(h.name.equalsIgnoreCase)) }
     }
 
   /**
@@ -100,20 +127,6 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
    */
   def removeHeaders(one: String, more: String*): T =
     removeHeaders(one +: more)
-
-  /**
-   * Creates message with supplied header.
-   *
-   * @param header message header
-   *
-   * @return new message
-   *
-   * @note All previous headers with same name are removed.
-   */
-  def withHeader(header: Header): T =
-    withHeaders {
-      headers.filterNot(_.name.equalsIgnoreCase(header.name)) :+ header
-    }
 
   /**
    * Creates message with supplied body.
@@ -149,6 +162,34 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
     withAttributes((one +: more).toMap)
 
   /**
+   * Creates message with supplied attribute.
+   *
+   * @param attributes attributes
+   *
+   * @return new message
+   *
+   * @note If attribute already exists, its value is replaced.
+   */
+  def putAttributes(attributes: Map[String, Any]): T =
+    attributes.isEmpty match {
+      case true  => this
+      case false => withAttributes(this.attributes ++ attributes)
+    }
+
+  /**
+   * Creates message with supplied attributes.
+   *
+   * @param one attribute
+   * @param more additional attribute
+   *
+   * @return new message
+   *
+   * @note If attribute already exists, its value is replaced.
+   */
+  def putAttributes(one: (String, Any), more: (String, Any)*): T =
+    putAttributes((one +: more).toMap)
+
+  /**
    * Creates message excluding attributes with given names.
    *
    * @param names attribute names
@@ -158,10 +199,7 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
   def removeAttributes(names: Seq[String]): T =
     names.isEmpty match {
       case true  => this
-      case false =>
-        withAttributes {
-          attributes.filterNot(a => names.contains(a._1))
-        }
+      case false => withAttributes { attributes.filterNot(a => names.contains(a._1)) }
     }
 
   /**
@@ -174,16 +212,4 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
    */
   def removeAttributes(one: String, more: String*): T =
     removeAttributes(one +: more)
-
-  /**
-   * Creates message with supplied attribute.
-   *
-   * @param attribute name/value pair
-   *
-   * @return new message
-   *
-   * @note If attribute already exists, its value is replaced.
-   */
-  def withAttribute(attribute: (String, Any)): T =
-    withAttributes(attributes + attribute)
 }

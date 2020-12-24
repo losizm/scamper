@@ -26,16 +26,16 @@ private object ContentEncoder {
   def gzip[T <: HttpMessage with MessageBuilder[T]](msg: T, bufferSize: Int = 8192)(implicit ec: ExecutionContext): T =
     msg.getHeaderValue("Content-Encoding")
       .map { enc => Header("Content-Encoding", enc + ", gzip") }
-      .map(msg.withHeader)
-      .getOrElse { msg.withHeader(`Content-Encoding: gzip`) }
+      .map(msg.putHeaders(_))
+      .getOrElse { msg.putHeaders(`Content-Encoding: gzip`) }
       .removeHeaders("Content-Length")
       .withBody { Compressor.gzip(msg.body.getInputStream, bufferSize) }
 
   def deflate[T <: HttpMessage with MessageBuilder[T]](msg: T, bufferSize: Int = 8192): T =
     msg.getHeaderValue("Content-Encoding")
       .map { enc => Header("Content-Encoding", enc + ", deflate") }
-      .map(msg.withHeader)
-      .getOrElse { msg.withHeader(`Content-Encoding: deflate`) }
+      .map(msg.putHeaders(_))
+      .getOrElse { msg.putHeaders(`Content-Encoding: deflate`) }
       .removeHeaders("Content-Length")
       .withBody { Compressor.deflate(msg.body.getInputStream, bufferSize) }
 }

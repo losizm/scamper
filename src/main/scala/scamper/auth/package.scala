@@ -151,7 +151,7 @@ package object auth {
 
     /** Creates new response setting Authentication-Info header to supplied values. */
     def withAuthenticationInfo(values: Map[String, String]): HttpResponse =
-      response.withHeader(Header("Authentication-Info", AuthParams.format(values.toMap).trim))
+      response.putHeaders(Header("Authentication-Info", AuthParams.format(values.toMap).trim))
 
     /** Creates new response setting Authentication-Info header to supplied values. */
     def withAuthenticationInfo(one: (String, String), more: (String, String)*): HttpResponse =
@@ -180,7 +180,7 @@ package object auth {
 
     /** Creates new request setting Authorization header to supplied value. */
     def withAuthorization(value: Credentials): HttpRequest =
-      request.withHeader(Header("Authorization", value.toString))
+      request.putHeaders(Header("Authorization", value.toString))
 
     /** Creates new request removing Authorization header. */
     def removeAuthorization(): HttpRequest = request.removeHeaders("Authorization")
@@ -258,7 +258,7 @@ package object auth {
 
     /** Creates new response setting Proxy-Authenticate header to supplied values. */
     def withProxyAuthenticate(values: Seq[Challenge]): HttpResponse =
-      response.withHeader(Header("Proxy-Authenticate", values.mkString(", ")))
+      response.putHeaders(Header("Proxy-Authenticate", values.mkString(", ")))
 
     /** Creates new response setting Proxy-Authenticate header to supplied values. */
     def withProxyAuthenticate(one: Challenge, more: Challenge*): HttpResponse =
@@ -341,7 +341,7 @@ package object auth {
 
     /** Creates new response setting Proxy-Authentication-Info header to supplied values. */
     def withProxyAuthenticationInfo(values: Map[String, String]): HttpResponse =
-      response.withHeader(Header("Proxy-Authentication-Info", AuthParams.format(values.toMap).trim))
+      response.putHeaders(Header("Proxy-Authentication-Info", AuthParams.format(values.toMap).trim))
 
     /** Creates new response setting Proxy-Authentication-Info header to supplied values. */
     def withProxyAuthenticationInfo(one: (String, String), more: (String, String)*): HttpResponse =
@@ -373,7 +373,7 @@ package object auth {
      * Creates new request setting Proxy-Authorization header to supplied value.
      */
     def withProxyAuthorization(value: Credentials): HttpRequest =
-      request.withHeader(Header("Proxy-Authorization", value.toString))
+      request.putHeaders(Header("Proxy-Authorization", value.toString))
 
     /** Creates new request removing Proxy-Authorization header. */
     def removeProxyAuthorization(): HttpRequest = request.removeHeaders("Proxy-Authorization")
@@ -451,7 +451,7 @@ package object auth {
 
     /** Creates new response setting WWW-Authenticate header to supplied values. */
     def withWwwAuthenticate(values: Seq[Challenge]): HttpResponse =
-      response.withHeader(Header("WWW-Authenticate", values.mkString(", ")))
+      response.putHeaders(Header("WWW-Authenticate", values.mkString(", ")))
 
     /** Creates new response setting WWW-Authenticate header to supplied values. */
     def withWwwAuthenticate(one: Challenge, more: Challenge*): HttpResponse =

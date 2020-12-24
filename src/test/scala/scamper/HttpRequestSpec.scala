@@ -63,7 +63,7 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "create HttpRequest with attributes" in {
-    var req = Get("/").withAttributes("id" -> 1, "name" -> "request").withAttribute("success" -> true)
+    var req = Get("/").withAttributes("id" -> 1, "name" -> "request").putAttributes("success" -> true)
     assert(req.method == Get)
     assert(req.attributes.size == 3)
     assert(req.getAttribute[Int]("id").contains(1))
@@ -82,7 +82,7 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "get default value if header not found" in {
     val userAgent = Header("User-Agent", "Scamper/x.x")
     val host = Header("Host", "localhost:8080")
-    val req = Get("/find?user=root&group=wheel").withHeader(userAgent)
+    val req = Get("/find?user=root&group=wheel").putHeaders(userAgent)
 
     assert(req.getHeaderOrElse("User-Agent", throw HeaderNotFound("User-Agent")) == userAgent)
     assert(req.getHeaderValueOrElse("User-Agent", throw HeaderNotFound("User-Agent")) == userAgent.value)

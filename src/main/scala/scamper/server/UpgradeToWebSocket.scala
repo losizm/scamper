@@ -83,9 +83,8 @@ object UpgradeToWebSocket {
       .withUpgrade("websocket")
       .withConnection("Upgrade")
       .withSecWebSocketAccept(WebSocket.acceptKey(req.secWebSocketKey))
-      .withAttribute("scamper.server.connection.upgrade" -> { (socket: Socket) =>
-        val sessionRequest = req.withBody(Entity.empty)
-          .withAttribute("scamper.server.message.socket", socket)
+      .putAttributes("scamper.server.connection.upgrade" -> { (socket: Socket) =>
+        val sessionRequest = req.withBody(Entity.empty).putAttributes("scamper.server.message.socket" -> socket)
         handler(WebSocketSession.forServer(sessionRequest, deflateMode))
       })
 }

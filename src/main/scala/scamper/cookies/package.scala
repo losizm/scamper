@@ -109,24 +109,15 @@ package object cookies {
       getCookie(name).map(_.value)
 
     /**
-     * Creates copy of request with supplied cookie.
-     *
-     * If a cookie already exists with given name, the existing cookie is
-     * replaced with the new cookie.
-     *
-     * @param cookies new cookie
-     */
-    def withCookie(cookie: PlainCookie): HttpRequest =
-      withCookies(cookies.filterNot(_.name == cookie.name) :+ cookie)
-
-    /**
      * Creates copy of request with new set of cookies.
      *
      * @param cookies new set of cookies
      */
     def withCookies(cookies: Seq[PlainCookie]): HttpRequest =
-      if (cookies.isEmpty) request.removeHeaders("Cookie")
-      else request.withHeader(Header("Cookie", cookies.mkString("; ")))
+      cookies.isEmpty match {
+        case true  => request.removeHeaders("Cookie")
+        case false => request.putHeaders(Header("Cookie", cookies.mkString("; ")))
+      }
 
     /**
      * Creates copy of request with new set of cookies.
@@ -136,6 +127,33 @@ package object cookies {
      */
     def withCookies(one: PlainCookie, more: PlainCookie*): HttpRequest =
       withCookies(one +: more)
+
+    /**
+     * Creates copy of request with supplied cookie.
+     *
+     * @param cookies new cookies
+     *
+     * @note Previous cookies with same name are removed.
+     */
+    def putCookies(cookies: Seq[PlainCookie]): HttpRequest =
+      cookies.isEmpty match {
+        case true  => request
+        case false =>
+          val names = cookies.map(_.name)
+          withCookies(this.cookies.filterNot(c => names.contains(c.name)) ++ cookies)
+      }
+
+
+    /**
+     * Creates copy of request with supplied cookies.
+     *
+     * @param one cookie
+     * @param more additional cookies
+     *
+     * @note Previous cookies with same name are removed.
+     */
+    def putCookies(one: PlainCookie, more: PlainCookie*): HttpRequest =
+      putCookies(one +: more)
 
     /**
      * Creates copy of request excluding cookies with given names.
@@ -178,26 +196,15 @@ package object cookies {
       getCookie(name).map(_.value)
 
     /**
-     * Creates copy of response with supplied cookie.
-     *
-     * If a cookie already exists with given name, the existing cookie is
-     * replaced with the new cookie.
-     *
-     * @param cookies new cookie
-     */
-    def withCookie(cookie: SetCookie): HttpResponse =
-      withCookies(cookies.filterNot(_.name == cookie.name) :+ cookie)
-
-    /**
      * Creates copy of response with new set of cookies.
      *
      * @param cookies new set of cookies
      */
     def withCookies(cookies: Seq[SetCookie]): HttpResponse =
-      response.withHeaders(
-        response.headers.filterNot(_.name.equalsIgnoreCase("Set-Cookie")) ++
-          cookies.map(c => Header("Set-Cookie", c.toString))
-      )
+      cookies.isEmpty match {
+        case true  => response.removeHeaders("Set-Cookie")
+        case false => response.putHeaders(cookies.map(c => Header("Set-Cookie", c.toString)))
+      }
 
     /**
      * Creates copy of response with new set of cookies.
@@ -207,6 +214,32 @@ package object cookies {
      */
     def withCookies(one: SetCookie, more: SetCookie*): HttpResponse =
       withCookies(one +: more)
+
+    /**
+     * Creates copy of response with supplied cookies.
+     *
+     * @param cookies new cookies
+     *
+     * @note Previous cookies with same name are removed.
+     */
+    def putCookies(cookies: Seq[SetCookie]): HttpResponse =
+      cookies.isEmpty match {
+        case true  => response
+        case false =>
+          val names = cookies.map(_.name)
+          withCookies(this.cookies.filterNot(c => names.contains(c.name)) ++ cookies)
+      }
+
+    /**
+     * Creates copy of response with supplied cookies.
+     *
+     * @param one cookie
+     * @param more additional cookies
+     *
+     * @note Previous cookies with same name are removed.
+     */
+    def putCookies(one: SetCookie, more: SetCookie*): HttpResponse =
+      putCookies(one +: more)
 
     /**
      * Creates copy of response excluding cookies with given names.

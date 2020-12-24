@@ -103,12 +103,12 @@ class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "read single Sec-WebSocket-Extensions header" in {
-    val list1 = Get("/websocket").withHeader("Sec-WebSocket-Extensions" -> "foo").secWebSocketExtensions
+    val list1 = Get("/websocket").putHeaders("Sec-WebSocket-Extensions" -> "foo").secWebSocketExtensions
     assert(list1.size == 1)
     assert(list1(0).identifier == "foo")
     assert(list1(0).params.isEmpty)
 
-    val list2 = Get("/websocket").withHeader("Sec-WebSocket-Extensions" -> "foo, bar; baz=2").secWebSocketExtensions
+    val list2 = Get("/websocket").putHeaders("Sec-WebSocket-Extensions" -> "foo, bar; baz=2").secWebSocketExtensions
     assert(list2.size == 2)
     assert(list2(0).identifier == "foo")
     assert(list2(0).params.isEmpty)
@@ -116,7 +116,7 @@ class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(list2(1).params.size == 1)
     assert(list2(1).params.get("baz").contains(Some("2")))
 
-    val list3 = Get("/websocket").withHeader("Sec-WebSocket-Extensions" -> "foo, bar; baz=2, qux; quux; quuux=3").secWebSocketExtensions
+    val list3 = Get("/websocket").putHeaders("Sec-WebSocket-Extensions" -> "foo, bar; baz=2, qux; quux; quuux=3").secWebSocketExtensions
     assert(list3.size == 3)
     assert(list3(0).identifier == "foo")
     assert(list3(0).params.isEmpty)

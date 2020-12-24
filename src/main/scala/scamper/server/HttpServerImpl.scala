@@ -184,8 +184,8 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         res
       else
         doKeepAlive(req, res) match {
-          case true  => res.withHeader(connectionKeepAlive).withHeader(keepAliveHeader)
-          case false => res.withHeader(connectionClose)
+          case true  => res.putHeaders(connectionKeepAlive, keepAliveHeader)
+          case false => res.putHeaders(connectionClose)
         }
 
     private def doKeepAlive(req: HttpRequest, res: HttpResponse): Boolean =
@@ -496,11 +496,12 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
     private def addAttributes[T <: HttpMessage](msg: T, socket: Socket, requestCount: Int, correlate: String)
         (implicit ev: <:<[T, MessageBuilder[T]]): T =
-      msg
-        .withAttribute("scamper.server.message.server"       -> server)
-        .withAttribute("scamper.server.message.socket"       -> socket)
-        .withAttribute("scamper.server.message.requestCount" -> requestCount)
-        .withAttribute("scamper.server.message.correlate"    -> correlate)
-        .withAttribute("scamper.server.message.logger"       -> logger)
+      msg.putAttributes(
+        "scamper.server.message.server"       -> server,
+        "scamper.server.message.socket"       -> socket,
+        "scamper.server.message.requestCount" -> requestCount,
+        "scamper.server.message.correlate"    -> correlate,
+        "scamper.server.message.logger"       -> logger
+      )
   }
 }

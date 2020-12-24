@@ -21,7 +21,7 @@ import scamper.Validate._
 private class TargetRequestHandler private (path: TargetPath, methods: Seq[RequestMethod], handler: RequestHandler) extends RequestHandler {
   def apply(req: HttpRequest): HttpMessage =
     check(req) match {
-      case true  => handler(req.withAttribute("scamper.server.request.parameters" -> path.getParams(req.path)))
+      case true  => handler(req.putAttributes("scamper.server.request.parameters" -> path.getParams(req.path)))
       case false => req
     }
 
