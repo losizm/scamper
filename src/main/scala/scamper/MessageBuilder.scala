@@ -116,35 +116,6 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
     }
 
   /**
-   * Creates message with optional header.
-   *
-   * @param name header name
-   * @param value optional header value
-   *
-   * @return new message
-   *
-   * @note All previous headers with same name are removed; if no value is
-   * supplied, then no header is added.
-   */
-  def withOptionalHeader(name: String, value: Option[String]): T =
-    value.map(value => Header(name, value))
-      .map(withHeader)
-      .getOrElse(removeHeaders(name))
-
-  /**
-   * Creates message with additional header, if value supplied.
-   *
-   * @param name header name
-   * @param value optional header value
-   *
-   * @return new message
-   */
-  def addOptionalHeader(name: String, value: Option[String]): T =
-    value.map(value => Header(name, value))
-      .map(addHeaders(_))
-      .getOrElse(this)
-
-  /**
    * Creates message with supplied body.
    *
    * @param body message body

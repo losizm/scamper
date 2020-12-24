@@ -79,30 +79,6 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(!req.attributes.contains("name"))
   }
 
-  it should "create HttpRequest with optional header" in {
-    var req1 = Get("/").withHeaders("Fixed: 0 ", "Sequence: 1", "Sequence: 2")
-
-    val req2 = req1.withOptionalHeader("Sequence", Some("3"))
-    assert(req2.headers.size == 2)
-    assert(req2.getHeaderValues("Fixed") == Seq("0"))
-    assert(req2.getHeaderValues("Sequence") == Seq("3"))
-
-    val req3 = req1.withOptionalHeader("Sequence", None)
-    assert(req3.headers.size == 1)
-    assert(req3.getHeaderValues("Fixed") == Seq("0"))
-    assert(req3.getHeaderValues("Sequence").isEmpty)
-
-    val req4 = req1.addOptionalHeader("Sequence", Some("3"))
-    assert(req4.headers.size == 4)
-    assert(req4.getHeaderValues("Fixed") == Seq("0"))
-    assert(req4.getHeaderValues("Sequence") == Seq("1", "2", "3"))
-
-    val req5 = req1.addOptionalHeader("Sequence", None)
-    assert(req5.headers.size == 3)
-    assert(req5.getHeaderValues("Fixed") == Seq("0"))
-    assert(req5.getHeaderValues("Sequence") == Seq("1", "2"))
-  }
-
   it should "get default value if header not found" in {
     val userAgent = Header("User-Agent", "Scamper/x.x")
     val host = Header("Host", "localhost:8080")

@@ -43,30 +43,6 @@ class HttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(!res.attributes.contains("name"))
   }
 
-  it should "create HttpResponse with optional header" in {
-    var res1 = Ok().withHeaders("Fixed: 0", "Sequence: 1", "Sequence: 2")
-
-    val res2 = res1.withOptionalHeader("Sequence", Some("3"))
-    assert(res2.headers.size == 2)
-    assert(res2.getHeaderValues("Fixed") == Seq("0"))
-    assert(res2.getHeaderValues("Sequence") == Seq("3"))
-
-    val res3 = res1.withOptionalHeader("Sequence", None)
-    assert(res3.headers.size == 1)
-    assert(res3.getHeaderValues("Fixed") == Seq("0"))
-    assert(res3.getHeaderValues("Sequence").isEmpty)
-
-    val res4 = res1.addOptionalHeader("Sequence", Some("3"))
-    assert(res4.headers.size == 4)
-    assert(res4.getHeaderValues("Fixed") == Seq("0"))
-    assert(res4.getHeaderValues("Sequence") == Seq("1", "2", "3"))
-
-    val res5 = res1.addOptionalHeader("Sequence", None)
-    assert(res5.headers.size == 3)
-    assert(res5.getHeaderValues("Fixed") == Seq("0"))
-    assert(res5.getHeaderValues("Sequence") == Seq("1", "2"))
-  }
-
   it should "get default value if header not found" in {
     val server = Header("Server", "Scamper/x.x")
     val location = Header("Location", "/find")
