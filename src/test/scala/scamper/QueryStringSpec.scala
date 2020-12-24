@@ -319,7 +319,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(q2.getValues("b") == Seq("2", "4"))
     assert(q2.getValues("c") == Seq("6"))
 
-    val q3 = q1.filterNames(Seq("a", "c").contains)
+    val q3 = q1.retain("a", "c")
     assert(q3.getValues("a") == Seq("1"))
     assert(q3.getValues("b").isEmpty)
     assert(q3.getValues("c") == Seq("5", "6"))

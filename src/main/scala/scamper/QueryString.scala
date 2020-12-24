@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2020 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@ trait QueryString {
    *
    * @throws NoSuchElementException if parameter not present
    */
-  def apply(name: String) = getOrElse(name, throw new NoSuchElementException(name))
+  def apply(name: String) =
+    getOrElse(name, throw new NoSuchElementException(name))
 
   /**
    * Gets first parameter value with given name if present.
@@ -46,7 +47,8 @@ trait QueryString {
    * @param name parameter name
    * @param default default value
    */
-  def getOrElse(name: String, default: => String): String = get(name).getOrElse(default)
+  def getOrElse(name: String, default: => String): String =
+    get(name).getOrElse(default)
 
   /**
    * Gets first parameter value with given name and parses it to `Int` if
@@ -166,6 +168,26 @@ trait QueryString {
     remove(one +: more)
 
   /**
+   * Retains parameters with given names, and removes all other parameters.
+   *
+   * @param names parameter names
+   *
+   * @return new query string
+   */
+  def retain(names: Seq[String]): QueryString
+
+  /**
+   * Retains parameters with given names, and removes all other parameters.
+   *
+   * @param one parameter name
+   * @param more additional parameter names
+   *
+   * @return new query string
+   */
+  def retain(one: String, more: String*): QueryString =
+    retain(one +: more)
+
+  /**
    * Creates new query string by concatenating supplied query string.
    *
    * @param that query string
@@ -258,17 +280,6 @@ trait QueryString {
    */
   def filterNot(pred: ((String, String)) => Boolean): QueryString =
     QueryString(toSeq.filterNot(pred))
-
-  /**
-   * Creates new query string by selecting parameters whose names satisfy
-   * supplied predicate.
-   *
-   * @param pred predicate
-   *
-   * @param new query string
-   */
-  def filterNames(pred: String => Boolean): QueryString =
-    filter(param => pred(param._1))
 
   /** Gets `Seq` of name-value pairs from query string. */
   def toSeq: Seq[(String, String)]
@@ -430,11 +441,11 @@ private object EmptyQueryString extends QueryString {
     SeqQueryString(values.map(value => name -> value))
 
   def remove(names: Seq[String]) = this
+  def retain(names: Seq[String]) = this
 
   override def concat(other: QueryString) = other
   override def merge(other: QueryString) = other
   override def filter(pred: ((String, String)) => Boolean) = this
-  override def filterNames(pred: String => Boolean) = this
 
   override val toString = ""
 }
@@ -457,6 +468,12 @@ private case class MapQueryString(toMap: Map[String, Seq[String]]) extends Query
     names.isEmpty match {
       case true  => this
       case false => MapQueryString(toMap.filterNot(x => names.contains(x._1)))
+    }
+
+  def retain(names: Seq[String]) =
+    names.isEmpty match {
+      case true  => this
+      case false => MapQueryString(toMap.filter(x => names.contains(x._1)))
     }
 
   lazy val toSeq =
@@ -488,6 +505,12 @@ private case class SeqQueryString(toSeq: Seq[(String, String)]) extends QueryStr
     names.isEmpty match {
       case true  => this
       case false => SeqQueryString(toSeq.filterNot(x => names.contains(x._1)))
+    }
+
+  def retain(names: Seq[String]) =
+    names.isEmpty match {
+      case true  => this
+      case false => SeqQueryString(toSeq.filter(x => names.contains(x._1)))
     }
 
   lazy val toMap =
