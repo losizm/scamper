@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2020 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,17 +41,17 @@ private object HttpServerImpl {
   private val count = new AtomicLong(0)
 
   case class Application(
-    logger: Logger = ConsoleLogger,
-    backlogSize: Int = 50,
-    poolSize: Int = Runtime.getRuntime.availableProcessors(),
-    queueSize: Int = Runtime.getRuntime.availableProcessors() * 4,
-    bufferSize: Int = 8192,
-    readTimeout: Int = 5000,
-    headerLimit: Int = 100,
-    keepAlive: Option[KeepAliveParameters] = None,
-    requestHandlers: Seq[RequestHandler] = Nil,
-    responseFilters: Seq[ResponseFilter] = Nil,
-    errorHandler: Option[ErrorHandler] = None,
+    logger:              Logger = ConsoleLogger,
+    backlogSize:         Int = 50,
+    poolSize:            Int = Runtime.getRuntime.availableProcessors(),
+    queueSize:           Int = Runtime.getRuntime.availableProcessors() * 4,
+    bufferSize:          Int = 8192,
+    readTimeout:         Int = 5000,
+    headerLimit:         Int = 100,
+    keepAlive:           Option[KeepAliveParameters] = None,
+    requestHandlers:     Seq[RequestHandler] = Nil,
+    responseFilters:     Seq[ResponseFilter] = Nil,
+    errorHandler:        Option[ErrorHandler] = None,
     serverSocketFactory: ServerSocketFactory = ServerSocketFactory.getDefault()
   )
 
@@ -68,14 +68,14 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
   private case object PersistConnection extends ConnectionManagement
   private case class UpgradeConnection(upgrade: Socket => Unit) extends ConnectionManagement
 
-  val logger = if (app.logger == null) NullLogger else app.logger
+  val logger      = if (app.logger == null) NullLogger else app.logger
   val backlogSize = app.backlogSize.max(1)
-  val poolSize = app.poolSize.max(1)
-  val queueSize = app.queueSize.max(0)
-  val bufferSize = app.bufferSize.max(1024)
+  val poolSize    = app.poolSize.max(1)
+  val queueSize   = app.queueSize.max(0)
+  val bufferSize  = app.bufferSize.max(1024)
   val readTimeout = app.readTimeout.max(100)
   val headerLimit = app.headerLimit.max(10)
-  val keepAlive = app.keepAlive.map(params => KeepAliveParameters(params.timeout.max(1), params.max.max(1)))
+  val keepAlive   = app.keepAlive.map(params => KeepAliveParameters(params.timeout.max(1), params.max.max(1)))
 
   private val serverSocket = app.serverSocketFactory.createServerSocket()
 
@@ -87,7 +87,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
   private val authority = s"${host.getCanonicalHostName}:$port"
 
   private val keepAliveEnabled = keepAlive.isDefined
-  private val keepAliveMax = keepAlive.map(_.max).getOrElse(1)
+  private val keepAliveMax     = keepAlive.map(_.max).getOrElse(1)
   private val keepAliveTimeout = keepAlive.map(_.timeout).getOrElse(0)
 
   private val requestHandler = RequestHandler.coalesce(app.requestHandlers)
@@ -101,7 +101,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
   })
 
   private val chunked = TransferCoding("chunked")
-  private var closed = new AtomicBoolean(false)
+  private var closed  = new AtomicBoolean(false)
 
   private val threadGroup = new ThreadGroup(s"scamper-server-$id")
 
@@ -175,9 +175,9 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
   }
 
   private object ConnectionManager {
-    private val keepAliveHeader = Header("Keep-Alive", s"timeout=$keepAliveTimeout, max=$keepAliveMax")
+    private val keepAliveHeader     = Header("Keep-Alive", s"timeout=$keepAliveTimeout, max=$keepAliveMax")
     private val connectionKeepAlive = Header("Connection", "keep-alive")
-    private val connectionClose = Header("Connection", "close")
+    private val connectionClose     = Header("Connection", "close")
 
     def apply(req: HttpRequest, res: HttpResponse): HttpResponse =
       if (isUpgrade(res))
@@ -212,7 +212,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
   private object ServiceManager extends Thread(threadGroup, s"scamper-server-$id-service-manager") {
     private val connectionCount = new AtomicLong(0)
-    private val serviceCount = new AtomicLong(0)
+    private val serviceCount    = new AtomicLong(0)
 
     override def run(): Unit =
       while (!isClosed)
@@ -228,10 +228,10 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
       f"${System.currentTimeMillis}%x-$serviceId%04x-$connectionId%04x-$requestCount%02x"
 
     private def service(connectionId: Long, requestCount: Int)(implicit socket: Socket): Unit = {
-      val serviceId = serviceCount.incrementAndGet
-      val correlate = createCorrelate(serviceId, connectionId, requestCount)
+      val serviceId  = serviceCount.incrementAndGet
+      val correlate  = createCorrelate(serviceId, connectionId, requestCount)
       val connection = socket.getInetAddress.getHostAddress + ":" + socket.getPort
-      val tag = connection + " (correlate=" + correlate + ")"
+      val tag        = connection + " (correlate=" + correlate + ")"
 
       def onReadError: PartialFunction[Throwable, HttpResponse] = {
         case ReadError(status)              => status()
@@ -369,11 +369,11 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
       buffer(0) = firstByte
 
-      val method = readMethod(buffer, 1)
-      val target = readTarget(buffer)
-      val version = readVersion(buffer)
+      val method    = readMethod(buffer, 1)
+      val target    = readTarget(buffer)
+      val version   = readVersion(buffer)
       val startLine = RequestLine(method, target, version)
-      val headers = readHeaders(buffer)
+      val headers   = readHeaders(buffer)
 
       HttpRequest(startLine, headers, Entity(socket.getInputStream))
     }
@@ -394,15 +394,15 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
       socket.getLine(buffer) match {
         case regex(version) => HttpVersion(version)
-        case _ => throw ReadError(BadRequest)
+        case _              => throw ReadError(BadRequest)
       }
     }
 
     private def readHeaders(buffer: Array[Byte])(implicit socket: Socket): Seq[Header] = {
-      val headers = new ArrayBuffer[Header]
+      val headers   = new ArrayBuffer[Header]
       val readLimit = headerLimit * bufferSize
-      var readSize = 0
-      var line = ""
+      var readSize  = 0
+      var line      = ""
 
       try {
         while ({ line = socket.getLine(buffer); line != "" }) {
@@ -460,10 +460,10 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
     private def encode(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
       encoding.foldLeft(in) { (in, enc) =>
-        if (enc.isChunked) in
-        else if (enc.isGzip) Compressor.gzip(in, bufferSize) { encoderContext }
+        if      (enc.isChunked) in
+        else if (enc.isGzip)    Compressor.gzip(in, bufferSize) { encoderContext }
         else if (enc.isDeflate) Compressor.deflate(in, bufferSize)
-        else throw new HttpException(s"Unsupported transfer encoding: $enc")
+        else                    throw new HttpException(s"Unsupported transfer encoding: $enc")
       }
 
     private def handle(req: HttpRequest): HttpResponse = {

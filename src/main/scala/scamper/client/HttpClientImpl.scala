@@ -39,30 +39,31 @@ private object HttpClientImpl {
 
   case class Settings(
     acceptEncodings: Seq[ContentCodingRange] = Nil,
-    bufferSize: Int = 8192,
-    readTimeout: Int = 30000,
-    continueTimeout: Int = 1000,
-    cookieStore: CookieStore = CookieStore.alwaysEmpty,
-    outgoing: Seq[RequestFilter] = Nil,
-    incoming: Seq[ResponseFilter] = Nil,
+    bufferSize:          Int = 8192,
+    readTimeout:         Int = 30000,
+    continueTimeout:     Int = 1000,
+    cookieStore:         CookieStore = CookieStore.alwaysEmpty,
+    outgoing:            Seq[RequestFilter] = Nil,
+    incoming:            Seq[ResponseFilter] = Nil,
     secureSocketFactory: SSLSocketFactory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
   )
 
-  def apply(settings: Settings): HttpClientImpl = new HttpClientImpl(count.incrementAndGet, settings)
+  def apply(settings: Settings): HttpClientImpl =
+    new HttpClientImpl(count.incrementAndGet, settings)
 }
 
 private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extends HttpClient {
   val acceptEncodings = settings.acceptEncodings
-  val bufferSize = settings.bufferSize.max(1024)
-  val readTimeout = settings.readTimeout.max(0)
+  val bufferSize      = settings.bufferSize.max(1024)
+  val readTimeout     = settings.readTimeout.max(0)
   val continueTimeout = settings.continueTimeout.max(0)
-  val cookieStore = settings.cookieStore
+  val cookieStore     = settings.cookieStore
 
   private val outgoing = settings.outgoing
   private val incoming = settings.incoming
 
   private val secureSocketFactory = settings.secureSocketFactory
-  private val requestCount = new AtomicLong(0)
+  private val requestCount        = new AtomicLong(0)
 
   def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T = {
     notNull(handler)
@@ -72,10 +73,10 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     require(target.isAbsolute, s"Request target not absolute: $target")
     require(target.getScheme.matches("(http|ws)s?"), s"Unsupported scheme: ${target.getScheme}")
 
-    val secure = target.getScheme.matches("https|wss")
-    val host = getEffectiveHost(target)
-    val userAgent = request.getHeaderValueOrElse("User-Agent", "Scamper/20.0.0")
-    val cookies = request.cookies ++ cookieStore.get(target)
+    val secure     = target.getScheme.matches("https|wss")
+    val host       = getEffectiveHost(target)
+    val userAgent  = request.getHeaderValueOrElse("User-Agent", "Scamper/20.0.0")
+    val cookies    = request.cookies ++ cookieStore.get(target)
     val connection = target.getScheme.matches("wss?") match {
       case true  => WebSocket.validate(request).connection.mkString(", ")
       case false => getEffectiveConnection(request)
@@ -178,7 +179,9 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
               setCloseGuard(res, false)
               throw cause
           }
-        case false => throw WebSocketHandshakeFailure(s"Connection upgrade not accepted: ${res.status}")
+
+        case false =>
+          throw WebSocketHandshakeFailure(s"Connection upgrade not accepted: ${res.status}")
       }
     }
   }
