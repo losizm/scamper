@@ -154,13 +154,24 @@ trait QueryString {
     update(name, one +: more)
 
   /**
-   * Removes parameter with given name.
+   * Removes parameters with given names.
    *
-   * @param name parameter name
+   * @param names parameter names
    *
    * @return new query string
    */
-  def remove(name: String): QueryString
+  def remove(names: Seq[String]): QueryString
+
+  /**
+   * Removes parameters with given names.
+   *
+   * @param one parameter name
+   * @param more additional parameter names
+   *
+   * @return new query string
+   */
+  def remove(one: String, more: String*): QueryString =
+    remove(one +: more)
 
   /**
    * Creates new query string by concatenating supplied query string.
@@ -377,7 +388,7 @@ object QueryString {
    * Creates query string from parameters.
    *
    * @param one parameter
-   * @param more parameters
+   * @param more additional parameters
    */
   def apply(one: (String, String), more: (String, String)*): QueryString =
     apply(one +: more)
@@ -426,7 +437,7 @@ private object EmptyQueryString extends QueryString {
   def update(name: String, values: Seq[String]) =
     SeqQueryString(values.map(value => name -> value))
 
-  def remove(name: String) = this
+  def remove(names: Seq[String]) = this
 
   override def concat(other: QueryString) = other
   override def merge(other: QueryString) = other
@@ -450,8 +461,11 @@ private case class MapQueryString(toMap: Map[String, Seq[String]]) extends Query
   def update(name: String, values: Seq[String]) =
     MapQueryString(toMap + { name -> values })
 
-  def remove(name: String) =
-    MapQueryString(toMap - name)
+  def remove(names: Seq[String]) =
+    names.isEmpty match {
+      case true  => this
+      case false => MapQueryString(toMap.filterNot(x => names.contains(x._1)))
+    }
 
   lazy val toSeq =
     toMap.toSeq
@@ -478,8 +492,11 @@ private case class SeqQueryString(toSeq: Seq[(String, String)]) extends QueryStr
   def update(name: String, values: Seq[String]) =
     SeqQueryString(toSeq.filterNot(_._1 == name) ++ values.map { value => name -> value })
 
-  def remove(name: String) =
-    SeqQueryString(toSeq.filterNot(_._1 == name))
+  def remove(names: Seq[String]) =
+    names.isEmpty match {
+      case true  => this
+      case false => SeqQueryString(toSeq.filterNot(x => names.contains(x._1)))
+    }
 
   lazy val toMap =
     toSeq.groupBy(_._1)

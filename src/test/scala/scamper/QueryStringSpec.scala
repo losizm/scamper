@@ -55,7 +55,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(updated.contains("description"))
     assert(updated.getValues("description") == Seq("user information"))
 
-    val removed = query.remove("name").remove("description")
+    val removed = query.remove("name", "description")
     assert(removed.contains("id"))
     assert(!removed.contains("name"))
     assert(removed.contains("groups"))
@@ -115,7 +115,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(updated.contains("description"))
     assert(updated.getValues("description") == Seq("user information"))
 
-    val removed = query.remove("name").remove("description")
+    val removed = query.remove("name", "description")
     assert(removed.contains("id"))
     assert(!removed.contains("name"))
     assert(removed.contains("groups"))
@@ -175,7 +175,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(updated.contains("description"))
     assert(updated.getValues("description") == Seq("user information"))
 
-    val removed = query.remove("name").remove("description")
+    val removed = query.remove("name", "description")
     assert(removed.contains("id"))
     assert(!removed.contains("name"))
     assert(removed.contains("groups"))
