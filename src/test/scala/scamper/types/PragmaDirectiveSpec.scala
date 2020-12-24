@@ -41,6 +41,7 @@ class PragmaDirectiveSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "be destructured" in {
     `no-cache` match {
       case PragmaDirective(name, None) => assert(name == "no-cache")
+      case _                           => throw new Exception("no-cache not destructed")
     }
 
     `no-cache` match { case `no-cache` => }

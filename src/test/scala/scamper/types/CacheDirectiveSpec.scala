@@ -69,6 +69,8 @@ class CacheDirectiveSpec extends org.scalatest.flatspec.AnyFlatSpec {
       case CacheDirective(name, Some(value)) =>
         assert(name == "s-maxage")
         assert(value == "60")
+
+      case _ => throw new Exception("s-maxage not destructured")
     }
 
     sMaxage match {
