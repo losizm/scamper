@@ -95,8 +95,6 @@ trait QueryString {
    * If a parameter with given name already exists, the newly supplied values
    * are appended to the existing values.
    *
-   * If a parameter does not exist, it is added with supplied values.
-   *
    * @param name parameter name
    * @param values parameter values
    *
@@ -110,8 +108,6 @@ trait QueryString {
    * If a parameter with given name already exists, the newly supplied values
    * are appended to the existing values.
    *
-   * If a parameter does not exist, it is added with supplied values.
-   *
    * @param name parameter name
    * @param one parameter value
    * @param more additional parameter values
@@ -122,27 +118,23 @@ trait QueryString {
     add(name, one +: more)
 
   /**
-   * Updates parameter with given name to supplied values.
+   * Sets parameter with given name to supplied values.
    *
    * If a parameter with given name already exists, its values are replaced
    * with the newly supplied values.
-   *
-   * If a parameter does not exist, it is added with supplied values.
    *
    * @param name parameter name
    * @param values parameter values
    *
    * @return new query string
    */
-  def update(name: String, values: Seq[String]): QueryString
+  def put(name: String, values: Seq[String]): QueryString
 
   /**
-   * Updates parameter with given name to supplied values.
+   * Sets parameter with given name to supplied values.
    *
    * If the parameter with given name already exists, its values are replaced
    * with the newly supplied values.
-   *
-   * If the parameter does not exist, it is added with supplied values.
    *
    * @param name parameter name
    * @param one parameter value
@@ -150,8 +142,8 @@ trait QueryString {
    *
    * @return new query string
    */
-  def update(name: String, one: String, more: String*): QueryString =
-    update(name, one +: more)
+  def put(name: String, one: String, more: String*): QueryString =
+    put(name, one +: more)
 
   /**
    * Removes parameters with given names.
@@ -434,7 +426,7 @@ private object EmptyQueryString extends QueryString {
   def add(name: String, values: Seq[String]) =
     SeqQueryString(values.map(value => name -> value))
 
-  def update(name: String, values: Seq[String]) =
+  def put(name: String, values: Seq[String]) =
     SeqQueryString(values.map(value => name -> value))
 
   def remove(names: Seq[String]) = this
@@ -458,7 +450,7 @@ private case class MapQueryString(toMap: Map[String, Seq[String]]) extends Query
   def add(name: String, values: Seq[String]) =
     MapQueryString(toMap + { name -> (getValues(name) ++ values) })
 
-  def update(name: String, values: Seq[String]) =
+  def put(name: String, values: Seq[String]) =
     MapQueryString(toMap + { name -> values })
 
   def remove(names: Seq[String]) =
@@ -489,7 +481,7 @@ private case class SeqQueryString(toSeq: Seq[(String, String)]) extends QueryStr
   def add(name: String, values: Seq[String]) =
     SeqQueryString(toSeq ++ values.map { value => name -> value })
 
-  def update(name: String, values: Seq[String]) =
+  def put(name: String, values: Seq[String]) =
     SeqQueryString(toSeq.filterNot(_._1 == name) ++ values.map { value => name -> value })
 
   def remove(names: Seq[String]) =

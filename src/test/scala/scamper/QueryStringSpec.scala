@@ -46,7 +46,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(added.contains("description"))
     assert(added.getValues("description") == Seq("user information"))
 
-    val updated = query.update("name", "superuser", "admin").update("description", "user information")
+    val updated = query.put("name", "superuser", "admin").put("description", "user information")
     assert(updated.contains("id"))
     assert(updated.contains("name"))
     assert(updated("name") == "superuser")
@@ -106,7 +106,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(added.contains("description"))
     assert(added.getValues("description") == Seq("user information"))
 
-    val updated = query.update("name", "superuser", "admin").update("description", "user information")
+    val updated = query.put("name", "superuser", "admin").put("description", "user information")
     assert(updated.contains("id"))
     assert(updated.contains("name"))
     assert(updated("name") == "superuser")
@@ -166,7 +166,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(added.contains("description"))
     assert(added.getValues("description") == Seq("user information"))
 
-    val updated = query.update("name", "superuser", "admin").update("description", "user information")
+    val updated = query.put("name", "superuser", "admin").put("description", "user information")
     assert(updated.contains("id"))
     assert(updated.contains("name"))
     assert(updated("name") == "superuser")
@@ -204,7 +204,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(added("name") == "superuser")
     assert(added.getValues("name") == Seq("superuser", "admin"))
 
-    val updated = query.update("name", "superuser", "admin")
+    val updated = query.put("name", "superuser", "admin")
     assert(updated("name") == "superuser")
     assert(updated.getValues("name") == Seq("superuser", "admin"))
 
