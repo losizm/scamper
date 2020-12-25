@@ -30,15 +30,16 @@ import scamper.RequestMethod.Registry._
 import scamper.Validate.notNull
 import scamper.client.Implicits.ClientHttpMessage
 import scamper.cookies.{ CookieStore, PlainCookie, RequestCookies, SetCookie }
-import scamper.headers.{ AcceptEncoding, Connection, ContentLength, Host, TE, TransferEncoding, Upgrade }
-import scamper.types.{ ContentCodingRange, TransferCoding }
+import scamper.headers.{ Accept, AcceptEncoding, Connection, ContentLength, Host, TE, TransferEncoding, Upgrade }
+import scamper.types.{ ContentCodingRange, MediaRange, TransferCoding }
 import scamper.websocket._
 
 private object HttpClientImpl {
   private val count = new AtomicLong(0)
 
   case class Settings(
-    acceptEncodings: Seq[ContentCodingRange] = Nil,
+    accept:              Seq[MediaRange] = Seq(MediaRange("*/*")),
+    acceptEncoding:      Seq[ContentCodingRange] = Nil,
     bufferSize:          Int = 8192,
     readTimeout:         Int = 30000,
     continueTimeout:     Int = 1000,
@@ -53,7 +54,8 @@ private object HttpClientImpl {
 }
 
 private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extends HttpClient {
-  val acceptEncodings = settings.acceptEncodings
+  val accept          = settings.accept
+  val acceptEncoding  = settings.acceptEncoding
   val bufferSize      = settings.bufferSize.max(1024)
   val readTimeout     = settings.readTimeout.max(0)
   val continueTimeout = settings.continueTimeout.max(0)
@@ -122,6 +124,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       val correlate = createCorrelate(requestCount.incrementAndGet)
 
       Try(addAttributes(effectiveRequest, conn, correlate, target))
+        .map(addAccept)
         .map(addAcceptEncoding)
         .map(outgoing.foldLeft(_) { (req, filter) => filter(req) })
         .map(conn.send)
@@ -245,10 +248,16 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       .map(_.setCloseGuard(enabled))
       .getOrElse(throw new NoSuchElementException("No such attribute: scamper.client.message.connection"))
 
-  private def addAcceptEncoding(req: HttpRequest): HttpRequest =
-    (req.hasAcceptEncoding || acceptEncodings.isEmpty) match {
+  private def addAccept(req: HttpRequest): HttpRequest =
+    (req.hasAccept || accept.isEmpty) match {
       case true  => req
-      case false => req.withAcceptEncoding(acceptEncodings)
+      case false => req.withAccept(accept)
+    }
+
+  private def addAcceptEncoding(req: HttpRequest): HttpRequest =
+    (req.hasAcceptEncoding || acceptEncoding.isEmpty) match {
+      case true  => req
+      case false => req.withAcceptEncoding(acceptEncoding)
     }
 
   private def storeCookies(target: Uri, res: HttpResponse): HttpResponse = {

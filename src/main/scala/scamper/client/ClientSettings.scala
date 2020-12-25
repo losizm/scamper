@@ -21,7 +21,7 @@ import javax.net.ssl.TrustManager
 
 import scamper.Validate.{ noNulls, notNull }
 import scamper.cookies.CookieStore
-import scamper.types.ContentCodingRange
+import scamper.types.{ ContentCodingRange, MediaRange }
 
 /**
  * Configures and creates `HttpClient`.
@@ -36,6 +36,7 @@ import scamper.types.ContentCodingRange
  *
  * | Key             | Value |
  * | --------------- | ----- |
+ * | accept          | `*``/``*` |
  * | acceptEncodings | `Nil` |
  * | bufferSize      | `8192` |
  * | readTimeout     | `30000` |
@@ -56,22 +57,40 @@ class ClientSettings {
   }
 
   /**
-   * Sets accepted encodings.
+   * Sets accepted content types.
    *
-   * The `Accept-Encoding` header for each outgoing request is set accordingly.
+   * The `Accept` header for each outgoing request is set accordingly.
    */
-  def acceptEncodings(ranges: Seq[ContentCodingRange]): this.type = synchronized {
-    settings = settings.copy(acceptEncodings = noNulls(ranges))
+  def accept(ranges: Seq[MediaRange]): this.type = synchronized {
+    settings = settings.copy(accept = noNulls(ranges))
     this
   }
 
   /**
-   * Sets accepted encodings.
+   * Sets accepted content types.
+   *
+   * The `Accept` header for each outgoing request is set accordingly.
+   */
+  def accept(one: MediaRange, more: MediaRange*): this.type =
+    accept(one +: more)
+
+  /**
+   * Sets accepted content encodings.
    *
    * The `Accept-Encoding` header for each outgoing request is set accordingly.
    */
-  def acceptEncodings(one: ContentCodingRange, more: ContentCodingRange*): this.type =
-    acceptEncodings(one +: more)
+  def acceptEncoding(ranges: Seq[ContentCodingRange]): this.type = synchronized {
+    settings = settings.copy(acceptEncoding = noNulls(ranges))
+    this
+  }
+
+  /**
+   * Sets accepted content encodings.
+   *
+   * The `Accept-Encoding` header for each outgoing request is set accordingly.
+   */
+  def acceptEncoding(one: ContentCodingRange, more: ContentCodingRange*): this.type =
+    acceptEncoding(one +: more)
 
   /**
    * Sets buffer size.
