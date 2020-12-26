@@ -37,17 +37,11 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
   lazy val query: QueryString =
     target.getRawQuery match {
       case null  => QueryString.empty
-      case query => QueryString(query)
+      case value => QueryString(value)
     }
 
   def setStartLine(newStartLine: RequestLine): HttpRequest =
     copy(startLine = newStartLine)
-
-  def setMethod(newMethod: RequestMethod): HttpRequest =
-    setStartLine(RequestLine(newMethod, target, version))
-
-  def setTarget(newTarget: Uri): HttpRequest =
-    setStartLine(RequestLine(method, newTarget, version))
 
   def setPath(newPath: String): HttpRequest =
     newPath match {
@@ -55,17 +49,8 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
       case _   => setTarget(target.setPath(newPath))
     }
 
-  def setQuery(query: QueryString): HttpRequest =
-    setTarget(target.setQuery(query.toString))
-
-  def setQuery(params: Map[String, Seq[String]]): HttpRequest =
-    setQuery(QueryString(params))
-
-  def setQuery(params: Seq[(String, String)]): HttpRequest =
-    setQuery(QueryString(params))
-
-  def setVersion(newVersion: HttpVersion): HttpRequest =
-    setStartLine(RequestLine(method, target, newVersion))
+  def setQuery(newQuery: QueryString): HttpRequest =
+    setTarget(target.setQuery(newQuery.toString))
 
   def setHeaders(newHeaders: Seq[Header]): HttpRequest =
     copy(headers = newHeaders)

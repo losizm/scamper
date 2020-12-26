@@ -26,12 +26,6 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
   def setStartLine(newStartLine: StatusLine) =
     copy(startLine = newStartLine)
 
-  def setStatus(newStatus: ResponseStatus): HttpResponse =
-    setStartLine(StatusLine(newStatus, version))
-
-  def setVersion(newVersion: HttpVersion): HttpResponse =
-    setStartLine(StatusLine(status, newVersion))
-
   def setHeaders(newHeaders: Seq[Header]): HttpResponse =
     copy(headers = newHeaders)
 

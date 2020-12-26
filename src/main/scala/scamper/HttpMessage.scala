@@ -24,7 +24,8 @@ sealed trait HttpMessage {
   def startLine: LineType
 
   /** Gets HTTP version. */
-  def version: HttpVersion = startLine.version
+  def version: HttpVersion =
+    startLine.version
 
   /** Gets message headers. */
   def headers: Seq[Header]
@@ -107,7 +108,8 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
   type LineType = RequestLine
 
   /** Gets request method. */
-  def method: RequestMethod = startLine.method
+  def method: RequestMethod =
+    startLine.method
 
   /** Tests for GET method. */
   def isGet: Boolean =
@@ -146,7 +148,8 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
     method == RequestMethod.Registry.Connect
 
   /** Gets request target. */
-  def target: Uri = startLine.target
+  def target: Uri =
+    startLine.target
 
   /** Gets target path. */
   def path: String
@@ -159,14 +162,16 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
    *
    * @return new request
    */
-  def setMethod(method: RequestMethod): HttpRequest
+  def setMethod(method: RequestMethod): HttpRequest =
+    setStartLine(RequestLine(method, target, version))
 
   /**
    * Creates request with new target.
    *
    * @return new request
    */
-  def setTarget(target: Uri): HttpRequest
+  def setTarget(target: Uri): HttpRequest =
+    setStartLine(RequestLine(method, target, version))
 
   /**
    * Creates request with new target path.
@@ -187,14 +192,16 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
    *
    * @return new request
    */
-  def setQuery(params: Map[String, Seq[String]]): HttpRequest
+  def setQuery(params: Map[String, Seq[String]]): HttpRequest =
+    setQuery(QueryString(params))
 
   /**
    * Creates request with new query using supplied parameters.
    *
    * @return new request
    */
-  def setQuery(params: Seq[(String, String)]): HttpRequest
+  def setQuery(params: Seq[(String, String)]): HttpRequest =
+    setQuery(QueryString(params))
 
   /**
    * Creates request with new query using supplied parameters.
@@ -209,7 +216,9 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
    *
    * @return new request
    */
-  def setVersion(version: HttpVersion): HttpRequest
+  def setVersion(version: HttpVersion): HttpRequest =
+    setStartLine(RequestLine(method, target, version))
+
 }
 
 /** Provides factory for `HttpRequest`. */
@@ -232,42 +241,52 @@ trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse] {
   type LineType = StatusLine
 
   /** Gets response status. */
-  def status: ResponseStatus = startLine.status
+  def status: ResponseStatus =
+    startLine.status
 
   /** Gets status code. */
-  def statusCode: Int = status.statusCode
+  def statusCode: Int =
+   status.statusCode
 
   /** Gets reason phrase. */
-  def reasonPhrase: String = status.reasonPhrase
+  def reasonPhrase: String =
+    status.reasonPhrase
 
   /** Tests for informational status. */
-  def isInformational: Boolean = status.isInformational
+  def isInformational: Boolean =
+    status.isInformational
 
   /** Tests for successful status. */
-  def isSuccessful: Boolean = status.isSuccessful
+  def isSuccessful: Boolean =
+    status.isSuccessful
 
   /** Tests for redirection status. */
-  def isRedirection: Boolean = status.isRedirection
+  def isRedirection: Boolean =
+    status.isRedirection
 
   /** Tests for client error status. */
-  def isClientError: Boolean = status.isClientError
+  def isClientError: Boolean =
+    status.isClientError
 
   /** Tests for server error status. */
-  def isServerError: Boolean = status.isServerError
+  def isServerError: Boolean =
+    status.isServerError
 
   /**
    * Creates response with new status.
    *
    * @return new response
    */
-  def setStatus(status: ResponseStatus): HttpResponse
+  def setStatus(status: ResponseStatus): HttpResponse =
+    setStartLine(StatusLine(status, version))
 
   /**
    * Creates response with new HTTP version.
    *
    * @return new response
    */
-  def setVersion(version: HttpVersion): HttpResponse
+  def setVersion(version: HttpVersion): HttpResponse =
+    setStartLine(StatusLine(status, version))
 }
 
 /** Provides factory for `HttpResponse`. */
