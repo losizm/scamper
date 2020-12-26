@@ -268,12 +268,12 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   }
 
   private def toBodilessRequest(request: HttpRequest): HttpRequest =
-    request.setBody(Entity.empty).removeContentLength().removeTransferEncoding()
+    request.setBody(Entity.empty).removeContentLength.removeTransferEncoding
 
   private def toBodyRequest(request: HttpRequest): HttpRequest =
     request.getTransferEncoding.map { encoding =>
       request.setTransferEncoding(encoding.filterNot(_.isChunked) :+ TransferCoding("chunked"))
-        .removeContentLength()
+        .removeContentLength
     }.orElse {
       request.getContentLength.map {
         case 0          => request.setBody(Entity.empty)

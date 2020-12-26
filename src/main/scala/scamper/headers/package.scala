@@ -76,7 +76,7 @@ package object headers {
       setAccept(one +: more)
 
     /** Creates new request removing Accept header. */
-    def removeAccept(): HttpRequest =
+    def removeAccept: HttpRequest =
       request.removeHeaders("Accept")
   }
 
@@ -109,7 +109,7 @@ package object headers {
       setAcceptCharset(one +: more)
 
     /** Creates new request removing Accept-Charset header. */
-    def removeAcceptCharset(): HttpRequest =
+    def removeAcceptCharset: HttpRequest =
       request.removeHeaders("Accept-Charset")
   }
 
@@ -142,7 +142,7 @@ package object headers {
       setAcceptEncoding(one +: more)
 
     /** Creates new request removing Accept-Encoding header. */
-    def removeAcceptEncoding(): HttpRequest =
+    def removeAcceptEncoding: HttpRequest =
       request.removeHeaders("Accept-Encoding")
   }
 
@@ -175,7 +175,7 @@ package object headers {
       setAcceptLanguage(one +: more)
 
     /** Creates new request removing Accept-Language header. */
-    def removeAcceptLanguage(): HttpRequest =
+    def removeAcceptLanguage: HttpRequest =
       request.removeHeaders("Accept-Language")
   }
 
@@ -208,7 +208,7 @@ package object headers {
       setAcceptPatch(one +: more)
 
     /** Creates new response removing Accept-Patch header. */
-    def removeAcceptPatch(): HttpResponse =
+    def removeAcceptPatch: HttpResponse =
       response.removeHeaders("Accept-Patch")
   }
 
@@ -239,7 +239,7 @@ package object headers {
       setAcceptRanges(one +: more)
 
     /** Creates new response removing Accept-Ranges header. */
-    def removeAcceptRanges(): HttpResponse =
+    def removeAcceptRanges: HttpResponse =
       response.removeHeaders("Accept-Ranges")
   }
 
@@ -266,7 +266,7 @@ package object headers {
       response.putHeaders(Header("Age", value))
 
     /** Creates new response removing Age header. */
-    def removeAge(): HttpResponse =
+    def removeAge: HttpResponse =
       response.removeHeaders("Age")
   }
 
@@ -299,7 +299,7 @@ package object headers {
       setAllow(one +: more)
 
     /** Creates new response removing Allow header. */
-    def removeAllow(): HttpResponse =
+    def removeAllow: HttpResponse =
       response.removeHeaders("Allow")
   }
 
@@ -330,7 +330,7 @@ package object headers {
       setCacheControl(one +: more)
 
     /** Creates new message removing Cache-Control header. */
-    def removeCacheControl()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeCacheControl(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Cache-Control")
   }
 
@@ -357,7 +357,7 @@ package object headers {
       response.putHeaders(Header("Content-Disposition", value.toString))
 
     /** Creates new response removing Content-Disposition header. */
-    def removeContentDisposition(): HttpResponse =
+    def removeContentDisposition: HttpResponse =
       response.removeHeaders("Content-Disposition")
   }
 
@@ -390,7 +390,7 @@ package object headers {
       setContentEncoding(one +: more)
 
     /** Creates new message removing Content-Encoding header. */
-    def removeContentEncoding()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeContentEncoding(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Content-Encoding")
   }
 
@@ -423,7 +423,7 @@ package object headers {
       setContentLanguage(one +: more)
 
     /** Creates new message removing Content-Language header. */
-    def removeContentLanguage()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeContentLanguage(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Content-Language")
   }
 
@@ -450,7 +450,7 @@ package object headers {
       message.putHeaders(Header("Content-Length", value))
 
     /** Creates new message removing Content-Length header. */
-    def removeContentLength()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeContentLength(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Content-Length")
   }
 
@@ -477,7 +477,7 @@ package object headers {
       message.putHeaders(Header("Content-Location", value.toString))
 
     /** Creates new message removing Content-Location header. */
-    def removeContentLocation()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeContentLocation(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Content-Location")
   }
 
@@ -504,7 +504,7 @@ package object headers {
       message.putHeaders(Header("Content-Range", value.toString))
 
     /** Creates new message removing Content-Range header. */
-    def removeContentRange()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeContentRange(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Content-Range")
   }
 
@@ -531,7 +531,7 @@ package object headers {
       message.putHeaders(Header("Content-Type", value.toString))
 
     /** Creates new message removing Content-Type header. */
-    def removeContentType()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeContentType(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Content-Type")
   }
 
@@ -562,7 +562,7 @@ package object headers {
       setConnection(one +: more)
 
     /** Creates new message removing Connection header. */
-    def removeConnection()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeConnection(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Connection")
   }
 
@@ -589,7 +589,7 @@ package object headers {
       message.putHeaders(Header("Date", value))
 
     /** Creates new message removing Date header. */
-    def removeDate()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeDate(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Date")
   }
 
@@ -616,7 +616,7 @@ package object headers {
       response.putHeaders(Header("ETag", value.toString))
 
     /** Creates new response removing ETag header. */
-    def removeETag(): HttpResponse =
+    def removeETag: HttpResponse =
       response.removeHeaders("ETag")
   }
 
@@ -643,7 +643,7 @@ package object headers {
       request.putHeaders(Header("Early-Data", value))
 
     /** Creates new request removing Early-Data header. */
-    def removeEarlyData(): HttpRequest =
+    def removeEarlyData: HttpRequest =
       request.removeHeaders("Early-Data")
   }
 
@@ -670,7 +670,7 @@ package object headers {
       request.putHeaders(Header("Expect", value))
 
     /** Creates new request removing Expect header. */
-    def removeExpect(): HttpRequest =
+    def removeExpect: HttpRequest =
       request.removeHeaders("Expect")
   }
 
@@ -697,7 +697,7 @@ package object headers {
       response.putHeaders(Header("Expires", value))
 
     /** Creates new response removing Expires header. */
-    def removeExpires(): HttpResponse =
+    def removeExpires: HttpResponse =
       response.removeHeaders("Expires")
   }
 
@@ -724,7 +724,7 @@ package object headers {
       request.putHeaders(Header("From", value))
 
     /** Creates new request removing From header. */
-    def removeFrom(): HttpRequest =
+    def removeFrom: HttpRequest =
       request.removeHeaders("From")
   }
 
@@ -751,7 +751,7 @@ package object headers {
       request.putHeaders(Header("Host", value))
 
     /** Creates new request removing Host header. */
-    def removeHost(): HttpRequest =
+    def removeHost: HttpRequest =
       request.removeHeaders("Host")
   }
 
@@ -784,7 +784,7 @@ package object headers {
       setIfMatch(one +: more)
 
     /** Creates new request removing If-Match header. */
-    def removeIfMatch(): HttpRequest =
+    def removeIfMatch: HttpRequest =
       request.removeHeaders("If-Match")
   }
 
@@ -811,7 +811,7 @@ package object headers {
       request.putHeaders(Header("If-Modified-Since", value))
 
     /** Creates new request removing If-Modified-Since header. */
-    def removeIfModifiedSince(): HttpRequest =
+    def removeIfModifiedSince: HttpRequest =
       request.removeHeaders("If-Modified-Since")
   }
 
@@ -844,7 +844,7 @@ package object headers {
       setIfNoneMatch(one +: more)
 
     /** Creates new request removing If-None-Match header. */
-    def removeIfNoneMatch(): HttpRequest =
+    def removeIfNoneMatch: HttpRequest =
       request.removeHeaders("If-None-Match")
   }
 
@@ -885,7 +885,7 @@ package object headers {
       request.putHeaders(Header("If-Range", value))
 
     /** Creates new request removing If-Range header. */
-    def removeIfRange(): HttpRequest =
+    def removeIfRange: HttpRequest =
       request.removeHeaders("If-Range")
   }
 
@@ -914,7 +914,7 @@ package object headers {
       request.putHeaders(Header("If-Unmodified-Since", value))
 
     /** Creates new request removing If-Unmodified-Since header. */
-    def removeIfUnmodifiedSince(): HttpRequest =
+    def removeIfUnmodifiedSince: HttpRequest =
       request.removeHeaders("If-Unmodified-Since")
   }
 
@@ -941,7 +941,7 @@ package object headers {
       message.putHeaders(Header("Keep-Alive", value.toString))
 
     /** Creates new message removing Keep-Alive header. */
-    def removeKeepAlive()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeKeepAlive(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Keep-Alive")
   }
 
@@ -968,7 +968,7 @@ package object headers {
       response.putHeaders(Header("Last-Modified", value))
 
     /** Creates new response removing Last-Modified header. */
-    def removeLastModified(): HttpResponse =
+    def removeLastModified: HttpResponse =
       response.removeHeaders("Last-Modified")
   }
 
@@ -999,7 +999,7 @@ package object headers {
       setLink(one +: more)
 
     /** Creates new response removing Link header. */
-    def removeLink(): HttpResponse =
+    def removeLink: HttpResponse =
       response.removeHeaders("Link")
   }
 
@@ -1026,7 +1026,7 @@ package object headers {
       response.putHeaders(Header("Location", value.toString))
 
     /** Creates new response removing Location header. */
-    def removeLocation(): HttpResponse =
+    def removeLocation: HttpResponse =
       response.removeHeaders("Location")
   }
 
@@ -1053,7 +1053,7 @@ package object headers {
       request.putHeaders(Header("Max-Forwards", value))
 
     /** Creates new request removing Max-Forwards header. */
-    def removeMaxForwards(): HttpRequest =
+    def removeMaxForwards: HttpRequest =
       request.removeHeaders("Max-Forwards")
   }
 
@@ -1084,7 +1084,7 @@ package object headers {
       setPragma(one +: more)
 
     /** Creates new request removing Pragma header. */
-    def removePragma(): HttpRequest =
+    def removePragma: HttpRequest =
       request.removeHeaders("Pragma")
   }
 
@@ -1119,7 +1119,7 @@ package object headers {
       setPrefer(one +: more)
 
     /** Creates new request removing Prefer header. */
-    def removePrefer(): HttpRequest =
+    def removePrefer: HttpRequest =
       request.removeHeaders("Prefer")
   }
 
@@ -1152,7 +1152,7 @@ package object headers {
       setPreferenceApplied(one +: more)
 
     /** Creates new response removing Preference-Applied header. */
-    def removePreferenceApplied(): HttpResponse =
+    def removePreferenceApplied: HttpResponse =
       response.removeHeaders("Preference-Applied")
   }
 
@@ -1179,7 +1179,7 @@ package object headers {
       request.putHeaders(Header("Range", value.toString))
 
     /** Creates new request removing Range header. */
-    def removeRange(): HttpRequest =
+    def removeRange: HttpRequest =
       request.removeHeaders("Range")
   }
 
@@ -1206,7 +1206,7 @@ package object headers {
       request.putHeaders(Header("Referer", value.toString))
 
     /** Creates new request removing Referer header. */
-    def removeReferer(): HttpRequest =
+    def removeReferer: HttpRequest =
       request.removeHeaders("Referer")
   }
 
@@ -1233,7 +1233,7 @@ package object headers {
       response.putHeaders(Header("Retry-After", value))
 
     /** Creates new response removing Retry-After header. */
-    def removeRetryAfter(): HttpResponse =
+    def removeRetryAfter: HttpResponse =
       response.removeHeaders("Retry-After")
   }
 
@@ -1264,7 +1264,7 @@ package object headers {
       setServer(one +: more)
 
     /** Creates new response removing Server header. */
-    def removeServer(): HttpResponse =
+    def removeServer: HttpResponse =
       response.removeHeaders("Server")
   }
 
@@ -1297,7 +1297,7 @@ package object headers {
       setTE(one +: more)
 
     /** Creates new request removing TE header. */
-    def removeTE(): HttpRequest =
+    def removeTE: HttpRequest =
       request.removeHeaders("TE")
   }
 
@@ -1328,7 +1328,7 @@ package object headers {
       setTrailer(one +: more)
 
     /** Creates new message removing Trailer header. */
-    def removeTrailer()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeTrailer(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Trailer")
   }
 
@@ -1361,7 +1361,7 @@ package object headers {
       setTransferEncoding(one +: more)
 
     /** Creates new message removing Transfer-Encoding header. */
-    def removeTransferEncoding()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeTransferEncoding(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Transfer-Encoding")
   }
 
@@ -1394,7 +1394,7 @@ package object headers {
       setUpgrade(one +: more)
 
     /** Creates new message removing Upgrade header. */
-    def removeUpgrade()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeUpgrade(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Upgrade")
   }
 
@@ -1425,7 +1425,7 @@ package object headers {
       setUserAgent(one +: more)
 
     /** Creates new request removing User-Agent header. */
-    def removeUserAgent(): HttpRequest =
+    def removeUserAgent: HttpRequest =
       request.removeHeaders("User-Agent")
   }
 
@@ -1456,7 +1456,7 @@ package object headers {
       setVary(one +: more)
 
     /** Creates new response removing Vary header. */
-    def removeVary(): HttpResponse =
+    def removeVary: HttpResponse =
       response.removeHeaders("Vary")
   }
 
@@ -1487,7 +1487,7 @@ package object headers {
       setVia(one +: more)
 
     /** Creates new response removing Via header. */
-    def removeVia(): HttpResponse =
+    def removeVia: HttpResponse =
       response.removeHeaders("Via")
   }
 
@@ -1518,7 +1518,7 @@ package object headers {
       setWarning(one +: more)
 
     /** Creates new response removing Warning header. */
-    def removeWarning(): HttpResponse =
+    def removeWarning: HttpResponse =
       response.removeHeaders("Warning")
   }
 }

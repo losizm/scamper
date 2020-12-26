@@ -484,7 +484,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
     private def prepare(res: HttpResponse): HttpResponse =
       if (res.hasTransferEncoding)
         res.setTransferEncoding(res.transferEncoding.filterNot(_.isChunked) :+ chunked)
-          .removeContentLength()
+          .removeContentLength
       else if (res.hasContentLength)
         res
       else

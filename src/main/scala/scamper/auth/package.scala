@@ -160,7 +160,7 @@ package object auth {
       setAuthenticationInfo((one +: more).toMap)
 
     /** Creates new response removing Authentication-Info header. */
-    def removeAuthenticationInfo(): HttpResponse =
+    def removeAuthenticationInfo: HttpResponse =
       response.removeHeaders("Authentication-Info")
   }
 
@@ -187,7 +187,7 @@ package object auth {
       request.putHeaders(Header("Authorization", value.toString))
 
     /** Creates new request removing Authorization header. */
-    def removeAuthorization(): HttpRequest =
+    def removeAuthorization: HttpRequest =
       request.removeHeaders("Authorization")
 
     /** Tests for basic authorization. */
@@ -274,7 +274,7 @@ package object auth {
       setProxyAuthenticate(one +: more)
 
     /** Creates new response removing Proxy-Authenticate header. */
-    def removeProxyAuthenticate(): HttpResponse =
+    def removeProxyAuthenticate: HttpResponse =
       response.removeHeaders("Proxy-Authenticate")
 
     /** Tests for basic proxy authentication. */
@@ -361,7 +361,7 @@ package object auth {
       setProxyAuthenticationInfo((one +: more).toMap)
 
     /** Creates new response removing Proxy-Authentication-Info header. */
-    def removeProxyAuthenticationInfo(): HttpResponse =
+    def removeProxyAuthenticationInfo: HttpResponse =
       response.removeHeaders("Proxy-Authentication-Info")
   }
 
@@ -390,7 +390,7 @@ package object auth {
       request.putHeaders(Header("Proxy-Authorization", value.toString))
 
     /** Creates new request removing Proxy-Authorization header. */
-    def removeProxyAuthorization(): HttpRequest =
+    def removeProxyAuthorization: HttpRequest =
       request.removeHeaders("Proxy-Authorization")
 
     /** Tests for basic proxy authorization. */
@@ -477,7 +477,7 @@ package object auth {
       setWwwAuthenticate(one +: more)
 
     /** Creates new response removing WWW-Authenticate header. */
-    def removeWwwAuthenticate(): HttpResponse =
+    def removeWwwAuthenticate: HttpResponse =
       response.removeHeaders("WWW-Authenticate")
 
     /** Tests for basic authentication. */

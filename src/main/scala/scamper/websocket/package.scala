@@ -52,7 +52,7 @@ package object websocket {
       response.putHeaders(Header("Sec-WebSocket-Accept", value))
 
     /** Creates new response removing Sec-WebSocket-Accept header. */
-    def removeSecWebSocketAccept(): HttpResponse =
+    def removeSecWebSocketAccept: HttpResponse =
       response.removeHeaders("Sec-WebSocket-Accept")
   }
 
@@ -85,7 +85,7 @@ package object websocket {
       setSecWebSocketExtensions(one +: more)
 
     /** Creates new message removing Sec-WebSocket-Extensions header. */
-    def removeSecWebSocketExtensions()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeSecWebSocketExtensions(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Sec-WebSocket-Extensions")
   }
 
@@ -112,7 +112,7 @@ package object websocket {
       request.putHeaders(Header("Sec-WebSocket-Key", value))
 
     /** Creates new request removing Sec-WebSocket-Key header. */
-    def removeSecWebSocketKey(): HttpRequest =
+    def removeSecWebSocketKey: HttpRequest =
       request.removeHeaders("Sec-WebSocket-Key")
   }
 
@@ -143,7 +143,7 @@ package object websocket {
       setSecWebSocketProtocol(one +: more)
 
     /** Creates new message removing Sec-WebSocket-Protocol header. */
-    def removeSecWebSocketProtocol()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeSecWebSocketProtocol(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Sec-WebSocket-Protocol")
   }
 
@@ -170,7 +170,7 @@ package object websocket {
       request.putHeaders(Header("Sec-WebSocket-Protocol-Client", value))
 
     /** Creates new request removing Sec-WebSocket-Protocol-Client header. */
-    def removeSecWebSocketProtocolClient(): HttpRequest =
+    def removeSecWebSocketProtocolClient: HttpRequest =
       request.removeHeaders("Sec-WebSocket-Protocol-Client")
   }
 
@@ -197,7 +197,7 @@ package object websocket {
       response.putHeaders(Header("Sec-WebSocket-Protocol-Server", value))
 
     /** Creates new response removing Sec-WebSocket-Protocol-Server header. */
-    def removeSecWebSocketProtocolServer(): HttpResponse =
+    def removeSecWebSocketProtocolServer: HttpResponse =
       response.removeHeaders("Sec-WebSocket-Protocol-Server")
   }
 
@@ -224,7 +224,7 @@ package object websocket {
       message.putHeaders(Header("Sec-WebSocket-Version", value))
 
     /** Creates new message removing Sec-WebSocket-Version header. */
-    def removeSecWebSocketVersion()(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def removeSecWebSocketVersion(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.removeHeaders("Sec-WebSocket-Version")
   }
 
@@ -256,7 +256,7 @@ package object websocket {
       setSecWebSocketVersionClient(one +: more)
 
     /** Creates new request removing Sec-WebSocket-Version-Client header. */
-    def removeSecWebSocketVersionClient(): HttpRequest =
+    def removeSecWebSocketVersionClient: HttpRequest =
       request.removeHeaders("Sec-WebSocket-Version-Client")
   }
 
@@ -288,7 +288,7 @@ package object websocket {
       setSecWebSocketVersionServer(one +: more)
 
     /** Creates new response removing Sec-WebSocket-Version-Server header. */
-    def removeSecWebSocketVersionServer(): HttpResponse =
+    def removeSecWebSocketVersionServer: HttpResponse =
       response.removeHeaders("Sec-WebSocket-Version-Server")
   }
 }
