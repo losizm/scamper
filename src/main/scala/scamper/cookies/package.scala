@@ -33,7 +33,7 @@ import scala.util.Try
  * import scamper.cookies.{ PlainCookie, RequestCookies }
  *
  * // Build request with cookies
- * val req = Get("https://localhost:8080/motd").withCookies(
+ * val req = Get("https://localhost:8080/motd").setCookies(
  *   PlainCookie("ID", "bG9zCg"), PlainCookie("Region", "SE-US")
  * )
  *
@@ -61,7 +61,7 @@ import scala.util.Try
  * import scamper.cookies.{ ResponseCookies, SetCookie }
  *
  * // Build response with cookies
- * val res = Ok("There is an answer.").withCookies(
+ * val res = Ok("There is an answer.").setCookies(
  *   SetCookie("ID", "bG9zCg", path = Some("/motd"), secure = true),
  *   SetCookie("Region", "SE-US")
  * )
@@ -113,7 +113,7 @@ package object cookies {
      *
      * @param cookies new set of cookies
      */
-    def withCookies(cookies: Seq[PlainCookie]): HttpRequest =
+    def setCookies(cookies: Seq[PlainCookie]): HttpRequest =
       cookies.isEmpty match {
         case true  => request.removeHeaders("Cookie")
         case false => request.putHeaders(Header("Cookie", cookies.mkString("; ")))
@@ -125,8 +125,8 @@ package object cookies {
      * @param one new cookie
      * @param more additional new cookies
      */
-    def withCookies(one: PlainCookie, more: PlainCookie*): HttpRequest =
-      withCookies(one +: more)
+    def setCookies(one: PlainCookie, more: PlainCookie*): HttpRequest =
+      setCookies(one +: more)
 
     /**
      * Creates copy of request with supplied cookie.
@@ -140,7 +140,7 @@ package object cookies {
         case true  => request
         case false =>
           val names = cookies.map(_.name)
-          withCookies(this.cookies.filterNot(c => names.contains(c.name)) ++ cookies)
+          setCookies(this.cookies.filterNot(c => names.contains(c.name)) ++ cookies)
       }
 
 
@@ -161,7 +161,7 @@ package object cookies {
      * @param names cookie names
      */
     def removeCookies(names: Seq[String]): HttpRequest =
-      withCookies(cookies.filterNot(cookie => names.contains(cookie.name)))
+      setCookies(cookies.filterNot(cookie => names.contains(cookie.name)))
 
     /**
      * Creates copy of request excluding cookies with given names.
@@ -200,7 +200,7 @@ package object cookies {
      *
      * @param cookies new set of cookies
      */
-    def withCookies(cookies: Seq[SetCookie]): HttpResponse =
+    def setCookies(cookies: Seq[SetCookie]): HttpResponse =
       cookies.isEmpty match {
         case true  => response.removeHeaders("Set-Cookie")
         case false => response.putHeaders(cookies.map(c => Header("Set-Cookie", c.toString)))
@@ -212,8 +212,8 @@ package object cookies {
      * @param one new cookie
      * @param more additional new cookies
      */
-    def withCookies(one: SetCookie, more: SetCookie*): HttpResponse =
-      withCookies(one +: more)
+    def setCookies(one: SetCookie, more: SetCookie*): HttpResponse =
+      setCookies(one +: more)
 
     /**
      * Creates copy of response with supplied cookies.
@@ -227,7 +227,7 @@ package object cookies {
         case true  => response
         case false =>
           val names = cookies.map(_.name)
-          withCookies(this.cookies.filterNot(c => names.contains(c.name)) ++ cookies)
+          setCookies(this.cookies.filterNot(c => names.contains(c.name)) ++ cookies)
       }
 
     /**
@@ -247,7 +247,7 @@ package object cookies {
      * @param names cookie names
      */
     def removeCookies(names: Seq[String]): HttpResponse =
-      withCookies(cookies.filterNot(cookie => names.contains(cookie.name)))
+      setCookies(cookies.filterNot(cookie => names.contains(cookie.name)))
 
     /**
      * Creates copy of response excluding cookies with given names.

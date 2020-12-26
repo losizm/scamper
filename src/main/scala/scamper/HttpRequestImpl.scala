@@ -40,39 +40,39 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
       case query => QueryString(query)
     }
 
-  def withStartLine(newStartLine: RequestLine): HttpRequest =
+  def setStartLine(newStartLine: RequestLine): HttpRequest =
     copy(startLine = newStartLine)
 
-  def withMethod(newMethod: RequestMethod): HttpRequest =
-    withStartLine(RequestLine(newMethod, target, version))
+  def setMethod(newMethod: RequestMethod): HttpRequest =
+    setStartLine(RequestLine(newMethod, target, version))
 
-  def withTarget(newTarget: Uri): HttpRequest =
-    withStartLine(RequestLine(method, newTarget, version))
+  def setTarget(newTarget: Uri): HttpRequest =
+    setStartLine(RequestLine(method, newTarget, version))
 
-  def withPath(newPath: String): HttpRequest =
+  def setPath(newPath: String): HttpRequest =
     newPath match {
-      case "*" if method == Options => withTarget(target.withPath(""))
-      case _   => withTarget(target.withPath(newPath))
+      case "*" if method == Options => setTarget(target.setPath(""))
+      case _   => setTarget(target.setPath(newPath))
     }
 
-  def withQuery(query: QueryString): HttpRequest =
-    withTarget(target.withQuery(query.toString))
+  def setQuery(query: QueryString): HttpRequest =
+    setTarget(target.setQuery(query.toString))
 
-  def withQuery(params: Map[String, Seq[String]]): HttpRequest =
-    withQuery(QueryString(params))
+  def setQuery(params: Map[String, Seq[String]]): HttpRequest =
+    setQuery(QueryString(params))
 
-  def withQuery(params: Seq[(String, String)]): HttpRequest =
-    withQuery(QueryString(params))
+  def setQuery(params: Seq[(String, String)]): HttpRequest =
+    setQuery(QueryString(params))
 
-  def withVersion(newVersion: HttpVersion): HttpRequest =
-    withStartLine(RequestLine(method, target, newVersion))
+  def setVersion(newVersion: HttpVersion): HttpRequest =
+    setStartLine(RequestLine(method, target, newVersion))
 
-  def withHeaders(newHeaders: Seq[Header]): HttpRequest =
+  def setHeaders(newHeaders: Seq[Header]): HttpRequest =
     copy(headers = newHeaders)
 
-  def withBody(newBody: Entity): HttpRequest =
+  def setBody(newBody: Entity): HttpRequest =
     copy(body = newBody)
 
-  def withAttributes(newAttributes: Map[String, Any]): HttpRequest =
+  def setAttributes(newAttributes: Map[String, Any]): HttpRequest =
     copy(attributes = newAttributes)
 }

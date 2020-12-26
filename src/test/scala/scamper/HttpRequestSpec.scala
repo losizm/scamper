@@ -21,7 +21,7 @@ import scamper.headers._
 
 class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "create HttpRequest with path" in {
-    val req = Get("?user=root&group=wheel").withPath("/find")
+    val req = Get("?user=root&group=wheel").setPath("/find")
     assert(req.method == Get)
     assert(req.target.toString == "/find?user=root&group=wheel")
     assert(req.path == "/find")
@@ -32,17 +32,17 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "create HttpRequest with empty path" in {
     assert(Get("").path == "/")
     assert(Get("http://localhost:8080").path == "/")
-    assert(Get("http://localhost:8080/index.html").withPath("").path == "/")
+    assert(Get("http://localhost:8080/index.html").setPath("").path == "/")
 
     assert(Options("").path == "*")
     assert(Options("http://localhost:8080").path == "*")
-    assert(Options("http://localhost:8080/index.html").withPath("/").path == "/")
-    assert(Options("http://localhost:8080/index.html").withPath("*").path == "*")
-    assert(Options("http://localhost:8080/index.html").withPath("").path == "*")
+    assert(Options("http://localhost:8080/index.html").setPath("/").path == "/")
+    assert(Options("http://localhost:8080/index.html").setPath("*").path == "*")
+    assert(Options("http://localhost:8080/index.html").setPath("").path == "*")
   }
 
   it should "create HttpRequest with query parameters" in {
-    val req = Get("/find").withQuery("user" -> "root", "group" -> "wheel")
+    val req = Get("/find").setQuery("user" -> "root", "group" -> "wheel")
     assert(req.method == Get)
     assert(req.target.toString == "/find?user=root&group=wheel")
     assert(req.path == "/find")
@@ -52,7 +52,7 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "create HttpRequest with host" in {
-    val req = Get("/find?user=root&group=wheel").withHost("localhost:8080")
+    val req = Get("/find?user=root&group=wheel").setHost("localhost:8080")
     assert(req.method == Get)
     assert(req.target.toString == "/find?user=root&group=wheel")
     assert(req.path == "/find")
@@ -63,14 +63,14 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "create HttpRequest with attributes" in {
-    var req = Get("/").withAttributes("id" -> 1, "name" -> "request").putAttributes("success" -> true)
+    var req = Get("/").setAttributes("id" -> 1, "name" -> "request").putAttributes("success" -> true)
     assert(req.method == Get)
     assert(req.attributes.size == 3)
     assert(req.getAttribute[Int]("id").contains(1))
     assert(req.getAttribute[String]("name").contains("request"))
     assert(req.getAttributeOrElse("success", false))
     assert(req.getAttributeOrElse("answer", 45) == 45)
-    assert(req.withAttributes(Map.empty[String, Any]).attributes.size == 0)
+    assert(req.setAttributes(Map.empty[String, Any]).attributes.size == 0)
 
     req = req.removeAttributes("name")
     assert(req.attributes.size == 2)

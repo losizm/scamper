@@ -21,20 +21,20 @@ import scamper.headers._
 
 class HttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "create with location" in {
-    val res = SeeOther().withLocation("/find")
+    val res = SeeOther().setLocation("/find")
     assert(res.status == SeeOther)
     assert(res.location.toString == "/find")
   }
 
   it should "create with attributes" in {
-    var res = Ok().withAttributes("id" -> 1, "name" -> "response").putAttributes("success" -> true)
+    var res = Ok().setAttributes("id" -> 1, "name" -> "response").putAttributes("success" -> true)
     assert(res.status == Ok)
     assert(res.attributes.size == 3)
     assert(res.getAttribute[Int]("id").contains(1))
     assert(res.getAttribute[String]("name").contains("response"))
     assert(res.getAttributeOrElse("success", false))
     assert(res.getAttributeOrElse("answer", 45) == 45)
-    assert(res.withAttributes(Map.empty[String, Any]).attributes.size == 0)
+    assert(res.setAttributes(Map.empty[String, Any]).attributes.size == 0)
 
     res = res.removeAttributes("name")
     assert(res.attributes.size == 2)

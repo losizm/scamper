@@ -158,7 +158,7 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
     require(target.isAbsolute, "target is not absolute")
     require(target.getScheme.matches("(http|ws)s?"), "invalid target scheme")
 
-    target.withPath("/" + target.getRawPath).normalize()
+    target.setPath("/" + target.getRawPath).normalize()
   }
 
   private def key(cookie: PersistentCookie): Key =

@@ -159,57 +159,57 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
    *
    * @return new request
    */
-  def withMethod(method: RequestMethod): HttpRequest
+  def setMethod(method: RequestMethod): HttpRequest
 
   /**
    * Creates request with new target.
    *
    * @return new request
    */
-  def withTarget(target: Uri): HttpRequest
+  def setTarget(target: Uri): HttpRequest
 
   /**
    * Creates request with new target path.
    *
    * @return new request
    */
-  def withPath(path: String): HttpRequest
+  def setPath(path: String): HttpRequest
 
   /**
    * Creates request with new query.
    *
    * @return new request
    */
-  def withQuery(query: QueryString): HttpRequest
+  def setQuery(query: QueryString): HttpRequest
 
   /**
    * Creates request with new query using supplied parameters.
    *
    * @return new request
    */
-  def withQuery(params: Map[String, Seq[String]]): HttpRequest
+  def setQuery(params: Map[String, Seq[String]]): HttpRequest
 
   /**
    * Creates request with new query using supplied parameters.
    *
    * @return new request
    */
-  def withQuery(params: Seq[(String, String)]): HttpRequest
+  def setQuery(params: Seq[(String, String)]): HttpRequest
 
   /**
    * Creates request with new query using supplied parameters.
    *
    * @return new request
    */
-  def withQuery(one: (String, String), more: (String, String)*): HttpRequest =
-    withQuery(one +: more)
+  def setQuery(one: (String, String), more: (String, String)*): HttpRequest =
+    setQuery(one +: more)
 
   /**
    * Creates request with new HTTP version.
    *
    * @return new request
    */
-  def withVersion(version: HttpVersion): HttpRequest
+  def setVersion(version: HttpVersion): HttpRequest
 }
 
 /** Provides factory for `HttpRequest`. */
@@ -260,14 +260,14 @@ trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse] {
    *
    * @return new response
    */
-  def withStatus(status: ResponseStatus): HttpResponse
+  def setStatus(status: ResponseStatus): HttpResponse
 
   /**
    * Creates response with new HTTP version.
    *
    * @return new response
    */
-  def withVersion(version: HttpVersion): HttpResponse
+  def setVersion(version: HttpVersion): HttpResponse
 }
 
 /** Provides factory for `HttpResponse`. */

@@ -68,7 +68,7 @@ object Implicits {
      *
      * @return new request
      */
-    def withGzipContentEncoding(bufferSize: Int = 8192): HttpRequest =
+    def setGzipContentEncoding(bufferSize: Int = 8192): HttpRequest =
       ContentEncoder.gzip(req, bufferSize) { Auxiliary.executor }
 
     /**
@@ -78,7 +78,7 @@ object Implicits {
      *
      * @return new request
      */
-    def withDeflateContentEncoding(bufferSize: Int = 8192): HttpRequest =
+    def setDeflateContentEncoding(bufferSize: Int = 8192): HttpRequest =
       ContentEncoder.deflate(req, bufferSize)
   }
 }

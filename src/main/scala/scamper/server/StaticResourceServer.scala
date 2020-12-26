@@ -42,13 +42,13 @@ private class StaticResourceServer(mountPath: Path, sourceDirectory: Path, class
 
   override protected def getResponse(path: Path, mediaType: MediaType, ifModifiedSince: Instant, headOnly: Boolean): HttpResponse = {
     val bytes = getResource(path)
-    val res = Ok().withContentType(mediaType)
-      .withContentLength(bytes.size)
-      .withLastModified(Instant.now())
+    val res = Ok().setContentType(mediaType)
+      .setContentLength(bytes.size)
+      .setLastModified(Instant.now())
 
     headOnly match {
       case true  => res
-      case false => res.withBody(bytes)
+      case false => res.setBody(bytes)
     }
   }
 

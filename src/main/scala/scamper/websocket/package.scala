@@ -48,7 +48,7 @@ package object websocket {
       response.getHeaderValue("Sec-WebSocket-Accept")
 
     /** Creates new response setting Sec-WebSocket-Accept header to supplied value. */
-    def withSecWebSocketAccept(value: String): HttpResponse =
+    def setSecWebSocketAccept(value: String): HttpResponse =
       response.putHeaders(Header("Sec-WebSocket-Accept", value))
 
     /** Creates new response removing Sec-WebSocket-Accept header. */
@@ -77,12 +77,12 @@ package object websocket {
         .reduceLeftOption(_ ++ _)
 
     /** Creates new message setting Sec-WebSocket-Extensions header to supplied values. */
-    def withSecWebSocketExtensions(values: Seq[WebSocketExtension])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setSecWebSocketExtensions(values: Seq[WebSocketExtension])(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Sec-WebSocket-Extensions", values.mkString(", ")))
 
     /** Creates new message setting Sec-WebSocket-Extensions header to supplied values. */
-    def withSecWebSocketExtensions(one: WebSocketExtension, more: WebSocketExtension*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withSecWebSocketExtensions(one +: more)
+    def setSecWebSocketExtensions(one: WebSocketExtension, more: WebSocketExtension*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setSecWebSocketExtensions(one +: more)
 
     /** Creates new message removing Sec-WebSocket-Extensions header. */
     def removeSecWebSocketExtensions()(implicit ev: <:<[T, MessageBuilder[T]]): T =
@@ -108,7 +108,7 @@ package object websocket {
       request.getHeaderValue("Sec-WebSocket-Key")
 
     /** Creates new request setting Sec-WebSocket-Key header to supplied value. */
-    def withSecWebSocketKey(value: String): HttpRequest =
+    def setSecWebSocketKey(value: String): HttpRequest =
       request.putHeaders(Header("Sec-WebSocket-Key", value))
 
     /** Creates new request removing Sec-WebSocket-Key header. */
@@ -135,12 +135,12 @@ package object websocket {
       message.getHeaderValue("Sec-WebSocket-Protocol").map(ListParser.apply)
 
     /** Creates new message setting Sec-WebSocket-Protocol header to supplied values. */
-    def withSecWebSocketProtocol(values: Seq[String])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setSecWebSocketProtocol(values: Seq[String])(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Sec-WebSocket-Protocol", values.mkString(", ")))
 
     /** Creates new message setting Sec-WebSocket-Protocol header to supplied values. */
-    def withSecWebSocketProtocol(one: String, more: String*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withSecWebSocketProtocol(one +: more)
+    def setSecWebSocketProtocol(one: String, more: String*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setSecWebSocketProtocol(one +: more)
 
     /** Creates new message removing Sec-WebSocket-Protocol header. */
     def removeSecWebSocketProtocol()(implicit ev: <:<[T, MessageBuilder[T]]): T =
@@ -166,7 +166,7 @@ package object websocket {
       request.getHeaderValue("Sec-WebSocket-Protocol-Client")
 
     /** Creates new request setting Sec-WebSocket-Protocol-Client header to supplied value. */
-    def withSecWebSocketProtocolClient(value: String): HttpRequest =
+    def setSecWebSocketProtocolClient(value: String): HttpRequest =
       request.putHeaders(Header("Sec-WebSocket-Protocol-Client", value))
 
     /** Creates new request removing Sec-WebSocket-Protocol-Client header. */
@@ -193,7 +193,7 @@ package object websocket {
       response.getHeaderValue("Sec-WebSocket-Protocol-Server")
 
     /** Creates new response setting Sec-WebSocket-Protocol-Server header to supplied value. */
-    def withSecWebSocketProtocolServer(value: String): HttpResponse =
+    def setSecWebSocketProtocolServer(value: String): HttpResponse =
       response.putHeaders(Header("Sec-WebSocket-Protocol-Server", value))
 
     /** Creates new response removing Sec-WebSocket-Protocol-Server header. */
@@ -220,7 +220,7 @@ package object websocket {
       message.getHeaderValue("Sec-WebSocket-Version")
 
     /** Creates new message setting Sec-WebSocket-Version header to supplied value. */
-    def withSecWebSocketVersion(value: String)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setSecWebSocketVersion(value: String)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Sec-WebSocket-Version", value))
 
     /** Creates new message removing Sec-WebSocket-Version header. */
@@ -248,12 +248,12 @@ package object websocket {
         .map(ListParser.apply)
 
     /** Creates new request setting Sec-WebSocket-Version-Client header to supplied values. */
-    def withSecWebSocketVersionClient(values: Seq[String]): HttpRequest =
+    def setSecWebSocketVersionClient(values: Seq[String]): HttpRequest =
       request.putHeaders(Header("Sec-WebSocket-Version-Client", values.mkString(", ")))
 
     /** Creates new request setting Sec-WebSocket-Version-Client header to supplied values. */
-    def withSecWebSocketVersionClient(one: String, more: String*): HttpRequest =
-      withSecWebSocketVersionClient(one +: more)
+    def setSecWebSocketVersionClient(one: String, more: String*): HttpRequest =
+      setSecWebSocketVersionClient(one +: more)
 
     /** Creates new request removing Sec-WebSocket-Version-Client header. */
     def removeSecWebSocketVersionClient(): HttpRequest =
@@ -280,12 +280,12 @@ package object websocket {
         .map(ListParser.apply)
 
     /** Creates new response setting Sec-WebSocket-Version-Server header to supplied values. */
-    def withSecWebSocketVersionServer(values: Seq[String]): HttpResponse =
+    def setSecWebSocketVersionServer(values: Seq[String]): HttpResponse =
       response.putHeaders(Header("Sec-WebSocket-Version-Server", values.mkString(", ")))
 
     /** Creates new response setting Sec-WebSocket-Version-Server header to supplied values. */
-    def withSecWebSocketVersionServer(one: String, more: String*): HttpResponse =
-      withSecWebSocketVersionServer(one +: more)
+    def setSecWebSocketVersionServer(one: String, more: String*): HttpResponse =
+      setSecWebSocketVersionServer(one +: more)
 
     /** Creates new response removing Sec-WebSocket-Version-Server header. */
     def removeSecWebSocketVersionServer(): HttpResponse =

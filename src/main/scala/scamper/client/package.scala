@@ -102,8 +102,8 @@ import RequestMethod.Registry._
  * implicit val parser = BodyParser.text(4096)
  *
  * Get("http://localhost:8080/motd")
- *   .withAccept("text/plain")
- *   .withAcceptLanguage("en-US; q=0.6", "fr-CA; q=0.4")
+ *   .setAccept("text/plain")
+ *   .setAcceptLanguage("en-US; q=0.6", "fr-CA; q=0.4")
  *   .send(res => println(res.as[String])) // Send request and print response
  * }}}
  *

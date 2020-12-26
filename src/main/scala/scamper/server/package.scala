@@ -68,7 +68,7 @@ package scamper
  * app.outgoing { res =>
  *   res.body.isKnownEmpty match {
  *     case true  => res
- *     case false => res.withGzipContentEncoding()
+ *     case false => res.setGzipContentEncoding()
  *   }
  * }
  *

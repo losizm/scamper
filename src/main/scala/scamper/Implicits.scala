@@ -82,9 +82,9 @@ object Implicits {
      * @param text message body
      * @param charset character set
      */
-    def withTextBody(text: String, charset: String = "UTF-8")(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+    def setTextBody(text: String, charset: String = "UTF-8")(implicit ev: <:<[T, MessageBuilder[T]]): T = {
       val entity = Entity(text, charset)
-      message.withBody(entity)
+      message.setBody(entity)
         .putHeaders(
           Header("Content-Type", s"text/plain; charset=$charset"),
           Header("Content-Length", entity.getLength.get)
@@ -99,10 +99,10 @@ object Implicits {
      *
      * @param file message body
      */
-    def withFileBody(file: File)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+    def setFileBody(file: File)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
       val entity = Entity(file)
       val mediaType = MediaType.fromFile(file).getOrElse(Auxiliary.applicationOctetStream)
-      message.withBody(entity)
+      message.setBody(entity)
         .putHeaders(
           Header("Content-Type", mediaType.toString),
           Header("Content-Length", entity.getLength.get)
@@ -118,8 +118,8 @@ object Implicits {
      *
      * @param data message body
      */
-    def withFormBody(data: Map[String, Seq[String]])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withFormBody(QueryString(data))
+    def setFormBody(data: Map[String, Seq[String]])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setFormBody(QueryString(data))
 
     /**
      * Creates new message with supplied form data as message body.
@@ -130,8 +130,8 @@ object Implicits {
      *
      * @param data message body
      */
-    def withFormBody(data: Seq[(String, String)])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withFormBody(QueryString(data))
+    def setFormBody(data: Seq[(String, String)])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setFormBody(QueryString(data))
 
     /**
      * Creates new message with supplied form data as message body.
@@ -143,8 +143,8 @@ object Implicits {
      * @param one form data
      * @param more additional form data
      */
-    def withFormBody(one: (String, String), more: (String, String)*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withFormBody(QueryString(one +: more))
+    def setFormBody(one: (String, String), more: (String, String)*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setFormBody(QueryString(one +: more))
 
     /**
      * Creates new message with supplied query string as message body.
@@ -155,9 +155,9 @@ object Implicits {
      *
      * @param query message body
      */
-    def withFormBody(query: QueryString)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+    def setFormBody(query: QueryString)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
       val entity = Entity(query)
-      message.withBody(entity)
+      message.setBody(entity)
         .putHeaders(
           Header("Content-Type", "application/x-www-form-urlencoded"),
           Header("Content-Length", entity.getLength.get)
@@ -173,9 +173,9 @@ object Implicits {
      *
      * @param multipart message body
      */
-    def withMultipartBody(multipart: Multipart)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+    def setMultipartBody(multipart: Multipart)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
       val boundary = Multipart.boundary()
-      message.withBody(Entity(multipart, boundary))
+      message.setBody(Entity(multipart, boundary))
         .putHeaders(Header("Content-Type", s"multipart/form-data; boundary=$boundary"))
     }
 
@@ -189,8 +189,8 @@ object Implicits {
      *
      * @param parts message body
      */
-    def withMultipartBody(parts: Seq[Part])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withMultipartBody(Multipart(parts))
+    def setMultipartBody(parts: Seq[Part])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setMultipartBody(Multipart(parts))
 
     /**
      * Creates new message with supplied parts as message body, with the parts
@@ -203,7 +203,7 @@ object Implicits {
      * @param one part
      * @param more additional parts
      */
-    def withMultipartBody(one: Part, more: Part*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withMultipartBody(Multipart(one +: more))
+    def setMultipartBody(one: Part, more: Part*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setMultipartBody(Multipart(one +: more))
   }
 }

@@ -257,7 +257,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         Try(filter(res)).recover {
           case err =>
             logger.error(s"$authority - Error while filtering response to $tag", err)
-            InternalServerError().withDate(Instant.now).withConnection("close")
+            InternalServerError().setDate(Instant.now).setConnection("close")
         }.map { res =>
           write(res)
           logger.info(s"$authority - Response sent to $tag")
@@ -337,7 +337,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
         case Failure(err: RejectedExecutionException) =>
           logger.warn(s"$authority - Request overflow while servicing request from $tag")
-          val res = ServiceUnavailable().withRetryAfter(Instant.now.plusSeconds(300))
+          val res = ServiceUnavailable().setRetryAfter(Instant.now.plusSeconds(300))
           Try(addAttributes(res, socket, requestCount, correlate)).map(onHandleResponse)
           logger.info(s"$authority - Closing connection to $tag")
           Try(socket.close())
@@ -476,22 +476,22 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
     private def filter(res: HttpResponse): HttpResponse =
       responseFilter {
         res.hasConnection match {
-          case true  => prepare(res).withDate(Instant.now)
-          case false => prepare(res).withDate(Instant.now).withConnection("close")
+          case true  => prepare(res).setDate(Instant.now)
+          case false => prepare(res).setDate(Instant.now).setConnection("close")
         }
       }
 
     private def prepare(res: HttpResponse): HttpResponse =
       if (res.hasTransferEncoding)
-        res.withTransferEncoding(res.transferEncoding.filterNot(_.isChunked) :+ chunked)
+        res.setTransferEncoding(res.transferEncoding.filterNot(_.isChunked) :+ chunked)
           .removeContentLength()
       else if (res.hasContentLength)
         res
       else
         res.body.getLength match {
-          case Some(0) => res.getContentType.map(_ => res.withContentLength(0)).getOrElse(res)
-          case Some(n) => res.withContentLength(n)
-          case None    => res.withTransferEncoding(chunked)
+          case Some(0) => res.getContentType.map(_ => res.setContentLength(0)).getOrElse(res)
+          case Some(n) => res.setContentLength(n)
+          case None    => res.setTransferEncoding(chunked)
         }
 
     private def addAttributes[T <: HttpMessage](msg: T, socket: Socket, requestCount: Int, correlate: String)

@@ -96,17 +96,17 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       case _       => request
     }
 
-    effectiveRequest = effectiveRequest.withHeaders(
+    effectiveRequest = effectiveRequest.setHeaders(
       Header("Host", host) +:
       Header("User-Agent", userAgent) +:
       effectiveRequest.headers.filterNot(_.name.matches("(?i)Host|User-Agent|Cookie|Connection")) :+
       Header("Connection", connection)
-    ).withCookies(cookies)
+    ).setCookies(cookies)
 
-    effectiveRequest = effectiveRequest.withTarget(target.toTarget)
+    effectiveRequest = effectiveRequest.setTarget(target.toTarget)
 
     if (!effectiveRequest.path.startsWith("/") && effectiveRequest.path != "*")
-      effectiveRequest = effectiveRequest.withPath("/" + effectiveRequest.path)
+      effectiveRequest = effectiveRequest.setPath("/" + effectiveRequest.path)
 
     val conn = createClientConnection(
       secure match {
@@ -162,7 +162,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       Header("Sec-WebSocket-Version", "13") +:
       Header("Sec-WebSocket-Extensions", "permessage-deflate; client_no_context_takeover; server_no_context_takeover") +:
       headers
-    ).withCookies(cookies)
+    ).setCookies(cookies)
 
     send(req) { res =>
       WebSocket.checkHandshake(req, res) match {
@@ -193,7 +193,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       (handler: ResponseHandler[T]): T = {
     val req = cookies match {
       case Nil => HttpRequest(method, target, headers, body)
-      case _   => HttpRequest(method, target, headers, body).withCookies(cookies)
+      case _   => HttpRequest(method, target, headers, body).setCookies(cookies)
     }
 
     send(req)(handler)
@@ -251,13 +251,13 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   private def addAccept(req: HttpRequest): HttpRequest =
     (req.hasAccept || accept.isEmpty) match {
       case true  => req
-      case false => req.withAccept(accept)
+      case false => req.setAccept(accept)
     }
 
   private def addAcceptEncoding(req: HttpRequest): HttpRequest =
     (req.hasAcceptEncoding || acceptEncoding.isEmpty) match {
       case true  => req
-      case false => req.withAcceptEncoding(acceptEncoding)
+      case false => req.setAcceptEncoding(acceptEncoding)
     }
 
   private def storeCookies(target: Uri, res: HttpResponse): HttpResponse = {
@@ -268,24 +268,24 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   }
 
   private def toBodilessRequest(request: HttpRequest): HttpRequest =
-    request.withBody(Entity.empty).removeContentLength().removeTransferEncoding()
+    request.setBody(Entity.empty).removeContentLength().removeTransferEncoding()
 
   private def toBodyRequest(request: HttpRequest): HttpRequest =
     request.getTransferEncoding.map { encoding =>
-      request.withTransferEncoding(encoding.filterNot(_.isChunked) :+ TransferCoding("chunked"))
+      request.setTransferEncoding(encoding.filterNot(_.isChunked) :+ TransferCoding("chunked"))
         .removeContentLength()
     }.orElse {
       request.getContentLength.map {
-        case 0          => request.withBody(Entity.empty)
+        case 0          => request.setBody(Entity.empty)
         case n if n > 0 => request
         case length     => throw RequestAborted(s"Invalid Content-Length: $length")
       }
     }.orElse {
       request.body.getLength.collect {
-        case 0          => request.withBody(Entity.empty).withContentLength(0)
-        case n if n > 0 => request.withContentLength(n)
+        case 0          => request.setBody(Entity.empty).setContentLength(0)
+        case n if n > 0 => request.setContentLength(n)
       }
     }.getOrElse {
-      request.withTransferEncoding(TransferCoding("chunked"))
+      request.setTransferEncoding(TransferCoding("chunked"))
     }
 }

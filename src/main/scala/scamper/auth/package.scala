@@ -32,11 +32,11 @@ package scamper
  *
  * // Present response challenge (scheme and parameters)
  * val challenge = Challenge("Bearer", "realm" -> "developer")
- * val res = Unauthorized().withWwwAuthenticate(challenge)
+ * val res = Unauthorized().setWwwAuthenticate(challenge)
  *
  * // Present request credentials (scheme and token)
  * val credentials = Credentials("Bearer", "QWxsIEFjY2VzcyEhIQo=")
- * val req = Get("/dev/projects").withAuthorization(credentials)
+ * val req = Get("/dev/projects").setAuthorization(credentials)
  * }}}
  *
  * === Basic Authentication ===
@@ -52,11 +52,11 @@ package scamper
  *
  * // Provide realm and optional parameters
  * val challenge = BasicChallenge("admin", "title" -> "Admin Console")
- * val res = Unauthorized().withWwwAuthenticate(challenge)
+ * val res = Unauthorized().setWwwAuthenticate(challenge)
  *
  * // Provide user and password
  * val credentials = BasicCredentials("sa", "l3tm31n")
- * val req = Get("/admin/users").withAuthorization(credentials)
+ * val req = Get("/admin/users").setAuthorization(credentials)
  * }}}
  *
  * In addition, there are methods for Basic authentication defined in the header
@@ -69,14 +69,14 @@ package scamper
  * import scamper.auth.{ Authorization, WwwAuthenticate }
  *
  * // Provide realm and optional parameters
- * val res = Unauthorized().withBasic("admin", "title" -> "Admin Console")
+ * val res = Unauthorized().setBasic("admin", "title" -> "Admin Console")
  *
  * // Access basic auth in response
  * printf(s"Realm: %s%n", res.basic.realm)
  * printf(s"Title: %s%n", res.basic.params("title"))
  *
  * // Provide user and password
- * val req = Get("/admin/users").withBasic("sa", "l3tm3m1n")
+ * val req = Get("/admin/users").setBasic("sa", "l3tm3m1n")
  *
  * // Access basic auth in request
  * printf(s"User: %s%n", req.basic.user)
@@ -96,7 +96,7 @@ package scamper
  * import scamper.auth.{ Authorization, WwwAuthenticate }
  *
  * // Provide challenge parameters
- * val res = Unauthorized().withBearer(
+ * val res = Unauthorized().setBearer(
  *   "scope" -> "user profile",
  *   "error" -> "invalid_token",
  *   "error_description" -> "Expired access token"
@@ -120,7 +120,7 @@ package scamper
  * println(res.bearer.isInsufficientScope)
  *
  * // Create request with Bearer token
- * val req = Get("/users").withBearer("R290IDUgb24gaXQhCg==")
+ * val req = Get("/users").setBearer("R290IDUgb24gaXQhCg==")
  *
  * // Access bearer auth in request
  * printf("Token: %s%n", req.bearer.token)
@@ -152,12 +152,12 @@ package object auth {
       response.getHeaderValue("Authentication-Info").map(AuthParams.parse)
 
     /** Creates new response setting Authentication-Info header to supplied values. */
-    def withAuthenticationInfo(values: Map[String, String]): HttpResponse =
+    def setAuthenticationInfo(values: Map[String, String]): HttpResponse =
       response.putHeaders(Header("Authentication-Info", AuthParams.format(values.toMap).trim))
 
     /** Creates new response setting Authentication-Info header to supplied values. */
-    def withAuthenticationInfo(one: (String, String), more: (String, String)*): HttpResponse =
-      withAuthenticationInfo((one +: more).toMap)
+    def setAuthenticationInfo(one: (String, String), more: (String, String)*): HttpResponse =
+      setAuthenticationInfo((one +: more).toMap)
 
     /** Creates new response removing Authentication-Info header. */
     def removeAuthenticationInfo(): HttpResponse =
@@ -183,7 +183,7 @@ package object auth {
       request.getHeaderValue("Authorization").map(Credentials.parse)
 
     /** Creates new request setting Authorization header to supplied value. */
-    def withAuthorization(value: Credentials): HttpRequest =
+    def setAuthorization(value: Credentials): HttpRequest =
       request.putHeaders(Header("Authorization", value.toString))
 
     /** Creates new request removing Authorization header. */
@@ -207,16 +207,16 @@ package object auth {
       getAuthorization.collect { case credentials: BasicCredentials => credentials }
 
     /** Creates new request with basic authorization. */
-    def withBasic(token: String): HttpRequest =
-      withBasic(BasicCredentials(token))
+    def setBasic(token: String): HttpRequest =
+      setBasic(BasicCredentials(token))
 
     /** Creates new request with basic authorization. */
-    def withBasic(user: String, password: String): HttpRequest =
-      withBasic(BasicCredentials(user, password))
+    def setBasic(user: String, password: String): HttpRequest =
+      setBasic(BasicCredentials(user, password))
 
     /** Creates new request with basic authorization. */
-    def withBasic(credentials: BasicCredentials): HttpRequest =
-      withAuthorization(credentials)
+    def setBasic(credentials: BasicCredentials): HttpRequest =
+      setAuthorization(credentials)
 
     /** Tests for bearer authorization. */
     def hasBearer: Boolean =
@@ -235,12 +235,12 @@ package object auth {
       getAuthorization.collect { case credentials: BearerCredentials => credentials }
 
     /** Creates new request with bearer authorization. */
-    def withBearer(token: String): HttpRequest =
-      withBearer(BearerCredentials(token))
+    def setBearer(token: String): HttpRequest =
+      setBearer(BearerCredentials(token))
 
     /** Creates new request with bearer authorization. */
-    def withBearer(credentials: BearerCredentials): HttpRequest =
-      withAuthorization(credentials)
+    def setBearer(credentials: BearerCredentials): HttpRequest =
+      setAuthorization(credentials)
   }
 
   /** Provides standardized access to Proxy-Authenticate header. */
@@ -266,12 +266,12 @@ package object auth {
         }
 
     /** Creates new response setting Proxy-Authenticate header to supplied values. */
-    def withProxyAuthenticate(values: Seq[Challenge]): HttpResponse =
+    def setProxyAuthenticate(values: Seq[Challenge]): HttpResponse =
       response.putHeaders(Header("Proxy-Authenticate", values.mkString(", ")))
 
     /** Creates new response setting Proxy-Authenticate header to supplied values. */
-    def withProxyAuthenticate(one: Challenge, more: Challenge*): HttpResponse =
-      withProxyAuthenticate(one +: more)
+    def setProxyAuthenticate(one: Challenge, more: Challenge*): HttpResponse =
+      setProxyAuthenticate(one +: more)
 
     /** Creates new response removing Proxy-Authenticate header. */
     def removeProxyAuthenticate(): HttpResponse =
@@ -294,16 +294,16 @@ package object auth {
       proxyAuthenticate.collectFirst { case challenge: BasicChallenge => challenge }
 
     /** Creates new response with basic proxy authentication. */
-    def withProxyBasic(realm: String, params: Map[String, String]): HttpResponse =
-      withProxyBasic(BasicChallenge(realm, params))
+    def setProxyBasic(realm: String, params: Map[String, String]): HttpResponse =
+      setProxyBasic(BasicChallenge(realm, params))
 
     /** Creates new response with basic proxy authentication. */
-    def withProxyBasic(realm: String, params: (String, String)*): HttpResponse =
-      withProxyBasic(BasicChallenge(realm, params : _*))
+    def setProxyBasic(realm: String, params: (String, String)*): HttpResponse =
+      setProxyBasic(BasicChallenge(realm, params : _*))
 
     /** Creates new response with basic proxy authentication. */
-    def withProxyBasic(challenge: BasicChallenge): HttpResponse =
-      withProxyAuthenticate(challenge)
+    def setProxyBasic(challenge: BasicChallenge): HttpResponse =
+      setProxyAuthenticate(challenge)
 
     /** Tests for bearer proxy authentication. */
     def hasProxyBearer: Boolean =
@@ -322,16 +322,16 @@ package object auth {
       proxyAuthenticate.collectFirst { case challenge: BearerChallenge => challenge }
 
     /** Creates new response with bearer proxy authentication. */
-    def withProxyBearer(params: Map[String, String]): HttpResponse =
-      withProxyBearer(BearerChallenge(params))
+    def setProxyBearer(params: Map[String, String]): HttpResponse =
+      setProxyBearer(BearerChallenge(params))
 
     /** Creates new response with bearer proxy authentication. */
-    def withProxyBearer(params: (String, String)*): HttpResponse =
-      withProxyBearer(BearerChallenge(params : _*))
+    def setProxyBearer(params: (String, String)*): HttpResponse =
+      setProxyBearer(BearerChallenge(params : _*))
 
     /** Creates new response with bearer proxy authentication. */
-    def withProxyBearer(challenge: BearerChallenge): HttpResponse =
-      withProxyAuthenticate(challenge)
+    def setProxyBearer(challenge: BearerChallenge): HttpResponse =
+      setProxyAuthenticate(challenge)
   }
 
   /** Provides standardized access to Proxy-Authentication-Info header. */
@@ -353,12 +353,12 @@ package object auth {
       response.getHeaderValue("Proxy-Authentication-Info").map(AuthParams.parse)
 
     /** Creates new response setting Proxy-Authentication-Info header to supplied values. */
-    def withProxyAuthenticationInfo(values: Map[String, String]): HttpResponse =
+    def setProxyAuthenticationInfo(values: Map[String, String]): HttpResponse =
       response.putHeaders(Header("Proxy-Authentication-Info", AuthParams.format(values.toMap).trim))
 
     /** Creates new response setting Proxy-Authentication-Info header to supplied values. */
-    def withProxyAuthenticationInfo(one: (String, String), more: (String, String)*): HttpResponse =
-      withProxyAuthenticationInfo((one +: more).toMap)
+    def setProxyAuthenticationInfo(one: (String, String), more: (String, String)*): HttpResponse =
+      setProxyAuthenticationInfo((one +: more).toMap)
 
     /** Creates new response removing Proxy-Authentication-Info header. */
     def removeProxyAuthenticationInfo(): HttpResponse =
@@ -386,7 +386,7 @@ package object auth {
     /**
      * Creates new request setting Proxy-Authorization header to supplied value.
      */
-    def withProxyAuthorization(value: Credentials): HttpRequest =
+    def setProxyAuthorization(value: Credentials): HttpRequest =
       request.putHeaders(Header("Proxy-Authorization", value.toString))
 
     /** Creates new request removing Proxy-Authorization header. */
@@ -410,16 +410,16 @@ package object auth {
       getProxyAuthorization.collect { case credentials: BasicCredentials => credentials }
 
     /** Creates new request with basic proxy authorization. */
-    def withProxyBasic(token: String): HttpRequest =
-      withProxyBasic(BasicCredentials(token))
+    def setProxyBasic(token: String): HttpRequest =
+      setProxyBasic(BasicCredentials(token))
 
     /** Creates new request with basic proxy authorization. */
-    def withProxyBasic(user: String, password: String): HttpRequest =
-      withProxyBasic(BasicCredentials(user, password))
+    def setProxyBasic(user: String, password: String): HttpRequest =
+      setProxyBasic(BasicCredentials(user, password))
 
     /** Creates new request with basic proxy authorization. */
-    def withProxyBasic(credentials: BasicCredentials): HttpRequest =
-      withProxyAuthorization(credentials)
+    def setProxyBasic(credentials: BasicCredentials): HttpRequest =
+      setProxyAuthorization(credentials)
 
     /** Tests for bearer proxy authorization. */
     def hasProxyBearer: Boolean =
@@ -438,12 +438,12 @@ package object auth {
       getProxyAuthorization.collect { case credentials: BearerCredentials => credentials }
 
     /** Creates new request with bearer proxy authorization. */
-    def withProxyBearer(token: String): HttpRequest =
-      withProxyBearer(BearerCredentials(token))
+    def setProxyBearer(token: String): HttpRequest =
+      setProxyBearer(BearerCredentials(token))
 
     /** Creates new request with bearer proxy authorization. */
-    def withProxyBearer(credentials: BearerCredentials): HttpRequest =
-      withProxyAuthorization(credentials)
+    def setProxyBearer(credentials: BearerCredentials): HttpRequest =
+      setProxyAuthorization(credentials)
   }
 
   /** Provides standardized access to WWW-Authenticate header. */
@@ -469,12 +469,12 @@ package object auth {
         }
 
     /** Creates new response setting WWW-Authenticate header to supplied values. */
-    def withWwwAuthenticate(values: Seq[Challenge]): HttpResponse =
+    def setWwwAuthenticate(values: Seq[Challenge]): HttpResponse =
       response.putHeaders(Header("WWW-Authenticate", values.mkString(", ")))
 
     /** Creates new response setting WWW-Authenticate header to supplied values. */
-    def withWwwAuthenticate(one: Challenge, more: Challenge*): HttpResponse =
-      withWwwAuthenticate(one +: more)
+    def setWwwAuthenticate(one: Challenge, more: Challenge*): HttpResponse =
+      setWwwAuthenticate(one +: more)
 
     /** Creates new response removing WWW-Authenticate header. */
     def removeWwwAuthenticate(): HttpResponse =
@@ -497,16 +497,16 @@ package object auth {
       wwwAuthenticate.collectFirst { case challenge: BasicChallenge => challenge }
 
     /** Creates new response with basic authentication. */
-    def withBasic(realm: String, params: Map[String, String]): HttpResponse =
-      withBasic(BasicChallenge(realm, params))
+    def setBasic(realm: String, params: Map[String, String]): HttpResponse =
+      setBasic(BasicChallenge(realm, params))
 
     /** Creates new response with basic authentication. */
-    def withBasic(realm: String, params: (String, String)*): HttpResponse =
-      withBasic(BasicChallenge(realm, params : _*))
+    def setBasic(realm: String, params: (String, String)*): HttpResponse =
+      setBasic(BasicChallenge(realm, params : _*))
 
     /** Creates new response with basic authentication. */
-    def withBasic(challenge: BasicChallenge): HttpResponse =
-      withWwwAuthenticate(challenge)
+    def setBasic(challenge: BasicChallenge): HttpResponse =
+      setWwwAuthenticate(challenge)
 
     /** Tests for bearer authentication. */
     def hasBearer: Boolean =
@@ -525,15 +525,15 @@ package object auth {
       wwwAuthenticate.collectFirst { case challenge: BearerChallenge => challenge }
 
     /** Creates new response with bearer authentication. */
-    def withBearer(params: Map[String, String]): HttpResponse =
-      withBearer(BearerChallenge(params))
+    def setBearer(params: Map[String, String]): HttpResponse =
+      setBearer(BearerChallenge(params))
 
     /** Creates new response with bearer authentication. */
-    def withBearer(params: (String, String)*): HttpResponse =
-      withBearer(BearerChallenge(params : _*))
+    def setBearer(params: (String, String)*): HttpResponse =
+      setBearer(BearerChallenge(params : _*))
 
     /** Creates new response with bearer authentication. */
-    def withBearer(challenge: BearerChallenge): HttpResponse =
-      withWwwAuthenticate(challenge)
+    def setBearer(challenge: BearerChallenge): HttpResponse =
+      setWwwAuthenticate(challenge)
   }
 }

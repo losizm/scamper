@@ -45,8 +45,8 @@ private class StaticFileServer(mountPath: Path, sourceDirectory: Path) extends R
               getResponse(path, mediaType, getIfModifiedSince(req), req.isHead)
             else
               NotAcceptable()
-          case Options => Ok().withAllow(Get, Head, Options).withContentLength(0)
-          case _ => MethodNotAllowed().withAllow(Get, Head, Options)
+          case Options => Ok().setAllow(Get, Head, Options).setContentLength(0)
+          case _ => MethodNotAllowed().setAllow(Get, Head, Options)
         }
       }.getOrElse(req)
 
@@ -60,15 +60,15 @@ private class StaticFileServer(mountPath: Path, sourceDirectory: Path) extends R
 
     ifModifiedSince.isBefore(lastModified) match {
       case true =>
-        val res = Ok().withContentType(mediaType)
-          .withContentLength(size)
-          .withLastModified(lastModified)
+        val res = Ok().setContentType(mediaType)
+          .setContentLength(size)
+          .setLastModified(lastModified)
 
         headOnly match {
           case true  => res
-          case false => res.withBody(path.toFile)
+          case false => res.setBody(path.toFile)
         }
-      case false => NotModified().withLastModified(lastModified)
+      case false => NotModified().setLastModified(lastModified)
     }
   }
 

@@ -23,39 +23,39 @@ import scamper.types.Implicits._
 
 class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec {
   val req = Get("/websocket/example")
-    .withUpgrade("websocket")
-    .withConnection("Upgrade")
-    .withSecWebSocketKey(WebSocket.generateKey())
-    .withSecWebSocketVersion("13")
+    .setUpgrade("websocket")
+    .setConnection("Upgrade")
+    .setSecWebSocketKey(WebSocket.generateKey())
+    .setSecWebSocketVersion("13")
 
   it should "check WebSocket request" in {
     assert(WebSocket.validate(req) == req)
     assert(WebSocket.validate(req) == req)
 
-    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.withMethod(Post)) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.setMethod(Post)) }
     assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.removeUpgrade()) }
     assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.removeConnection()) }
     assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.removeSecWebSocketKey()) }
     assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.removeSecWebSocketVersion()) }
 
-    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.withUpgrade("no-websocket")) }
-    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.withConnection("no-upgrade")) }
-    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.withSecWebSocketKey("123456789012345")) }
-    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.withSecWebSocketVersion("14")) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.setUpgrade("no-websocket")) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.setConnection("no-upgrade")) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.setSecWebSocketKey("123456789012345")) }
+    assertThrows[InvalidWebSocketRequest] { WebSocket.validate(req.setSecWebSocketVersion("14")) }
   }
 
   it should "check WebSocket response" in {
     val res = SwitchingProtocols()
-      .withUpgrade("websocket")
-      .withConnection("Upgrade")
-      .withSecWebSocketAccept(WebSocket.acceptKey(req.secWebSocketKey))
+      .setUpgrade("websocket")
+      .setConnection("Upgrade")
+      .setSecWebSocketAccept(WebSocket.acceptKey(req.secWebSocketKey))
 
     assert(WebSocket.checkHandshake(req, res))
     assert(!WebSocket.checkHandshake(req, res.removeUpgrade()))
     assert(!WebSocket.checkHandshake(req, res.removeSecWebSocketAccept()))
 
-    assert(!WebSocket.checkHandshake(req, res.withUpgrade("no-websocket")))
-    assert(!WebSocket.checkHandshake(req, res.withSecWebSocketAccept("123")))
+    assert(!WebSocket.checkHandshake(req, res.setUpgrade("no-websocket")))
+    assert(!WebSocket.checkHandshake(req, res.setSecWebSocketAccept("123")))
   }
 
   it should "parse WebSocket extension" in {
@@ -130,7 +130,7 @@ class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "read multiple Sec-WebSocket-Extensions headers" in {
-    val list1 = Get("/websocket").withHeaders(
+    val list1 = Get("/websocket").setHeaders(
       "Sec-WebSocket-Extensions" -> "foo",
       "Sec-WebSocket-Extensions" -> "bar; baz=2"
     ).secWebSocketExtensions
@@ -142,7 +142,7 @@ class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(list1(1).params.size == 1)
     assert(list1(1).params.get("baz").contains(Some("2")))
 
-    val list2 = Get("/websocket").withHeaders(
+    val list2 = Get("/websocket").setHeaders(
       "Sec-WebSocket-Extensions" -> "foo",
       "Sec-WebSocket-Extensions" -> "bar; baz=2",
       "Sec-WebSocket-Extensions" -> "qux; quux; quuux=3"
@@ -159,7 +159,7 @@ class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(list2(2).params.get("quux").contains(None))
     assert(list2(2).params.get("quuux").contains(Some("3")))
 
-    val list3 = Get("/websocket").withHeaders(
+    val list3 = Get("/websocket").setHeaders(
       "Sec-WebSocket-Extensions" -> "foo, bar; baz=2",
       "Sec-WebSocket-Extensions" -> "qux; quux; quuux=3"
     ).secWebSocketExtensions
@@ -175,7 +175,7 @@ class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(list3(2).params.get("quux").contains(None))
     assert(list3(2).params.get("quuux").contains(Some("3")))
 
-    val list4 = Get("/websocket").withHeaders(
+    val list4 = Get("/websocket").setHeaders(
       "Sec-WebSocket-Extensions" -> "foo",
       "Sec-WebSocket-Extensions" -> "bar; baz=2, qux; quux; quuux=3"
     ).secWebSocketExtensions

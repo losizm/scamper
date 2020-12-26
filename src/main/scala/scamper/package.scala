@@ -33,7 +33,7 @@
  * import scamper.Implicits.stringToUri
  * import scamper.RequestMethod.Registry.Get
  *
- * val request = Get("/motd").withHeaders(
+ * val request = Get("/motd").setHeaders(
  *   Header("Host: localhost:8080"),
  *   Header("Accept: text/plain")
  * )
@@ -55,7 +55,7 @@
  * import scamper.Implicits.stringToEntity
  * import scamper.ResponseStatus.Registry.Ok
  *
- * val response = Ok("There is an answer.").withHeaders(
+ * val response = Ok("There is an answer.").setHeaders(
  *   Header("Content-Type: text/plain"),
  *   Header("Connection: close")
  * )

@@ -96,7 +96,7 @@ object Implicits {
      *
      * @return new response
      */
-    def withGzipContentEncoding(bufferSize: Int = 8192): HttpResponse =
+    def setGzipContentEncoding(bufferSize: Int = 8192): HttpResponse =
       ContentEncoder.gzip(res, bufferSize) { Auxiliary.executor }
 
     /**
@@ -106,7 +106,7 @@ object Implicits {
      *
      * @return new response
      */
-    def withDeflateContentEncoding(bufferSize: Int = 8192): HttpResponse =
+    def setDeflateContentEncoding(bufferSize: Int = 8192): HttpResponse =
       ContentEncoder.deflate(res, bufferSize)
 
     /**
@@ -119,7 +119,7 @@ object Implicits {
      *
      * @return new response
      */
-    def withAttachment(file: File): HttpResponse =
+    def setAttachment(file: File): HttpResponse =
       createWithContentDisposition("attachment", file)
 
     /**
@@ -132,7 +132,7 @@ object Implicits {
      *
      * @return new response
      */
-    def withInline(file: File): HttpResponse =
+    def setInline(file: File): HttpResponse =
       createWithContentDisposition("inline", file)
 
     private def createWithContentDisposition(typeName: String, file: File): HttpResponse = {
@@ -144,10 +144,10 @@ object Implicits {
         "filename*" -> s"utf-8''${file.getName().toUrlEncoded("utf-8")}"
       )
 
-      res.withBody(entity)
-        .withContentType(mediaType)
-        .withContentLength(entity.getLength.get)
-        .withContentDisposition(disposition)
+      res.setBody(entity)
+        .setContentType(mediaType)
+        .setContentLength(entity.getLength.get)
+        .setContentDisposition(disposition)
     }
   }
 }

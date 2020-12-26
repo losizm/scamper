@@ -23,21 +23,21 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
   notNull(body)
   notNull(attributes)
 
-  def withStartLine(newStartLine: StatusLine) =
+  def setStartLine(newStartLine: StatusLine) =
     copy(startLine = newStartLine)
 
-  def withStatus(newStatus: ResponseStatus): HttpResponse =
-    withStartLine(StatusLine(newStatus, version))
+  def setStatus(newStatus: ResponseStatus): HttpResponse =
+    setStartLine(StatusLine(newStatus, version))
 
-  def withVersion(newVersion: HttpVersion): HttpResponse =
-    withStartLine(StatusLine(status, newVersion))
+  def setVersion(newVersion: HttpVersion): HttpResponse =
+    setStartLine(StatusLine(status, newVersion))
 
-  def withHeaders(newHeaders: Seq[Header]): HttpResponse =
+  def setHeaders(newHeaders: Seq[Header]): HttpResponse =
     copy(headers = newHeaders)
 
-  def withBody(newBody: Entity): HttpResponse =
+  def setBody(newBody: Entity): HttpResponse =
     copy(body = newBody)
 
-  def withAttributes(newAttributes: Map[String, Any]): HttpResponse =
+  def setAttributes(newAttributes: Map[String, Any]): HttpResponse =
     copy(attributes = newAttributes)
 }

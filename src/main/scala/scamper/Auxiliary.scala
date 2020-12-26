@@ -201,19 +201,19 @@ private object Auxiliary {
     def toTarget: Uri =
       buildUri(null, null, uri.getRawPath, uri.getRawQuery, null)
 
-    def withScheme(scheme: String): Uri =
+    def setScheme(scheme: String): Uri =
       buildUri(scheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
 
-    def withAuthority(authority: String): Uri =
+    def setAuthority(authority: String): Uri =
       buildUri(uri.getScheme, authority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
 
-    def withPath(path: String): Uri =
+    def setPath(path: String): Uri =
       buildUri(uri.getScheme, uri.getRawAuthority, path, uri.getRawQuery, uri.getRawFragment)
 
-    def withQuery(query: String): Uri =
+    def setQuery(query: String): Uri =
       buildUri(uri.getScheme, uri.getRawAuthority, uri.getRawPath, query, uri.getRawFragment)
 
-    def withFragment(fragment: String): Uri =
+    def setFragment(fragment: String): Uri =
       buildUri(uri.getScheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, fragment)
 
     private def buildUri(scheme: String, authority: String, path: String, query: String, fragment: String): Uri = {

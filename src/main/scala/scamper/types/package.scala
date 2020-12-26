@@ -28,12 +28,15 @@ package scamper
  * val json = MediaRange("application", "json", 0.9f)
  * val html = MediaRange("text/html; q=0.1")
  *
- * val req = Get("/motd").withAccept(json, html)
+ * val req = Get("/motd")
+ *   .setAccept(json, html)
  *
  * val text = MediaType("text/plain")
  * val gzip = TransferCoding("gzip")
  *
- * val res = Ok("There is an answer.").withContentType(text).withTransferEncoding(gzip)
+ * val res = Ok("There is an answer.")
+ *   .setContentType(text)
+ *   .setTransferEncoding(gzip)
  * }}}
  *
  * Using values defined in [[Implicits]], properly formatted strings
@@ -46,9 +49,12 @@ package scamper
  * import scamper.headers.{ Accept, ContentType, TransferEncoding }
  * import scamper.types.Implicits._
  *
- * val req = Get("/motd").withAccept("application/json; q=0.9", "text/html; q=0.1")
+ * val req = Get("/motd")
+ *   .setAccept("application/json; q=0.9", "text/html; q=0.1")
  *
- * val res = Ok("There is an answer.").withContentType("text/plain").withTransferEncoding("gzip")
+ * val res = Ok("There is an answer.")
+ *   .setContentType("text/plain")
+ *   .setTransferEncoding("gzip")
  * }}}
  *
  * @see [[scamper.headers]]

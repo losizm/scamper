@@ -37,7 +37,9 @@ import scamper.types._
  * import scamper.types.Implicits.stringToMediaRange
  *
  * // Build request using 'Host' and 'Accept' headers
- * val req = Get("/motd").withHost("localhost:8080").withAccept("text/plain")
+ * val req = Get("/motd")
+ *   .setHost("localhost:8080")
+ *   .setAccept("text/plain")
  *
  * // Access and print header values
  * printf("Host: %s%n", req.host)
@@ -66,12 +68,12 @@ package object headers {
         .map(_.map(MediaRange.apply))
 
     /** Creates new request setting Accept header to supplied values. */
-    def withAccept(values: Seq[MediaRange]): HttpRequest =
+    def setAccept(values: Seq[MediaRange]): HttpRequest =
       request.putHeaders(Header("Accept", values.mkString(", ")))
 
     /** Creates new request setting Accept header to supplied values. */
-    def withAccept(one: MediaRange, more: MediaRange*): HttpRequest =
-      withAccept(one +: more)
+    def setAccept(one: MediaRange, more: MediaRange*): HttpRequest =
+      setAccept(one +: more)
 
     /** Creates new request removing Accept header. */
     def removeAccept(): HttpRequest =
@@ -99,12 +101,12 @@ package object headers {
         .map(_.map(CharsetRange.parse))
 
     /** Creates new request setting Accept-Charset header to supplied values. */
-    def withAcceptCharset(values: Seq[CharsetRange]): HttpRequest =
+    def setAcceptCharset(values: Seq[CharsetRange]): HttpRequest =
       request.putHeaders(Header("Accept-Charset", values.mkString(", ")))
 
     /** Creates new request setting Accept-Charset header to supplied values. */
-    def withAcceptCharset(one: CharsetRange, more: CharsetRange*): HttpRequest =
-      withAcceptCharset(one +: more)
+    def setAcceptCharset(one: CharsetRange, more: CharsetRange*): HttpRequest =
+      setAcceptCharset(one +: more)
 
     /** Creates new request removing Accept-Charset header. */
     def removeAcceptCharset(): HttpRequest =
@@ -132,12 +134,12 @@ package object headers {
         .map(_.map(ContentCodingRange.parse))
 
     /** Creates new request setting Accept-Encoding header to supplied values. */
-    def withAcceptEncoding(values: Seq[ContentCodingRange]): HttpRequest =
+    def setAcceptEncoding(values: Seq[ContentCodingRange]): HttpRequest =
       request.putHeaders(Header("Accept-Encoding", values.mkString(", ")))
 
     /** Creates new request setting Accept-Encoding header to supplied values. */
-    def withAcceptEncoding(one: ContentCodingRange, more: ContentCodingRange*): HttpRequest =
-      withAcceptEncoding(one +: more)
+    def setAcceptEncoding(one: ContentCodingRange, more: ContentCodingRange*): HttpRequest =
+      setAcceptEncoding(one +: more)
 
     /** Creates new request removing Accept-Encoding header. */
     def removeAcceptEncoding(): HttpRequest =
@@ -165,12 +167,12 @@ package object headers {
         .map(_.map(LanguageRange.parse))
 
     /** Creates new request setting Accept-Language header to supplied values. */
-    def withAcceptLanguage(values: Seq[LanguageRange]): HttpRequest =
+    def setAcceptLanguage(values: Seq[LanguageRange]): HttpRequest =
       request.putHeaders(Header("Accept-Language", values.mkString(", ")))
 
     /** Creates new request setting Accept-Language header to supplied values. */
-    def withAcceptLanguage(one: LanguageRange, more: LanguageRange*): HttpRequest =
-      withAcceptLanguage(one +: more)
+    def setAcceptLanguage(one: LanguageRange, more: LanguageRange*): HttpRequest =
+      setAcceptLanguage(one +: more)
 
     /** Creates new request removing Accept-Language header. */
     def removeAcceptLanguage(): HttpRequest =
@@ -198,12 +200,12 @@ package object headers {
         .map(_.map(MediaType.apply))
 
     /** Creates new response setting Accept-Patch header to supplied values. */
-    def withAcceptPatch(values: Seq[MediaType]): HttpResponse =
+    def setAcceptPatch(values: Seq[MediaType]): HttpResponse =
       response.putHeaders(Header("Accept-Patch", values.mkString(", ")))
 
     /** Creates new response setting Accept-Patch header to supplied values. */
-    def withAcceptPatch(one: MediaType, more: MediaType*): HttpResponse =
-      withAcceptPatch(one +: more)
+    def setAcceptPatch(one: MediaType, more: MediaType*): HttpResponse =
+      setAcceptPatch(one +: more)
 
     /** Creates new response removing Accept-Patch header. */
     def removeAcceptPatch(): HttpResponse =
@@ -229,12 +231,12 @@ package object headers {
       response.getHeaderValue("Accept-Ranges").map(ListParser.apply)
 
     /** Creates new response setting Accept-Ranges header to supplied values. */
-    def withAcceptRanges(values: Seq[String]): HttpResponse =
+    def setAcceptRanges(values: Seq[String]): HttpResponse =
       response.putHeaders(Header("Accept-Ranges", values.mkString(", ")))
 
     /** Creates new response setting Accept-Ranges header to supplied values. */
-    def withAcceptRanges(one: String, more: String*): HttpResponse =
-      withAcceptRanges(one +: more)
+    def setAcceptRanges(one: String, more: String*): HttpResponse =
+      setAcceptRanges(one +: more)
 
     /** Creates new response removing Accept-Ranges header. */
     def removeAcceptRanges(): HttpResponse =
@@ -260,7 +262,7 @@ package object headers {
       response.getHeader("Age").map(_.longValue)
 
     /** Creates new response setting Age header to supplied value. */
-    def withAge(value: Long): HttpResponse =
+    def setAge(value: Long): HttpResponse =
       response.putHeaders(Header("Age", value))
 
     /** Creates new response removing Age header. */
@@ -289,12 +291,12 @@ package object headers {
         .map(_.map(RequestMethod.apply))
 
     /** Creates new response setting Allow header to supplied values. */
-    def withAllow(values: Seq[RequestMethod]): HttpResponse =
+    def setAllow(values: Seq[RequestMethod]): HttpResponse =
       response.putHeaders(Header("Allow", values.mkString(", ")))
 
     /** Creates new response setting Allow header to supplied values. */
-    def withAllow(one: RequestMethod, more: RequestMethod*): HttpResponse =
-      withAllow(one +: more)
+    def setAllow(one: RequestMethod, more: RequestMethod*): HttpResponse =
+      setAllow(one +: more)
 
     /** Creates new response removing Allow header. */
     def removeAllow(): HttpResponse =
@@ -320,12 +322,12 @@ package object headers {
       message.getHeaderValue("Cache-Control").map(CacheDirective.parseAll)
 
     /** Creates new message setting Cache-Control header to supplied values. */
-    def withCacheControl(values: Seq[CacheDirective])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setCacheControl(values: Seq[CacheDirective])(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Cache-Control", values.mkString(", ")))
 
     /** Creates new message setting Cache-Control header to supplied values. */
-    def withCacheControl(one: CacheDirective, more: CacheDirective*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withCacheControl(one +: more)
+    def setCacheControl(one: CacheDirective, more: CacheDirective*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setCacheControl(one +: more)
 
     /** Creates new message removing Cache-Control header. */
     def removeCacheControl()(implicit ev: <:<[T, MessageBuilder[T]]): T =
@@ -351,7 +353,7 @@ package object headers {
       response.getHeaderValue("Content-Disposition").map(DispositionType.parse)
 
     /** Creates new response setting Content-Disposition header to supplied value. */
-    def withContentDisposition(value: DispositionType): HttpResponse =
+    def setContentDisposition(value: DispositionType): HttpResponse =
       response.putHeaders(Header("Content-Disposition", value.toString))
 
     /** Creates new response removing Content-Disposition header. */
@@ -380,12 +382,12 @@ package object headers {
         .map(_.map(ContentCoding.apply))
 
     /** Creates new message setting Content-Encoding header to supplied values. */
-    def withContentEncoding(values: Seq[ContentCoding])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setContentEncoding(values: Seq[ContentCoding])(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Content-Encoding", values.mkString(", ")))
 
     /** Creates new message setting Content-Encoding header to supplied values. */
-    def withContentEncoding(one: ContentCoding, more: ContentCoding*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withContentEncoding(one +: more)
+    def setContentEncoding(one: ContentCoding, more: ContentCoding*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setContentEncoding(one +: more)
 
     /** Creates new message removing Content-Encoding header. */
     def removeContentEncoding()(implicit ev: <:<[T, MessageBuilder[T]]): T =
@@ -413,12 +415,12 @@ package object headers {
         .map(_.map(LanguageTag.parse))
 
     /** Creates new message setting Content-Language header to supplied values. */
-    def withContentLanguage(values: Seq[LanguageTag])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setContentLanguage(values: Seq[LanguageTag])(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Content-Language", values.mkString(", ")))
 
     /** Creates new message setting Content-Language header to supplied values. */
-    def withContentLanguage(one: LanguageTag, more: LanguageTag*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withContentLanguage(one +: more)
+    def setContentLanguage(one: LanguageTag, more: LanguageTag*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setContentLanguage(one +: more)
 
     /** Creates new message removing Content-Language header. */
     def removeContentLanguage()(implicit ev: <:<[T, MessageBuilder[T]]): T =
@@ -444,7 +446,7 @@ package object headers {
       message.getHeader("Content-Length").map(_.longValue)
 
     /** Creates new message setting Content-Length header to supplied value. */
-    def withContentLength(value: Long)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setContentLength(value: Long)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Content-Length", value))
 
     /** Creates new message removing Content-Length header. */
@@ -471,7 +473,7 @@ package object headers {
       message.getHeaderValue("Content-Location").map(Uri(_))
 
     /** Creates new message setting Content-Location header to supplied value. */
-    def withContentLocation(value: Uri)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setContentLocation(value: Uri)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Content-Location", value.toString))
 
     /** Creates new message removing Content-Location header. */
@@ -498,7 +500,7 @@ package object headers {
       message.getHeaderValue("Content-Range").map(ByteContentRange.parse)
 
     /** Creates new message setting Content-Range header to supplied value. */
-    def withContentRange(value: ByteContentRange)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setContentRange(value: ByteContentRange)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Content-Range", value.toString))
 
     /** Creates new message removing Content-Range header. */
@@ -525,7 +527,7 @@ package object headers {
       message.getHeaderValue("Content-Type").map(MediaType.apply)
 
     /** Creates new message setting Content-Type header to supplied value. */
-    def withContentType(value: MediaType)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setContentType(value: MediaType)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Content-Type", value.toString))
 
     /** Creates new message removing Content-Type header. */
@@ -552,12 +554,12 @@ package object headers {
       message.getHeaderValue("Connection").map(ListParser.apply)
 
     /** Creates new message setting Connection header to supplied values. */
-    def withConnection(values: Seq[String])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setConnection(values: Seq[String])(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Connection", values.mkString(", ")))
 
     /** Creates new message setting Connection header to supplied values. */
-    def withConnection(one: String, more: String*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withConnection(one +: more)
+    def setConnection(one: String, more: String*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setConnection(one +: more)
 
     /** Creates new message removing Connection header. */
     def removeConnection()(implicit ev: <:<[T, MessageBuilder[T]]): T =
@@ -583,7 +585,7 @@ package object headers {
       message.getHeader("Date").map(_.dateValue)
 
     /** Creates new message setting Date header to supplied value. */
-    def withDate(value: Instant)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setDate(value: Instant)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Date", value))
 
     /** Creates new message removing Date header. */
@@ -610,7 +612,7 @@ package object headers {
       response.getHeaderValue("ETag").map(EntityTag.parse)
 
     /** Creates new response setting ETag header to supplied value. */
-    def withETag(value: EntityTag): HttpResponse =
+    def setETag(value: EntityTag): HttpResponse =
       response.putHeaders(Header("ETag", value.toString))
 
     /** Creates new response removing ETag header. */
@@ -637,7 +639,7 @@ package object headers {
       request.getHeaderValue("Early-Data").map(_.toInt)
 
     /** Creates new request setting Early-Data header to supplied value. */
-    def withEarlyData(value: Int): HttpRequest =
+    def setEarlyData(value: Int): HttpRequest =
       request.putHeaders(Header("Early-Data", value))
 
     /** Creates new request removing Early-Data header. */
@@ -664,7 +666,7 @@ package object headers {
       request.getHeaderValue("Expect")
 
     /** Creates new request setting Expect header to supplied value. */
-    def withExpect(value: String): HttpRequest =
+    def setExpect(value: String): HttpRequest =
       request.putHeaders(Header("Expect", value))
 
     /** Creates new request removing Expect header. */
@@ -691,7 +693,7 @@ package object headers {
       response.getHeader("Expires").map(_.dateValue)
 
     /** Creates new response setting Expires header to supplied value. */
-    def withExpires(value: Instant): HttpResponse =
+    def setExpires(value: Instant): HttpResponse =
       response.putHeaders(Header("Expires", value))
 
     /** Creates new response removing Expires header. */
@@ -718,7 +720,7 @@ package object headers {
       request.getHeaderValue("From")
 
     /** Creates new request setting From header to supplied value. */
-    def withFrom(value: String): HttpRequest =
+    def setFrom(value: String): HttpRequest =
       request.putHeaders(Header("From", value))
 
     /** Creates new request removing From header. */
@@ -745,7 +747,7 @@ package object headers {
       request.getHeaderValue("Host")
 
     /** Creates new request setting Host header to supplied value. */
-    def withHost(value: String): HttpRequest =
+    def setHost(value: String): HttpRequest =
       request.putHeaders(Header("Host", value))
 
     /** Creates new request removing Host header. */
@@ -774,12 +776,12 @@ package object headers {
         .map(_.map(EntityTag.parse))
 
     /** Creates new request setting If-Match header to supplied values. */
-    def withIfMatch(values: Seq[EntityTag]): HttpRequest =
+    def setIfMatch(values: Seq[EntityTag]): HttpRequest =
       request.putHeaders(Header("If-Match", values.mkString(", ")))
 
     /** Creates new request setting If-Match header to supplied values. */
-    def withIfMatch(one: EntityTag, more: EntityTag*): HttpRequest =
-      withIfMatch(one +: more)
+    def setIfMatch(one: EntityTag, more: EntityTag*): HttpRequest =
+      setIfMatch(one +: more)
 
     /** Creates new request removing If-Match header. */
     def removeIfMatch(): HttpRequest =
@@ -805,7 +807,7 @@ package object headers {
       request.getHeader("If-Modified-Since").map(_.dateValue)
 
     /** Creates new request setting If-Modified-Since header to supplied value. */
-    def withIfModifiedSince(value: Instant): HttpRequest =
+    def setIfModifiedSince(value: Instant): HttpRequest =
       request.putHeaders(Header("If-Modified-Since", value))
 
     /** Creates new request removing If-Modified-Since header. */
@@ -834,12 +836,12 @@ package object headers {
         .map(_.map(EntityTag.parse))
 
     /** Creates new request setting If-None-Match header to supplied values. */
-    def withIfNoneMatch(values: Seq[EntityTag]): HttpRequest =
+    def setIfNoneMatch(values: Seq[EntityTag]): HttpRequest =
       request.putHeaders(Header("If-None-Match", values.mkString(", ")))
 
     /** Creates new request setting If-None-Match header to supplied values. */
-    def withIfNoneMatch(one: EntityTag, more: EntityTag*): HttpRequest =
-      withIfNoneMatch(one +: more)
+    def setIfNoneMatch(one: EntityTag, more: EntityTag*): HttpRequest =
+      setIfNoneMatch(one +: more)
 
     /** Creates new request removing If-None-Match header. */
     def removeIfNoneMatch(): HttpRequest =
@@ -871,15 +873,15 @@ package object headers {
       }
 
     /** Creates new request setting If-Range header to supplied value. */
-    def withIfRange(value: Either[EntityTag, Instant]): HttpRequest =
-      value.fold(withIfRange, withIfRange)
+    def setIfRange(value: Either[EntityTag, Instant]): HttpRequest =
+      value.fold(setIfRange, setIfRange)
 
     /** Creates new request setting If-Range header to supplied value. */
-    def withIfRange(value: EntityTag): HttpRequest =
+    def setIfRange(value: EntityTag): HttpRequest =
       request.putHeaders(Header("If-Range", value.toString))
 
     /** Creates new request setting If-Range header to supplied value. */
-    def withIfRange(value: Instant): HttpRequest =
+    def setIfRange(value: Instant): HttpRequest =
       request.putHeaders(Header("If-Range", value))
 
     /** Creates new request removing If-Range header. */
@@ -908,7 +910,7 @@ package object headers {
     /**
      * Creates new request setting If-Unmodified-Since header to supplied value.
      */
-    def withIfUnmodifiedSince(value: Instant): HttpRequest =
+    def setIfUnmodifiedSince(value: Instant): HttpRequest =
       request.putHeaders(Header("If-Unmodified-Since", value))
 
     /** Creates new request removing If-Unmodified-Since header. */
@@ -935,7 +937,7 @@ package object headers {
       message.getHeaderValue("Keep-Alive").map(KeepAliveParameters.parse)
 
     /** Creates new message setting Keep-Alive header to supplied value. */
-    def withKeepAlive(value: KeepAliveParameters)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setKeepAlive(value: KeepAliveParameters)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Keep-Alive", value.toString))
 
     /** Creates new message removing Keep-Alive header. */
@@ -962,7 +964,7 @@ package object headers {
       response.getHeader("Last-Modified").map(_.dateValue)
 
     /** Creates new response setting Last-Modified header to supplied value. */
-    def withLastModified(value: Instant): HttpResponse =
+    def setLastModified(value: Instant): HttpResponse =
       response.putHeaders(Header("Last-Modified", value))
 
     /** Creates new response removing Last-Modified header. */
@@ -989,12 +991,12 @@ package object headers {
       response.getHeaderValue("Link").map(LinkValue.parseAll)
 
     /** Creates new response setting Link header to supplied values. */
-    def withLink(values: Seq[LinkValue]): HttpResponse =
+    def setLink(values: Seq[LinkValue]): HttpResponse =
       response.putHeaders(Header("Link", values.mkString(", ")))
 
     /** Creates new response setting Link header to supplied values. */
-    def withLink(one: LinkValue, more: LinkValue*): HttpResponse =
-      withLink(one +: more)
+    def setLink(one: LinkValue, more: LinkValue*): HttpResponse =
+      setLink(one +: more)
 
     /** Creates new response removing Link header. */
     def removeLink(): HttpResponse =
@@ -1020,7 +1022,7 @@ package object headers {
       response.getHeaderValue("Location").map(Uri(_))
 
     /** Creates new response setting Location header to supplied value. */
-    def withLocation(value: Uri): HttpResponse =
+    def setLocation(value: Uri): HttpResponse =
       response.putHeaders(Header("Location", value.toString))
 
     /** Creates new response removing Location header. */
@@ -1047,7 +1049,7 @@ package object headers {
       request.getHeader("Max-Forwards").map(_.longValue)
 
     /** Creates new request setting Max-Forwards header to supplied value. */
-    def withMaxForwards(value: Long): HttpRequest =
+    def setMaxForwards(value: Long): HttpRequest =
       request.putHeaders(Header("Max-Forwards", value))
 
     /** Creates new request removing Max-Forwards header. */
@@ -1074,12 +1076,12 @@ package object headers {
       request.getHeaderValue("Pragma").map(PragmaDirective.parseAll)
 
     /** Creates new request setting Pragma header to supplied values. */
-    def withPragma(values: Seq[PragmaDirective]): HttpRequest =
+    def setPragma(values: Seq[PragmaDirective]): HttpRequest =
       request.putHeaders(Header("Pragma", values.mkString(", ")))
 
     /** Creates new request setting Pragma header to supplied values. */
-    def withPragma(one: PragmaDirective, more: PragmaDirective*): HttpRequest =
-      withPragma(one +: more)
+    def setPragma(one: PragmaDirective, more: PragmaDirective*): HttpRequest =
+      setPragma(one +: more)
 
     /** Creates new request removing Pragma header. */
     def removePragma(): HttpRequest =
@@ -1109,12 +1111,12 @@ package object headers {
         }
 
     /** Creates new request setting Prefer header to supplied values. */
-    def withPrefer(values: Seq[Preference]): HttpRequest =
+    def setPrefer(values: Seq[Preference]): HttpRequest =
       request.putHeaders(Header("Prefer", values.mkString(", ")))
 
     /** Creates new request setting Prefer header to supplied values. */
-    def withPrefer(one: Preference, more: Preference*): HttpRequest =
-      withPrefer(one +: more)
+    def setPrefer(one: Preference, more: Preference*): HttpRequest =
+      setPrefer(one +: more)
 
     /** Creates new request removing Prefer header. */
     def removePrefer(): HttpRequest =
@@ -1142,12 +1144,12 @@ package object headers {
         .map(_.map(Preference.apply))
 
     /** Creates new response setting Preference-Applied header to supplied values. */
-    def withPreferenceApplied(values: Seq[Preference]): HttpResponse =
+    def setPreferenceApplied(values: Seq[Preference]): HttpResponse =
       response.putHeaders(Header("Preference-Applied", values.mkString(", ")))
 
     /** Creates new response setting Preference-Applied header to supplied values. */
-    def withPreferenceApplied(one: Preference, more: Preference*): HttpResponse =
-      withPreferenceApplied(one +: more)
+    def setPreferenceApplied(one: Preference, more: Preference*): HttpResponse =
+      setPreferenceApplied(one +: more)
 
     /** Creates new response removing Preference-Applied header. */
     def removePreferenceApplied(): HttpResponse =
@@ -1173,7 +1175,7 @@ package object headers {
       request.getHeaderValue("Range").map(ByteRange.parse)
 
     /** Creates new request setting Range header to supplied value. */
-    def withRange(value: ByteRange): HttpRequest =
+    def setRange(value: ByteRange): HttpRequest =
       request.putHeaders(Header("Range", value.toString))
 
     /** Creates new request removing Range header. */
@@ -1200,7 +1202,7 @@ package object headers {
       request.getHeaderValue("Referer").map(Uri(_))
 
     /** Creates new request setting Referer header to supplied value. */
-    def withReferer(value: Uri): HttpRequest =
+    def setReferer(value: Uri): HttpRequest =
       request.putHeaders(Header("Referer", value.toString))
 
     /** Creates new request removing Referer header. */
@@ -1227,7 +1229,7 @@ package object headers {
       response.getHeader("Retry-After").map(_.dateValue)
 
     /** Creates new response setting Retry-After header to supplied value. */
-    def withRetryAfter(value: Instant): HttpResponse =
+    def setRetryAfter(value: Instant): HttpResponse =
       response.putHeaders(Header("Retry-After", value))
 
     /** Creates new response removing Retry-After header. */
@@ -1254,12 +1256,12 @@ package object headers {
       response.getHeaderValue("Server").map(ProductType.parseAll)
 
     /** Creates new response setting Server header to supplied values. */
-    def withServer(values: Seq[ProductType]): HttpResponse =
+    def setServer(values: Seq[ProductType]): HttpResponse =
       response.putHeaders(Header("Server", values.mkString(" ")))
 
     /** Creates new response setting Server header to supplied values. */
-    def withServer(one: ProductType, more: ProductType*): HttpResponse =
-      withServer(one +: more)
+    def setServer(one: ProductType, more: ProductType*): HttpResponse =
+      setServer(one +: more)
 
     /** Creates new response removing Server header. */
     def removeServer(): HttpResponse =
@@ -1287,12 +1289,12 @@ package object headers {
         .map(_.map(TransferCodingRange.parse))
 
     /** Creates new request setting TE header to supplied values. */
-    def withTE(values: Seq[TransferCodingRange]): HttpRequest =
+    def setTE(values: Seq[TransferCodingRange]): HttpRequest =
       request.putHeaders(Header("TE", values.mkString(", ")))
 
     /** Creates new request setting TE header to supplied values. */
-    def withTE(one: TransferCodingRange, more: TransferCodingRange*): HttpRequest =
-      withTE(one +: more)
+    def setTE(one: TransferCodingRange, more: TransferCodingRange*): HttpRequest =
+      setTE(one +: more)
 
     /** Creates new request removing TE header. */
     def removeTE(): HttpRequest =
@@ -1318,12 +1320,12 @@ package object headers {
       message.getHeaderValue("Trailer").map(ListParser.apply)
 
     /** Creates new message setting Trailer header to supplied values. */
-    def withTrailer(values: Seq[String])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setTrailer(values: Seq[String])(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Trailer", values.mkString(", ")))
 
     /** Creates new message setting Trailer header to supplied values. */
-    def withTrailer(one: String, more: String*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withTrailer(one +: more)
+    def setTrailer(one: String, more: String*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setTrailer(one +: more)
 
     /** Creates new message removing Trailer header. */
     def removeTrailer()(implicit ev: <:<[T, MessageBuilder[T]]): T =
@@ -1351,12 +1353,12 @@ package object headers {
         .map(_.map(TransferCoding.parse))
 
     /** Creates new message setting Transfer-Encoding header to supplied values. */
-    def withTransferEncoding(values: Seq[TransferCoding])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setTransferEncoding(values: Seq[TransferCoding])(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Transfer-Encoding", values.mkString(", ")))
 
     /** Creates new message setting Transfer-Encoding header to supplied values. */
-    def withTransferEncoding(one: TransferCoding, more: TransferCoding*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withTransferEncoding(one +: more)
+    def setTransferEncoding(one: TransferCoding, more: TransferCoding*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setTransferEncoding(one +: more)
 
     /** Creates new message removing Transfer-Encoding header. */
     def removeTransferEncoding()(implicit ev: <:<[T, MessageBuilder[T]]): T =
@@ -1384,12 +1386,12 @@ package object headers {
         .map(_.map(Protocol.parse))
 
     /** Creates new message setting Upgrade header to supplied values. */
-    def withUpgrade(values: Seq[Protocol])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+    def setUpgrade(values: Seq[Protocol])(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Upgrade", values.mkString(", ")))
 
     /** Creates new message setting Upgrade header to supplied values. */
-    def withUpgrade(one: Protocol, more: Protocol*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      withUpgrade(one +: more)
+    def setUpgrade(one: Protocol, more: Protocol*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      setUpgrade(one +: more)
 
     /** Creates new message removing Upgrade header. */
     def removeUpgrade()(implicit ev: <:<[T, MessageBuilder[T]]): T =
@@ -1415,12 +1417,12 @@ package object headers {
       request.getHeaderValue("User-Agent").map(ProductType.parseAll)
 
     /** Creates new request setting User-Agent header to supplied value. */
-    def withUserAgent(values: Seq[ProductType]): HttpRequest =
+    def setUserAgent(values: Seq[ProductType]): HttpRequest =
       request.putHeaders(Header("User-Agent", values.mkString(" ")))
 
     /** Creates new request setting User-Agent header to supplied value. */
-    def withUserAgent(one: ProductType, more: ProductType*): HttpRequest =
-      withUserAgent(one +: more)
+    def setUserAgent(one: ProductType, more: ProductType*): HttpRequest =
+      setUserAgent(one +: more)
 
     /** Creates new request removing User-Agent header. */
     def removeUserAgent(): HttpRequest =
@@ -1446,12 +1448,12 @@ package object headers {
       response.getHeaderValue("Vary").map(ListParser.apply)
 
     /** Creates new response setting Vary header to supplied values. */
-    def withVary(values: Seq[String]): HttpResponse =
+    def setVary(values: Seq[String]): HttpResponse =
       response.putHeaders(Header("Vary", values.mkString(", ")))
 
     /** Creates new response setting Vary header to supplied values. */
-    def withVary(one: String, more: String*): HttpResponse =
-      withVary(one +: more)
+    def setVary(one: String, more: String*): HttpResponse =
+      setVary(one +: more)
 
     /** Creates new response removing Vary header. */
     def removeVary(): HttpResponse =
@@ -1477,12 +1479,12 @@ package object headers {
       response.getHeaderValue("Via").map(ViaType.parseAll)
 
     /** Creates new response setting Via header to supplied values. */
-    def withVia(values: Seq[ViaType]): HttpResponse =
+    def setVia(values: Seq[ViaType]): HttpResponse =
       response.putHeaders(Header("Via", values.mkString(", ")))
 
     /** Creates new response setting Via header to supplied values. */
-    def withVia(one: ViaType, more: ViaType*): HttpResponse =
-      withVia(one +: more)
+    def setVia(one: ViaType, more: ViaType*): HttpResponse =
+      setVia(one +: more)
 
     /** Creates new response removing Via header. */
     def removeVia(): HttpResponse =
@@ -1508,12 +1510,12 @@ package object headers {
       response.getHeaderValue("Warning").map(WarningType.parseAll)
 
     /** Creates new response setting Warning header to supplied values. */
-    def withWarning(values: Seq[WarningType]): HttpResponse =
+    def setWarning(values: Seq[WarningType]): HttpResponse =
       response.putHeaders(Header("Warning", values.mkString(", ")))
 
     /** Creates new response setting Warning header to supplied values. */
-    def withWarning(one: WarningType, more: WarningType*): HttpResponse =
-      withWarning(one +: more)
+    def setWarning(one: WarningType, more: WarningType*): HttpResponse =
+      setWarning(one +: more)
 
     /** Creates new response removing Warning header. */
     def removeWarning(): HttpResponse =

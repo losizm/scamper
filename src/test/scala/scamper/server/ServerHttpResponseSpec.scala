@@ -29,7 +29,7 @@ class ServerHttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec {
   val encodedFileName = s"utf-8''${file.getName.toUrlEncoded("utf-8")}"
 
   it should "add file attachment to HttpResponse" in {
-    val res = Ok().withAttachment(file)
+    val res = Ok().setAttachment(file)
 
     assert { res.contentType == MediaType("text", "html") }
     assert { res.contentLength == file.length }
@@ -40,7 +40,7 @@ class ServerHttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "add inline content to HttpResponse" in {
-    val res = Ok().withInline(file)
+    val res = Ok().setInline(file)
 
     assert { res.contentType == MediaType("text", "html") }
     assert { res.contentLength == file.length }

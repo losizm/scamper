@@ -20,8 +20,8 @@ import scamper.headers.ContentLength
 
 class ResponseFilterSpec extends org.scalatest.flatspec.AnyFlatSpec {
   "ResponseFilter" should "be composed with another" in {
-    val f1: ResponseFilter = _.withContentLength(10)
-    val f2: ResponseFilter = _.withContentLength(20)
+    val f1: ResponseFilter = _.setContentLength(10)
+    val f2: ResponseFilter = _.setContentLength(20)
     val res = Ok()
 
     assert { f1.compose(f2).apply(res).contentLength == 10 }
