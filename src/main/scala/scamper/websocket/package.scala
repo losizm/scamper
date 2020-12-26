@@ -31,6 +31,10 @@ package object websocket {
 
   /** Provides standardized access to Sec-WebSocket-Accept header. */
   implicit class SecWebSocketAccept(private val response: HttpResponse) extends AnyVal {
+    /** Tests for Sec-WebSocket-Accept header. */
+    def hasSecWebSocketAccept: Boolean =
+      response.hasHeader("Sec-WebSocket-Accept")
+
     /**
      * Gets Sec-WebSocket-Accept header value.
      *
@@ -43,10 +47,6 @@ package object websocket {
     def getSecWebSocketAccept: Option[String] =
       response.getHeaderValue("Sec-WebSocket-Accept")
 
-    /** Tests for Sec-WebSocket-Accept header. */
-    def hasSecWebSocketAccept: Boolean =
-      response.hasHeader("Sec-WebSocket-Accept")
-
     /** Creates new response setting Sec-WebSocket-Accept header to supplied value. */
     def withSecWebSocketAccept(value: String): HttpResponse =
       response.putHeaders(Header("Sec-WebSocket-Accept", value))
@@ -58,6 +58,10 @@ package object websocket {
 
   /** Provides standardized access to Sec-WebSocket-Extensions header. */
   implicit class SecWebSocketExtensions[T <: HttpMessage](private val message: T) extends AnyVal {
+    /** Tests for Sec-WebSocket-Extensions header. */
+    def hasSecWebSocketExtensions: Boolean =
+      message.hasHeader("Sec-WebSocket-Extensions")
+
     /**
      * Gets Sec-WebSocket-Extensions header values.
      *
@@ -71,10 +75,6 @@ package object websocket {
       message.getHeaderValues("Sec-WebSocket-Extensions")
         .map(WebSocketExtension.parseAll)
         .reduceLeftOption(_ ++ _)
-
-    /** Tests for Sec-WebSocket-Extensions header. */
-    def hasSecWebSocketExtensions: Boolean =
-      message.hasHeader("Sec-WebSocket-Extensions")
 
     /** Creates new message setting Sec-WebSocket-Extensions header to supplied values. */
     def withSecWebSocketExtensions(values: Seq[WebSocketExtension])(implicit ev: <:<[T, MessageBuilder[T]]): T =
@@ -91,6 +91,10 @@ package object websocket {
 
   /** Provides standardized access to Sec-WebSocket-Key header. */
   implicit class SecWebSocketKey(private val request: HttpRequest) extends AnyVal {
+    /** Tests for Sec-WebSocket-Key header. */
+    def hasSecWebSocketKey: Boolean =
+      request.hasHeader("Sec-WebSocket-Key")
+
     /**
      * Gets Sec-WebSocket-Key header value.
      *
@@ -103,9 +107,6 @@ package object websocket {
     def getSecWebSocketKey: Option[String] =
       request.getHeaderValue("Sec-WebSocket-Key")
 
-    /** Tests for Sec-WebSocket-Key header. */
-    def hasSecWebSocketKey: Boolean = request.hasHeader("Sec-WebSocket-Key")
-
     /** Creates new request setting Sec-WebSocket-Key header to supplied value. */
     def withSecWebSocketKey(value: String): HttpRequest =
       request.putHeaders(Header("Sec-WebSocket-Key", value))
@@ -117,6 +118,10 @@ package object websocket {
 
   /** Provides standardized access to Sec-WebSocket-Protocol header. */
   implicit class SecWebSocketProtocol[T <: HttpMessage](private val message: T) extends AnyVal {
+    /** Tests for Sec-WebSocket-Protocol header. */
+    def hasSecWebSocketProtocol: Boolean =
+      message.hasHeader("Sec-WebSocket-Protocol")
+
     /**
      * Gets Sec-WebSocket-Protocol header values.
      *
@@ -128,10 +133,6 @@ package object websocket {
     /** Gets Sec-WebSocket-Protocol header values if present. */
     def getSecWebSocketProtocol: Option[Seq[String]] =
       message.getHeaderValue("Sec-WebSocket-Protocol").map(ListParser.apply)
-
-    /** Tests for Sec-WebSocket-Protocol header. */
-    def hasSecWebSocketProtocol: Boolean =
-      message.hasHeader("Sec-WebSocket-Protocol")
 
     /** Creates new message setting Sec-WebSocket-Protocol header to supplied values. */
     def withSecWebSocketProtocol(values: Seq[String])(implicit ev: <:<[T, MessageBuilder[T]]): T =
@@ -148,6 +149,10 @@ package object websocket {
 
   /** Provides standardized access to Sec-WebSocket-Protocol-Client header. */
   implicit class SecWebSocketProtocolClient(private val request: HttpRequest) extends AnyVal {
+    /** Tests for Sec-WebSocket-Protocol-Client header. */
+    def hasSecWebSocketProtocolClient: Boolean =
+      request.hasHeader("Sec-WebSocket-Protocol-Client")
+
     /**
      * Gets Sec-WebSocket-Protocol-Client header value.
      *
@@ -160,10 +165,6 @@ package object websocket {
     def getSecWebSocketProtocolClient: Option[String] =
       request.getHeaderValue("Sec-WebSocket-Protocol-Client")
 
-    /** Tests for Sec-WebSocket-Protocol-Client header. */
-    def hasSecWebSocketProtocolClient: Boolean =
-      request.hasHeader("Sec-WebSocket-Protocol-Client")
-
     /** Creates new request setting Sec-WebSocket-Protocol-Client header to supplied value. */
     def withSecWebSocketProtocolClient(value: String): HttpRequest =
       request.putHeaders(Header("Sec-WebSocket-Protocol-Client", value))
@@ -175,6 +176,10 @@ package object websocket {
 
   /** Provides standardized access to Sec-WebSocket-Protocol-Server header. */
   implicit class SecWebSocketProtocolServer(private val response: HttpResponse) extends AnyVal {
+    /** Tests for Sec-WebSocket-Protocol-Server header. */
+    def hasSecWebSocketProtocolServer: Boolean =
+      response.hasHeader("Sec-WebSocket-Protocol-Server")
+
     /**
      * Gets Sec-WebSocket-Protocol-Server header value.
      *
@@ -187,10 +192,6 @@ package object websocket {
     def getSecWebSocketProtocolServer: Option[String] =
       response.getHeaderValue("Sec-WebSocket-Protocol-Server")
 
-    /** Tests for Sec-WebSocket-Protocol-Server header. */
-    def hasSecWebSocketProtocolServer: Boolean =
-      response.hasHeader("Sec-WebSocket-Protocol-Server")
-
     /** Creates new response setting Sec-WebSocket-Protocol-Server header to supplied value. */
     def withSecWebSocketProtocolServer(value: String): HttpResponse =
       response.putHeaders(Header("Sec-WebSocket-Protocol-Server", value))
@@ -202,6 +203,10 @@ package object websocket {
 
   /** Provides standardized access to Sec-WebSocket-Version header. */
   implicit class SecWebSocketVersion[T <: HttpMessage](private val message: T) extends AnyVal {
+    /** Tests for Sec-WebSocket-Version header. */
+    def hasSecWebSocketVersion: Boolean =
+      message.hasHeader("Sec-WebSocket-Version")
+
     /**
      * Gets Sec-WebSocket-Version header value.
      *
@@ -214,9 +219,6 @@ package object websocket {
     def getSecWebSocketVersion: Option[String] =
       message.getHeaderValue("Sec-WebSocket-Version")
 
-    /** Tests for Sec-WebSocket-Version header. */
-    def hasSecWebSocketVersion: Boolean = message.hasHeader("Sec-WebSocket-Version")
-
     /** Creates new message setting Sec-WebSocket-Version header to supplied value. */
     def withSecWebSocketVersion(value: String)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       message.putHeaders(Header("Sec-WebSocket-Version", value))
@@ -228,6 +230,10 @@ package object websocket {
 
   /** Provides standardized access to Sec-WebSocket-Version-Client header. */
   implicit class SecWebSocketVersionClient(private val request: HttpRequest) extends AnyVal {
+    /** Tests for Sec-WebSocket-Version-Client header. */
+    def hasSecWebSocketVersionClient: Boolean =
+      request.hasHeader("Sec-WebSocket-Version-Client")
+
     /**
      * Gets Sec-WebSocket-Version-Client header values.
      *
@@ -240,10 +246,6 @@ package object websocket {
     def getSecWebSocketVersionClient: Option[Seq[String]] =
       request.getHeaderValue("Sec-WebSocket-Version-Client")
         .map(ListParser.apply)
-
-    /** Tests for Sec-WebSocket-Version-Client header. */
-    def hasSecWebSocketVersionClient: Boolean =
-      request.hasHeader("Sec-WebSocket-Version-Client")
 
     /** Creates new request setting Sec-WebSocket-Version-Client header to supplied values. */
     def withSecWebSocketVersionClient(values: Seq[String]): HttpRequest =
@@ -260,6 +262,10 @@ package object websocket {
 
   /** Provides standardized access to Sec-WebSocket-Version-Server header. */
   implicit class SecWebSocketVersionServer(private val response: HttpResponse) extends AnyVal {
+    /** Tests for Sec-WebSocket-Version-Server header. */
+    def hasSecWebSocketVersionServer: Boolean =
+      response.hasHeader("Sec-WebSocket-Version-Server")
+
     /**
      * Gets Sec-WebSocket-Version-Server header values.
      *
@@ -272,10 +278,6 @@ package object websocket {
     def getSecWebSocketVersionServer: Option[Seq[String]] =
       response.getHeaderValue("Sec-WebSocket-Version-Server")
         .map(ListParser.apply)
-
-    /** Tests for Sec-WebSocket-Version-Server header. */
-    def hasSecWebSocketVersionServer: Boolean =
-      response.hasHeader("Sec-WebSocket-Version-Server")
 
     /** Creates new response setting Sec-WebSocket-Version-Server header to supplied values. */
     def withSecWebSocketVersionServer(values: Seq[String]): HttpResponse =

@@ -135,19 +135,21 @@ package object auth {
 
   /** Provides standardized access to Authentication-Info header. */
   implicit class AuthenticationInfo(private val response: HttpResponse) extends AnyVal {
+    /** Tests for Authentication-Info header. */
+    def hasAuthenticationInfo: Boolean =
+      response.hasHeader("Authentication-Info")
+
     /**
      * Gets Authentication-Info header values.
      *
      * @return header value or empty map if Authentication-Info is not present
      */
-    def authenticationInfo: Map[String, String] = getAuthenticationInfo.getOrElse(Map.empty)
+    def authenticationInfo: Map[String, String] =
+      getAuthenticationInfo.getOrElse(Map.empty)
 
     /** Gets Authentication-Info header value if present. */
     def getAuthenticationInfo: Option[Map[String, String]] =
       response.getHeaderValue("Authentication-Info").map(AuthParams.parse)
-
-    /** Tests for Authentication-Info header. */
-    def hasAuthenticationInfo: Boolean = response.hasHeader("Authentication-Info")
 
     /** Creates new response setting Authentication-Info header to supplied values. */
     def withAuthenticationInfo(values: Map[String, String]): HttpResponse =
@@ -158,11 +160,16 @@ package object auth {
       withAuthenticationInfo((one +: more).toMap)
 
     /** Creates new response removing Authentication-Info header. */
-    def removeAuthenticationInfo(): HttpResponse = response.removeHeaders("Authentication-Info")
+    def removeAuthenticationInfo(): HttpResponse =
+      response.removeHeaders("Authentication-Info")
   }
 
   /** Provides standardized access to Authorization header. */
   implicit class Authorization(private val request: HttpRequest) extends AnyVal {
+    /** Tests for Authorization header. */
+    def hasAuthorization: Boolean =
+      request.hasHeader("Authorization")
+
     /**
      * Gets Authorization header value.
      *
@@ -175,15 +182,17 @@ package object auth {
     def getAuthorization: Option[Credentials] =
       request.getHeaderValue("Authorization").map(Credentials.parse)
 
-    /** Tests for Authorization header. */
-    def hasAuthorization: Boolean = request.hasHeader("Authorization")
-
     /** Creates new request setting Authorization header to supplied value. */
     def withAuthorization(value: Credentials): HttpRequest =
       request.putHeaders(Header("Authorization", value.toString))
 
     /** Creates new request removing Authorization header. */
-    def removeAuthorization(): HttpRequest = request.removeHeaders("Authorization")
+    def removeAuthorization(): HttpRequest =
+      request.removeHeaders("Authorization")
+
+    /** Tests for basic authorization. */
+    def hasBasic: Boolean =
+      getBasic.isDefined
 
     /**
      * Gets basic authorization.
@@ -197,9 +206,6 @@ package object auth {
     def getBasic: Option[BasicCredentials] =
       getAuthorization.collect { case credentials: BasicCredentials => credentials }
 
-    /** Tests for basic authorization. */
-    def hasBasic: Boolean = getBasic.isDefined
-
     /** Creates new request with basic authorization. */
     def withBasic(token: String): HttpRequest =
       withBasic(BasicCredentials(token))
@@ -211,6 +217,10 @@ package object auth {
     /** Creates new request with basic authorization. */
     def withBasic(credentials: BasicCredentials): HttpRequest =
       withAuthorization(credentials)
+
+    /** Tests for bearer authorization. */
+    def hasBearer: Boolean =
+      getBearer.isDefined
 
     /**
      * Gets bearer authorization.
@@ -224,9 +234,6 @@ package object auth {
     def getBearer: Option[BearerCredentials] =
       getAuthorization.collect { case credentials: BearerCredentials => credentials }
 
-    /** Tests for bearer authorization. */
-    def hasBearer: Boolean = getBearer.isDefined
-
     /** Creates new request with bearer authorization. */
     def withBearer(token: String): HttpRequest =
       withBearer(BearerCredentials(token))
@@ -238,12 +245,17 @@ package object auth {
 
   /** Provides standardized access to Proxy-Authenticate header. */
   implicit class ProxyAuthenticate(private val response: HttpResponse) extends AnyVal {
+    /** Tests for Proxy-Authenticate. */
+    def hasProxyAuthenticate: Boolean =
+      response.hasHeader("Proxy-Authenticate")
+
     /**
      * Gets Proxy-Authenticate header values.
      *
      * @return header values or empty sequence if Proxy-Authenticate is not present
      */
-    def proxyAuthenticate: Seq[Challenge] = getProxyAuthenticate.getOrElse(Nil)
+    def proxyAuthenticate: Seq[Challenge] =
+      getProxyAuthenticate.getOrElse(Nil)
 
     /** Gets Proxy-Authenticate header values if present. */
     def getProxyAuthenticate: Option[Seq[Challenge]] =
@@ -252,9 +264,6 @@ package object auth {
           case Nil => None
           case seq => Some(seq)
         }
-
-    /** Tests for Proxy-Authenticate. */
-    def hasProxyAuthenticate: Boolean = response.hasHeader("Proxy-Authenticate")
 
     /** Creates new response setting Proxy-Authenticate header to supplied values. */
     def withProxyAuthenticate(values: Seq[Challenge]): HttpResponse =
@@ -265,7 +274,12 @@ package object auth {
       withProxyAuthenticate(one +: more)
 
     /** Creates new response removing Proxy-Authenticate header. */
-    def removeProxyAuthenticate(): HttpResponse = response.removeHeaders("Proxy-Authenticate")
+    def removeProxyAuthenticate(): HttpResponse =
+      response.removeHeaders("Proxy-Authenticate")
+
+    /** Tests for basic proxy authentication. */
+    def hasProxyBasic: Boolean =
+      getProxyBasic.isDefined
 
     /**
      * Gets basic proxy authentication.
@@ -279,9 +293,6 @@ package object auth {
     def getProxyBasic: Option[BasicChallenge] =
       proxyAuthenticate.collectFirst { case challenge: BasicChallenge => challenge }
 
-    /** Tests for basic proxy authentication. */
-    def hasProxyBasic: Boolean = getProxyBasic.isDefined
-
     /** Creates new response with basic proxy authentication. */
     def withProxyBasic(realm: String, params: Map[String, String]): HttpResponse =
       withProxyBasic(BasicChallenge(realm, params))
@@ -294,6 +305,10 @@ package object auth {
     def withProxyBasic(challenge: BasicChallenge): HttpResponse =
       withProxyAuthenticate(challenge)
 
+    /** Tests for bearer proxy authentication. */
+    def hasProxyBearer: Boolean =
+      getProxyBearer.isDefined
+
     /**
      * Gets bearer proxy authentication.
      *
@@ -305,9 +320,6 @@ package object auth {
     /** Gets bearer proxy authentication if present. */
     def getProxyBearer: Option[BearerChallenge] =
       proxyAuthenticate.collectFirst { case challenge: BearerChallenge => challenge }
-
-    /** Tests for bearer proxy authentication. */
-    def hasProxyBearer: Boolean = getProxyBearer.isDefined
 
     /** Creates new response with bearer proxy authentication. */
     def withProxyBearer(params: Map[String, String]): HttpResponse =
@@ -324,6 +336,10 @@ package object auth {
 
   /** Provides standardized access to Proxy-Authentication-Info header. */
   implicit class ProxyAuthenticationInfo(private val response: HttpResponse) extends AnyVal {
+    /** Tests for Proxy-Authentication-Info header. */
+    def hasProxyAuthenticationInfo: Boolean =
+      response.hasHeader("Proxy-Authentication-Info")
+
     /**
      * Gets Proxy-Authentication-Info header values.
      *
@@ -335,9 +351,6 @@ package object auth {
     /** Gets Proxy-Authentication-Info header value if present. */
     def getProxyAuthenticationInfo: Option[Map[String, String]] =
       response.getHeaderValue("Proxy-Authentication-Info").map(AuthParams.parse)
-
-    /** Tests for Proxy-Authentication-Info header. */
-    def hasProxyAuthenticationInfo: Boolean = response.hasHeader("Proxy-Authentication-Info")
 
     /** Creates new response setting Proxy-Authentication-Info header to supplied values. */
     def withProxyAuthenticationInfo(values: Map[String, String]): HttpResponse =
@@ -354,6 +367,10 @@ package object auth {
 
   /** Provides standardized access to Proxy-Authorization header. */
   implicit class ProxyAuthorization(private val request: HttpRequest) extends AnyVal {
+    /** Tests for Proxy-Authorization header. */
+    def hasProxyAuthorization: Boolean =
+      request.hasHeader("Proxy-Authorization")
+
     /**
      * Gets Proxy-Authorization header value.
      *
@@ -366,9 +383,6 @@ package object auth {
     def getProxyAuthorization: Option[Credentials] =
       request.getHeaderValue("Proxy-Authorization").map(Credentials.parse)
 
-    /** Tests for Proxy-Authorization header. */
-    def hasProxyAuthorization: Boolean = request.hasHeader("Proxy-Authorization")
-
     /**
      * Creates new request setting Proxy-Authorization header to supplied value.
      */
@@ -376,7 +390,12 @@ package object auth {
       request.putHeaders(Header("Proxy-Authorization", value.toString))
 
     /** Creates new request removing Proxy-Authorization header. */
-    def removeProxyAuthorization(): HttpRequest = request.removeHeaders("Proxy-Authorization")
+    def removeProxyAuthorization(): HttpRequest =
+      request.removeHeaders("Proxy-Authorization")
+
+    /** Tests for basic proxy authorization. */
+    def hasProxyBasic: Boolean =
+      getProxyBasic.isDefined
 
     /**
      * Gets basic proxy authorization.
@@ -390,9 +409,6 @@ package object auth {
     def getProxyBasic: Option[BasicCredentials] =
       getProxyAuthorization.collect { case credentials: BasicCredentials => credentials }
 
-    /** Tests for basic proxy authorization. */
-    def hasProxyBasic: Boolean = getProxyBasic.isDefined
-
     /** Creates new request with basic proxy authorization. */
     def withProxyBasic(token: String): HttpRequest =
       withProxyBasic(BasicCredentials(token))
@@ -404,6 +420,10 @@ package object auth {
     /** Creates new request with basic proxy authorization. */
     def withProxyBasic(credentials: BasicCredentials): HttpRequest =
       withProxyAuthorization(credentials)
+
+    /** Tests for bearer proxy authorization. */
+    def hasProxyBearer: Boolean =
+      getProxyBearer.isDefined
 
     /**
      * Gets bearer proxy authorization.
@@ -417,9 +437,6 @@ package object auth {
     def getProxyBearer: Option[BearerCredentials] =
       getProxyAuthorization.collect { case credentials: BearerCredentials => credentials }
 
-    /** Tests for bearer proxy authorization. */
-    def hasProxyBearer: Boolean = getProxyBearer.isDefined
-
     /** Creates new request with bearer proxy authorization. */
     def withProxyBearer(token: String): HttpRequest =
       withProxyBearer(BearerCredentials(token))
@@ -431,12 +448,17 @@ package object auth {
 
   /** Provides standardized access to WWW-Authenticate header. */
   implicit class WwwAuthenticate(private val response: HttpResponse) extends AnyVal {
+    /** Tests for WWW-Authenticate header. */
+    def hasWwwAuthenticate: Boolean =
+      response.hasHeader("WWW-Authenticate")
+
     /**
      * Gets WWW-Authenticate header values.
      *
      * @return header values or empty sequence if WWW-Authenticate is not present
      */
-    def wwwAuthenticate: Seq[Challenge] = getWwwAuthenticate.getOrElse(Nil)
+    def wwwAuthenticate: Seq[Challenge] =
+      getWwwAuthenticate.getOrElse(Nil)
 
     /** Gets WWW-Authenticate header values if present. */
     def getWwwAuthenticate: Option[Seq[Challenge]] =
@@ -445,9 +467,6 @@ package object auth {
           case Nil => None
           case seq => Some(seq)
         }
-
-    /** Tests for WWW-Authenticate header. */
-    def hasWwwAuthenticate: Boolean = response.hasHeader("WWW-Authenticate")
 
     /** Creates new response setting WWW-Authenticate header to supplied values. */
     def withWwwAuthenticate(values: Seq[Challenge]): HttpResponse =
@@ -458,7 +477,12 @@ package object auth {
       withWwwAuthenticate(one +: more)
 
     /** Creates new response removing WWW-Authenticate header. */
-    def removeWwwAuthenticate(): HttpResponse = response.removeHeaders("WWW-Authenticate")
+    def removeWwwAuthenticate(): HttpResponse =
+      response.removeHeaders("WWW-Authenticate")
+
+    /** Tests for basic authentication. */
+    def hasBasic: Boolean =
+      getBasic.isDefined
 
     /**
      * Gets basic authentication.
@@ -472,9 +496,6 @@ package object auth {
     def getBasic: Option[BasicChallenge] =
       wwwAuthenticate.collectFirst { case challenge: BasicChallenge => challenge }
 
-    /** Tests for basic authentication. */
-    def hasBasic: Boolean = getBasic.isDefined
-
     /** Creates new response with basic authentication. */
     def withBasic(realm: String, params: Map[String, String]): HttpResponse =
       withBasic(BasicChallenge(realm, params))
@@ -487,6 +508,10 @@ package object auth {
     def withBasic(challenge: BasicChallenge): HttpResponse =
       withWwwAuthenticate(challenge)
 
+    /** Tests for bearer authentication. */
+    def hasBearer: Boolean =
+      getBearer.isDefined
+
     /**
      * Gets bearer authentication.
      *
@@ -498,9 +523,6 @@ package object auth {
     /** Gets bearer authentication if present. */
     def getBearer: Option[BearerChallenge] =
       wwwAuthenticate.collectFirst { case challenge: BearerChallenge => challenge }
-
-    /** Tests for bearer authentication. */
-    def hasBearer: Boolean = getBearer.isDefined
 
     /** Creates new response with bearer authentication. */
     def withBearer(params: Map[String, String]): HttpResponse =
