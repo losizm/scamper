@@ -84,7 +84,7 @@ package object headers {
   implicit class AcceptCharset(private val request: HttpRequest) extends AnyVal {
     /** Tests for Accept-Charset header. */
     def hasAcceptCharset: Boolean =
-      request.hasHeader("AcceptCharset")
+      request.hasHeader("Accept-Charset")
 
     /**
      * Gets Accept-Charset header values.
@@ -1139,9 +1139,11 @@ package object headers {
 
     /** Gets Preference-Applied header values if present. */
     def getPreferenceApplied: Option[Seq[Preference]] =
-      response.getHeaderValue("Preference-Applied")
-        .map(ListParser.apply)
-        .map(_.map(Preference.apply))
+      response.getHeaderValues("Preference-Applied")
+        .flatMap(Preference.parseAll) match {
+          case Nil => None
+          case seq => Some(seq)
+        }
 
     /** Creates new response setting Preference-Applied header to supplied values. */
     def setPreferenceApplied(values: Seq[Preference]): HttpResponse =
@@ -1461,10 +1463,10 @@ package object headers {
   }
 
   /** Provides standardized access to Via header. */
-  implicit class Via(private val response: HttpResponse) extends AnyVal {
+  implicit class Via[T <: HttpMessage](private val message: T) extends AnyVal {
     /** Tests for Via header. */
     def hasVia: Boolean =
-      response.hasHeader("Via")
+      message.hasHeader("Via")
 
     /**
      * Gets Via header values.
@@ -1476,26 +1478,26 @@ package object headers {
 
     /** Gets Via header values if present. */
     def getVia: Option[Seq[ViaType]] =
-      response.getHeaderValue("Via").map(ViaType.parseAll)
+      message.getHeaderValue("Via").map(ViaType.parseAll)
 
-    /** Creates new response setting Via header to supplied values. */
-    def setVia(values: Seq[ViaType]): HttpResponse =
-      response.putHeaders(Header("Via", values.mkString(", ")))
+    /** Creates new message setting Via header to supplied values. */
+    def setVia(values: Seq[ViaType])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.putHeaders(Header("Via", values.mkString(", ")))
 
-    /** Creates new response setting Via header to supplied values. */
-    def setVia(one: ViaType, more: ViaType*): HttpResponse =
+    /** Creates new message setting Via header to supplied values. */
+    def setVia(one: ViaType, more: ViaType*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       setVia(one +: more)
 
-    /** Creates new response removing Via header. */
-    def removeVia: HttpResponse =
-      response.removeHeaders("Via")
+    /** Creates new message removing Via header. */
+    def removeVia(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Via")
   }
 
   /** Provides standardized access to Warning header. */
-  implicit class Warning(private val response: HttpResponse) extends AnyVal {
+  implicit class Warning[T <: HttpMessage](private val message: T) extends AnyVal {
     /** Tests for Warning header. */
     def hasWarning: Boolean =
-      response.hasHeader("Warning")
+      message.hasHeader("Warning")
 
     /**
      * Gets Warning header values.
@@ -1507,18 +1509,18 @@ package object headers {
 
     /** Gets Warning header values if present. */
     def getWarning: Option[Seq[WarningType]] =
-      response.getHeaderValue("Warning").map(WarningType.parseAll)
+      message.getHeaderValue("Warning").map(WarningType.parseAll)
 
-    /** Creates new response setting Warning header to supplied values. */
-    def setWarning(values: Seq[WarningType]): HttpResponse =
-      response.putHeaders(Header("Warning", values.mkString(", ")))
+    /** Creates new message setting Warning header to supplied values. */
+    def setWarning(values: Seq[WarningType])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.putHeaders(Header("Warning", values.mkString(", ")))
 
-    /** Creates new response setting Warning header to supplied values. */
-    def setWarning(one: WarningType, more: WarningType*): HttpResponse =
+    /** Creates new message setting Warning header to supplied values. */
+    def setWarning(one: WarningType, more: WarningType*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       setWarning(one +: more)
 
-    /** Creates new response removing Warning header. */
-    def removeWarning: HttpResponse =
-      response.removeHeaders("Warning")
+    /** Creates new message removing Warning header. */
+    def removeWarning(implicit ev: <:<[T, MessageBuilder[T]]): T =
+      message.removeHeaders("Warning")
   }
 }
