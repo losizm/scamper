@@ -28,7 +28,7 @@ trait StatusCode {
   def meaning: String
 
   /** Indicator for reserved value. */
-  def reserved: Boolean
+  def isReserved: Boolean
 
   /** Converts value to 2-byte data array. */
   def toData: Array[Byte] =
@@ -113,7 +113,7 @@ object StatusCode {
      * code (e.g., 1003 or 1009) or if there is a need to hide specific details
      * about the policy.
      */
-    val PolicyVioliation: StatusCode = StatusCodeImpl(1008, "Policy Violation", false)
+    val PolicyViolation: StatusCode = StatusCodeImpl(1008, "Policy Violation", false)
 
     /**
      * 1009 indicates that an endpoint is terminating the connection because it
@@ -183,7 +183,7 @@ object StatusCode {
       case 1005 => Registry.NoStatusReceived
       case 1006 => Registry.AbnormalClosure
       case 1007 => Registry.InvalidFramePayload
-      case 1008 => Registry.PolicyVioliation
+      case 1008 => Registry.PolicyViolation
       case 1009 => Registry.MessageTooBig
       case 1010 => Registry.MandatoryExtension
       case 1011 => Registry.InternalError
@@ -211,6 +211,6 @@ object StatusCode {
     Some(code.value)
 }
 
-private case class StatusCodeImpl(value: Int, meaning: String, reserved: Boolean) extends StatusCode {
+private case class StatusCodeImpl(value: Int, meaning: String, isReserved: Boolean) extends StatusCode {
   override lazy val toString: String = s"$value ($meaning)"
 }

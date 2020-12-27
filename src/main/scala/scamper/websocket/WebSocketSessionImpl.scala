@@ -91,7 +91,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
       Try(doClose(statusCode.toData))
 
       try
-        if (!statusCode.reserved)
+        if (!statusCode.isReserved)
           conn.write(makeFrame(statusCode.toData, Close))
       catch {
         case err: Exception => if (!closeReceived.get) doError(err)
