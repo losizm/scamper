@@ -17,44 +17,44 @@ package scamper.types
 
 import scamper.Uri
 
-class LinkValueSpec extends org.scalatest.flatspec.AnyFlatSpec {
-  "LinkValue" should "be created" in {
-    var link = LinkValue(Uri("/assets/icon.png"))
+class LinkTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+  "LinkType" should "be created" in {
+    var link = LinkType(Uri("/assets/icon.png"))
     assert(link.ref.toString == "/assets/icon.png")
     assert(link.params.isEmpty)
     assert(link.toString == "</assets/icon.png>")
-    assert(link == LinkValue(Uri("/assets/icon.png")))
+    assert(link == LinkType(Uri("/assets/icon.png")))
 
-    link = LinkValue(Uri("/assets/large-icon.png"), "size" -> Some("64x64"))
+    link = LinkType(Uri("/assets/large-icon.png"), "size" -> Some("64x64"))
     assert(link.ref.toString == "/assets/large-icon.png")
     assert(link.params("size") == Some("64x64"))
     assert(link.toString == "</assets/large-icon.png>; size=64x64")
-    assert(link == LinkValue(Uri("/assets/large-icon.png"), "size" -> Some("64x64")))
+    assert(link == LinkType(Uri("/assets/large-icon.png"), "size" -> Some("64x64")))
   }
 
   it should "be parsed" in {
-    assert(LinkValue.parse("</assets/icon.png>") == LinkValue(Uri("/assets/icon.png")))
-    assert(LinkValue.parse("</assets/large-icon.png>;size=64x64") == LinkValue(Uri("/assets/large-icon.png"), "size" -> Some("64x64")))
+    assert(LinkType.parse("</assets/icon.png>") == LinkType(Uri("/assets/icon.png")))
+    assert(LinkType.parse("</assets/large-icon.png>;size=64x64") == LinkType(Uri("/assets/large-icon.png"), "size" -> Some("64x64")))
     assert {
-      LinkValue.parseAll("</assets/icon.png>,</assets/large-icon.png>;size=64x64") ==
-        Seq(LinkValue(Uri("/assets/icon.png")),LinkValue(Uri("/assets/large-icon.png"), "size" -> Some("64x64")))
+      LinkType.parseAll("</assets/icon.png>,</assets/large-icon.png>;size=64x64") ==
+        Seq(LinkType(Uri("/assets/icon.png")),LinkType(Uri("/assets/large-icon.png"), "size" -> Some("64x64")))
     }
   }
 
   it should "be destructured" in {
-    LinkValue.parse("</assets/icon.png>") match {
-      case LinkValue(ref, params) => assert(ref.toString == "/assets/icon.png" && params.isEmpty)
+    LinkType.parse("</assets/icon.png>") match {
+      case LinkType(ref, params) => assert(ref.toString == "/assets/icon.png" && params.isEmpty)
     }
 
-    LinkValue.parse("</assets/large-icon.png>;size=64x64") match {
-      case LinkValue(ref, params) =>
+    LinkType.parse("</assets/large-icon.png>;size=64x64") match {
+      case LinkType(ref, params) =>
         assert(ref.toString == "/assets/large-icon.png")
         assert(params("size") == Some("64x64"))
     }
   }
 
   it should "not be created with malformed value" in {
-    assertThrows[IllegalArgumentException](LinkValue.parse("/assets/icon.png"))
-    assertThrows[IllegalArgumentException](LinkValue.parse("/assets/icon.png>; size=64x64"))
+    assertThrows[IllegalArgumentException](LinkType.parse("/assets/icon.png"))
+    assertThrows[IllegalArgumentException](LinkType.parse("/assets/icon.png>; size=64x64"))
   }
 }

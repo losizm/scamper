@@ -50,8 +50,8 @@ object Implicits {
   /** Converts string to [[LanguageRange]]. */
   implicit val stringToLanguageRange = (range: String) => LanguageRange.parse(range)
 
-  /** Converts string to [[LinkValue]]. */
-  implicit val stringToLinkValue = (link: String) => LinkValue.parse(link)
+  /** Converts string to [[LinkType]]. */
+  implicit val stringToLinkType = (link: String) => LinkType.parse(link)
 
   /** Converts string to [[MediaType]]. */
   implicit val stringToMediaType = (mediaType: String) => MediaType(mediaType)

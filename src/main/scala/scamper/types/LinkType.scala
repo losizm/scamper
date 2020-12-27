@@ -22,7 +22,7 @@ import scamper.{ HeaderParams, ListParser, Uri }
  *
  * @see [[scamper.headers.Link]]
  */
-trait LinkValue {
+trait LinkType {
   /** Gets link reference. */
   def ref: Uri
 
@@ -34,12 +34,12 @@ trait LinkValue {
     s"<$ref>${HeaderParams.format(params)}"
 }
 
-/** Provides factory for `LinkValue`. */
-object LinkValue {
+/** Provides factory for `LinkType`. */
+object LinkType {
   private val syntax = """\s*<([^,<>"]+)>\s*(;.+)?\s*""".r
 
   /** Parses formatted link. */
-  def parse(link: String): LinkValue =
+  def parse(link: String): LinkType =
     link match {
       case syntax(ref, null)   => apply(Uri(ref))
       case syntax(ref, params) => apply(Uri(ref), HeaderParams.parse(params))
@@ -47,20 +47,20 @@ object LinkValue {
     }
 
   /** Parses formatted list of links. */
-  def parseAll(links: String): Seq[LinkValue] =
+  def parseAll(links: String): Seq[LinkType] =
     ListParser(links).map(parse)
 
   /** Creates link with supplied values. */
-  def apply(ref: Uri, params: (String, Option[String])*): LinkValue =
-    LinkValueImpl(ref, params.toMap)
+  def apply(ref: Uri, params: (String, Option[String])*): LinkType =
+    LinkTypeImpl(ref, params.toMap)
 
   /** Creates link with supplied values. */
-  def apply(ref: Uri, params: Map[String, Option[String]]): LinkValue =
-    LinkValueImpl(ref, params)
+  def apply(ref: Uri, params: Map[String, Option[String]]): LinkType =
+    LinkTypeImpl(ref, params)
 
   /** Destructures link. */
-  def unapply(link: LinkValue): Option[(Uri, Map[String, Option[String]])] =
+  def unapply(link: LinkType): Option[(Uri, Map[String, Option[String]])] =
     Some((link.ref, link.params))
 }
 
-private case class LinkValueImpl(ref: Uri, params: Map[String, Option[String]]) extends LinkValue
+private case class LinkTypeImpl(ref: Uri, params: Map[String, Option[String]]) extends LinkType
