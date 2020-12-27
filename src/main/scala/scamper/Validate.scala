@@ -15,7 +15,7 @@
  */
 package scamper
 
-import scala.collection.GenTraversableOnce
+import java.util.Objects.isNull
 
 private object Validate {
   @inline
@@ -33,19 +33,19 @@ private object Validate {
   }
 
   @inline
-  def noNulls[T <: GenTraversableOnce[_]](values: T): T = {
+  def noNulls[T <: Seq[_]](values: T): T = {
     if (values == null)
       throw new NullPointerException()
-    if (values.exists(_ == null))
+    if (values.contains(null))
       throw new IllegalArgumentException()
     values
   }
 
   @inline
-  def noNulls[T <: GenTraversableOnce[_]](values: T, message: => String): T = {
+  def noNulls[T <: Seq[_]](values: T, message: => String): T = {
     if (values == null)
       throw new NullPointerException()
-    if (values.exists(_ == null))
+    if (values.contains(null))
       throw new IllegalArgumentException(message)
     values
   }
