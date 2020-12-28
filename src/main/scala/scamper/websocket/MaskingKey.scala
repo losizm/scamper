@@ -55,9 +55,9 @@ object MaskingKey {
    * @return `Some` masking key if `value` is nonzero; `None` otherwise
    */
   def get(value: Int): Option[MaskingKey] =
-    (value == 0) match {
+    value == 0 match {
       case true  => None
-      case fale  => Some(new MaskingKeyImpl(value))
+      case fale  => Some(MaskingKeyImpl(value))
     }
       
   /**
@@ -68,7 +68,7 @@ object MaskingKey {
   def apply(value: Int): MaskingKey = {
     if (value == 0)
       throw new IllegalArgumentException("value is 0")
-    new MaskingKeyImpl(value)
+    MaskingKeyImpl(value)
   }
 
   /** Creates masking key with randomly generated value. */
@@ -76,25 +76,24 @@ object MaskingKey {
     var value = 0
     while (value == 0)
       value = random.nextInt()
-    new MaskingKeyImpl(value)
+    MaskingKeyImpl(value)
   }
 }
 
 private case class MaskingKeyImpl(value: Int) extends MaskingKey {
+  private val key = Array(
+    ((value & 0xff000000) >> 24).toByte,
+    ((value & 0x00ff0000) >> 16).toByte,
+    ((value & 0x0000ff00) >>  8).toByte,
+    ((value & 0x000000ff) >>  0).toByte
+  )
+
   override lazy val toString: String = f"MaskingKey(0x$value%08x)"
 
   def apply(data: Array[Byte], length: Int, position: Long): Array[Byte] = {
-    val key = Array(
-      { (value & 0xff000000) >> 24 }.toByte,
-      { (value & 0x00ff0000) >> 16 }.toByte,
-      { (value & 0x0000ff00) >>  8 }.toByte,
-      { (value & 0x000000ff) >>  0 }.toByte
-    )
-
     val offset = (position % 4).toInt
-
     for (i <- 0 until length)
-      data(i) = { data(i) ^ key((i + offset) % 4) }.toByte
+      data(i) = (data(i) ^ key((offset + i) % 4)).toByte
     data
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2020 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,8 @@ package object scamper {
   /** Provides factory for `Uri`. */
   object Uri {
     /** Creates URI from supplied string. */
-    def apply(uri: String): Uri = new Uri(uri)
+    def apply(uri: String): Uri =
+      new Uri(uri)
 
     /** Creates URI with supplied scheme, scheme-specific part, and fragment. */
     def apply(scheme: String, schemeSpecificPart: String, fragment: String = null): Uri =

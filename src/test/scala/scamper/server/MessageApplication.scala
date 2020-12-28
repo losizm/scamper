@@ -17,7 +17,7 @@ package scamper.server
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import scala.collection.concurrent.TrieMap
+import scala.collection.mutable.LinkedHashMap
 
 import scamper.{ BodyParser, HttpRequest, HttpMessage }
 import scamper.Implicits._
@@ -30,7 +30,7 @@ object MessageApplication extends (Router => Unit) {
   private implicit val bodyParser = BodyParser.text(8192)
 
   def apply(router: Router): Unit = {
-    val messages = new TrieMap[Int, String]
+    val messages = new LinkedHashMap[Int, String]
     val sequence = new AtomicInteger
 
     router.get("/") { implicit req =>
@@ -39,11 +39,9 @@ object MessageApplication extends (Router => Unit) {
         val limit  = getQueryInt("limit", messages.size)
 
         val outMessages = messages
-          .collect { case (id, message) => f"$id%03d: $message" }
-          .toSeq
-          .sorted
           .drop(offset)
           .take(limit)
+          .map { case (id, message) => s"$id: $message" }
           .mkString("\r\n\r\n")
 
         Ok(outMessages)
@@ -82,7 +80,7 @@ object MessageApplication extends (Router => Unit) {
         val msg = getTextBody
         
         messages
-          .replace(id, msg)
+          .put(id, msg)
           .map(_ => Ok("Message updated."))
           .getOrElse(NotFound(s"Message not found: $id"))
           .setContentType("text/plain")

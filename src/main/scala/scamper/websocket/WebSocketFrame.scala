@@ -86,13 +86,8 @@ object WebSocketFrame {
     if (isCompressed && opcode != Text && opcode != Binary && opcode != Continuation)
       throw new IllegalArgumentException("isCompressed set for non data frame")
 
-    if (key == null)
+    if (key == null || key.contains(null))
       throw new NullPointerException("key")
-
-    key.foreach { value =>
-      if (value == null)
-        throw new NullPointerException("key")
-    }
 
     if (length < 0)
       throw new IllegalArgumentException("length less than zero")
@@ -117,7 +112,7 @@ object WebSocketFrame {
    */
   def apply(isFinal: Boolean, isCompressed: Boolean, opcode: Opcode, key: Option[MaskingKey], length: Int, data: Array[Byte]): WebSocketFrame = {
     key.foreach(key => key(data, length, 0))
-    apply(isFinal, isCompressed, opcode, key, length, { if (length == 0) EmptyInputStream else new ByteArrayInputStream(data, 0, length) })
+    apply(isFinal, isCompressed, opcode, key, length, if (length == 0) EmptyInputStream else new ByteArrayInputStream(data, 0, length))
   }
 
   /**
