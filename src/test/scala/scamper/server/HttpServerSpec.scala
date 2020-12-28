@@ -162,7 +162,7 @@ class HttpServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer 
 
       val apiMessages = res.as[Map[Int, String]]
       assert(apiMessages.size == originalMessages.size)
-      
+
       apiMessages.foreach {
         case (id, message) => assert(message == originalMessages(id))
       }
@@ -214,7 +214,7 @@ class HttpServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer 
 
       val apiMessages = res.as[Map[Int, String]]
       assert(apiMessages.size == originalMessages.size - deletedMessages.size)
-      
+
       deletedMessages.foreach { id =>
         assert(!apiMessages.contains(id))
       }

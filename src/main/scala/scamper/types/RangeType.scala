@@ -93,7 +93,7 @@ object ByteRange {
   sealed trait ByteRangeSpec
 
   /** Byte range spec with first position and optional last position. */
-  case class Slice(first: Long, last: Option[Long]) extends ByteRangeSpec 
+  case class Slice(first: Long, last: Option[Long]) extends ByteRangeSpec
 
   /** Byte range spec with suffix length. */
   case class Suffix(length: Long) extends ByteRangeSpec

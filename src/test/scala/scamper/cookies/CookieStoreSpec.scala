@@ -35,7 +35,7 @@ class CookieStoreSpec extends org.scalatest.flatspec.AnyFlatSpec {
     val cookies = cookieStore.get("https://ht.abc.com/a/b/c")
     assert { matches(cookies, b) }
   }
-  
+
   it should "get cookies with matching domain" in {
     val a = SetCookie("a", "1", domain = Some("abc.com"))
     val b = SetCookie("b", "2", domain = Some("ht.abc.com"))
@@ -50,7 +50,7 @@ class CookieStoreSpec extends org.scalatest.flatspec.AnyFlatSpec {
     val cookies = cookieStore.get("https://ht.abc.com/a/b/c")
     assert { matches(cookies, a, b) }
   }
-  
+
   it should "get cookies with matching path" in {
     val a = SetCookie("a", "1", domain = Some("abc.com"), path = Some("/a"))
     val b = SetCookie("b", "2", domain = Some("abc.com"), path = Some("/a/b"))
@@ -65,7 +65,7 @@ class CookieStoreSpec extends org.scalatest.flatspec.AnyFlatSpec {
     val cookies = cookieStore.get("https://ht.abc.com/a/b/c")
     assert { matches(cookies, a, b) }
   }
-  
+
   it should "get cookies that are not expired" in {
     val a = SetCookie("a", "1", expires = None)
     val b = SetCookie("b", "2", expires = Some(Instant.now().plusSeconds(60)))
@@ -80,7 +80,7 @@ class CookieStoreSpec extends org.scalatest.flatspec.AnyFlatSpec {
     val cookies = cookieStore.get("https://abc.com/a/b/c")
     assert { matches(cookies, a, b, d, e) }
   }
-  
+
   it should "get cookies that are not secure" in {
     val a = SetCookie("a", "1", secure = false)
     val b = SetCookie("b", "2", secure = true)
@@ -94,7 +94,7 @@ class CookieStoreSpec extends org.scalatest.flatspec.AnyFlatSpec {
     val cookies2 = cookieStore.get("https://abc.com/a/b/c")
     assert { matches(cookies2, a, b) }
   }
-  
+
   it should "get cookies that are ordered by longest path" in {
     val a = SetCookie("a", "1", path = None)
     val b = SetCookie("b", "2", path = Some("/a"))
@@ -110,7 +110,7 @@ class CookieStoreSpec extends org.scalatest.flatspec.AnyFlatSpec {
     val cookies = cookieStore.get("http://abc.com/a/b/c/d/e/f")
     assert { cookies == Seq(e, g, f, c, d, b, a).map(_.toPlainCookie) }
   }
-  
+
   it should "replace existing cookie" in {
     val a1 = SetCookie("a", "1", domain = Some("abc.com"), path = Some("/a/b/c"), httpOnly = true)
     val a2 = SetCookie("a", "2", domain = Some("abc.com"), path = Some("/a/b/c"), maxAge = Some(60), secure = true)
@@ -139,7 +139,7 @@ class CookieStoreSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert { !newCookie.httpOnly }
     assert { newCookie.persistent }
   }
-  
+
   it should "list and clear cookies" in {
     val a = SetCookie("a", "1")
     val b = SetCookie("b", "2", maxAge = Some(60))

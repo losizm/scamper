@@ -30,7 +30,7 @@ private object SecureServerSocketFactory {
   def create(keyStore: KeyStore, password: Array[Char]): SSLServerSocketFactory = {
     val keyManagerFactory = KeyManagerFactory.getInstance("SunX509")
     keyManagerFactory.init(keyStore, password)
-    
+
     val sslContext = SSLContext.getInstance("TLS")
     sslContext.init(keyManagerFactory.getKeyManagers(), null, null)
     sslContext.getServerSocketFactory()

@@ -53,7 +53,7 @@ object MessageApplication extends (Router => Unit) {
       withErrorHandling {
         val msg = getTextBody
         val id  = sequence.incrementAndGet()
-        
+
         messages.put(id, msg)
 
         Created("Message posted.")
@@ -65,7 +65,7 @@ object MessageApplication extends (Router => Unit) {
     router.get("/:id") { implicit req =>
       withErrorHandling {
         val id = getPathInt("id")
-        
+
         messages
           .get(id)
           .map(Ok(_))
@@ -78,7 +78,7 @@ object MessageApplication extends (Router => Unit) {
       withErrorHandling {
         val id  = getPathInt("id")
         val msg = getTextBody
-        
+
         messages
           .put(id, msg)
           .map(_ => Ok("Message updated."))
@@ -90,7 +90,7 @@ object MessageApplication extends (Router => Unit) {
     router.delete("/:id") { implicit req =>
       withErrorHandling {
         val id = getPathInt("id")
-        
+
         messages
           .remove(id)
           .map(_ => Ok("Message deleted."))

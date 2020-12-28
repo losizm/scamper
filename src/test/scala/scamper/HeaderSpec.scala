@@ -47,7 +47,7 @@ class HeaderSpec extends org.scalatest.flatspec.AnyFlatSpec {
 
   it should "be destructured" in {
     val header = Header("Content-Type: text/plain")
-    
+
     header match {
       case Header(name, value) =>
         assert(name == "Content-Type")

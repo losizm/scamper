@@ -66,7 +66,7 @@ trait Router {
    * @throws IllegalArgumentException if router path is not `*` and does not
    * begin with `/` or if it escapes mount path
    *
-   * @note If `*` is supplied as router path, its absolute path is also `*`. 
+   * @note If `*` is supplied as router path, its absolute path is also `*`.
    */
   def toAbsolutePath(path: String): String =
     NormalizePath(path) match {

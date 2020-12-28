@@ -59,7 +59,7 @@ object MaskingKey {
       case true  => None
       case fale  => Some(MaskingKeyImpl(value))
     }
-      
+
   /**
    * Creates masking key with supplied value.
    *

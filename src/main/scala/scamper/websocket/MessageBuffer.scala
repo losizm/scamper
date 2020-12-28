@@ -21,7 +21,7 @@ import java.util.zip.{ Inflater, InflaterOutputStream }
 private trait MessageBuffer {
   def add(data: Array[Byte]): Unit
   def size: Int
-  def get: Array[Byte] 
+  def get: Array[Byte]
 }
 
 private class IdentityMessageBuffer extends MessageBuffer {
