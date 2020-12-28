@@ -28,24 +28,13 @@ private class RouterImpl private (val mountPath: String) extends Router {
   }
 
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type = synchronized {
-    handlers += TargetRequestHandler(toFullPath(path), methods, handler)
+    handlers += TargetRequestHandler(toAbsolutePath(path), methods, handler)
     this
   }
 
   private[server] def createRequestHandler(): RequestHandler = synchronized {
     RequestHandler.coalesce(handlers.toSeq)
   }
-
-  private def toFullPath(path: String): String =
-    NormalizePath(path) match {
-      case ""   => mountPath
-      case "*"  => "*"
-      case "/"  => mountPath
-      case path =>
-        if (!path.startsWith("/") || path.matches("/\\.\\.(/.*)?"))
-          throw new IllegalArgumentException(s"Invalid router path: $path")
-        mountPath + path
-    }
 }
 
 private object RouterImpl {

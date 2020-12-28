@@ -60,7 +60,7 @@ object MessageApplication extends (Router => Unit) {
 
         Created("Message posted.")
           .setContentType("text/plain")
-          .setLocation(s"${router.mountPath}/$id")
+          .setLocation(router.toAbsolutePath(s"/$id"))
       }
     }
 

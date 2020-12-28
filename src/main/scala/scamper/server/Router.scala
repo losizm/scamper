@@ -57,6 +57,32 @@ trait Router {
   /** Gets mount path. */
   def mountPath: String
 
+
+  /**
+   * Expands supplied router path to its absolute path.
+   *
+   * @param path router path
+   *
+   * @throws IllegalArgumentException if router path is not `*` and does not
+   * begin with `/` or if it escapes mount path
+   *
+   * @note If `*` is supplied as router path, its absolute path is also `*`. 
+   */
+  def toAbsolutePath(path: String): String =
+    NormalizePath(path) match {
+      case ""   => mountPath
+      case "*"  => "*"
+      case "/"  => mountPath
+      case path =>
+        if (!path.startsWith("/") || path.matches("/\\.\\.(/.*)?"))
+          throw new IllegalArgumentException(s"Invalid router path: $path")
+
+        mountPath == "/" match {
+          case true  => path
+          case false => mountPath + path
+        }
+    }
+
   /**
    * Adds supplied request handler.
    *
