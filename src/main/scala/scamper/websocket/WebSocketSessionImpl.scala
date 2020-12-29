@@ -52,13 +52,13 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
   def isSecure: Boolean = conn.isSecure
 
   def state: SessionState =
-    conn.isOpen match {
-      case true  =>
+    closeSent.get || closeReceived.get || !conn.isOpen match {
+      case true  => SessionState.Closed
+      case false =>
         openInvoked.get match {
           case true  => SessionState.Open
           case false => SessionState.Pending
         }
-      case false => SessionState.Closed
     }
 
   def idleTimeout: Int = _idleTimeout
@@ -96,7 +96,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
       catch {
         case err: Exception => if (!closeReceived.get) doError(err)
       } finally {
-        Try(conn.close())
+        Future { try Thread.sleep(1000) finally conn.close() }
       }
     }
 
@@ -187,13 +187,13 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
         close(GoingAway)
 
       case err: WebSocketError =>
-        if (!closeSent.get()) {
+        if (!closeSent.get) {
           doError(err)
           close(err.statusCode)
         }
 
       case err =>
-        if (!closeSent.get()) {
+        if (!closeSent.get) {
           doError(err)
           close(AbnormalClosure)
         }
@@ -245,7 +245,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
           message.add(moreData)
 
           if (frame.isFinal) {
-            handler.foreach(handle => handle(decode(message.get)))
+            handler.foreach(_(decode(message.get)))
             continue = false
           }
 
@@ -259,35 +259,28 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
   }
 
   private def doPing(data: Array[Byte]): Unit =
-    pingHandler.foreach(handle => handle(data))
+    pingHandler.foreach(_(data))
 
   private def doPong(data: Array[Byte]): Unit =
-    pongHandler.foreach(handle => handle(data))
+    pongHandler.foreach(_(data))
 
   private def doError(err: Throwable): Unit =
-    errorHandler.foreach(handle => handle(err))
+    errorHandler.foreach(_(err))
 
   private def doClose(data: Array[Byte]): Unit =
     if (closeReceived.compareAndSet(false, true)) {
       val statusCode = StatusCode.get(data.take(2)).getOrElse(NoStatusReceived)
 
       try
-        closeHandler.foreach { handle =>
-          handle(statusCode)
-        }
+        closeHandler.foreach(_(statusCode))
       finally
         close(statusCode)
     }
 
   private def sendData(data: Array[Byte], binary: Boolean): Unit =
-    (!deflate.compressed && data.length <= payloadLimit) match {
-      case true  =>
-        synchronized {
-          conn.write(makeFrame(data, if (binary) Binary else Text))
-        }
-
-      case false =>
-        sendData(new ByteArrayInputStream(data), binary)
+    deflate.compressed || data.length > payloadLimit match {
+      case true  => sendData(new ByteArrayInputStream(data), binary)
+      case false => synchronized { conn.write(makeFrame(data, if (binary) Binary else Text)) }
     }
 
   private def sendData(data: InputStream, binary: Boolean): Unit = synchronized {
