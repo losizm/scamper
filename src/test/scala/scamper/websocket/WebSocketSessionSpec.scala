@@ -39,75 +39,27 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
 
   it should "end sessions with 'Going Away' (deflate)" in withSessions(true)(testGoingAway)
 
-  private val assertDelay = 250L;
+  private val assertDelay    = 250L;
+  private val textMessages   = new ListBuffer[String]
+  private val binaryMessages = new ListBuffer[Array[Byte]]
+  private val pingMessages   = new ListBuffer[Array[Byte]]
+  private val pongMessages   = new ListBuffer[Array[Byte]]
+  private val serverClosure  = new AtomicReference[StatusCode]
+  private val clientClosure  = new AtomicReference[StatusCode]
 
   private def testNormalClosure(server: WebSocketSession, client: WebSocketSession): Unit = {
-    val messages       = Seq("This is message #1.", "This is message #2.", "This is message #3.")
-    val textMessages   = new ListBuffer[String]
-    val binaryMessages = new ListBuffer[String]
-    val pingMessages   = new ListBuffer[String]
-    val pongMessages   = new ListBuffer[String]
-    val serverClosure  = new AtomicReference[StatusCode]
-    val clientClosure  = new AtomicReference[StatusCode]
+    val messages = Seq("This is message #1.", "This is message #2.", "This is message #3.")
 
-    info("set up server session")
-    assert(server.state == SessionState.Pending)
-
-    server.onPing { message =>
-      pingMessages += new String(message, "utf-8")
-      server.pong(message)
-    }
-
-    server.onPong { message =>
-      pongMessages += new String(message, "utf-8")
-    }
-
-    server.onBinary { message =>
-      binaryMessages += new String(message, "utf-8")
-    }
-
-    server.onText(textMessages.+=)
-    server.onClose(serverClosure.set)
-
-    assert(server.state == SessionState.Pending)
-    info("open server session")
-    server.open()
-    assert(server.state == SessionState.Open)
-
-    info("set up client session")
-    assert(client.state == SessionState.Pending)
-
-    client.onPing { message =>
-      pingMessages += new String(message, "utf-8")
-      client.pong(message)
-    }
-
-    client.onPong { message =>
-      pongMessages += new String(message, "utf-8")
-    }
-
-    client.onBinary { message =>
-      binaryMessages += new String(message, "utf-8")
-    }
-
-    client.onText(textMessages.+=)
-    client.onClose(clientClosure.set)
-
-    assert(client.state == SessionState.Pending)
-    info("open client session")
-    client.open()
-    assert(client.state == SessionState.Open)
-
-    info("begin server send")
+    info("send server messages")
     messages.foreach(server.send)
     messages.foreach(message => server.send(message.getBytes("utf-8")))
     messages.foreach(message => server.ping(message.getBytes("utf-8")))
 
     Thread.sleep(assertDelay)
     assert(messages == textMessages.toSeq)
-    assert(messages == binaryMessages.toSeq)
-    assert(messages == pingMessages.toSeq)
-    assert(messages == pongMessages.toSeq)
+    assert(messages == binaryMessages.map(bytes => new String(bytes, "utf-8")).toSeq)
+    assert(messages == pingMessages.map(bytes => new String(bytes, "utf-8")).toSeq)
+    assert(messages == pongMessages.map(bytes => new String(bytes, "utf-8")).toSeq)
 
     // Reset test buffers
     textMessages.clear()
@@ -115,16 +67,16 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
     pingMessages.clear()
     pongMessages.clear()
 
-    info("begin client send")
+    info("send client messages")
     messages.foreach(client.send)
     messages.foreach(message => client.send(message.getBytes("utf-8")))
     messages.foreach(message => client.ping(message.getBytes("utf-8")))
 
     Thread.sleep(assertDelay)
     assert(messages == textMessages.toSeq)
-    assert(messages == binaryMessages.toSeq)
-    assert(messages == pingMessages.toSeq)
-    assert(messages == pongMessages.toSeq)
+    assert(messages == binaryMessages.map(bytes => new String(bytes, "utf-8")).toSeq)
+    assert(messages == pingMessages.map(bytes => new String(bytes, "utf-8")).toSeq)
+    assert(messages == pongMessages.map(bytes => new String(bytes, "utf-8")).toSeq)
 
     info("close client session")
     client.close()
@@ -142,31 +94,6 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   private def testMessageTooBig(server: WebSocketSession, client: WebSocketSession): Unit = {
-    val binaryMessages = new ListBuffer[Array[Byte]]
-    val serverClosure  = new AtomicReference[StatusCode]
-    val clientClosure  = new AtomicReference[StatusCode]
-
-    info("set up server session")
-    assert(server.state == SessionState.Pending)
-    server.payloadLimit(1024)
-    server.onClose(serverClosure.set)
-    assert(server.state == SessionState.Pending)
-
-    info("open server session")
-    server.open()
-    assert(server.state == SessionState.Open)
-
-    info("set up client session")
-    assert(client.state == SessionState.Pending)
-    client.messageCapacity(8192)
-    client.onBinary(binaryMessages.+=)
-    client.onClose(clientClosure.set)
-    assert(client.state == SessionState.Pending)
-
-    info("open client session")
-    client.open()
-    assert(client.state == SessionState.Open)
-
     info("send messages")
     server.send(RandomBytes(client.messageCapacity - 128))
     server.send(RandomBytes(client.messageCapacity - 64))
@@ -185,30 +112,7 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   private def testGoingAway(server: WebSocketSession, client: WebSocketSession): Unit = {
-    val messages      = Seq("This is message #1.", "This is message #2.", "This is message #3.")
-    val textMessages  = new ListBuffer[String]
-    val serverClosure = new AtomicReference[StatusCode]
-    val clientClosure = new AtomicReference[StatusCode]
-
-    info("set up server session")
-    assert(server.state == SessionState.Pending)
-    server.idleTimeout(500)
-    server.onText(textMessages.+=)
-    server.onClose(serverClosure.set)
-    assert(server.state == SessionState.Pending)
-
-    info("open server session")
-    server.open()
-    assert(server.state == SessionState.Open)
-
-    info("set up client session")
-    assert(client.state == SessionState.Pending)
-    client.onClose(clientClosure.set)
-    assert(client.state == SessionState.Pending)
-
-    info("open client session")
-    client.open()
-    assert(client.state == SessionState.Open)
+    val messages = Seq("This is message #1.", "This is message #2.", "This is message #3.")
 
     info("send messages")
     messages.foreach(client.send)
@@ -232,13 +136,21 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
     try {
       val futureServer = Future {
         server = connection.accept()
-        WebSocketSession.forServer(server, "server", Uri("/"), "13", deflate, None)
+        createSession(server, "server", true, deflate)
       }
 
       val futureClient = Future {
         client = new Socket("localhost", connection.getLocalPort)
-        WebSocketSession.forClient(client, "client", Uri("/"), "13", deflate, None)
+        createSession(client, "client", false, deflate)
       }
+
+      // Reset test data
+      textMessages.clear()
+      binaryMessages.clear()
+      pingMessages.clear()
+      pongMessages.clear()
+      serverClosure.set(null)
+      clientClosure.set(null)
 
       test(
         Await.result(futureServer, 5.seconds),
@@ -249,5 +161,41 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
       Try(server.close())
       Try(connection.close())
     }
+  }
+
+  private def createSession(socket: Socket, title: String, server: Boolean, deflate: Boolean): WebSocketSession = {
+    val session = server match {
+      case true  => WebSocketSession.forServer(socket, title, Uri("/"), "13", deflate, None)
+      case false => WebSocketSession.forClient(socket, title, Uri("/"), "13", deflate, None)
+    }
+
+    info(s"set up $title session")
+    assert(session.state == SessionState.Pending)
+
+    session.idleTimeout(1000)
+    session.payloadLimit(1024)
+    session.messageCapacity(8192)
+    session.onText(textMessages.+=)
+    session.onBinary(message => binaryMessages += message.clone())
+    session.onPong(message => pongMessages += message.clone())
+
+    session.onPing { message =>
+      pingMessages += message.clone()
+      session.pong(message)
+    }
+
+    server match {
+      case true  => session.onClose(serverClosure.set)
+      case false => session.onClose(clientClosure.set)
+    }
+
+    assert(session.state == SessionState.Pending)
+    info(s"open $title session")
+    session.open()
+
+    Thread.sleep(assertDelay)
+    assert(session.state == SessionState.Open)
+
+    session
   }
 }
