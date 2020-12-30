@@ -60,6 +60,7 @@ trait TestServer {
       .get("/about")(doAbout)
       .post("/echo")(doEcho)
       .route("/api/messages")(MessageApplication)
+      .websocket("/chat/:id")(WebSocketChatServer)
       .create("localhost", 0)
 
   private def doHome(req: HttpRequest): HttpResponse =
