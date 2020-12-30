@@ -31,22 +31,7 @@ import Uri.{ http, https }
 trait TestServer {
   private implicit val bodyParser = BodyParser.bytes(8192)
 
-  def withServer[T](f: HttpServer => T): T = {
-    val server = buildServer()
-
-    try
-      f(server)
-    finally
-      server.close()
-  }
-
-  def serverUri(implicit server: HttpServer): Uri =
-    server.isSecure match {
-      case true  => https(server.host.getHostAddress + ":" + server.port)
-      case false => http (server.host.getHostAddress + ":" + server.port)
-    }
-
-  private def buildServer(): HttpServer =
+  def getServer(): HttpServer =
     HttpServer
       .app()
       .logger(NullLogger)
@@ -62,6 +47,21 @@ trait TestServer {
       .route("/api/messages")(MessageApplication)
       .websocket("/chat/:id")(WebSocketChatServer)
       .create("localhost", 0)
+
+  def withServer[T](f: HttpServer => T): T = {
+    val server = getServer()
+
+    try
+      f(server)
+    finally
+      server.close()
+  }
+
+  def serverUri(implicit server: HttpServer): Uri =
+    server.isSecure match {
+      case true  => https(server.host.getHostAddress + ":" + server.port)
+      case false => http (server.host.getHostAddress + ":" + server.port)
+    }
 
   private def doHome(req: HttpRequest): HttpResponse =
     Ok()

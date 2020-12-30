@@ -22,9 +22,8 @@ import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.concurrent.duration.DurationInt
 import scala.util.{ Try, Failure, Success }
-import scala.util.Random.{ nextBytes => randomBytes }
 
-import scamper.{ Auxiliary, Uri }
+import scamper.{ Auxiliary, RandomBytes, Uri }
 import scamper.websocket.StatusCode.Registry.{ GoingAway, MessageTooBig, NormalClosure }
 
 class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
@@ -169,10 +168,10 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(client.state == SessionState.Open)
 
     info("send messages")
-    server.send(randomBytes(client.messageCapacity - 128))
-    server.send(randomBytes(client.messageCapacity - 64))
-    server.send(randomBytes(client.messageCapacity - 32))
-    server.send(randomBytes(client.messageCapacity + 32))
+    server.send(RandomBytes(client.messageCapacity - 128))
+    server.send(RandomBytes(client.messageCapacity - 64))
+    server.send(RandomBytes(client.messageCapacity - 32))
+    server.send(RandomBytes(client.messageCapacity + 32))
 
     Thread.sleep(assertDelay)
     assert(binaryMessages.size == 3)
