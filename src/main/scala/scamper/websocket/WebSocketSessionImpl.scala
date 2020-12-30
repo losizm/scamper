@@ -103,36 +103,36 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
   def send(message: String): Unit =
     sendData(message.getBytes("UTF-8"), false)
 
-  def sendAsync[T](message: String)(callback: Try[Unit] => T): Unit =
-    Future(send(message)).onComplete(callback)
+  def sendAsync[T](message: String): Future[Unit] =
+    Future(send(message))
 
   def send(message: Array[Byte]): Unit =
     sendData(message, true)
 
-  def sendAsync[T](message: Array[Byte])(callback: Try[Unit] => T): Unit =
-    Future(send(message)).onComplete(callback)
+  def sendAsync[T](message: Array[Byte]): Future[Unit] =
+    Future(send(message))
 
   def send(message: InputStream, binary: Boolean = false): Unit =
     sendData(message, binary)
 
-  def sendAsync[T](message: InputStream, binary: Boolean = false)(callback: Try[Unit] => T): Unit =
-    Future(send(message, binary)).onComplete(callback)
+  def sendAsync[T](message: InputStream, binary: Boolean = false): Future[Unit] =
+    Future(send(message, binary))
 
   def ping(data: Array[Byte] = Array.empty): Unit = {
     require(data.length <= 125, "data length must not exceed 125 bytes")
     conn.write(makeFrame(data, Ping))
   }
 
-  def pingAsync[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit =
-    Future(ping(data)).onComplete(callback)
+  def pingAsync[T](data: Array[Byte] = Array.empty): Future[Unit] =
+    Future(ping(data))
 
   def pong(data: Array[Byte] = Array.empty): Unit = {
     require(data.length <= 125, "data length must not exceed 125 bytes")
     conn.write(makeFrame(data, Pong))
   }
 
-  def pongAsync[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit =
-    Future(pong(data)).onComplete(callback)
+  def pongAsync[T](data: Array[Byte] = Array.empty): Future[Unit] =
+    Future(pong(data))
 
   def onText[T](handler: String => T): this.type = {
     textHandler = Option(handler)
@@ -317,6 +317,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
       data
     )
 
+  /** Check incoming frame. */
   private def checkFrame(frame: WebSocketFrame, messageSize: Int = 0): Unit = {
     if ((messageSize + frame.length) > messageCapacity)
       throw WebSocketError(MessageTooBig)
@@ -344,7 +345,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
           position += count
         }
 
-        frame.key.map(key => key(data))
+        frame.key.foreach(key => key(data))
         data
     }
 }

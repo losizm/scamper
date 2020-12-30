@@ -18,6 +18,7 @@ package scamper.websocket
 import java.io.InputStream
 import java.net.Socket
 
+import scala.concurrent.Future
 import scala.util.Try
 
 import scamper.{ Entity, HttpRequest, Uri }
@@ -136,7 +137,7 @@ trait WebSocketSession {
    * @param message text message
    * @param callback result handler
    */
-  def sendAsync[T](message: String)(callback: Try[Unit] => T): Unit
+  def sendAsync[T](message: String): Future[Unit]
 
   /**
    * Sends binary message.
@@ -152,7 +153,7 @@ trait WebSocketSession {
    * @param message binary message
    * @param callback result handler
    */
-  def sendAsync[T](message: Array[Byte])(callback: Try[Unit] => T): Unit
+  def sendAsync[T](message: Array[Byte]): Future[Unit]
 
   /**
    * Sends message.
@@ -176,7 +177,7 @@ trait WebSocketSession {
    * @param binary indicator for binary message
    * @param callback result handler
    */
-  def sendAsync[T](message: InputStream, binary: Boolean = false)(callback: Try[Unit] => T): Unit
+  def sendAsync[T](message: InputStream, binary: Boolean = false): Future[Unit]
 
   /**
    * Sends ping message.
@@ -192,7 +193,7 @@ trait WebSocketSession {
    * @param data application data to accompany ping message
    * @param callback result handler
    */
-  def pingAsync[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit
+  def pingAsync[T](data: Array[Byte] = Array.empty): Future[Unit]
 
   /**
    * Sends pong message.
@@ -208,7 +209,7 @@ trait WebSocketSession {
    * @param data application data to accompany pong message
    * @param callback result handler
    */
-  def pongAsync[T](data: Array[Byte] = Array.empty)(callback: Try[Unit] => T): Unit
+  def pongAsync[T](data: Array[Byte] = Array.empty): Future[Unit]
 
   /**
    * Sets handler for incoming text message.
