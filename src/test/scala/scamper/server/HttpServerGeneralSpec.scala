@@ -27,7 +27,7 @@ import scamper.types.Implicits._
 import RequestMethod.Registry._
 import ResponseStatus.Registry._
 
-class HttpServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
+class HttpServerGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
   private implicit val client         = HttpClient.settings().continueTimeout(1000).create()
   private implicit val textBodyParser = BodyParser.text(8192)
   private implicit val byteBodyParser = BodyParser.bytes(8192)
