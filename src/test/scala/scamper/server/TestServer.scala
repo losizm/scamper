@@ -40,7 +40,7 @@ trait TestServer {
       .queueSize(4)
       .bufferSize(1024)
       .readTimeout(500)
-      .headerLimit(10)
+      .headerLimit(20)
       .get("/")(doHome)
       .get("/about")(doAbout)
       .post("/echo")(doEcho)
