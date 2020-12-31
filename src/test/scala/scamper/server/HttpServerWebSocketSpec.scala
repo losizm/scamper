@@ -173,7 +173,7 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
       // Reset test data
       messages.clear()
       pingData.clear()
-      pingData.addAll(RandomBytes(32))
+      pingData.appendAll(RandomBytes(32))
       pongData.clear()
       pingReceived.set(false)
       closure.set(Reserved)
@@ -187,7 +187,7 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
         session.payloadLimit(1024)
         session.messageCapacity(8192)
         session.onText(messages.+=)
-        session.onPong(data => pongData.addAll(data))
+        session.onPong(data => pongData.appendAll(data))
         session.onClose(closure.set)
 
         session.onPing { data =>
