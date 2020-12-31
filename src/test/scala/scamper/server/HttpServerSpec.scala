@@ -18,19 +18,21 @@ package scamper.server
 import scamper._
 import scamper.Implicits._
 import scamper.client.HttpClient
+import scamper.client.Implicits.ClientHttpRequest
 import scamper.headers._
 import scamper.server.Implicits._
 import scamper.types._
 import scamper.types.Implicits._
 
+import RequestMethod.Registry._
 import ResponseStatus.Registry._
 
 class HttpServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
-  private implicit val client         = HttpClient()
+  private implicit val client         = HttpClient.settings().continueTimeout(1000).create()
   private implicit val textBodyParser = BodyParser.text(8192)
   private implicit val byteBodyParser = BodyParser.bytes(8192)
 
-  it should "test home endpoint" in withServer { implicit server =>
+  it should "handle /home endpoint" in withServer { implicit server =>
     client.get(serverUri) { res =>
       assert(res.status == Ok)
       assert(!res.hasContentType)
@@ -60,7 +62,7 @@ class HttpServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer 
     }
   }
 
-  it should "test about endpoint" in withServer { implicit server =>
+  it should "handle /about endpoint" in withServer { implicit server =>
     client.get(s"$serverUri/about") { res =>
       assert(res.status == Ok)
       assert(res.contentType == MediaType("text/plain"))
@@ -77,7 +79,7 @@ class HttpServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer 
     }
   }
 
-  it should "test echo endpoint" in withServer { implicit server =>
+  it should "handle /echo endpoint" in withServer { implicit server =>
     client.post(s"$serverUri/echo", body = "Hello, world!") { res =>
       assert(res.status == Ok)
       assert(res.contentType == MediaType("application/octet-stream"))
@@ -92,5 +94,110 @@ class HttpServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer 
       assert(res.connection == Seq("close"))
       assert(res.hasDate)
     }
+  }
+
+  it should "send 404 (Not Found)" in withServer { implicit server =>
+    Get(s"$serverUri/path/to/nothing")
+      .send { res =>
+        assert(res.status == NotFound)
+        assert(res.connection == Seq("close"))
+        assert(res.hasDate)
+      }
+  }
+
+  it should "send 408 (Request Timeout)" in withServer { implicit server =>
+    Post(s"$serverUri/echo")
+      .setExpect("100-continue")
+      .setBody("Hello, server!")
+      .send { res =>
+        assert(res.status == RequestTimeout)
+        assert(res.connection == Seq("close"))
+        assert(res.hasDate)
+      }
+  }
+
+  it should "send 413 (Payload Too Large)" in withServer { implicit server =>
+    Post(s"${serverUri}/echo")
+      .setBody(RandomBytes(16 * 1024))
+      .send { res =>
+        assert(res.status == PayloadTooLarge)
+        assert(res.connection == Seq("close"))
+        assert(res.hasDate)
+      }
+  }
+
+  it should "send 414 (URI Too Long)" in withServer { implicit server =>
+    Get(s"${serverUri}${"/test" * 1024}")
+      .send { res =>
+        assert(res.status == UriTooLong)
+        assert(res.connection == Seq("close"))
+        assert(res.hasDate)
+      }
+  }
+
+  it should "send 431 (Request Header Fields Too Large)" in withServer { implicit server =>
+    info("too many headers")
+    Get(serverUri)
+      .setHeaders((1 to 20).map(n => Header(s"Test-Header-$n", n)))
+      .send { res =>
+        assert(res.status == RequestHeaderFieldsTooLarge)
+        assert(res.connection == Seq("close"))
+        assert(res.hasDate)
+      }
+
+    info("header too large")
+    Get(serverUri)
+      .setHeaders(Header("Test-Header", "test" * 1024))
+      .send { res =>
+        assert(res.status == RequestHeaderFieldsTooLarge)
+        assert(res.connection == Seq("close"))
+        assert(res.hasDate)
+      }
+  }
+
+  it should "send 500 (Internal Server Error)" in withServer { implicit server =>
+    Get(s"$serverUri/throwException")
+      .send { res =>
+        assert(res.status == InternalServerError)
+        assert(res.connection == Seq("close"))
+        assert(res.hasDate)
+      }
+  }
+
+  it should "send 501 (Not Implemented)" in withServer { implicit server =>
+    Get(s"$serverUri/notImplemented")
+      .send { res =>
+        assert(res.status == NotImplemented)
+        assert(res.connection == Seq("close"))
+        assert(res.hasDate)
+      }
+
+    Post(s"$serverUri/notImplemented")
+      .send { res =>
+        assert(res.status == NotImplemented)
+        assert(res.connection == Seq("close"))
+        assert(res.hasDate)
+      }
+
+    Put(s"$serverUri/notImplemented")
+      .send { res =>
+        assert(res.status == NotImplemented)
+        assert(res.connection == Seq("close"))
+        assert(res.hasDate)
+      }
+
+    Delete(s"$serverUri/notImplemented")
+      .send { res =>
+        assert(res.status == NotImplemented)
+        assert(res.connection == Seq("close"))
+        assert(res.hasDate)
+      }
+
+    RequestMethod("ANY")(s"$serverUri/notImplemented")
+      .send { res =>
+        assert(res.status == NotImplemented)
+        assert(res.connection == Seq("close"))
+        assert(res.hasDate)
+      }
   }
 }

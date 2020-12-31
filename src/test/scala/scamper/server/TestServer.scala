@@ -39,13 +39,16 @@ trait TestServer {
       .poolSize(2)
       .queueSize(4)
       .bufferSize(1024)
-      .readTimeout(1000)
-      .headerLimit(20)
+      .readTimeout(500)
+      .headerLimit(10)
       .get("/")(doHome)
       .get("/about")(doAbout)
       .post("/echo")(doEcho)
+      .get("/throwException")(doThrowException)
+      .incoming("/notImplemented")(doNotImplemented)
       .route("/api/messages")(MessageApplication)
       .websocket("/chat/:id")(WebSocketChatServer)
+      .error(doError)
       .create("localhost", 0)
 
   def withServer[T](f: HttpServer => T): T = {
@@ -73,4 +76,18 @@ trait TestServer {
   private def doEcho(req: HttpRequest): HttpResponse =
     Ok(req.as[Array[Byte]])
       .setContentType("application/octet-stream")
+
+  private def doThrowException(req: HttpRequest): HttpResponse =
+    throw new Exception("Something went wrong")
+
+  private def doNotImplemented(req: HttpRequest): HttpResponse =
+    ???
+
+  private def doError(err: Throwable, req: HttpRequest): HttpResponse =
+    err match {
+      case _: NotImplementedError => NotImplemented()
+      case _: ReadLimitExceeded   => PayloadTooLarge()
+      case _: EntityTooLarge      => PayloadTooLarge()
+      case _                      => InternalServerError()
+    }
 }
