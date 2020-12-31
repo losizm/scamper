@@ -320,13 +320,6 @@ object WebSocketSession {
   def forServer(socket: Socket, id: String, target: Uri, version: String, deflate: Boolean, logger: Option[Logger]): WebSocketSession =
     forServer(WebSocketConnection(socket), id, target, version, deflate, logger)
 
-  private[scamper] def forServer(req: HttpRequest, deflate: DeflateMode): WebSocketSession = {
-    val conn = WebSocketConnection(req.getAttribute[Socket]("scamper.server.message.socket").get)
-    val id = req.getAttribute[String]("scamper.server.message.correlate").get
-    val target = req.target
-    val version = req.secWebSocketVersion
-    val logger = new SessionLogger(id, req.getAttribute[Logger]("scamper.server.message.logger").get)
-
-    new WebSocketSessionImpl(id, target, version, logger)(conn, true, deflate)
-  }
+  private[scamper] def forServer(socket: Socket, id: String, target: Uri, version: String, deflate: DeflateMode, logger: Logger): WebSocketSession =
+    new WebSocketSessionImpl(id, target, version, new SessionLogger(id, logger))(WebSocketConnection(socket), true, deflate)
 }

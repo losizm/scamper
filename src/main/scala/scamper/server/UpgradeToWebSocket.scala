@@ -24,6 +24,8 @@ import scamper.headers.{ Connection, Upgrade }
 import scamper.types.Implicits.stringToProtocol
 import scamper.websocket._
 
+import Implicits._
+
 /**
  * Upgrades request to WebSocket connection.
  *
@@ -84,7 +86,15 @@ object UpgradeToWebSocket {
       .setConnection("Upgrade")
       .setSecWebSocketAccept(WebSocket.acceptKey(req.secWebSocketKey))
       .putAttributes("scamper.server.connection.upgrade" -> { (socket: Socket) =>
-        val sessionRequest = req.setBody(Entity.empty).putAttributes("scamper.server.message.socket" -> socket)
-        handler(WebSocketSession.forServer(sessionRequest, deflateMode))
+        val session = WebSocketSession.forServer(
+          socket  = socket,
+          id      = req.correlate,
+          target  = req.target,
+          version = req.secWebSocketVersion,
+          deflate = deflateMode,
+          logger  = req.logger
+        )
+
+        handler(session)
       })
 }
