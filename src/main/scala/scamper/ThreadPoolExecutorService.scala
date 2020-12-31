@@ -22,51 +22,55 @@ import scala.concurrent.{ ExecutionContext, ExecutionContextExecutorService }
 
 private object ThreadPoolExecutorService {
   def fixed(
-    name: String,
-    poolSize: Int,
-    queueSize: Int = 0,
+    name:        String,
+    poolSize:    Int,
+    queueSize:   Int = 0,
     threadGroup: Option[ThreadGroup] = None
   )(rejectedExecutionHandler: RejectedExecutionHandler): ExecutionContextExecutorService =
-    createExecutorService(name, poolSize, poolSize, 0, queueSize, threadGroup) {
-      rejectedExecutionHandler
-    }
+    createExecutorService(
+      name               = name,
+      inCorePoolSize     = poolSize,
+      inMaxPoolSize      = poolSize,
+      inKeepAliveSeconds = 0,
+      inQueueSize        = queueSize,
+      inThreadGroup      = threadGroup,
+      rejectedHandler    = rejectedExecutionHandler
+    )
 
   def dynamic(
-    name: String,
-    corePoolSize: Int,
-    maxPoolSize: Int,
-    keepAliveSeconds: Long = 60,
-    queueSize: Int = 0,
-    threadGroup: Option[ThreadGroup] = None
+    name:             String,
+    corePoolSize:     Int,
+    maxPoolSize:      Int,
+    keepAliveSeconds: Long = 60L,
+    queueSize:        Int = 0,
+    threadGroup:      Option[ThreadGroup] = None
   )(rejectedExecutionHandler: RejectedExecutionHandler): ExecutionContextExecutorService =
-    createExecutorService(name, corePoolSize, maxPoolSize, keepAliveSeconds, queueSize, threadGroup) {
-      rejectedExecutionHandler
-    }
+    createExecutorService(
+      name               = name,
+      inCorePoolSize     = corePoolSize,
+      inMaxPoolSize      = maxPoolSize,
+      inKeepAliveSeconds = keepAliveSeconds,
+      inQueueSize        = queueSize,
+      inThreadGroup      = threadGroup,
+      rejectedHandler    = rejectedExecutionHandler
+    )
 
   private def createExecutorService(
-    name: String,
-    inCorePoolSize: Int,
-    inMaxPoolSize: Int,
+    name:               String,
+    inCorePoolSize:     Int,
+    inMaxPoolSize:      Int,
     inKeepAliveSeconds: Long,
-    inQueueSize: Int,
-    inThreadGroup: Option[ThreadGroup]
-  )(rejectedExecutionHandler: RejectedExecutionHandler): ExecutionContextExecutorService =
+    inQueueSize:        Int,
+    inThreadGroup:      Option[ThreadGroup],
+    rejectedHandler:    RejectedExecutionHandler
+  ): ExecutionContextExecutorService =
     ExecutionContext.fromExecutorService {
-      val corePoolSize = inCorePoolSize.max(0)
-      val maxPoolSize = inMaxPoolSize.max(corePoolSize).max(1)
+      val corePoolSize     = inCorePoolSize.max(0)
+      val maxPoolSize      = inMaxPoolSize.max(corePoolSize).max(1)
       val keepAliveSeconds = inKeepAliveSeconds.max(0)
-      val queueSize = inQueueSize.max(0)
-      val threadGroup = inThreadGroup.getOrElse(new ThreadGroup(name))
-
-      val threadFactory = new ThreadFactory {
-        private val count = new AtomicLong(0)
-
-        def newThread(task: Runnable) = {
-          val thread = new Thread(threadGroup, task, s"$name-${count.incrementAndGet()}")
-          thread.setDaemon(true)
-          thread
-        }
-      }
+      val queueSize        = inQueueSize.max(0)
+      val threadGroup      = inThreadGroup.getOrElse(new ThreadGroup(name))
+      val threadCount      = new AtomicLong(0)
 
       new ThreadPoolExecutor(
         corePoolSize,
@@ -77,8 +81,14 @@ private object ThreadPoolExecutorService {
           case 0 => new SynchronousQueue()
           case n => new ArrayBlockingQueue(n)
         },
-        threadFactory,
-        rejectedExecutionHandler
+        new ThreadFactory {
+          def newThread(task: Runnable) = {
+            val thread = new Thread(threadGroup, task, s"$name-${threadCount.incrementAndGet()}")
+            thread.setDaemon(true)
+            thread
+          }
+        },
+        rejectedHandler
       )
     }
 }

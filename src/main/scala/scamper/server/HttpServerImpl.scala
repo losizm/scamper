@@ -105,38 +105,76 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
   private val threadGroup = new ThreadGroup(s"scamper-server-$id")
 
-  private val serviceContext = ThreadPoolExecutorService
-    .fixed(s"scamper-server-$id-service", poolSize, queueSize, Some(threadGroup)) {
-      (_, _) => throw new RejectedExecutionException(s"Rejected scamper-server-$id-service task")
-    }
+  private val serviceContext =
+    ThreadPoolExecutorService
+      .fixed(
+        name        = s"scamper-server-$id-service",
+        poolSize    = poolSize,
+        queueSize   = queueSize,
+        threadGroup = Some(threadGroup)
+      ) { (_, _) =>
+        throw new RejectedExecutionException(s"Rejected scamper-server-$id-service task")
+      }
 
-  private val keepAliveContext = ThreadPoolExecutorService
-    .dynamic(s"scamper-server-$id-keepAlive", poolSize, poolSize * keepAlivePoolSizeFactor, 60L, 0, Some(threadGroup)) {
-      (_, _) => throw new ReadAborted(s"rejected scamper-server-$id-keepAlive task")
-    }
+  private val keepAliveContext =
+    ThreadPoolExecutorService
+      .dynamic(
+        name             = s"scamper-server-$id-keepAlive",
+        corePoolSize     = poolSize,
+        maxPoolSize      = poolSize * keepAlivePoolSizeFactor,
+        queueSize        = 0,
+        keepAliveSeconds = 60L,
+        threadGroup      = Some(threadGroup)
+      ) { (_, _) =>
+        throw new ReadAborted(s"rejected scamper-server-$id-keepAlive task")
+      }
 
-  private val upgradeContext = ThreadPoolExecutorService
-    .dynamic(s"scamper-server-$id-upgrade", poolSize, poolSize * upgradePoolSizeFactor, 60L, 0, Some(threadGroup)) {
-      (_, _) => throw new RejectedExecutionException(s"Rejected scamper-server-$id-upgrade task")
-    }
+  private val upgradeContext =
+    ThreadPoolExecutorService
+      .dynamic(
+        name             = s"scamper-server-$id-upgrade",
+        corePoolSize     = poolSize,
+        maxPoolSize      = poolSize * upgradePoolSizeFactor,
+        queueSize        = 0,
+        keepAliveSeconds = 60L,
+        threadGroup      = Some(threadGroup)
+      ) { (_, _) =>
+        throw new RejectedExecutionException(s"Rejected scamper-server-$id-upgrade task")
+      }
 
-  private val encoderContext = ThreadPoolExecutorService
-    .dynamic(s"scamper-server-$id-encoder", poolSize, poolSize * encoderPoolSizeFactor, 60L, 0, Some(threadGroup)) {
-      (task, executor) =>
+  private val encoderContext =
+    ThreadPoolExecutorService
+      .dynamic(
+        name             = s"scamper-server-$id-encoder",
+        corePoolSize     = poolSize,
+        maxPoolSize      = poolSize * encoderPoolSizeFactor,
+        queueSize        = 0,
+        keepAliveSeconds = 60L,
+        threadGroup      = Some(threadGroup)
+      ) { (task, executor) =>
         logger.warn(s"$authority - Running rejected scamper-server-$id-encoder task on dedicated thread")
         executor.getThreadFactory.newThread(task).start()
-    }
+      }
 
-  private val closerContext = ThreadPoolExecutorService
-    .dynamic(s"scamper-server-$id-closer", poolSize, poolSize * closerPoolSizeFactor, 60L, 0, Some(threadGroup)) {
-      (task, executor) =>
+  private val closerContext =
+    ThreadPoolExecutorService
+      .dynamic(
+        name             = s"scamper-server-$id-closer",
+        corePoolSize     = poolSize,
+        maxPoolSize      = poolSize * closerPoolSizeFactor,
+        keepAliveSeconds = 60L,
+        queueSize        = 0,
+        threadGroup      = Some(threadGroup)
+      ) { (task, executor) =>
         logger.warn(s"$authority - Running rejected scamper-server-$id-closer task on dedicated thread")
         executor.getThreadFactory.newThread(task).start()
-    }
+      }
 
-  val isSecure: Boolean = app.serverSocketFactory.isInstanceOf[SSLServerSocketFactory]
+  val isSecure: Boolean =
+    app.serverSocketFactory.isInstanceOf[SSLServerSocketFactory]
 
-  def isClosed: Boolean = closed.get()
+  def isClosed: Boolean =
+    closed.get()
 
   def close(): Unit =
     if (closed.compareAndSet(false, true)) {
@@ -150,7 +188,8 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
       Try(logger.asInstanceOf[Closeable].close())
     }
 
-  override def toString(): String = s"HttpServer(host=$host, port=$port, isSecure=$isSecure, isClosed=$isClosed)"
+  override def toString(): String =
+    s"HttpServer(host=$host, port=$port, isSecure=$isSecure, isClosed=$isClosed)"
 
   try {
     logger.info(s"$authority - Starting server")
