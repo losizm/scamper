@@ -44,7 +44,7 @@ trait HttpClient {
   def continueTimeout: Int
 
   /** Gets cookie store. */
-  def cookieStore: CookieStore
+  def cookies: CookieStore
 
   /**
    * Sends request and passes response to supplied handler.

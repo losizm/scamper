@@ -43,7 +43,7 @@ private object HttpClientImpl {
     bufferSize:          Int = 8192,
     readTimeout:         Int = 30000,
     continueTimeout:     Int = 1000,
-    cookieStore:         CookieStore = CookieStore.alwaysEmpty,
+    cookies:             CookieStore = CookieStore.alwaysEmpty,
     outgoing:            Seq[RequestFilter] = Nil,
     incoming:            Seq[ResponseFilter] = Nil,
     secureSocketFactory: SSLSocketFactory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
@@ -59,7 +59,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   val bufferSize      = settings.bufferSize.max(1024)
   val readTimeout     = settings.readTimeout.max(0)
   val continueTimeout = settings.continueTimeout.max(0)
-  val cookieStore     = settings.cookieStore
+  val cookies         = settings.cookies
 
   private val outgoing = settings.outgoing
   private val incoming = settings.incoming
@@ -78,7 +78,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     val secure     = target.getScheme.matches("https|wss")
     val host       = getEffectiveHost(target)
     val userAgent  = request.getHeaderValueOrElse("User-Agent", "Scamper/20.0.0")
-    val cookies    = request.cookies ++ cookieStore.get(target)
+    val reqCookies = request.cookies ++ cookies.get(target)
     val connection = target.getScheme.matches("wss?") match {
       case true  => WebSocket.validate(request).connection.mkString(", ")
       case false => getEffectiveConnection(request)
@@ -101,7 +101,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       Header("User-Agent", userAgent) +:
       effectiveRequest.headers.filterNot(_.name.matches("(?i)Host|User-Agent|Cookie|Connection")) :+
       Header("Connection", connection)
-    ).setCookies(cookies)
+    ).setCookies(reqCookies)
 
     effectiveRequest = effectiveRequest.setTarget(target.toTarget)
 
@@ -263,7 +263,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   private def storeCookies(target: Uri, res: HttpResponse): HttpResponse = {
     res.getHeaderValues("Set-Cookie")
       .flatMap { value => Try(SetCookie.parse(value)).toOption }
-      .foreach { cookie => cookieStore.put(target, cookie) }
+      .foreach { cookie => cookies.put(target, cookie) }
     res
   }
 

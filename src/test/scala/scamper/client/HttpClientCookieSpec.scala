@@ -33,7 +33,7 @@ class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestS
         .settings()
         .trust(new java.io.File("./src/test/resources/secure/truststore"))
         .outgoing(doCookieCheck(secure))
-        .cookieStore()
+        .cookies()
         .create()
 
     info("send request to /cookies/foo/1")
@@ -140,7 +140,7 @@ class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestS
     }
 
     // Clear all cookies
-    client.cookieStore.clear()
+    client.cookies.clear()
 
     info("send request to /cookies/foo/bar/baz/qux/2")
     client.get(s"$serverUri/cookies/foo/bar/baz/qux/2") { res =>
