@@ -90,18 +90,18 @@ object MediaType {
   private val fileNamePattern = ".+\\.(\\w+)".r
 
   /** Gets media type for given file. */
-  def fromFile(file: File): Option[MediaType] =
-    fromFileName(file.getName)
+  def forFile(file: File): Option[MediaType] =
+    forFileName(file.getName)
 
   /** Gets media type for given file name. */
-  def fromFileName(fileName: String): Option[MediaType] =
+  def forFileName(fileName: String): Option[MediaType] =
     fileName match {
-      case fileNamePattern(suffix) => fromSuffix(suffix)
+      case fileNamePattern(suffix) => forSuffix(suffix)
       case _ => None
     }
 
   /** Gets media type for given file name suffix. */
-  def fromSuffix(suffix: String): Option[MediaType] =
+  def forSuffix(suffix: String): Option[MediaType] =
     mappings.get(suffix.toLowerCase)
 
   /** Parses formatted media type. */

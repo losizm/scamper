@@ -241,7 +241,7 @@ object FilePart {
       .getOrElse(DispositionType("form-data", "name" -> name))
 
   private def getType(content: File): MediaType =
-    MediaType.fromFile(content).getOrElse(Auxiliary.applicationOctetStream)
+    MediaType.forFile(content).getOrElse(Auxiliary.applicationOctetStream)
 }
 
 private case class MultipartImpl(parts: Seq[Part]) extends Multipart

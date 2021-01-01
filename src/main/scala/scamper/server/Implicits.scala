@@ -137,7 +137,7 @@ object Implicits {
 
     private def createWithContentDisposition(typeName: String, file: File): HttpResponse = {
       val entity = Entity(file)
-      val mediaType = MediaType.fromFile(file).getOrElse(Auxiliary.applicationOctetStream)
+      val mediaType = MediaType.forFile(file).getOrElse(Auxiliary.applicationOctetStream)
       val disposition = DispositionType(
         typeName,
         "filename" -> file.getName(),

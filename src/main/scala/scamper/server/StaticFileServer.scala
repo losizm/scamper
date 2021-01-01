@@ -90,7 +90,7 @@ private class StaticFileServer(mountPath: Path, sourceDirectory: Path) extends R
     Try(req.ifModifiedSince).getOrElse(Instant.MIN)
 
   private def getMediaType(path: Path): MediaType =
-    MediaType.fromFileName(path.getFileName.toString)
+    MediaType.forFileName(path.getFileName.toString)
       .getOrElse(applicationOctetStream)
 }
 

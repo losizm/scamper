@@ -101,7 +101,7 @@ object Implicits {
      */
     def setFileBody(file: File)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
       val entity = Entity(file)
-      val mediaType = MediaType.fromFile(file).getOrElse(Auxiliary.applicationOctetStream)
+      val mediaType = MediaType.forFile(file).getOrElse(Auxiliary.applicationOctetStream)
       message.setBody(entity)
         .putHeaders(
           Header("Content-Type", mediaType.toString),
