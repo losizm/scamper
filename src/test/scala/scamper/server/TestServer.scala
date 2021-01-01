@@ -15,6 +15,8 @@
  */
 package scamper.server
 
+import java.io.File
+
 import scala.collection.concurrent.TrieMap
 
 import scamper._
@@ -31,16 +33,18 @@ import Uri.{ http, https }
 trait TestServer {
   private implicit val bodyParser = BodyParser.bytes(8192)
 
-  def getServer(): HttpServer =
+  def getServer(logging: Boolean = false): HttpServer =
     HttpServer
       .app()
-      .logger(NullLogger)
+      .logger(if (logging) ConsoleLogger else NullLogger)
       .backlogSize(8)
       .poolSize(2)
       .queueSize(4)
       .bufferSize(1024)
       .readTimeout(500)
       .headerLimit(20)
+      .incoming(doAuditLog("Incoming request")(_))
+      .outgoing(doAuditLog("Outgoing response")(_))
       .get("/")(doHome)
       .get("/about")(doAbout)
       .post("/echo")(doEcho)
@@ -48,12 +52,13 @@ trait TestServer {
       .incoming("/notImplemented")(doNotImplemented)
       .route("/api/messages")(MessageApplication)
       .websocket("/chat/:id")(WebSocketChatServer)
+      .files("/files/riteshiff", new File("./src/test/resources/riteshiff"))
+      .resources("/resources/riteshiff", "riteshiff")
       .error(doError)
       .create("localhost", 0)
 
   def withServer[T](f: HttpServer => T): T = {
     val server = getServer()
-
     try
       f(server)
     finally
@@ -65,6 +70,18 @@ trait TestServer {
       case true  => https(server.host.getHostAddress + ":" + server.port)
       case false => http (server.host.getHostAddress + ":" + server.port)
     }
+
+  private def doAuditLog[T <: HttpMessage](prefix: String)(msg: T): T = {
+    msg.logger.info {
+      val eol = System.getProperty("line.separator")
+      s"$prefix (correlate=${msg.correlate})" +
+      eol +
+      msg.headers
+        .map(_.toString)
+        .mkString(msg.startLine.toString + eol, eol, eol)
+    }
+    msg
+  }
 
   private def doHome(req: HttpRequest): HttpResponse =
     Ok()

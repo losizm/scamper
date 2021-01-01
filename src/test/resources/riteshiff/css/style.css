@@ -1,0 +1,78 @@
+body {
+  background-color: #111;
+  color: #aaa;
+  font-family: "Times New Roman", Times, serif;
+}
+
+div.title {
+  border: solid 2px #143;
+  border-radius: 8px;
+  padding: 0.1em 0.5em 0.1em 0.33em;
+  color: #286;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 2em;
+  letter-spacing: -0.075em;
+}
+div.title > em {
+  color: #268;
+  font-style: italic;
+}
+
+div.header > h1 {
+  color: #606060;
+}
+
+div.content > a {
+  font-size: 0.9em;
+}
+
+div.footer {
+  margin-top: 24px;
+  border-top: solid 1px #333;
+  padding: 0.1em 0.5em 0.1em 0.33em;
+  color: #444;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 0.4em;
+}
+div.footer > a {
+  color: #444;
+}
+div.footer > a:link, div.footer > a:visited, div.footer > a:hover, div.footer > a:active  {
+  color: #444;
+}
+
+ul.nav {
+  display: flex;
+  padding: 0;
+  list-style-type: none;
+}
+ul.nav > li {
+  margin-top: 0;
+}
+ul.nav > li + li {
+  margin-left: 0.5em;
+}
+ul.nav > li > a {
+  border-radius: 0.2em;
+  border: 1px solid #282828;
+  padding: 0.1em 0.5em;
+  background-color: #1f1f1f;
+  color: #268;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 0.66em;
+  text-decoration: none;
+}
+ul.nav > li > a:link, ul.nav > li > a:visited {
+  color: #268;
+}
+ul.nav > li > a:hover {
+  border: 1px solid #303030;
+  color: #48a;
+}
+ul.nav > li > a:active {
+  color: #826;
+}
+ul.nav > li > a.active {
+  color: #826;
+}
