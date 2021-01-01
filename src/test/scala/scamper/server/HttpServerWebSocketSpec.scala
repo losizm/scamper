@@ -34,7 +34,43 @@ import ResponseStatus.Registry._
 import StatusCode.Registry._
 
 class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
-  it should "complete chat session with Normal Closure" in withSession { session =>
+  it should "complete chat session with Normal Closure" in testNormalClosure(false)
+
+  it should "complete chat session with Normal Closure with SSL/TLS" in testNormalClosure(true)
+
+  it should "complete chat session with Unsupported Data" in testUnsupportedData(false)
+
+  it should "complete chat session with Unsupported Data with SSL/TLS" in testUnsupportedData(true)
+
+  it should "complete chat session with Protocol Error" in testProtocolError(false)
+
+  it should "complete chat session with Protocol Error with SSL/TLS" in testProtocolError(true)
+
+  it should "complete chat session with Internal Error" in testInternalError(false)
+
+  it should "complete chat session with Internal Error with SSL/TLS" in testInternalError(true)
+
+  it should "complete chat session with Going Away" in testGoingAway(false)
+
+  it should "complete chat session with Going Away with SSL/TLS" in testGoingAway(true)
+
+  it should "complete chat session with Policy Violation" in testPolicyViolation(false)
+
+  it should "complete chat session with Policy Violation with SSL/TLS" in testPolicyViolation(true)
+
+  private val client =
+    HttpClient
+      .settings()
+      .trust(new java.io.File("./src/test/resources/secure/truststore"))
+      .create()
+
+  private val messages     = new ListBuffer[String]
+  private val pingData     = new ListBuffer[Byte]
+  private val pongData     = new ListBuffer[Byte]
+  private val pingReceived = new AtomicReference[Boolean]
+  private val closure      = new AtomicReference[StatusCode]
+
+  private def testNormalClosure(secure: Boolean) = withSession(secure) { session =>
     val conversation = ListMap(
       "Hi."                 -> "Hello.",
       "What is your name?"  -> "My name is Lupita.",
@@ -61,7 +97,7 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
     assert(closure.get == NormalClosure)
   }
 
-  it should "complete chat session with Unsupported Data" in withSession { session =>
+  private def testUnsupportedData(secure: Boolean) = withSession(secure) { session =>
     val conversation = ListMap(
       "Hi."          -> "Hello.",
       "How are you?" -> "I'm fine. How are you?",
@@ -83,7 +119,7 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
     assert(closure.get == UnsupportedData)
   }
 
-  it should "complete chat session with Protocol Error" in withSession { session =>
+  private def testProtocolError(secure: Boolean) = withSession(secure) { session =>
     val conversation = ListMap(
       "Hi."          -> "Hello.",
       "How are you?" -> "I'm fine. How are you?",
@@ -105,7 +141,7 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
     assert(closure.get == ProtocolError)
   }
 
-  it should "complete chat session with Internal Error" in withSession { session =>
+  private def testInternalError(secure: Boolean) = withSession(secure) { session =>
     val conversation = ListMap(
       "Hi."          -> "Hello.",
       "How are you?" -> "I'm fine. How are you?",
@@ -127,7 +163,7 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
     assert(closure.get == InternalError)
   }
 
-  it should "complete chat session with Going Away" in withSession { session =>
+  private def testGoingAway(secure: Boolean) = withSession(secure) { session =>
     val conversation = ListMap(
       "Hi."          -> "Hello.",
       "How are you?" -> "I'm fine. How are you?",
@@ -148,7 +184,7 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
     assert(closure.get == GoingAway)
   }
 
-  it should "complete chat session with Policy Violation" in withSession { session =>
+  private def testPolicyViolation(secure: Boolean) = withSession(secure) { session =>
     info("send messages")
     (1 to 10).foreach(_ => session.send("Hi."))
 
@@ -161,15 +197,8 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
     assert(closure.get == PolicyViolation)
   }
 
-  private val client       = HttpClient()
-  private val messages     = new ListBuffer[String]
-  private val pingData     = new ListBuffer[Byte]
-  private val pongData     = new ListBuffer[Byte]
-  private val pingReceived = new AtomicReference[Boolean]
-  private val closure      = new AtomicReference[StatusCode]
-
-  private def withSession[T](test: WebSocketSession => T): Unit =
-    withServer { implicit server =>
+  private def withSession[T](secure: Boolean)(test: WebSocketSession => T): Unit =
+    withServer(secure) { implicit server =>
       // Reset test data
       messages.clear()
       pingData.clear()
@@ -178,7 +207,8 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
       pingReceived.set(false)
       closure.set(Reserved)
 
-      val session = client.websocket(s"${serverUri.setScheme("ws")}/chat/lupita") { session =>
+      val scheme  = if (server.isSecure) "wss" else "ws"
+      val session = client.websocket(s"${serverUri.setScheme(scheme)}/chat/lupita") { session =>
         info("set up client session")
 
         assert(session.state == SessionState.Pending)

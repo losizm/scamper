@@ -28,10 +28,19 @@ import scamper.types.Implicits._
 import ResponseStatus.Registry._
 
 class HttpServerRouteSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
-  private implicit val client     = HttpClient()
+  it should "test message application" in testApplication(false)
+
+  it should "test message application with SSL/TLS" in testApplication(true)
+
+  private implicit val client =
+    HttpClient
+      .settings()
+      .trust(new java.io.File("./src/test/resources/secure/truststore"))
+      .create()
+
   private implicit val bodyParser = BodyParser.text(8192)
 
-  it should "test message application" in withServer { implicit server =>
+  private def testApplication(secure: Boolean) = withServer(secure) { implicit server =>
     implicit object MessagesBodyParser extends BodyParser[Map[Int, String]] {
       private val message = """\s*(\d+):\s+(.+)\s*""".r
 

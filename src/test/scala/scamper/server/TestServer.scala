@@ -33,8 +33,8 @@ import Uri.{ http, https }
 trait TestServer {
   private implicit val bodyParser = BodyParser.bytes(8192)
 
-  def getServer(logging: Boolean = false): HttpServer =
-    HttpServer
+  def getServer(secure: Boolean = false, logging: Boolean = false): HttpServer = {
+    val app = HttpServer
       .app()
       .logger(if (logging) ConsoleLogger else NullLogger)
       .backlogSize(8)
@@ -51,14 +51,25 @@ trait TestServer {
       .get("/throwException")(doThrowException)
       .incoming("/notImplemented")(doNotImplemented)
       .route("/api/messages")(MessageApplication)
+      .route("/cookies")(CookieApplication)
       .websocket("/chat/:id")(WebSocketChatServer)
       .files("/files/riteshiff", new File("./src/test/resources/riteshiff"))
       .resources("/resources/riteshiff", "riteshiff")
       .error(doError)
-      .create("localhost", 0)
 
-  def withServer[T](f: HttpServer => T): T = {
-    val server = getServer()
+
+    if (secure)
+      app.secure(
+        new File("./src/test/resources/secure/keystore"),
+        "letmein",
+        "pkcs12"
+      )
+
+    app.create("localhost", 0)
+  }
+
+  def withServer[T](secure: Boolean)(f: HttpServer => T): T = {
+    val server = getServer(secure)
     try
       f(server)
     finally

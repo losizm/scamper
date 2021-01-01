@@ -31,15 +31,25 @@ import scamper.types.Implicits._
 import ResponseStatus.Registry._
 
 class HttpServerStaticServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
-  private implicit val client = HttpClient()
+  it should "serve files" in testStaticServer("files", false)
+
+  it should "serve files with SSL/TLS" in testStaticServer("files", true)
+
+  it should "serve resources" in testStaticServer("resources", false)
+
+  it should "serve resources with SSL/TLS" in testStaticServer("resources", true)
+
+  private implicit val client =
+    HttpClient
+      .settings()
+      .trust(new java.io.File("./src/test/resources/secure/truststore"))
+      .continueTimeout(1000)
+      .create()
+
   private implicit val parser = BodyParser.bytes(32 * 1024)
 
-  it should "serve files" in testStaticServer("files")
-
-  it should "serve resources" in testStaticServer("resources")
-
-  private def testStaticServer(kind: String): Unit =
-    withServer { implicit server =>
+  private def testStaticServer(kind: String, secure: Boolean): Unit =
+    withServer(secure) { implicit server =>
       info(s"serve html $kind")
       client.get(s"$serverUri/$kind/riteshiff/home.html") { res =>
         assert(res.status == Ok)

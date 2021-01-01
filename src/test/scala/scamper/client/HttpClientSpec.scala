@@ -45,10 +45,15 @@ class HttpClientSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer 
   private val requestClient               = new AtomicReference[HttpClient]
   private val socket                      = new AtomicReference[Socket]
 
-  it should "validate request and response" in withServer { implicit server =>
+  it should "validate request and response" in testClient(false)
+
+  it should "validate request and response with SSL/TLS" in testClient(true)
+
+  private def testClient(secure: Boolean) = withServer(secure) { implicit server =>
     implicit val bodyParser = BodyParser.text(8192)
     implicit val client = HttpClient
       .settings()
+      .trust(new java.io.File("./src/test/resources/secure/truststore"))
       .accept("text/html; q=0.9", "text/plain; q=0.1")
       .acceptEncoding("deflate", "gzip")
       .continueTimeout(1000)
