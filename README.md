@@ -36,7 +36,7 @@ developers to create web applications as pipelines of request handlers.
 - [HTTP Server](#HTTP-Server)
   - [Server Application](#Server-Application)
   - [Request Handlers](#Request-Handlers)
-    - [Targeted Handling](#Targeted-Handling)
+    - [Target Handling](#Target-Handling)
     - [Path Parameters](#Path-Parameters)
     - [Serving Static Files](#Serving-Static-Files)
     - [Serving Static Resources](#Serving-Static-Resources)
@@ -54,7 +54,7 @@ developers to create web applications as pipelines of request handlers.
 To use **Scamper**, start by adding it as a dependency to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "19.2.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "20.0.0"
 ```
 
 ## HTTP Messages
@@ -75,8 +75,8 @@ import scamper.headers.{ Accept, Host}
 import scamper.types.Implicits.stringToMediaRange
 
 val req = Get("/motd")
-  .withHost("localhost:8080")
-  .withAccept("text/plain", "*/*; q=0.5")
+  .setHost("localhost:8080")
+  .setAccept("text/plain", "*/*; q=0.5")
 ```
 
 ### Building Responses
@@ -91,8 +91,8 @@ import scamper.headers.{ Connection, ContentType }
 import scamper.types.Implicits.stringToMediaType
 
 val res = Ok("There is an answer.")
-  .withContentType("text/plain")
-  .withConnection("close")
+  .setContentType("text/plain")
+  .setConnection("close")
 ```
 
 ## Specialized Header Access
@@ -105,7 +105,7 @@ case-insensitive, and the header value is a `String`.
 import scamper.Implicits.{ stringToUri, tupleToHeader }
 import scamper.RequestMethod.Registry.Post
 
-val req = Post("/api/users").withHeader("Content-Type" -> "application/json")
+val req = Post("/api/users").setHeaders("Content-Type" -> "application/json")
 
 val contentType: Option[String] = req.getHeaderValue("Content-Type")
 ```
@@ -117,17 +117,17 @@ defined in `scamper.headers`.
 For example, `ContentType` adds the following methods:
 
 ```scala
+/** Tests for Content-Type header. */
+def hasContentType: Boolean
+
 /** Gets Content-Type header value. */
 def contentType: MediaType
 
 /** Gets Content-Type header value if present. */
 def getContentType: Option[MediaType]
 
-/** Tests for Content-Type header. */
-def hasContentType: Boolean
-
-/** Creates message with Content-Type header set to supplied value. */
-def withContentType(value: MediaType): HttpMessage
+/** Creates message setting Content-Type header. */
+def setContentType(value: MediaType): HttpMessage
 
 /** Creates message removing Content-Type header. */
 def removeContentType(): HttpMessage
@@ -141,7 +141,7 @@ import scamper.RequestMethod.Registry.Post
 import scamper.headers.ContentType
 import scamper.types.MediaType
 
-val req = Post("/api/users").withContentType(MediaType("application", "json"))
+val req = Post("/api/users").setContentType(MediaType("application", "json"))
 println(req.contentType.mainType) // application
 println(req.contentType.subtype) // json
 ```
@@ -155,7 +155,7 @@ import scamper.RequestMethod.Registry.Post
 import scamper.headers.ContentType
 import scamper.types.Implicits.stringToMediaType
 
-val req = Post("/api/users").withContentType("application/json")
+val req = Post("/api/users").setContentType("application/json")
 println(req.contentType.mainType) // application
 println(req.contentType.subtype) // json
 ```
@@ -178,7 +178,7 @@ import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Get
 import scamper.cookies.{ PlainCookie, RequestCookies }
 
-val req = Get("https://localhost:8080/motd").withCookies(
+val req = Get("https://localhost:8080/motd").setCookies(
   PlainCookie("ID", "bG9zCg"), PlainCookie("Region", "SE-US")
 )
 
@@ -212,7 +212,7 @@ import scamper.Implicits.stringToEntity
 import scamper.ResponseStatus.Registry.Ok
 import scamper.cookies.{ ResponseCookies, SetCookie }
 
-val res = Ok("There is an answer.").withCookies(
+val res = Ok("There is an answer.").setCookies(
   SetCookie("ID", "bG9zCg", path = Some("/motd"), secure = true),
   SetCookie("Region", "SE-US")
 )
@@ -266,7 +266,7 @@ val body = Entity("""
   </body>
 </html>
 """)
-val res = Ok(body).withContentType("text/html; charset=utf-8")
+val res = Ok(body).setContentType("text/html; charset=utf-8")
 ```
 
 Or create a message using file content.
@@ -279,7 +279,7 @@ import scamper.headers.ContentType
 import scamper.types.Implicits.stringToMediaType
 
 val body = Entity(new File("./index.html"))
-val res = Ok(body).withContentType("text/html; charset=utf-8")
+val res = Ok(body).setContentType("text/html; charset=utf-8")
 ```
 
 There are implicit converters available for common entity types, so you aren't
@@ -292,7 +292,7 @@ import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.ContentType
 import scamper.types.Implicits.stringToMediaType
 
-val res = Ok(new File("./index.html")).withContentType("text/html; charset=utf-8")
+val res = Ok(new File("./index.html")).setContentType("text/html; charset=utf-8")
 ```
 
 ### Parsing Body
@@ -367,7 +367,7 @@ val formData = Multipart(
 )
 
 // Create request with multipart body
-val req = Post("https://upload.musiclibrary.com/songs").withMultipartBody(formData)
+val req = Post("https://upload.musiclibrary.com/songs").setMultipartBody(formData)
 ```
 
 And for an incoming message with multipart form-data, there's a standard
@@ -405,7 +405,7 @@ import scamper.RequestMethod.Registry.Get
 
 def send(req: HttpRequest): HttpResponse = ???
 
-val req = Get("/motd").withAttribute("send-before" -> (Deadline.now + 1.minute))
+val req = Get("/motd").setAttributes("send-before" -> (Deadline.now + 1.minute))
 
 val res = req.getAttribute[Deadline]("send-before")
   .filter(_.hasTimeLeft())
@@ -433,11 +433,11 @@ import scamper.auth.{ Authorization, Challenge, Credentials, WwwAuthenticate }
 
 // Present response challenge (scheme and parameters)
 val challenge = Challenge("Bearer", "realm" -> "developer")
-val res = Unauthorized().withWwwAuthenticate(challenge)
+val res = Unauthorized().setWwwAuthenticate(challenge)
 
 // Present request credentials (scheme and token)
 val credentials = Credentials("Bearer", "QWxsIEFjY2VzcyEhIQo=")
-val req = Get("/dev/projects").withAuthorization(credentials)
+val req = Get("/dev/projects").setAuthorization(credentials)
 ```
 
 _**Note:** The `Authorization` and `WwwAuthenticate` header classes are for
@@ -460,11 +460,11 @@ import scamper.auth.{ Authorization, BasicChallenge, BasicCredentials, WwwAuthen
 
 // Provide realm and optional parameters
 val challenge = BasicChallenge("admin", "title" -> "Admin Console")
-val res = Unauthorized().withWwwAuthenticate(challenge)
+val res = Unauthorized().setWwwAuthenticate(challenge)
 
 // Provide user and password
 val credentials = BasicCredentials("sa", "l3tm31n")
-val req = Get("/admin/users").withAuthorization(credentials)
+val req = Get("/admin/users").setAuthorization(credentials)
 ```
 
 In addition, there are methods for Basic authentication defined in the header
@@ -477,14 +477,14 @@ import scamper.ResponseStatus.Registry.Unauthorized
 import scamper.auth.{ Authorization, WwwAuthenticate }
 
 // Provide realm and optional parameters
-val res = Unauthorized().withBasic("admin", "title" -> "Admin Console")
+val res = Unauthorized().setBasic("admin", "title" -> "Admin Console")
 
 // Access basic auth in response
 printf(s"Realm: %s%n", res.basic.realm)
 printf(s"Title: %s%n", res.basic.params("title"))
 
 // Provide user and password
-val req = Get("/admin/users").withBasic("sa", "l3tm3m1n")
+val req = Get("/admin/users").setBasic("sa", "l3tm3m1n")
 
 // Access basic auth in request
 printf(s"User: %s%n", req.basic.user)
@@ -504,7 +504,7 @@ import scamper.ResponseStatus.Registry.Unauthorized
 import scamper.auth.{ Authorization, WwwAuthenticate }
 
 // Provide challenge parameters
-val res = Unauthorized().withBearer(
+val res = Unauthorized().setBearer(
   "scope" -> "user profile",
   "error" -> "invalid_token",
   "error_description" -> "Expired access token"
@@ -528,7 +528,7 @@ println(res.bearer.isInvalidRequest)
 println(res.bearer.isInsufficientScope)
 
 // Create request with Bearer token
-val req = Get("/users").withBearer("R290IDUgb24gaXQhCg==")
+val req = Get("/users").setBearer("R290IDUgb24gaXQhCg==")
 
 // Access bearer auth in request
 printf("Token: %s%n", req.bearer.token)
@@ -547,8 +547,8 @@ import scamper.headers.ContentType
 import scamper.types.Implicits.stringToMediaType
 
 val req = Post("https://localhost:8080/users")
-  .withContentType("application/json")
-  .withBody(s"""{ "id": 500, "name": "guest" }""")
+  .setContentType("application/json")
+  .setBody(s"""{ "id": 500, "name": "guest" }""")
 
 // Send request and print response status
 HttpClient.send(req) { res =>
@@ -605,8 +605,8 @@ implicit val client = HttpClient()
 implicit val parser = BodyParser.text(4096)
 
 Get("http://localhost:8080/motd")
-  .withAccept("text/plain")
-  .withAcceptLanguage("fr-CA; q=0.6", "en-CA; q=0.4")
+  .setAccept("text/plain")
+  .setAcceptLanguage("fr-CA; q=0.6", "en-CA; q=0.4")
   .send(res => println(res.as[String])) // Send request and print response
 ```
 
@@ -620,11 +620,12 @@ import java.io.File
 import scamper.Implicits.{ stringToEntity, stringToUri }
 import scamper.client.HttpClient
 import scamper.cookies.CookieStore
-import scamper.types.Implicits.stringToContentCodingRange
+import scamper.types.Implicits.{ stringToContentCodingRange, stringToMediaRange }
 
 // Build client from settings
 val client = HttpClient.settings()
-  .acceptEncodings("gzip", "deflate")
+  .accept("text/plain; q=0.9", "application/json; q=0.1")
+  .acceptEncoding("gzip", "deflate")
   .bufferSize(8192)
   .readTimeout(3000)
   .continueTimeout(1000)
@@ -637,8 +638,11 @@ client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
 }
 ```
 
-The `acceptEncodings` provides a list of content coding ranges, which are used
-to set the **Accept-Encoding** header on each outgoing request.
+The `accept` provides a list of accepted media types, which are used to set the
+**Accept** header on each outgoing request.
+
+The `acceptEncoding` provides a list of accepted content encodings, which are
+used to set the **Accept-Encoding** header on each outgoing request.
 
 The `bufferSize` is the size in bytes used for the client send and receive
 buffers.
@@ -702,7 +706,7 @@ settings.outgoing { req =>
   def findCookies(target: Uri): Seq[PlainCookie] = ???
 
   // Add cookies to request
-  req.withCookies { findCookies(req.absoluteTarget) }
+  req.setCookies { findCookies(req.absoluteTarget) }
 }
 
 // Add response filter
@@ -763,7 +767,7 @@ HttpClient().websocket("ws://localhost:9090/hello") { session =>
 ```
 
 In the above example, the client establishes a WebSocket connection to the
-specified target URI. _(Note use **ws** scheme. For secure connections, use
+specified target URI. _(Note use of **ws** scheme. For secure connections, use
 **wss** instead.)_
 
 After the client and server perform the opening handshake, a `WebSocketSession`
@@ -880,11 +884,11 @@ app.incoming { req =>
 
 // Add handler to allow GET and HEAD requests only
 app.incoming { req =>
-  (req.isGet || req.isHead) match {
+  req.isGet || req.isHead match {
     // Return request for next handler
     case true  => req
-    // Otherwise return response to end request chain
-    case false => MethodNotAllowed().withAllow(Get, Head)
+    // Return response to end request chain
+    case false => MethodNotAllowed().setAllow(Get, Head)
   }
 }
 ```
@@ -908,17 +912,16 @@ import scamper.types.Implicits.stringToLanguageTag
 app.incoming { req =>
   val translator: BodyParser[String] = ???
 
-  (req.isPost && req.contentLanguage.contains("fr")) match {
-    case true  => req.withBody(translator.parse(req)).withContentLanguage("en")
+  req.isPost && req.contentLanguage.contains("fr") match {
+    case true  => req.setBody(translator.parse(req)).setContentLanguage("en")
     case false => req
   }
 }
 ```
 
-#### Targeted Handling
+#### Target Handling
 
-A handler can be added to a targeted path with or without a targeted request
-method.
+A handler can be added to a target path with or setout a target request method.
 
 ```scala
 import scamper.Implicits.stringToEntity
@@ -926,7 +929,7 @@ import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.{ Forbidden, Ok }
 
 // Match request method and exact path
-app.incoming(Get, "/about") { req =>
+app.incoming("/about", Get) { req =>
   Ok("This server is powered by Scamper.")
 }
 
@@ -956,7 +959,7 @@ app.post("/messages") { req =>
   implicit val parser = BodyParser.text()
 
   val id = post(req.as[String])
-  Created().withLocation(s"/messages/$id")
+  Created().setLocation(s"/messages/$id")
 }
 ```
 
@@ -1011,7 +1014,7 @@ app.post("/translate/:in/to/:out") { req =>
   def translator(from: String, to: String): BodyParser[String] = ???
 
   val from = req.params.getString("in")
-  val to = req.params.getString("out")
+  val to   = req.params.getString("out")
 
   Ok(translator(from, to).parse(req))
 }
@@ -1019,22 +1022,21 @@ app.post("/translate/:in/to/:out") { req =>
 
 #### Serving Static Files
 
-You can add a request handler at a mount path to serve static files from a
-source directory.
+You can mount a file server as a specialized request handler.
 
 ```scala
 app.files("/app/main", new File("/path/to/public"))
 ```
 
 This adds a handler to serve files from the directory at _/path/to/public_. The
-files are mapped based on the request path excluding the mount path. For example,
+files are located using the request path minus the mount path. For example,
 _http://localhost:8080/app/main/images/logo.png_ would map to
 _/path/to/public/images/logo.png_.
 
 #### Serving Static Resources
 
-If your web assets are bundled in a jar file, just drop the jar on the
-classpath, and you can configure the application to serve its contents.
+If your web assets are bundled in a JAR file, just drop it on the classpath and
+add a handler to serve its contents.
 
 ```scala
 app.resources("/app/main", "assets")
@@ -1043,7 +1045,7 @@ app.resources("/app/main", "assets")
 In the above configuration, requests prefixed with _/app/main_ are served
 resources from the _assets_ directory. The mapping works similiar to static
 files, only the resources are located using a class loader. _(See
-[ServerApplication.resources()](https://losizm.github.io/scamper/latest/api/scamper/server/ServerApplication.html#resources(mountPath:String,sourceDirectory:String,classLoader:ClassLoader):ServerApplication.this.type)
+[ServerApplication.resources()](https://losizm.github.io/scamper/latest/api/scamper/server/ServerApplication.html#resources(path:String,source:String,loader:ClassLoader):ServerApplication.this.type)
 in scaladoc for additional details.)_
 
 #### Aborting Response
@@ -1113,7 +1115,7 @@ handlers.
 ```scala
 import scamper.ResponseStatus.Registry.{ BadRequest, InternalServerError }
 
-// Accepts Throwable and HttpRequest; returns HttpResponse
+// Accept Throwable and HttpRequest; return HttpResponse
 app.error { (err, req) =>
   def isClientError(err: Throwable): Boolean = ???
 
@@ -1139,7 +1141,7 @@ import scamper.server.Implicits.ServerHttpRequest
 val app = HttpServer.app()
 
 // Mount router to /api
-app.use("/api") { router =>
+app.route("/api") { router =>
   val messages = Map(1 -> "Hello, world!", 2 -> "Goodbye, cruel world!")
 
   // Map handler to /api/messages
@@ -1184,7 +1186,7 @@ import scamper.server.Implicits.ServerHttpResponse
 app.outgoing { res =>
   res.body.isKnownEmpty match {
     case true  => res
-    case false => res.withGzipContentEncoding()
+    case false => res.setGzipContentEncoding()
   }
 }
 ```

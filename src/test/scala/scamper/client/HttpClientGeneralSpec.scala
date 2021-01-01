@@ -29,7 +29,7 @@ import scamper.types.Implicits._
 import RequestMethod.Registry._
 import ResponseStatus.Registry._
 
-class HttpClientSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
+class HttpClientGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
   private val requestLineCheck            = new AtomicBoolean
   private val hostHeaderCheck             = new AtomicBoolean
   private val userAgentHeaderCheck        = new AtomicBoolean
