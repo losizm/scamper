@@ -90,6 +90,10 @@ class HttpClientGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
         assert(res.getHeaderValues("Response-Test-1") == Seq("test"))
         assert(res.getHeaderValue("Response-Test-2").contains("update-1"))
         assert(res.getHeaderValues("Response-Test-2") == Seq("update-1", "update-2"))
+        assert(res.request.getHeaderValue("Request-Test-1").contains("test"))
+        assert(res.request.getHeaderValues("Request-Test-1") == Seq("test"))
+        assert(res.request.getHeaderValue("Request-Test-2").contains("update-1"))
+        assert(res.request.getHeaderValues("Request-Test-2") == Seq("update-1", "update-2"))
 
         info("check response body")
         assert(res.as[String] == "This is a test." * 100)

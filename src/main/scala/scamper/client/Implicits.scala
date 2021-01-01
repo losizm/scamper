@@ -81,4 +81,16 @@ object Implicits {
     def setDeflateContentEncoding(bufferSize: Int = 8192): HttpRequest =
       ContentEncoder.deflate(req, bufferSize)
   }
+
+  /** Adds client-side extension methods to `HttpResponse`. */
+  implicit class ClientHttpResponse(private val res: HttpResponse) extends AnyVal {
+    /**
+     * Gets corresponding request.
+     *
+     * @note The request is the outgoing request after filters were applied and
+     * excludes message body.
+     */
+    def request: HttpRequest =
+      res.getAttribute("scamper.client.response.request").get
+  }
 }

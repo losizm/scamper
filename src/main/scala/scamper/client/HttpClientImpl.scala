@@ -127,8 +127,10 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
         .map(addAccept)
         .map(addAcceptEncoding)
         .map(outgoing.foldLeft(_) { (req, filter) => filter(req) })
+        .map { req => effectiveRequest = req; req }
         .map(conn.send)
         .map(addAttributes(_, conn, correlate, target))
+        .map(addRequestAttribute(_, effectiveRequest))
         .map(storeCookies(target, _))
         .map(incoming.foldLeft(_) { (res, filter) => filter(res) })
         .map(handler.apply)
@@ -242,6 +244,9 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       "scamper.client.message.correlate"      -> correlate,
       "scamper.client.message.absoluteTarget" -> absoluteTarget
     )
+
+  private def addRequestAttribute(res: HttpResponse, req: HttpRequest): HttpResponse =
+    res.putAttributes("scamper.client.response.request" -> req.setBody(Entity.empty))
 
   private def setCloseGuard(msg: HttpMessage, enabled: Boolean): Unit =
     msg.getAttribute[HttpClientConnection]("scamper.client.message.connection")
