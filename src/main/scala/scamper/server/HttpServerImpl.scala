@@ -105,7 +105,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
   private val threadGroup = new ThreadGroup(s"scamper-server-$id")
 
-  private val serviceContext =
+  private val serviceExecutor =
     ThreadPoolExecutorService
       .fixed(
         name        = s"scamper-server-$id-service",
@@ -116,7 +116,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         throw new RejectedExecutionException(s"Rejected scamper-server-$id-service task")
       }
 
-  private val keepAliveContext =
+  private val keepAliveExecutor =
     ThreadPoolExecutorService
       .dynamic(
         name             = s"scamper-server-$id-keepAlive",
@@ -129,7 +129,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         throw new ReadAborted(s"rejected scamper-server-$id-keepAlive task")
       }
 
-  private val upgradeContext =
+  private val upgradeExecutor =
     ThreadPoolExecutorService
       .dynamic(
         name             = s"scamper-server-$id-upgrade",
@@ -142,7 +142,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         throw new RejectedExecutionException(s"Rejected scamper-server-$id-upgrade task")
       }
 
-  private val encoderContext =
+  private val encoderExecutor =
     ThreadPoolExecutorService
       .dynamic(
         name             = s"scamper-server-$id-encoder",
@@ -156,7 +156,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         executor.getThreadFactory.newThread(task).start()
       }
 
-  private val closerContext =
+  private val closerExecutor =
     ThreadPoolExecutorService
       .fixed(
         name             = s"scamper-server-$id-closer",
@@ -178,11 +178,11 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
     if (closed.compareAndSet(false, true)) {
       Try(logger.info(s"$authority - Shutting down server"))
       Try(serverSocket.close())
-      Try(keepAliveContext.shutdownNow())
-      Try(upgradeContext.shutdownNow())
-      Try(encoderContext.shutdownNow())
-      Try(serviceContext.shutdownNow())
-      Try(closerContext.shutdownNow())
+      Try(keepAliveExecutor.shutdownNow())
+      Try(upgradeExecutor.shutdownNow())
+      Try(encoderExecutor.shutdownNow())
+      Try(serviceExecutor.shutdownNow())
+      Try(closerExecutor.shutdownNow())
       Try(logger.asInstanceOf[Closeable].close())
     }
 
@@ -348,11 +348,11 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
       val result = (requestCount == 1) match {
         case true =>
           logger.info(s"$authority - Connection accepted from $tag")
-          Future(onBeginService(readByte(false))) { serviceContext }
+          Future(onBeginService(readByte(false))) { serviceExecutor }
 
         case false =>
-          Future(readByte(true)) { keepAliveContext }
-            .map(onBeginService) { serviceContext }
+          Future(readByte(true)) { keepAliveExecutor }
+            .map(onBeginService) { serviceExecutor }
       }
 
       result.onComplete {
@@ -366,7 +366,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
         case Success(UpgradeConnection(upgrade)) =>
           logger.info(s"$authority - Upgrading connection to $tag")
-          Future(upgrade(socket)) { upgradeContext }
+          Future(upgrade(socket)) { upgradeExecutor }
 
         case Failure(err: ReadAborted) =>
           (requestCount > 1) match {
@@ -386,7 +386,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         case Failure(err) =>
           logger.info(s"$authority - Closing connection to $tag")
           Try(socket.close())
-      } { closerContext }
+      } { closerExecutor }
     }
 
     private def readByte(keepingAlive: Boolean)(implicit socket: Socket): Byte = {
@@ -502,7 +502,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
     private def encode(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
       encoding.foldLeft(in) { (in, enc) =>
         if      (enc.isChunked) in
-        else if (enc.isGzip)    Compressor.gzip(in, bufferSize) { encoderContext }
+        else if (enc.isGzip)    Compressor.gzip(in, bufferSize) { encoderExecutor }
         else if (enc.isDeflate) Compressor.deflate(in, bufferSize)
         else                    throw new HttpException(s"Unsupported transfer encoding: $enc")
       }
