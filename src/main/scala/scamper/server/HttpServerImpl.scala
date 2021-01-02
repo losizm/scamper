@@ -59,7 +59,7 @@ private object HttpServerImpl {
     new HttpServerImpl(count.incrementAndGet(), new InetSocketAddress(host, port), app)
 }
 
-private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: HttpServerImpl.Application) extends HttpServer { server =>
+private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: HttpServerImpl.Application) extends HttpServer {
   private case class ReadError(status: ResponseStatus) extends HttpException(status.reasonPhrase)
   private case class ReadAborted(reason: String) extends HttpException(s"Read aborted with $reason")
 
@@ -158,12 +158,10 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
   private val closerContext =
     ThreadPoolExecutorService
-      .dynamic(
+      .fixed(
         name             = s"scamper-server-$id-closer",
-        corePoolSize     = poolSize,
-        maxPoolSize      = poolSize * closerPoolSizeFactor,
-        keepAliveSeconds = 60L,
-        queueSize        = 0,
+        poolSize         = poolSize,
+        queueSize        = poolSize * closerQueueSizeFactor,
         threadGroup      = Some(threadGroup)
       ) { (task, executor) =>
         logger.warn(s"$authority - Running rejected scamper-server-$id-closer task on dedicated thread")
@@ -540,7 +538,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
     private def addAttributes[T <: HttpMessage](msg: T, socket: Socket, requestCount: Int, correlate: String)
         (implicit ev: <:<[T, MessageBuilder[T]]): T =
       msg.putAttributes(
-        "scamper.server.message.server"       -> server,
+        "scamper.server.message.server"       -> HttpServerImpl.this,
         "scamper.server.message.socket"       -> socket,
         "scamper.server.message.requestCount" -> requestCount,
         "scamper.server.message.correlate"    -> correlate,

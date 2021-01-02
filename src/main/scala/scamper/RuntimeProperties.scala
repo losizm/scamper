@@ -23,10 +23,10 @@ import scala.util.Try
 private object RuntimeProperties {
   object auxiliary {
     lazy val executorShowWarning      = getBooleanProperty("scamper.auxiliary.executor.showWarning", false)
-    lazy val executorCorePoolSize     = getIntProperty("scamper.auxiliary.executor.corePoolSize", 0)
-    lazy val executorMaxPoolSize      = getIntProperty("scamper.auxiliary.executor.maxPoolSize", runtime.availableProcessors * 2)
-    lazy val executorKeepAliveSeconds = getLongProperty("scamper.auxiliary.executor.keepAliveSeconds", 60L)
-    lazy val executorQueueSize        = getIntProperty("scamper.auxiliary.executor.queueSize", 0)
+    lazy val executorCorePoolSize     = getIntProperty("scamper.auxiliary.executor.corePoolSize", 0).max(0)
+    lazy val executorMaxPoolSize      = getIntProperty("scamper.auxiliary.executor.maxPoolSize", runtime.availableProcessors * 2).max(1)
+    lazy val executorKeepAliveSeconds = getLongProperty("scamper.auxiliary.executor.keepAliveSeconds", 60L).max(0L)
+    lazy val executorQueueSize        = getIntProperty("scamper.auxiliary.executor.queueSize", 0).max(0)
   }
 
   object cookies {
@@ -38,7 +38,7 @@ private object RuntimeProperties {
     lazy val keepAlivePoolSizeFactor = getIntProperty("scamper.server.keepAlive.poolSizeFactor", 2).max(1)
     lazy val upgradePoolSizeFactor   = getIntProperty("scamper.server.upgrade.poolSizeFactor", 2).max(1)
     lazy val encoderPoolSizeFactor   = getIntProperty("scamper.server.encoder.poolSizeFactor", 2).max(1)
-    lazy val closerPoolSizeFactor    = getIntProperty("scamper.server.closer.poolSizeFactor", 2).max(1)
+    lazy val closerQueueSizeFactor   = getIntProperty("scamper.server.closer.queueSizeFactor", 2).max(0)
   }
 
   private def getBooleanProperty(name: String, default: => Boolean): Boolean =
