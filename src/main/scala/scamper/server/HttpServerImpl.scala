@@ -298,7 +298,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         }.map { res =>
           write(res)
           logger.info(s"$authority - Response sent to $tag")
-          Try(res.body.getInputStream.close()) // Close filtered response body
+          Try(res.body.inputStream.close()) // Close filtered response body
           val connection = res.connection
 
           if (connection.exists(_ equalsIgnoreCase "upgrade"))
@@ -308,7 +308,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
           else
             CloseConnection
         }.map { connectionManagement =>
-          Try(res.body.getInputStream.close()) // Close unfiltered response body
+          Try(res.body.inputStream.close()) // Close unfiltered response body
           connectionManagement
         }.recover {
           case err =>
@@ -481,7 +481,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         var length = 0
 
         res.getTransferEncoding.map { encoding =>
-          val in = encode(res.body.getInputStream, encoding)
+          val in = encode(res.body.inputStream, encoding)
           while ({ length = in.read(buffer); length != -1 }) {
             socket.writeLine(length.toHexString)
             socket.write(buffer, 0, length)
@@ -490,7 +490,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
           socket.writeLine("0")
           socket.writeLine()
         }.getOrElse {
-          val in = res.body.getInputStream
+          val in = res.body.inputStream
           while ({ length = in.read(buffer); length != -1 })
             socket.write(buffer, 0, length)
         }

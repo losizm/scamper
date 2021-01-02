@@ -59,7 +59,7 @@ trait BodyDecoder {
    * @param message HTTP message
    * @param f function
    *
-   * @return value from supplied function
+   * @return applied function value
    *
    * @note The input stream throws [[ReadLimitExceeded]] if the decoder reads
    * beyond `maxLength` of message body.

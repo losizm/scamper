@@ -31,17 +31,17 @@ trait Entity {
     getLength.contains(0)
 
   /** Gets input stream. */
-  def getInputStream: InputStream
+  def inputStream: InputStream
 
   /**
    * Passes input stream to supplied function.
    *
    * @param f function
    *
-   * @return value from supplied function
+   * @return applied function value
    */
   def withInputStream[T](f: InputStream => T): T =
-    f(getInputStream)
+    f(inputStream)
 }
 
 /** Provides factory for `Entity`. */
@@ -113,26 +113,26 @@ object Entity {
 
 private object EmptyEntity extends Entity {
   val getLength = Some(0L)
-  val getInputStream = EmptyInputStream
+  val inputStream = EmptyInputStream
 }
 
 private case class ByteArrayEntity(bytes: Array[Byte]) extends Entity {
   val getLength = Some(bytes.length.toLong)
-  val getInputStream = new ByteArrayInputStream(bytes)
+  val inputStream = new ByteArrayInputStream(bytes)
 }
 
 private case class FileEntity(file: File) extends Entity {
   lazy val getLength = Some(file.length)
-  lazy val getInputStream = new FileInputStream(file)
+  lazy val inputStream = new FileInputStream(file)
 }
 
-private case class InputStreamEntity(getInputStream: InputStream) extends Entity {
+private case class InputStreamEntity(inputStream: InputStream) extends Entity {
   val getLength = None
 }
 
 private case class MultipartEntity(multipart: Multipart, boundary: String) extends Entity {
   val getLength = None
-  lazy val getInputStream = new WriterInputStream(writeMultipart)(Auxiliary.executor)
+  lazy val inputStream = new WriterInputStream(writeMultipart)(Auxiliary.executor)
 
   private def writeMultipart(out: OutputStream): Unit = {
     val start = "--" + boundary

@@ -71,7 +71,7 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
   private def writeBody(request: HttpRequest): Unit =
     request.getTransferEncoding.map { encoding =>
       val buffer = new Array[Byte](bufferSize)
-      val in = encodeInputStream(request.body.getInputStream, encoding)
+      val in = encodeInputStream(request.body.inputStream, encoding)
       var chunkSize = 0
 
       while ({ chunkSize = in.read(buffer); chunkSize != -1 }) {
@@ -85,7 +85,7 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
       socket.flush()
     }.getOrElse {
       val buffer = new Array[Byte](bufferSize)
-      val in = request.body.getInputStream
+      val in = request.body.inputStream
       var length = 0
       while ({ length = in.read(buffer); length != -1 })
         socket.write(buffer, 0, length)

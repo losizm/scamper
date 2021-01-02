@@ -334,7 +334,7 @@ implicit object UserParser extends BodyParser[User] {
 
   // Parses JSON message body to User
   def parse(message: HttpMessage): User =
-    Json.parse(message.body.getInputStream).as[User]
+    Json.parse(message.body.inputStream).as[User]
 }
 
 def printUser(message: HttpMessage): Unit = {
