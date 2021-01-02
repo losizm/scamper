@@ -87,8 +87,7 @@ object Implicits {
     /**
      * Gets corresponding request.
      *
-     * @note The request is the outgoing request after filters were applied and
-     * excludes message body.
+     * @note The request is the outgoing request after filters were applied.
      */
     def request: HttpRequest =
       res.getAttribute("scamper.client.response.request").get

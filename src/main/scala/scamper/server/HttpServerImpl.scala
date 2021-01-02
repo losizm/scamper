@@ -547,7 +547,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
   private def addRequestAttribute(res: HttpResponse, req: HttpRequest): HttpResponse =
     req != null match {
-      case true  => res.putAttributes("scamper.server.response.request" -> req.setBody(Entity.empty))
+      case true  => res.putAttributes("scamper.server.response.request" -> req)
       case false => res
     }
   }

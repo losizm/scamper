@@ -246,7 +246,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     )
 
   private def addRequestAttribute(res: HttpResponse, req: HttpRequest): HttpResponse =
-    res.putAttributes("scamper.client.response.request" -> req.setBody(Entity.empty))
+    res.putAttributes("scamper.client.response.request" -> req)
 
   private def setCloseGuard(msg: HttpMessage, enabled: Boolean): Unit =
     msg.getAttribute[HttpClientConnection]("scamper.client.message.connection")

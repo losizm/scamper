@@ -95,8 +95,7 @@ object Implicits {
      * The request is not available if server could not read it or the server
      * rejected it before it was read.
      *
-     * @note The request is the incoming request before handlers were applied
-     * and excludes message body.
+     * @note The request is the incoming request before handlers were applied.
      */
     def request: Option[HttpRequest] =
       res.getAttribute("scamper.server.response.request")

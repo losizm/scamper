@@ -125,12 +125,12 @@ class HttpServerAttributesSpec extends org.scalatest.flatspec.AnyFlatSpec with T
         .bufferSize(1024)
         .headerLimit(10)
         .logger(if (logging) ConsoleLogger else NullLogger)
-        .incoming { req => request.set(req.setBody(Entity.empty)); req }
+        .incoming { req => request.set(req); req }
         .incoming(_.putAttributes("after" -> 0))
         .incoming("/error") { _ => throw new Exception("Internal Error") }
         .incoming { req => req.as[Array[Byte]]; req }
         .incoming { _ => Ok() }
-        .outgoing { res => response.set(res.setBody(Entity.empty)); res }
+        .outgoing { res => response.set(res); res }
         .outgoing(_.putAttributes("after" -> 0))
 
     if (secure)
