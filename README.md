@@ -629,7 +629,7 @@ val client = HttpClient.settings()
   .bufferSize(8192)
   .readTimeout(3000)
   .continueTimeout(1000)
-  .cookieStore(CookieStore())
+  .cookies(CookieStore())
   .trust(new File("/path/to/truststore"))
   .create()
 
@@ -655,7 +655,7 @@ for a **100 Continue** response from the server before the client sends the
 request body. This behavior is effected only if the request includes an
 **Expect** header set to **100-Continue**.
 
-The `cookieStore` is used to store cookies included in HTTP responses. Using the
+The `cookies` is used to store cookies included in HTTP responses. Using the
 cookie store, the client automatically adds the appropriate cookies to each
 outgoing request.
 

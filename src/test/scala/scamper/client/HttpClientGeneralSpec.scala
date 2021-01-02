@@ -53,7 +53,7 @@ class HttpClientGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
     implicit val bodyParser = BodyParser.text(8192)
     implicit val client = HttpClient
       .settings()
-      .trust(new java.io.File("./src/test/resources/secure/truststore"))
+      .trust(Resources.truststore)
       .accept("text/html; q=0.9", "text/plain; q=0.1")
       .acceptEncoding("deflate", "gzip")
       .continueTimeout(1000)

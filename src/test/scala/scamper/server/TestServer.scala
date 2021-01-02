@@ -15,8 +15,6 @@
  */
 package scamper.server
 
-import java.io.File
-
 import scala.collection.concurrent.TrieMap
 
 import scamper._
@@ -53,16 +51,12 @@ trait TestServer {
       .route("/api/messages")(MessageApplication)
       .route("/cookies")(CookieApplication)
       .websocket("/chat/:id")(WebSocketChatServer)
-      .files("/files/riteshiff", new File("./src/test/resources/riteshiff"))
+      .files("/files/riteshiff", Resources.riteshiff)
       .resources("/resources/riteshiff", "riteshiff")
       .error(doError)
 
     if (secure)
-      app.secure(
-        new File("./src/test/resources/secure/keystore"),
-        "letmein",
-        "pkcs12"
-      )
+      app.secure(Resources.keystore, "letmein", "pkcs12")
 
     app.create("localhost", 0)
   }

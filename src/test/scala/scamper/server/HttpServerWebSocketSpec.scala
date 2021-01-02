@@ -61,7 +61,7 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
   private val client =
     HttpClient
       .settings()
-      .trust(new java.io.File("./src/test/resources/secure/truststore"))
+      .trust(Resources.truststore)
       .create()
 
   private val messages     = new ListBuffer[String]

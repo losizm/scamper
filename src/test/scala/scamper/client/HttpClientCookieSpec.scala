@@ -31,7 +31,7 @@ class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestS
     implicit val client =
       HttpClient
         .settings()
-        .trust(new java.io.File("./src/test/resources/secure/truststore"))
+        .trust(Resources.truststore)
         .outgoing(doCookieCheck(secure))
         .cookies()
         .create()

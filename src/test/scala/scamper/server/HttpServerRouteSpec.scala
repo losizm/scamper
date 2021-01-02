@@ -35,7 +35,7 @@ class HttpServerRouteSpec extends org.scalatest.flatspec.AnyFlatSpec with TestSe
   private implicit val client =
     HttpClient
       .settings()
-      .trust(new java.io.File("./src/test/resources/secure/truststore"))
+      .trust(Resources.truststore)
       .create()
 
   private implicit val bodyParser = BodyParser.text(8192)

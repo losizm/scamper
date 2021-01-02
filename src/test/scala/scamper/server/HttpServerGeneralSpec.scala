@@ -101,7 +101,7 @@ class HttpServerGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
   private implicit val client =
     HttpClient
       .settings()
-      .trust(new java.io.File("./src/test/resources/secure/truststore"))
+      .trust(Resources.truststore)
       .continueTimeout(1000)
       .create()
 

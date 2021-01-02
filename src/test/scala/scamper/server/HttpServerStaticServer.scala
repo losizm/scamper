@@ -15,8 +15,7 @@
  */
 package scamper.server
 
-import java.io.File
-import java.nio.file.{ Files, Paths }
+import java.nio.file.Files
 
 import scala.collection.immutable.ListMap
 
@@ -42,7 +41,7 @@ class HttpServerStaticServerSpec extends org.scalatest.flatspec.AnyFlatSpec with
   private implicit val client =
     HttpClient
       .settings()
-      .trust(new java.io.File("./src/test/resources/secure/truststore"))
+      .trust(Resources.truststore)
       .continueTimeout(1000)
       .create()
 
@@ -92,5 +91,5 @@ class HttpServerStaticServerSpec extends org.scalatest.flatspec.AnyFlatSpec with
   }
 
   private def getBytes(path: String): Array[Byte] =
-    Files.readAllBytes(Paths.get("./src/test/resources/riteshiff", path))
+    Files.readAllBytes(Resources.riteshiff.toPath.resolve(path))
 }
