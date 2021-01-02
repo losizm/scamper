@@ -323,10 +323,14 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
           logger.info(s"$authority - Servicing request from $tag")
           socket.setSoTimeout(readTimeout)
 
+          var request: HttpRequest = null
+
           Try(read(firstByte))
             .map(req => addAttributes(req, socket, requestCount, correlate))
+            .map { req => request = req; req }
             .fold(err => Try(onReadError(err)), req => onHandleRequest(req))
             .map(res => addAttributes(res, socket, requestCount, correlate))
+            .map(addRequestAttribute(_, request))
             .map(onHandleResponse)
             .get
         } catch {
@@ -542,5 +546,11 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         "scamper.server.message.correlate"    -> correlate,
         "scamper.server.message.logger"       -> logger
       )
+
+  private def addRequestAttribute(res: HttpResponse, req: HttpRequest): HttpResponse =
+    req != null match {
+      case true  => res.putAttributes("scamper.server.response.request" -> req.setBody(Entity.empty))
+      case false => res
+    }
   }
 }

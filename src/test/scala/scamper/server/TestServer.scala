@@ -57,7 +57,6 @@ trait TestServer {
       .resources("/resources/riteshiff", "riteshiff")
       .error(doError)
 
-
     if (secure)
       app.secure(
         new File("./src/test/resources/secure/keystore"),

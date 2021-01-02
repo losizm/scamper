@@ -90,6 +90,18 @@ object Implicits {
   /** Adds server-side extension methods to `HttpResponse`. */
   implicit class ServerHttpResponse(private val res: HttpResponse) extends AnyVal {
     /**
+     * Optionally gets corresponding request.
+     *
+     * The request is not available if server could not read it or the server
+     * rejected it before it was read.
+     *
+     * @note The request is the incoming request before handlers were applied
+     * and excludes message body.
+     */
+    def request: Option[HttpRequest] =
+      res.getAttribute("scamper.server.response.request")
+
+    /**
      * Adds `gzip` to `Content-Encoding` header and encodes message body.
      *
      * @param bufferSize size in bytes of buffer used to encode message body
