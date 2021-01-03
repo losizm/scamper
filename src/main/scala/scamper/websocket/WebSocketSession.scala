@@ -80,7 +80,7 @@ trait WebSocketSession {
   /**
    * Gets payload limit of outgoing message.
    *
-   * @param length payload limit (in bytes)
+   * @param length payload limit in bytes
    *
    * @return this session
    *
@@ -100,7 +100,7 @@ trait WebSocketSession {
   /**
    * Sets capacity of incoming message.
    *
-   * @param size message capacity (in bytes)
+   * @param size message capacity in bytes
    *
    * @return this session
    *

@@ -21,7 +21,7 @@ package scamper.types
  * @see [[scamper.headers.KeepAlive]]
  */
 trait KeepAliveParameters {
-  /** Gets idle timeout (in seconds). */
+  /** Gets idle timeout seconds. */
   def timeout: Int
 
   /** Gets max requests. */

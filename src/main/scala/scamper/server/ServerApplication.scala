@@ -129,7 +129,7 @@ class ServerApplication extends Router {
    *
    * The `queueSize` specifies the maximum number of requests that can be queued
    * for processing. Incoming requests that exceed this limit are sent
-   * '''503 Service Unavailable'''.
+   * 503 (Service Unavailable).
    *
    * @param size queue size
    *
@@ -148,9 +148,9 @@ class ServerApplication extends Router {
    *
    * The `bufferSize` also determines the maximum length of any header line.
    * Incoming requests containing a header that exceeds this limit are sent
-   * '''431 Request Header Fields Too Large'''.
+   * 431 (Request Header Fields Too Large).
    *
-   * @param size buffer size (in bytes)
+   * @param size buffer size in bytes
    *
    * @return this application
    *
@@ -166,9 +166,9 @@ class ServerApplication extends Router {
    * Sets read timeout.
    *
    * The `readTimeout` specifies how long a read from a socket blocks before it
-   * times out, whereafter '''408 Request Timeout''' is sent to client.
+   * times out, whereafter 408 (Request Timeout) is sent to client.
    *
-   * @param timeout read timeout (in milliseconds)
+   * @param timeout read timeout in milliseconds
    *
    * @return this application
    */
@@ -182,7 +182,7 @@ class ServerApplication extends Router {
    *
    * The `headerLimit` specifies the maximum number of headers allowed. Incoming
    * requests containing headers that exceed this limit are sent
-   * '''431 Request Header Fields Too Large'''.
+   * 431 (Request Header Fields Too Large).
    *
    * @param limit header limit
    *
@@ -208,7 +208,7 @@ class ServerApplication extends Router {
   /**
    * Enables persistent connections using specified timeout and max.
    *
-   * @param timeout idle timeout (in seconds)
+   * @param timeout idle timeout in seconds
    * @param max maximum number of requests per connection
    *
    * @return this application

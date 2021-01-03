@@ -19,10 +19,10 @@ import java.security.SecureRandom
 
 object RandomBytes {
   private val random = new SecureRandom()
-  
+
   def apply(size: Int): Array[Byte] =
     apply(new Array[Byte](size))
-  
+
   def apply(bytes: Array[Byte]): Array[Byte] = {
     random.nextBytes(bytes)
     bytes

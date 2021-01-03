@@ -53,7 +53,7 @@ sealed trait HttpMessage {
   def hasHeader(name: String): Boolean =
     headers.exists(_.name.equalsIgnoreCase(name))
 
-  /** Gets first header with given name.  */
+  /** Gets first header with given name. */
   def getHeader(name: String): Option[Header] =
     headers.find(_.name.equalsIgnoreCase(name))
 

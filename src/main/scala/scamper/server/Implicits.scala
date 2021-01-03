@@ -72,8 +72,8 @@ object Implicits {
       req.getAttributeOrElse("scamper.server.request.parameters", new MapPathParameters(Map.empty))
 
     /**
-     * Sends interim `100 Continue` response if request includes `Expect` header
-     * with `100-Continue`.
+     * Sends interim 100 (Continue) response if request includes Expect header
+     * set to 100-Continue.
      *
      * @return `true` if response was sent; `false` otherwise
      */
@@ -102,7 +102,7 @@ object Implicits {
       res.getAttribute("scamper.server.response.request")
 
     /**
-     * Adds `gzip` to `Content-Encoding` header and encodes message body.
+     * Adds `gzip` to Content-Encoding header and encodes message body.
      *
      * @param bufferSize size in bytes of buffer used to encode message body
      *
@@ -112,7 +112,7 @@ object Implicits {
       ContentEncoder.gzip(res, bufferSize) { Auxiliary.executor }
 
     /**
-     * Adds `deflate` to `Content-Encoding` header and encodes message body.
+     * Adds `deflate` to Content-Encoding header and encodes message body.
      *
      * @param bufferSize size in bytes of buffer used to encode message body
      *

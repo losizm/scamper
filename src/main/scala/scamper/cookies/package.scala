@@ -23,9 +23,9 @@ import scala.util.Try
  *
  * === Request Cookies ===
  *
- * In [[HttpRequest]], cookies are stringed together in the '''Cookie''' header.
- * You can access them using extension methods provided by [[RequestCookies]],
- * with each cookie represented as [[PlainCookie]].
+ * In [[HttpRequest]], cookies are stringed together in the Cookie header. You
+ * can access them using extension methods provided by [[RequestCookies]], with
+ * each cookie represented as [[PlainCookie]].
  *
  * {{{
  * import scamper.Implicits.stringToUri
@@ -51,9 +51,9 @@ import scala.util.Try
  *
  * === Response Cookies ===
  *
- * In [[HttpResponse]], the cookies are a collection of '''Set-Cookie'''
- * header values.  Specialized access is provided by [[ResponseCookies]], with
- * each cookie represented as [[SetCookie]].
+ * In [[HttpResponse]], the cookies are a collection of Set-Cookie header
+ * values. Specialized access is provided by [[ResponseCookies]], with each
+ * cookie represented as [[SetCookie]].
  *
  * {{{
  * import scamper.Implicits.stringToEntity
@@ -83,7 +83,7 @@ import scala.util.Try
  * }}}
  */
 package object cookies {
-  /** Provides access to request cookies in `Cookie` header. */
+  /** Provides access to request cookies in Cookie header. */
   implicit class RequestCookies(private val request: HttpRequest) extends AnyVal {
     /** Gets cookies. */
     def cookies: Seq[PlainCookie] =
@@ -173,7 +173,7 @@ package object cookies {
       removeCookies(one +: more)
   }
 
-  /** Provides access to response cookies in `Set-Cookie` headers. */
+  /** Provides access to response cookies in Set-Cookie headers. */
   implicit class ResponseCookies(private val response: HttpResponse) extends AnyVal {
     /** Gets cookies. */
     def cookies: Seq[SetCookie] =

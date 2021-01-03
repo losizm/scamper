@@ -62,7 +62,7 @@ object Implicits {
       client.send(req)(handler)
 
     /**
-     * Adds `gzip` to `Content-Encoding` header and encodes message body.
+     * Adds `gzip` to Content-Encoding header and encodes message body.
      *
      * @param bufferSize size in bytes of buffer used to encode message body
      *
@@ -72,7 +72,7 @@ object Implicits {
       ContentEncoder.gzip(req, bufferSize) { Auxiliary.executor }
 
     /**
-     * Adds `deflate` to `Content-Encoding` header and encodes message body.
+     * Adds `deflate` to Content-Encoding header and encodes message body.
      *
      * @param bufferSize size in bytes of buffer used to encode message body
      *

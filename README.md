@@ -647,13 +647,13 @@ used to set the **Accept-Encoding** header on each outgoing request.
 The `bufferSize` is the size in bytes used for the client send and receive
 buffers.
 
-The `readTimeout` sets how long (in milliseconds) a read on the client socket
-blocks before a `SocketTimeoutException` is thrown.
+The `readTimeout` sets how many milliseconds a read on the client socket blocks
+before a `SocketTimeoutException` is thrown.
 
-The `continueTimeout` specifies how long (in milliseconds) the client waits
-for a **100 Continue** response from the server before the client sends the
+The `continueTimeout` specifies how many milliseconds the client waits for a
+_100 (Continue)_ response from the server before the client sends the
 request body. This behavior is effected only if the request includes an
-**Expect** header set to **100-Continue**.
+**Expect** header set to _100-Continue_.
 
 The `cookies` is used to store cookies included in HTTP responses. Using the
 cookie store, the client automatically adds the appropriate cookies to each
@@ -767,8 +767,8 @@ HttpClient().websocket("ws://localhost:9090/hello") { session =>
 ```
 
 In the above example, the client establishes a WebSocket connection to the
-specified target URI. _(Note use of **ws** scheme. For secure connections, use
-**wss** instead.)_
+specified target URI. _(Note use of "ws" scheme. For secure connections, use
+"wss" instead.)_
 
 After the client and server perform the opening handshake, a `WebSocketSession`
 is passed to the supplied handler. The handler then applies subsequent handlers
@@ -845,20 +845,20 @@ The `poolSize` specifies the maximum number of requests processed
 concurrently.
 
 The `queueSize` specifies the maximum number of requests permitted to wait for
-processing. Incoming requests that exceed this limit are sent **503 Service
-Unavailable**.
+processing. Incoming requests that exceed this limit are sent _503 (Service
+Unavailable)_.
 
 The `bufferSize` is the length in bytes of the buffer used when reading from
 and writing to a socket.
 
-The `readTimeout` controls how long a read from a socket blocks before it
-times out, whereafter **408 Request Timeout** is sent to client.
+The `readTimeout` controls how many milliseconds a read from a socket blocks
+before it times out, whereafter _408 (Request Timeout)_ is sent to client.
 
 The `headerLimit` sets the maximum number of request headers allowed. Incoming
-requests that exceed this limit are sent **431 Request Header Fields Too Large**.
+requests that exceed this limit are sent _431 (Request Header Fields Too Large)_.
 
 The `keepAlive` settings enable persistent connections using the specified
-idle timeout (in seconds) and max requests per connection.
+idle timeout seconds and max requests per connection.
 
 ### Request Handlers
 
@@ -896,7 +896,7 @@ app.incoming { req =>
 The order in which handlers are applied matters. For instance, in the example
 above, you'd swap the order of handlers if you wanted to log GET and HEAD
 requests only, and all other requests would immediately be sent
-**405 Method Not Allowed** and never make it to the request logger.
+_405 (Method Not Allowed)_ and never make it to the request logger.
 
 And a request handler is not restricted to returning the same request it
 accepted.

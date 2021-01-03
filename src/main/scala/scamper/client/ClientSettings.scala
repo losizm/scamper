@@ -59,7 +59,7 @@ class ClientSettings {
   /**
    * Sets accepted content types.
    *
-   * The `Accept` header for each outgoing request is set accordingly.
+   * The Accept header for each outgoing request is set accordingly.
    */
   def accept(ranges: Seq[MediaRange]): this.type = synchronized {
     settings = settings.copy(accept = noNulls(ranges))
@@ -69,7 +69,7 @@ class ClientSettings {
   /**
    * Sets accepted content types.
    *
-   * The `Accept` header for each outgoing request is set accordingly.
+   * The Accept header for each outgoing request is set accordingly.
    */
   def accept(one: MediaRange, more: MediaRange*): this.type =
     accept(one +: more)
@@ -77,7 +77,7 @@ class ClientSettings {
   /**
    * Sets accepted content encodings.
    *
-   * The `Accept-Encoding` header for each outgoing request is set accordingly.
+   * The Accept-Encoding header for each outgoing request is set accordingly.
    */
   def acceptEncoding(ranges: Seq[ContentCodingRange]): this.type = synchronized {
     settings = settings.copy(acceptEncoding = noNulls(ranges))
@@ -87,7 +87,7 @@ class ClientSettings {
   /**
    * Sets accepted content encodings.
    *
-   * The `Accept-Encoding` header for each outgoing request is set accordingly.
+   * The Accept-Encoding header for each outgoing request is set accordingly.
    */
   def acceptEncoding(one: ContentCodingRange, more: ContentCodingRange*): this.type =
     acceptEncoding(one +: more)
@@ -106,9 +106,8 @@ class ClientSettings {
   /**
    * Sets read timeout.
    *
-   * The read timeout specifies how long (in milliseconds) a read from client
-   * socket blocks before it times out, whereafter `SocketTimeoutException` is
-   * thrown.
+   * The read timeout specifies how many milliseconds a read from client socket
+   * blocks before it times out, whereafter `SocketTimeoutException` is thrown.
    */
   def readTimeout(timeout: Int): this.type = synchronized {
     settings = settings.copy(readTimeout = timeout)
@@ -118,11 +117,11 @@ class ClientSettings {
   /**
    * Sets continue timeout.
    *
-   * The continue timeout specifies how long to wait (in milliseconds) for
-   * '''100 Continue''' response before sending the request body.
+   * The continue timeout specifies how many milliseconds to wait for a 100
+   * (Continue) response before sending the request body.
    *
-   * @note This applies only to requests that include `Except: 100-Continue`
-   *   header and request body.
+   * @note This applies only to requests that include an Except header set to
+   * 100-Continue.
    */
   def continueTimeout(timeout: Int): this.type = synchronized {
     settings = settings.copy(continueTimeout = timeout)

@@ -38,7 +38,7 @@ object WebSocket {
   }
 
   /**
-   * Generates header value for `Sec-WebSocket-Accept` using supplied WebSocket
+   * Generates header value for Sec-WebSocket-Accept using supplied WebSocket
    * key.
    *
    * @param key WebSocket key

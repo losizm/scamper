@@ -19,7 +19,7 @@ import scamper.Grammar.Token
 import scamper.{ HeaderParams, ListParser }
 
 /**
- * Standardized type for `Sec-WebSocket-Extensions` header value.
+ * Standardized type for Sec-WebSocket-Extensions header value.
  *
  * @see [[SecWebSocketExtensions]]
  */
