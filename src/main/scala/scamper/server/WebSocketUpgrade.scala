@@ -32,7 +32,7 @@ import Implicits._
  * {{{
  * import scamper.HttpRequest
  * import scamper.ResponseStatus.Registry.Unauthorized
- * import scamper.server.{ ServerApplication, UpgradeToWebSocket }
+ * import scamper.server.{ ServerApplication, WebSocketUpgrade }
  *
  * val app = ServerApplication()
  *
@@ -41,7 +41,7 @@ import Implicits._
  *
  *   authorize(req) match {
  *     case true  =>
- *       UpgradeToWebSocket(req) { session =>
+ *       WebSocketUpgrade(req) { session =>
  *         // Set up session
  *         ...
  *         session.open()
@@ -51,7 +51,7 @@ import Implicits._
  * }
  * }}}
  */
-object UpgradeToWebSocket {
+object WebSocketUpgrade {
   /**
    * Upgrades request to WebSocket connection.
    *
@@ -61,8 +61,8 @@ object UpgradeToWebSocket {
    * @param req request
    * @param handler WebSocket session handler
    *
-   * @return '''101 SwitchingProtocols''' if valid WebSocket upgrade request;
-   * otherwise, '''400 Bad Request'''
+   * @return 101 (Switching Protocols) if valid WebSocket upgrade request;
+   * otherwise, 400 (Bad Request)
    */
   def apply[T](req: HttpRequest)(handler: WebSocketSession => T): HttpResponse =
     try {

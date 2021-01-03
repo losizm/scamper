@@ -25,7 +25,7 @@ private class WebSocketRequestHandler private (handler: WebSocketSession => Any)
   def apply(req: HttpRequest): HttpMessage =
     WebSocket.isUpgrade(req) match {
       case true  =>
-        UpgradeToWebSocket(req) { session =>
+        WebSocketUpgrade(req) { session =>
           try handler(session)
           catch {
             case err: Exception =>
