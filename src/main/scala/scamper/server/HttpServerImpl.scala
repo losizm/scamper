@@ -296,9 +296,12 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
             logger.error(s"$authority - Error while filtering response to $tag", err)
             InternalServerError().setDate(Instant.now).setConnection("close")
         }.map { res =>
-          write(res)
-          logger.info(s"$authority - Response sent to $tag")
-          Try(res.body.inputStream.close()) // Close filtered response body
+          try {
+            write(res)
+            logger.info(s"$authority - Response sent to $tag")
+          } finally
+            Try(res.body.inputStream.close()) // Close filtered response body
+
           val connection = res.connection
 
           if (connection.exists(_ equalsIgnoreCase "upgrade"))
