@@ -858,7 +858,7 @@ The `headerLimit` sets the maximum number of request headers allowed. Incoming
 requests that exceed this limit are sent **431 Request Header Fields Too Large**.
 
 The `keepAlive` settings enable persistent connections using the specified
-timeout (in seconds) and max requests per connection.
+idle timeout (in seconds) and max requests per connection.
 
 ### Request Handlers
 

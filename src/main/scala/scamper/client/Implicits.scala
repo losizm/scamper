@@ -87,7 +87,8 @@ object Implicits {
     /**
      * Gets corresponding request.
      *
-     * @note The request is the outgoing request after filters were applied.
+     * @note The request is the outgoing request after filters are applied, and
+     * the message entity's input stream is an active object.
      */
     def request: HttpRequest =
       res.getAttribute("scamper.client.response.request").get

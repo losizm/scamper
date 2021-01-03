@@ -194,7 +194,7 @@ class ServerApplication extends Router {
   }
 
   /**
-   * Enables keep-alive connections using specified parameters.
+   * Enables persistent connections using specified parameters.
    *
    * @param params keep-alive parameters
    *
@@ -206,9 +206,9 @@ class ServerApplication extends Router {
   }
 
   /**
-   * Enables keep-alive connections using specified timeout and max.
+   * Enables persistent connections using specified timeout and max.
    *
-   * @param timeout connection timeout (in seconds)
+   * @param timeout idle timeout (in seconds)
    * @param max maximum number of requests per connection
    *
    * @return this application
