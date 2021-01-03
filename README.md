@@ -623,7 +623,8 @@ import scamper.cookies.CookieStore
 import scamper.types.Implicits.{ stringToContentCodingRange, stringToMediaRange }
 
 // Build client from settings
-val client = HttpClient.settings()
+val client = HttpClient
+  .settings()
   .accept("text/plain; q=0.9", "application/json; q=0.1")
   .acceptEncoding("gzip", "deflate")
   .bufferSize(8192)
@@ -674,7 +675,8 @@ class SingleSiteTrustManager(address: String) extends TrustManager {
 }
 
 // Build client from settings
-val client = HttpClient.settings()
+val client = HttpClient
+  .settings()
   .readTimeout(5000)
   // Use supplied trust manager
   .trust(new SingleSiteTrustManager("192.168.0.2"))
@@ -744,7 +746,7 @@ HttpClient().websocket("ws://localhost:9090/hello") { session =>
 
   session.onPing { data =>
     println(s"Received ping message.")
-    session.pong()
+    session.pong(data)
   }
 
   session.onPong { data =>
@@ -921,7 +923,7 @@ app.incoming { req =>
 
 #### Target Handling
 
-A handler can be added to a target path with or setout a target request method.
+A handler can be added to a target path with or without a target request method.
 
 ```scala
 import scamper.Implicits.stringToEntity
@@ -1076,7 +1078,7 @@ app.websocket("/hello") { session =>
   // Log ping message and send corresponding pong
   session.onPing { data =>
     session.logger.info("Received ping message.")
-    session.pong()
+    session.pong(data)
   }
 
   // Log pong message
