@@ -32,17 +32,19 @@ private object Auxiliary {
   val applicationOctetStream = MediaType("application", "octet-stream")
   val textPlain = MediaType("text", "plain")
 
-  lazy val executor = ThreadPoolExecutorService.dynamic(
-    "scamper-auxiliary",
-    executorCorePoolSize,
-    executorMaxPoolSize,
-    executorKeepAliveSeconds,
-    executorQueueSize
-  ) { (task, executor) =>
-    if (executorShowWarning)
-      System.err.println(s"[WARNING] Running rejected scamper-auxiliary task on dedicated thread.")
-    executor.getThreadFactory.newThread(task).start()
-  }
+  lazy val executor =
+    ThreadPoolExecutorService
+      .dynamic(
+        name             = "scamper-auxiliary",
+        corePoolSize     = executorCorePoolSize,
+        maxPoolSize      = executorMaxPoolSize,
+        keepAliveSeconds = executorKeepAliveSeconds,
+        queueSize        = executorQueueSize
+      ) { (task, executor) =>
+        if (executorShowWarning)
+          System.err.println(s"[WARNING] Running rejected scamper-auxiliary task on dedicated thread.")
+        executor.getThreadFactory.newThread(task).start()
+      }
 
   implicit class FileType(private val file: File) extends AnyVal {
     def withOutputStream[T](f: OutputStream => T): T = {
