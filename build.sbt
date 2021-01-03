@@ -1,17 +1,16 @@
 organization := "com.github.losizm"
-name := "scamper"
-version := "20.0.0"
-
-description := "The HTTP library for Scala"
-homepage := Some(url("https://github.com/losizm/scamper"))
-licenses := List("Apache License, Version 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
+name         := "scamper"
+version      := "20.0.1"
+description  := "The HTTP library for Scala"
+homepage     := Some(url("https://github.com/losizm/scamper"))
+licenses     := List("Apache License, Version 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
 scalaVersion := "2.13.4"
 scalacOptions ++= Seq("-deprecation", "-feature", "-Xcheckinit")
 
 Compile / doc / scalacOptions ++= Seq(
-  "-doc-title", name.value,
-  "-doc-version", version.value,
+  "-doc-title"       , name.value,
+  "-doc-version"     , version.value,
   "-doc-root-content", "src/main/scala/root.scala"
 )
 
@@ -47,6 +46,6 @@ publishTo := {
   val nexus = "https://oss.sonatype.org"
   isSnapshot.value match {
     case true  => Some("snaphsots" at s"$nexus/content/repositories/snapshots")
-    case false => Some("releases" at s"$nexus/service/local/staging/deploy/maven2")
+    case false => Some("releases"  at s"$nexus/service/local/staging/deploy/maven2")
   }
 }
