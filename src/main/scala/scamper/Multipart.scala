@@ -62,7 +62,7 @@ trait Multipart {
    *
    * @param name part name
    *
-   * @throws ClassCastException if part is present and is not text part
+   * @throws java.lang.ClassCastException if part is present and is not text
    */
   def getTextPart(name: String): Option[TextPart] =
     getPart(name).map(_.asInstanceOf[TextPart])
@@ -72,7 +72,7 @@ trait Multipart {
    *
    * @param name part name
    *
-   * @throws ClassCastException if part is present and is not text part
+   * @throws java.lang.ClassCastException if part is present and is not text
    */
   def getText(name: String): Option[String] =
     getTextPart(name).map(_.content)
@@ -82,7 +82,7 @@ trait Multipart {
    *
    * @param name part name
    *
-   * @throws ClassCastException if part is present and is not file part
+   * @throws java.lang.ClassCastException if part is present and is not file
    */
   def getFilePart(name: String): Option[FilePart] =
     getPart(name).map(_.asInstanceOf[FilePart])
@@ -92,7 +92,7 @@ trait Multipart {
    *
    * @param name part name
    *
-   * @throws ClassCastException if part is present and is not file part
+   * @throws java.lang.ClassCastException if part is present and is not file
    */
   def getFile(name: String): Option[File] =
     getFilePart(name).map(_.content)

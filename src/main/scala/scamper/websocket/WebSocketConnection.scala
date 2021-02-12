@@ -54,8 +54,8 @@ class WebSocketConnection private (socket: Socket) {
    *  interpreted as indefinitely
    *
    * @throws WebSocketError if frame is invalid or otherwise unreadable
-   * @throws EOFException if unexpected EOF occurs
-   * @throws InterruptedIOException if timeout is exceeded
+   * @throws java.io.EOFException if unexpected EOF occurs
+   * @throws java.io.InterruptedIOException if timeout is exceeded
    *
    * @note This method is synchronized on the WebSocket's input channel,
    *  permitting only one read request at a time.
@@ -114,7 +114,7 @@ class WebSocketConnection private (socket: Socket) {
    *
    * @param frame WebSocket frame
    *
-   * @throws EOFException if payload truncation is detected
+   * @throws java.io.EOFException if payload truncation is detected
    *
    * @note This method is synchronized on the WebSocket's output channel,
    *  permitting only one write request at a time.

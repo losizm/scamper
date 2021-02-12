@@ -171,7 +171,7 @@ object StatusCode {
   /**
    * Gets registered status code for given value.
    *
-   * @throws NoSuchElementException if value not registered
+   * @throws java.util.NoSuchElementException if value not registered
    */
   def apply(value: Int): StatusCode =
     value match {
@@ -194,8 +194,8 @@ object StatusCode {
   /**
    * Gets registered status code for supplied data.
    *
-   * @throws NoSuchElementException if value not registered
-   * @throws IllegalArgumentException if `data.size != 2`
+   * @throws java.util.NoSuchElementException if value not registered
+   * @throws java.lang.IllegalArgumentException if `data.size != 2`
    *
    * @note The data is converted to two-byte unsigned integer, which is then
    *  used to obtain status code.

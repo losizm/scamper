@@ -63,7 +63,7 @@ object MaskingKey {
   /**
    * Creates masking key with supplied value.
    *
-   * @throws IllegalArgumentException if `value` is zero
+   * @throws java.lang.IllegalArgumentException if `value` is zero
    */
   def apply(value: Int): MaskingKey = {
     if (value == 0)

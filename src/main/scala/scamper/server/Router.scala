@@ -63,8 +63,8 @@ trait Router {
    *
    * @param path router path
    *
-   * @throws IllegalArgumentException if router path is not `*` and does not
-   * begin with `/` or if it escapes mount path
+   * @throws java.lang.IllegalArgumentException if router path is not `*` and
+   * does not begin with `/` or if it escapes mount path
    *
    * @note If `*` is supplied as router path, its absolute path is also `*`.
    */

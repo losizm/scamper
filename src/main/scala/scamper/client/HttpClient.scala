@@ -54,7 +54,8 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @throws IllegalArgumentException if `request.target` is not absolute
+   * @throws java.lang.IllegalArgumentException if `request.target` is not
+   * absolute
    */
   def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T
 
@@ -68,7 +69,7 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @throws IllegalArgumentException if `target` is not absolute
+   * @throws java.lang.IllegalArgumentException if `target` is not absolute
    */
   def get[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
 
@@ -83,7 +84,7 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @throws IllegalArgumentException if `target` is not absolute
+   * @throws java.lang.IllegalArgumentException if `target` is not absolute
    */
   def post[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T
@@ -99,7 +100,7 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @throws IllegalArgumentException if `target` is not absolute
+   * @throws java.lang.IllegalArgumentException if `target` is not absolute
    */
   def put[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
     (handler: ResponseHandler[T]): T
@@ -114,7 +115,7 @@ trait HttpClient {
    *
    * @return value from response handler
    *
-   * @throws IllegalArgumentException if `target` is not absolute
+   * @throws java.lang.IllegalArgumentException if `target` is not absolute
    */
   def delete[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
 
@@ -129,10 +130,11 @@ trait HttpClient {
    *
    * @return value from session handler
    *
-   * @throws IllegalArgumentException if `target` is not WebSocket URI (i.e.,
-   *  it must be an absolute URI having a scheme of either `"ws"` or `"wss"`)
+   * @throws java.lang.IllegalArgumentException if `target` is not WebSocket URI
+   * (i.e., it must be absolute URI having scheme of either `"ws"` or `"wss"`)
    *
-   * @throws WebSocketHandshakeFailure if WebSocket handshake fails
+   * @throws scamper.websocket.WebSocketHandshakeFailure if WebSocket handshake
+   * fails
    */
   def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: WebSocketSession => T): T
 }
@@ -155,7 +157,8 @@ object HttpClient {
    *
    * @return value from supplied handler
    *
-   * @throws IllegalArgumentException if `request.target` is not absolute
+   * @throws java.lang.IllegalArgumentException if `request.target` is not
+   * absolute
    */
   def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T = {
     notNull(request)

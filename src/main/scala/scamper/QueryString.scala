@@ -28,7 +28,7 @@ trait QueryString {
    *
    * @param name parameter name
    *
-   * @throws NoSuchElementException if parameter not present
+   * @throws java.util.NoSuchElementException if parameter not present
    */
   def apply(name: String) =
     getOrElse(name, throw new NoSuchElementException(name))
@@ -56,7 +56,8 @@ trait QueryString {
    *
    * @param name parameter name
    *
-   * @throws NumberFormatException if parameter value cannot be parsed to `Int`
+   * @throws java.lang.NumberFormatException if parameter value cannot be parsed
+   * to `Int`
    */
   def getInt(name: String): Option[Int] =
     get(name).map(_.toInt)
@@ -67,7 +68,8 @@ trait QueryString {
    *
    * @param name parameter name
    *
-   * @throws NumberFormatException if parameter value cannot be parsed to `Long`
+   * @throws java.lang.NumberFormatException if parameter value cannot be parsed
+   * to `Long`
    */
   def getLong(name: String): Option[Long] =
     get(name).map(_.toLong)

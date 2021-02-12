@@ -32,7 +32,7 @@ trait BodyParser[T] {
    *
    * @return instance of `T`
    *
-   * @throws IOException if error occurs while parsing
+   * @throws java.io.IOException if error occurs while parsing
    */
   def parse(message: HttpMessage): T
 }

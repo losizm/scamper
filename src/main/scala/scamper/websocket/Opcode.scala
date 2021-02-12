@@ -68,7 +68,7 @@ object Opcode {
   /**
    * Gets registered opcode for given value.
    *
-   * @throws NoSuchElementException if value not registered
+   * @throws java.util.NoSuchElementException if value not registered
    */
   def apply(value: Int): Opcode =
     value match {

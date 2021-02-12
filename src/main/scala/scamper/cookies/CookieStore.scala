@@ -50,7 +50,8 @@ sealed trait CookieStore {
    *
    * @param target request URI
    *
-   * @throws IllegalArgumentException if target is not HTTP or WebSocket URI
+   * @throws java.lang.IllegalArgumentException if target is not HTTP or
+   * WebSocket URI
    */
   def get(target: Uri): Seq[PlainCookie]
 
@@ -60,7 +61,8 @@ sealed trait CookieStore {
    * @param target request URI
    * @param cookies response cookies
    *
-   * @throws IllegalArgumentException if target is not HTTP or WebSocket URI
+   * @throws java.lang.IllegalArgumentException if target is not HTTP or
+   * WebSocket URI
    *
    * @return this cookie store
    */
@@ -73,7 +75,8 @@ sealed trait CookieStore {
    * @param one response cookie
    * @param more additional response cookies
    *
-   * @throws IllegalArgumentException if target is not HTTP or WebSocket URI
+   * @throws java.lang.IllegalArgumentException if target is not HTTP or
+   * WebSocket URI
    *
    * @return this cookie store
    */
