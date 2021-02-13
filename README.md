@@ -71,7 +71,7 @@ further define the request.
 ```scala
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Get
-import scamper.headers.{ Accept, Host}
+import scamper.headers.{ Accept, Host }
 import scamper.types.Implicits.stringToMediaRange
 
 val req = Get("/motd")
@@ -123,7 +123,7 @@ def hasContentType: Boolean
 /** Gets Content-Type header value. */
 def contentType: MediaType
 
-/** Gets Content-Type header value if present. */
+/** Optionally gets Content-Type header value. */
 def getContentType: Option[MediaType]
 
 /** Creates message setting Content-Type header. */
@@ -578,15 +578,11 @@ implicit val parser = BodyParser.text()
 // Create client instance
 val client = HttpClient()
 
-def getMessageOfTheDay(): Either[Int, String] = {
-  // Use client instance
-  client.get("http://localhost:8080/motd") { res =>
-    res.isSuccessful match {
-      case true  => Right(res.as[String])
-      case false => Left(res.statusCode)
-    }
+def messageOfTheDay: Either[Int, String] =
+  client.get("http://localhost:8080/motd") {
+    case res if res.isSuccessful  => Right(res.as[String])
+    case res if !res.isSuccessful => Left(res.statusCode)
   }
-}
 ```
 
 And, if an implicit client is in scope, you can make use of `send()` on the
@@ -912,10 +908,10 @@ import scamper.types.Implicits.stringToLanguageTag
 
 // Translates message body from French (Oui, oui.)
 app.incoming { req =>
-  val translator: BodyParser[String] = ???
+  implicit val translator: BodyParser[String] = ???
 
   req.isPost && req.contentLanguage.contains("fr") match {
-    case true  => req.setBody(translator.parse(req)).setContentLanguage("en")
+    case true  => req.setBody(req.as[String]).setContentLanguage("en")
     case false => req
   }
 }
@@ -990,7 +986,7 @@ app.delete("/orders/:id") { req =>
   }
 }
 
-// Match prefixed path with any request method
+// Match prefixed path for GET requests
 app.get("/archive/*path") { req =>
   def findFile(path: String): Option[File] = ???
 
@@ -1013,12 +1009,13 @@ import scamper.server.Implicits.ServerHttpRequest
 
 // Match path with two parameters
 app.post("/translate/:in/to/:out") { req =>
-  def translator(from: String, to: String): BodyParser[String] = ???
+  def translate(from: String, to: String): BodyParser[String] = ???
 
-  val from = req.params.getString("in")
-  val to   = req.params.getString("out")
+  val from   = req.params.getString("in")
+  val to     = req.params.getString("out")
+  val result = req.as(translate(from, to))
 
-  Ok(translator(from, to).parse(req))
+  Ok(result)
 }
 ```
 
@@ -1246,7 +1243,7 @@ printf("Closed: %s%n", server.isClosed)
 And, ultimately, it is used to gracefully shut down the server.
 
 ```scala
-server.close() // Good-bye, world.
+server.close() // Good-bye, cruel world.
 ```
 
 ## API Documentation
@@ -1255,5 +1252,5 @@ See [scaladoc](https://losizm.github.io/scamper/latest/api/scamper/index.html)
 for additional details.
 
 ## License
-**Scamper** is licensed under the Apache License, Version 2. See LICENSE file
-for more information.
+**Scamper** is licensed under the Apache License, Version 2. See [LICENSE](LICENSE)
+file for more information.
