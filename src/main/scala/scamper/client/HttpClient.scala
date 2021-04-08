@@ -19,7 +19,7 @@ import scamper.{ Entity, Header, HttpRequest, Uri }
 import scamper.Validate.notNull
 import scamper.cookies.{ CookieStore, PlainCookie }
 import scamper.types.{ ContentCodingRange, MediaRange }
-import scamper.websocket.WebSocketSession
+import scamper.websocket.WebSocketSessionHandler
 
 /**
  * Provides utility for sending request and handling response.
@@ -136,7 +136,7 @@ trait HttpClient {
    * @throws scamper.websocket.WebSocketHandshakeFailure if WebSocket handshake
    * fails
    */
-  def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: WebSocketSession => T): T
+  def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: WebSocketSessionHandler[T]): T
 }
 
 /** Provides factory for creating `HttpClient`. */

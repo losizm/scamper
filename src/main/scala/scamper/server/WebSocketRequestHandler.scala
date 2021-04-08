@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,27 @@ import scala.util.Try
 
 import scamper.{ HttpMessage, HttpRequest }
 import scamper.Validate.notNull
-import scamper.websocket.{ StatusCode, WebSocket, WebSocketSession }
+import scamper.websocket.{ StatusCode, WebSocket, WebSocketApplication }
 
-private class WebSocketRequestHandler private (handler: WebSocketSession => Any) extends RequestHandler {
+private class WebSocketRequestHandler(app: WebSocketApplication) extends RequestHandler {
   def apply(req: HttpRequest): HttpMessage =
     WebSocket.isUpgrade(req) match {
-      case true  =>
+      case true =>
         WebSocketUpgrade(req) { session =>
-          try handler(session)
+          try
+            app(session)
           catch {
             case err: Exception =>
-              Try(session.logger.error(s"Error in session handler: $err", err))
+              Try(session.logger.error(s"Error in WebSocket application: $err", err))
               Try(session.close(StatusCode.Registry.InternalError))
           }
         }
+
       case false => req
     }
 }
 
 private object WebSocketRequestHandler {
-  def apply(handler: WebSocketSession => Any) =
-    new WebSocketRequestHandler(notNull(handler))
+  def apply(app: WebSocketApplication): WebSocketRequestHandler =
+    new WebSocketRequestHandler(notNull(app))
 }

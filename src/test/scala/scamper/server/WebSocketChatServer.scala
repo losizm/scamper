@@ -76,7 +76,7 @@ class WebSocketChatServer(session: WebSocketSession) {
     }
 }
 
-object WebSocketChatServer extends (WebSocketSession => WebSocketChatServer) {
-  def apply(session: WebSocketSession): WebSocketChatServer =
+object WebSocketChatServer extends WebSocketApplication {
+  def apply(session: WebSocketSession): Unit =
     new WebSocketChatServer(session)
 }

@@ -151,7 +151,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     (handler: ResponseHandler[T]): T = send(Delete, target, headers, cookies, Entity.empty)(handler)
 
   def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
-    (handler: WebSocketSession => T): T = {
+    (handler: WebSocketSessionHandler[T]): T = {
 
     require(target.getScheme == "ws" || target.getScheme == "wss", s"Invalid WebSocket scheme: ${target.getScheme}")
 

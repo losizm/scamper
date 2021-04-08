@@ -28,7 +28,7 @@ import StatusCode.Registry.{ MessageTooBig, ProtocolError }
 /**
  * Represents endpoint of WebSocket connection.
  *
- * @see [[WebSocketConnection.apply]]
+ * @see [[WebSocketConnection.apply WebSocketConnection]]
  */
 class WebSocketConnection private (socket: Socket) {
   private val finBits      = 0x80
@@ -50,8 +50,8 @@ class WebSocketConnection private (socket: Socket) {
   /**
    * Reads next frame from WebSocket connection.
    *
-   * @param timeout maximum time to wait for any read operation; `0` is
-   *  interpreted as indefinitely
+   * @param timeout timeout in milliseconds of any read operation; `0` is
+   * interpreted as indefinite
    *
    * @throws WebSocketError if frame is invalid or otherwise unreadable
    * @throws java.io.EOFException if unexpected EOF occurs

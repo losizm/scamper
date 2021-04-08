@@ -19,7 +19,7 @@ import java.io.File
 
 import scamper.RequestMethod
 import scamper.RequestMethod.Registry.{ Delete, Get, Post, Put }
-import scamper.websocket.WebSocketSession
+import scamper.websocket.WebSocketApplication
 
 /**
  * Used for routing request handlers.
@@ -233,30 +233,27 @@ trait Router {
     incoming(StaticResourceServer(mountPath + MountPath.normalize(path), source, loader))
 
   /**
-   * Adds WebSocket server at given router path using supplied session handler for each
-   * connection.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path WebSocket path
-   * @param handler WebSocket session handler
-   *
-   * @return this router
-   */
-  def websocket[T](path: String)(handler: WebSocketSession => T): this.type =
-    incoming(path, Get)(WebSocketRequestHandler(handler))
-
-  /**
-   * Adds routing application at given path.
+   * Mounts WebSocket application at given path.
    *
    * @param path router path at which application is mounted
-   * @param routing routing application
+   * @param app WebSocket application
    *
    * @return this router
    */
-  def route[T](path: String)(routing: RoutingApplication): this.type = {
+  def websocket[T](path: String)(app: WebSocketApplication): this.type =
+    incoming(path, Get)(WebSocketRequestHandler(app))
+
+  /**
+   * Mounts routing application at given path.
+   *
+   * @param path router path at which application is mounted
+   * @param app routing application
+   *
+   * @return this router
+   */
+  def route[T](path: String)(app: RoutingApplication): this.type = {
     val router = RouterImpl(mountPath + MountPath.normalize(path))
-    routing(router)
+    app(router)
     incoming(MountRequestHandler(router.mountPath, router.createRequestHandler()))
   }
 }
