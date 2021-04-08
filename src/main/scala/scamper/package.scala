@@ -73,7 +73,7 @@
  * }}}
  */
 package object scamper {
-  /** Uniform Resource Identifier */
+  /** Defines alias to `java.net.URI`. */
   type Uri = java.net.URI
 
   /** Provides factory for `Uri`. */

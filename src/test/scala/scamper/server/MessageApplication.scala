@@ -26,7 +26,7 @@ import scamper.headers.{ ContentType, Location }
 import scamper.server.Implicits._
 import scamper.types.Implicits._
 
-object MessageApplication extends (Router => Unit) {
+object MessageApplication extends RoutingApplication {
   private implicit val bodyParser = BodyParser.text(8192)
 
   def apply(router: Router): Unit = {

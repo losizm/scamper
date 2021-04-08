@@ -247,16 +247,14 @@ trait Router {
     incoming(path, Get)(WebSocketRequestHandler(handler))
 
   /**
-   * Adds new router at given path.
+   * Adds routing application at given path.
    *
-   * A new router is created and passed to routing application.
-   *
-   * @param path router path at which new router is mounted
+   * @param path router path at which application is mounted
    * @param routing routing application
    *
    * @return this router
    */
-  def route[T](path: String)(routing: Router => T): this.type = {
+  def route[T](path: String)(routing: RoutingApplication): this.type = {
     val router = RouterImpl(mountPath + MountPath.normalize(path))
     routing(router)
     incoming(MountRequestHandler(router.mountPath, router.createRequestHandler()))

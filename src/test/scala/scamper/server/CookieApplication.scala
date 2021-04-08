@@ -20,7 +20,7 @@ import scamper.ResponseStatus.Registry.Ok
 import scamper.cookies._
 import scamper.server.Implicits._
 
-object CookieApplication extends (Router => Unit) {
+object CookieApplication extends RoutingApplication {
   def apply(router: Router): Unit = {
     router.get("/foo/bar/baz/*") { implicit req =>
       Ok()
