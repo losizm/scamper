@@ -77,7 +77,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
     val secure     = target.getScheme.matches("https|wss")
     val host       = getEffectiveHost(target)
-    val userAgent  = request.getHeaderValueOrElse("User-Agent", "Scamper/20.0.1")
+    val userAgent  = request.getHeaderValueOrElse("User-Agent", "Scamper/21.0.0")
     val reqCookies = request.cookies ++ cookies.get(target)
     val connection = target.getScheme.matches("wss?") match {
       case true  => WebSocket.validate(request).connection.mkString(", ")
