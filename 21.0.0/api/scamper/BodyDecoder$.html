@@ -1,0 +1,326 @@
+<!DOCTYPE html ><html><head><meta http-equiv="X-UA-Compatible" content="IE=edge"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/><title>scamper 21.0.0 - scamper.BodyDecoder</title><meta content="scamper 21.0.0 - scamper.BodyDecoder" name="description"/><meta content="scamper 21.0.0 scamper.BodyDecoder" name="keywords"/><meta http-equiv="content-type" content="text/html; charset=UTF-8"/><link href="../lib/index.css" media="screen" type="text/css" rel="stylesheet"/><link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet"/><link href="../lib/print.css" media="print" type="text/css" rel="stylesheet"/><link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css"/><script type="text/javascript" src="../lib/jquery.min.js"></script><script type="text/javascript" src="../lib/index.js"></script><script type="text/javascript" src="../index.js"></script><script type="text/javascript" src="../lib/scheduler.js"></script><script type="text/javascript" src="../lib/template.js"></script><script type="text/javascript">/* this variable can be used by the JS to determine the path to the root document */
+var toRoot = '../';</script></head><body><div id="search"><span id="doc-title">scamper<span id="doc-version">21.0.0</span></span> <span class="close-results"><span class="left">&lt;</span> Back</span><div id="textfilter"><span class="input"><input autocapitalize="none" placeholder="Search" id="index-input" type="text" accesskey="/"/><i class="clear material-icons"></i><i id="search-icon" class="material-icons"></i></span></div></div><div id="search-results"><div id="search-progress"><div id="progress-fill"></div></div><div id="results-content"><div id="entity-results"></div><div id="member-results"></div></div></div><div id="content-scroll-container" style="-webkit-overflow-scrolling: touch;"><div id="content-container" style="-webkit-overflow-scrolling: touch;"><div id="subpackage-spacer"><div id="packages"><h1>Packages</h1><ul><li class="indented0 " name="_root_.root" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="_root_" class="anchorToMember"></a><a id="root:_root_" class="anchorToMember"></a> <span class="permalink"><a href="../index.html" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">package</span></span> <span class="symbol"><a href="../index.html" title="Provided herein is API documentation for Scamper, the HTTP library for Scala."><span class="name">root</span></a></span><p class="shortcomment cmt">Provided herein is API documentation for <i>Scamper</i>, the HTTP library for
+Scala.</p><div class="fullcomment"><div class="comment cmt"><p>Provided herein is API documentation for <i>Scamper</i>, the HTTP library for
+Scala.
+</p></div><dl class="attributes block"><dt>Definition Classes</dt><dd><a href="../index.html" name="_root_" id="_root_" class="extype">root</a></dd></dl></div></li><li class="indented1 " name="_root_.scamper" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="scamper" class="anchorToMember"></a><a id="scamper:scamper" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/index.html" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">package</span></span> <span class="symbol"><a href="index.html" title="Defines core types."><span class="name">scamper</span></a></span><p class="shortcomment cmt">Defines core types.</p><div class="fullcomment"><div class="comment cmt"><p>Defines core types.</p><h5> HTTP Messages </h5><p>At the core of <i>Scamper</i> is <a href="HttpMessage.html" name="scamper.HttpMessage" id="scamper.HttpMessage" class="extype">HttpMessage</a>, which is a trait that defines
+the fundamental characteristics of an HTTP message. <a href="HttpRequest.html" name="scamper.HttpRequest" id="scamper.HttpRequest" class="extype">HttpRequest</a> and
+<a href="HttpResponse.html" name="scamper.HttpResponse" id="scamper.HttpResponse" class="extype">HttpResponse</a> extend the specification to define characteristics specific
+to their respective message types.</p><p>An <a href="HttpRequest.html" name="scamper.HttpRequest" id="scamper.HttpRequest" class="extype">HttpRequest</a> is created using a factory method defined in its companion
+object. Or you can start with a <a href="RequestMethod.html" name="scamper.RequestMethod" id="scamper.RequestMethod" class="extype">RequestMethod</a> and use builder methods to
+further define the request.</p><pre><span class="kw">import</span> scamper.Header
+<span class="kw">import</span> scamper.Implicits.stringToUri
+<span class="kw">import</span> scamper.RequestMethod.Registry.Get
+
+<span class="kw">val</span> request = Get(<span class="lit">"/motd"</span>).setHeaders(
+  Header(<span class="lit">"Host: localhost:8080"</span>),
+  Header(<span class="lit">"Accept: text/plain"</span>)
+)
+
+printf(<span class="lit">"Request Method: %s%n"</span>, request.method)
+printf(<span class="lit">"Target URI: %s%n"</span>, request.target)
+
+request.headers.foreach(println)
+
+<span class="kw">val</span> host: <span class="std">Option</span>[<span class="std">String</span>] = request.getHeaderValue(<span class="lit">"Host"</span>)</pre><p>An <a href="HttpResponse.html" name="scamper.HttpResponse" id="scamper.HttpResponse" class="extype">HttpResponse</a> is created using a factory method defined in its
+companion object. Or you can start with a <a href="ResponseStatus.html" name="scamper.ResponseStatus" id="scamper.ResponseStatus" class="extype">ResponseStatus</a> and use builder
+methods to further define the response.</p><pre><span class="kw">import</span> scamper.{ BodyParser, Header }
+<span class="kw">import</span> scamper.Implicits.stringToEntity
+<span class="kw">import</span> scamper.ResponseStatus.Registry.Ok
+
+<span class="kw">val</span> response = Ok(<span class="lit">"There is an answer."</span>).setHeaders(
+  Header(<span class="lit">"Content-Type: text/plain"</span>),
+  Header(<span class="lit">"Connection: close"</span>)
+)
+
+printf(<span class="lit">"Status Code: %s%n"</span>, response.statusCode)
+printf(<span class="lit">"Reason Phrase: %s%n"</span>, response.reasonPhrase)
+
+response.headers.foreach(println)
+
+<span class="kw">val</span> contentType: <span class="std">Option</span>[<span class="std">String</span>] = response.getHeaderValue(<span class="lit">"Content-Type"</span>)
+
+<span class="kw">implicit</span> <span class="kw">val</span> parser = BodyParser.text()
+
+printf(<span class="lit">"Body: %s%n"</span>, response.as[<span class="std">String</span>])</pre></div><dl class="attributes block"><dt>Definition Classes</dt><dd><a href="../index.html" name="_root_" id="_root_" class="extype">root</a></dd></dl></div></li><li class="indented2 " name="scamper.auth" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="auth" class="anchorToMember"></a><a id="auth:auth" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/auth/index.html" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">package</span></span> <span class="symbol"><a href="auth/index.html" title="Provides specialized access to authentication headers."><span class="name">auth</span></a></span><p class="shortcomment cmt">Provides specialized access to authentication headers.</p><div class="fullcomment"><div class="comment cmt"><p>Provides specialized access to authentication headers.</p><h5> Challenges and Credentials </h5><p>When working with authentication, a <code>Challenge</code> is presented in the response,
+and <code>Credentials</code> in the request. Each of these has an assigned scheme, which
+is associated with either a token or a set of parameters.</p><pre><span class="kw">import</span> scamper.Implicits.stringToUri
+<span class="kw">import</span> scamper.RequestMethod.Registry.Get
+<span class="kw">import</span> scamper.ResponseStatus.Registry.Unauthorized
+<span class="kw">import</span> scamper.auth.{ Authorization, Challenge, Credentials, WwwAuthenticate }
+
+<span class="cmt">// Present response challenge (scheme and parameters)</span>
+<span class="kw">val</span> challenge = Challenge(<span class="lit">"Bearer"</span>, <span class="lit">"realm"</span> -&gt; <span class="lit">"developer"</span>)
+<span class="kw">val</span> res = Unauthorized().setWwwAuthenticate(challenge)
+
+<span class="cmt">// Present request credentials (scheme and token)</span>
+<span class="kw">val</span> credentials = Credentials(<span class="lit">"Bearer"</span>, <span class="lit">"QWxsIEFjY2VzcyEhIQo="</span>)
+<span class="kw">val</span> req = Get(<span class="lit">"/dev/projects"</span>).setAuthorization(credentials)</pre><h5> Basic Authentication </h5><p>There are subclasses defined for Basic authentication: <code>BasicChallenge</code> and
+<code>BasicCredentials</code>.</p><pre><span class="kw">import</span> scamper.Implicits.stringToUri
+<span class="kw">import</span> scamper.RequestMethod.Registry.Get
+<span class="kw">import</span> scamper.ResponseStatus.Registry.Unauthorized
+<span class="kw">import</span> scamper.auth.{ Authorization, BasicChallenge, BasicCredentials, WwwAuthenticate }
+
+<span class="cmt">// Provide realm and optional parameters</span>
+<span class="kw">val</span> challenge = BasicChallenge(<span class="lit">"admin"</span>, <span class="lit">"title"</span> -&gt; <span class="lit">"Admin Console"</span>)
+<span class="kw">val</span> res = Unauthorized().setWwwAuthenticate(challenge)
+
+<span class="cmt">// Provide user and password</span>
+<span class="kw">val</span> credentials = BasicCredentials(<span class="lit">"sa"</span>, <span class="lit">"l3tm31n"</span>)
+<span class="kw">val</span> req = Get(<span class="lit">"/admin/users"</span>).setAuthorization(credentials)</pre><p>In addition, there are methods for Basic authentication defined in the header
+classes.</p><pre><span class="kw">import</span> scamper.Implicits.stringToUri
+<span class="kw">import</span> scamper.RequestMethod.Registry.Get
+<span class="kw">import</span> scamper.ResponseStatus.Registry.Unauthorized
+<span class="kw">import</span> scamper.auth.{ Authorization, WwwAuthenticate }
+
+<span class="cmt">// Provide realm and optional parameters</span>
+<span class="kw">val</span> res = Unauthorized().setBasic(<span class="lit">"admin"</span>, <span class="lit">"title"</span> -&gt; <span class="lit">"Admin Console"</span>)
+
+<span class="cmt">// Access basic auth in response</span>
+printf(s<span class="lit">"Realm: %s%n"</span>, res.basic.realm)
+printf(s<span class="lit">"Title: %s%n"</span>, res.basic.params(<span class="lit">"title"</span>))
+
+<span class="cmt">// Provide user and password</span>
+<span class="kw">val</span> req = Get(<span class="lit">"/admin/users"</span>).setBasic(<span class="lit">"sa"</span>, <span class="lit">"l3tm3m1n"</span>)
+
+<span class="cmt">// Access basic auth in request</span>
+printf(s<span class="lit">"User: %s%n"</span>, req.basic.user)
+printf(s<span class="lit">"Password: %s%n"</span>, req.basic.password)</pre><h5> Bearer Authentication </h5><p>There are subclasses defined for Bearer authentication: <code>BearerChallenge</code> and
+<code>BearerCredentials</code>. In addition, there are Bearer-specific methods available
+in the header classes.</p><pre><span class="kw">import</span> scamper.Implicits.stringToUri
+<span class="kw">import</span> scamper.RequestMethod.Registry.Get
+<span class="kw">import</span> scamper.ResponseStatus.Registry.Unauthorized
+<span class="kw">import</span> scamper.auth.{ Authorization, WwwAuthenticate }
+
+<span class="cmt">// Provide challenge parameters</span>
+<span class="kw">val</span> res = Unauthorized().setBearer(
+  <span class="lit">"scope"</span> -&gt; <span class="lit">"user profile"</span>,
+  <span class="lit">"error"</span> -&gt; <span class="lit">"invalid_token"</span>,
+  <span class="lit">"error_description"</span> -&gt; <span class="lit">"Expired access token"</span>
+)
+
+<span class="cmt">// Print optional realm parameter</span>
+res.bearer.realm.foreach(println)
+
+<span class="cmt">// Print scope from space-delimited parameter</span>
+<span class="kw">val</span> scope: <span class="std">Seq</span>[<span class="std">String</span>] = res.bearer.scope
+scope.foreach(println)
+
+<span class="cmt">// Print error parameters</span>
+res.bearer.error.foreach(println)
+res.bearer.errorDescription.foreach(println)
+res.bearer.errorUri.foreach(println)
+
+<span class="cmt">// Test for error conditions</span>
+println(res.bearer.isInvalidToken)
+println(res.bearer.isInvalidRequest)
+println(res.bearer.isInsufficientScope)
+
+<span class="cmt">// Create request with Bearer token</span>
+<span class="kw">val</span> req = Get(<span class="lit">"/users"</span>).setBearer(<span class="lit">"R290IDUgb24gaXQhCg=="</span>)
+
+<span class="cmt">// Access bearer auth in request</span>
+printf(<span class="lit">"Token: %s%n"</span>, req.bearer.token)</pre></div><dl class="attributes block"><dt>Definition Classes</dt><dd><a href="index.html" name="scamper" id="scamper" class="extype">scamper</a></dd></dl></div></li><li class="indented2 " name="scamper.client" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="client" class="anchorToMember"></a><a id="client:client" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/client/index.html" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">package</span></span> <span class="symbol"><a href="client/index.html" title="Provides HTTP client implementation."><span class="name">client</span></a></span><p class="shortcomment cmt">Provides HTTP client implementation.</p><div class="fullcomment"><div class="comment cmt"><p>Provides HTTP client implementation.</p><h5> Using HTTP Client </h5><p>The <a href="client/HttpClient$.html" name="scamper.client.HttpClient" id="scamper.client.HttpClient" class="extype">HttpClient</a> object can be used to send a request and handle
+the response.</p><pre><span class="kw">import</span> scamper.BodyParser
+<span class="kw">import</span> scamper.Implicits.stringToUri
+<span class="kw">import</span> scamper.RequestMethod.Registry.Get
+<span class="kw">import</span> scamper.client.HttpClient
+
+<span class="kw">implicit</span> <span class="kw">val</span> parser = BodyParser.text()
+
+<span class="kw">def</span> getMessageOfTheDay(): Either[<span class="std">Int</span>, <span class="std">String</span>] = {
+  <span class="kw">val</span> req = Get(<span class="lit">"localhost:8080/motd"</span>)
+
+  <span class="cmt">// Send request and handle response</span>
+  HttpClient.send(req) { res <span class="kw">=&gt;</span>
+    res.isSuccessful <span class="kw">match</span> {
+      <span class="kw">case</span> <span class="kw">true</span>  <span class="kw">=&gt;</span> Right(res.as[<span class="std">String</span>])
+      <span class="kw">case</span> <span class="kw">false</span> <span class="kw">=&gt;</span> Left(res.statusCode)
+    }
+  }
+}</pre><p>Note the request must be created with an absolute URI to make effective use
+of the client.</p><h5> Creating HTTP Client </h5><p>When using the <code>HttpClient</code> object as the client, it creates an
+<a href="client/HttpClient.html" name="scamper.client.HttpClient" id="scamper.client.HttpClient" class="extype">HttpClient</a> instance for one-time usage. If you plan to send multiple
+requests, you can create and maintain a reference to a client. With it, you
+also get access to methods corresponding to standard HTTP request methods.</p><pre><span class="kw">import</span> scamper.BodyParser
+<span class="kw">import</span> scamper.Implicits.stringToUri
+<span class="kw">import</span> scamper.client.HttpClient
+
+<span class="kw">implicit</span> <span class="kw">val</span> parser = BodyParser.text()
+
+<span class="cmt">// Create HttpClient instance</span>
+<span class="kw">val</span> client = HttpClient()
+
+<span class="kw">def</span> getMessageOfTheDay(): Either[<span class="std">Int</span>, <span class="std">String</span>] = {
+  <span class="cmt">// Use client instance</span>
+  client.get(<span class="lit">"http://localhost:8080/motd"</span>) { res <span class="kw">=&gt;</span>
+    res.isSuccessful <span class="kw">match</span> {
+      <span class="kw">case</span> <span class="kw">true</span>  <span class="kw">=&gt;</span> Right(res.as[<span class="std">String</span>])
+      <span class="kw">case</span> <span class="kw">false</span> <span class="kw">=&gt;</span> Left(res.statusCode)
+    }
+  }
+}</pre><p>And, if an implicit client is in scope, you can make use of <code>send()</code> on the
+request itself.</p><pre><span class="kw">import</span> scamper.BodyParser
+<span class="kw">import</span> scamper.Implicits.stringToUri
+<span class="kw">import</span> scamper.RequestMethod.Registry.Get
+<span class="kw">import</span> scamper.client.HttpClient
+<span class="kw">import</span> scamper.client.Implicits.ClientHttpRequestType <span class="cmt">// Adds send method to request</span>
+<span class="kw">import</span> scamper.headers.{ Accept, AcceptLanguage }
+<span class="kw">import</span> scamper.types.Implicits.{ stringToMediaRange, stringToLanguageRange }
+
+<span class="kw">implicit</span> <span class="kw">val</span> client = HttpClient()
+<span class="kw">implicit</span> <span class="kw">val</span> parser = BodyParser.text(<span class="num">4096</span>)
+
+Get(<span class="lit">"http://localhost:8080/motd"</span>)
+  .setAccept(<span class="lit">"text/plain"</span>)
+  .setAcceptLanguage(<span class="lit">"en-US; q=0.6"</span>, <span class="lit">"fr-CA; q=0.4"</span>)
+  .send(res <span class="kw">=&gt;</span> println(res.as[<span class="std">String</span>])) <span class="cmt">// Send request and print response</span></pre><p>See also <a href="client/ClientSettings.html" name="scamper.client.ClientSettings" id="scamper.client.ClientSettings" class="extype">ClientSettings</a> for information about configuring the HTTP
+client before it is created.
+</p></div><dl class="attributes block"><dt>Definition Classes</dt><dd><a href="index.html" name="scamper" id="scamper" class="extype">scamper</a></dd></dl></div></li><li class="indented2 " name="scamper.cookies" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="cookies" class="anchorToMember"></a><a id="cookies:cookies" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/cookies/index.html" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">package</span></span> <span class="symbol"><a href="cookies/index.html" title="Provides specialized access to message cookies."><span class="name">cookies</span></a></span><p class="shortcomment cmt">Provides specialized access to message cookies.</p><div class="fullcomment"><div class="comment cmt"><p>Provides specialized access to message cookies.</p><h5> Request Cookies </h5><p>In <a href="HttpRequest.html" name="scamper.HttpRequest" id="scamper.HttpRequest" class="extype">HttpRequest</a>, cookies are stringed together in the Cookie header. You
+can access them using extension methods provided by <a href="cookies/package$$RequestCookies.html" name="scamper.cookies.RequestCookies" id="scamper.cookies.RequestCookies" class="extype">RequestCookies</a>, with
+each cookie represented as <a href="cookies/PlainCookie.html" name="scamper.cookies.PlainCookie" id="scamper.cookies.PlainCookie" class="extype">PlainCookie</a>.</p><pre><span class="kw">import</span> scamper.Implicits.stringToUri
+<span class="kw">import</span> scamper.RequestMethod.Registry.Get
+<span class="kw">import</span> scamper.cookies.{ PlainCookie, RequestCookies }
+
+<span class="cmt">// Build request with cookies</span>
+<span class="kw">val</span> req = Get(<span class="lit">"https://localhost:8080/motd"</span>).setCookies(
+  PlainCookie(<span class="lit">"ID"</span>, <span class="lit">"bG9zCg"</span>), PlainCookie(<span class="lit">"Region"</span>, <span class="lit">"SE-US"</span>)
+)
+
+<span class="cmt">// Print all cookies</span>
+req.cookies.foreach(println)
+
+<span class="cmt">// Get cookies by name</span>
+<span class="kw">val</span> id: <span class="std">Option</span>[PlainCookie] = req.getCookie(<span class="lit">"ID"</span>)
+<span class="kw">val</span> region: <span class="std">Option</span>[PlainCookie] = req.getCookie(<span class="lit">"Region"</span>)
+
+<span class="cmt">// Get cookie values by name</span>
+assert(req.getCookieValue(<span class="lit">"ID"</span>).contains(<span class="lit">"bG9zCg"</span>))
+assert(req.getCookieValue(<span class="lit">"Region"</span>).contains(<span class="lit">"SE-US"</span>))</pre><h5> Response Cookies </h5><p>In <a href="HttpResponse.html" name="scamper.HttpResponse" id="scamper.HttpResponse" class="extype">HttpResponse</a>, the cookies are a collection of Set-Cookie header
+values. Specialized access is provided by <a href="cookies/package$$ResponseCookies.html" name="scamper.cookies.ResponseCookies" id="scamper.cookies.ResponseCookies" class="extype">ResponseCookies</a>, with each
+cookie represented as <a href="cookies/SetCookie.html" name="scamper.cookies.SetCookie" id="scamper.cookies.SetCookie" class="extype">SetCookie</a>.</p><pre><span class="kw">import</span> scamper.Implicits.stringToEntity
+<span class="kw">import</span> scamper.ResponseStatus.Registry.Ok
+<span class="kw">import</span> scamper.cookies.{ ResponseCookies, SetCookie }
+
+<span class="cmt">// Build response with cookies</span>
+<span class="kw">val</span> res = Ok(<span class="lit">"There is an answer."</span>).setCookies(
+  SetCookie(<span class="lit">"ID"</span>, <span class="lit">"bG9zCg"</span>, path = <span class="std">Some</span>(<span class="lit">"/motd"</span>), secure = <span class="kw">true</span>),
+  SetCookie(<span class="lit">"Region"</span>, <span class="lit">"SE-US"</span>)
+)
+
+<span class="cmt">// Print all cookies</span>
+res.cookies.foreach(println)
+
+<span class="cmt">// Get cookies by name</span>
+<span class="kw">val</span> id: <span class="std">Option</span>[SetCookie] = res.getCookie(<span class="lit">"ID"</span>)
+<span class="kw">val</span> region: <span class="std">Option</span>[SetCookie] = res.getCookie(<span class="lit">"Region"</span>)
+
+<span class="cmt">// Get attributes of ID cookie</span>
+<span class="kw">val</span> path: <span class="std">String</span> = id.flatMap(_.path).getOrElse(<span class="lit">"/"</span>)
+<span class="kw">val</span> secure: <span class="std">Boolean</span> = id.map(_.secure).getOrElse(<span class="kw">false</span>)
+
+<span class="cmt">// Get cookie values by name</span>
+assert(res.getCookieValue(<span class="lit">"ID"</span>).contains(<span class="lit">"bG9zCg"</span>))
+assert(res.getCookieValue(<span class="lit">"Region"</span>).contains(<span class="lit">"SE-US"</span>))</pre></div><dl class="attributes block"><dt>Definition Classes</dt><dd><a href="index.html" name="scamper" id="scamper" class="extype">scamper</a></dd></dl></div></li><li class="indented2 " name="scamper.headers" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="headers" class="anchorToMember"></a><a id="headers:headers" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/headers/index.html" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">package</span></span> <span class="symbol"><a href="headers/index.html" title="Provides specialized access to message headers."><span class="name">headers</span></a></span><p class="shortcomment cmt">Provides specialized access to message headers.</p><div class="fullcomment"><div class="comment cmt"><p>Provides specialized access to message headers.</p><h5> Using Header Classes </h5><p>Specialized header access is provided by type classes. Some headers are
+available to both requests and responses, and others are available only to a
+specific message type. This behavior is driven by the HTTP specification.</p><pre><span class="kw">import</span> scamper.Implicits.stringToUri
+<span class="kw">import</span> scamper.RequestMethod.Registry.Get
+<span class="kw">import</span> scamper.headers.{ Accept, Host }
+<span class="kw">import</span> scamper.types.Implicits.stringToMediaRange
+
+<span class="cmt">// Build request using 'Host' and 'Accept' headers</span>
+<span class="kw">val</span> req = Get(<span class="lit">"/motd"</span>)
+  .setHost(<span class="lit">"localhost:8080"</span>)
+  .setAccept(<span class="lit">"text/plain"</span>)
+
+<span class="cmt">// Access and print header values</span>
+printf(<span class="lit">"Host: %s%n"</span>, req.host)
+printf(<span class="lit">"Accept: %s%n"</span>, req.accept.mkString(<span class="lit">", "</span>))</pre></div><dl class="attributes block"><dt>Definition Classes</dt><dd><a href="index.html" name="scamper" id="scamper" class="extype">scamper</a></dd></dl></div></li><li class="indented2 " name="scamper.logging" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="logging" class="anchorToMember"></a><a id="logging:logging" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/logging/index.html" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">package</span></span> <span class="symbol"><a href="logging/index.html" title="Provides logging facilities."><span class="name">logging</span></a></span><p class="shortcomment cmt">Provides logging facilities.</p><div class="fullcomment"><div class="comment cmt"><p>Provides logging facilities.</p></div><dl class="attributes block"><dt>Definition Classes</dt><dd><a href="index.html" name="scamper" id="scamper" class="extype">scamper</a></dd></dl></div></li><li class="indented2 " name="scamper.server" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="server" class="anchorToMember"></a><a id="server:server" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/server/index.html" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">package</span></span> <span class="symbol"><a href="server/index.html" title="Provides HTTP server implementation."><span class="name">server</span></a></span><p class="shortcomment cmt">Provides HTTP server implementation.</p><div class="fullcomment"><div class="comment cmt"><p>Provides HTTP server implementation.</p><h5> Building HTTP Server </h5><p>To build a server, you begin with <code>ServerApplication</code>. This is a mutable
+structure to which you apply changes to configure the server. Once the desired
+settings are applied, you invoke one of several methods to create the server.</p><pre><span class="kw">import</span> java.io.File
+<span class="kw">import</span> scamper.BodyParser
+<span class="kw">import</span> scamper.Implicits.stringToEntity
+<span class="kw">import</span> scamper.ResponseStatus.Registry.{ NotFound, Ok }
+<span class="kw">import</span> scamper.server.HttpServer
+<span class="kw">import</span> scamper.server.Implicits._
+
+<span class="cmt">// Get server application</span>
+<span class="kw">val</span> app = HttpServer.app()
+
+<span class="cmt">// Add request handler to log all requests</span>
+app.incoming { req <span class="kw">=&gt;</span>
+  println(req.startLine)
+  req
+}
+
+<span class="cmt">// Add request handler to specific request method and path</span>
+app.get(<span class="lit">"/about"</span>) { req <span class="kw">=&gt;</span>
+  Ok(<span class="lit">"This server is powered by Scamper."</span>)
+}
+
+<span class="cmt">// Add request handler using path parameter</span>
+app.put(<span class="lit">"/data/:id"</span>) { req <span class="kw">=&gt;</span>
+  <span class="kw">def</span> update(id: <span class="std">Int</span>, data: <span class="std">String</span>): <span class="std">Boolean</span> = ???
+
+  <span class="kw">implicit</span> <span class="kw">val</span> parser = BodyParser.text()
+
+  <span class="cmt">// Get path parameter</span>
+  <span class="kw">val</span> id = req.params.getInt(<span class="lit">"id"</span>)
+
+  update(id, req.as[<span class="std">String</span>]) <span class="kw">match</span> {
+    <span class="kw">case</span> <span class="kw">true</span>  <span class="kw">=&gt;</span> Ok()
+    <span class="kw">case</span> <span class="kw">false</span> <span class="kw">=&gt;</span> NotFound()
+  }
+}
+
+<span class="cmt">// Serve static files</span>
+app.files(<span class="lit">"/main"</span>, <span class="kw">new</span> File(<span class="lit">"/path/to/public"</span>))
+
+<span class="cmt">// Gzip response body if not empty</span>
+app.outgoing { res <span class="kw">=&gt;</span>
+  res.body.isKnownEmpty <span class="kw">match</span> {
+    <span class="kw">case</span> <span class="kw">true</span>  <span class="kw">=&gt;</span> res
+    <span class="kw">case</span> <span class="kw">false</span> <span class="kw">=&gt;</span> res.setGzipContentEncoding()
+  }
+}
+
+<span class="cmt">// Create server</span>
+<span class="kw">val</span> server = app.create(<span class="num">8080</span>)
+
+printf(<span class="lit">"Host: %s%n"</span>, server.host)
+printf(<span class="lit">"Port: %d%n"</span>, server.port)
+
+<span class="cmt">// Run server for 60 seconds</span>
+Thread.sleep(<span class="num">60</span> * <span class="num">1000</span>)
+
+<span class="cmt">// Close server when done</span>
+server.close()</pre></div><dl class="attributes block"><dt>Definition Classes</dt><dd><a href="index.html" name="scamper" id="scamper" class="extype">scamper</a></dd></dl></div></li><li class="indented2 " name="scamper.types" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="types" class="anchorToMember"></a><a id="types:types" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/types/index.html" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">package</span></span> <span class="symbol"><a href="types/index.html" title="Defines standard types for header values."><span class="name">types</span></a></span><p class="shortcomment cmt">Defines standard types for header values.</p><div class="fullcomment"><div class="comment cmt"><p>Defines standard types for header values.</p><pre><span class="kw">import</span> scamper.Implicits.{ stringToEntity, stringToUri }
+<span class="kw">import</span> scamper.RequestMethod.Registry.Get
+<span class="kw">import</span> scamper.ResponseStatus.Registry.Ok
+<span class="kw">import</span> scamper.headers.{ Accept, ContentType, TransferEncoding }
+<span class="kw">import</span> scamper.types.{ MediaRange, MediaType, TransferCoding }
+
+<span class="kw">val</span> json = MediaRange(<span class="lit">"application"</span>, <span class="lit">"json"</span>, <span class="num">0.9</span>f)
+<span class="kw">val</span> html = MediaRange(<span class="lit">"text/html; q=0.1"</span>)
+
+<span class="kw">val</span> req = Get(<span class="lit">"/motd"</span>)
+  .setAccept(json, html)
+
+<span class="kw">val</span> text = MediaType(<span class="lit">"text/plain"</span>)
+<span class="kw">val</span> gzip = TransferCoding(<span class="lit">"gzip"</span>)
+
+<span class="kw">val</span> res = Ok(<span class="lit">"There is an answer."</span>)
+  .setContentType(text)
+  .setTransferEncoding(gzip)</pre><p>Using values defined in <a href="types/Implicits$.html" name="scamper.types.Implicits" id="scamper.types.Implicits" class="extype">Implicits</a>, properly formatted strings
+can be implicitly converted to standardized types.</p><pre><span class="kw">import</span> scamper.Implicits.{ stringToEntity, stringToUri }
+<span class="kw">import</span> scamper.RequestMethod.Registry.Get
+<span class="kw">import</span> scamper.ResponseStatus.Registry.Ok
+<span class="kw">import</span> scamper.headers.{ Accept, ContentType, TransferEncoding }
+<span class="kw">import</span> scamper.types.Implicits._
+
+<span class="kw">val</span> req = Get(<span class="lit">"/motd"</span>)
+  .setAccept(<span class="lit">"application/json; q=0.9"</span>, <span class="lit">"text/html; q=0.1"</span>)
+
+<span class="kw">val</span> res = Ok(<span class="lit">"There is an answer."</span>)
+  .setContentType(<span class="lit">"text/plain"</span>)
+  .setTransferEncoding(<span class="lit">"gzip"</span>)</pre></div><dl class="attributes block"><dt>Definition Classes</dt><dd><a href="index.html" name="scamper" id="scamper" class="extype">scamper</a></dd><dt>See also</dt><dd><span class="cmt"><p><a href="headers/index.html" name="scamper.headers" id="scamper.headers" class="extype">scamper.headers</a></p></span></dd></dl></div></li><li class="indented2 " name="scamper.websocket" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="websocket" class="anchorToMember"></a><a id="websocket:websocket" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/websocket/index.html" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">package</span></span> <span class="symbol"><a href="websocket/index.html" title="Provides WebSocket implementation."><span class="name">websocket</span></a></span><p class="shortcomment cmt">Provides WebSocket implementation.</p><div class="fullcomment"><div class="comment cmt"><p>Provides WebSocket implementation.</p></div><dl class="attributes block"><dt>Definition Classes</dt><dd><a href="index.html" name="scamper" id="scamper" class="extype">scamper</a></dd></dl></div></li><li class="current-entities indented1"><a href="" title="Provides factory for BodyDecoder." class="object"></a> <a href="BodyDecoder.html" title="Provides access to decoded message body." class="trait"></a><a href="BodyDecoder.html" title="Provides access to decoded message body.">BodyDecoder</a></li><li class="current-entities indented1"><a href="BodyParser$.html" title="Provides factory for BodyParser." class="object"></a> <a href="BodyParser.html" title="Provides utility for parsing message body." class="trait"></a><a href="BodyParser.html" title="Provides utility for parsing message body.">BodyParser</a></li><li class="current-entities indented1"><a href="Entity$.html" title="Provides factory for Entity." class="object"></a> <a href="Entity.html" title="Provides input stream to HTTP entity." class="trait"></a><a href="Entity.html" title="Provides input stream to HTTP entity.">Entity</a></li><li class="current-entities indented1"><span class="separator"></span> <a href="EntityTooLarge.html" title="Indicates entity larger than established maximum length." class="class"></a><a href="EntityTooLarge.html" title="Indicates entity larger than established maximum length.">EntityTooLarge</a></li><li class="current-entities indented1"><a href="FilePart$.html" title="Provides factory for FilePart." class="object"></a> <a href="FilePart.html" title="Represents file content in multipart form data." class="trait"></a><a href="FilePart.html" title="Represents file content in multipart form data.">FilePart</a></li><li class="current-entities indented1"><a href="Header$.html" title="Provides factory for Header." class="object"></a> <a href="Header.html" title="Defines HTTP header." class="trait"></a><a href="Header.html" title="Defines HTTP header.">Header</a></li><li class="current-entities indented1"><span class="separator"></span> <a href="HeaderNotFound.html" title="Indicates absence of specified header." class="class"></a><a href="HeaderNotFound.html" title="Indicates absence of specified header.">HeaderNotFound</a></li><li class="current-entities indented1"><span class="separator"></span> <a href="HttpException.html" title="Indicates exception in HTTP processing." class="class"></a><a href="HttpException.html" title="Indicates exception in HTTP processing.">HttpException</a></li><li class="current-entities indented1"><span class="separator"></span> <a href="HttpMessage.html" title="Defines HTTP message." class="trait"></a><a href="HttpMessage.html" title="Defines HTTP message.">HttpMessage</a></li><li class="current-entities indented1"><a href="HttpRequest$.html" title="Provides factory for HttpRequest." class="object"></a> <a href="HttpRequest.html" title="Defines HTTP request." class="trait"></a><a href="HttpRequest.html" title="Defines HTTP request.">HttpRequest</a></li><li class="current-entities indented1"><a href="HttpResponse$.html" title="Provides factory for HttpResponse." class="object"></a> <a href="HttpResponse.html" title="Defines HTTP response." class="trait"></a><a href="HttpResponse.html" title="Defines HTTP response.">HttpResponse</a></li><li class="current-entities indented1"><a href="HttpVersion$.html" title="Provides factory for HttpVersion." class="object"></a> <a href="HttpVersion.html" title="Defines HTTP version." class="trait"></a><a href="HttpVersion.html" title="Defines HTTP version.">HttpVersion</a></li><li class="current-entities indented1"><span class="separator"></span> <a href="Implicits$.html" title="Includes implicit converter functions and type classes." class="object"></a><a href="Implicits$.html" title="Includes implicit converter functions and type classes.">Implicits</a></li><li class="current-entities indented1"><span class="separator"></span> <a href="MessageBuilder.html" title="Provides builder pattern for HTTP message." class="trait"></a><a href="MessageBuilder.html" title="Provides builder pattern for HTTP message.">MessageBuilder</a></li><li class="current-entities indented1"><a href="Multipart$.html" title="Provides factory for Multipart." class="object"></a> <a href="Multipart.html" title="Represents multipart form data." class="trait"></a><a href="Multipart.html" title="Represents multipart form data.">Multipart</a></li><li class="current-entities indented1"><span class="separator"></span> <a href="Part.html" title="Represents part in multipart form data." class="trait"></a><a href="Part.html" title="Represents part in multipart form data.">Part</a></li><li class="current-entities indented1"><a href="QueryString$.html" title="Provides factory for QueryString." class="object"></a> <a href="QueryString.html" title="Represents query string as mapped parameters." class="trait"></a><a href="QueryString.html" title="Represents query string as mapped parameters.">QueryString</a></li><li class="current-entities indented1"><span class="separator"></span> <a href="ReadLimitExceeded.html" title="Indicates read of input stream exceeds established limit." class="class"></a><a href="ReadLimitExceeded.html" title="Indicates read of input stream exceeds established limit.">ReadLimitExceeded</a></li><li class="current-entities indented1"><a href="RequestLine$.html" title="Provides factory for RequestLine." class="object"></a> <a href="RequestLine.html" title="Defines HTTP request line." class="trait"></a><a href="RequestLine.html" title="Defines HTTP request line.">RequestLine</a></li><li class="current-entities indented1"><a href="RequestMethod$.html" title="Provides factory for RequestMethod." class="object"></a> <a href="RequestMethod.html" title="Defines HTTP request method." class="trait"></a><a href="RequestMethod.html" title="Defines HTTP request method.">RequestMethod</a></li><li class="current-entities indented1"><a href="ResponseStatus$.html" title="Provides factory for ResponseStatus." class="object"></a> <a href="ResponseStatus.html" title="Defines HTTP response status." class="trait"></a><a href="ResponseStatus.html" title="Defines HTTP response status.">ResponseStatus</a></li><li class="current-entities indented1"><span class="separator"></span> <a href="StartLine.html" title="Defines HTTP message start line." class="trait"></a><a href="StartLine.html" title="Defines HTTP message start line.">StartLine</a></li><li class="current-entities indented1"><a href="StatusLine$.html" title="Provides factory for StatusLine." class="object"></a> <a href="StatusLine.html" title="Defines HTTP status line." class="trait"></a><a href="StatusLine.html" title="Defines HTTP status line.">StatusLine</a></li><li class="current-entities indented1"><a href="TextPart$.html" title="Provides factory for TextPart." class="object"></a> <a href="TextPart.html" title="Represents text content in multipart form data." class="trait"></a><a href="TextPart.html" title="Represents text content in multipart form data.">TextPart</a></li><li class="current-entities indented1"><span class="separator"></span> <a href="package$$Uri$.html" title="Provides factory for Uri." class="object"></a><a href="package$$Uri$.html" title="Provides factory for Uri.">Uri</a></li></ul></div></div><div id="content"><body class="object value"><div id="definition"><a href="BodyDecoder.html" title="See companion trait"><div class="big-circle object-companion-trait">o</div></a><p id="owner"><a href="index.html" name="scamper" id="scamper" class="extype">scamper</a></p><h1><a href="BodyDecoder.html" title="See companion trait">BodyDecoder</a><span class="permalink"><a href="../scamper/BodyDecoder$.html" title="Permalink"><i class="material-icons"></i></a></span></h1><h3><span class="morelinks"><div>Companion <a href="BodyDecoder.html" title="See companion trait">trait BodyDecoder</a></div></span></h3></div><h4 id="signature" class="signature"><span class="modifier_kind"><span class="modifier"></span> <span class="kind">object</span></span> <span class="symbol"><span class="name">BodyDecoder</span></span></h4><div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Provides factory for <code>BodyDecoder</code>.</p></div><div class="toggleContainer"><div class="toggle block"><span>Linear Supertypes</span><div class="superTypes hiddenContent"><span name="scala.AnyRef" class="extype">AnyRef</span>, <span name="scala.Any" class="extype">Any</span></div></div></div></div><div id="mbrsel"><div class="toggle"></div><div id="memberfilter"><i class="material-icons arrow"></i><span class="input"><input placeholder="Filter all members" id="mbrsel-input" type="text" accesskey="/"/></span><i class="clear material-icons"></i></div><div id="filterby"><div id="order"><span class="filtertype">Ordering</span><ol><li class="alpha in"><span>Alphabetic</span></li><li class="inherit out"><span>By Inheritance</span></li></ol></div><div class="ancestors"><span class="filtertype">Inherited<br/></span><ol id="linearization"><li class="in" name="scamper.BodyDecoder"><span>BodyDecoder</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li></ol></div><div class="ancestors"><span class="filtertype"></span><ol><li class="hideall out"><span>Hide All</span></li><li class="showall in"><span>Show All</span></li></ol></div><div id="visbl"><span class="filtertype">Visibility</span><ol><li class="public in"><span>Public</span></li><li class="protected out"><span>Protected</span></li></ol></div></div></div><div id="template"><div id="allMembers"><div class="values members"><h3>Value Members</h3><ol><li class="indented0 " name="scala.AnyRef#!=" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="!=(x$1:Any):Boolean" class="anchorToMember"></a><a id="!=(Any):Boolean" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#!=(x$1:Any):Boolean" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name" title="gt4s: $bang$eq">!=</span><span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div></li><li class="indented0 " name="scala.AnyRef###" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="##:Int" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html###:Int" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name" title="gt4s: $hash$hash">##</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div></li><li class="indented0 " name="scala.AnyRef#==" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="==(x$1:Any):Boolean" class="anchorToMember"></a><a id="==(Any):Boolean" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#==(x$1:Any):Boolean" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name" title="gt4s: $eq$eq">==</span><span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div></li><li class="indented0 " name="scamper.BodyDecoder#apply" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="apply(maxLength:Long):scamper.BodyDecoder" class="anchorToMember"></a><a id="apply(Long):BodyDecoder" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#apply(maxLength:Long):scamper.BodyDecoder" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">def</span></span> <span class="symbol"><span class="name">apply</span><span class="params">(<span name="maxLength">maxLength: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <a href="BodyDecoder.html" name="scamper.BodyDecoder" id="scamper.BodyDecoder" class="extype">BodyDecoder</a></span></span><p class="shortcomment cmt">Creates decoder with specified maximum length.</p><div class="fullcomment"><div class="comment cmt"><p>Creates decoder with specified maximum length.
+</p></div><dl class="paramcmts block"><dt class="param">maxLength</dt><dd class="cmt"><p>maximum length of message body</p></dd></dl></div></li><li class="indented0 " name="scala.Any#asInstanceOf" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="asInstanceOf[T0]:T0" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#asInstanceOf[T0]:T0" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span name="scala.Any.asInstanceOf.T0" class="extype">T0</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>Any</dd></dl></div></li><li class="indented0 " name="scala.AnyRef#clone" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="prt"><a id="clone():Object" class="anchorToMember"></a><a id="clone():AnyRef" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#clone():Object" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">def</span></span> <span class="symbol"><span class="name">clone</span><span class="params">()</span><span class="result">: <span name="scala.AnyRef" class="extype">AnyRef</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Attributes</dt><dd>protected[<span name="java.lang" class="extype">lang</span>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd><span class="name">@throws</span><span class="args">(<span><span class="defval">classOf[java.lang.CloneNotSupportedException]</span></span>)</span> <span class="name">@native</span><span class="args">()</span> </dd></dl></div></li><li class="indented0 " name="scala.AnyRef#eq" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="eq(x$1:AnyRef):Boolean" class="anchorToMember"></a><a id="eq(AnyRef):Boolean" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#eq(x$1:AnyRef):Boolean" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span name="scala.AnyRef" class="extype">AnyRef</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div></li><li class="indented0 " name="scala.AnyRef#equals" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="equals(x$1:Object):Boolean" class="anchorToMember"></a><a id="equals(AnyRef):Boolean" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#equals(x$1:Object):Boolean" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">def</span></span> <span class="symbol"><span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span name="scala.AnyRef" class="extype">AnyRef</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div></li><li class="indented0 " name="scala.AnyRef#finalize" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="prt"><a id="finalize():Unit" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#finalize():Unit" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">def</span></span> <span class="symbol"><span class="name">finalize</span><span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Attributes</dt><dd>protected[<span name="java.lang" class="extype">lang</span>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd><span class="name">@throws</span><span class="args">(<span><span class="symbol">classOf[java.lang.Throwable]</span></span>)</span> </dd></dl></div></li><li class="indented0 " name="scala.AnyRef#getClass" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="getClass():Class[_]" class="anchorToMember"></a><a id="getClass():Class[_&lt;:AnyRef]" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#getClass():Class[_]" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name">getClass</span><span class="params">()</span><span class="result">: <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#java.lang.Class" name="java.lang.Class" id="java.lang.Class" class="extype">Class</a>[_ &lt;: <span name="scala.AnyRef" class="extype">AnyRef</span>]</span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef → Any</dd><dt>Annotations</dt><dd><span class="name">@native</span><span class="args">()</span> </dd></dl></div></li><li class="indented0 " name="scala.AnyRef#hashCode" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="hashCode():Int" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#hashCode():Int" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">def</span></span> <span class="symbol"><span class="name">hashCode</span><span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef → Any</dd><dt>Annotations</dt><dd><span class="name">@native</span><span class="args">()</span> </dd></dl></div></li><li class="indented0 " name="scala.Any#isInstanceOf" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="isInstanceOf[T0]:Boolean" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#isInstanceOf[T0]:Boolean" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>Any</dd></dl></div></li><li class="indented0 " name="scala.AnyRef#ne" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="ne(x$1:AnyRef):Boolean" class="anchorToMember"></a><a id="ne(AnyRef):Boolean" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#ne(x$1:AnyRef):Boolean" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span name="scala.AnyRef" class="extype">AnyRef</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div></li><li class="indented0 " name="scala.AnyRef#notify" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="notify():Unit" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#notify():Unit" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name">notify</span><span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd><span class="name">@native</span><span class="args">()</span> </dd></dl></div></li><li class="indented0 " name="scala.AnyRef#notifyAll" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="notifyAll():Unit" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#notifyAll():Unit" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd><span class="name">@native</span><span class="args">()</span> </dd></dl></div></li><li class="indented0 " name="scala.AnyRef#synchronized" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="synchronized[T0](x$1:=&gt;T0):T0" class="anchorToMember"></a><a id="synchronized[T0](=&gt;T0):T0" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: =&gt; <span name="java.lang.AnyRef.synchronized.T0" class="extype">T0</span></span>)</span><span class="result">: <span name="java.lang.AnyRef.synchronized.T0" class="extype">T0</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div></li><li class="indented0 " name="scala.AnyRef#toString" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="toString():String" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#toString():String" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier"></span> <span class="kind">def</span></span> <span class="symbol"><span class="name">toString</span><span class="params">()</span><span class="result">: <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#java.lang.String" name="java.lang.String" id="java.lang.String" class="extype">String</a></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div></li><li class="indented0 " name="scala.AnyRef#wait" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="wait():Unit" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#wait():Unit" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name">wait</span><span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd><span class="name">@throws</span><span class="args">(<span><span class="defval">classOf[java.lang.InterruptedException]</span></span>)</span> </dd></dl></div></li><li class="indented0 " name="scala.AnyRef#wait" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="wait(x$1:Long,x$2:Int):Unit" class="anchorToMember"></a><a id="wait(Long,Int):Unit" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>, <span name="arg1">arg1: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd><span class="name">@throws</span><span class="args">(<span><span class="defval">classOf[java.lang.InterruptedException]</span></span>)</span> </dd></dl></div></li><li class="indented0 " name="scala.AnyRef#wait" group="Ungrouped" fullComment="yes" data-isabs="false" visbl="pub"><a id="wait(x$1:Long):Unit" class="anchorToMember"></a><a id="wait(Long):Unit" class="anchorToMember"></a> <span class="permalink"><a href="../scamper/BodyDecoder$.html#wait(x$1:Long):Unit" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">final </span> <span class="kind">def</span></span> <span class="symbol"><span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span></span><div class="fullcomment"><dl class="attributes block"><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd><span class="name">@throws</span><span class="args">(<span><span class="defval">classOf[java.lang.InterruptedException]</span></span>)</span> <span class="name">@native</span><span class="args">()</span> </dd></dl></div></li></ol></div></div><div id="inheritedMembers"><div name="scala.AnyRef" class="parent"><h3>Inherited from <span name="scala.AnyRef" class="extype">AnyRef</span></h3></div><div name="scala.Any" class="parent"><h3>Inherited from <span name="scala.Any" class="extype">Any</span></h3></div></div><div id="groupedMembers"><div name="Ungrouped" class="group"><h3>Ungrouped</h3></div></div></div><div id="tooltip"></div><div id="footer"></div></body></div></div></div></body></html>
