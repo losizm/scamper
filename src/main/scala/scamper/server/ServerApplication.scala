@@ -24,7 +24,7 @@ import scamper.logging.{ Logger, LogWriter }
 import scamper.types.KeepAliveParameters
 
 /**
- * Configures and creates `HttpServer`.
+ * Defines server application for creating `HttpServer`.
  *
  * `ServerApplication` is a mutable structure. With each applied change, the
  * application is modified and returned. After the desired settings are applied,

@@ -17,12 +17,12 @@ package scamper.server
 
 import scamper.{ HttpRequest, HttpResponse }
 
-/** Provides utility for handling error when servicing request. */
+/** Defines utility for handling error during request processing. */
 trait ErrorHandler {
   /**
    * Creates response for given error.
    *
-   * @param error error generated when servicing request
+   * @param error error generated during request processing
    * @param request request for which error was generated
    */
   def apply(error: Throwable, request: HttpRequest): HttpResponse

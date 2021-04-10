@@ -22,7 +22,7 @@ import scala.util.Try
 import scamper.types._
 
 /**
- * Provides specialized access to message headers.
+ * Defines type classes for specialized access to message headers.
  *
  * === Using Header Classes ===
  *

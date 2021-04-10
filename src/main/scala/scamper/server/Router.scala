@@ -22,7 +22,7 @@ import scamper.RequestMethod.Registry.{ Delete, Get, Post, Put }
 import scamper.websocket.WebSocketApplication
 
 /**
- * Used for routing request handlers.
+ * Defines router for request handling.
  *
  * {{{
  * import scamper.Implicits.stringToEntity

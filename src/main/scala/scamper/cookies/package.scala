@@ -19,7 +19,7 @@ import java.time.Instant
 import scala.util.Try
 
 /**
- * Provides specialized access to message cookies.
+ * Defines types for specialized access to message cookies.
  *
  * === Request Cookies ===
  *

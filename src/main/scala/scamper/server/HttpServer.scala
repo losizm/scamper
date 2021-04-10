@@ -22,7 +22,7 @@ import scamper.logging.Logger
 import scamper.types.KeepAliveParameters
 
 /**
- * Provides handle to server instance.
+ * Defines handle to server instance.
  *
  * @see [[HttpServer$ HttpServer]], [[ServerApplication]]
  */
@@ -75,7 +75,7 @@ trait HttpServer {
   def close(): Unit
 }
 
-/** Provides factory for creating `HttpServer`. */
+/** Provides factory for `HttpServer`. */
 object HttpServer {
   /** Gets new instance of server application. */
   def app(): ServerApplication = new ServerApplication()

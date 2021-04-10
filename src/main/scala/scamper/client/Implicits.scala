@@ -19,7 +19,7 @@ import java.net.Socket
 
 import scamper._
 
-/** Includes client-side type classes. */
+/** Defines client-side type classes. */
 object Implicits {
   /** Adds client-side extension methods to `HttpMessage`. */
   implicit class ClientHttpMessage(private val msg: HttpMessage) extends AnyVal {

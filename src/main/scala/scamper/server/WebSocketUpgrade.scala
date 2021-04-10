@@ -27,7 +27,7 @@ import scamper.websocket._
 import Implicits._
 
 /**
- * Upgrades request to WebSocket connection.
+ * Provides factory for upgrading request to WebSocket connection.
  *
  * {{{
  * import scamper.HttpRequest

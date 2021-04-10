@@ -16,7 +16,7 @@
 package scamper
 
 /**
- * Provides HTTP server implementation.
+ * Defines HTTP server implementation.
  *
  * === Building HTTP Server ===
  *

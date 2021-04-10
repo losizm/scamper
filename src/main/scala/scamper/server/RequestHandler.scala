@@ -17,7 +17,7 @@ package scamper.server
 
 import scamper.{ HttpMessage, HttpRequest, HttpResponse }
 
-/** Provides utility for handling incoming request. */
+/** Defines handler for incoming request. */
 trait RequestHandler {
   /**
    * Handles incoming request.

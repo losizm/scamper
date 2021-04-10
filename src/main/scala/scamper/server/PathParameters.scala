@@ -17,7 +17,7 @@ package scamper.server
 
 import scala.util.Try
 
-/** Provides access to path parameters. */
+/** Defines access to path parameters. */
 trait PathParameters {
   /**
    * Gets parameter value as `String`.

@@ -17,7 +17,7 @@ package scamper.server
 
 import scamper.HttpResponse
 
-/** Provides utility for filtering outgoing response. */
+/** Defines filter for outgoing response. */
 trait ResponseFilter {
   /**
    * Filters outgoing response.

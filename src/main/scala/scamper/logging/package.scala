@@ -21,7 +21,7 @@ import java.time.Instant
 
 import scala.util.Try
 
-/** Provides logging facilities. */
+/** Defines logging utilities. */
 package object logging {
   /** Defines logger interface. */
   trait Logger {

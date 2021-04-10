@@ -26,7 +26,7 @@ import scamper.types.{ DispositionType, MediaType }
 
 import Auxiliary.{ SocketType, StringType }
 
-/** Includes server-side type classes. */
+/** Defines server-side type classes. */
 object Implicits {
   /** Adds server-side extension methods to `HttpMessage`. */
   implicit class ServerHttpMessage(private val msg: HttpMessage) extends AnyVal {

@@ -24,7 +24,7 @@ import scamper.cookies.CookieStore
 import scamper.types.{ ContentCodingRange, MediaRange }
 
 /**
- * Configures and creates `HttpClient`.
+ * Defines HTTP client settings.
  *
  * `ClientSettings` is a mutable structure. With each applied change, the
  * settings are modified and returned. After applying the desired settings, a
@@ -176,7 +176,7 @@ class ClientSettings {
   def create(): HttpClient = synchronized { HttpClientImpl(settings) }
 }
 
-/** Provides factory method for `ClientSettings`. */
+/** Provides factory for `ClientSettings`. */
 object ClientSettings {
   /** Gets new instance of client settings. */
   def apply(): ClientSettings = new ClientSettings()

@@ -22,10 +22,10 @@ import scamper.types.{ ContentCodingRange, MediaRange }
 import scamper.websocket.WebSocketSessionHandler
 
 /**
- * Provides utility for sending request and handling response.
+ * Defines HTTP client.
  *
- * A client is created from either [[HttpClient.apply HttpClient.apply()]] or
- * [[ClientSettings]].
+ * A client is created using either the [[HttpClient$.apply HttpClient]] object
+ * or [[ClientSettings]].
  */
 trait HttpClient {
   /** Gets accepted content types. */
@@ -139,7 +139,7 @@ trait HttpClient {
   def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: WebSocketSessionHandler[T]): T
 }
 
-/** Provides factory for creating `HttpClient`. */
+/** Provides factory for `HttpClient`. */
 object HttpClient {
   /** Gets new instance of client settings. */
   def settings(): ClientSettings = new ClientSettings()

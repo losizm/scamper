@@ -27,7 +27,7 @@ import Auxiliary.UriType
 import RequestMethod.Registry._
 
 /**
- * Provides HTTP client implementation.
+ * Defines HTTP client implementation.
  *
  * === Using HTTP Client ===
  *
@@ -114,18 +114,18 @@ package object client {
   /** Indicates request is aborted. */
   case class RequestAborted(message: String) extends HttpException(message)
 
-  /** Provides utility for filtering outgoing request. */
+  /** Defines filter for outgoing request. */
   trait RequestFilter {
     /** Filters outgoing request. */
     def apply(req: HttpRequest): HttpRequest
   }
 
-  /** Provides utility for handling incoming response. */
+  /** Defines handler for incoming response. */
   trait ResponseHandler[T] {
     /** Handles response. */
     def apply(res: HttpResponse): T
   }
 
-  /** Provides utility for filtering incoming response. */
+  /** Defines filter for incoming response. */
   trait ResponseFilter extends ResponseHandler[HttpResponse]
 }

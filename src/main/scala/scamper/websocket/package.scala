@@ -15,7 +15,7 @@
  */
 package scamper
 
-/** Provides WebSocket implementation. */
+/** Defines WebSocket implementation. */
 package object websocket {
   /** Converts string to [[WebSocketExtension]]. */
   implicit val stringToWebSocketExtension = (ext: String) => WebSocketExtension.parse(ext)
