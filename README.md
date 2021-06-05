@@ -1,4 +1,5 @@
 # Scamper
+
 **Scamper** is the HTTP library for Scala. It defines the interface for reading
 and writing HTTP messages. In addition, it provides [client](#HTTP-Client) and
 [server](#HTTP-Server) implementations, both of which support WebSockets with
@@ -12,6 +13,7 @@ developers to create web applications as pipelines of request handlers.
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_2.13.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_2.13%22)
 
 ## Table of Contents
+
 - [Getting Started](#Getting-Started)
 - [HTTP Messages](#HTTP-Messages)
   - [Building Requests](#Building-Requests)
@@ -51,6 +53,7 @@ developers to create web applications as pipelines of request handlers.
 - [License](#License)
 
 ## Getting Started
+
 To use **Scamper**, start by adding it as a dependency to your project:
 
 ```scala
@@ -58,12 +61,14 @@ libraryDependencies += "com.github.losizm" %% "scamper" % "21.0.0"
 ```
 
 ## HTTP Messages
+
 At the core of **Scamper** is `HttpMessage`, which is a trait that defines the
 fundamental characteristics of an HTTP message. `HttpRequest` and `HttpResponse`
 extend the specification to define characteristics specific to their respective
 message types.
 
 ### Building Requests
+
 An `HttpRequest` can be created using a factory method defined in its companion
 object. Or you can start with a `RequestMethod` and use builder methods to
 further define the request.
@@ -80,6 +85,7 @@ val req = Get("/motd")
 ```
 
 ### Building Responses
+
 An `HttpResponse` can be created using a factory method defined in its companion
 object. Or you can start with a `ResponseStatus` and use builder methods to
 further define the response.
@@ -242,10 +248,12 @@ Whereas `getHeaderValue()` retrieves the first header value only,
 `getHeaderValues()` collects all header values into a `Seq[String]`._
 
 ## Message Body
+
 The message body is represented as an `Entity`, which provides access to an
 `InputStream`.
 
 ### Creating Body
+
 When building a message, use the `Entity` factory to create the body. For
 example, you can create a message with text content.
 
@@ -1252,5 +1260,6 @@ See [scaladoc](https://losizm.github.io/scamper/latest/api/scamper/index.html)
 for additional details.
 
 ## License
+
 **Scamper** is licensed under the Apache License, Version 2. See [LICENSE](LICENSE)
-file for more information.
+for more information.
