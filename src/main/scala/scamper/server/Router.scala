@@ -240,7 +240,7 @@ trait Router {
    *
    * @return this router
    */
-  def websocket[T](path: String)(app: WebSocketApplication): this.type =
+  def websocket(path: String)(app: WebSocketApplication): this.type =
     incoming(path, Get)(WebSocketRequestHandler(app))
 
   /**
@@ -251,7 +251,7 @@ trait Router {
    *
    * @return this router
    */
-  def route[T](path: String)(app: RoutingApplication): this.type = {
+  def route(path: String)(app: RoutingApplication): this.type = {
     val router = RouterImpl(mountPath + MountPath.normalize(path))
     app(router)
     incoming(MountRequestHandler(router.mountPath, router.createRequestHandler()))
