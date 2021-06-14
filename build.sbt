@@ -16,8 +16,8 @@ Compile / doc / scalacOptions ++= Seq(
 
 crossScalaVersions := Seq("2.12.13")
 
-unmanagedSourceDirectories in Compile += {
-  (sourceDirectory in Compile).value / s"scala-${scalaBinaryVersion.value}"
+Compile / unmanagedSourceDirectories += {
+  (Compile / sourceDirectory).value / s"scala-${scalaBinaryVersion.value}"
 }
 
 libraryDependencies += "org.scalatest" %% "scalatest-flatspec" % "3.2.5" % "test"
