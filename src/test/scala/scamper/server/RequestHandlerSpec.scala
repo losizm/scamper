@@ -21,15 +21,15 @@ import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Ok
 
 class RequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
-  "RequestHandler" should "be composed with another" in {
+  it should "compose request handlers" in {
     val req = Get("/")
     val filter: RequestHandler = _.putHeaders(Header("foo", "bar"))
     val processor: RequestHandler = req => Ok().putHeaders(req.getHeader("foo").getOrElse(Header("foo", "baz")))
 
-    assert { filter.compose(processor)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("baz") }
-    assert { filter.orElse(processor)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("bar") }
+    assert { filter.after(processor)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("baz") }
+    assert { filter.before(processor)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("bar") }
 
-    assert { processor.compose(filter)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("bar") }
-    assert { processor.orElse(filter)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("baz") }
+    assert { processor.after(filter)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("bar") }
+    assert { processor.before(filter)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("baz") }
   }
 }

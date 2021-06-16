@@ -22,39 +22,36 @@ trait ResponseFilter {
   /**
    * Filters outgoing response.
    *
-   * The filter may return the original response or an alternate one.
-   *
    * @param response outgoing response
    */
   def apply(response: HttpResponse): HttpResponse
 
   /**
-   * Composes this filter and other, with other applied first.
+   * Creates composite filter by appying `this` before `other`.
    *
    * @param other other filter
    */
-  def compose(other: ResponseFilter): ResponseFilter =
-    req => apply(other(req))
+  def before(other: ResponseFilter): ResponseFilter =
+    req => other(apply(req))
 
   /**
-   * Composes this filter and other, with this applied first.
+   * Creates composite filter by applying `this` after `other`.
    *
    * @param other other filter
    */
-  def andThen(other: ResponseFilter): ResponseFilter =
-    req => other(apply(req))
+  def after(other: ResponseFilter): ResponseFilter =
+    req => apply(other(req))
 }
 
 /** Provides `ResponseFilter` utilities. */
 object ResponseFilter {
   /**
-   * Composes chain of response filters, with response of preceding filter
-   * passed to its successor.
+   * Composes response filters, with filters applied in order.
    *
    * @param filters response filters
    *
-   * @note If `filters` is empty, a response filter is created that returns
-   *   the response it receives.
+   * @note If `filters` is empty, a filter is created to return supplied
+   * response.
    */
   def chain(filters: Seq[ResponseFilter]): ResponseFilter = {
     @annotation.tailrec
@@ -67,8 +64,7 @@ object ResponseFilter {
   }
 
   /**
-   * Composes chain of response filters, with response of preceding filter
-   * passed to its successor.
+   * Composes response filters, with filters applied in order.
    *
    * @param one response filter
    * @param more additional response filters

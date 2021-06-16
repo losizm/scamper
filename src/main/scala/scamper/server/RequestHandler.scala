@@ -22,37 +22,36 @@ trait RequestHandler {
   /**
    * Handles incoming request.
    *
-   * If handler satisfies the request, then it returns a response. Otherwise, it
-   * returns a request, which can be either the original request or an alternate
-   * one.
+   * If handler satisfies the request, then it returns a response; otherwise, it
+   * returns a request.
    */
   def apply(request: HttpRequest): HttpMessage
 
   /**
-   * Composes this handler with other, using this as a fallback.
+   * Creates composite handler by applying `this` before `other`.
    *
-   * If `other` returns a request, then the request is passed to `this`.
-   * Otherwise, if `other` returns a response, then `this` is not invoked.
+   * If `this` returns a request, then the request is passed to `other`;
+   * otherwise, if `this` returns a response, then `other` is not invoked.
    *
-   * @param other initial handler
+   * @param other fallback handler
    */
-  def compose(other: RequestHandler): RequestHandler =
-    other(_) match {
-      case req: HttpRequest  => apply(req)
+  def before(other: RequestHandler): RequestHandler =
+    apply(_) match {
+      case req: HttpRequest  => other(req)
       case res: HttpResponse => res
     }
 
   /**
-   * Composes this handler with other, using other as a fallback.
+   * Creates composite handler by applying `this` after `other`.
    *
-   * If `this` returns a request, then the request is passed to `other`.
-   * Otherwise, if `this` returns a response, then `other` is not invoked.
+   * If `other` returns a request, then the request is passed to `this`;
+   * otherwise, if `other` returns a response, then `this` is not invoked.
    *
-   * @param other fallback handler
+   * @param other initial handler
    */
-  def orElse(other: RequestHandler): RequestHandler =
-    apply(_) match {
-      case req: HttpRequest  => other(req)
+  def after(other: RequestHandler): RequestHandler =
+    other(_) match {
+      case req: HttpRequest  => apply(req)
       case res: HttpResponse => res
     }
 }
@@ -60,13 +59,12 @@ trait RequestHandler {
 /** Provides `RequestHandler` utilities. */
 object RequestHandler {
   /**
-   * Composes head handler with tail handlers, using tail handlers as
-   * fallbacks.
+   * Composes request handlers, with tail handlers as fallbacks.
    *
    * @param handlers request handlers
    *
-   * @note If `handlers` is empty, a request handler is created that returns
-   *   the request it receives.
+   * @note If `handlers` is empty, a handler is created to return supplied
+   * request.
    */
   def coalesce(handlers: Seq[RequestHandler]): RequestHandler = {
     @annotation.tailrec
@@ -83,8 +81,7 @@ object RequestHandler {
   }
 
   /**
-   * Composes `one` handler with `more` handlers, using `more` handlers as
-   * fallbacks.
+   * Composes `one` handler with `more` handlers, using `more` as fallbacks.
    *
    * @param one request handler
    * @param more additional request handlers
