@@ -17,7 +17,7 @@ package scamper.cookies
 
 import java.time.Instant
 
-import scamper.DateValue
+import scamper.{ DateValue, ListParser }
 
 import CookieGrammar._
 
@@ -45,6 +45,11 @@ object PlainCookie {
       case Array(name, value) => apply(name.trim, value.trim)
       case _ => throw new IllegalArgumentException(s"Malformed cookie: $cookie")
     }
+
+  /** Parses formatted list of cookies. */
+  def parseAll(cookies: String): Seq[PlainCookie] =
+    ListParser(cookies, semicolon = true)
+      .map(PlainCookie.parse)
 
   /** Creates cookie with supplied name and value. */
   def apply(name: String, value: String): PlainCookie =

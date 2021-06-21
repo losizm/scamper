@@ -88,8 +88,7 @@ package object cookies {
     /** Gets cookies. */
     def cookies: Seq[PlainCookie] =
       request.getHeaderValue("Cookie")
-        .map(ListParser(_, semicolon = true))
-        .map(_.map(PlainCookie.parse).toSeq)
+        .map(PlainCookie.parseAll)
         .getOrElse(Nil)
 
     /**
