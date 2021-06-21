@@ -178,15 +178,19 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
     var continue = true
   }
 
-  def parse(message: HttpMessage): Multipart =
-    message.contentType match {
-      case MediaType("multipart", "form-data", params) =>
-        params.get("boundary")
-          .map { boundary => getMultipart(decode(message), boundary) }
+  def parse(message: HttpMessage): Multipart = {
+    val mediaType = message.contentType
+
+    (mediaType.isMultipart && mediaType.subtype == "form-data") match {
+      case true =>
+        mediaType.params.get("boundary")
+          .map(boundary => getMultipart(decode(message), boundary))
           .getOrElse(throw new HttpException("Missing boundary in Content-Type header"))
 
-      case value => throw new HttpException(s"Content-Type is not multipart/form-data: $value")
+      case false =>
+        throw new HttpException(s"Expected multipart/form-data for Content-Type: $mediaType")
     }
+  }
 
   private def getMultipart(in: InputStream, boundary: String): Multipart = {
     val buffer = new Array[Byte](bufferSize)
@@ -200,11 +204,11 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
           val headers = HeaderStream.getHeaders(in, buffer)
 
           val disposition = headers.collectFirst {
-            case Header(name, value) if name.equalsIgnoreCase("Content-Disposition") => DispositionType.parse(value)
+            case header if header.name.equalsIgnoreCase("Content-Disposition") => DispositionType.parse(header.value)
           }.getOrElse(throw HeaderNotFound("Content-Disposition"))
 
           val contentType = headers.collectFirst {
-            case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType(value)
+            case header if header.name.equalsIgnoreCase("Content-Type") => MediaType(header.value)
           }.getOrElse(Auxiliary.textPlain)
 
           if (contentType.isText && disposition.params.get("filename").isEmpty) {

@@ -94,18 +94,6 @@ class MediaRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(!range.matches(MediaType("text/html; charset=utf-8")))
   }
 
-  it should "be destructured" in {
-    val range = MediaRange("text/html; charset=iso-8859-1")
-
-    range match {
-      case MediaRange(mainType, subtype, weight, params) =>
-        assert(mainType == range.mainType)
-        assert(subtype == range.subtype)
-        assert(weight == range.weight)
-        assert(params == range.params)
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](MediaRange("(text)/html"))
     assertThrows[IllegalArgumentException](MediaRange("text/(html)"))

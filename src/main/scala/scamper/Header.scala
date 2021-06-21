@@ -54,10 +54,6 @@ object Header {
       case Array(name, value) => apply(name.trim, value.trim)
       case _ => throw new IllegalArgumentException(s"Malformed header: $header")
     }
-
-  /** Destructures header. */
-  def unapply(header: Header): Option[(String, String)] =
-    Some(header.name -> header.value)
 }
 
 private case class HeaderImpl(name: String, value: String) extends Header {

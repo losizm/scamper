@@ -56,31 +56,6 @@ class ChallengeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(challenge.toString == s"Insecure foo=bar")
   }
 
-  it should "be destructured" in {
-    Challenge.parse("Basic realm=Console, charset=utf-8") match {
-      case BasicChallenge(realm, params) =>
-        assert(realm == "Console")
-        assert(params.size == 2)
-        assert(params("realm") == "Console")
-        assert(params("charset") == "utf-8")
-    }
-
-    Challenge.parse("Bearer realm=\"example\", error=invalid_token, scope=\"user profile\"") match {
-      case BearerChallenge(params) =>
-        assert(params.size == 3)
-        assert(params("realm") == "example")
-        assert(params("scope") == "user profile")
-        assert(params("error") == "invalid_token")
-    }
-
-    Challenge.parse(s"Insecure foo=bar") match {
-      case Challenge(scheme, params) =>
-        assert(scheme == "Insecure")
-        assert(params("foo") == "bar")
-        assert(params.size == 1)
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](Challenge.parse("Basic"))
     assertThrows[IllegalArgumentException](Challenge.parse("Basic realm"))

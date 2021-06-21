@@ -183,11 +183,11 @@ object TextPart {
   /** Creates text part with supplied headers and content. */
   def apply(headers: Seq[Header], content: String): TextPart = {
     val contentDisposition = headers.collectFirst {
-      case Header(name, value) if name.equalsIgnoreCase("Content-Disposition") => DispositionType.parse(value)
+      case header if header.name.equalsIgnoreCase("Content-Disposition") => DispositionType.parse(header.value)
     }.getOrElse(throw HeaderNotFound("Content-Disposition"))
 
     val contentType = headers.collectFirst {
-      case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType(value)
+      case header if header.name.equalsIgnoreCase("Content-Type") => MediaType(header.value)
     }.getOrElse(Auxiliary.textPlain)
 
     apply(contentDisposition, contentType, notNull(content))
@@ -226,11 +226,11 @@ object FilePart {
   /** Creates file part from supplied headers and content. */
   def apply(headers: Seq[Header], content: File): FilePart = {
     val contentDisposition = headers.collectFirst {
-      case Header(name, value) if name.equalsIgnoreCase("Content-Disposition") => DispositionType.parse(value)
+      case header if header.name.equalsIgnoreCase("Content-Disposition") => DispositionType.parse(header.value)
     }.getOrElse(throw HeaderNotFound("Content-Disposition"))
 
     val contentType = headers.collectFirst {
-      case Header(name, value) if name.equalsIgnoreCase("Content-Type") => MediaType(value)
+      case header if header.name.equalsIgnoreCase("Content-Type") => MediaType(header.value)
     }.getOrElse(getType(content))
 
     apply(contentDisposition, contentType, content)

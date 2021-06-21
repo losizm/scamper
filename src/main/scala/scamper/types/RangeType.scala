@@ -74,10 +74,6 @@ object ByteRange {
   def apply(one: ByteRangeSpec, more: ByteRangeSpec*): ByteRange =
     ByteRangeImpl(one +: more)
 
-  /** Destructures byte range. */
-  def unapply(range: ByteRange): Option[(String, Seq[ByteRangeSpec])] =
-    Some((range.unit, range.set))
-
   private def parseSet(set: String): Seq[ByteRangeSpec] =
     ListParser(set).map {
       case slice(first, null) => Slice(first.toLong, None)

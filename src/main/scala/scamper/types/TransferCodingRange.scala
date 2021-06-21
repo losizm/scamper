@@ -78,10 +78,6 @@ object TransferCodingRange {
   /** Creates range with supplied values. */
   def apply(name: String, weight: Float = 1.0f, params: Map[String, String] = Map.empty): TransferCodingRange =
     TransferCodingRangeImpl(Name(name), QValue(weight), Params(params))
-
-  /** Destructures range. */
-  def unapply(range: TransferCodingRange): Option[(String, Float, Map[String, String])] =
-    Some((range.name, range.weight, range.params))
 }
 
 private case class TransferCodingRangeImpl(name: String, weight: Float, params: Map[String, String]) extends TransferCodingRange {

@@ -82,9 +82,6 @@ object RequestMethod {
         throw new IllegalArgumentException(s"Invalid request method name: $name")
       }
     }
-
-  /** Destructures request method. */
-  def unapply(method: RequestMethod): Option[String] = Some(method.name)
 }
 
 private case class RequestMethodImpl(name: String) extends RequestMethod {

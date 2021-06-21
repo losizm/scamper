@@ -61,10 +61,6 @@ object WarningType {
   /** Creates warning with supplied values. */
   def apply(code: Int, agent: String, text: String, date: Option[Instant] = None): WarningType =
     WarningTypeImpl(code, agent, text, date)
-
-  /** Destructures warning. */
-  def unapply(warning: WarningType): Option[(Int, String, String, Option[Instant])] =
-    Some((warning.code, warning.agent, warning.text, warning.date))
 }
 
 private case class WarningTypeImpl(code: Int, agent: String, text: String, date: Option[Instant]) extends WarningType

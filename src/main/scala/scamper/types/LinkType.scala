@@ -57,10 +57,6 @@ object LinkType {
   /** Creates link with supplied values. */
   def apply(ref: Uri, params: Map[String, Option[String]]): LinkType =
     LinkTypeImpl(ref, params)
-
-  /** Destructures link. */
-  def unapply(link: LinkType): Option[(Uri, Map[String, Option[String]])] =
-    Some((link.ref, link.params))
 }
 
 private case class LinkTypeImpl(ref: Uri, params: Map[String, Option[String]]) extends LinkType

@@ -54,10 +54,6 @@ object LanguageRange {
   /** Creates range with supplied language tag and weight. */
   def apply(tag: String, weight: Float): LanguageRange =
     LanguageRangeImpl(tag, QValue(weight))
-
-  /** Destructures range. */
-  def unapply(range: LanguageRange): Option[(String, Float)] =
-    Some((range.tag, range.weight))
 }
 
 private case class LanguageRangeImpl(tag: String, weight: Float) extends LanguageRange {

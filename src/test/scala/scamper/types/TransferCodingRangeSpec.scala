@@ -62,17 +62,6 @@ class TransferCodingRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(!TransferCodingRange.parse("gzip; y=1").matches(TransferCoding.parse("gzip")))
   }
 
-  it should "be destructured" in {
-    val range = TransferCodingRange.parse("""Deflate; a=1; b=two; c="x y z" """)
-
-    range match {
-      case TransferCodingRange(name, weight, params) =>
-        assert(name == range.name)
-        assert(weight == range.weight)
-        assert(params == range.params)
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](TransferCodingRange.parse("chunked; q"))
     assertThrows[IllegalArgumentException](TransferCodingRange.parse("chunked; q="))

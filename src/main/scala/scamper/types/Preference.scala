@@ -144,10 +144,6 @@ object Preference {
       case name => PreferenceImpl(Name(name), value.filterNot(_.isEmpty).map(Value), Params(params))
     }
 
-  /** Destructures preference. */
-  def unapply(preference: Preference): Option[(String, Option[String], Map[String, Option[String]])] =
-    Some((preference.name, preference.value, preference.params))
-
   private def Name(value: String): String =
     Token(value) getOrElse {
       throw new IllegalArgumentException(s"Invalid name: $value")

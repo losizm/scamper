@@ -45,16 +45,6 @@ class HeaderSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(header.value == "user=guest,\r\n\tgroup=readonly")
   }
 
-  it should "be destructured" in {
-    val header = Header("Content-Type: text/plain")
-
-    header match {
-      case Header(name, value) =>
-        assert(name == "Content-Type")
-        assert(value == "text/plain")
-    }
-  }
-
   it should "not be created from malformed value" in {
     assertThrows[IllegalArgumentException](Header("text/plain"))
     assertThrows[IllegalArgumentException](Header("Cookie", "user=guest,\r\ngroup=readonly"))

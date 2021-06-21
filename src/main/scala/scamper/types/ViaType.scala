@@ -56,10 +56,6 @@ object ViaType {
   /** Creates via type with supplied values. */
   def apply(protocol: Protocol, by: String, comment: Option[String] = None): ViaType =
     ViaTypeImpl(protocol, by, comment.map(_.trim))
-
-  /** Destructures via type. */
-  def unapply(via: ViaType): Option[(Protocol, String, Option[String])] =
-    Some((via.protocol, via.by, via.comment))
 }
 
 private case class ViaTypeImpl(protocol: Protocol, by: String, comment: Option[String]) extends ViaType

@@ -240,10 +240,6 @@ object ResponseStatus {
       require(statusCode >= 100 && statusCode <= 599, s"status code out of bounds: $statusCode")
       ResponseStatusImpl(statusCode, reasonPhrase)
     }
-
-  /** Destructures response status. */
-  def unapply(status: ResponseStatus): Option[(Int, String)] =
-    Some((status.statusCode, status.reasonPhrase))
 }
 
 private case class ResponseStatusImpl(statusCode: Int, reasonPhrase: String) extends ResponseStatus {

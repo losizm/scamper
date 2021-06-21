@@ -36,20 +36,6 @@ class ProtocolSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(protocol == Protocol("IRC", None))
   }
 
-  it should "be destructured" in {
-    Protocol.parse("HTTP/2.0") match {
-      case Protocol(name, Some(version)) => assert(name == "HTTP" && version == "2.0")
-    }
-
-    Protocol.parse("SHTTP/1.3") match {
-      case Protocol(name, Some(version)) => assert(name == "SHTTP" && version == "1.3")
-    }
-
-    Protocol.parse("IRC") match {
-      case Protocol(name, None) => assert(name == "IRC")
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](Protocol.parse("HTTP / 2.0"))
     assertThrows[IllegalArgumentException](Protocol.parse("HTTP/"))

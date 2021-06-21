@@ -45,16 +45,6 @@ class TransferCodingSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(coding.toString == "gzip; q=0.1; level=\"1 2 3\"" || coding.toString == "gzip; level=\"1 2 3\"; q=0.1")
   }
 
-  it should "be destructured" in {
-    val coding = TransferCoding.parse("""Deflate; a=1; b=two; c="x y z" """)
-
-    coding match {
-      case TransferCoding(name, params) =>
-        assert(name == coding.name)
-        assert(params == coding.params)
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](TransferCoding.parse("chunked; q"))
     assertThrows[IllegalArgumentException](TransferCoding.parse("chunked; q="))

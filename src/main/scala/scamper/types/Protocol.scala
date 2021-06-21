@@ -49,10 +49,6 @@ object Protocol {
   def apply(name: String, version: Option[String]): Protocol =
     ProtocolImpl(CheckToken(name), version.map(CheckToken))
 
-  /** Destructures protocol. */
-  def unapply(protocol: Protocol): Option[(String, Option[String])] =
-    Some((protocol.name, protocol.version))
-
   private def CheckToken(token: String): String =
     Token(token).getOrElse {
       throw new IllegalArgumentException(s"Invalid token: $token")

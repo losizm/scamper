@@ -53,10 +53,6 @@ object HttpVersion {
       case (1, 0) => `HTTP/1.0`
       case (_, _) => HttpVersionImpl(major, minor)
     }
-
-  /** Destructures HTTP version. */
-  def unapply(version: HttpVersion): Option[(Int, Int)] =
-    Some((version.major, version.minor))
 }
 
 private case class HttpVersionImpl(major: Int, minor: Int) extends HttpVersion {

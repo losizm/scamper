@@ -35,10 +35,7 @@ sealed trait Cookie {
  *
  * @see [[SetCookie]]
  */
-trait PlainCookie extends Cookie {
-  /** Returns formatted cookie. */
-  override lazy val toString: String = s"$name=$value"
-}
+trait PlainCookie extends Cookie
 
 /** Provides factory for `PlainCookie`. */
 object PlainCookie {
@@ -52,13 +49,11 @@ object PlainCookie {
   /** Creates cookie with supplied name and value. */
   def apply(name: String, value: String): PlainCookie =
     PlainCookieImpl(Name(name), Value(value))
-
-  /** Destructures cookie. */
-  def unapply(cookie: PlainCookie): Option[(String, String)] =
-    Some((cookie.name, cookie.value))
 }
 
-private case class PlainCookieImpl(name: String, value: String) extends PlainCookie
+private case class PlainCookieImpl(name: String, value: String) extends PlainCookie {
+  override lazy val toString: String = s"$name=$value"
+}
 
 /**
  * Defines HTTP response cookie.
@@ -89,23 +84,6 @@ trait SetCookie extends Cookie {
 
   /** Converts to `PlainCookie`. */
   def toPlainCookie: PlainCookie = PlainCookie(name, value)
-
-  /** Returns formatted cookie. */
-  override lazy val toString: String = {
-    val cookie = new StringBuilder
-
-    cookie.append(name).append('=').append(value)
-
-    domain.foreach(cookie.append("; Domain=").append(_))
-    path.foreach(cookie.append("; Path=").append(_))
-    expires.foreach(date => cookie.append("; Expires=").append(DateValue.format(date)))
-    maxAge.foreach(cookie.append("; Max-Age=").append(_))
-
-    if (secure) cookie.append("; Secure")
-    if (httpOnly) cookie.append("; HttpOnly")
-
-    cookie.toString
-  }
 }
 
 /** Provides factory for `SetCookie`. */
@@ -127,10 +105,6 @@ object SetCookie {
   def apply(name: String, value: String, domain: Option[String] = None, path: Option[String] = None, expires: Option[Instant] = None,
       maxAge: Option[Long] = None, secure: Boolean = false, httpOnly: Boolean = false): SetCookie =
     SetCookieImpl(Name(name), Value(value), CookieAttributes(domain, path, expires, maxAge, secure, httpOnly))
-
-  /** Destructures cookie. */
-  def unapply(cookie: SetCookie): Option[(String, String, Option[String], Option[String], Option[Instant], Option[Long], Boolean, Boolean)] =
-    Some((cookie.name, cookie.value, cookie.domain, cookie.path, cookie.expires, cookie.maxAge, cookie.secure, cookie.httpOnly))
 }
 
 private case class SetCookieImpl(name: String, value: String, attrs: CookieAttributes) extends SetCookie {
@@ -140,6 +114,22 @@ private case class SetCookieImpl(name: String, value: String, attrs: CookieAttri
   def maxAge: Option[Long] = attrs.maxAge
   def secure: Boolean = attrs.secure
   def httpOnly: Boolean = attrs.httpOnly
+
+  override lazy val toString: String = {
+    val cookie = new StringBuilder
+
+    cookie.append(name).append('=').append(value)
+
+    domain.foreach(cookie.append("; Domain=").append(_))
+    path.foreach(cookie.append("; Path=").append(_))
+    expires.foreach(date => cookie.append("; Expires=").append(DateValue.format(date)))
+    maxAge.foreach(cookie.append("; Max-Age=").append(_))
+
+    if (secure) cookie.append("; Secure")
+    if (httpOnly) cookie.append("; HttpOnly")
+
+    cookie.toString
+  }
 }
 
 /** Persistent cookie in [[CookieStore]]. */

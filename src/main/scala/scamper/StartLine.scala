@@ -56,10 +56,6 @@ object RequestLine {
   def apply(method: RequestMethod, target: Uri, version: HttpVersion = HttpVersion(1, 1)): RequestLine =
     RequestLineImpl(notNull(method), adjustTarget(notNull(target), method.name), notNull(version))
 
-  /** Destructures request line. */
-  def unapply(line: RequestLine): Option[(RequestMethod, Uri, HttpVersion)] =
-    Some((line.method, line.target, line.version))
-
   private def adjustTarget(target: Uri, method: String): Uri =
     target.isAbsolute match {
       case true  => target
@@ -117,10 +113,6 @@ object StatusLine {
   /** Creates status line with supplied parts. */
   def apply(status: ResponseStatus, version: HttpVersion = HttpVersion(1, 1)): StatusLine =
     StatusLineImpl(notNull(status), notNull(version))
-
-  /** Destructures status line. */
-  def unapply(line: StatusLine): Option[(ResponseStatus, HttpVersion)] =
-    Some((line.status, line.version))
 }
 
 private case class StatusLineImpl(status: ResponseStatus, version: HttpVersion) extends StatusLine {

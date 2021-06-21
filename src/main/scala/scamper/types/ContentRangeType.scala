@@ -67,10 +67,6 @@ object ByteContentRange {
   def apply(resp: ByteRangeResp): ByteContentRange =
     ByteContentRangeImpl(resp)
 
-  /** Destructures range. */
-  def unapply(range: ByteContentRange): Option[(String, ByteRangeResp)] =
-    Some((range.unit, range.resp))
-
   private def parseResp(resp: String): ByteRangeResp =
     resp match {
       case satisfied(first, last, "*")    => Satisfied(first.toLong, last.toLong, None)

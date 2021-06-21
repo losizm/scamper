@@ -29,10 +29,6 @@ trait WebSocketExtension {
 
   /** Gets extension parameters. */
   def params: Map[String, Option[String]]
-
-  /** Returns formatted extension. */
-  override lazy val toString: String =
-    s"${identifier}${HeaderParams.format(params)}"
 }
 
 /** Provides factory for `WebSocketExtension`. */
@@ -58,10 +54,6 @@ object WebSocketExtension {
   def parseAll(extensions: String): Seq[WebSocketExtension] =
     ListParser(extensions).map(parse)
 
-  /** Destructures WebSocket extension. */
-  def unapply(extension: WebSocketExtension): Option[(String, Map[String, Option[String]])] =
-    Some((extension.identifier, extension.params))
-
   private def checkIdentifier(identifier: String): String =
     Token(identifier)
       .getOrElse(throw new IllegalArgumentException(s"Invalid extension identifier: $identifier"))
@@ -75,4 +67,7 @@ object WebSocketExtension {
   }
 }
 
-private case class WebSocketExtensionImpl(identifier: String, params: Map[String, Option[String]]) extends WebSocketExtension
+private case class WebSocketExtensionImpl(identifier: String, params: Map[String, Option[String]]) extends WebSocketExtension {
+  override lazy val toString: String =
+    s"${identifier}${HeaderParams.format(params)}"
+}

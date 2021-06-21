@@ -28,14 +28,6 @@ class KeepAliveParametersSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert { params.toString == "timeout=60, max=100" }
   }
 
-  it should "destructure KeepAliveParameters" in {
-    KeepAliveParameters(60, 100) match {
-      case KeepAliveParameters(timeout, max) =>
-        assert { timeout == 60 }
-        assert { max == 100 }
-    }
-  }
-
   it should "should not parse invalid parameters" in {
     assertThrows[IllegalArgumentException](KeepAliveParameters.parse("timeout=5; max=10"))
     assertThrows[IllegalArgumentException](KeepAliveParameters.parse("timeout=5"))

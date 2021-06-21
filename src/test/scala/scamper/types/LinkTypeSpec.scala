@@ -41,18 +41,6 @@ class LinkTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     }
   }
 
-  it should "be destructured" in {
-    LinkType.parse("</assets/icon.png>") match {
-      case LinkType(ref, params) => assert(ref.toString == "/assets/icon.png" && params.isEmpty)
-    }
-
-    LinkType.parse("</assets/large-icon.png>;size=64x64") match {
-      case LinkType(ref, params) =>
-        assert(ref.toString == "/assets/large-icon.png")
-        assert(params("size") == Some("64x64"))
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](LinkType.parse("/assets/icon.png"))
     assertThrows[IllegalArgumentException](LinkType.parse("/assets/icon.png>; size=64x64"))

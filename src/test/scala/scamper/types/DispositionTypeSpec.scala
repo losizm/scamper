@@ -50,16 +50,6 @@ class DispositionTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(disposition.toString == "attachment; filename*=example.txt")
   }
 
-  it should "be destructured" in {
-    val disposition = DispositionType.parse("""extended-type; a=1; b="t w o"; c=trois""")
-
-    disposition match {
-      case DispositionType(name, params) =>
-        assert(name == disposition.name)
-        assert(params == disposition.params)
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](DispositionType.parse("inline; filename"))
     assertThrows[IllegalArgumentException](DispositionType.parse("inline; filename="))

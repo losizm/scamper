@@ -51,10 +51,6 @@ object ContentCoding {
   /** Creates content coding with supplied name. */
   def apply(name: String): ContentCoding =
     ContentCodingImpl(Name(name))
-
-  /** Destructures content coding. */
-  def unapply(coding: ContentCoding): Option[String] =
-    Some(coding.name)
 }
 
 private case class ContentCodingImpl(name: String) extends ContentCoding

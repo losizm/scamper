@@ -54,10 +54,6 @@ object ProductType {
   def apply(name: String, version: Option[String]): ProductType =
     ProductTypeImpl(CheckToken(name), version.map(CheckToken))
 
-  /** Destructures product. */
-  def unapply(product: ProductType): Option[(String, Option[String])] =
-    Some((product.name, product.version))
-
   private def CheckToken(token: String): String =
     Token(token).getOrElse {
       throw new IllegalArgumentException(s"Invalid token: $token")

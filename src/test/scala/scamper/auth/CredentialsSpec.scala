@@ -50,25 +50,6 @@ class CredentialsSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(credentials.toString == "Insecure aXNzYTpyYWUK")
   }
 
-  it should "be destructured" in {
-    Credentials.parse(s"Basic $token") match {
-      case BasicCredentials(user, password) =>
-        assert(user == "guest")
-        assert(password == "letmein")
-    }
-
-    Credentials.parse(s"Bearer $token") match {
-      case BearerCredentials(token) =>
-        assert(token.contains(token))
-    }
-
-    Credentials.parse("Insecure aXNzYTpyYWUK") match {
-      case Credentials(scheme, token) =>
-        assert(scheme == "Insecure")
-        assert(token == "aXNzYTpyYWUK")
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](Credentials.parse("Basic"))
     assertThrows[IllegalArgumentException](Credentials.parse("Basic realm"))

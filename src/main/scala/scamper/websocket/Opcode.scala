@@ -80,10 +80,6 @@ object Opcode {
       case 10 => Registry.Pong
       case _  => throw new NoSuchElementException()
     }
-
-  /** Destructures supplied opcode to its `value`. */
-  def unapply(code: Opcode): Option[Int] =
-    Some(code.value)
 }
 
 private case class OpcodeImpl(value: Int, meaning: String) extends Opcode {

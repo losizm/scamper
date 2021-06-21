@@ -71,32 +71,6 @@ class PreferenceSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(Preference("respond-async", Map("stop" -> None)) == `respond-async`)
   }
 
-  it should "be destructured" in {
-    Preference.parse("Pref=value; param1=\"value1\"; param2=value2; param3=\"value three\"") match {
-      case Preference(name, value, params) =>
-        assert(name == "pref")
-        assert(value.contains("value"))
-        assert(params.size == 3)
-        assert(params("param1").contains("value1"))
-        assert(params("param2").contains("value2"))
-        assert(params("param3").contains("value three"))
-    }
-
-    Preference.parse("Pref=value") match {
-      case Preference(name, value, params) =>
-        assert(name == "pref")
-        assert(value.contains("value"))
-        assert(params.isEmpty)
-    }
-
-    Preference.parse("PREF") match {
-      case Preference(name, value, params) =>
-        assert(name == "pref")
-        assert(value.isEmpty)
-        assert(params.isEmpty)
-    }
-  }
-
   it should "not be created with invalid value" in {
     assertThrows[IllegalArgumentException](Preference.parse("pref value"))
     assertThrows[IllegalArgumentException](Preference.parse("pref=value param1"))

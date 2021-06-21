@@ -26,12 +26,6 @@ class CookiesSpec extends org.scalatest.flatspec.AnyFlatSpec {
     val cookie = PlainCookie.parse("SID=31d4d96e407aad42")
     assert(cookie.name == "SID")
     assert(cookie.value == "31d4d96e407aad42")
-
-    cookie match {
-      case PlainCookie(name, value) =>
-        assert(name == cookie.name)
-        assert(value == cookie.value)
-    }
   }
 
   it should "not be created from malformed value" in {
@@ -46,18 +40,6 @@ class CookiesSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(cookie.path.contains("/"))
     assert(cookie.expires.contains(scamper.DateValue.parse("Wed, 09 Jun 2021 10:18:14 GMT")))
     assert(cookie.secure)
-
-    cookie match {
-      case SetCookie(name, value, domain, path, expires, maxAge, secure, httpOnly) =>
-        assert(name == cookie.name)
-        assert(value == cookie.value)
-        assert(domain == cookie.domain)
-        assert(path == cookie.path)
-        assert(expires == cookie.expires)
-        assert(maxAge == cookie.maxAge)
-        assert(secure == cookie.secure)
-        assert(httpOnly == cookie.httpOnly)
-    }
   }
 
   it should "not be created from malformed value" in {

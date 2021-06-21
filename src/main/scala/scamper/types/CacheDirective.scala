@@ -78,10 +78,6 @@ object CacheDirective {
     } getOrElse {
       throw new IllegalArgumentException(s"Invalid cache directive name: $name")
     }
-
-  /** Destructures directive. */
-  def unapply(directive: CacheDirective): Option[(String, Option[String])] =
-    Some(directive.name -> directive.value)
 }
 
 private case class CacheDirectiveImpl(name: String, value: Option[String]) extends CacheDirective

@@ -36,20 +36,6 @@ class ProductTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(product == ProductType("libwww", None))
   }
 
-  it should "be destructured" in {
-    ProductType.parse("CERN-LineMode/2.15") match {
-      case ProductType(name, Some(version)) => assert(name == "CERN-LineMode" && version == "2.15")
-    }
-
-    ProductType.parse("libwww/2.17b3") match {
-      case ProductType(name, Some(version)) => assert(name == "libwww" && version == "2.17b3")
-    }
-
-    ProductType.parse("libwww") match {
-      case ProductType(name, None) => assert(name == "libwww")
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](ProductType.parse("CERN-LineMode / 2.15"))
     assertThrows[IllegalArgumentException](ProductType.parse("CERN-LineMode / 2.15,2"))

@@ -30,16 +30,6 @@ class EntityTagSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(tag == EntityTag("xyz", true))
   }
 
-  it should "be destructured" in {
-    EntityTag.parse("\"abc\"") match {
-      case EntityTag(opaque, weak) => assert(opaque == "\"abc\"" && !weak)
-    }
-
-    EntityTag.parse("W/\"xyz\"") match {
-      case EntityTag(opaque, weak) => assert(opaque == "\"xyz\"" && weak)
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](EntityTag.parse("w/\"abc\""))
     assertThrows[IllegalArgumentException](EntityTag.parse("abc"))

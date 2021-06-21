@@ -47,16 +47,6 @@ class ContentCodingRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(!ContentCodingRange.parse("deflate").matches(ContentCoding("identity")))
   }
 
-  it should "be destructured" in {
-    val range = ContentCodingRange.parse("Deflate; q=0.7")
-
-    range match {
-      case ContentCodingRange(name, weight) =>
-        assert(name == range.name)
-        assert(weight == range.weight)
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](ContentCodingRange.parse("identity; q"))
     assertThrows[IllegalArgumentException](ContentCodingRange.parse("identity; q="))

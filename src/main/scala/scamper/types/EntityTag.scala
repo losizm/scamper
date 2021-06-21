@@ -57,10 +57,6 @@ object EntityTag {
     if (opaque.matches("\"[^\"]*\"")) EntityTagImpl(opaque, weak)
     else if (opaque.matches("[^\"]*")) EntityTagImpl("\"" + opaque + "\"", weak)
     else throw new IllegalArgumentException(s"Invalid opaque tag: $opaque")
-
-  /** Destructures tag. */
-  def unapply(tag: EntityTag): Option[(String, Boolean)] =
-    Some((tag.opaque, tag.weak))
 }
 
 private case class EntityTagImpl(opaque: String, weak: Boolean) extends EntityTag

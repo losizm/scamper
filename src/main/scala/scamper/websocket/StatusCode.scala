@@ -205,10 +205,6 @@ object StatusCode {
       case 2 => apply(BigInt(1, data).toInt)
       case _ => throw new IllegalArgumentException()
     }
-
-  /** Destructures supplied status code to its value. */
-  def unapply(code: StatusCode): Option[Int] =
-    Some(code.value)
 }
 
 private case class StatusCodeImpl(value: Int, meaning: String, isReserved: Boolean) extends StatusCode {

@@ -58,10 +58,6 @@ object CharsetRange {
     Token(charset).map(charset => CharsetRangeImpl(charset, QValue(weight))).getOrElse {
       throw new IllegalArgumentException(s"Invalid charset: $charset")
     }
-
-  /** Destructures range. */
-  def unapply(range: CharsetRange): Option[(String, Float)] =
-    Some((range.charset, range.weight))
 }
 
 private case class CharsetRangeImpl(charset: String, weight: Float) extends CharsetRange {

@@ -54,9 +54,6 @@ class WarningTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(WarningType.parseAll(s"$warn1, $warn2") == Seq(warn1, warn2))
   }
 
-  it should "be destructured" in {
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](WarningType.parse("110 localhost:8000"))
     assertThrows[IllegalArgumentException](WarningType.parse("110 localhost:8000 Response is Stale"))

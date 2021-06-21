@@ -64,10 +64,6 @@ object PragmaDirective {
     } getOrElse {
       throw new IllegalArgumentException(s"Invalid pragma directive name: $name")
     }
-
-  /** Destructures directive. */
-  def unapply(directive: PragmaDirective): Option[(String, Option[String])] =
-    Some(directive.name -> directive.value)
 }
 
 private case class PragmaDirectiveImpl(name: String, value: Option[String]) extends PragmaDirective

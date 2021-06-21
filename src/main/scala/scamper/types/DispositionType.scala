@@ -57,10 +57,6 @@ object DispositionType {
   /** Creates disposition with supplied name and paramaters. */
   def apply(name: String, params: (String, String)*): DispositionType =
     apply(name, params.toMap)
-
-  /** Destructures disposition. */
-  def unapply(disposition: DispositionType): Option[(String, Map[String, String])] =
-    Some((disposition.name, disposition.params))
 }
 
 private case class DispositionTypeImpl(name: String, params: Map[String, String]) extends DispositionType

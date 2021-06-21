@@ -38,19 +38,6 @@ class PragmaDirectiveSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(PragmaDirective.parseAll("no-cache, community = \"home\"") == Seq(`no-cache`, PragmaDirective("Community", Some("home"))))
   }
 
-  it should "be destructured" in {
-    `no-cache` match {
-      case PragmaDirective(name, None) => assert(name == "no-cache")
-      case _                           => throw new Exception("no-cache not destructed")
-    }
-
-    `no-cache` match { case `no-cache` => }
-
-    PragmaDirective("max-age", Some("60")) match {
-      case PragmaDirective(name, Some(value)) => assert(name == "max-age" && value == "60")
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](PragmaDirective.parse("no/cache"))
     assertThrows[IllegalArgumentException](PragmaDirective.parse("no-cache ="))

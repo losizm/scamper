@@ -59,10 +59,6 @@ object BasicChallenge {
   /** Creates challenge with realm and supplied parameters. */
   def apply(realm: String, params: (String, String)*): BasicChallenge =
     BasicChallengeImpl(realm, Params(("realm" -> realm) +: params))
-
-  /** Destructures challenge. */
-  def unapply(challenge: BasicChallenge): Option[(String, Map[String, String])] =
-    Some(challenge.realm -> challenge.params)
 }
 
 private case class BasicChallengeImpl(realm: String, params: Map[String, String]) extends BasicChallenge
@@ -105,10 +101,6 @@ object BearerChallenge {
   /** Creates challenge with supplied parameters. */
   def apply(params: (String, String)*): BearerChallenge =
     BearerChallengeImpl(Params(params))
-
-  /** Destructures challenge. */
-  def unapply(challenge: BearerChallenge): Option[Map[String, String]] =
-    Some(challenge.params)
 }
 
 private case class BearerChallengeImpl(params: Map[String, String]) extends BearerChallenge {
@@ -161,10 +153,6 @@ object Challenge {
         require(token.isEmpty, s"Invalid challenge: token not allowed")
         DefaultChallenge(scheme, params)
     }
-
-  /** Destructures challenge. */
-  def unapply(challenge: Challenge): Option[(String, Map[String, String])] =
-    Some((challenge.scheme, challenge.params))
 }
 
 private case class DefaultChallenge(scheme: String, params: Map[String, String]) extends Challenge
@@ -210,10 +198,6 @@ object BasicCredentials {
   /** Creates credentials with supplied user and password. */
   def apply(user: String, password: String): BasicCredentials =
     BasicCredentialsImpl(Base64.encodeToString(user + ":" + password))
-
-  /** Destructures credentials. */
-  def unapply(credentials: BasicCredentials): Option[(String, String)] =
-    Some(credentials.user -> credentials.password)
 }
 
 private case class BasicCredentialsImpl(token: String) extends BasicCredentials {
@@ -234,10 +218,6 @@ object BearerCredentials {
   /** Creates credentials with supplied token. */
   def apply(token: String): BearerCredentials =
     BearerCredentialsImpl(Token(token))
-
-  /** Destructures credentials. */
-  def unapply(credentials: BearerCredentials): Option[String] =
-    Some(credentials.token)
 }
 
 private case class BearerCredentialsImpl(token: String) extends BearerCredentials
@@ -269,10 +249,6 @@ object Credentials {
         token.map(DefaultCredentials(scheme, _))
           .getOrElse(throw new IllegalArgumentException("Token required for credentials"))
     }
-
-  /** Destructures credentials. */
-  def unapply(credentials: Credentials): Option[(String, String)] =
-    Some((credentials.scheme, credentials.token))
 }
 
 private case class DefaultCredentials(scheme: String, token: String) extends Credentials

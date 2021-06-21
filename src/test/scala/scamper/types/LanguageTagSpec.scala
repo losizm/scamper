@@ -38,16 +38,6 @@ class LanguageTagSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(tag.toRange(0.123f).weight == 0.123f)
   }
 
-  it should "be destructured" in {
-    val tag = LanguageTag.parse("en-US-1995")
-    tag match {
-      case LanguageTag(primary, Seq(other1, other2)) =>
-        assert(primary == tag.primary)
-        assert(other1 == tag.others(0))
-        assert(other2 == tag.others(1))
-    }
-  }
-
   it should "not be created with invalid name" in {
     assertThrows[IllegalArgumentException](LanguageTag.parse("en US"))
     assertThrows[IllegalArgumentException](LanguageTag.parse("1995-en-US"))

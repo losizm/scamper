@@ -62,34 +62,6 @@ class CacheDirectiveSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(CacheDirective.parseAll("no-store, max-age=120") == Seq(`no-store`, `max-age`(120)))
   }
 
-  it should "be destructured" in {
-    val sMaxage = `s-maxage`(60)
-
-    sMaxage match {
-      case CacheDirective(name, Some(value)) =>
-        assert(name == "s-maxage")
-        assert(value == "60")
-
-      case _ => throw new Exception("s-maxage not destructured")
-    }
-
-    sMaxage match {
-      case `s-maxage`(secs) => assert(secs == 60)
-    }
-
-    val mustRevalidate = CacheDirective("Must-Revalidate")
-
-    mustRevalidate match {
-      case CacheDirective(name, value) =>
-        assert(name == "must-revalidate")
-        assert(!value.isDefined)
-    }
-
-    mustRevalidate match {
-      case `must-revalidate` =>
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](CacheDirective("no-cache /"))
     assertThrows[IllegalArgumentException](CacheDirective("no-cache ="))

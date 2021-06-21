@@ -91,10 +91,6 @@ object MediaRange {
   /** Creates range with supplied values. */
   def apply(mainType: String, subtype: String, weight: Float = 1.0f, params: Map[String, String] = Map.empty): MediaRange =
     MediaRangeImpl(MainType(mainType), Subtype(subtype), QValue(weight), Params(params))
-
-  /** Destructures range. */
-  def unapply(mediaRange: MediaRange): Option[(String, String, Float, Map[String, String])] =
-    Some((mediaRange.mainType, mediaRange.subtype, mediaRange.weight, mediaRange.params))
 }
 
 private case class MediaRangeImpl(mainType: String, subtype: String, weight: Float, params: Map[String, String]) extends MediaRange {

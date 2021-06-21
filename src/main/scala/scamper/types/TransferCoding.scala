@@ -60,10 +60,6 @@ object TransferCoding {
   /** Creates transfer coding with supplied values. */
   def apply(name: String, params: (String, String)*): TransferCoding =
     apply(name, params.toMap)
-
-  /** Destructures transfer coding. */
-  def unapply(coding: TransferCoding): Option[(String, Map[String, String])] =
-    Some((coding.name, coding.params))
 }
 
 private case class TransferCodingImpl(name: String, params: Map[String, String]) extends TransferCoding

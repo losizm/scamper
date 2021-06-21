@@ -52,10 +52,6 @@ object KeepAliveParameters {
       keepAlive.getOrElse("max"    , throw new IllegalArgumentException("Missing Keep-Alive parameter: max"))
     )
   }
-
-  /** Destructures parameters to `timeout` and `max`. */
-  def unapply(params: KeepAliveParameters): Option[(Int, Int)] =
-    Some(params.timeout, params.max)
 }
 
 private case class KeepAliveParametersImpl(timeout: Int, max: Int) extends KeepAliveParameters

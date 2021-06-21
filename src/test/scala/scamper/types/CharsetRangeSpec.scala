@@ -49,16 +49,6 @@ class CharsetRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(!CharsetRange.parse("utf-16be; q=0.6").matches("utf-16le"))
   }
 
-  it should "be destructured" in {
-    val range = CharsetRange.parse("iso-8859-1; q=0.7")
-
-    range match {
-      case CharsetRange(charset, weight) =>
-        assert(charset == range.charset)
-        assert(weight == range.weight)
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](CharsetRange.parse("ascii; q"))
     assertThrows[IllegalArgumentException](CharsetRange.parse("ascii; q="))

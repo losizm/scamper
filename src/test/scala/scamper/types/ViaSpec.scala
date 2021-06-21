@@ -41,28 +41,6 @@ class ViaTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(via == ViaType(Protocol.parse("IRC/6.9"), "irc.net:99", Some("   ")))
   }
 
-  it should "be destructured" in {
-    ParseVia("1.1 www.hub.com:7777 (Hub/0.1b)") match {
-      case ViaType(protocol, by, Some(comment)) =>
-        assert(protocol == Protocol.parse("HTTP/1.1"))
-        assert(by == "www.hub.com:7777")
-        assert(comment == "Hub/0.1b")
-    }
-
-    ParseVia("SHTTP/1.3 secret-gateway") match {
-      case ViaType(protocol, by, None) =>
-        assert(protocol == Protocol.parse("SHTTP/1.3"))
-        assert(by == "secret-gateway")
-    }
-
-    ParseVia("IRC/6.9 irc.net:99 ()") match {
-      case ViaType(protocol, by, Some(comment)) =>
-        assert(protocol == Protocol.parse("IRC/6.9"))
-        assert(by == "irc.net:99")
-        assert(comment.isEmpty)
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](ParseVia("HTTP/1.1"))
     assertThrows[IllegalArgumentException](ParseVia("HTTP/1.1 (Hub/0.1b)"))

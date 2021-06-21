@@ -48,17 +48,6 @@ class MediaTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(contentType.toString == "text/html; charset=utf-8; not-a-charset=\"iso 8859 1\"")
   }
 
-  it should "be destructured" in {
-    val contentType = MediaType("text/html; charset=iso-8859-1")
-
-    contentType match {
-      case MediaType(mainType, subtype, params) =>
-        assert(mainType == contentType.mainType)
-        assert(subtype == contentType.subtype)
-        assert(params == contentType.params)
-    }
-  }
-
   it should "not be created with malformed value" in {
     assertThrows[IllegalArgumentException](MediaType("(text)/html"))
     assertThrows[IllegalArgumentException](MediaType("text/(html)"))

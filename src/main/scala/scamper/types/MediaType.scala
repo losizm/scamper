@@ -117,10 +117,6 @@ object MediaType {
   /** Creates media type with supplied values. */
   def apply(mainType: String, subtype: String, params: (String, String)*): MediaType =
     apply(mainType, subtype, params.toMap)
-
-  /** Destructures media type. */
-  def unapply(mediaType: MediaType): Option[(String, String, Map[String, String])] =
-    Some((mediaType.mainType, mediaType.subtype, mediaType.params))
 }
 
 private case class MediaTypeImpl(mainType: String, subtype: String, params: Map[String, String]) extends MediaType

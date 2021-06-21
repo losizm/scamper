@@ -54,11 +54,6 @@ object LanguageTag {
   def apply(primary: String, others: Seq[String]): LanguageTag =
     LanguageTagImpl(Primary(primary), others.collect(Other))
 
-
-  /** Destructures tag. */
-  def unapply(tag: LanguageTag): Option[(String, Seq[String])] =
-    Some((tag.primary, tag.others))
-
   private def Primary: PartialFunction[String, String] = {
     case primary(value) => value
     case value => throw new IllegalArgumentException(s"Invalid primary subtag: $value")

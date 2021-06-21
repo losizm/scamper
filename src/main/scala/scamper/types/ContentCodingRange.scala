@@ -68,10 +68,6 @@ object ContentCodingRange {
   /** Creates range with supplied name and weight. */
   def apply(name: String, weight: Float): ContentCodingRange =
     ContentCodingRangeImpl(Name(name), QValue(weight))
-
-  /** Destructures range. */
-  def unapply(range: ContentCodingRange): Option[(String, Float)] =
-    Some((range.name, range.weight))
 }
 
 private case class ContentCodingRangeImpl(name: String, weight: Float) extends ContentCodingRange {

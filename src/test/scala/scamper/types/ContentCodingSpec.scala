@@ -38,11 +38,6 @@ class ContentCodingSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(coding.toString == "gzip")
   }
 
-  it should "be destructured" in {
-    val coding = ContentCoding("Deflate")
-    coding match { case ContentCoding(name) => assert(name == coding.name) }
-  }
-
   it should "not be created with invalid name" in {
     assertThrows[IllegalArgumentException](ContentCoding("x gzip"))
     assertThrows[IllegalArgumentException](ContentCoding("gzip; q=1.0"))
