@@ -18,15 +18,12 @@ package scamper
 import scala.util.Try
 
 /** Defines HTTP version. */
-trait HttpVersion {
+sealed trait HttpVersion {
   /** Gets major version. */
   def major: Int
 
   /** Gets minor version. */
   def minor: Int
-
-  /** Returns formatted HTTP version. */
-  override val toString: String = s"$major.$minor"
 }
 
 /** Provides factory for `HttpVersion`. */
@@ -62,4 +59,6 @@ object HttpVersion {
     Some((version.major, version.minor))
 }
 
-private case class HttpVersionImpl(major: Int, minor: Int) extends HttpVersion
+private case class HttpVersionImpl(major: Int, minor: Int) extends HttpVersion {
+  override val toString = s"$major.$minor"
+}

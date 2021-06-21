@@ -30,15 +30,12 @@ sealed trait StartLine {
  *
  * @see [[StatusLine]]
  */
-trait RequestLine extends StartLine {
+sealed trait RequestLine extends StartLine {
   /** Gets request method. */
   def method: RequestMethod
 
   /** Gets request target. */
   def target: Uri
-
-  /** Returns formatted request line. */
-  override lazy val toString: String = s"$method $target HTTP/$version"
 }
 
 /** Provides factory for `RequestLine`. */
@@ -85,19 +82,18 @@ object RequestLine {
     }
 }
 
-private case class RequestLineImpl(method: RequestMethod, target: Uri, version: HttpVersion) extends RequestLine
+private case class RequestLineImpl(method: RequestMethod, target: Uri, version: HttpVersion) extends RequestLine {
+  override lazy val toString: String = s"$method $target HTTP/$version"
+}
 
 /**
  * Defines HTTP status line.
  *
  * @see [[RequestLine]]
  */
-trait StatusLine extends StartLine {
+sealed trait StatusLine extends StartLine {
   /** Gets response status. */
   def status: ResponseStatus
-
-  /** Returns formatted status line. */
-  override lazy val toString: String = s"HTTP/$version ${status.statusCode} ${status.reasonPhrase}"
 }
 
 /** Provides factory for `StatusLine`. */
@@ -127,4 +123,6 @@ object StatusLine {
     Some((line.status, line.version))
 }
 
-private case class StatusLineImpl(status: ResponseStatus, version: HttpVersion) extends StatusLine
+private case class StatusLineImpl(status: ResponseStatus, version: HttpVersion) extends StatusLine {
+  override lazy val toString = s"HTTP/$version ${status.statusCode} ${status.reasonPhrase}"
+}

@@ -20,7 +20,7 @@ import java.time.Instant
 import HeaderHelper._
 
 /** Defines HTTP header. */
-trait Header {
+sealed trait Header {
   /** Gets header name. */
   def name: String
 
@@ -32,9 +32,6 @@ trait Header {
 
   /** Gets header value as `Long`. */
   def longValue: Long = value.toLong
-
-  /** Returns formatted header. */
-  override lazy val toString: String = s"$name: $value"
 }
 
 /** Provides factory for `Header`. */
@@ -63,4 +60,6 @@ object Header {
     Some(header.name -> header.value)
 }
 
-private case class HeaderImpl(name: String, value: String) extends Header
+private case class HeaderImpl(name: String, value: String) extends Header {
+  override lazy val toString = s"$name: $value"
+}

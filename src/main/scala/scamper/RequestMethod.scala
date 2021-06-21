@@ -20,16 +20,13 @@ package scamper
  *
  * @see [[RequestMethod.Registry]]
  */
-trait RequestMethod {
+sealed trait RequestMethod {
   /** Gets method name. */
   def name: String
 
   /** Creates `HttpRequest` with this request method and supplied target. */
   def apply(target: Uri): HttpRequest =
     HttpRequest(this, target, Nil, Entity.empty)
-
-  /** Returns formatted request method. */
-  override lazy val toString: String = name
 }
 
 /**
@@ -90,4 +87,6 @@ object RequestMethod {
   def unapply(method: RequestMethod): Option[String] = Some(method.name)
 }
 
-private case class RequestMethodImpl(name: String) extends RequestMethod
+private case class RequestMethodImpl(name: String) extends RequestMethod {
+  override val toString = name
+}

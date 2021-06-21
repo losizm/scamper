@@ -22,7 +22,7 @@ import scala.collection.mutable.TreeMap
  *
  * @see [[ResponseStatus.Registry]]
  */
-trait ResponseStatus {
+sealed trait ResponseStatus {
   /** Gets status code. */
   def statusCode: Int
 
@@ -52,9 +52,6 @@ trait ResponseStatus {
   /** Creates `HttpResponse` with this status and supplied body. */
   def apply(body: Entity = Entity.empty): HttpResponse =
     HttpResponse(this, Nil, body)
-
-  /** Returns formatted response status. */
-  override lazy val toString: String = s"$statusCode $reasonPhrase"
 }
 
 /**
@@ -249,4 +246,6 @@ object ResponseStatus {
     Some((status.statusCode, status.reasonPhrase))
 }
 
-private case class ResponseStatusImpl(statusCode: Int, reasonPhrase: String) extends ResponseStatus
+private case class ResponseStatusImpl(statusCode: Int, reasonPhrase: String) extends ResponseStatus {
+  override lazy val toString = s"$statusCode $reasonPhrase"
+}
