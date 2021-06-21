@@ -43,7 +43,7 @@ trait Challenge extends AuthType {
 }
 
 /** Challenge for Basic authentication. */
-trait BasicChallenge extends Challenge {
+sealed trait BasicChallenge extends Challenge {
   val scheme: String = "Basic"
 
   /** Gets realm. */
@@ -64,7 +64,7 @@ object BasicChallenge {
 private case class BasicChallengeImpl(realm: String, params: Map[String, String]) extends BasicChallenge
 
 /** Challenge for Bearer authentication. */
-trait BearerChallenge extends Challenge {
+sealed trait BearerChallenge extends Challenge {
   val scheme: String = "Bearer"
 
   /** Gets realm. */
@@ -174,7 +174,7 @@ trait Credentials extends AuthType {
 }
 
 /** Credentials for Basic authorization. */
-trait BasicCredentials extends Credentials {
+sealed trait BasicCredentials extends Credentials {
   val scheme: String = "Basic"
 
   /** Gets user. */
@@ -209,7 +209,7 @@ private case class BasicCredentialsImpl(token: String) extends BasicCredentials 
 }
 
 /** Credentials for Bearer authorization. */
-trait BearerCredentials extends Credentials {
+sealed trait BearerCredentials extends Credentials {
   val scheme: String = "Bearer"
 }
 
