@@ -75,16 +75,10 @@ object RequestLine {
       case true  => target
       case false =>
         target.toString match {
-          case "" =>
-            if (method == "OPTIONS")
-              Uri("*")
-            else
-              Uri("/")
-
           case uri if uri.startsWith("/") => target
           case uri if uri.startsWith("*") => target
           case uri =>
-            if (method == "OPTIONS" && (uri.startsWith("?") || uri.startsWith("#")))
+            if (method == "OPTIONS" && (uri.isEmpty || uri.startsWith("?") || uri.startsWith("#")))
               Uri("*" + uri)
             else
               Uri("/" + uri)
