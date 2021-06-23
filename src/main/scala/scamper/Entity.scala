@@ -48,11 +48,11 @@ trait Entity {
 object Entity {
   /** Creates entity from supplied bytes. */
   def apply(bytes: Array[Byte]): Entity =
-    ByteArrayEntity(notNull(bytes))
+    ByteArrayEntity(notNull(bytes, "bytes"))
 
   /** Creates entity from supplied input stream. */
   def apply(in: InputStream): Entity =
-    InputStreamEntity(notNull(in))
+    InputStreamEntity(notNull(in, "bytes"))
 
   /**
    * Creates entity from supplied writer.
@@ -61,11 +61,11 @@ object Entity {
    * output stream are used to build entity.
    */
   def apply(writer: OutputStream => Unit): Entity =
-    InputStreamEntity(new WriterInputStream(notNull(writer))(Auxiliary.executor))
+    InputStreamEntity(new WriterInputStream(notNull(writer, "writer"))(Auxiliary.executor))
 
   /** Creates entity from supplied file. */
   def apply(file: File): Entity =
-    FileEntity(notNull(file))
+    FileEntity(notNull(file, "file"))
 
   /** Creates entity from supplied text. */
   def apply(text: String, charset: String = "UTF-8"): Entity =
@@ -105,7 +105,7 @@ object Entity {
 
   /** Creates entity from supplied multipart form data. */
   def apply(multipart: Multipart, boundary: String): Entity =
-    MultipartEntity(notNull(multipart), notNull(boundary))
+    MultipartEntity(notNull(multipart, "multipart"), notNull(boundary, "boundary"))
 
   /** Gets empty entity. */
   def empty: Entity = EmptyEntity

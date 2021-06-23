@@ -58,11 +58,17 @@ object RequestLine {
    * @note Request line is created as HTTP/1.1.
    */
   def apply(method: RequestMethod, target: Uri): RequestLine =
-    RequestLineImpl(notNull(method), adjustTarget(notNull(target), method.name), HttpVersion(1, 1))
+    RequestLineImpl(
+      notNull(method, "method"),
+      adjustTarget(notNull(target, "target"), method.name),
+      HttpVersion(1, 1))
 
   /** Creates request line. */
   def apply(method: RequestMethod, target: Uri, version: HttpVersion): RequestLine =
-    RequestLineImpl(notNull(method), adjustTarget(notNull(target), method.name), notNull(version))
+    RequestLineImpl(
+      notNull(method, "method"),
+      adjustTarget(notNull(target, "target"), method.name),
+      notNull(version, "version"))
 
   private def adjustTarget(target: Uri, method: String): Uri =
     target.isAbsolute match {
@@ -124,11 +130,15 @@ object StatusLine {
    * @note Status line is created as HTTP/1.1.
    */
   def apply(status: ResponseStatus): StatusLine =
-    StatusLineImpl(HttpVersion(1, 1), notNull(status))
+    StatusLineImpl(
+      HttpVersion(1, 1),
+      notNull(status, "status"))
 
   /** Creates status line. */
   def apply(version: HttpVersion, status: ResponseStatus): StatusLine =
-    StatusLineImpl(notNull(version), notNull(status))
+    StatusLineImpl(
+      notNull(version, "version"),
+      notNull(status, "status"))
 }
 
 private case class StatusLineImpl(version: HttpVersion, status: ResponseStatus) extends StatusLine {

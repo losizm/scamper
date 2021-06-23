@@ -20,19 +20,16 @@ import RequestMethod.Registry.Options
 import Validate.{ noNulls, notNull }
 
 private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header], body: Entity, attributes: Map[String, Any] = Map.empty) extends HttpRequest {
-  notNull(startLine)
-  noNulls(headers, "headers cannot contain null header")
-  notNull(body)
-  notNull(attributes)
+  notNull(startLine, "startLine")
+  noNulls(headers, "headers")
+  notNull(body, "body")
+  notNull(attributes, "attributes")
 
-  lazy val path: String = target.normalize.getRawPath match {
-    case "" =>
-      if (method == Options)
-        "*"
-      else
-        "/"
-    case path => path
-  }
+  lazy val path: String =
+    target.normalize.getRawPath match {
+      case ""   => if (method == Options) "*" else "/"
+      case path => path
+    }
 
   lazy val query: QueryString =
     target.getRawQuery match {

@@ -136,7 +136,7 @@ object Multipart {
 
   /** Creates multipart with supplied parts. */
   def apply(parts: Seq[Part]): Multipart =
-    MultipartImpl(noNulls(parts))
+    MultipartImpl(noNulls(parts, "parts"))
 
   /** Creates multipart with supplied parts. */
   def apply(one: Part, more: Part*): Multipart =
@@ -181,7 +181,7 @@ object TextPart {
       case header if header.name.equalsIgnoreCase("Content-Type") => MediaType(header.value)
     }.getOrElse(Auxiliary.textPlain)
 
-    apply(contentDisposition, contentType, notNull(content))
+    apply(contentDisposition, contentType, notNull(content, "content"))
   }
 }
 
@@ -211,7 +211,7 @@ object FilePart {
     val name = contentDisposition.params.get("name")
       .getOrElse(throw new HttpException("Missing name parameter in content disposition"))
 
-    FilePartImpl(name, notNull(content), contentDisposition, contentType)
+    FilePartImpl(name, notNull(content, "content"), contentDisposition, contentType)
   }
 
   /** Creates file part from supplied headers and content. */

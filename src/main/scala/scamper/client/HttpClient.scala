@@ -161,8 +161,8 @@ object HttpClient {
    * absolute
    */
   def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T = {
-    notNull(request)
-    notNull(handler)
+    notNull(request, "request")
+    notNull(handler, "handler")
 
     apply().send(request)(handler)
   }

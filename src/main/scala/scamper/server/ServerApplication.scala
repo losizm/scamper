@@ -305,7 +305,7 @@ class ServerApplication extends Router {
    * @return this application
    */
   def outgoing(filter: ResponseFilter): this.type = synchronized {
-    app = app.copy(responseFilters = app.responseFilters :+ notNull(filter))
+    app = app.copy(responseFilters = app.responseFilters :+ notNull(filter, "filter"))
     this
   }
 

@@ -62,7 +62,7 @@ class ClientSettings {
    * The Accept header for each outgoing request is set accordingly.
    */
   def accept(ranges: Seq[MediaRange]): this.type = synchronized {
-    settings = settings.copy(accept = noNulls(ranges))
+    settings = settings.copy(accept = noNulls(ranges, "ranges"))
     this
   }
 
@@ -80,7 +80,7 @@ class ClientSettings {
    * The Accept-Encoding header for each outgoing request is set accordingly.
    */
   def acceptEncoding(ranges: Seq[ContentCodingRange]): this.type = synchronized {
-    settings = settings.copy(acceptEncoding = noNulls(ranges))
+    settings = settings.copy(acceptEncoding = noNulls(ranges, "ranges"))
     this
   }
 
@@ -134,7 +134,7 @@ class ClientSettings {
    * @param cookies cookie store
    */
   def cookies(cookieStore: CookieStore = CookieStore()): this.type = synchronized {
-    settings = settings.copy(cookies = notNull(cookieStore))
+    settings = settings.copy(cookies = notNull(cookieStore, "cookieStore"))
     this
   }
 
@@ -162,13 +162,13 @@ class ClientSettings {
 
   /** Adds supplied request filter. */
   def outgoing(filter: RequestFilter): this.type = synchronized {
-    settings = settings.copy(outgoing = settings.outgoing :+ notNull(filter))
+    settings = settings.copy(outgoing = settings.outgoing :+ notNull(filter, "filter"))
     this
   }
 
   /** Adds supplied response filter. */
   def incoming(filter: ResponseFilter): this.type = synchronized {
-    settings = settings.copy(incoming = settings.incoming :+ notNull(filter))
+    settings = settings.copy(incoming = settings.incoming :+ notNull(filter, "filter"))
     this
   }
 
