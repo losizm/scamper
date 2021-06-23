@@ -52,8 +52,16 @@ object RequestLine {
       throw new IllegalArgumentException(s"Malformed request line: $line")
     }
 
-  /** Creates request line with supplied parts. */
-  def apply(method: RequestMethod, target: Uri, version: HttpVersion = HttpVersion(1, 1)): RequestLine =
+  /**
+   * Creates request line.
+   *
+   * @note Request line is created as HTTP/1.1.
+   */
+  def apply(method: RequestMethod, target: Uri): RequestLine =
+    RequestLineImpl(notNull(method), adjustTarget(notNull(target), method.name), HttpVersion(1, 1))
+
+  /** Creates request line. */
+  def apply(method: RequestMethod, target: Uri, version: HttpVersion): RequestLine =
     RequestLineImpl(notNull(method), adjustTarget(notNull(target), method.name), notNull(version))
 
   private def adjustTarget(target: Uri, method: String): Uri =
@@ -101,20 +109,28 @@ object StatusLine {
     Try {
       line match {
         case syntax(version, statusCode, null | "")    =>
-          StatusLineImpl(ResponseStatus(statusCode.toInt), HttpVersion(version))
+          StatusLineImpl(HttpVersion(version), ResponseStatus(statusCode.toInt))
 
         case syntax(version, statusCode, reasonPhrase) =>
-          StatusLineImpl(ResponseStatus(statusCode.toInt, reasonPhrase), HttpVersion(version))
+          StatusLineImpl(HttpVersion(version), ResponseStatus(statusCode.toInt, reasonPhrase))
       }
     } getOrElse {
       throw new IllegalArgumentException(s"Malformed status line: $line")
     }
 
-  /** Creates status line with supplied parts. */
-  def apply(status: ResponseStatus, version: HttpVersion = HttpVersion(1, 1)): StatusLine =
-    StatusLineImpl(notNull(status), notNull(version))
+  /**
+   * Creates status line.
+   *
+   * @note Status line is created as HTTP/1.1.
+   */
+  def apply(status: ResponseStatus): StatusLine =
+    StatusLineImpl(HttpVersion(1, 1), notNull(status))
+
+  /** Creates status line. */
+  def apply(version: HttpVersion, status: ResponseStatus): StatusLine =
+    StatusLineImpl(notNull(version), notNull(status))
 }
 
-private case class StatusLineImpl(status: ResponseStatus, version: HttpVersion) extends StatusLine {
+private case class StatusLineImpl(version: HttpVersion, status: ResponseStatus) extends StatusLine {
   override lazy val toString = s"HTTP/$version ${status.statusCode} ${status.reasonPhrase}"
 }

@@ -278,7 +278,7 @@ trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse] {
    * @return new response
    */
   def setStatus(status: ResponseStatus): HttpResponse =
-    setStartLine(StatusLine(status, version))
+    setStartLine(StatusLine(version, status))
 
   /**
    * Creates response with new HTTP version.
@@ -286,7 +286,7 @@ trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse] {
    * @return new response
    */
   def setVersion(version: HttpVersion): HttpResponse =
-    setStartLine(StatusLine(status, version))
+    setStartLine(StatusLine(version, status))
 }
 
 /** Provides factory for `HttpResponse`. */
@@ -297,5 +297,5 @@ object HttpResponse {
 
   /** Creates response with supplied message parts. */
   def apply(status: ResponseStatus, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: HttpVersion = HttpVersion(1, 1)): HttpResponse =
-    HttpResponseImpl(StatusLine(status, version), headers, body)
+    HttpResponseImpl(StatusLine(version, status), headers, body)
 }
