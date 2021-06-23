@@ -27,7 +27,11 @@ sealed trait Header {
   /** Gets header value. */
   def value: String
 
-  /** Gets header value as `Instant`. */
+  /**
+   * Gets header value as `Instant`.
+   *
+   * @note The header value is assumed formatted per &sect;3.3 of RFC5322.
+   */
   def dateValue: Instant = DateValue.parse(value)
 
   /** Gets header value as `Long`. */
@@ -44,7 +48,11 @@ object Header {
   def apply(name: String, value: Long): Header =
     apply(name, value.toString)
 
-  /** Creates header using supplied name and value. */
+  /**
+   * Creates header using supplied name and value.
+   *
+   * @note The header value is formatted per &sect;3.3 of RFC5322.
+   */
   def apply(name: String, value: Instant): Header =
     apply(name, DateValue.format(value))
 
