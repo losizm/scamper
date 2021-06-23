@@ -163,4 +163,3 @@ private case class MultipartEntity(multipart: Multipart, boundary: String) exten
     out.flush()
   }
 }
-

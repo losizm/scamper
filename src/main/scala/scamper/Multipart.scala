@@ -25,37 +25,32 @@ import scamper.types.{ DispositionType, MediaType }
  *
  * @see [[Part]]
  */
-trait Multipart {
+sealed trait Multipart {
   /** Gets parts. */
   def parts: Seq[Part]
 
   /** Gets all text parts. */
-  lazy val textParts: Seq[TextPart] =
-    parts.collect { case part: TextPart => part }
+  def textParts: Seq[TextPart]
 
   /** Gets all file parts. */
-  lazy val fileParts: Seq[FilePart] =
-    parts.collect { case part: FilePart => part }
+  def fileParts: Seq[FilePart]
 
   /** Collects all text parts into query string. */
-  lazy val toQuery: QueryString =
-    QueryString(textParts.map(part => part.name -> part.content))
+  def toQuery: QueryString
 
   /**
    * Gets first part with given name.
    *
    * @param name part name
    */
-  def getPart(name: String): Option[Part] =
-    parts.collectFirst { case part if part.name == name => part }
+  def getPart(name: String): Option[Part]
 
   /**
    * Gets all parts with given name
    *
    * @param name part name
    */
-  def getParts(name: String): Seq[Part] =
-    parts.collect { case part if part.name == name => part }
+  def getParts(name: String): Seq[Part]
 
   /**
    * Gets first part with given name and casts it to `TextPart`.
@@ -64,8 +59,7 @@ trait Multipart {
    *
    * @throws java.lang.ClassCastException if part is present and is not text
    */
-  def getTextPart(name: String): Option[TextPart] =
-    getPart(name).map(_.asInstanceOf[TextPart])
+  def getTextPart(name: String): Option[TextPart]
 
   /**
    * Gets text content of first part with given name.
@@ -74,8 +68,7 @@ trait Multipart {
    *
    * @throws java.lang.ClassCastException if part is present and is not text
    */
-  def getText(name: String): Option[String] =
-    getTextPart(name).map(_.content)
+  def getText(name: String): Option[String]
 
   /**
    * Gets first part with given name and casts it to `FilePart`.
@@ -84,8 +77,7 @@ trait Multipart {
    *
    * @throws java.lang.ClassCastException if part is present and is not file
    */
-  def getFilePart(name: String): Option[FilePart] =
-    getPart(name).map(_.asInstanceOf[FilePart])
+  def getFilePart(name: String): Option[FilePart]
 
   /**
    * Gets file content of first part with given name.
@@ -94,8 +86,7 @@ trait Multipart {
    *
    * @throws java.lang.ClassCastException if part is present and is not file
    */
-  def getFile(name: String): Option[File] =
-    getFilePart(name).map(_.content)
+  def getFile(name: String): Option[File]
 }
 
 /**
@@ -244,10 +235,47 @@ object FilePart {
     MediaType.forFile(content).getOrElse(Auxiliary.applicationOctetStream)
 }
 
-private case class MultipartImpl(parts: Seq[Part]) extends Multipart
+private case class MultipartImpl(parts: Seq[Part]) extends Multipart {
+  lazy val textParts: Seq[TextPart] =
+    parts.collect { case part: TextPart => part }
 
-private case class TextPartImpl(name: String, content: String, contentDisposition: DispositionType, contentType: MediaType) extends TextPart
+  lazy val fileParts: Seq[FilePart] =
+    parts.collect { case part: FilePart => part }
 
-private case class FilePartImpl(name: String, content: File, contentDisposition: DispositionType, contentType: MediaType) extends FilePart {
+  lazy val toQuery: QueryString =
+    QueryString(textParts.map(part => part.name -> part.content))
+
+  def getPart(name: String): Option[Part] =
+    parts.collectFirst { case part if part.name == name => part }
+
+  def getParts(name: String): Seq[Part] =
+    parts.collect { case part if part.name == name => part }
+
+  def getTextPart(name: String): Option[TextPart] =
+    getPart(name).map(_.asInstanceOf[TextPart])
+
+  def getText(name: String): Option[String] =
+    getTextPart(name).map(_.content)
+
+  def getFilePart(name: String): Option[FilePart] =
+    getPart(name).map(_.asInstanceOf[FilePart])
+
+  def getFile(name: String): Option[File] =
+    getFilePart(name).map(_.content)
+}
+
+private case class TextPartImpl(
+  name:               String,
+  content:            String,
+  contentDisposition: DispositionType,
+  contentType:        MediaType
+) extends TextPart
+
+private case class FilePartImpl(
+  name:               String,
+  content:            File,
+  contentDisposition: DispositionType,
+  contentType:        MediaType
+) extends FilePart {
   val getFileName: Option[String] = contentDisposition.params.get("filename")
 }
