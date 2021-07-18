@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import scamper.ListParser
  *
  * @see [[scamper.headers.CacheControl]]
  */
-trait CacheDirective {
+trait CacheDirective:
   /** Gets directive name. */
   def name: String
 
@@ -33,11 +33,10 @@ trait CacheDirective {
   /** Returns formatted directive. */
   override lazy val toString: String =
     name + value.map(x => "=" + Token(x).getOrElse(s"""\"$x\"""")).getOrElse("")
-}
 
 /** Provides factory for `CacheDirective`. */
-object CacheDirective {
-  import CacheDirectives._
+object CacheDirective:
+  import CacheDirectives.*
 
   private val syntax1 = """\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val syntax2 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
@@ -45,12 +44,11 @@ object CacheDirective {
 
   /** Parses formatted directive. */
   def parse(directive: String): CacheDirective =
-    directive match {
+    directive match
       case syntax1(name) => apply(name)
       case syntax2(name, value) => apply(name, Some(value))
       case syntax3(name, value) => apply(name, Some(value))
-      case _ => throw new IllegalArgumentException(s"Malformed cache directive: $directive")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed cache directive: $directive")
 
   /** Parses formatted list of directives. */
   def parseAll(directives: String): Seq[CacheDirective] =
@@ -76,8 +74,7 @@ object CacheDirective {
       case "stale-while-revalidate" => `stale-while-revalidate`(value.getOrElse("0").toLong)
       case token                    => CacheDirectiveImpl(token, value)
     } getOrElse {
-      throw new IllegalArgumentException(s"Invalid cache directive name: $name")
+      throw IllegalArgumentException(s"Invalid cache directive name: $name")
     }
-}
 
 private case class CacheDirectiveImpl(name: String, value: Option[String]) extends CacheDirective

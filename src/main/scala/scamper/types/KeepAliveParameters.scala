@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ package scamper.types
  *
  * @see [[scamper.headers.KeepAlive]]
  */
-trait KeepAliveParameters {
+trait KeepAliveParameters:
   /** Gets idle timeout seconds. */
   def timeout: Int
 
@@ -29,29 +29,26 @@ trait KeepAliveParameters {
 
   /** Returns formatted parameters. */
   override lazy val toString: String = s"timeout=$timeout, max=$max"
-}
 
 /** Provides factory for `KeepAliveParameters`. */
-object KeepAliveParameters {
+object KeepAliveParameters:
   /** Creates parameters with supplied timeout and max. */
   def apply(timeout: Int, max: Int): KeepAliveParameters =
     KeepAliveParametersImpl(timeout, max)
 
   /** Parse formatted parameters. */
-  def parse(params: String): KeepAliveParameters = {
+  def parse(params: String): KeepAliveParameters =
     val keepAlive = params.split(",")
       .map { _.split("=").map(_.trim) }
       .map {
         case Array("timeout", timeout) => "timeout" -> timeout.toInt
         case Array("max"    , max    ) => "max"     -> max.toInt
-        case _                         => throw new IllegalArgumentException(s"Invalid Keep-Alive parameters: $params")
+        case _                         => throw IllegalArgumentException(s"Invalid Keep-Alive parameters: $params")
       }.toMap
 
     KeepAliveParametersImpl(
-      keepAlive.getOrElse("timeout", throw new IllegalArgumentException("Missing Keep-Alive parameter: timeout")),
-      keepAlive.getOrElse("max"    , throw new IllegalArgumentException("Missing Keep-Alive parameter: max"))
+      keepAlive.getOrElse("timeout", throw IllegalArgumentException("Missing Keep-Alive parameter: timeout")),
+      keepAlive.getOrElse("max"    , throw IllegalArgumentException("Missing Keep-Alive parameter: max"))
     )
-  }
-}
 
 private case class KeepAliveParametersImpl(timeout: Int, max: Int) extends KeepAliveParameters

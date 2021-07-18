@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package scamper.websocket
 
-import Opcode.Registry._
+import Opcode.Registry.*
 
-class OpcodeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class OpcodeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "check registered opcodes" in {
     assert(Opcode(0) == Continuation)
     assert(Opcode.get(0).contains(Continuation))
@@ -73,4 +73,3 @@ class OpcodeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(Opcode.get(7).isEmpty)
     assert(Opcode.get(11).isEmpty)
   }
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@
  */
 package scamper.auth
 
+import scala.language.implicitConversions
+
 import scamper.{ HeaderNotFound, HttpException }
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Unauthorized
 
-class AuthHeadersSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class AuthHeadersSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "create response with Authentication-Info header" in {
     val res1 = Unauthorized()
     assert(!res1.hasAuthenticationInfo)
@@ -298,4 +300,3 @@ class AuthHeadersSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(res5.bearer == BearerChallenge("realm" -> "test", "title" -> "Test Realm"))
     assert(res5.getBearer.contains(BearerChallenge("realm" -> "test", "title" -> "Test Realm")))
   }
-}

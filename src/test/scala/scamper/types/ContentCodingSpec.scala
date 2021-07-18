@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-class ContentCodingSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class ContentCodingSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "ContentCoding" should "be created" in {
     var coding = ContentCoding("Compress")
     assert(coding.name == "compress")
@@ -42,4 +42,3 @@ class ContentCodingSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](ContentCoding("x gzip"))
     assertThrows[IllegalArgumentException](ContentCoding("gzip; q=1.0"))
   }
-}

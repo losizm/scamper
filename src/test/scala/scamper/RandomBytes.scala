@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,12 @@ package scamper
 
 import java.security.SecureRandom
 
-object RandomBytes {
-  private val random = new SecureRandom()
+object RandomBytes:
+  private val random = SecureRandom()
 
   def apply(size: Int): Array[Byte] =
     apply(new Array[Byte](size))
 
-  def apply(bytes: Array[Byte]): Array[Byte] = {
+  def apply(bytes: Array[Byte]): Array[Byte] =
     random.nextBytes(bytes)
     bytes
-  }
-}

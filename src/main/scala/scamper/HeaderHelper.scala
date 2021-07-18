@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,15 @@
  */
 package scamper
 
-import Grammar._
+import Grammar.*
 
-private object HeaderHelper {
+private object HeaderHelper:
   def Name(name: String): String =
     Token(name) getOrElse {
-      throw new IllegalArgumentException(s"Invalid header name: $name")
+      throw IllegalArgumentException(s"Invalid header name: $name")
     }
 
   def Value(value: String): String =
     HeaderValue(value) orElse FoldedHeaderValue(value) getOrElse {
-      throw new IllegalArgumentException(s"Invalid header value: $value")
+      throw IllegalArgumentException(s"Invalid header value: $value")
     }
-}

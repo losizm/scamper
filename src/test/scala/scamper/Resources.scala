@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@ package scamper
 
 import java.io.File
 
-private object Resources {
-  val keystore   = new File("./src/test/resources/secure/keystore")
-  val truststore = new File("./src/test/resources/secure/truststore")
-  val riteshiff  = new File("./src/test/resources/riteshiff")
-}
+private object Resources:
+  val keystore   = File("./src/test/resources/secure/keystore")
+  val truststore = File("./src/test/resources/secure/truststore")
+  val riteshiff  = File("./src/test/resources/riteshiff")

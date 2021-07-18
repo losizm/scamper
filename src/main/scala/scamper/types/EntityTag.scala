@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ package scamper.types
  * @see [[scamper.headers.IfNoneMatch]]
  * @see [[scamper.headers.IfRange]]
  */
-trait EntityTag {
+trait EntityTag:
   /** Gets entity tag's opaque value. */
   def opaque: String
 
@@ -33,19 +33,17 @@ trait EntityTag {
 
   /** Returns formatted entity tag. */
   override lazy val toString: String =
-    if (weak) "W/" + opaque else opaque
-}
+    if weak then "W/" + opaque else opaque
 
 /** Provides factory for `EntityTag`. */
-object EntityTag {
+object EntityTag:
   private val syntax = """\s*(W/)?("[^"]*")\s*""".r
 
   /** Parses formatted tag. */
   def parse(tag: String): EntityTag =
-    tag match {
+    tag match
       case syntax(weak, opaque) => EntityTagImpl(opaque, weak != null)
-      case _ => throw new IllegalArgumentException(s"Malformed entity tag: $tag")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed entity tag: $tag")
 
   /**
    * Creates tag with supplied values.
@@ -54,9 +52,8 @@ object EntityTag {
    * already supplied as such.
    */
   def apply(opaque: String, weak: Boolean): EntityTag =
-    if (opaque.matches("\"[^\"]*\"")) EntityTagImpl(opaque, weak)
-    else if (opaque.matches("[^\"]*")) EntityTagImpl("\"" + opaque + "\"", weak)
-    else throw new IllegalArgumentException(s"Invalid opaque tag: $opaque")
-}
+    if      opaque.matches("\"[^\"]*\"") then EntityTagImpl(opaque, weak)
+    else if opaque.matches("[^\"]*")     then EntityTagImpl("\"" + opaque + "\"", weak)
+    else throw IllegalArgumentException(s"Invalid opaque tag: $opaque")
 
 private case class EntityTagImpl(opaque: String, weak: Boolean) extends EntityTag

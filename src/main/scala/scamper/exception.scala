@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import java.io.IOException
  * @param message detail message
  * @param cause underlying cause
  */
-class HttpException(message: String, cause: Throwable) extends RuntimeException(message, cause) {
+class HttpException(message: String, cause: Throwable) extends RuntimeException(message, cause):
   /** Constructs HttpException. */
   def this() = this(null, null)
 
@@ -42,7 +42,6 @@ class HttpException(message: String, cause: Throwable) extends RuntimeException(
    * @param cause underlying cause
    */
   def this(cause: Throwable) = this(null, cause)
-}
 
 /** Indicates absence of specified header. */
 case class HeaderNotFound(name: String) extends HttpException(name)

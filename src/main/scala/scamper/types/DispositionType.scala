@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package scamper.types
 
-import DispositionTypeHelper._
+import DispositionTypeHelper.*
 
 /**
  * Standardized type for Content-Disposition header value.
  *
  * @see [[scamper.headers.ContentDisposition]]
  */
-trait DispositionType {
+trait DispositionType:
   /** Gets name. */
   def name: String
 
@@ -40,15 +40,13 @@ trait DispositionType {
 
   /** Returns formatted disposition. */
   override lazy val toString: String = name + FormatParams(params)
-}
 
 /** Provides factory for `DispositionType`. */
-object DispositionType {
+object DispositionType:
   /** Parses formatted disposition. */
   def parse(disposition: String): DispositionType =
-    ParseContentDisposition(disposition) match {
+    ParseContentDisposition(disposition) match
       case (name, params) => apply(name, params)
-    }
 
   /** Creates disposition with supplied name and parameters. */
   def apply(name: String, params: Map[String, String]): DispositionType =
@@ -57,6 +55,5 @@ object DispositionType {
   /** Creates disposition with supplied name and paramaters. */
   def apply(name: String, params: (String, String)*): DispositionType =
     apply(name, params.toMap)
-}
 
 private case class DispositionTypeImpl(name: String, params: Map[String, String]) extends DispositionType

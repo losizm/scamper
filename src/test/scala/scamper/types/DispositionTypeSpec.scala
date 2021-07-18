@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-class DispositionTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class DispositionTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "DispositionType" should "be created without parameters" in {
     var disposition = DispositionType.parse("INLINE")
     assert(disposition.name == "inline")
@@ -55,4 +55,3 @@ class DispositionTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](DispositionType.parse("inline; filename="))
     assertThrows[IllegalArgumentException](DispositionType.parse("inline; =0.1"))
   }
-}

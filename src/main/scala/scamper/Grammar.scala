@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,14 @@ package scamper
 import scala.util.Try
 import scala.util.matching.Regex
 
-private class Grammar(syntax: Regex) {
+private class Grammar(syntax: Regex):
   def apply(value: String): Option[String] =
     Try(value match { case syntax(first, _*) => first }).toOption
-}
 
-private object Grammar {
+private object Grammar:
   val Token             = new Grammar("([\\w!#$%&'*+.^`|~-]+)".r)
   val Token68           = new Grammar("([\\w.~/+-]+=*)".r)
   val QuotedString      = new Grammar("\"([\\x20-\\x7E&&[^\"]]*)\"".r)
   val QuotableString    = new Grammar("([\\x20-\\x7E&&[^\"]]*)".r)
   val HeaderValue       = new Grammar("(\\p{Print}*)".r)
   val FoldedHeaderValue = new Grammar("((?:\\p{Print}*(?:\r\n|\r|\n)[ \t]+\\p{Print}*)*)".r)
-}

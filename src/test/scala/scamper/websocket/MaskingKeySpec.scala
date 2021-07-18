@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package scamper.websocket
 import java.io.{ ByteArrayInputStream, ByteArrayOutputStream }
 import java.util.Arrays
 
-class MaskingKeySpec extends org.scalatest.flatspec.AnyFlatSpec {
+class MaskingKeySpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "mask/unmask data" in {
-    implicit val key = MaskingKey()
+    given key: MaskingKey = MaskingKey()
     assert(key.value != 0)
 
     val msg     = "Peter piper picked peters, but Run rocked rhymes."
@@ -41,31 +41,27 @@ class MaskingKeySpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   @annotation.tailrec
-  private def bulkMask(data: Array[Byte], times: Int)(implicit key: MaskingKey): Array[Byte] =
-    times < 1 match {
+  private def bulkMask(data: Array[Byte], times: Int)(using key: MaskingKey): Array[Byte] =
+    times < 1 match
       case true  => data
       case false =>
         key(data)
         bulkMask(data, times - 1)
-    }
 
   @annotation.tailrec
-  private def streamMask(data: Array[Byte], times: Int)(implicit key: MaskingKey): Array[Byte] =
-    times < 1 match {
+  private def streamMask(data: Array[Byte], times: Int)(using key: MaskingKey): Array[Byte] =
+    times < 1 match
       case true  => data
       case false =>
-        val in  = new ByteArrayInputStream(data)
-        val out = new ByteArrayOutputStream()
+        val in  = ByteArrayInputStream(data)
+        val out = ByteArrayOutputStream()
         var buf = new Array[Byte](5) // Use uneven buffer for test
         var len = 0
         var pos = 0
 
-        while ({ len = in.read(buf); len != -1 }) {
+        while { len = in.read(buf); len != -1 } do
           key(buf, len, pos)
           out.write(buf, 0, len)
           pos += len
-        }
 
         streamMask(out.toByteArray, times - 1)
-    }
-}

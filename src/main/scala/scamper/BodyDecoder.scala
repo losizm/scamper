@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import headers.{ ContentEncoding, ContentLength, TransferEncoding }
 import types.{ ContentCoding, TransferCoding }
 
 /** Provides access to decoded message body. */
-trait BodyDecoder {
+trait BodyDecoder:
   /** Gets maximum length of message body. */
   def maxLength: Long
 
@@ -35,23 +35,21 @@ trait BodyDecoder {
    * beyond `maxLength` of message body.
    */
   def decode(message: HttpMessage): InputStream =
-    if (message.body.isKnownEmpty)
+    if message.body.isKnownEmpty then
       EmptyInputStream
     else
-      message match {
+      message match
         case res: HttpResponse if res.isInformational   => EmptyInputStream
         case res: HttpResponse if res.statusCode == 204 => EmptyInputStream
         case res: HttpResponse if res.statusCode == 304 => EmptyInputStream
         case _ =>
-          message.body.withInputStream { in =>
-            val transferIn = message.transferEncoding match {
-              case Nil      => new BoundedInputStream(in, maxLength, getContentLength(message))
-              case encoding => transferInputStream(new BoundedInputStream(in, maxLength, Long.MaxValue), encoding)
-            }
+          message.body.withData { in =>
+            val transferIn = message.transferEncoding match
+              case Nil      => BoundedInputStream(in, maxLength, getContentLength(message))
+              case encoding => transferInputStream(BoundedInputStream(in, maxLength, Long.MaxValue), encoding)
 
             contentInputStream(transferIn, message.contentEncoding)
           }
-      }
 
   /**
    * Passes decoded message body to supplied function.
@@ -69,39 +67,31 @@ trait BodyDecoder {
 
   private def transferInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
     encoding.takeRight(6).foldRight(in) { (encoding, in) =>
-      if (encoding.isChunked)
-        new ChunkedInputStream(in)
-      else if (encoding.isGzip)
-        new GZIPInputStream(in)
-      else if (encoding.isDeflate)
-        new InflaterInputStream(in)
-      else throw new HttpException(s"Unsupported transfer encoding: $encoding")
+      if      encoding.isChunked then ChunkedInputStream(in)
+      else if encoding.isGzip    then GZIPInputStream(in)
+      else if encoding.isDeflate then InflaterInputStream(in)
+      else throw HttpException(s"Unsupported transfer encoding: $encoding")
     }
 
   private def contentInputStream(in: InputStream, encoding: Seq[ContentCoding]): InputStream =
     encoding.takeRight(6).foldRight(in) { (encoding, in) =>
-      if (encoding.isGzip)
-        new GZIPInputStream(in)
-      else if (encoding.isDeflate)
-        new InflaterInputStream(in)
-      else if (encoding.isIdentity)
-        in
-      else throw new HttpException(s"Unsupported content encoding: $encoding")
+      if      encoding.isGzip     then GZIPInputStream(in)
+      else if encoding.isDeflate  then InflaterInputStream(in)
+      else if encoding.isIdentity then in
+      else throw HttpException(s"Unsupported content encoding: $encoding")
     }
 
   private def getContentLength(message: HttpMessage): Long =
-    message.getContentLength.orElse(message.body.getLength).getOrElse(0)
-}
+    message.getContentLength.orElse(message.body.knownSize).getOrElse(0)
 
 /** Provides factory for `BodyDecoder`. */
-object BodyDecoder {
+object BodyDecoder:
   /**
    * Creates decoder with specified maximum length.
    *
    * @param maxLength maximum length of message body
    */
   def apply(maxLength: Long): BodyDecoder =
-    new BodyDecoderImpl(maxLength)
-}
+    BodyDecoderImpl(maxLength)
 
 private class BodyDecoderImpl(val maxLength: Long) extends BodyDecoder

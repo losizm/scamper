@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-class TransferCodingSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class TransferCodingSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "TransferCoding" should "be created without parameters" in {
     var coding = TransferCoding.parse("CHUNKED")
     assert(coding.name == "chunked")
@@ -50,4 +50,3 @@ class TransferCodingSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](TransferCoding.parse("chunked; q="))
     assertThrows[IllegalArgumentException](TransferCoding.parse("chunked; =0.1"))
   }
-}

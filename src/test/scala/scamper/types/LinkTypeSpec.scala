@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package scamper.types
 
 import scamper.Uri
 
-class LinkTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class LinkTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "LinkType" should "be created" in {
     var link = LinkType(Uri("/assets/icon.png"))
     assert(link.ref.toString == "/assets/icon.png")
@@ -45,4 +45,3 @@ class LinkTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](LinkType.parse("/assets/icon.png"))
     assertThrows[IllegalArgumentException](LinkType.parse("/assets/icon.png>; size=64x64"))
   }
-}

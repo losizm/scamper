@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,16 @@ package scamper.server
 
 import java.net.Socket
 
+import scala.language.implicitConversions
+
 import scamper.{ Entity, HttpRequest, HttpResponse }
 import scamper.Implicits.stringToEntity
 import scamper.ResponseStatus.Registry.{ BadRequest, SwitchingProtocols }
 import scamper.headers.{ Connection, Upgrade }
 import scamper.types.Implicits.stringToProtocol
-import scamper.websocket._
+import scamper.websocket.{ *, given }
 
-import Implicits._
+import Implicits.*
 
 /**
  * Provides factory for upgrading request to WebSocket connection.
@@ -39,7 +41,7 @@ import Implicits._
  * app.get("/chat/:roomId") { req =>
  *   def authorize(req: HttpRequest): Boolean = ...
  *
- *   authorize(req) match {
+ *   authorize(req) match
  *     case true  =>
  *       WebSocketUpgrade(req) { session =>
  *         // Set up session
@@ -47,40 +49,38 @@ import Implicits._
  *         session.open()
  *       }
  *     case false => Unauthorized()
- *   }
  * }
  * }}}
  */
-object WebSocketUpgrade {
+object WebSocketUpgrade:
   /**
    * Upgrades request to WebSocket connection.
    *
-   * If request is successfully upgraded to WebSocket, supplied handler will be
-   * called with session after connection is established.
+   * If request is successfully upgraded to WebSocket, the supplied application
+   * will be invoked after connection is established.
    *
    * @param req request
-   * @param handler WebSocket session handler
+   * @param application WebSocket application
    *
    * @return 101 (Switching Protocols) if valid WebSocket upgrade request;
    * otherwise, 400 (Bad Request)
    */
-  def apply[T](req: HttpRequest)(handler: WebSocketSession => T): HttpResponse =
-    try {
+  def apply(req: HttpRequest)(application: WebSocketApplication[?]): HttpResponse =
+    try
       WebSocket.validate(req)
 
-      if (WebSocket.enablePermessageDeflate(req))
-        createResponse(req, handler, DeflateMode.Message)
+      if WebSocket.enablePermessageDeflate(req) then
+        createResponse(req, application, DeflateMode.Message)
           .setSecWebSocketExtensions("permessage-deflate; client_no_context_takeover; server_no_context_takeover")
-      else if (WebSocket.enableWebkitDeflateFrame(req))
-        createResponse(req, handler, DeflateMode.Frame)
+      else if WebSocket.enableWebkitDeflateFrame(req) then
+        createResponse(req, application, DeflateMode.Frame)
           .setSecWebSocketExtensions("x-webkit-deflate-frame; no_context_takeover")
       else
-        createResponse(req, handler, DeflateMode.None)
-    } catch {
+        createResponse(req, application, DeflateMode.None)
+    catch
       case InvalidWebSocketRequest(message) => BadRequest(message)
-    }
 
-  private def createResponse[T](req: HttpRequest, handler: WebSocketSession => T, deflateMode: DeflateMode): HttpResponse =
+  private def createResponse(req: HttpRequest, application: WebSocketApplication[?], deflateMode: DeflateMode): HttpResponse =
     SwitchingProtocols()
       .setUpgrade("websocket")
       .setConnection("Upgrade")
@@ -95,6 +95,5 @@ object WebSocketUpgrade {
           logger  = req.logger
         )
 
-        handler(session)
+        application(session)
       })
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@ package scamper.client
 
 import java.net.Socket
 
-import scamper._
+import scamper.*
 
-/** Defines client-side type classes. */
-object Implicits {
+/** Defines client-side implicit classes. */
+object Implicits:
   /** Adds client-side extension methods to `HttpMessage`. */
-  implicit class ClientHttpMessage(private val msg: HttpMessage) extends AnyVal {
+  implicit class ClientHttpMessage(msg: HttpMessage) extends AnyVal:
     /** Gets message socket. */
     def socket: Socket = msg.getAttribute("scamper.client.message.socket").get
 
@@ -44,10 +44,9 @@ object Implicits {
 
     /** Gets client to which this message belongs. */
     def client: HttpClient = msg.getAttribute("scamper.client.message.client").get
-  }
 
   /** Adds client-side extension methods to `HttpRequest`. */
-  implicit class ClientHttpRequest(private val req: HttpRequest) extends AnyVal {
+  implicit class ClientHttpRequest(req: HttpRequest) extends AnyVal:
     /**
      * Sends request and passes response to given handler.
      *
@@ -58,7 +57,7 @@ object Implicits {
      * @note To make effective use of this method, `req.target` must be an
      *   absolute URI.
      */
-    def send[T](handler: ResponseHandler[T])(implicit client: HttpClient): T =
+    def send[T](handler: ResponseHandler[T])(using client: HttpClient): T =
       client.send(req)(handler)
 
     /**
@@ -69,7 +68,7 @@ object Implicits {
      * @return new request
      */
     def setGzipContentEncoding(bufferSize: Int = 8192): HttpRequest =
-      ContentEncoder.gzip(req, bufferSize) { Auxiliary.executor }
+      ContentEncoder.gzip(req, bufferSize)(using Auxiliary.executor)
 
     /**
      * Adds `deflate` to Content-Encoding header and encodes message body.
@@ -80,10 +79,9 @@ object Implicits {
      */
     def setDeflateContentEncoding(bufferSize: Int = 8192): HttpRequest =
       ContentEncoder.deflate(req, bufferSize)
-  }
 
   /** Adds client-side extension methods to `HttpResponse`. */
-  implicit class ClientHttpResponse(private val res: HttpResponse) extends AnyVal {
+  implicit class ClientHttpResponse(res: HttpResponse) extends AnyVal:
     /**
      * Gets corresponding request.
      *
@@ -92,5 +90,3 @@ object Implicits {
      */
     def request: HttpRequest =
       res.getAttribute("scamper.client.response.request").get
-  }
-}

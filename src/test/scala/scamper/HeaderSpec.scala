@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper
 
-class HeaderSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class HeaderSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "Header" should "be created from formatted value" in {
     val header = Header("Content-Type: text/plain")
     assert(header.name == "Content-Type")
@@ -23,8 +23,16 @@ class HeaderSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(header.toString == "Content-Type: text/plain")
   }
 
-  it should "be created using long value" in {
+  it should "be created using int value" in {
     val header = Header("Content-Length", 80)
+    assert(header.name == "Content-Length")
+    assert(header.value == "80")
+    assert(header.intValue == 80)
+    assert(header.toString == "Content-Length: 80")
+  }
+
+  it should "be created using long value" in {
+    val header = Header("Content-Length", 80L)
     assert(header.name == "Content-Length")
     assert(header.value == "80")
     assert(header.longValue == 80)
@@ -49,4 +57,3 @@ class HeaderSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](Header("text/plain"))
     assertThrows[IllegalArgumentException](Header("Cookie", "user=guest,\r\ngroup=readonly"))
   }
-}

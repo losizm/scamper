@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,22 @@ import java.net.URL
 import scala.io.Source
 import scala.util.Try
 
-import scamper.RuntimeProperties.cookies._
+import scamper.RuntimeProperties.cookies.*
 
 /** Checks domains for public suffix. */
-private object PublicSuffixList {
+private object PublicSuffixList:
   private lazy val list: Seq[String] =
     Try(getRemoteList())
       .orElse(Try(getLocalList()))
       .getOrElse(Nil)
 
   private lazy val includes: Seq[String] =
-    list.filterNot(_ startsWith "!")
+    list.filterNot(_.startsWith("!"))
       .map(toRegex)
 
   private lazy val excludes: Seq[String] =
-    list.filter(_ startsWith "!")
-      .map(_ drop 1)
+    list.filter(_.startsWith("!"))
+      .map(_.drop(1))
       .map(toRegex)
 
   /**
@@ -48,27 +48,22 @@ private object PublicSuffixList {
   def check(domain: String): Boolean =
     includes.exists(domain.matches) && !excludes.exists(domain.matches)
 
-  private def getRemoteList(): Seq[String] = {
-    getRemotePublicSuffixList match {
-      case true  => getLines(new URL(publicSuffixListUrl))
-      case false => throw new UnsupportedOperationException()
-    }
-  }
+  private def getRemoteList(): Seq[String] =
+    getRemotePublicSuffixList match
+      case true  => getLines(URL(publicSuffixListUrl))
+      case false => throw UnsupportedOperationException()
 
-  private def getLocalList(): Seq[String] = {
+  private def getLocalList(): Seq[String] =
     val url = getClass.getResource("public_suffix_list.dat")
     getLines(url)
-  }
 
-  private def getLines(url: URL): Seq[String] = {
+  private def getLines(url: URL): Seq[String] =
     Source.fromURL(url)
       .getLines()
       .map(line => line.split("\\s+", 2).head)
       .filterNot(line => line.isEmpty || line.startsWith("//"))
       .toSeq
-  }
 
   private def toRegex(suffix: String): String =
     "(?i)" + suffix.replaceAll("""\.""", """\\.""")
         .replaceAll("""\*""", """[^.]+""")
-}

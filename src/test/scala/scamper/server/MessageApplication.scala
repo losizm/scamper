@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,21 @@ package scamper.server
 import java.util.concurrent.atomic.AtomicInteger
 
 import scala.collection.mutable.LinkedHashMap
+import scala.language.implicitConversions
 
 import scamper.{ BodyParser, HttpRequest, HttpMessage }
-import scamper.Implicits._
-import scamper.ResponseStatus.Registry._
+import scamper.Implicits.given
+import scamper.ResponseStatus.Registry.*
 import scamper.headers.{ ContentType, Location }
-import scamper.server.Implicits._
-import scamper.types.Implicits._
+import scamper.server.Implicits.given
+import scamper.types.Implicits.given
 
-object MessageApplication extends RoutingApplication {
-  private implicit val bodyParser = BodyParser.text(8192)
+object MessageApplication extends RoutingApplication:
+  private given BodyParser[String] = BodyParser.text(8192)
 
-  def apply(router: Router): Unit = {
-    val messages = new LinkedHashMap[Int, String]
-    val sequence = new AtomicInteger
+  def apply(router: Router): Unit =
+    val messages = LinkedHashMap[Int, String]()
+    val sequence = AtomicInteger()
 
     router.get("/") { implicit req =>
       withErrorHandling {
@@ -98,23 +99,21 @@ object MessageApplication extends RoutingApplication {
           .setContentType("text/plain")
       }
     }
-  }
 
-  private def getPathInt(name: String)(implicit req: HttpRequest): Int =
+  private def getPathInt(name: String)(using req: HttpRequest): Int =
     req.params.getInt("id")
 
-  private def getQueryInt(name: String, default: => Int = 0)(implicit req: HttpRequest): Int =
+  private def getQueryInt(name: String, default: => Int = 0)(using req: HttpRequest): Int =
     try
       req
         .query
         .getInt(name)
         .getOrElse(default)
-    catch {
+    catch
       case _: NumberFormatException =>
-        throw new ParameterNotConvertible(name, "__hidden__")
-    }
+        throw ParameterNotConvertible(name, "__hidden__")
 
-  private def getTextBody(implicit req: HttpRequest): String =
+  private def getTextBody(using req: HttpRequest): String =
     req
       .as[String]
       .replaceAll("\\s+", " ")
@@ -123,7 +122,7 @@ object MessageApplication extends RoutingApplication {
   private def withErrorHandling(message: => HttpMessage): HttpMessage =
     try
       message
-    catch {
+    catch
       case err: ParameterNotConvertible =>
         BadRequest("Invalid ${err.name}")
           .setContentType("text/plain")
@@ -131,5 +130,3 @@ object MessageApplication extends RoutingApplication {
       case _: Exception =>
         InternalServerError("Internal error encountered")
           .setContentType("text/plain")
-    }
-}

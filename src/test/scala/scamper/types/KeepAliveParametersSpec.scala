@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-class KeepAliveParametersSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class KeepAliveParametersSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "parse String to KeepAliveParameters" in {
     var params = KeepAliveParameters.parse("timeout=5, max=10")
     assert { params.timeout == 5 }
@@ -33,4 +33,3 @@ class KeepAliveParametersSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](KeepAliveParameters.parse("timeout=5"))
     assertThrows[IllegalArgumentException](KeepAliveParameters.parse("max=10"))
   }
-}

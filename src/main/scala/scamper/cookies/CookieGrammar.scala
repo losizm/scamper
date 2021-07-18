@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,16 @@ package scamper.cookies
 
 import scamper.Grammar
 
-private object CookieGrammar {
-  private val CookieValue = new Grammar("([\\x21-\\x7E&&[^\",;\\\\]]*)".r)
-  private val QuotedCookieValue = new Grammar("\"([\\x21-\\x7E&&[^\",;\\\\]]*)\"".r)
+private object CookieGrammar:
+  private val CookieValue = Grammar("([\\x21-\\x7E&&[^\",;\\\\]]*)".r)
+  private val QuotedCookieValue = Grammar("\"([\\x21-\\x7E&&[^\",;\\\\]]*)\"".r)
 
   def Name(name: String): String =
     Grammar.Token(name) getOrElse {
-      throw new IllegalArgumentException(s"Invalid cookie name: $name")
+      throw IllegalArgumentException(s"Invalid cookie name: $name")
     }
 
   def Value(value: String): String =
     CookieValue(value) orElse QuotedCookieValue(value) getOrElse {
-      throw new IllegalArgumentException(s"Invalid cookie value: $value")
+      throw IllegalArgumentException(s"Invalid cookie value: $value")
     }
-}

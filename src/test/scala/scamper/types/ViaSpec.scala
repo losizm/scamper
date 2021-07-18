@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package scamper.types
 
-import ViaType.{ parse => ParseVia }
+import ViaType.parse as ParseVia
 
-class ViaTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class ViaTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "ViaType" should "be created" in {
     var via = ParseVia("1.1 www.hub.com:7777 (  Hub/0.1b  )")
     assert(via.protocol == Protocol.parse("HTTP/1.1"))
@@ -45,4 +45,3 @@ class ViaTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](ParseVia("HTTP/1.1"))
     assertThrows[IllegalArgumentException](ParseVia("HTTP/1.1 (Hub/0.1b)"))
   }
-}

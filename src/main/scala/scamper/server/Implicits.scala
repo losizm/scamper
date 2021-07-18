@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@ import scamper.types.{ DispositionType, MediaType }
 
 import Auxiliary.{ SocketType, StringType }
 
-/** Defines server-side type classes. */
-object Implicits {
+/** Defines server-side implicit classes. */
+object Implicits:
   /** Adds server-side extension methods to `HttpMessage`. */
-  implicit class ServerHttpMessage(private val msg: HttpMessage) extends AnyVal {
+  implicit class ServerHttpMessage(msg: HttpMessage) extends AnyVal:
     /**
      * Gets message correlate.
      *
@@ -63,13 +63,12 @@ object Implicits {
     /** Gets server to which this message belongs. */
     def server: HttpServer =
       msg.getAttribute("scamper.server.message.server").get
-  }
 
   /** Adds server-side extension methods to `HttpRequest`. */
-  implicit class ServerHttpRequest(private val req: HttpRequest) extends AnyVal {
+  implicit class ServerHttpRequest(req: HttpRequest) extends AnyVal:
     /** Gets path parameters. */
     def params: PathParameters =
-      req.getAttributeOrElse("scamper.server.request.parameters", new MapPathParameters(Map.empty))
+      req.getAttributeOrElse("scamper.server.request.parameters", MapPathParameters(Map.empty))
 
     /**
      * Sends interim 100 (Continue) response if request includes Expect header
@@ -85,10 +84,9 @@ object Implicits {
           socket.writeLine()
           socket.flush()
         }.isDefined
-  }
 
   /** Adds server-side extension methods to `HttpResponse`. */
-  implicit class ServerHttpResponse(private val res: HttpResponse) extends AnyVal {
+  implicit class ServerHttpResponse(res: HttpResponse) extends AnyVal:
     /**
      * Optionally gets corresponding request.
      *
@@ -109,7 +107,7 @@ object Implicits {
      * @return new response
      */
     def setGzipContentEncoding(bufferSize: Int = 8192): HttpResponse =
-      ContentEncoder.gzip(res, bufferSize) { Auxiliary.executor }
+      ContentEncoder.gzip(res, bufferSize)(using Auxiliary.executor)
 
     /**
      * Adds `deflate` to Content-Encoding header and encodes message body.
@@ -147,7 +145,7 @@ object Implicits {
     def setInline(file: File): HttpResponse =
       createWithContentDisposition("inline", file)
 
-    private def createWithContentDisposition(typeName: String, file: File): HttpResponse = {
+    private def createWithContentDisposition(typeName: String, file: File): HttpResponse =
       val entity = Entity(file)
       val mediaType = MediaType.forFile(file).getOrElse(Auxiliary.applicationOctetStream)
       val disposition = DispositionType(
@@ -158,8 +156,5 @@ object Implicits {
 
       res.setBody(entity)
         .setContentType(mediaType)
-        .setContentLength(entity.getLength.get)
+        .setContentLength(entity.knownSize.get)
         .setContentDisposition(disposition)
-    }
-  }
-}

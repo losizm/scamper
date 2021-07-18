@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import scamper.{ DateValue, ListParser }
  *
  * @see [[scamper.headers.Warning]]
  */
-trait WarningType {
+trait WarningType:
   /** Gets warning code. */
   def code: Int
 
@@ -40,19 +40,17 @@ trait WarningType {
   /** Returns formatted warning. */
   override lazy val toString: String =
     s"""$code $agent "$text"${date.map(x => " \"" + DateValue.format(x) + "\"").getOrElse("")}"""
-}
 
 /** Provides factory for `WarningType`. */
-object WarningType {
+object WarningType:
   private val syntax = """\s*(\d{3})\s*([\p{Graph}&&[^",]]+)\s*"([^"]*)"\s*(?:"([\w, :+-]+)")?\s*""".r
 
   /** Parses formatted warning. */
   def parse(warning: String): WarningType =
-    warning match {
+    warning match
       case syntax(code, agent, text, null) => apply(code.toInt, agent, text)
       case syntax(code, agent, text, date) => apply(code.toInt, agent, text, Some(DateValue.parse(date)))
-      case _ => throw new IllegalArgumentException(s"Malformed warning: $warning")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed warning: $warning")
 
   /** Parses formatted list of warnings. */
   def parseAll(warnings: String): Seq[WarningType] =
@@ -61,6 +59,5 @@ object WarningType {
   /** Creates warning with supplied values. */
   def apply(code: Int, agent: String, text: String, date: Option[Instant] = None): WarningType =
     WarningTypeImpl(code, agent, text, date)
-}
 
 private case class WarningTypeImpl(code: Int, agent: String, text: String, date: Option[Instant]) extends WarningType

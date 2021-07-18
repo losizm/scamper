@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import scamper.types.KeepAliveParameters
  *
  * @see [[HttpServer$ HttpServer]], [[ServerApplication]]
  */
-trait HttpServer {
+trait HttpServer:
   /** Gets logger. */
   def logger: Logger
 
@@ -73,12 +73,11 @@ trait HttpServer {
 
   /** Closes server. */
   def close(): Unit
-}
 
 /** Provides factory for `HttpServer`. */
-object HttpServer {
+object HttpServer:
   /** Gets new instance of server application. */
-  def app(): ServerApplication = new ServerApplication()
+  def app(): ServerApplication = ServerApplication()
 
   /**
    * Creates server at given port using supplied handler.
@@ -161,4 +160,3 @@ object HttpServer {
    */
   def apply(host: InetAddress, port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
     app().secure(key, cert).incoming(handler).create(host, port)
-}

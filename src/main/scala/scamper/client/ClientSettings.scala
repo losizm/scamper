@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,24 +30,23 @@ import scamper.types.{ ContentCodingRange, MediaRange }
  * settings are modified and returned. After applying the desired settings, a
  * client is created using a factory method.
  *
- * @constructor Creates client settings.
- *
- * === Default Settings ===
+ * ### Default Settings
  *
  * | Key             | Value |
  * | --------------- | ----- |
- * | accept          | `*``/``*` |
+ * | accept          | `*`/`*` |
  * | acceptEncodings | `Nil` |
  * | bufferSize      | `8192` |
  * | readTimeout     | `30000` |
  * | continueTimeout | `1000` |
  * | coookies        | `CookieStore.alwaysEmpty` |
- * | trust           | ''(Not set)'' |
- * | incoming        | ''(Not set)'' |
- * | outgoing        | ''(Not set)'' |
- * <br>
+ * | trust           | _(Not set)_ |
+ * | incoming        | _(Not set)_ |
+ * | outgoing        | _(Not set)_ |
+ *
+ * @constructor Creates client settings.
  */
-class ClientSettings {
+class ClientSettings:
   private var settings = HttpClientImpl.Settings()
 
   /** Resets to default settings. */
@@ -174,10 +173,8 @@ class ClientSettings {
 
   /** Creates client using current settings. */
   def create(): HttpClient = synchronized { HttpClientImpl(settings) }
-}
 
 /** Provides factory for `ClientSettings`. */
-object ClientSettings {
+object ClientSettings:
   /** Gets new instance of client settings. */
   def apply(): ClientSettings = new ClientSettings()
-}

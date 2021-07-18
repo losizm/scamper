@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,80 +27,77 @@ import scamper.ResponseStatus.Registry.Continue
 import scamper.headers.TransferEncoding
 import scamper.types.TransferCoding
 
-private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTimeout: Int) extends AutoCloseable {
-  private val closeGuard = new AtomicBoolean(false)
+private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTimeout: Int) extends AutoCloseable:
+  private val closeGuard = AtomicBoolean(false)
 
   def getSocket(): Socket = socket
   def getCloseGuard(): Boolean = closeGuard.get()
   def setCloseGuard(enable: Boolean): Unit = closeGuard.set(enable)
 
-  def send(request: HttpRequest): HttpResponse = {
+  def send(request: HttpRequest): HttpResponse =
     socket.writeLine(request.startLine.toString)
     request.headers.map(_.toString).foreach(socket.writeLine)
     socket.writeLine()
     socket.flush()
 
-    val continue = new AtomicBoolean(true)
+    val continue = AtomicBoolean(true)
 
-    if (!request.body.isKnownEmpty)
+    if !request.body.isKnownEmpty then
       Future {
-        if (request.getHeaderValues("Expect").exists { _.toLowerCase == "100-continue" })
+        if request.getHeaderValues("Expect").exists { _.toLowerCase == "100-continue" } then
           continue.synchronized { continue.wait(continueTimeout) }
 
-        if (continue.get)
+        if continue.get then
           writeBody(request)
-      } { executor }
+      }(using executor)
 
-    getResponse(request.isHead) match {
+    getResponse(request.isHead) match
       case res if res.status == Continue =>
         continue.synchronized { continue.notify() }
         getResponse(request.isHead)
 
       case res =>
-        if (!res.isSuccessful)
+        if !res.isSuccessful then
           continue.set(false)
         continue.synchronized { continue.notify() }
         res
-    }
-  }
 
   def close(): Unit =
-    if (!closeGuard.get())
+    if !closeGuard.get() then
       socket.close()
 
   private def writeBody(request: HttpRequest): Unit =
     request.getTransferEncoding.map { encoding =>
       val buffer = new Array[Byte](bufferSize)
-      val in = encodeInputStream(request.body.inputStream, encoding)
+      val in = encodeInputStream(request.body.data, encoding)
       var chunkSize = 0
 
-      while ({ chunkSize = in.read(buffer); chunkSize != -1 }) {
+      while { chunkSize = in.read(buffer); chunkSize != -1 } do
         socket.writeLine(chunkSize.toHexString)
         socket.write(buffer, 0, chunkSize)
         socket.writeLine()
-      }
 
       socket.writeLine("0")
       socket.writeLine()
       socket.flush()
     }.getOrElse {
       val buffer = new Array[Byte](bufferSize)
-      val in = request.body.inputStream
+      val in = request.body.data
       var length = 0
-      while ({ length = in.read(buffer); length != -1 })
+      while { length = in.read(buffer); length != -1 } do
         socket.write(buffer, 0, length)
       socket.flush()
     }
 
   private def encodeInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
     encoding.foldLeft(in) { (in, enc) =>
-      if (enc.isChunked) in
-      else if (enc.isGzip) Compressor.gzip(in) { executor }
-      else if (enc.isDeflate) Compressor.deflate(in)
-      else throw new HttpException(s"Unsupported transfer encoding: $enc")
+      if      enc.isChunked then in
+      else if enc.isGzip    then Compressor.gzip(in)(using executor)
+      else if enc.isDeflate then Compressor.deflate(in)
+      else throw HttpException(s"Unsupported transfer encoding: $enc")
     }
 
-  private def getResponse(headOnly: Boolean): HttpResponse = {
+  private def getResponse(headOnly: Boolean): HttpResponse =
     val buffer = new Array[Byte](bufferSize)
     val statusLine = StatusLine(socket.getLine(buffer))
     val headers = HeaderStream.getHeaders(socket.getInputStream(), buffer)
@@ -108,10 +105,7 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
     HttpResponse(
       statusLine,
       headers,
-      headOnly match {
+      headOnly match
         case true  => Entity.empty
         case false => Entity(socket.getInputStream())
-      }
     )
-  }
-}

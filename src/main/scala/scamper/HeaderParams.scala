@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package scamper
 
-import Grammar._
+import Grammar.*
 
-private object HeaderParams {
+private object HeaderParams:
   private val NoValue     = """\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val TokenValue  = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val QuotedValue = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*"([^"]*)"\s*""".r
@@ -29,11 +29,11 @@ private object HeaderParams {
       case TokenValue(name, value)  => name -> Some(value)
       case QuotedValue(name, value) => name -> Some(value)
       case BadValue(name, value)    => name -> Some(value)
-      case param => throw new IllegalArgumentException(s"Malformed parameters: $param")
+      case param => throw IllegalArgumentException(s"Malformed parameters: $param")
     }.toMap
 
   def format(params: Map[String, Option[String]]): String =
-    if (params.isEmpty) ""
+    if params.isEmpty then ""
     else
       params.map {
         case (name, Some(value)) => s"; $name=${formatParamValue(value)}"
@@ -41,4 +41,3 @@ private object HeaderParams {
       }.mkString
 
   private def formatParamValue(value: String): String = Token(value).getOrElse(s"""\"$value\"""")
-}

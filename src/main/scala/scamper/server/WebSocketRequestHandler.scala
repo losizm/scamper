@@ -21,25 +21,20 @@ import scamper.{ HttpMessage, HttpRequest }
 import scamper.Validate.notNull
 import scamper.websocket.{ StatusCode, WebSocket, WebSocketApplication }
 
-private class WebSocketRequestHandler(app: WebSocketApplication) extends RequestHandler {
+private class WebSocketRequestHandler(app: WebSocketApplication[?]) extends RequestHandler:
   def apply(req: HttpRequest): HttpMessage =
-    WebSocket.isUpgrade(req) match {
+    WebSocket.isUpgrade(req) match
       case true =>
         WebSocketUpgrade(req) { session =>
           try
             app(session)
-          catch {
-            case err: Exception =>
+          catch case err: Exception =>
               Try(session.logger.error(s"Error in WebSocket application: $err", err))
               Try(session.close(StatusCode.Registry.InternalError))
-          }
         }
 
       case false => req
-    }
-}
 
-private object WebSocketRequestHandler {
-  def apply(app: WebSocketApplication): WebSocketRequestHandler =
+private object WebSocketRequestHandler:
+  def apply(app: WebSocketApplication[?]): WebSocketRequestHandler =
     new WebSocketRequestHandler(notNull(app))
-}

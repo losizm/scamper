@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package scamper
 
 /** Defines HTTP message. */
-sealed trait HttpMessage {
+sealed trait HttpMessage:
   /** Type of start line in message */
   type LineType <: StartLine
 
@@ -46,7 +46,7 @@ sealed trait HttpMessage {
    *
    * @param parser body parser
    */
-  def as[T](implicit parser: BodyParser[T]): T =
+  def as[T](using parser: BodyParser[T]): T =
     parser.parse(this)
 
   /** Tests for header with given name. */
@@ -97,14 +97,13 @@ sealed trait HttpMessage {
    */
   def getAttributeOrElse[T](name: String, default: => T): T =
     getAttribute(name).getOrElse(default)
-}
 
 /**
  * Defines HTTP request.
  *
  * @see [[HttpResponse]]
  */
-trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
+trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest]:
   type LineType = RequestLine
 
   /** Gets request method. */
@@ -219,10 +218,9 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest] {
   def setVersion(version: HttpVersion): HttpRequest =
     setStartLine(RequestLine(method, target, version))
 
-}
 
 /** Provides factory for `HttpRequest`. */
-object HttpRequest {
+object HttpRequest:
   /** Creates request with supplied message parts. */
   def apply(requestLine: RequestLine, headers: Seq[Header], body: Entity): HttpRequest =
     HttpRequestImpl(requestLine, headers, body)
@@ -230,14 +228,13 @@ object HttpRequest {
   /** Creates request with supplied message parts. */
   def apply(method: RequestMethod, target: Uri = Uri("/"), headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: HttpVersion = HttpVersion(1, 1)): HttpRequest =
     HttpRequestImpl(RequestLine(method, target, version), headers, body)
-}
 
 /**
  * Defines HTTP response.
  *
  * @see [[HttpRequest]]
  */
-trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse] {
+trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse]:
   type LineType = StatusLine
 
   /** Gets response status. */
@@ -287,10 +284,9 @@ trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse] {
    */
   def setVersion(version: HttpVersion): HttpResponse =
     setStartLine(StatusLine(version, status))
-}
 
 /** Provides factory for `HttpResponse`. */
-object HttpResponse {
+object HttpResponse:
   /** Creates response with supplied message parts. */
   def apply(statusLine: StatusLine, headers: Seq[Header], body: Entity): HttpResponse =
     HttpResponseImpl(statusLine, headers, body)
@@ -298,4 +294,3 @@ object HttpResponse {
   /** Creates response with supplied message parts. */
   def apply(status: ResponseStatus, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: HttpVersion = HttpVersion(1, 1)): HttpResponse =
     HttpResponseImpl(StatusLine(version, status), headers, body)
-}

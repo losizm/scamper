@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,18 @@
  */
 package scamper
 
-import java.time.Instant
-import scala.util.Try
-
 /**
  * Defines types for specialized access to message cookies.
  *
- * === Request Cookies ===
+ * ### Request Cookies
  *
  * In [[HttpRequest]], cookies are stringed together in the Cookie header. You
  * can access them using extension methods provided by [[RequestCookies]], with
  * each cookie represented as [[PlainCookie]].
  *
  * {{{
+ * import scala.language.implicitConversions
+ *
  * import scamper.Implicits.stringToUri
  * import scamper.RequestMethod.Registry.Get
  * import scamper.cookies.{ PlainCookie, RequestCookies }
@@ -49,13 +48,15 @@ import scala.util.Try
  * assert(req.getCookieValue("Region").contains("SE-US"))
  * }}}
  *
- * === Response Cookies ===
+ * ### Response Cookies
  *
  * In [[HttpResponse]], the cookies are a collection of Set-Cookie header
  * values. Specialized access is provided by [[ResponseCookies]], with each
  * cookie represented as [[SetCookie]].
  *
  * {{{
+ * import scala.language.implicitConversions
+ *
  * import scamper.Implicits.stringToEntity
  * import scamper.ResponseStatus.Registry.Ok
  * import scamper.cookies.{ ResponseCookies, SetCookie }
@@ -82,179 +83,175 @@ import scala.util.Try
  * assert(res.getCookieValue("Region").contains("SE-US"))
  * }}}
  */
-package object cookies {
-  /** Provides access to request cookies in Cookie header. */
-  implicit class RequestCookies(private val request: HttpRequest) extends AnyVal {
-    /** Gets cookies. */
-    def cookies: Seq[PlainCookie] =
-      request.getHeaderValue("Cookie")
-        .map(PlainCookie.parseAll)
-        .getOrElse(Nil)
+package cookies
 
-    /**
-     * Gets specified cookie.
-     *
-     * @param name cookie name
-     */
-    def getCookie(name: String): Option[PlainCookie] =
-      cookies.find(_.name == name)
+import java.time.Instant
+import scala.util.Try
 
-    /**
-     * Gets value of specified cookie.
-     *
-     * @param name cookie name
-     */
-    def getCookieValue(name: String): Option[String] =
-      getCookie(name).map(_.value)
+/** Provides access to request cookies in Cookie header. */
+implicit class RequestCookies(request: HttpRequest) extends AnyVal:
+  /** Gets cookies. */
+  def cookies: Seq[PlainCookie] =
+    request.getHeaderValue("Cookie")
+      .map(PlainCookie.parseAll)
+      .getOrElse(Nil)
 
-    /**
-     * Creates copy of request with new set of cookies.
-     *
-     * @param cookies new set of cookies
-     */
-    def setCookies(cookies: Seq[PlainCookie]): HttpRequest =
-      cookies.isEmpty match {
-        case true  => request.removeHeaders("Cookie")
-        case false => request.putHeaders(Header("Cookie", cookies.mkString("; ")))
-      }
+  /**
+   * Gets specified cookie.
+   *
+   * @param name cookie name
+   */
+  def getCookie(name: String): Option[PlainCookie] =
+    cookies.find(_.name == name)
 
-    /**
-     * Creates copy of request with new set of cookies.
-     *
-     * @param one new cookie
-     * @param more additional new cookies
-     */
-    def setCookies(one: PlainCookie, more: PlainCookie*): HttpRequest =
-      setCookies(one +: more)
+  /**
+   * Gets value of specified cookie.
+   *
+   * @param name cookie name
+   */
+  def getCookieValue(name: String): Option[String] =
+    getCookie(name).map(_.value)
 
-    /**
-     * Creates copy of request with supplied cookie.
-     *
-     * @param cookies new cookies
-     *
-     * @note Previous cookies with same name are removed.
-     */
-    def putCookies(cookies: Seq[PlainCookie]): HttpRequest =
-      cookies.isEmpty match {
-        case true  => request
-        case false =>
-          val names = cookies.map(_.name)
-          setCookies(this.cookies.filterNot(c => names.contains(c.name)) ++ cookies)
-      }
+  /**
+   * Creates copy of request with new set of cookies.
+   *
+   * @param cookies new set of cookies
+   */
+  def setCookies(cookies: Seq[PlainCookie]): HttpRequest =
+    cookies.isEmpty match
+      case true  => request.removeHeaders("Cookie")
+      case false => request.putHeaders(Header("Cookie", cookies.mkString("; ")))
 
+  /**
+   * Creates copy of request with new set of cookies.
+   *
+   * @param one new cookie
+   * @param more additional new cookies
+   */
+  def setCookies(one: PlainCookie, more: PlainCookie*): HttpRequest =
+    setCookies(one +: more)
 
-    /**
-     * Creates copy of request with supplied cookies.
-     *
-     * @param one cookie
-     * @param more additional cookies
-     *
-     * @note Previous cookies with same name are removed.
-     */
-    def putCookies(one: PlainCookie, more: PlainCookie*): HttpRequest =
-      putCookies(one +: more)
+  /**
+   * Creates copy of request with supplied cookie.
+   *
+   * @param cookies new cookies
+   *
+   * @note Previous cookies with same name are removed.
+   */
+  def putCookies(cookies: Seq[PlainCookie]): HttpRequest =
+    cookies.isEmpty match
+      case true  => request
+      case false =>
+        val names = cookies.map(_.name)
+        setCookies(this.cookies.filterNot(c => names.contains(c.name)) ++ cookies)
 
-    /**
-     * Creates copy of request excluding cookies with given names.
-     *
-     * @param names cookie names
-     */
-    def removeCookies(names: Seq[String]): HttpRequest =
-      setCookies(cookies.filterNot(cookie => names.contains(cookie.name)))
+  /**
+   * Creates copy of request with supplied cookies.
+   *
+   * @param one cookie
+   * @param more additional cookies
+   *
+   * @note Previous cookies with same name are removed.
+   */
+  def putCookies(one: PlainCookie, more: PlainCookie*): HttpRequest =
+    putCookies(one +: more)
 
-    /**
-     * Creates copy of request excluding cookies with given names.
-     *
-     * @param one cookie name
-     * @param more additional cookie names
-     */
-    def removeCookies(one: String, more: String*): HttpRequest =
-      removeCookies(one +: more)
-  }
+  /**
+   * Creates copy of request excluding cookies with given names.
+   *
+   * @param names cookie names
+   */
+  def removeCookies(names: Seq[String]): HttpRequest =
+    setCookies(cookies.filterNot(cookie => names.contains(cookie.name)))
 
-  /** Provides access to response cookies in Set-Cookie headers. */
-  implicit class ResponseCookies(private val response: HttpResponse) extends AnyVal {
-    /** Gets cookies. */
-    def cookies: Seq[SetCookie] =
-      response.getHeaderValues("Set-Cookie").map(SetCookie.parse)
+  /**
+   * Creates copy of request excluding cookies with given names.
+   *
+   * @param one cookie name
+   * @param more additional cookie names
+   */
+  def removeCookies(one: String, more: String*): HttpRequest =
+    removeCookies(one +: more)
 
-    /**
-     * Gets specified cookie.
-     *
-     * @param name cookie name
-     */
-    def getCookie(name: String): Option[SetCookie] =
-      cookies.find(_.name == name)
+/** Provides access to response cookies in Set-Cookie headers. */
+implicit class ResponseCookies(response: HttpResponse) extends AnyVal:
+  /** Gets cookies. */
+  def cookies: Seq[SetCookie] =
+    response.getHeaderValues("Set-Cookie").map(SetCookie.parse)
 
-    /**
-     * Gets value of specified cookie.
-     *
-     * @param name cookie name
-     */
-    def getCookieValue(name: String): Option[String] =
-      getCookie(name).map(_.value)
+  /**
+   * Gets specified cookie.
+   *
+   * @param name cookie name
+   */
+  def getCookie(name: String): Option[SetCookie] =
+    cookies.find(_.name == name)
 
-    /**
-     * Creates copy of response with new set of cookies.
-     *
-     * @param cookies new set of cookies
-     */
-    def setCookies(cookies: Seq[SetCookie]): HttpResponse =
-      cookies.isEmpty match {
-        case true  => response.removeHeaders("Set-Cookie")
-        case false => response.putHeaders(cookies.map(c => Header("Set-Cookie", c.toString)))
-      }
+  /**
+   * Gets value of specified cookie.
+   *
+   * @param name cookie name
+   */
+  def getCookieValue(name: String): Option[String] =
+    getCookie(name).map(_.value)
 
-    /**
-     * Creates copy of response with new set of cookies.
-     *
-     * @param one new cookie
-     * @param more additional new cookies
-     */
-    def setCookies(one: SetCookie, more: SetCookie*): HttpResponse =
-      setCookies(one +: more)
+  /**
+   * Creates copy of response with new set of cookies.
+   *
+   * @param cookies new set of cookies
+   */
+  def setCookies(cookies: Seq[SetCookie]): HttpResponse =
+    cookies.isEmpty match
+      case true  => response.removeHeaders("Set-Cookie")
+      case false => response.putHeaders(cookies.map(c => Header("Set-Cookie", c.toString)))
 
-    /**
-     * Creates copy of response with supplied cookies.
-     *
-     * @param cookies new cookies
-     *
-     * @note Previous cookies with same name are removed.
-     */
-    def putCookies(cookies: Seq[SetCookie]): HttpResponse =
-      cookies.isEmpty match {
-        case true  => response
-        case false =>
-          val names = cookies.map(_.name)
-          setCookies(this.cookies.filterNot(c => names.contains(c.name)) ++ cookies)
-      }
+  /**
+   * Creates copy of response with new set of cookies.
+   *
+   * @param one new cookie
+   * @param more additional new cookies
+   */
+  def setCookies(one: SetCookie, more: SetCookie*): HttpResponse =
+    setCookies(one +: more)
 
-    /**
-     * Creates copy of response with supplied cookies.
-     *
-     * @param one cookie
-     * @param more additional cookies
-     *
-     * @note Previous cookies with same name are removed.
-     */
-    def putCookies(one: SetCookie, more: SetCookie*): HttpResponse =
-      putCookies(one +: more)
+  /**
+   * Creates copy of response with supplied cookies.
+   *
+   * @param cookies new cookies
+   *
+   * @note Previous cookies with same name are removed.
+   */
+  def putCookies(cookies: Seq[SetCookie]): HttpResponse =
+    cookies.isEmpty match
+      case true  => response
+      case false =>
+        val names = cookies.map(_.name)
+        setCookies(this.cookies.filterNot(c => names.contains(c.name)) ++ cookies)
 
-    /**
-     * Creates copy of response excluding cookies with given names.
-     *
-     * @param names cookie names
-     */
-    def removeCookies(names: Seq[String]): HttpResponse =
-      setCookies(cookies.filterNot(cookie => names.contains(cookie.name)))
+  /**
+   * Creates copy of response with supplied cookies.
+   *
+   * @param one cookie
+   * @param more additional cookies
+   *
+   * @note Previous cookies with same name are removed.
+   */
+  def putCookies(one: SetCookie, more: SetCookie*): HttpResponse =
+    putCookies(one +: more)
 
-    /**
-     * Creates copy of response excluding cookies with given names.
-     *
-     * @param one cookie name
-     * @param more additional cookie names
-     */
-    def removeCookies(one: String, more: String*): HttpResponse =
-      removeCookies(one +: more)
-  }
-}
+  /**
+   * Creates copy of response excluding cookies with given names.
+   *
+   * @param names cookie names
+   */
+  def removeCookies(names: Seq[String]): HttpResponse =
+    setCookies(cookies.filterNot(cookie => names.contains(cookie.name)))
+
+  /**
+   * Creates copy of response excluding cookies with given names.
+   *
+   * @param one cookie name
+   * @param more additional cookie names
+   */
+  def removeCookies(one: String, more: String*): HttpResponse =
+    removeCookies(one +: more)

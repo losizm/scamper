@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,19 @@
  */
 package scamper.types
 
-import scamper.Grammar._
+import scamper.Grammar.*
 
-private object MediaTypeHelper {
+private object MediaTypeHelper:
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)/([\w!#$%&'*+.^`|~-]+)(\s*(?:;.*)?)""".r
 
   def MainType(mainType: String): String =
     Token(mainType) getOrElse {
-      throw new IllegalArgumentException(s"Invalid main type: $mainType")
+      throw IllegalArgumentException(s"Invalid main type: $mainType")
     }
 
   def Subtype(subtype: String): String =
     Token(subtype) getOrElse {
-      throw new IllegalArgumentException(s"Invalid subtype: $subtype")
+      throw IllegalArgumentException(s"Invalid subtype: $subtype")
     }
 
   def Params(params: Map[String, String]): Map[String, String] =
@@ -35,23 +35,21 @@ private object MediaTypeHelper {
 
   def ParamName(name: String): String =
     Token(name) getOrElse {
-      throw new IllegalArgumentException(s"Invalid parameter name: $name")
+      throw IllegalArgumentException(s"Invalid parameter name: $name")
     }
 
   def ParamValue(value: String): String =
     Token(value) orElse QuotableString(value) getOrElse {
-      throw new IllegalArgumentException(s"Invalid parameter value: $value")
+      throw IllegalArgumentException(s"Invalid parameter value: $value")
     }
 
   def ParseMediaType(mediaType: String): (String, String, Map[String, String]) =
-    mediaType match {
+    mediaType match
       case syntax(mainType, subtype, params) => (mainType, subtype, ParseParams(params))
-      case _ => throw new IllegalArgumentException(s"Malformed media type: $mediaType")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed media type: $mediaType")
 
   def ParseParams(params: String): Map[String, String] =
     StandardParams.parse(params)
 
   def FormatParams(params: Map[String, String]): String =
     StandardParams.format(params)
-}

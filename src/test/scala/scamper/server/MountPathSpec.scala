@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper.server
 
-class MountPathSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class MountPathSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "match mount path to another path" in {
     val p1 = MountPath("/")
     assert(p1.matches("/"))
@@ -63,4 +63,3 @@ class MountPathSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](MountPath("/.."))
     assertThrows[IllegalArgumentException](MountPath("/../abc/xyz"))
   }
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-class EntityTagSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class EntityTagSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "EntityTag" should "be created" in {
     var tag = EntityTag.parse("\"abc\"")
     assert(tag.opaque == "\"abc\"")
@@ -35,4 +35,3 @@ class EntityTagSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](EntityTag.parse("abc"))
     assertThrows[IllegalArgumentException](EntityTag.parse("\"abc\"xyz\""))
   }
-}

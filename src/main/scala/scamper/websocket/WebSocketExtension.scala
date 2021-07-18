@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,15 @@ import scamper.{ HeaderParams, ListParser }
  *
  * @see [[SecWebSocketExtensions]]
  */
-trait WebSocketExtension {
+trait WebSocketExtension:
   /** Gets extension identifier. */
   def identifier: String
 
   /** Gets extension parameters. */
   def params: Map[String, Option[String]]
-}
 
 /** Provides factory for `WebSocketExtension`. */
-object WebSocketExtension {
+object WebSocketExtension:
   private val syntax = """\s*([^,;\s]+)\s*(;.+)?\s*""".r
 
   /** Creates WebSocket extension from supplied values. */
@@ -45,10 +44,9 @@ object WebSocketExtension {
 
   /** Parses formatted extension. */
   def parse(extension: String): WebSocketExtension =
-    extension match {
+    extension match
       case syntax(identifier, null)   => apply(identifier)
       case syntax(identifier, params) => apply(identifier, HeaderParams.parse(params))
-    }
 
   /** Parses formatted list of extensions. */
   def parseAll(extensions: String): Seq[WebSocketExtension] =
@@ -56,18 +54,15 @@ object WebSocketExtension {
 
   private def checkIdentifier(identifier: String): String =
     Token(identifier)
-      .getOrElse(throw new IllegalArgumentException(s"Invalid extension identifier: $identifier"))
+      .getOrElse(throw IllegalArgumentException(s"Invalid extension identifier: $identifier"))
 
-  private def checkParams(params: Map[String, Option[String]]): Map[String, Option[String]] = {
+  private def checkParams(params: Map[String, Option[String]]): Map[String, Option[String]] =
     params.keys.foreach { name =>
-      if (Token(name).isEmpty)
-        throw new IllegalArgumentException(s"Invalid extension parameter: $name")
+      if Token(name).isEmpty then
+        throw IllegalArgumentException(s"Invalid extension parameter: $name")
     }
     params
-  }
-}
 
-private case class WebSocketExtensionImpl(identifier: String, params: Map[String, Option[String]]) extends WebSocketExtension {
+private case class WebSocketExtensionImpl(identifier: String, params: Map[String, Option[String]]) extends WebSocketExtension:
   override lazy val toString: String =
     s"${identifier}${HeaderParams.format(params)}"
-}

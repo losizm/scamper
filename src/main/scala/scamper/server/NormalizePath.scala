@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,11 @@ package scamper.server
 
 import scamper.Uri
 
-private object NormalizePath {
+private object NormalizePath:
   def apply(path: String): String =
     Uri(path.replaceAll("//+", "/"))
       .normalize()
-      .toString match {
+      .toString match
         case ""   => ""
         case "/"  => "/"
-        case path => if (path.last == '/') path.init else path
-      }
-}
+        case path => if path.last == '/' then path.init else path

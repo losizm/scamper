@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,14 @@ import scamper.websocket.WebSocketApplication
  * Defines router for request handling.
  *
  * {{{
+ * import scala.language.implicitConversions
+ *
  * import scamper.Implicits.stringToEntity
  * import scamper.ResponseStatus.Registry.{ NotFound, Ok }
- * import scamper.server.HttpServer
- * import scamper.server.Implicits.ServerHttpRequestType
+ * import scamper.server.ServerApplication
+ * import scamper.server.Implicits.ServerHttpRequest
  *
- * val app = HttpServer.app()
+ * val app = ServerApplication()
  *
  * // Mount router to /api
  * app.route("/api") { router =>
@@ -53,7 +55,7 @@ import scamper.websocket.WebSocketApplication
  *
  * @see [[ServerApplication.route]]
  */
-trait Router {
+trait Router:
   /** Gets mount path. */
   def mountPath: String
 
@@ -69,19 +71,17 @@ trait Router {
    * @note If `*` is supplied as router path, its absolute path is also `*`.
    */
   def toAbsolutePath(path: String): String =
-    NormalizePath(path) match {
+    NormalizePath(path) match
       case ""   => mountPath
       case "*"  => "*"
       case "/"  => mountPath
       case path =>
-        if (!path.startsWith("/") || path.matches("/\\.\\.(/.*)?"))
-          throw new IllegalArgumentException(s"Invalid router path: $path")
+        if !path.startsWith("/") || path.matches("/\\.\\.(/.*)?") then
+          throw IllegalArgumentException(s"Invalid router path: $path")
 
-        mountPath == "/" match {
+        mountPath == "/" match
           case true  => path
           case false => mountPath + path
-        }
-    }
 
   /**
    * Adds supplied request handler.
@@ -170,7 +170,7 @@ trait Router {
    * remaining path is used to locate a file in the source directory or one of
    * its subdirectories.
    *
-   * === File Mapping Examples ===
+   * ### File Mapping Examples
    *
    * | Mount Path | Source Directory | Router Path               | Maps to |
    * | ---------- | ---------------- | ------------------------- | ------- |
@@ -192,7 +192,7 @@ trait Router {
    * remaining path is used to locate a resource in the source directory or one
    * of its subdirectories.
    *
-   * === Resource Mapping Examples ===
+   * ### Resource Mapping Examples
    *
    * | Mount Path | Source Directory | Router Path               | Maps to |
    * | ---------- | ---------------- | ------------------------- | ------- |
@@ -216,7 +216,7 @@ trait Router {
    * remaining path is used to locate a resource in the source directory or one
    * of its subdirectories.
    *
-   * === Resource Mapping Examples ===
+   * ### Resource Mapping Examples
    *
    * | Mount Path | Source Directory | Router Path               | Maps to |
    * | ---------- | ---------------- | ------------------------- | ------- |
@@ -240,7 +240,7 @@ trait Router {
    *
    * @return this router
    */
-  def websocket(path: String)(app: WebSocketApplication): this.type =
+  def websocket(path: String)(app: WebSocketApplication[?]): this.type =
     incoming(path, Get)(WebSocketRequestHandler(app))
 
   /**
@@ -251,9 +251,7 @@ trait Router {
    *
    * @return this router
    */
-  def route(path: String)(app: RoutingApplication): this.type = {
+  def route(path: String)(app: RoutingApplication): this.type =
     val router = RouterImpl(mountPath + MountPath.normalize(path))
     app(router)
     incoming(MountRequestHandler(router.mountPath, router.createRequestHandler()))
-  }
-}

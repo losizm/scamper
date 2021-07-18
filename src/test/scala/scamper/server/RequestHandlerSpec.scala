@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@
  */
 package scamper.server
 
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToUri
 import scamper.{ Header, HttpRequest, HttpResponse }
 import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Ok
 
-class RequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class RequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "compose request handlers" in {
     val req = Get("/")
     val filter: RequestHandler = _.putHeaders(Header("foo", "bar"))
@@ -32,4 +34,3 @@ class RequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert { processor.after(filter)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("bar") }
     assert { processor.before(filter)(req).asInstanceOf[HttpResponse].getHeaderValue("foo").contains("baz") }
   }
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import scala.util.{ Try, Failure, Success }
 import scamper.{ Auxiliary, RandomBytes, Uri }
 import scamper.websocket.StatusCode.Registry.{ GoingAway, MessageTooBig, NormalClosure }
 
-class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "end sessions with 'Normal Closure' (no compression)" in withSessions(false)(testNormalClosure)
 
   it should "end sessions with 'Normal Closure' (deflate)" in withSessions(true)(testNormalClosure)
@@ -40,14 +40,14 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
   it should "end sessions with 'Going Away' (deflate)" in withSessions(true)(testGoingAway)
 
   private val assertDelay    = 250L;
-  private val textMessages   = new ListBuffer[String]
-  private val binaryMessages = new ListBuffer[Array[Byte]]
-  private val pingMessages   = new ListBuffer[Array[Byte]]
-  private val pongMessages   = new ListBuffer[Array[Byte]]
-  private val serverClosure  = new AtomicReference[StatusCode]
-  private val clientClosure  = new AtomicReference[StatusCode]
+  private val textMessages   = ListBuffer[String]()
+  private val binaryMessages = ListBuffer[Array[Byte]]()
+  private val pingMessages   = ListBuffer[Array[Byte]]()
+  private val pongMessages   = ListBuffer[Array[Byte]]()
+  private val serverClosure  = AtomicReference[StatusCode]()
+  private val clientClosure  = AtomicReference[StatusCode]()
 
-  private def testNormalClosure(server: WebSocketSession, client: WebSocketSession): Unit = {
+  private def testNormalClosure(server: WebSocketSession, client: WebSocketSession): Unit =
     val messages = Seq("This is message #1.", "This is message #2.", "This is message #3.")
 
     info("send server messages")
@@ -57,9 +57,9 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
 
     Thread.sleep(assertDelay)
     assert(messages == textMessages.toSeq)
-    assert(messages == binaryMessages.map(bytes => new String(bytes, "utf-8")).toSeq)
-    assert(messages == pingMessages.map(bytes => new String(bytes, "utf-8")).toSeq)
-    assert(messages == pongMessages.map(bytes => new String(bytes, "utf-8")).toSeq)
+    assert(messages == binaryMessages.map(bytes => String(bytes, "utf-8")).toSeq)
+    assert(messages == pingMessages.map(bytes => String(bytes, "utf-8")).toSeq)
+    assert(messages == pongMessages.map(bytes => String(bytes, "utf-8")).toSeq)
 
     // Reset test buffers
     textMessages.clear()
@@ -74,9 +74,9 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
 
     Thread.sleep(assertDelay)
     assert(messages == textMessages.toSeq)
-    assert(messages == binaryMessages.map(bytes => new String(bytes, "utf-8")).toSeq)
-    assert(messages == pingMessages.map(bytes => new String(bytes, "utf-8")).toSeq)
-    assert(messages == pongMessages.map(bytes => new String(bytes, "utf-8")).toSeq)
+    assert(messages == binaryMessages.map(bytes => String(bytes, "utf-8")).toSeq)
+    assert(messages == pingMessages.map(bytes => String(bytes, "utf-8")).toSeq)
+    assert(messages == pongMessages.map(bytes => String(bytes, "utf-8")).toSeq)
 
     info("close client session")
     client.close()
@@ -91,9 +91,8 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
     Thread.sleep(assertDelay)
     assert(server.state == SessionState.Closed)
     assert(serverClosure.get == NormalClosure)
-  }
 
-  private def testMessageTooBig(server: WebSocketSession, client: WebSocketSession): Unit = {
+  private def testMessageTooBig(server: WebSocketSession, client: WebSocketSession): Unit =
     info("send messages")
     server.send(RandomBytes(client.messageCapacity - 128))
     server.send(RandomBytes(client.messageCapacity - 64))
@@ -109,9 +108,8 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(server.state == SessionState.Closed)
     assert(clientClosure.get == MessageTooBig)
     assert(serverClosure.get == MessageTooBig)
-  }
 
-  private def testGoingAway(server: WebSocketSession, client: WebSocketSession): Unit = {
+  private def testGoingAway(server: WebSocketSession, client: WebSocketSession): Unit =
     val messages = Seq("This is message #1.", "This is message #2.", "This is message #3.")
 
     info("send messages")
@@ -123,24 +121,23 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(server.state == SessionState.Closed)
     assert(clientClosure.get == GoingAway)
     assert(serverClosure.get == GoingAway)
-  }
 
-  private def withSessions[T](deflate: Boolean)(test: (WebSocketSession, WebSocketSession) => T): Unit = {
-    implicit val executor = Auxiliary.executor
+  private def withSessions[T](deflate: Boolean)(test: (WebSocketSession, WebSocketSession) => T): Unit =
+    given ExecutionContext = Auxiliary.executor
 
     var server: Socket = null
     var client: Socket = null
 
-    val connection = new ServerSocket(0)
+    val connection = ServerSocket(0)
 
-    try {
+    try
       val futureServer = Future {
         server = connection.accept()
         createSession(server, "server", true, deflate)
       }
 
       val futureClient = Future {
-        client = new Socket("localhost", connection.getLocalPort)
+        client = Socket("localhost", connection.getLocalPort)
         createSession(client, "client", false, deflate)
       }
 
@@ -156,18 +153,15 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
         Await.result(futureServer, 5.seconds),
         Await.result(futureClient, 5.seconds)
       )
-    } finally {
+    finally
       Try(client.close())
       Try(server.close())
       Try(connection.close())
-    }
-  }
 
-  private def createSession(socket: Socket, title: String, server: Boolean, deflate: Boolean): WebSocketSession = {
-    val session = server match {
+  private def createSession(socket: Socket, title: String, server: Boolean, deflate: Boolean): WebSocketSession =
+    val session = server match
       case true  => WebSocketSession.forServer(socket, title, Uri("/"), "13", deflate, None)
       case false => WebSocketSession.forClient(socket, title, Uri("/"), "13", deflate, None)
-    }
 
     info(s"set up $title session")
     assert(session.state == SessionState.Pending)
@@ -184,10 +178,9 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
       session.pong(message)
     }
 
-    server match {
+    server match
       case true  => session.onClose(serverClosure.set)
       case false => session.onClose(clientClosure.set)
-    }
 
     assert(session.state == SessionState.Pending)
     info(s"open $title session")
@@ -197,5 +190,3 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(session.state == SessionState.Open)
 
     session
-  }
-}

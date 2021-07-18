@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package scamper
  * Defines standard types for header values.
  *
  * {{{
+ * import scala.language.implicitConversions
+ *
  * import scamper.Implicits.{ stringToEntity, stringToUri }
  * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Ok
@@ -43,11 +45,13 @@ package scamper
  * can be implicitly converted to standardized types.
  *
  * {{{
+ * import scala.language.implicitConversions
+ *
  * import scamper.Implicits.{ stringToEntity, stringToUri }
  * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Ok
  * import scamper.headers.{ Accept, ContentType, TransferEncoding }
- * import scamper.types.Implicits._
+ * import scamper.types.Implicits.{ *, given }
  *
  * val req = Get("/motd")
  *   .setAccept("application/json; q=0.9", "text/html; q=0.1")

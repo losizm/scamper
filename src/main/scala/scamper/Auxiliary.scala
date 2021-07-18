@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
 import scamper.types.MediaType
-import RuntimeProperties.auxiliary._
+import RuntimeProperties.auxiliary.*
 
-private object Auxiliary {
+private object Auxiliary:
   private val crlf = "\r\n".getBytes("UTF-8")
 
   val applicationOctetStream = MediaType("application", "octet-stream")
@@ -41,74 +41,66 @@ private object Auxiliary {
         keepAliveSeconds = executorKeepAliveSeconds,
         queueSize        = executorQueueSize
       ) { (task, executor) =>
-        if (executorShowWarning)
+        if executorShowWarning then
           System.err.println(s"[WARNING] Running rejected scamper-auxiliary task on dedicated thread.")
         executor.getThreadFactory.newThread(task).start()
       }
 
-  implicit class FileType(private val file: File) extends AnyVal {
-    def withOutputStream[T](f: OutputStream => T): T = {
-      val out = new FileOutputStream(file)
+  implicit class FileType(private val file: File) extends AnyVal:
+    def withOutputStream[T](f: OutputStream => T): T =
+      val out = FileOutputStream(file)
       try f(out)
       finally Try(out.close())
-    }
 
-    def withInputStream[T](f: InputStream => T): T = {
-      val in = new FileInputStream(file)
+    def withInputStream[T](f: InputStream => T): T =
+      val in = FileInputStream(file)
       try f(in)
       finally Try(in.close())
-    }
-  }
 
-  implicit class InputStreamType(private val in: InputStream) extends AnyVal {
-    def getBytes(bufferSize: Int = 8192): Array[Byte] = {
-      val bytes = new ArrayBuffer[Byte]
+  implicit class InputStreamType(private val in: InputStream) extends AnyVal:
+    def getBytes(bufferSize: Int = 8192): Array[Byte] =
+      val bytes = ArrayBuffer[Byte]()
       val buffer = new Array[Byte](bufferSize.max(1024))
       var len = 0
 
-      while ({ len = in.read(buffer); len != -1 })
+      while { len = in.read(buffer); len != -1 } do
         bytes ++= buffer.take(len)
 
       bytes.toArray
-    }
 
     def getText(bufferSize: Int = 8192): String =
-      new String(getBytes(bufferSize), "UTF-8")
+      String(getBytes(bufferSize), "UTF-8")
 
-    def getToken(delimiters: String, buffer: Array[Byte], offset: Int = 0): String = {
+    def getToken(delimiters: String, buffer: Array[Byte], offset: Int = 0): String =
       var length = offset
       var byte = -1
 
-      while ({ byte = in.read(); !delimiters.contains(byte) && byte != -1}) {
+      while { byte = in.read(); !delimiters.contains(byte) && byte != -1 } do
         buffer(length) = byte.toByte
         length += 1
-      }
 
-      new String(buffer, 0, length, "UTF-8")
-    }
+      String(buffer, 0, length, "UTF-8")
 
-    def getLine(buffer: Array[Byte], offset: Int = 0): String = {
+    def getLine(buffer: Array[Byte], offset: Int = 0): String =
       var length = offset
       var byte = -1
 
-      while ({ byte = in.read(); byte != '\n' && byte != -1}) {
+      while { byte = in.read(); byte != '\n' && byte != -1} do
         buffer(length) = byte.toByte
         length += 1
-      }
 
-      if (length > 0 && buffer(length - 1) == '\r')
+      if length > 0 && buffer(length - 1) == '\r' then
         length -= 1
 
-      new String(buffer, 0, length, "UTF-8")
-    }
+      String(buffer, 0, length, "UTF-8")
 
-    def readLine(buffer: Array[Byte], offset: Int = 0): Int = {
+    def readLine(buffer: Array[Byte], offset: Int = 0): Int =
       val bufferSize = buffer.size
       var length = offset
       var continue = length < bufferSize
 
-      while (continue) {
-        in.read() match {
+      while continue do
+        in.read() match
           case -1 =>
             continue = false
 
@@ -116,41 +108,33 @@ private object Auxiliary {
             buffer(length) = byte.toByte
             length += 1
             continue = length < bufferSize && byte != '\n'
-        }
-      }
 
       length
-    }
 
     def readMostly(buffer: Array[Byte]): Int =
       readMostly(buffer, 0, buffer.length)
 
-    def readMostly(buffer: Array[Byte], offset: Int, length: Int): Int = {
+    def readMostly(buffer: Array[Byte], offset: Int, length: Int): Int =
       var total = in.read(buffer, offset, length)
 
-      if (total != -1 && total < length) {
+      if total != -1 && total < length then
         var count = 0
-        do {
+
+        while count != -1 && total < length do
           total += count
           count = in.read(buffer, offset + total, length - total)
-        } while (count != -1 && total < length)
-      }
 
       total
-    }
-  }
 
-  implicit class OutputStreamType(private val out: OutputStream) extends AnyVal {
-    def writeLine(text: String): Unit = {
+  implicit class OutputStreamType(private val out: OutputStream) extends AnyVal:
+    def writeLine(text: String): Unit =
       out.write(text.getBytes("UTF-8"))
       out.write(crlf)
-    }
 
     def writeLine(): Unit =
       out.write(crlf)
-  }
 
-  implicit class SocketType(private val socket: Socket) extends AnyVal {
+  implicit class SocketType(private val socket: Socket) extends AnyVal:
     def read(): Int =
       socket.getInputStream().read()
 
@@ -186,9 +170,8 @@ private object Auxiliary {
 
     def flush(): Unit =
       socket.getOutputStream().flush()
-  }
 
-  implicit class StringType(private val string: String) extends AnyVal {
+  implicit class StringType(private val string: String) extends AnyVal:
     def matchesAny(regexes: String*): Boolean =
       regexes.exists(string.matches)
 
@@ -197,9 +180,8 @@ private object Auxiliary {
 
     def toUrlDecoded(charset: String): String =
       URLDecoder.decode(string, charset)
-  }
 
-  implicit class UriType(private val uri: Uri) extends AnyVal {
+  implicit class UriType(private val uri: Uri) extends AnyVal:
     def toTarget: Uri =
       buildUri(null, null, uri.getRawPath, uri.getRawQuery, null)
 
@@ -218,25 +200,22 @@ private object Auxiliary {
     def setFragment(fragment: String): Uri =
       buildUri(uri.getScheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, fragment)
 
-    private def buildUri(scheme: String, authority: String, path: String, query: String, fragment: String): Uri = {
-      val uri = new StringBuilder()
+    private def buildUri(scheme: String, authority: String, path: String, query: String, fragment: String): Uri =
+      val uri = StringBuilder()
 
-      if (scheme != null)
+      if scheme != null then
         uri.append(scheme).append(":")
 
-      if (authority != null)
+      if authority != null then
         uri.append("//").append(authority)
 
-      if (path != null && path != "")
+      if path != null && path != "" then
         uri.append('/').append(path.dropWhile(_ == '/'))
 
-      if (query != null && query != "")
+      if query != null && query != "" then
         uri.append('?').append(query)
 
-      if (fragment != null && fragment != "")
+      if fragment != null && fragment != "" then
         uri.append('#').append(fragment)
 
       Uri(uri.toString)
-    }
-  }
-}

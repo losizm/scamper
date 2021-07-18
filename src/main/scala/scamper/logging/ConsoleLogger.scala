@@ -13,52 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scamper.websocket
+package scamper.logging
 
-import scamper.logging.Logger
+import java.time.Instant
 
-private class SessionLogger(id: String, logger: Logger) extends Logger:
+/** Provides logger to console. */
+object ConsoleLogger extends Logger:
   def trace(message: String): Unit =
-    logger.trace(s"@WebSocket($id) $message")
+    log("trace", message)
 
   def trace(format: String, args: Any*): Unit =
-    logger.trace(s"@WebSocket($id) $format", args*)
+    log("trace", format.format(args*))
 
   def trace(message: String, cause: Throwable): Unit =
-    logger.trace(s"@WebSocket($id) $message", cause)
+    log("trace", message, cause)
 
   def debug(message: String): Unit =
-    logger.debug(s"@WebSocket($id) $message")
+    log("debug", message)
 
   def debug(format: String, args: Any*): Unit =
-    logger.debug(s"@WebSocket($id) $format", args*)
+    log("debug", format.format(args*))
 
   def debug(message: String, cause: Throwable): Unit =
-    logger.debug(s"@WebSocket($id) $message", cause)
+    log("debug", message, cause)
 
   def info(message: String): Unit =
-    logger.info(s"@WebSocket($id) $message")
+    log("info", message)
 
   def info(format: String, args: Any*): Unit =
-    logger.info(s"@WebSocket($id) $format", args*)
+    log("info", format.format(args*))
 
   def info(message: String, cause: Throwable): Unit =
-    logger.info(s"@WebSocket($id) $message", cause)
+    log("info", message, cause)
 
   def warn(message: String): Unit =
-    logger.warn(s"@WebSocket($id) $message")
+    log("warn", message)
 
   def warn(format: String, args: Any*): Unit =
-    logger.warn(s"@WebSocket($id) $format", args*)
+    log("warn", format.format(args*))
 
   def warn(message: String, cause: Throwable): Unit =
-    logger.warn(s"@WebSocket($id) $message", cause)
+    log("warn", message, cause)
 
   def error(message: String): Unit =
-    logger.error(s"@WebSocket($id) $message")
+    log("error", message)
 
   def error(format: String, args: Any*): Unit =
-    logger.error(s"@WebSocket($id) $format", args*)
+    log("error", format.format(args*))
 
   def error(message: String, cause: Throwable): Unit =
-    logger.error(s"@WebSocket($id) $message", cause)
+    log("error", message, cause)
+
+  private def log(level: String, message: String): Unit =
+    Console.println(s"${Instant.now()} [$level] $message")
+
+  private def log(level: String, message: String, cause: Throwable): Unit =
+    log(level, message)
+    cause.printStackTrace(Console.out)

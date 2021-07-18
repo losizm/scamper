@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package scamper.auth
 
 import scamper.Base64
 
-class CredentialsSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class CredentialsSpec extends org.scalatest.flatspec.AnyFlatSpec:
   private val token = Base64.encodeToString("guest:letmein")
 
   "Credentials" should "be created with basic scheme" in {
@@ -59,4 +59,3 @@ class CredentialsSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](Credentials.parse("Insecure issa:rae"))
     assertThrows[IllegalArgumentException](Credentials.parse("Insecure aXNzYTpyYWUK realm=Insecure"))
   }
-}

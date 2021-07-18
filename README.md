@@ -1,16 +1,10 @@
 # Scamper
 
 **Scamper** is the HTTP library for Scala. It defines the interface for reading
-and writing HTTP messages. In addition, it provides [client](#HTTP-Client) and
-[server](#HTTP-Server) implementations, both of which support WebSockets with
-_permessage-deflate_.
+and writing HTTP messages, and it provides [client](#HTTP-Client) and
+[server](#HTTP-Server) implementations including WebSockets.
 
-The client handles content and transfer encoding, as well as manages cookies.
-
-The server is integrated into a lightweight web framework, which allows
-developers to create web applications as pipelines of request handlers.
-
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_2.13.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_2.13%22)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_3.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_3%22)
 
 ## Table of Contents
 
@@ -54,26 +48,31 @@ developers to create web applications as pipelines of request handlers.
 
 ## Getting Started
 
-To use **Scamper**, start by adding it as a dependency to your project:
+To get started, add **Scamper** to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "21.0.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "23.0.0"
 ```
+
+_**NOTE:** Starting with version 23, **scamper** is written for Scala 3
+exclusively. See previous releases for compatibility with Scala 2.12 and Scala
+2.13._
 
 ## HTTP Messages
 
-At the core of **Scamper** is `HttpMessage`, which is a trait that defines the
-fundamental characteristics of an HTTP message. `HttpRequest` and `HttpResponse`
+At the core of **Scamper** is `HttpMessage`, which defines the fundamental
+characteristics of an HTTP message. `HttpRequest` and `HttpResponse`
 extend the specification to define characteristics specific to their respective
 message types.
 
 ### Building Requests
 
-An `HttpRequest` can be created using a factory method defined in its companion
-object. Or you can start with a `RequestMethod` and use builder methods to
-further define the request.
+An `HttpRequest` can be created using one of its factory methods, or you can
+start with a `RequestMethod`.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Get
 import scamper.headers.{ Accept, Host }
@@ -86,11 +85,12 @@ val req = Get("/motd")
 
 ### Building Responses
 
-An `HttpResponse` can be created using a factory method defined in its companion
-object. Or you can start with a `ResponseStatus` and use builder methods to
-further define the response.
+An `HttpResponse` can be created using one of its factory methods, or you can
+start with a `ResponseStatus`.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToEntity
 import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.{ Connection, ContentType }
@@ -103,11 +103,12 @@ val res = Ok("There is an answer.")
 
 ## Specialized Header Access
 
-There is a set of methods in `HttpMessage` that provides generalized header
-access. With these methods, the header name is a `String`, which is
-case-insensitive, and the header value is a `String`.
+`HttpMessage` provides a set of methods for generalized header access. Using
+these methods, the header value are represented as a `String`.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.{ stringToUri, tupleToHeader }
 import scamper.RequestMethod.Registry.Post
 
@@ -116,9 +117,9 @@ val req = Post("/api/users").setHeaders("Content-Type" -> "application/json")
 val contentType: Option[String] = req.getHeaderValue("Content-Type")
 ```
 
-This gets the job done in many cases; however, `HttpMessage` can be extended for
-specialized header access. There are extension methods provided by type classes
-defined in `scamper.headers`.
+This gets the job done in many cases. However, there are extension methods
+provided by implicit classes defined in `scamper.headers`, which can be imported
+for specialized header access.
 
 For example, `ContentType` adds the following methods:
 
@@ -139,9 +140,11 @@ def setContentType(value: MediaType): HttpMessage
 def removeContentType(): HttpMessage
 ```
 
-So you can work with the header using specialized header types.
+So, you can work with the header using a specialized header type.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Post
 import scamper.headers.ContentType
@@ -156,6 +159,8 @@ And, with utilities defined in `scamper.types.Implicits`, you can implicitly
 convert values to header types.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Post
 import scamper.headers.ContentType
@@ -176,10 +181,12 @@ the case for cookies. Specialized access is provided by classes in
 
 In `HttpRequest`, cookies are stringed together in the **Cookie** header. You
 may access the cookies in their _unbaked_ form using generalized header access.
-Or you can access them using the extension methods provided by `RequestCookies`,
+Or, you can access them using extension methods provided by `RequestCookies`,
 with each cookie presented as `PlainCookie`.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Get
 import scamper.cookies.{ PlainCookie, RequestCookies }
@@ -207,13 +214,11 @@ assert(req.getHeaderValue("Cookie").contains("ID=bG9zCg; Region=SE-US"))
 
 In `HttpResponse`, the cookies are a collection of **Set-Cookie** header values.
 Specialized access is provided by `ResponseCookies`, with each cookie
-presented as `SetCookie`.
-
-Along with name and value, `SetCookie` provides additional attributes, such as
-the path to which the cookie is valid, when the cookie expires, whether the
-cookie should be sent over secure channels only, and a few others.
+represented as `SetCookie`.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToEntity
 import scamper.ResponseStatus.Registry.Ok
 import scamper.cookies.{ ResponseCookies, SetCookie }
@@ -249,15 +254,17 @@ Whereas `getHeaderValue()` retrieves the first header value only,
 
 ## Message Body
 
-The message body is represented as an `Entity`, which provides access to an
-`InputStream`.
+The message body is represented as an `Entity`, which provides access to its
+data via an `InputStream`.
 
 ### Creating Body
 
-When building a message, use the `Entity` factory to create the body. For
+When building a message, use an `Entity` factory to create the body. For
 example, you can create a message with text content.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Entity
 import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.ContentType
@@ -277,80 +284,86 @@ val body = Entity("""
 val res = Ok(body).setContentType("text/html; charset=utf-8")
 ```
 
-Or create a message using file content.
+Or, create a message using file content.
 
 ```scala
+import scala.language.implicitConversions
+
 import java.io.File
 import scamper.Entity
 import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.ContentType
 import scamper.types.Implicits.stringToMediaType
 
-val body = Entity(new File("./index.html"))
+val body = Entity(File("./index.html"))
 val res = Ok(body).setContentType("text/html; charset=utf-8")
 ```
 
-There are implicit converters available for common entity types, so you aren't
+There are implicit conversions available for common entity types, so you aren't
 required to create them explicitly.
 
 ```scala
+import scala.language.implicitConversions
+
 import java.io.File
 import scamper.Implicits.fileToEntity
 import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.ContentType
 import scamper.types.Implicits.stringToMediaType
 
-val res = Ok(new File("./index.html")).setContentType("text/html; charset=utf-8")
+val res = Ok(File("./index.html")).setContentType("text/html; charset=utf-8")
 ```
 
 ### Parsing Body
 
 When handling an incoming message, use an appropriate `BodyParser` to parse the
 message body. There are factory methods available, such as one used for creating
-a text body parser.
+a text parser.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.{ BodyParser, HttpMessage }
 
 // Create text body parser
-implicit val parser = BodyParser.text(maxLength = 1024)
+given BodyParser[String] = BodyParser.text(maxLength = 1024)
 
-def printText(message: HttpMessage): Unit = {
-  // Parse message body to String using implicit parser
+def printText(message: HttpMessage): Unit =
+  // Parse message as String using given parser
   val text = message.as[String]
 
   println(text)
-}
 ```
 
-And you can implement your own parser. Here's one powered by [little-json](https://github.com/losizm/little-json):
+And, you can implement your own. Here's one powered by [little-json](https://github.com/losizm/little-json):
 
 ```scala
-import javax.json.{ JsonObject, JsonValue }
 import little.json.{ Json, JsonInput }
-import little.json.Implicits._
+import little.json.Implicits.given
+
+import scala.language.implicitConversions
+
 import scamper.{ BodyParser, HttpMessage }
+import scamper.Implicits.{ stringToEntity, stringToUri }
+import scamper.RequestMethod.Registry.Post
 
 case class User(id: Int, name: String)
 
-implicit object UserParser extends BodyParser[User] {
-  // Define how to convert JsonObject to User
-  implicit val userInput: JsonInput[User] = {
-    case json: JsonObject => User(json.getInt("id"), json.getString("name"))
-    case json: JsonValue  => throw new IllegalArgumentException("Not an OBJECT")
-  }
+// Define how to parse JSON body to user
+given BodyParser[User] with
+  given JsonInput[User] = json => User(json("id"), json("name"))
 
-  // Parses JSON message body to User
   def parse(message: HttpMessage): User =
-    Json.parse(message.body.inputStream).as[User]
-}
+    Json.parse(message.body.data)
 
-def printUser(message: HttpMessage): Unit = {
-  // Parse message body to User (implicitly using UserParser)
-  val user = message.as[User]
+// Create test message with JSON body
+val request = Post("/users").setBody("""{ "id": 1000, "name": "lupita" }""")
 
-  println(s"uid=${user.id}(${user.name})")
-}
+// Parse message as User
+val user = request.as[User]
+
+assert(user.id == 1000)
+assert(user.name == "lupita")
 ```
 
 ## Multipart Message Body
@@ -361,6 +374,8 @@ message, the **Content-Type** header is set to _multipart/form-data_ with a
 boundary parameter whose value is used to delimit parts in the encoded body.
 
 ```scala
+import scala.language.implicitConversions
+
 import java.io.File
 import scamper.{ Multipart, TextPart, FilePart }
 import scamper.Implicits.{ HttpMessageType, stringToUri }
@@ -371,22 +386,24 @@ val formData = Multipart(
   TextPart("title", "Form Of Intellect"),
   TextPart("artist", "Gang Starr"),
   TextPart("album", "Step In The Arena"),
-  FilePart("media", new File("/music/gang_starr/form_of_intellect.m4a"))
+  FilePart("media", File("/music/gang_starr/form_of_intellect.m4a"))
 )
 
 // Create request with multipart body
 val req = Post("https://upload.musiclibrary.com/songs").setMultipartBody(formData)
 ```
 
-And for an incoming message with multipart form-data, there's a standard
+And, for an incoming message with multipart form-data, there's a standard
 `BodyParser` for parsing the message content.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.{ BodyParser, HttpRequest, Multipart }
 
-def saveTrack(req: HttpRequest): Unit = {
+def saveTrack(req: HttpRequest): Unit =
   // Get parser for multipart message body
-  implicit val parser = BodyParser.multipart()
+  given BodyParser[Multipart] = BodyParser.multipart()
 
   // Parse message to Multipart instance
   val multipart = req.as[Multipart]
@@ -398,7 +415,6 @@ def saveTrack(req: HttpRequest): Unit = {
   val track = multipart.getFile("media")
 
   ...
-}
 ```
 
 ## Message Attributes
@@ -406,6 +422,8 @@ def saveTrack(req: HttpRequest): Unit = {
 Attributes are arbitrary key-value pairs associated with a message.
 
 ```scala
+import scala.language.implicitConversions
+
 import scala.concurrent.duration.{ Deadline, DurationInt }
 import scamper.Implicits.stringToUri
 import scamper.{ HttpRequest, HttpResponse }
@@ -434,6 +452,8 @@ and `Credentials` in the request. Each of these has an assigned scheme, which is
 associated with either a token or a set of parameters.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Unauthorized
@@ -451,7 +471,7 @@ val req = Get("/dev/projects").setAuthorization(credentials)
 _**Note:** The `Authorization` and `WwwAuthenticate` header classes are for
 authentication between user agent and origin server. There are other header
 classes available for proxy authentication &ndash; see
-[scaladoc](https://losizm.github.io/scamper/latest/api/scamper/index.html) for
+[scaladoc](https://losizm.github.io/scamper/latest/api/scamper/auth.html) for
 details._
 
 
@@ -461,6 +481,8 @@ There are subclasses defined for Basic authentication: `BasicChallenge` and
 `BasicCredentials`.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Unauthorized
@@ -479,6 +501,8 @@ In addition, there are methods for Basic authentication defined in the header
 classes.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Unauthorized
@@ -506,6 +530,8 @@ There are subclasses defined for Bearer authentication: `BearerChallenge` and
 the header classes.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Unauthorized
@@ -548,6 +574,8 @@ printf("Token: %s%n", req.bearer.token)
 responses.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.{ stringToEntity, stringToUri }
 import scamper.RequestMethod.Registry.Post
 import scamper.client.HttpClient
@@ -577,26 +605,30 @@ to a client. With it, you also get access to methods corresponding to standard
 HTTP request methods.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.BodyParser
 import scamper.Implicits.stringToUri
 import scamper.client.HttpClient
 
-implicit val parser = BodyParser.text()
+given BodyParser[String] = BodyParser.text()
 
 // Create client instance
 val client = HttpClient()
 
 def messageOfTheDay: Either[Int, String] =
   client.get("http://localhost:8080/motd") {
-    case res if res.isSuccessful  => Right(res.as[String])
-    case res if !res.isSuccessful => Left(res.statusCode)
+    case res if res.isSuccessful => Right(res.as[String])
+    case res                     => Left(res.statusCode)
   }
 ```
 
-And, if an implicit client is in scope, you can make use of `send()` on the
-request itself.
+And, if a given client is in scope, you can make use of `send()` on the request
+itself.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.BodyParser
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Get
@@ -605,8 +637,8 @@ import scamper.client.Implicits.ClientHttpRequest // Adds send method to request
 import scamper.headers.{ Accept, AcceptLanguage }
 import scamper.types.Implicits.{ stringToMediaRange, stringToLanguageRange }
 
-implicit val client = HttpClient()
-implicit val parser = BodyParser.text(4096)
+given HttpClient = HttpClient()
+given BodyParser[String] = BodyParser.text(4096)
 
 Get("http://localhost:8080/motd")
   .setAccept("text/plain")
@@ -620,6 +652,8 @@ You can also create a client using `ClientSettings`, which allows you to
 configure the client before creating it.
 
 ```scala
+import scala.language.implicitConversions
+
 import java.io.File
 import scamper.Implicits.{ stringToEntity, stringToUri }
 import scamper.client.HttpClient
@@ -635,7 +669,7 @@ val client = HttpClient
   .readTimeout(3000)
   .continueTimeout(1000)
   .cookies(CookieStore())
-  .trust(new File("/path/to/truststore"))
+  .trust(File("/path/to/truststore"))
   .create()
 
 client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
@@ -669,6 +703,8 @@ example. Or, if greater control is required for securing connections, you can
 supply a trust manager instead.
 
 ```scala
+import scala.language.implicitConversions
+
 import javax.net.ssl.TrustManager
 import scamper.Implicits.stringToUri
 import scamper.client.HttpClient
@@ -683,7 +719,7 @@ val client = HttpClient
   .settings()
   .readTimeout(5000)
   // Use supplied trust manager
-  .trust(new SingleSiteTrustManager("192.168.0.2"))
+  .trust(SingleSiteTrustManager("192.168.0.2"))
   .create()
 
 client.get("https://192.168.0.2:3000/messages") { res =>
@@ -700,8 +736,8 @@ filters to the client.
 ```scala
 import scamper.Uri
 import scamper.client.HttpClient
-import scamper.client.Implicits._
-import scamper.cookies._
+import scamper.client.Implicits.*
+import scamper.cookies.*
 
 val settings = HttpClient.settings()
 
@@ -737,6 +773,8 @@ executed in order, and response filters are executed in order.
 The client instance can also be used as a WebSocket client.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToUri
 import scamper.client.HttpClient
 
@@ -744,7 +782,7 @@ HttpClient().websocket("ws://localhost:9090/hello") { session =>
   session.onText { message =>
     println(s"Received text message: $message")
 
-    if (message.equalsIgnoreCase("bye"))
+    if message.equalsIgnoreCase("bye") then
       session.close()
   }
 
@@ -786,7 +824,7 @@ second span, the session will be closed automatically.
 Before the session begins reading incoming messages, it must first be opened.
 And, to kick things off, a simple text message is sent to the server.
 
-See [WebSocketSession](https://losizm.github.io/scamper/latest/api/scamper/websocket/WebSocketSession.html)
+See [WebSocketSession](https://losizm.github.io/scamper/latest/api/scamper/websocket.html)
 in scaladoc for additional details.
 
 ## HTTP Server
@@ -795,6 +833,8 @@ in scaladoc for additional details.
 with a simple example.
 
 ```scala
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToEntity
 import scamper.ResponseStatus.Registry.Ok
 import scamper.server.HttpServer
@@ -828,10 +868,10 @@ This gives you the default application as a starting point. With this in hand,
 you can set the location of the server log.
 
 ```scala
-app.logger(new File("/tmp/server.log"))
+app.logger(File("/tmp/server.log"))
 ```
 
-And there are performance-related settings that can be tweaked as well.
+And, there are performance-related settings that can be tweaked as well.
 
 ```scala
 app.backlogSize(50)
@@ -890,12 +930,11 @@ app.incoming { req =>
 
 // Add handler to allow GET and HEAD requests only
 app.incoming { req =>
-  req.isGet || req.isHead match {
+  req.isGet || req.isHead match
     // Return request for next handler
     case true  => req
     // Return response to end request chain
     case false => MethodNotAllowed().setAllow(Get, Head)
-  }
 }
 ```
 
@@ -904,24 +943,27 @@ above, you'd swap the order of handlers if you wanted to log GET and HEAD
 requests only, and all other requests would immediately be sent
 _405 (Method Not Allowed)_ and never make it to the request logger.
 
-And a request handler is not restricted to returning the same request it
+And, a request handler is not restricted to returning the same request it
 accepted.
 
 ```scala
-import scamper.BodyParser
+import scamper.{ BodyParser, HttpMessage }
 import scamper.Implicits.stringToEntity
 import scamper.headers.ContentLanguage
 import scamper.types.LanguageTag
 import scamper.types.Implicits.stringToLanguageTag
 
-// Translates message body from French (Oui, oui.)
+// Translate message body from French (Oui, oui.)
 app.incoming { req =>
-  implicit val translator: BodyParser[String] = ???
+  given BodyParser[String] with
+    val parser = BodyParser.text()
 
-  req.isPost && req.contentLanguage.contains("fr") match {
+    def parse(msg: HttpMessage) =
+      msg.as(using parser).replaceAll("\boui\b", "yes")
+
+  req.isPost && req.contentLanguage.contains("fr") match
     case true  => req.setBody(req.as[String]).setContentLanguage("en")
     case false => req
-  }
 }
 ```
 
@@ -945,24 +987,32 @@ app.incoming("/private") { req =>
 }
 ```
 
-And handlers can be added using methods corresponding to the standard HTTP
+And, handlers can be added using methods corresponding to the standard HTTP
 request methods.
 
 ```scala
+import java.util.concurrent.atomic.AtomicInteger
+import scala.collection.concurrent.TrieMap
 import scamper.Implicits.stringToUri
 import scamper.ResponseStatus.Registry.{ Created, Ok }
 import scamper.headers.Location
 
 // Match GET requests to given path
-app.get("/about") { req =>
-  Ok("This server is powered by Scamper.")
+app.get("/motd") { req =>
+  Ok("She who laughs last laughs best.")
 }
 
 // Match POST requests to given path
 app.post("/messages") { req =>
-  def post(message: String): Int = ???
+  val messages = TrieMap[Int, String]()
+  val count    = AtomicInteger(0)
 
-  implicit val parser = BodyParser.text()
+  def post(message: String): Int =
+    val id = count.incrementAndGet()
+    messages += id -> message
+    id
+
+  given BodyParser[String] = BodyParser.text()
 
   val id = post(req.as[String])
   Created().setLocation(s"/messages/$id")
@@ -988,10 +1038,9 @@ app.delete("/orders/:id") { req =>
   // Get resolved parameter
   val id = req.params.getInt("id")
 
-  deleteOrder(id) match {
+  deleteOrder(id) match
     case true  => Accepted()
     case false => NotFound()
-  }
 }
 
 // Match prefixed path for GET requests
@@ -1021,7 +1070,7 @@ app.post("/translate/:in/to/:out") { req =>
 
   val from   = req.params.getString("in")
   val to     = req.params.getString("out")
-  val result = req.as(translate(from, to))
+  val result = req.as(using translate(from, to))
 
   Ok(result)
 }
@@ -1032,7 +1081,7 @@ app.post("/translate/:in/to/:out") { req =>
 You can mount a file server as a specialized request handler.
 
 ```scala
-app.files("/app/main", new File("/path/to/public"))
+app.files("/app/main", File("/path/to/public"))
 ```
 
 This adds a handler to serve files from the directory at _/path/to/public_. The
@@ -1052,7 +1101,7 @@ app.resources("/app/main", "assets")
 In the above configuration, requests prefixed with _/app/main_ are served
 resources from the _assets_ directory. The mapping works similiar to static
 files, only the resources are located using a class loader. _(See
-[ServerApplication.resources()](https://losizm.github.io/scamper/latest/api/scamper/server/ServerApplication.html#resources(path:String,source:String,loader:ClassLoader):ServerApplication.this.type)
+[ServerApplication.resources()](https://losizm.github.io/scamper/latest/api/scamper/server/ServerApplication.html#resources-73a)
 in scaladoc for additional details.)_
 
 #### Aborting Response
@@ -1066,7 +1115,7 @@ import scamper.server.ResponseAborted
 
 // Ignore requests originating from evil site
 app.incoming { req =>
-  if (req.referer.getHost == "www.phishing.com")
+  if req.referer.getHost == "www.phishing.com" then
     throw ResponseAborted("Not trusted")
   req
 }
@@ -1124,12 +1173,12 @@ import scamper.ResponseStatus.Registry.{ BadRequest, InternalServerError }
 
 // Accept Throwable and HttpRequest; return HttpResponse
 app.error { (err, req) =>
-  def isClientError(err: Throwable): Boolean = ???
+  def isClientError(err: Throwable): Boolean =
+    err.isInstanceOf[NumberFormatException]
 
-  isClientError(err) match {
+  isClientError(err) match
     case true  => BadRequest("Your bad.")
     case false => InternalServerError("My bad.")
-  }
 }
 ```
 
@@ -1140,20 +1189,21 @@ in much the same way as `ServerApplication`, except it is configured for request
 handling only, and all router paths are relative to its mount path.
 
 ```scala
+import scala.language.implicitConversions
 import scamper.Implicits.stringToEntity
 import scamper.ResponseStatus.Registry.{ NotFound, Ok }
-import scamper.server.HttpServer
+import scamper.server.ServerApplication
 import scamper.server.Implicits.ServerHttpRequest
 
-val app = HttpServer.app()
-
 // Mount router to /api
+val app = ServerApplication()
+
 app.route("/api") { router =>
   val messages = Map(1 -> "Hello, world!", 2 -> "Goodbye, cruel world!")
 
   // Map handler to /api/messages
   router.get("/messages") { req =>
-    Ok(messages.mkString("\r\n"))
+    Ok(messages.mkString("\n"))
   }
 
   // Map handler to /api/messages/:id
@@ -1184,17 +1234,16 @@ app.outgoing { res =>
 This is pretty much the same as the request logger from earlier, only instead of
 `HttpRequest`, it accepts and returns `HttpResponse`.
 
-And the filter is not restricted to returning the same response it accepts.
+And, the filter is not restricted to returning the same response it accepts.
 
 ```scala
 import scamper.server.Implicits.ServerHttpResponse
 
 // Gzip response body if not empty
 app.outgoing { res =>
-  res.body.isKnownEmpty match {
+  res.body.isKnownEmpty match
     case true  => res
     case false => res.setGzipContentEncoding()
-  }
 }
 ```
 
@@ -1204,7 +1253,7 @@ The last piece of configuration is whether to secure the server using SSL/TLS.
 To use a secure transport, you must supply an appropriate key and certificate.
 
 ```scala
-app.secure(new File("/path/to/private.key"), new File("/path/to/public.crt"))
+app.secure(File("/path/to/private.key"), File("/path/to/public.crt"))
 ```
 
 Or, if you have them tucked away in a keystore, you can supply the keystore
@@ -1212,7 +1261,7 @@ location.
 
 ```scala
 // Supply location, password, and store type (i.e., JKS, JCEKS, PCKS12)
-app.secure(new File("/path/to/keystore"), "s3cr3t", "pkcs12")
+app.secure(File("/path/to/keystore"), "s3cr3t", "pkcs12")
 ```
 
 ### Creating Server
@@ -1256,7 +1305,7 @@ server.close() // Good-bye, cruel world.
 
 ## API Documentation
 
-See [scaladoc](https://losizm.github.io/scamper/latest/api/scamper/index.html)
+See [scaladoc](https://losizm.github.io/scamper/latest/api/index.html)
 for additional details.
 
 ## License

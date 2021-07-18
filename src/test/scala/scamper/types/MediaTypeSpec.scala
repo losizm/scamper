@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-class MediaTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class MediaTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "MediaType" should "be created without parameters" in {
     val contentType = MediaType("text/html")
     assert(contentType.mainType == "text")
@@ -54,4 +54,3 @@ class MediaTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](MediaType("text/html; charset"))
     assertThrows[IllegalArgumentException](MediaType("text/html; charset=iso 8859 1"))
   }
-}

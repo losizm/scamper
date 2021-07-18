@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,15 @@ import java.time.Instant
 
 import scamper.{ DateValue, ListParser }
 
-import CookieGrammar._
+import CookieGrammar.*
 
 /** Defines HTTP cookie. */
-sealed trait Cookie {
+sealed trait Cookie:
   /** Gets cookie name. */
   def name: String
 
   /** Gets cookie value. */
   def value: String
-}
 
 /**
  * Defines HTTP request cookie.
@@ -38,13 +37,12 @@ sealed trait Cookie {
 trait PlainCookie extends Cookie
 
 /** Provides factory for `PlainCookie`. */
-object PlainCookie {
+object PlainCookie:
   /** Parses formatted cookie. */
   def parse(cookie: String): PlainCookie =
-    cookie.split("=", 2) match {
+    cookie.split("=", 2) match
       case Array(name, value) => apply(name.trim, value.trim)
-      case _ => throw new IllegalArgumentException(s"Malformed cookie: $cookie")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed cookie: $cookie")
 
   /** Parses formatted list of cookies. */
   def parseAll(cookies: String): Seq[PlainCookie] =
@@ -54,18 +52,16 @@ object PlainCookie {
   /** Creates cookie with supplied name and value. */
   def apply(name: String, value: String): PlainCookie =
     PlainCookieImpl(Name(name), Value(value))
-}
 
-private case class PlainCookieImpl(name: String, value: String) extends PlainCookie {
+private case class PlainCookieImpl(name: String, value: String) extends PlainCookie:
   override lazy val toString: String = s"$name=$value"
-}
 
 /**
  * Defines HTTP response cookie.
  *
  * @see [[PlainCookie]]
  */
-trait SetCookie extends Cookie {
+trait SetCookie extends Cookie:
   /** Gets cookie domain. */
   def domain: Option[String]
 
@@ -89,30 +85,25 @@ trait SetCookie extends Cookie {
 
   /** Converts to `PlainCookie`. */
   def toPlainCookie: PlainCookie = PlainCookie(name, value)
-}
 
 /** Provides factory for `SetCookie`. */
-object SetCookie {
+object SetCookie:
   /** Parses formatted cookie. */
   def parse(cookie: String): SetCookie =
-    cookie.split(";", 2) match {
+    cookie.split(";", 2) match
       case Array(pair, attrs) =>
-        pair.split("=", 2) match {
+        pair.split("=", 2) match
           case Array(name, value) => SetCookieImpl(Name(name), Value(value), CookieAttributes.parse(attrs))
-        }
       case Array(pair) =>
-        pair.split("=", 2) match {
+        pair.split("=", 2) match
           case Array(name, value) => SetCookieImpl(Name(name), Value(value), CookieAttributes())
-        }
-    }
 
   /** Creates cookie with supplied name, value, and attributes. */
   def apply(name: String, value: String, domain: Option[String] = None, path: Option[String] = None, expires: Option[Instant] = None,
       maxAge: Option[Long] = None, secure: Boolean = false, httpOnly: Boolean = false): SetCookie =
     SetCookieImpl(Name(name), Value(value), CookieAttributes(domain, path, expires, maxAge, secure, httpOnly))
-}
 
-private case class SetCookieImpl(name: String, value: String, attrs: CookieAttributes) extends SetCookie {
+private case class SetCookieImpl(name: String, value: String, attrs: CookieAttributes) extends SetCookie:
   def domain: Option[String] = attrs.domain
   def path: Option[String] = attrs.path
   def expires: Option[Instant] = attrs.expires
@@ -120,8 +111,8 @@ private case class SetCookieImpl(name: String, value: String, attrs: CookieAttri
   def secure: Boolean = attrs.secure
   def httpOnly: Boolean = attrs.httpOnly
 
-  override lazy val toString: String = {
-    val cookie = new StringBuilder
+  override lazy val toString: String =
+    val cookie = StringBuilder()
 
     cookie.append(name).append('=').append(value)
 
@@ -130,15 +121,13 @@ private case class SetCookieImpl(name: String, value: String, attrs: CookieAttri
     expires.foreach(date => cookie.append("; Expires=").append(DateValue.format(date)))
     maxAge.foreach(cookie.append("; Max-Age=").append(_))
 
-    if (secure) cookie.append("; Secure")
-    if (httpOnly) cookie.append("; HttpOnly")
+    if secure then cookie.append("; Secure")
+    if httpOnly then cookie.append("; HttpOnly")
 
     cookie.toString
-  }
-}
 
 /** Persistent cookie in [[CookieStore]]. */
-sealed trait PersistentCookie extends Cookie {
+sealed trait PersistentCookie extends Cookie:
   /** Gets cookie domain. */
   def domain: String
 
@@ -180,7 +169,6 @@ sealed trait PersistentCookie extends Cookie {
 
   /** Converts to `PlainCookie`. */
   def toPlainCookie: PlainCookie = PlainCookie(name, value)
-}
 
 private case class PersistentCookieImpl(
   name: String,
@@ -192,12 +180,10 @@ private case class PersistentCookieImpl(
   hostOnly: Boolean = false,
   persistent: Boolean = false,
   creation: Instant = Instant.now(),
-  expiry: Instant = Instant.now()) extends PersistentCookie
-{
+  expiry: Instant = Instant.now()) extends PersistentCookie:
+
   private var _lastAccess: Instant = Instant.now()
   def lastAccess = _lastAccess
-  def touch() = {
+  def touch() =
     _lastAccess = Instant.now()
     this
-  }
-}

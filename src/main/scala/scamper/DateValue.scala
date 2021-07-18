@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
  */
 package scamper
 
-import java.time.{ Instant, OffsetDateTime, ZoneOffset }
+import java.time.{ Instant, ZonedDateTime, ZoneId }
 import java.time.format.DateTimeFormatter.{ RFC_1123_DATE_TIME => DateFormatter }
 
-private object DateValue {
-  private val gmt = ZoneOffset.of("Z")
+private object DateValue:
+  private val gmt = ZoneId.of("GMT")
 
   def format(value: Instant): String =
-    DateFormatter.format(value.atOffset(gmt))
+    DateFormatter.format(value.atZone(gmt))
 
   def parse(value: String): Instant =
-    OffsetDateTime.parse(value, DateFormatter).toInstant
-}
+    ZonedDateTime.parse(value, DateFormatter).toInstant

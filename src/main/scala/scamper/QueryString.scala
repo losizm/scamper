@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import java.net.URLDecoder.decode
 import java.net.URLEncoder.encode
 
 /** Represents query string as mapped parameters. */
-trait QueryString {
+trait QueryString:
   /** Gets parameter names. */
   def names: Seq[String]
 
@@ -200,10 +200,9 @@ trait QueryString {
    * parameter values in `that` appended to those in `this`.
    */
   def concat(that: QueryString): QueryString =
-    that.isEmpty match {
+    that.isEmpty match
       case true  => this
       case false => QueryString(toSeq ++ that.toSeq)
-    }
 
   /**
    * Creates new query string by concatenating supplied parameters.
@@ -236,10 +235,9 @@ trait QueryString {
    * parameter values in `that` overriding those in `this`.
    */
   def merge(that: QueryString): QueryString =
-    that.isEmpty match {
+    that.isEmpty match
       case true  => this
       case false => QueryString(toMap ++ that.toMap)
-    }
 
   /**
    * Creates new query string by merging supplied parameters.
@@ -360,10 +358,9 @@ trait QueryString {
    * @note Alias to `merge`.
    */
   def <<(params: Seq[(String, String)]): QueryString = merge(params)
-}
 
 /** Provides factory for `QueryString`. */
-object QueryString {
+object QueryString:
   /** Gets empty query string. */
   def empty: QueryString = EmptyQueryString
 
@@ -373,10 +370,9 @@ object QueryString {
    * @param params parameters
    */
   def apply(params: Map[String, Seq[String]]): QueryString =
-    params.isEmpty match {
+    params.isEmpty match
       case true  => EmptyQueryString
       case false => MapQueryString(params)
-    }
 
   /**
    * Creates query string from parameters.
@@ -384,10 +380,9 @@ object QueryString {
    * @param params parameters
    */
   def apply(params: Seq[(String, String)]): QueryString =
-    params.isEmpty match {
+    params.isEmpty match
       case true  => EmptyQueryString
       case false => SeqQueryString(params)
-    }
 
   /**
    * Creates query string from parameters.
@@ -404,10 +399,9 @@ object QueryString {
    * @param query encoded query string
    */
   def apply(query: String): QueryString =
-    parse(query) match {
+    parse(query) match
       case Nil    => EmptyQueryString
       case params => SeqQueryString(params)
-    }
 
   private def parse(query: String): Seq[(String, String)] =
     query.split("&").map(_.split("=")).toIndexedSeq.collect {
@@ -424,9 +418,8 @@ object QueryString {
     params map {
       case (name, value) => s"${encode(name, "UTF-8")}=${encode(value, "UTF-8")}"
     } mkString "&"
-}
 
-private object EmptyQueryString extends QueryString {
+private object EmptyQueryString extends QueryString:
   def names = Nil
   def get(name: String) = None
   def getValues(name: String) = Nil
@@ -450,9 +443,8 @@ private object EmptyQueryString extends QueryString {
   override def filter(pred: ((String, String)) => Boolean) = this
 
   override val toString = ""
-}
 
-private case class MapQueryString(toMap: Map[String, Seq[String]]) extends QueryString {
+private case class MapQueryString(toMap: Map[String, Seq[String]]) extends QueryString:
   lazy val names = toMap.keys.toSeq
 
   def get(name: String) = toMap.get(name).flatMap(_.headOption)
@@ -467,16 +459,14 @@ private case class MapQueryString(toMap: Map[String, Seq[String]]) extends Query
     MapQueryString(toMap + { name -> values })
 
   def remove(names: Seq[String]) =
-    names.isEmpty match {
+    names.isEmpty match
       case true  => this
       case false => MapQueryString(toMap.filterNot(x => names.contains(x._1)))
-    }
 
   def retain(names: Seq[String]) =
-    names.isEmpty match {
+    names.isEmpty match
       case true  => this
       case false => MapQueryString(toMap.filter(x => names.contains(x._1)))
-    }
 
   lazy val toSeq =
     toMap.toSeq
@@ -487,9 +477,8 @@ private case class MapQueryString(toMap: Map[String, Seq[String]]) extends Query
       .toMap
 
   override lazy val toString = QueryString.format(toMap)
-}
 
-private case class SeqQueryString(toSeq: Seq[(String, String)]) extends QueryString {
+private case class SeqQueryString(toSeq: Seq[(String, String)]) extends QueryString:
   lazy val names = toSeq.map(_._1).distinct
 
   def get(name: String) = toSeq.collectFirst { case (`name`, value) => value }
@@ -504,16 +493,14 @@ private case class SeqQueryString(toSeq: Seq[(String, String)]) extends QueryStr
     SeqQueryString(toSeq.filterNot(_._1 == name) ++ values.map { value => name -> value })
 
   def remove(names: Seq[String]) =
-    names.isEmpty match {
+    names.isEmpty match
       case true  => this
       case false => SeqQueryString(toSeq.filterNot(x => names.contains(x._1)))
-    }
 
   def retain(names: Seq[String]) =
-    names.isEmpty match {
+    names.isEmpty match
       case true  => this
       case false => SeqQueryString(toSeq.filter(x => names.contains(x._1)))
-    }
 
   lazy val toMap =
     toSeq.groupBy(_._1)
@@ -526,4 +513,3 @@ private case class SeqQueryString(toSeq: Seq[(String, String)]) extends QueryStr
       .toMap
 
   override lazy val toString = QueryString.format(toSeq)
-}

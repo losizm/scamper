@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package scamper.server
 import scamper.{ HttpMessage, HttpRequest, HttpResponse }
 
 /** Defines handler for incoming request. */
-trait RequestHandler {
+@FunctionalInterface
+trait RequestHandler:
   /**
    * Handles incoming request.
    *
@@ -36,10 +37,9 @@ trait RequestHandler {
    * @param other fallback handler
    */
   def before(other: RequestHandler): RequestHandler =
-    apply(_) match {
+    apply(_) match
       case req: HttpRequest  => other(req)
       case res: HttpResponse => res
-    }
 
   /**
    * Creates composite handler by applying `this` after `other`.
@@ -50,14 +50,12 @@ trait RequestHandler {
    * @param other initial handler
    */
   def after(other: RequestHandler): RequestHandler =
-    other(_) match {
+    other(_) match
       case req: HttpRequest  => apply(req)
       case res: HttpResponse => res
-    }
-}
 
 /** Provides `RequestHandler` utilities. */
-object RequestHandler {
+object RequestHandler:
   /**
    * Composes request handlers, with tail handlers as fallbacks.
    *
@@ -66,19 +64,16 @@ object RequestHandler {
    * @note If `handlers` is empty, a handler is created to return supplied
    * request.
    */
-  def coalesce(handlers: Seq[RequestHandler]): RequestHandler = {
+  def coalesce(handlers: Seq[RequestHandler]): RequestHandler =
     @annotation.tailrec
     def handle(req: HttpRequest, handlers: Seq[RequestHandler]): HttpMessage =
-      handlers match {
+      handlers match
         case Nil          => req
         case head +: tail =>
-          head(req) match {
+          head(req) match
             case req: HttpRequest  => handle(req, tail)
             case res: HttpResponse => res
-          }
-      }
     handle(_, handlers)
-  }
 
   /**
    * Composes `one` handler with `more` handlers, using `more` as fallbacks.
@@ -88,4 +83,3 @@ object RequestHandler {
    */
   def coalesce(one: RequestHandler, more: RequestHandler*): RequestHandler =
     coalesce(one +: more)
-}

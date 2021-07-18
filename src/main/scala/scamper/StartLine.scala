@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,36 +20,33 @@ import scala.util.Try
 import Validate.notNull
 
 /** Defines HTTP message start line. */
-sealed trait StartLine {
+sealed trait StartLine:
   /** Gets HTTP version. */
   def version: HttpVersion
-}
 
 /**
  * Defines HTTP request line.
  *
  * @see [[StatusLine]]
  */
-sealed trait RequestLine extends StartLine {
+sealed trait RequestLine extends StartLine:
   /** Gets request method. */
   def method: RequestMethod
 
   /** Gets request target. */
   def target: Uri
-}
 
 /** Provides factory for `RequestLine`. */
-object RequestLine {
+object RequestLine:
   private val syntax = """([\w!#$%&'*+.^`|~-]+)\h+(\p{Graph}+)\h+HTTP/(\d+(?:\.\d+)?)\h*""".r
 
   /** Parses formatted request line. */
   def apply(line: String): RequestLine =
     Try {
-      line match {
+      line match
         case syntax(method, target, version) => RequestLineImpl(RequestMethod(method), Uri(target), HttpVersion(version))
-      }
     } getOrElse {
-      throw new IllegalArgumentException(s"Malformed request line: $line")
+      throw IllegalArgumentException(s"Malformed request line: $line")
     }
 
   /**
@@ -71,51 +68,45 @@ object RequestLine {
       notNull(version, "version"))
 
   private def adjustTarget(target: Uri, method: String): Uri =
-    target.isAbsolute match {
+    target.isAbsolute match
       case true  => target
       case false =>
-        target.toString match {
+        target.toString match
           case uri if uri.startsWith("/") => target
           case uri if uri.startsWith("*") => target
           case uri =>
-            if (method == "OPTIONS" && (uri.isEmpty || uri.startsWith("?") || uri.startsWith("#")))
+            if method == "OPTIONS" && (uri.isEmpty || uri.startsWith("?") || uri.startsWith("#")) then
               Uri("*" + uri)
             else
               Uri("/" + uri)
-        }
-    }
-}
 
-private case class RequestLineImpl(method: RequestMethod, target: Uri, version: HttpVersion) extends RequestLine {
+private case class RequestLineImpl(method: RequestMethod, target: Uri, version: HttpVersion) extends RequestLine:
   override lazy val toString: String = s"$method $target HTTP/$version"
-}
 
 /**
  * Defines HTTP status line.
  *
  * @see [[RequestLine]]
  */
-sealed trait StatusLine extends StartLine {
+sealed trait StatusLine extends StartLine:
   /** Gets response status. */
   def status: ResponseStatus
-}
 
 /** Provides factory for `StatusLine`. */
-object StatusLine {
+object StatusLine:
   private val syntax = """HTTP/(\d+(?:\.\d+)?)\h+(\d+)(?:\h+(\p{Print}*?))?\h*""".r
 
   /** Parses formatted status line. */
   def apply(line: String): StatusLine =
     Try {
-      line match {
+      line match
         case syntax(version, statusCode, null | "")    =>
           StatusLineImpl(HttpVersion(version), ResponseStatus(statusCode.toInt))
 
         case syntax(version, statusCode, reasonPhrase) =>
           StatusLineImpl(HttpVersion(version), ResponseStatus(statusCode.toInt, reasonPhrase))
-      }
     } getOrElse {
-      throw new IllegalArgumentException(s"Malformed status line: $line")
+      throw IllegalArgumentException(s"Malformed status line: $line")
     }
 
   /**
@@ -133,8 +124,6 @@ object StatusLine {
     StatusLineImpl(
       notNull(version, "version"),
       notNull(status, "status"))
-}
 
-private case class StatusLineImpl(version: HttpVersion, status: ResponseStatus) extends StatusLine {
+private case class StatusLineImpl(version: HttpVersion, status: ResponseStatus) extends StatusLine:
   override lazy val toString = s"HTTP/$version ${status.statusCode} ${status.reasonPhrase}"
-}

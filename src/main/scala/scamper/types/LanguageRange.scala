@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ package scamper.types
  *
  * @see [[scamper.headers.AcceptLanguage]]
  */
-trait LanguageRange {
+trait LanguageRange:
   /** Gets language tag. */
   def tag: String
 
@@ -35,29 +35,26 @@ trait LanguageRange {
 
   /** Returns formatted range. */
   override lazy val toString: String =
-    if (weight == 1.0f) tag
+    if weight == 1.0f then tag
     else tag + "; q=" + weight
-}
 
 /** Provides factory for `LanguageRange`. */
-object LanguageRange {
+object LanguageRange:
   private val syntax = """([\w*-]+)(?i:\s*;\s*q=(\d+(?:\.\d*)?))?""".r
 
   /** Parses formatted range. */
   def parse(range: String): LanguageRange =
-    range match {
+    range match
       case syntax(tag, null)   => apply(tag, 1.0f)
       case syntax(tag, weight) => apply(tag, weight.toFloat)
-      case _ => throw new IllegalArgumentException(s"Malformed language range: $range")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed language range: $range")
 
   /** Creates range with supplied language tag and weight. */
   def apply(tag: String, weight: Float): LanguageRange =
     LanguageRangeImpl(tag, QValue(weight))
-}
 
-private case class LanguageRangeImpl(tag: String, weight: Float) extends LanguageRange {
-  private val languageTag = if (tag == "*") None else Some(LanguageTag.parse(tag))
+private case class LanguageRangeImpl(tag: String, weight: Float) extends LanguageRange:
+  private val languageTag = if tag == "*" then None else Some(LanguageTag.parse(tag))
 
   def matches(that: LanguageTag): Boolean =
     languageTag.forall { tag =>
@@ -66,4 +63,3 @@ private case class LanguageRangeImpl(tag: String, weight: Float) extends Languag
 
   private def matchesOthers(others: Seq[String], that: Seq[String]): Boolean =
     others.size <= that.size && others.zip(that).forall(x => x._1.equalsIgnoreCase(x._2))
-}

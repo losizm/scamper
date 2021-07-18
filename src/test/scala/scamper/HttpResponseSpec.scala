@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
  */
 package scamper
 
-import scamper.Implicits.{ stringToEntity, stringToHeader, stringToUri }
-import scamper.ResponseStatus.Registry._
-import scamper.headers._
+import scala.language.implicitConversions
 
-class HttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec {
+import scamper.Implicits.{ stringToEntity, stringToHeader, stringToUri }
+import scamper.ResponseStatus.Registry.*
+import scamper.headers.*
+
+class HttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "create with location" in {
     val res = SeeOther().setLocation("/find")
     assert(res.status == SeeOther)
@@ -60,4 +62,3 @@ class HttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[HeaderNotFound](res.getHeaderOrElse("Server", throw HeaderNotFound("Server")))
     assertThrows[HeaderNotFound](res.getHeaderValueOrElse("Server", throw HeaderNotFound("Server")))
   }
-}

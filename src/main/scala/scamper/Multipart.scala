@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import scamper.types.{ DispositionType, MediaType }
  *
  * @see [[Part]]
  */
-sealed trait Multipart {
+sealed trait Multipart:
   /** Gets parts. */
   def parts: Seq[Part]
 
@@ -87,14 +87,13 @@ sealed trait Multipart {
    * @throws java.lang.ClassCastException if part is present and is not file
    */
   def getFile(name: String): Option[File]
-}
 
 /**
  * Represents part in multipart form data.
  *
  * @see [[Multipart]]
  */
-sealed trait Part {
+sealed trait Part:
   /** Gets name. */
   def name: String
 
@@ -103,34 +102,31 @@ sealed trait Part {
 
   /** Gets Content-Type header value. */
   def contentType: MediaType
-}
 
 /**
  * Represents text content in multipart form data.
  *
  * @see [[FilePart]]
  */
-trait TextPart extends Part {
+trait TextPart extends Part:
   /** Gets text content. */
   def content: String
-}
 
 /**
  * Represents file content in multipart form data.
  *
  * @see [[TextPart]]
  */
-trait FilePart extends Part {
+trait FilePart extends Part:
   /** Gets file content. */
   def content: File
 
   /** Gets file name specified in Content-Disposition header. */
   def getFileName: Option[String]
-}
 
 /** Provides factory for `Multipart`. */
-object Multipart {
-  private val random = new java.security.SecureRandom()
+object Multipart:
+  private val random = java.security.SecureRandom()
   private val prefix = "----MultipartBoundary_"
   private val charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz"
 
@@ -144,11 +140,10 @@ object Multipart {
 
   /** Generates boundary. */
   def boundary(): String =
-    prefix + new String(random.ints(16, 0, 62).toArray.map(charset))
-}
+    prefix + String(random.ints(16, 0, 62).toArray.map(charset))
 
 /** Provides factory for `TextPart`. */
-object TextPart {
+object TextPart:
   /** Creates text part with given name and content. */
   def apply(name: String, content: String): TextPart =
     apply(DispositionType("form-data", "name" -> name), content)
@@ -158,21 +153,20 @@ object TextPart {
     apply(contentDisposition, Auxiliary.textPlain, content)
 
   /** Creates text part with supplied disposition, content type, and content. */
-  def apply(contentDisposition: DispositionType, contentType: MediaType, content: String): TextPart = {
-    if (!contentDisposition.isFormData)
-      throw new HttpException("Content disposition is not form-data")
+  def apply(contentDisposition: DispositionType, contentType: MediaType, content: String): TextPart =
+    if !contentDisposition.isFormData then
+      throw HttpException("Content disposition is not form-data")
 
-    if (!contentType.isText)
-      throw new HttpException("Content type is not text")
+    if !contentType.isText then
+      throw HttpException("Content type is not text")
 
     val name = contentDisposition.params.get("name")
-      .getOrElse(throw new HttpException("Missing name parameter in content disposition"))
+      .getOrElse(throw HttpException("Missing name parameter in content disposition"))
 
     TextPartImpl(name, content, contentDisposition, contentType)
-  }
 
   /** Creates text part with supplied headers and content. */
-  def apply(headers: Seq[Header], content: String): TextPart = {
+  def apply(headers: Seq[Header], content: String): TextPart =
     val contentDisposition = headers.collectFirst {
       case header if header.name.equalsIgnoreCase("Content-Disposition") => DispositionType.parse(header.value)
     }.getOrElse(throw HeaderNotFound("Content-Disposition"))
@@ -182,11 +176,9 @@ object TextPart {
     }.getOrElse(Auxiliary.textPlain)
 
     apply(contentDisposition, contentType, notNull(content, "content"))
-  }
-}
 
 /** Provides factory for `FilePart`. */
-object FilePart {
+object FilePart:
   /** Creates file part with given name and content. */
   def apply(name: String, content: File): FilePart =
     apply(getDisposition(name, Some(content.getName)), getType(content), content)
@@ -204,18 +196,17 @@ object FilePart {
     apply(contentDisposition, getType(content), content)
 
   /** Creates file part from supplied disposition, content type, and content. */
-  def apply(contentDisposition: DispositionType, contentType: MediaType, content: File): FilePart = {
-    if (!contentDisposition.isFormData)
-      throw new HttpException("Content disposition is not form-data")
+  def apply(contentDisposition: DispositionType, contentType: MediaType, content: File): FilePart =
+    if !contentDisposition.isFormData then
+      throw HttpException("Content disposition is not form-data")
 
     val name = contentDisposition.params.get("name")
-      .getOrElse(throw new HttpException("Missing name parameter in content disposition"))
+      .getOrElse(throw HttpException("Missing name parameter in content disposition"))
 
     FilePartImpl(name, notNull(content, "content"), contentDisposition, contentType)
-  }
 
   /** Creates file part from supplied headers and content. */
-  def apply(headers: Seq[Header], content: File): FilePart = {
+  def apply(headers: Seq[Header], content: File): FilePart =
     val contentDisposition = headers.collectFirst {
       case header if header.name.equalsIgnoreCase("Content-Disposition") => DispositionType.parse(header.value)
     }.getOrElse(throw HeaderNotFound("Content-Disposition"))
@@ -225,7 +216,6 @@ object FilePart {
     }.getOrElse(getType(content))
 
     apply(contentDisposition, contentType, content)
-  }
 
   private def getDisposition(name: String, optFileName: Option[String]): DispositionType =
     optFileName.map(fileName => DispositionType("form-data", "name" -> name, "filename" -> fileName))
@@ -233,9 +223,8 @@ object FilePart {
 
   private def getType(content: File): MediaType =
     MediaType.forFile(content).getOrElse(Auxiliary.applicationOctetStream)
-}
 
-private case class MultipartImpl(parts: Seq[Part]) extends Multipart {
+private case class MultipartImpl(parts: Seq[Part]) extends Multipart:
   lazy val textParts: Seq[TextPart] =
     parts.collect { case part: TextPart => part }
 
@@ -262,7 +251,6 @@ private case class MultipartImpl(parts: Seq[Part]) extends Multipart {
 
   def getFile(name: String): Option[File] =
     getFilePart(name).map(_.content)
-}
 
 private case class TextPartImpl(
   name:               String,
@@ -276,6 +264,5 @@ private case class FilePartImpl(
   content:            File,
   contentDisposition: DispositionType,
   contentType:        MediaType
-) extends FilePart {
+) extends FilePart:
   val getFileName: Option[String] = contentDisposition.params.get("filename")
-}

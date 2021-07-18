@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-class ContentCodingRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class ContentCodingRangeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "ContentCodingRange" should "be created" in {
     var range = ContentCodingRange.parse("GZIP; q=0.7")
     assert(range.name == "gzip")
@@ -52,4 +52,3 @@ class ContentCodingRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](ContentCodingRange.parse("identity; q="))
     assertThrows[IllegalArgumentException](ContentCodingRange.parse("identity; =0.1"))
   }
-}

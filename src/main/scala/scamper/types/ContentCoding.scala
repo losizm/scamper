@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import CodingHelper.Name
  *
  * @see [[scamper.headers.ContentEncoding]]
  */
-trait ContentCoding {
+trait ContentCoding:
   /** Gets coding name. */
   def name: String
 
@@ -44,13 +44,11 @@ trait ContentCoding {
 
   /** Returns formatted content coding. */
   override val toString: String = name
-}
 
 /** Provides factory for `ContentCoding`. */
-object ContentCoding {
+object ContentCoding:
   /** Creates content coding with supplied name. */
   def apply(name: String): ContentCoding =
     ContentCodingImpl(Name(name))
-}
 
 private case class ContentCodingImpl(name: String) extends ContentCoding

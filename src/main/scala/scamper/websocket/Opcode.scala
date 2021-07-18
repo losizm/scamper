@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ package scamper.websocket
  *
  * @see [[Opcode.Registry]]
  */
-trait Opcode {
+trait Opcode:
   /** Gets value. */
   def value: Int
 
@@ -29,16 +29,15 @@ trait Opcode {
 
   /** Tests for control frame opcode. */
   def isControl: Boolean = value >= 8
-}
 
 /**
  * Provides factory methods and registry for `Opcode`.
  *
  * @see [[Opcode.Registry]]
  */
-object Opcode {
+object Opcode:
   /** Contains registered WebSocket opcodes. */
-  object Registry {
+  object Registry:
     /** 0 &ndash; Continuation Frame */
     val Continuation: Opcode = OpcodeImpl(0, "Continuation")
 
@@ -56,14 +55,11 @@ object Opcode {
 
     /** 10 &ndash; Pong Frame */
     val Pong: Opcode = OpcodeImpl(10, "Pong")
-  }
 
   /** Gets opcode for given value, if registered. */
   def get(value: Int): Option[Opcode] =
     try Some(apply(value))
-    catch {
-      case _: NoSuchElementException => None
-    }
+    catch case _: NoSuchElementException => None
 
   /**
    * Gets registered opcode for given value.
@@ -71,7 +67,7 @@ object Opcode {
    * @throws java.util.NoSuchElementException if value not registered
    */
   def apply(value: Int): Opcode =
-    value match {
+    value match
       case  0 => Registry.Continuation
       case  1 => Registry.Text
       case  2 => Registry.Binary
@@ -79,9 +75,6 @@ object Opcode {
       case  9 => Registry.Ping
       case 10 => Registry.Pong
       case _  => throw new NoSuchElementException()
-    }
-}
 
-private case class OpcodeImpl(value: Int, meaning: String) extends Opcode {
+private case class OpcodeImpl(value: Int, meaning: String) extends Opcode:
   override lazy val toString: String = s"$value ($meaning)"
-}

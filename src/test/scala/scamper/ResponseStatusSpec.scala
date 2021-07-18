@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package scamper
 
-import ResponseStatus.Registry._
+import ResponseStatus.Registry.*
 
-class ResponseStatusSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class ResponseStatusSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "get registered status" in {
     assert { ResponseStatus(100) == Continue }
     assert { ResponseStatus.get(100).contains(Continue) }
@@ -39,4 +39,3 @@ class ResponseStatusSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[NoSuchElementException] { ResponseStatus(600) }
     assert { ResponseStatus.get(600).isEmpty }
   }
-}

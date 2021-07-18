@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package scamper.server
 import scamper.{ HttpRequest, HttpResponse }
 
 /** Defines utility for handling error during request processing. */
-trait ErrorHandler {
+@FunctionalInterface
+trait ErrorHandler:
   /**
    * Creates response for given error.
    *
@@ -26,4 +27,3 @@ trait ErrorHandler {
    * @param request request for which error was generated
    */
   def apply(error: Throwable, request: HttpRequest): HttpResponse
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,22 @@
  */
 package scamper.websocket
 
-import java.io._
-import java.util.zip._
+import java.io.*
+import java.util.zip.*
 
-private object WebSocketDeflate {
+private object WebSocketDeflate:
   def compress(message: InputStream): InputStream =
-    new SequenceInputStream(
-      new DeflaterInputStream(message, new Deflater(Deflater.DEFAULT_COMPRESSION, true)),
-      new ByteArrayInputStream(new Array[Byte](1))
+    SequenceInputStream(
+      DeflaterInputStream(message, Deflater(Deflater.DEFAULT_COMPRESSION, true)),
+      ByteArrayInputStream(new Array[Byte](1))
     )
 
   def compress(message: Array[Byte]): Array[Byte] =
     compress(message, 0, message.length)
 
-  def compress(message: Array[Byte], offset: Int, length: Int): Array[Byte] = {
-    val buffer = new ByteArrayOutputStream()
-    val compressor = new DeflaterOutputStream(buffer, new Deflater(Deflater.DEFAULT_COMPRESSION, true))
+  def compress(message: Array[Byte], offset: Int, length: Int): Array[Byte] =
+    val buffer = ByteArrayOutputStream()
+    val compressor = DeflaterOutputStream(buffer, Deflater(Deflater.DEFAULT_COMPRESSION, true))
 
     compressor.write(message, offset, length)
     compressor.finish()
@@ -39,17 +39,16 @@ private object WebSocketDeflate {
 
     buffer.write(0)
     buffer.toByteArray()
-  }
 
   def decompress(message: InputStream): InputStream =
-    new InflaterInputStream(message, new Inflater(true))
+    InflaterInputStream(message, Inflater(true))
 
   def decompress(message: Array[Byte]): Array[Byte] =
     decompress(message, 0, message.length)
 
-  def decompress(message: Array[Byte], offset: Int, length: Int): Array[Byte] = {
-    val buffer = new ByteArrayOutputStream()
-    val decompressor = new InflaterOutputStream(buffer, new Inflater(true))
+  def decompress(message: Array[Byte], offset: Int, length: Int): Array[Byte] =
+    val buffer = ByteArrayOutputStream()
+    val decompressor = InflaterOutputStream(buffer, Inflater(true))
 
     decompressor.write(message, offset, length)
     decompressor.finish()
@@ -57,5 +56,3 @@ private object WebSocketDeflate {
     decompressor.close()
 
     buffer.toByteArray()
-  }
-}

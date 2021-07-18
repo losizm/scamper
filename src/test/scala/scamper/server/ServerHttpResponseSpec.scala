@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.{ ContentDisposition, ContentLength, ContentType }
 import scamper.types.MediaType
 
-import Implicits._
+import Implicits.*
 
-class ServerHttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec {
-  val file = new File("./src/test/resources/test.html")
+class ServerHttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec:
+  val file = File("./src/test/resources/test.html")
   val encodedFileName = s"utf-8''${file.getName.toUrlEncoded("utf-8")}"
 
   it should "add file attachment to HttpResponse" in {
@@ -49,4 +49,3 @@ class ServerHttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert { res.contentDisposition.params("filename") == file.getName }
     assert { res.contentDisposition.params("filename*") == encodedFileName }
   }
-}

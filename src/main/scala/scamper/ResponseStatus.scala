@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import scala.collection.mutable.TreeMap
  *
  * @see [[ResponseStatus.Registry]]
  */
-sealed trait ResponseStatus {
+sealed trait ResponseStatus:
   /** Gets status code. */
   def statusCode: Int
 
@@ -52,17 +52,16 @@ sealed trait ResponseStatus {
   /** Creates `HttpResponse` with this status and supplied body. */
   def apply(body: Entity = Entity.empty): HttpResponse =
     HttpResponse(this, Nil, body)
-}
 
 /**
  * Provides factory for `ResponseStatus`.
  *
  * @see [[ResponseStatus.Registry]]
  */
-object ResponseStatus {
+object ResponseStatus:
   /** Contains registered response statuses. */
-  object Registry {
-    private val registry = new TreeMap[Int, ResponseStatus]
+  object Registry:
+    private val registry = TreeMap[Int, ResponseStatus]()
 
     /** 100 Continue */
     val Continue = add(100, "Continue")
@@ -214,15 +213,13 @@ object ResponseStatus {
     /** 511 Network Authentication Required */
     val NetworkAuthenticationRequired = add(511, "Network Authentication Required")
 
-    private def add(statusCode: Int, reasonPhrase: String): ResponseStatus = {
+    private def add(statusCode: Int, reasonPhrase: String): ResponseStatus =
       val status = ResponseStatusImpl(statusCode, reasonPhrase)
       registry += { statusCode -> status }
       status
-    }
 
     private[ResponseStatus] def apply(statusCode: Int): ResponseStatus = registry(statusCode)
     private[ResponseStatus] def get(statusCode: Int): Option[ResponseStatus] = registry.get(statusCode)
-  }
 
   /** Gets response status for given status code, if registered. */
   def get(statusCode: Int): Option[ResponseStatus] = Registry.get(statusCode)
@@ -240,8 +237,6 @@ object ResponseStatus {
       require(statusCode >= 100 && statusCode <= 599, s"status code out of bounds: $statusCode")
       ResponseStatusImpl(statusCode, reasonPhrase)
     }
-}
 
-private case class ResponseStatusImpl(statusCode: Int, reasonPhrase: String) extends ResponseStatus {
+private case class ResponseStatusImpl(statusCode: Int, reasonPhrase: String) extends ResponseStatus:
   override lazy val toString = s"$statusCode $reasonPhrase"
-}

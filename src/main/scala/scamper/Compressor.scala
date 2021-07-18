@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,18 @@ import java.util.zip.{ DeflaterInputStream, GZIPOutputStream }
 
 import scala.concurrent.ExecutionContext
 
-private object Compressor {
-  def gzip(in: InputStream, bufferSize: Int = 8192)(implicit ec: ExecutionContext): InputStream =
-    new WriterInputStream(out => write(in, new GZIPOutputStream(out), bufferSize))
+private object Compressor:
+  def gzip(in: InputStream, bufferSize: Int = 8192)(using ec: ExecutionContext): InputStream =
+    WriterInputStream(out => write(in, GZIPOutputStream(out), bufferSize))
 
   def deflate(in: InputStream, bufferSize: Int = 8192): InputStream =
-    new DeflaterInputStream(in)
+    DeflaterInputStream(in)
 
-  private def write(in: InputStream, out: GZIPOutputStream, bufferSize: Int): Unit = {
+  private def write(in: InputStream, out: GZIPOutputStream, bufferSize: Int): Unit =
     val buffer = new Array[Byte](bufferSize)
     var length = 0
 
-    while ({ length = in.read(buffer); length != -1 })
+    while { length = in.read(buffer); length != -1 } do
       out.write(buffer, 0, length)
     out.finish()
     out.flush()
-  }
-}
-

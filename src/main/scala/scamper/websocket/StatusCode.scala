@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ package scamper.websocket
  *
  * @see [[StatusCode.Registry]]
  */
-trait StatusCode {
+trait StatusCode:
   /** Gets value. */
   def value: Int
 
@@ -36,21 +36,20 @@ trait StatusCode {
       { (0xff00 & value) >> 8 }.toByte,
       { (0x00ff & value) >> 0 }.toByte
     )
-}
 
 /**
  * Provides factory methods and registry for `StatusCode`.
  *
  * @see [[StatusCode.Registry]]
  */
-object StatusCode {
+object StatusCode:
   /**
    * Contains registered WebSocket status codes.
    *
    * @note The status code descriptions are taken in part from those provided in
    * [[https://tools.ietf.org/rfc/rfc6455.txt RFC 6455]].
    */
-  object Registry {
+  object Registry:
     /**
      * 1000 indicates a normal closure, meaning that the purpose for which the
      * connection was established has been fulfilled.
@@ -83,7 +82,7 @@ object StatusCode {
     val Reserved: StatusCode = StatusCodeImpl(1004, "Reserved", true)
 
     /**
-     * 1005 is a reserved value and ''must not'' be set as a status code in a
+     * 1005 is a reserved value and _must not_ be set as a status code in a
      * Close control frame by an endpoint. It is designated for use in
      * applications expecting a status code to indicate that no status code was
      * actually present.
@@ -91,7 +90,7 @@ object StatusCode {
     val NoStatusReceived: StatusCode = StatusCodeImpl(1005, "No Status Received", true)
 
     /**
-     * 1006 is a reserved value and ''must not'' be set as a status code in a
+     * 1006 is a reserved value and _must not_ be set as a status code in a
      * Close control frame by an endpoint. It is designated for use in
      * applications expecting a status code to indicate that the connection was
      * closed abnormally, e.g., without sending or receiving a Close control
@@ -139,21 +138,18 @@ object StatusCode {
     val InternalError: StatusCode = StatusCodeImpl(1011, "Internal Server Error", false)
 
     /**
-     * 1015 is a reserved value and ''must not'' be set as a status code in a
+     * 1015 is a reserved value and _must not_ be set as a status code in a
      * Close control frame by an endpoint. It is designated for use in
      * applications expecting a status code to indicate that the connection was
      * closed due to a failure to perform a TLS handshake (e.g., the server
      * certificate can't be verified).
      */
     val TlsHandshake: StatusCode = StatusCodeImpl(1015, "TLS Handshake", true)
-  }
 
   /** Gets status code for given value, if registered. */
   def get(value: Int): Option[StatusCode] =
     try Some(apply(value))
-    catch {
-      case _: NoSuchElementException => None
-    }
+    catch case _: NoSuchElementException => None
 
   /**
    * Gets status code for supplied data, if registered.
@@ -163,10 +159,9 @@ object StatusCode {
    */
   def get(data: Array[Byte]): Option[StatusCode] =
     try Some(apply(data))
-    catch {
+    catch
       case _: NoSuchElementException   => None
       case _: IllegalArgumentException => None
-    }
 
   /**
    * Gets registered status code for given value.
@@ -174,7 +169,7 @@ object StatusCode {
    * @throws java.util.NoSuchElementException if value not registered
    */
   def apply(value: Int): StatusCode =
-    value match {
+    value match
       case 1000 => Registry.NormalClosure
       case 1001 => Registry.GoingAway
       case 1002 => Registry.ProtocolError
@@ -189,7 +184,6 @@ object StatusCode {
       case 1011 => Registry.InternalError
       case 1015 => Registry.TlsHandshake
       case _    => throw new NoSuchElementException()
-    }
 
   /**
    * Gets registered status code for supplied data.
@@ -201,12 +195,9 @@ object StatusCode {
    *  used to obtain status code.
    */
   def apply(data: Array[Byte]): StatusCode =
-    data.length match {
+    data.length match
       case 2 => apply(BigInt(1, data).toInt)
-      case _ => throw new IllegalArgumentException()
-    }
-}
+      case _ => throw IllegalArgumentException()
 
-private case class StatusCodeImpl(value: Int, meaning: String, isReserved: Boolean) extends StatusCode {
+private case class StatusCodeImpl(value: Int, meaning: String, isReserved: Boolean) extends StatusCode:
   override lazy val toString: String = s"$value ($meaning)"
-}

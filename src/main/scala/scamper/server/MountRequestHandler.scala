@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,12 @@ package scamper.server
 import scamper.{ HttpMessage, HttpRequest }
 import scamper.Validate.notNull
 
-private class MountRequestHandler private (path: MountPath, handler: RequestHandler) extends RequestHandler {
+private class MountRequestHandler private (path: MountPath, handler: RequestHandler) extends RequestHandler:
   def apply(req: HttpRequest): HttpMessage =
-    path.matches(req.path) match {
+    path.matches(req.path) match
       case true  => handler(req)
       case false => req
-    }
-}
 
-private object MountRequestHandler {
+private object MountRequestHandler:
   def apply(path: String, handler: RequestHandler): MountRequestHandler =
     new MountRequestHandler(MountPath(path), notNull(handler))
-}

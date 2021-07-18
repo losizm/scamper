@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import StatusCode.Registry.{ MessageTooBig, ProtocolError }
  *
  * @see [[WebSocketConnection.apply WebSocketConnection]]
  */
-class WebSocketConnection private (socket: Socket) {
+class WebSocketConnection private (socket: Socket):
   private val finBits      = 0x80
   private val compressBits = 0x40
   private val reservedBits = 0x30
@@ -38,8 +38,8 @@ class WebSocketConnection private (socket: Socket) {
   private val maskBits     = 0x80
   private val lengthBits   = 0x7f
 
-  private val in = new DataInputStream(socket.getInputStream())
-  private val out = new DataOutputStream(socket.getOutputStream())
+  private val in = DataInputStream(socket.getInputStream())
+  private val out = DataOutputStream(socket.getOutputStream())
 
   /** Tests for secure WebSocket connection. */
   def isSecure: Boolean = socket.isInstanceOf[SSLSocket]
@@ -67,23 +67,23 @@ class WebSocketConnection private (socket: Socket) {
     val isFinal = (byte0 & finBits) != 0
     val isCompressed = (byte0 & compressBits) != 0
 
-    if ((byte0 & reservedBits) != 0)
+    if (byte0 & reservedBits) != 0 then
       throw WebSocketError(ProtocolError)
 
     val opcode = Opcode.get(byte0 & opcodeBits).getOrElse {
       throw WebSocketError(ProtocolError)
     }
 
-    if (isCompressed && opcode != Text && opcode != Binary && opcode != Continuation)
+    if isCompressed && opcode != Text && opcode != Binary && opcode != Continuation then
       throw WebSocketError(ProtocolError)
 
-    if (opcode.isControl && !isFinal)
+    if opcode.isControl && !isFinal then
       throw WebSocketError(ProtocolError)
 
     val byte1 = in.readUnsignedByte()
     val isMasked = (byte1 & maskBits) != 0
 
-    val length = (byte1 & lengthBits) match {
+    val length: Long = (byte1 & lengthBits) match
       case 126 => in.readUnsignedShort()
 
       case 127 =>
@@ -91,19 +91,17 @@ class WebSocketConnection private (socket: Socket) {
 
         // If length is negative, then it represents an unsigned long value
         // greater than Long.MaxValue
-        if (length < 0)
+        if length < 0 then
           throw WebSocketError(MessageTooBig)
         length
 
       case length => length
-    }
 
-    val key = isMasked match {
+    val key = isMasked match
       case true  => MaskingKey.get(in.readInt())
       case false => None
-    }
 
-    if (isMasked ^ key.isDefined)
+    if isMasked ^ key.isDefined then
       throw WebSocketError(ProtocolError)
 
     WebSocketFrame(isFinal, isCompressed, opcode, key, length, in)
@@ -120,24 +118,21 @@ class WebSocketConnection private (socket: Socket) {
    *  permitting only one write request at a time.
    */
   def write(frame: WebSocketFrame): Unit = out.synchronized {
-    val finBit = frame.isFinal match {
+    val finBit = frame.isFinal match
       case true  => 128
       case false => 0
-    }
 
-    val compressBit = frame.isCompressed match {
+    val compressBit = frame.isCompressed match
       case true  => 64
       case false => 0
-    }
 
     out.write(finBit + compressBit + frame.opcode.value)
 
-    val maskBit = frame.key.isDefined match {
+    val maskBit = frame.key.isDefined match
       case true  => 128
       case false => 0
-    }
 
-    frame.length match {
+    frame.length match
       case length if length <= 125 =>
         out.write(maskBit + length.toInt)
 
@@ -148,26 +143,23 @@ class WebSocketConnection private (socket: Socket) {
       case length =>
         out.write(maskBit + 127)
         out.writeLong(length)
-    }
 
     frame.key.foreach { key =>
       out.writeInt(key.value)
     }
 
-    if (frame.length > 0) {
+    if frame.length > 0 then
       val buf = new Array[Byte](8192)
       val in = frame.payload
       var tot = 0
       var len = 0
 
-      while ({ len = in.read(buf); len != -1 }) {
+      while { len = in.read(buf); len != -1 } do
         out.write(buf, 0, len)
         tot += len
-      }
 
-      if (tot < frame.length)
-        throw new EOFException(s"Truncation dectected: Payload length ($tot) is less than declared length (${frame.length})")
-    }
+      if tot < frame.length then
+        throw EOFException(s"Truncation dectected: Payload length ($tot) is less than declared length (${frame.length})")
 
     out.flush()
   }
@@ -179,14 +171,12 @@ class WebSocketConnection private (socket: Socket) {
    *  sending an appropriate Close frame before invoking this method.
    */
   def close(): Unit = Try(socket.close())
-}
 
 /** Provides factory for `WebSocketConnection`. */
-object WebSocketConnection {
+object WebSocketConnection:
   /**
    * Creates WebSocket connection using supplied socket.
    *
    * @param socket socket connection
    */
   def apply(socket: Socket): WebSocketConnection = new WebSocketConnection(socket)
-}

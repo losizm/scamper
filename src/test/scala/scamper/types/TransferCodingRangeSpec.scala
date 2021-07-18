@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-class TransferCodingRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class TransferCodingRangeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "TransferCodingRange" should "be created without parameters" in {
     var range = TransferCodingRange.parse("CHUNKED; q=1.0")
     assert(range.name == "chunked")
@@ -67,4 +67,3 @@ class TransferCodingRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](TransferCodingRange.parse("chunked; q="))
     assertThrows[IllegalArgumentException](TransferCodingRange.parse("chunked; =0.1"))
   }
-}

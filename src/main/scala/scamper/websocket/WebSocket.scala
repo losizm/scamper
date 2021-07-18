@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,21 @@ import java.security.{ MessageDigest, SecureRandom }
 import scala.util.Try
 
 import scamper.{ Base64, HttpMessage, HttpRequest, HttpResponse }
-import scamper.ResponseStatus.Registry._
+import scamper.ResponseStatus.Registry.*
 import scamper.headers.{ Connection, Upgrade }
 
 /** Provides utilities for WebSocket handshake. */
-object WebSocket {
-  private val random = new SecureRandom()
+object WebSocket:
+  private val random = SecureRandom()
 
   /** Globally Unique Identifier &ndash; 258EAFA5-E914-47DA-95CA-C5AB0DC85B11 */
   val guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
   /** Generates WebSocket key. */
-  def generateKey(): String = {
+  def generateKey(): String =
     val key = new Array[Byte](16)
     random.nextBytes(key)
     Base64.encodeToString(key)
-  }
 
   /**
    * Generates header value for Sec-WebSocket-Accept using supplied WebSocket
@@ -85,27 +84,26 @@ object WebSocket {
    *
    * @return unmodified WebSocket request
    */
-  def validate(req: HttpRequest): HttpRequest = {
-    if (!req.isGet)
+  def validate(req: HttpRequest): HttpRequest =
+    if !req.isGet then
       throw InvalidWebSocketRequest(s"Invalid method for WebSocket request: ${req.method}")
 
-    if (!checkUpgrade(req))
+    if !checkUpgrade(req) then
       throw InvalidWebSocketRequest("Missing or invalid header: Upgrade")
 
-    if (!checkConnection(req))
+    if !checkConnection(req) then
       throw InvalidWebSocketRequest("Missing or invalid header: Connection")
 
-    if (!checkWebSocketKey(req))
+    if !checkWebSocketKey(req) then
       throw InvalidWebSocketRequest("Missing or invalid header: Sec-WebSocket-Key")
 
-    if (!checkWebSocketVersion(req))
+    if !checkWebSocketVersion(req) then
       throw InvalidWebSocketRequest("Missing or invalid header: Sec-WebSocket-Version")
 
     //if (!checkWebSocketExtensions(req))
     //  throw InvalidWebSocketRequest("Invalid header: Sec-WebSocket-Extensions")
 
     req
-  }
 
   private def checkUpgrade(msg: HttpMessage): Boolean =
     msg.upgrade.exists { protocol =>
@@ -164,4 +162,3 @@ object WebSocket {
         case _ => false
       }
     }
-}

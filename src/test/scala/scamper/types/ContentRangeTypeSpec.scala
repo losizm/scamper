@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package scamper.types
 
-import scamper.types.ByteContentRange._
+import scamper.types.ByteContentRange.*
 
-class ContentRangeTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class ContentRangeTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "ByteContentRange" should "be created with satisfied response" in {
     var range = ByteContentRange.parse("bytes 8-15/1024")
     assert(range.unit == "bytes")
@@ -36,4 +36,3 @@ class ContentRangeTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(range.resp.asInstanceOf[Unsatisfied] == Unsatisfied(8192))
     assert(range.toString == "bytes */8192")
   }
-}

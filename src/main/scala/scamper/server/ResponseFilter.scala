@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package scamper.server
 import scamper.HttpResponse
 
 /** Defines filter for outgoing response. */
-trait ResponseFilter {
+@FunctionalInterface
+trait ResponseFilter:
   /**
    * Filters outgoing response.
    *
@@ -41,10 +42,9 @@ trait ResponseFilter {
    */
   def after(other: ResponseFilter): ResponseFilter =
     req => apply(other(req))
-}
 
 /** Provides `ResponseFilter` utilities. */
-object ResponseFilter {
+object ResponseFilter:
   /**
    * Composes response filters, with filters applied in order.
    *
@@ -53,15 +53,13 @@ object ResponseFilter {
    * @note If `filters` is empty, a filter is created to return supplied
    * response.
    */
-  def chain(filters: Seq[ResponseFilter]): ResponseFilter = {
+  def chain(filters: Seq[ResponseFilter]): ResponseFilter =
     @annotation.tailrec
     def filter(res: HttpResponse, filters: Seq[ResponseFilter]): HttpResponse =
-      filters match {
+      filters match
         case Nil          => res
         case head +: tail => filter(head(res), tail)
-      }
     filter(_, filters)
-  }
 
   /**
    * Composes response filters, with filters applied in order.
@@ -71,4 +69,3 @@ object ResponseFilter {
    */
   def chain(one: ResponseFilter, more: ResponseFilter*): ResponseFilter =
     chain(one +: more)
-}

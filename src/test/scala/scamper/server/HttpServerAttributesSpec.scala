@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,30 +17,32 @@ package scamper.server
 
 import java.util.concurrent.atomic.AtomicReference
 
-import scamper._
-import scamper.Implicits._
+import scala.language.implicitConversions
+
+import scamper.*
+import scamper.Implicits.given
 import scamper.client.HttpClient
-import scamper.headers.{ Server => _, _ }
-import scamper.logging._
-import scamper.server.Implicits._
+import scamper.headers.{ Server as _, * }
+import scamper.logging.*
+import scamper.server.Implicits.given
 
-import RequestMethod.Registry._
-import ResponseStatus.Registry._
+import RequestMethod.Registry.*
+import ResponseStatus.Registry.*
 
-class HttpServerAttributesSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
+class HttpServerAttributesSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer:
   it should "check attributes" in testAttributes(false)
 
   it should "check attributes with SSL/TLS" in testAttributes(false)
 
-  private implicit val parser = BodyParser.bytes(8192)
-  private implicit val client =
+  private given parser: BodyParser[Array[Byte]] = BodyParser.bytes(8192)
+  private given client: HttpClient =
     HttpClient
       .settings()
       .trust(Resources.truststore)
       .create()
 
-  private val request  = new AtomicReference[HttpRequest]
-  private val response = new AtomicReference[HttpResponse]
+  private val request  = AtomicReference[HttpRequest]()
+  private val response = AtomicReference[HttpResponse]()
 
   private def testAttributes(secure: Boolean) = withServer(secure) { implicit server =>
     info("200 OK")
@@ -118,24 +120,22 @@ class HttpServerAttributesSpec extends org.scalatest.flatspec.AnyFlatSpec with T
     }
   }
 
-  override def getServer(secure: Boolean = false, logging: Boolean = false): HttpServer = {
+  override def getServer(secure: Boolean = false, logging: Boolean = false): HttpServer =
     val app =
       HttpServer
         .app()
         .bufferSize(1024)
         .headerLimit(10)
-        .logger(if (logging) ConsoleLogger else NullLogger)
+        .logger(if logging then ConsoleLogger else NullLogger)
         .incoming { req => request.set(req); req }
         .incoming(_.putAttributes("after" -> 0))
-        .incoming("/error") { _ => throw new Exception("Internal Error") }
+        .incoming("/error") { _ => throw Exception("Internal Error") }
         .incoming { req => req.as[Array[Byte]]; req }
         .incoming { _ => Ok() }
         .outgoing { res => response.set(res); res }
         .outgoing(_.putAttributes("after" -> 0))
 
-    if (secure)
+    if secure then
       app.secure(Resources.keystore, "letmein", "pkcs12")
 
     app.create("localhost", 0)
-  }
-}

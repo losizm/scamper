@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,23 @@ package scamper
 
 import java.io.IOException
 
-class WriterInputStreamSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class WriterInputStreamSpec extends org.scalatest.flatspec.AnyFlatSpec:
   private val buf = new Array[Byte](256)
 
   "WriterInputStream" should "read fully" in {
-    val in = new WriterInputStream(8, out => (0 until 256).foreach(out.write))(Auxiliary.executor)
+    val in = WriterInputStream(8, out => (0 until 256).foreach(out.write))(using Auxiliary.executor)
     try assert(in.read(buf) == 256 && in.read() == -1)
     finally in.close()
   }
 
   it should "skip fully" in {
-    val in = new WriterInputStream(8, out => (0 until 256).foreach(out.write))(Auxiliary.executor)
+    val in = WriterInputStream(8, out => (0 until 256).foreach(out.write))(using Auxiliary.executor)
     try assert(in.skip(256) == 256 && in.read() == -1)
     finally in.close()
   }
 
   it should "throw IOException" in {
-    val in = new WriterInputStream(8, { out => (0 until 4).foreach(out.write); throw new Exception })(Auxiliary.executor)
+    val in = WriterInputStream(8, { out => (0 until 4).foreach(out.write); throw Exception() })(using Auxiliary.executor)
     try assertThrows[IOException](in.read(buf))
     finally in.close()
   }
-}

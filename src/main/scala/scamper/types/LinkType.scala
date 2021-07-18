@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import scamper.{ HeaderParams, ListParser, Uri }
  *
  * @see [[scamper.headers.Link]]
  */
-trait LinkType {
+trait LinkType:
   /** Gets link reference. */
   def ref: Uri
 
@@ -32,19 +32,17 @@ trait LinkType {
   /** Returns formatted link. */
   override lazy val toString: String =
     s"<$ref>${HeaderParams.format(params)}"
-}
 
 /** Provides factory for `LinkType`. */
-object LinkType {
+object LinkType:
   private val syntax = """\s*<([^,<>"]+)>\s*(;.+)?\s*""".r
 
   /** Parses formatted link. */
   def parse(link: String): LinkType =
-    link match {
+    link match
       case syntax(ref, null)   => apply(Uri(ref))
       case syntax(ref, params) => apply(Uri(ref), HeaderParams.parse(params))
-      case _ => throw new IllegalArgumentException(s"Malformed link: $link")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed link: $link")
 
   /** Parses formatted list of links. */
   def parseAll(links: String): Seq[LinkType] =
@@ -57,6 +55,5 @@ object LinkType {
   /** Creates link with supplied values. */
   def apply(ref: Uri, params: Map[String, Option[String]]): LinkType =
     LinkTypeImpl(ref, params)
-}
 
 private case class LinkTypeImpl(ref: Uri, params: Map[String, Option[String]]) extends LinkType

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 package scamper
 
 /** Provides builder pattern for HTTP message. */
-trait MessageBuilder[T <: HttpMessage] { this: T =>
+trait MessageBuilder[T <: HttpMessage]:
+  this: T =>
+
   /**
    * Creates message with supplied start line.
    *
@@ -24,7 +26,7 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
    *
    * @return new message
    */
-  def setStartLine(startLine: T#LineType): T
+  def setStartLine(startLine: this.LineType): T
 
   /**
    * Creates message with supplied headers.
@@ -58,10 +60,9 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
    * @return new message
    */
   def addHeaders(headers: Seq[Header]): T =
-    headers.isEmpty match {
+    headers.isEmpty match
       case true  => this
       case false => setHeaders(this.headers ++ headers)
-    }
 
   /**
    * Creates message with additional headers.
@@ -84,12 +85,11 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
    * @note All previous headers with same name are removed.
    */
   def putHeaders(headers: Seq[Header]): T =
-    headers.isEmpty match {
+    headers.isEmpty match
       case true  => this
       case false =>
         val names = headers.map(_.name).distinct
         setHeaders { this.headers.filterNot(h => names.exists(h.name.equalsIgnoreCase)) ++ headers }
-    }
 
   /**
    * Creates message with supplied headers.
@@ -112,10 +112,9 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
    * @return new message
    */
   def removeHeaders(names: Seq[String]): T =
-    names.isEmpty match {
+    names.isEmpty match
       case true  => this
       case false => setHeaders { headers.filterNot(h => names.exists(h.name.equalsIgnoreCase)) }
-    }
 
   /**
    * Creates message excluding headers with given names.
@@ -171,10 +170,9 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
    * @note If attribute already exists, its value is replaced.
    */
   def putAttributes(attributes: Map[String, Any]): T =
-    attributes.isEmpty match {
+    attributes.isEmpty match
       case true  => this
       case false => setAttributes(this.attributes ++ attributes)
-    }
 
   /**
    * Creates message with supplied attributes.
@@ -197,10 +195,9 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
    * @return new message
    */
   def removeAttributes(names: Seq[String]): T =
-    names.isEmpty match {
+    names.isEmpty match
       case true  => this
       case false => setAttributes { attributes.filterNot(a => names.contains(a._1)) }
-    }
 
   /**
    * Creates message excluding attributes with given names.
@@ -212,4 +209,3 @@ trait MessageBuilder[T <: HttpMessage] { this: T =>
    */
   def removeAttributes(one: String, more: String*): T =
     removeAttributes(one +: more)
-}

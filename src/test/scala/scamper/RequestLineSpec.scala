@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package scamper
 
-import scamper.RequestMethod.Registry._
+import scamper.RequestMethod.Registry.*
 
-class RequestLineSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class RequestLineSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "RequestLine" should "be created" in {
     var request = RequestLine("GET / HTTP/1.1")
     assert(request.method == Get)
@@ -45,4 +45,3 @@ class RequestLineSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](RequestLine("GET /index.html"))
     assertThrows[IllegalArgumentException](RequestLine("GET HTTP/1.1"))
   }
-}

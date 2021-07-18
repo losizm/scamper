@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import scamper.ListParser
  *
  * @see [[scamper.headers.Via]]
  */
-trait ViaType {
+trait ViaType:
   /** Gets received protcol. */
   def protocol: Protocol
 
@@ -34,20 +34,18 @@ trait ViaType {
 
   /** Returns formatted via. */
   override lazy val toString: String =
-    (if (protocol.name == "HTTP") protocol.version.getOrElse("-") else protocol.toString) + ' ' + by + comment.map(" (" + _ + ')').getOrElse("")
-}
+    (if protocol.name == "HTTP" then protocol.version.getOrElse("-") else protocol.toString) + ' ' + by + comment.map(" (" + _ + ')').getOrElse("")
 
 /** Provides factory for `ViaType`. */
-object ViaType {
+object ViaType:
   private val syntax = """\s*(?:([\w!#$%&'*+.^`|~-]+)/)?([\w!#$%&'*+.^`|~-]+)\s+([\w!#$%&'*+.:^`|~-]+)(?:\s+\(\s*(.*?)\s*\))?\s*""".r
 
   /** Parses formatted via. */
   def parse(via: String): ViaType =
-    via match {
+    via match
       case syntax(null, version, by, comment)   => ViaTypeImpl(Protocol("HTTP", Some(version)), by, Option(comment))
       case syntax(name, version, by, comment)   => ViaTypeImpl(Protocol(name, Some(version)), by, Option(comment))
-      case _ => throw new IllegalArgumentException(s"Malformed via: $via")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed via: $via")
 
   /** Parses formatted list of vias. */
   def parseAll(vias: String): Seq[ViaType] =
@@ -56,6 +54,5 @@ object ViaType {
   /** Creates via type with supplied values. */
   def apply(protocol: Protocol, by: String, comment: Option[String] = None): ViaType =
     ViaTypeImpl(protocol, by, comment.map(_.trim))
-}
 
 private case class ViaTypeImpl(protocol: Protocol, by: String, comment: Option[String]) extends ViaType

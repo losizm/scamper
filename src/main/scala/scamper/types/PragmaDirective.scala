@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import scamper.ListParser
  *
  * @see [[scamper.headers.Pragma]]
  */
-trait PragmaDirective {
+trait PragmaDirective:
   /** Gets directive name. */
   def name: String
 
@@ -33,11 +33,10 @@ trait PragmaDirective {
   /** Returns formatted directive. */
   override lazy val toString: String =
     name + value.map(x => "=" + Token(x).getOrElse(s"""\"$x\"""")).getOrElse("")
-}
 
 /** Provides factory for `PragmaDirective`. */
-object PragmaDirective {
-  import PragmaDirectives._
+object PragmaDirective:
+  import PragmaDirectives.*
 
   private val syntax1 = """\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val syntax2 = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
@@ -45,12 +44,11 @@ object PragmaDirective {
 
   /** Parses formatted directive. */
   def parse(directive: String): PragmaDirective =
-    directive match {
+    directive match
       case syntax1(name) => apply(name)
       case syntax2(name, value) => apply(name, Some(value))
       case syntax3(name, value) => apply(name, Some(value))
-      case _ => throw new IllegalArgumentException(s"Malformed pragma directive: $directive")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed pragma directive: $directive")
 
   /** Parses formatted list of directives. */
   def parseAll(directives: String): Seq[PragmaDirective] =
@@ -62,8 +60,7 @@ object PragmaDirective {
       case "no-cache" => `no-cache`
       case token      => PragmaDirectiveImpl(token, value)
     } getOrElse {
-      throw new IllegalArgumentException(s"Invalid pragma directive name: $name")
+      throw IllegalArgumentException(s"Invalid pragma directive name: $name")
     }
-}
 
 private case class PragmaDirectiveImpl(name: String, value: Option[String]) extends PragmaDirective

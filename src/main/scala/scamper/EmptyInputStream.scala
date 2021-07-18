@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package scamper
 
 import java.io.InputStream
 
-private object EmptyInputStream extends InputStream {
+private object EmptyInputStream extends InputStream:
   override def available(): Int = 0
   override def read(): Int = -1
   override def read(buffer: Array[Byte]): Int = -1
@@ -27,5 +27,3 @@ private object EmptyInputStream extends InputStream {
   override def markSupported(): Boolean = true
   override def mark(limit: Int): Unit = ()
   override def reset(): Unit = ()
-}
-

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,16 @@ import java.util.Properties
 
 import scala.util.{ Success, Try }
 
-import scamper.CollectionConverters._
+import scamper.CollectionConverters.*
 
-import MediaTypeHelper._
+import MediaTypeHelper.*
 
 /**
  * Standardized type for Content-Type header value.
  *
  * @see [[scamper.headers.ContentType]]
  */
-trait MediaType {
+trait MediaType:
   /** Gets main type of media type. */
   def mainType: String
 
@@ -69,12 +69,11 @@ trait MediaType {
 
   /** Returns formatted media type. */
   override lazy val toString: String = mainType + '/' + subtype + FormatParams(params)
-}
 
 /** Provides factory for `MediaType`. */
-object MediaType {
+object MediaType:
   private val mappings: Map[String, MediaType] = Try {
-    val props = new Properties()
+    val props = Properties()
     val in = getClass.getResourceAsStream("media-types.properties")
 
     try props.load(in)
@@ -95,10 +94,9 @@ object MediaType {
 
   /** Gets media type for given file name. */
   def forFileName(fileName: String): Option[MediaType] =
-    fileName match {
+    fileName match
       case fileNamePattern(suffix) => forSuffix(suffix)
       case _ => None
-    }
 
   /** Gets media type for given file name suffix. */
   def forSuffix(suffix: String): Option[MediaType] =
@@ -106,9 +104,8 @@ object MediaType {
 
   /** Parses formatted media type. */
   def apply(mediaType: String): MediaType =
-    ParseMediaType(mediaType) match {
+    ParseMediaType(mediaType) match
       case (mainType, subtype, params) => apply(mainType, subtype, params)
-    }
 
   /** Creates media type with supplied values. */
   def apply(mainType: String, subtype: String, params: Map[String, String]): MediaType =
@@ -117,6 +114,5 @@ object MediaType {
   /** Creates media type with supplied values. */
   def apply(mainType: String, subtype: String, params: (String, String)*): MediaType =
     apply(mainType, subtype, params.toMap)
-}
 
 private case class MediaTypeImpl(mainType: String, subtype: String, params: Map[String, String]) extends MediaType

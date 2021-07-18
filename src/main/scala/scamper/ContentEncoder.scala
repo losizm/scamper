@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,21 @@
 package scamper
 
 import scala.concurrent.ExecutionContext
+import scala.language.implicitConversions
 
 import Implicits.inputStreamToEntity
 
-private object ContentEncoder {
+private object ContentEncoder:
   private val `Content-Encoding: gzip` = Header("Content-Encoding", "gzip")
   private val `Content-Encoding: deflate` = Header("Content-Encoding", "deflate")
 
-  def gzip[T <: HttpMessage with MessageBuilder[T]](msg: T, bufferSize: Int = 8192)(implicit ec: ExecutionContext): T =
+  def gzip[T <: HttpMessage with MessageBuilder[T]](msg: T, bufferSize: Int = 8192)(using ec: ExecutionContext): T =
     msg.getHeaderValue("Content-Encoding")
       .map { enc => Header("Content-Encoding", enc + ", gzip") }
       .map(msg.putHeaders(_))
       .getOrElse { msg.putHeaders(`Content-Encoding: gzip`) }
       .removeHeaders("Content-Length")
-      .setBody { Compressor.gzip(msg.body.inputStream, bufferSize) }
+      .setBody { Compressor.gzip(msg.body.data, bufferSize) }
 
   def deflate[T <: HttpMessage with MessageBuilder[T]](msg: T, bufferSize: Int = 8192): T =
     msg.getHeaderValue("Content-Encoding")
@@ -37,6 +38,4 @@ private object ContentEncoder {
       .map(msg.putHeaders(_))
       .getOrElse { msg.putHeaders(`Content-Encoding: deflate`) }
       .removeHeaders("Content-Length")
-      .setBody { Compressor.deflate(msg.body.inputStream, bufferSize) }
-}
-
+      .setBody { Compressor.deflate(msg.body.data, bufferSize) }

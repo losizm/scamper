@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +15,28 @@
  */
 package scamper
 
-import java.lang.Runtime.{ getRuntime => runtime }
+import java.lang.Runtime.getRuntime as runtime
 import java.lang.System.getProperty
 
 import scala.util.Try
 
-private object RuntimeProperties {
-  object auxiliary {
+private object RuntimeProperties:
+  object auxiliary:
     lazy val executorShowWarning      = getBooleanProperty("scamper.auxiliary.executor.showWarning", false)
     lazy val executorCorePoolSize     = getIntProperty("scamper.auxiliary.executor.corePoolSize", 0).max(0)
     lazy val executorMaxPoolSize      = getIntProperty("scamper.auxiliary.executor.maxPoolSize", runtime.availableProcessors * 2).max(1)
     lazy val executorKeepAliveSeconds = getLongProperty("scamper.auxiliary.executor.keepAliveSeconds", 60L).max(0L)
     lazy val executorQueueSize        = getIntProperty("scamper.auxiliary.executor.queueSize", 0).max(0)
-  }
 
-  object cookies {
+  object cookies:
     lazy val getRemotePublicSuffixList = getBooleanProperty("scamper.cookies.getRemotePublicSuffixList", false)
     lazy val publicSuffixListUrl       = getProperty("scamper.cookies.publicSuffixListUrl", "https://publicsuffix.org/list/public_suffix_list.dat")
-  }
 
-  object server {
+  object server:
     lazy val keepAlivePoolSizeFactor = getIntProperty("scamper.server.keepAlive.poolSizeFactor", 2).max(1)
     lazy val upgradePoolSizeFactor   = getIntProperty("scamper.server.upgrade.poolSizeFactor", 2).max(1)
     lazy val encoderPoolSizeFactor   = getIntProperty("scamper.server.encoder.poolSizeFactor", 2).max(1)
     lazy val closerQueueSizeFactor   = getIntProperty("scamper.server.closer.queueSizeFactor", 2).max(0)
-  }
 
   private def getBooleanProperty(name: String, default: => Boolean): Boolean =
     Try(sys.props(name).toBoolean)
@@ -52,4 +49,3 @@ private object RuntimeProperties {
   private def getLongProperty(name: String, default: => Long): Long =
     Try(sys.props(name).toLong)
       .getOrElse(default)
-}

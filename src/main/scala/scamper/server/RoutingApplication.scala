@@ -16,11 +16,11 @@
 package scamper.server
 
 /** Defines routing application. */
-trait RoutingApplication {
+@FunctionalInterface
+trait RoutingApplication:
   /**
    * Applies router.
    *
    * @param router router
    */
   def apply(router: Router): Unit
-}

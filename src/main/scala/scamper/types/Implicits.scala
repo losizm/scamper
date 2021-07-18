@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,71 +15,92 @@
  */
 package scamper.types
 
-/** Contains implicit converter functions. */
-object Implicits {
+/** Provides implicit conversions. */
+object Implicits:
   /** Converts string to [[ByteRange]]. */
-  implicit val stringToByteRange = (range: String) => ByteRange.parse(range)
+  given stringToByteRange: Conversion[String, ByteRange] with
+    def apply(range: String) = ByteRange.parse(range)
 
   /** Converts string to [[ByteContentRange]]. */
-  implicit val stringToByteContentRange = (range: String) => ByteContentRange.parse(range)
+  given stringToByteContentRange: Conversion[String, ByteContentRange] with
+    def apply(range: String) = ByteContentRange.parse(range)
 
   /** Converts string to [[CacheDirective]]. */
-  implicit val stringToCacheDirective = (directive: String) => CacheDirective.parse(directive)
+  given stringToCacheDirective: Conversion[String, CacheDirective] with
+    def apply(directive: String) = CacheDirective.parse(directive)
 
   /** Converts string to [[CharsetRange]]. */
-  implicit val stringToCharsetRange = (range: String) => CharsetRange.parse(range)
+  given stringToCharsetRange: Conversion[String, CharsetRange] with
+    def apply(range: String) = CharsetRange.parse(range)
 
   /** Converts string to [[ContentCoding]]. */
-  implicit val stringToContentCoding = (coding: String) => ContentCoding(coding)
+  given stringToContentCoding: Conversion[String, ContentCoding] with
+    def apply(coding: String) = ContentCoding(coding)
 
   /** Converts string to [[ContentCodingRange]]. */
-  implicit val stringToContentCodingRange = (range: String) => ContentCodingRange.parse(range)
+  given stringToContentCodingRange: Conversion[String, ContentCodingRange] with
+    def apply(range: String) = ContentCodingRange.parse(range)
 
   /** Converts string to [[DispositionType]]. */
-  implicit val stringToDispositionType = (disposition: String) => DispositionType.parse(disposition)
+  given stringToDispositionType: Conversion[String, DispositionType] with
+    def apply(disposition: String) = DispositionType.parse(disposition)
 
   /** Converts string to [[EntityTag]]. */
-  implicit val stringToEntityTag = (tag: String) => EntityTag.parse(tag)
+  given stringToEntityTag: Conversion[String, EntityTag] with
+    def apply(tag: String) = EntityTag.parse(tag)
 
   /** Converts string to [[KeepAliveParameters]]. */
-  implicit val stringToKeepAliveParameters = (params: String) => KeepAliveParameters.parse(params)
+  given stringToKeepAliveParameters: Conversion[String, KeepAliveParameters] with
+    def apply(params: String) = KeepAliveParameters.parse(params)
 
   /** Converts string to [[LanguageTag]]. */
-  implicit val stringToLanguageTag = (tag: String) => LanguageTag.parse(tag)
+  given stringToLanguageTag: Conversion[String, LanguageTag] with
+    def apply(tag: String) = LanguageTag.parse(tag)
 
   /** Converts string to [[LanguageRange]]. */
-  implicit val stringToLanguageRange = (range: String) => LanguageRange.parse(range)
+  given stringToLanguageRange: Conversion[String, LanguageRange] with
+    def apply(range: String) = LanguageRange.parse(range)
 
   /** Converts string to [[LinkType]]. */
-  implicit val stringToLinkType = (link: String) => LinkType.parse(link)
+  given stringToLinkType: Conversion[String, LinkType] with
+    def apply(link: String) = LinkType.parse(link)
 
   /** Converts string to [[MediaType]]. */
-  implicit val stringToMediaType = (mediaType: String) => MediaType(mediaType)
+  given stringToMediaType: Conversion[String, MediaType] with
+    def apply(mediaType: String) = MediaType(mediaType)
 
   /** Converts string to [[MediaRange]]. */
-  implicit val stringToMediaRange = (range: String) => MediaRange(range)
+  given stringToMediaRange: Conversion[String, MediaRange] with
+    def apply(range: String) = MediaRange(range)
 
   /** Converts string to [[PragmaDirective]]. */
-  implicit val stringToPragmaDirective = (directive: String) => PragmaDirective.parse(directive)
+  given stringToPragmaDirective: Conversion[String, PragmaDirective] with
+    def apply(directive: String) = PragmaDirective.parse(directive)
 
   /** Converts string to [[Preference]]. */
-  implicit val stringToPreference = (preference: String) => Preference.parse(preference)
+  given stringToPreference: Conversion[String, Preference] with
+    def apply(preference: String) = Preference.parse(preference)
 
   /** Converts string to [[ProductType]]. */
-  implicit val stringToProductType = (product: String) => ProductType.parse(product)
+  given stringToProductType: Conversion[String, ProductType] with
+    def apply(product: String) = ProductType.parse(product)
 
   /** Converts string to [[Protocol]]. */
-  implicit val stringToProtocol = (protocol: String) => Protocol.parse(protocol)
+  given stringToProtocol: Conversion[String, Protocol] with
+    def apply(protocol: String) = Protocol.parse(protocol)
 
   /** Converts string to [[TransferCoding]]. */
-  implicit val stringToTransferCoding = (coding: String) => TransferCoding.parse(coding)
+  given stringToTransferCoding: Conversion[String, TransferCoding] with
+    def apply(coding: String) = TransferCoding.parse(coding)
 
   /** Converts string to [[TransferCodingRange]]. */
-  implicit val stringToTransferCodingRange = (range: String) => TransferCodingRange.parse(range)
+  given stringToTransferCodingRange: Conversion[String, TransferCodingRange] with
+    def apply(range: String) = TransferCodingRange.parse(range)
 
   /** Converts string to [[ViaType]]. */
-  implicit val stringToViaType = (via: String) => ViaType.parse(via)
+  given stringToViaType: Conversion[String, ViaType] with
+    def apply(via: String) = ViaType.parse(via)
 
   /** Converts string to [[WarningType]]. */
-  implicit val stringToWarningType = (warning: String) => WarningType.parse(warning)
-}
+  given stringToWarningType: Conversion[String, WarningType] with
+    def apply(warning: String) = WarningType.parse(warning)

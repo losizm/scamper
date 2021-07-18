@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,18 @@
 package scamper.server
 
 import scamper.{ HttpMessage, HttpRequest, RequestMethod }
-import scamper.Validate._
+import scamper.Validate.*
 
-private class TargetRequestHandler private (path: TargetPath, methods: Seq[RequestMethod], handler: RequestHandler) extends RequestHandler {
+private class TargetRequestHandler private (path: TargetPath, methods: Seq[RequestMethod], handler: RequestHandler) extends RequestHandler:
   def apply(req: HttpRequest): HttpMessage =
-    check(req) match {
+    check(req) match
       case true  => handler(req.putAttributes("scamper.server.request.parameters" -> path.getParams(req.path)))
       case false => req
-    }
 
   @inline
   private def check(req: HttpRequest): Boolean =
     path.matches(req.path) && (methods.isEmpty || methods.contains(req.method))
-}
 
-private object TargetRequestHandler {
+private object TargetRequestHandler:
   def apply(path: String, methods: Seq[RequestMethod], handler: RequestHandler): TargetRequestHandler =
     new TargetRequestHandler(TargetPath(path), noNulls(methods), notNull(handler))
-}

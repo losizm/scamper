@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ import scala.util.matching.Regex
 
 import scamper.Auxiliary.StringType
 
-private class TargetPath private (val value: String) {
+private class TargetPath private (val value: String):
   private val segments = segmentize(value)
 
-  private val regex = value match {
+  private val regex = value match
     case "/" => "/"
     case "*" => ".*"
     case _   => "/" + segments.map {
@@ -30,7 +30,6 @@ private class TargetPath private (val value: String) {
       case s if s.matches("(\\*\\w*)") => """[\w+\-.~%/]*"""
       case s => Regex.quote(s)
     }.mkString("/")
-  }
 
   private val params = segments.zipWithIndex.collect {
     case (s, i) if s.matches("(:\\w+)")   => s.tail -> { (xs: Seq[String]) => xs(i) }
@@ -38,36 +37,32 @@ private class TargetPath private (val value: String) {
   }
 
   def getParams(path: String): PathParameters =
-    new MapPathParameters(params.isEmpty match {
+    MapPathParameters(params.isEmpty match
       case true  => Map.empty
       case false =>
         val segments = segmentize(path)
         params.map {
           case (name, getValue) => name -> getValue(segments)
         }.toMap
-    })
+    )
 
   def matches(path: String): Boolean =
     path.matches(regex)
 
   private def segmentize(path: String): Seq[String] =
-    path match {
+    path match
       case "/" => Nil
       case "*" => Nil
       case p   => p.tail.split("/").toSeq
-    }
-}
 
-private object TargetPath {
+private object TargetPath:
   def apply(value: String): TargetPath =
     new TargetPath(normalize(value))
 
-  def normalize(value: String): String = {
+  def normalize(value: String): String =
     val path = NormalizePath(value)
 
-    if (!path.matchesAny("/", "\\*", """(/:\w+|/[\w+\-.~%]+)+""", """(/:\w+|/[\w+\-.~%]+)*/\*\w*"""))
-      throw new IllegalArgumentException(s"Invalid target path: $path")
+    if !path.matchesAny("/", "\\*", """(/:\w+|/[\w+\-.~%]+)+""", """(/:\w+|/[\w+\-.~%]+)*/\*\w*""") then
+      throw IllegalArgumentException(s"Invalid target path: $path")
 
     path
-  }
-}

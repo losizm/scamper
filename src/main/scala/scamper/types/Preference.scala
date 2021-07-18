@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import scamper.ListParser
  * @see [[scamper.headers.Prefer]]
  * @see [[scamper.headers.PreferenceApplied]]
  */
-trait Preference {
+trait Preference:
   /** Gets name. */
   def name: String
 
@@ -35,7 +35,7 @@ trait Preference {
   def params: Map[String, Option[String]]
 
   /** Returns formatted preference. */
-  override lazy val toString: String = {
+  override lazy val toString: String =
     def pair(a: String, b: Option[String]) = a + {
       b.map(x => "=" + Token(x).getOrElse(s"""\"$x\"""")).getOrElse("")
     }
@@ -43,66 +43,57 @@ trait Preference {
     pair(name, value) + params.map {
       case (name, value) => "; " + pair(name, value)
     }.mkString
-  }
-}
 
 /** Provides registered preferences. */
-object Preferences {
+object Preferences:
   /** Preference for `wait=duration`. */
-  final case class `wait=duration`(seconds: Long) extends Preference {
+  final case class `wait=duration`(seconds: Long) extends Preference:
     val name: String = "wait"
     val value: Option[String] = Some(seconds.toString)
     val params: Map[String, Option[String]] = Map.empty
-  }
 
   /** Preference for `handling=strict`. */
-  case object `handling=strict` extends Preference {
+  case object `handling=strict` extends Preference:
     val name: String = "handling"
     val value: Option[String] = Some("strict")
     val params: Map[String, Option[String]] = Map.empty
-  }
 
   /** Preference for `handling=lenient`. */
-  case object `handling=lenient` extends Preference {
+  case object `handling=lenient` extends Preference:
     val name: String = "handling"
     val value: Option[String] = Some("lenient")
     val params: Map[String, Option[String]] = Map.empty
-  }
 
   /** Preference for `return=representation`. */
-  case object `return=representation` extends Preference {
+  case object `return=representation` extends Preference:
     val name: String = "return"
     val value: Option[String] = Some("representation")
     val params: Map[String, Option[String]] = Map.empty
-  }
 
   /** Preference for `return=minimal`. */
-  case object `return=minimal` extends Preference {
+  case object `return=minimal` extends Preference:
     val name: String = "return"
     val value: Option[String] = Some("minimal")
     val params: Map[String, Option[String]] = Map.empty
-  }
 
   /** Preference for `respond-async`. */
-  case object `respond-async` extends Preference {
+  case object `respond-async` extends Preference:
     val name: String = "respond-async"
     val value: Option[String] = None
     val params: Map[String, Option[String]] = Map.empty
-  }
-}
-import Preferences._
+
+import Preferences.*
 
 /** Provides factory for `Preference`. */
-object Preference {
+object Preference:
   /** Parses formatted preference. */
-  def parse(preference: String): Preference = {
+  def parse(preference: String): Preference =
     val pref = preference.split(";", 2)
 
-    val (name, value) = pref.head.split("=", 2).map(_.trim) match {
+    val (name, value) = pref.head.split("=", 2).map(_.trim) match
       case Array(name, "")    => name -> None
       case Array(name, value) => name -> RawValue(value)
       case Array(name)        => name -> None
-    }
 
     val params = pref.tail.flatMap(ListParser(_, true)).map(_.split("=", 2)).map {
       case Array(name, value) => name -> RawValue(value)
@@ -110,7 +101,6 @@ object Preference {
     }
 
     apply(name, value, params.toMap)
-  }
 
   /** Parses formatted list of preferences. */
   def parseAll(preferences: String): Seq[Preference] =
@@ -134,33 +124,31 @@ object Preference {
 
   /** Creates preference with supplied name, optional value, and parameters. */
   def apply(name: String, value: Option[String], params: Map[String, Option[String]]): Preference =
-    name.toLowerCase match {
-      case "wait" if value.exists(_ matches "\\d+")     => `wait=duration`(value.get.toLong)
+    name.toLowerCase match
+      case "wait" if value.exists(_.matches("\\d+"))    => `wait=duration`(value.get.toLong)
       case "return" if value.contains("representation") => `return=representation`
       case "return" if value.contains("minimal")        => `return=minimal`
       case "handling" if value.contains("strict")       => `handling=strict`
       case "handling" if value.contains("lenient")      => `handling=lenient`
       case "respond-async"                              => `respond-async`
       case name => PreferenceImpl(Name(name), value.filterNot(_.isEmpty).map(Value), Params(params))
-    }
 
   private def Name(value: String): String =
     Token(value) getOrElse {
-      throw new IllegalArgumentException(s"Invalid name: $value")
+      throw IllegalArgumentException(s"Invalid name: $value")
     }
 
   private def Value(value: String): String =
     Token(value) orElse QuotableString(value) getOrElse {
-      throw new IllegalArgumentException(s"Invalid value: $value")
+      throw IllegalArgumentException(s"Invalid value: $value")
     }
 
   private def RawValue(value: String): Option[String] =
     Token(value) orElse QuotedString(value) orElse {
-      throw new IllegalArgumentException(s"Invalid value: $value")
+      throw IllegalArgumentException(s"Invalid value: $value")
     }
 
   private def Params(params: Map[String, Option[String]]): Map[String, Option[String]] =
     params.map { case (name, value) => Name(name) -> value.filterNot(_.isEmpty).map(Value) }
-}
 
 private case class PreferenceImpl(name: String, value: Option[String], params: Map[String, Option[String]]) extends Preference

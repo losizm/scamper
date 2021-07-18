@@ -16,11 +16,11 @@
 package scamper.websocket
 
 /** Defines WebSocket application. */
-trait WebSocketApplication extends WebSocketSessionHandler[Unit] {
+@FunctionalInterface
+trait WebSocketApplication[T]:
   /**
    * Applies WebSocket session.
    *
    * @param session WebSocket session.
    */
-  def apply(session: WebSocketSession): Unit
-}
+  def apply(session: WebSocketSession): T

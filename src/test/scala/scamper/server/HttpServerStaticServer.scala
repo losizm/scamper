@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,19 @@ package scamper.server
 import java.nio.file.Files
 
 import scala.collection.immutable.ListMap
+import scala.language.implicitConversions
 
-import scamper._
-import scamper.Implicits._
+import scamper.*
+import scamper.Implicits.given
 import scamper.client.HttpClient
-import scamper.headers._
-import scamper.server.Implicits._
-import scamper.types._
-import scamper.types.Implicits._
+import scamper.headers.*
+import scamper.server.Implicits.given
+import scamper.types.*
+import scamper.types.Implicits.given
 
-import ResponseStatus.Registry._
+import ResponseStatus.Registry.*
 
-class HttpServerStaticServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
+class HttpServerStaticServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer:
   it should "serve files" in testStaticServer("files", false)
 
   it should "serve files with SSL/TLS" in testStaticServer("files", true)
@@ -38,14 +39,14 @@ class HttpServerStaticServerSpec extends org.scalatest.flatspec.AnyFlatSpec with
 
   it should "serve resources with SSL/TLS" in testStaticServer("resources", true)
 
-  private implicit val client =
+  private given client: HttpClient =
     HttpClient
       .settings()
       .trust(Resources.truststore)
       .continueTimeout(1000)
       .create()
 
-  private implicit val parser = BodyParser.bytes(32 * 1024)
+  private given parser: BodyParser[Array[Byte]] = BodyParser.bytes(32 * 1024)
 
   private def testStaticServer(kind: String, secure: Boolean): Unit =
     withServer(secure) { implicit server =>
@@ -92,4 +93,3 @@ class HttpServerStaticServerSpec extends org.scalatest.flatspec.AnyFlatSpec with
 
   private def getBytes(path: String): Array[Byte] =
     Files.readAllBytes(Resources.riteshiff.toPath.resolve(path))
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@
  */
 package scamper.websocket
 
+import scala.language.implicitConversions
+
 import scamper.{ HeaderNotFound, HttpException }
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.{ Get, Post }
 import scamper.ResponseStatus.Registry.Ok
 
-class WebSocketHeadersSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class WebSocketHeadersSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "create response with Sec-WebSocket-Accept header" in {
     val res1 = Ok()
     assert(!res1.hasSecWebSocketAccept)
@@ -194,4 +196,3 @@ class WebSocketHeadersSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(res2.removeSecWebSocketVersionServer == res1)
     assert(res2.getHeaderValue("Sec-WebSocket-Version-Server").contains("13, -09"))
   }
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package scamper.types
 
-import CacheDirectives._
+import CacheDirectives.*
 
-class CacheDirectiveSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class CacheDirectiveSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "CacheDirective" should "be created" in {
     var directive = CacheDirective("No-Cache")
     assert(directive.name == "no-cache")
@@ -66,4 +66,3 @@ class CacheDirectiveSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](CacheDirective("no-cache /"))
     assertThrows[IllegalArgumentException](CacheDirective("no-cache ="))
   }
-}

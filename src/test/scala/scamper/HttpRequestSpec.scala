@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
  */
 package scamper
 
-import scamper.Implicits.{ stringToUri, stringToHeader }
-import scamper.RequestMethod.Registry._
-import scamper.headers._
+import scala.language.implicitConversions
 
-class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
+import scamper.Implicits.{ stringToUri, stringToHeader }
+import scamper.RequestMethod.Registry.*
+import scamper.headers.*
+
+class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "create HttpRequest with path" in {
     val req = Get("?user=root&group=wheel").setPath("/find")
     assert(req.method == Get)
@@ -108,4 +110,3 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(Trace("/").isTrace)
     assert(Connect("/").isConnect)
   }
-}

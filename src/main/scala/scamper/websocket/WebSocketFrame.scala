@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package scamper.websocket
 import java.io.{ ByteArrayInputStream, InputStream }
 
 import scamper.{ BoundedInputStream, EmptyInputStream }
-import Opcode.Registry._
+import Opcode.Registry.*
 
 /** Defines frame for WebSocket message. */
-trait WebSocketFrame {
+trait WebSocketFrame:
   /** Tests for final frame. */
   def isFinal: Boolean
 
@@ -60,10 +60,9 @@ trait WebSocketFrame {
 
   /** Tests for Pong frame. */
   def isPong: Boolean = opcode == Pong
-}
 
 /** Provides factory for `WebSocketFrame`. */
-object WebSocketFrame {
+object WebSocketFrame:
   /**
    * Creates WebSocket frame using supplied attributes.
    *
@@ -74,29 +73,27 @@ object WebSocketFrame {
    * @param length payload length
    * @param payload input stream to payload
    */
-  def apply(isFinal: Boolean, isCompressed: Boolean, opcode: Opcode, key: Option[MaskingKey], length: Long, payload: InputStream): WebSocketFrame = {
-    if (opcode.isControl) {
-      if (!isFinal)
-        throw new IllegalArgumentException("isFinal not set for control frame")
+  def apply(isFinal: Boolean, isCompressed: Boolean, opcode: Opcode, key: Option[MaskingKey], length: Long, payload: InputStream): WebSocketFrame =
+    if opcode.isControl then
+      if !isFinal then
+        throw IllegalArgumentException("isFinal not set for control frame")
 
-      if (length > 125)
-        throw new IllegalArgumentException("length greater than 125 bytes for control frame")
-    }
+      if length > 125 then
+        throw IllegalArgumentException("length greater than 125 bytes for control frame")
 
-    if (isCompressed && opcode != Text && opcode != Binary && opcode != Continuation)
-      throw new IllegalArgumentException("isCompressed set for non data frame")
+    if isCompressed && opcode != Text && opcode != Binary && opcode != Continuation then
+      throw IllegalArgumentException("isCompressed set for non data frame")
 
-    if (key == null || key.contains(null))
-      throw new NullPointerException("key")
+    if key == null || key.contains(null) then
+      throw NullPointerException("key")
 
-    if (length < 0)
-      throw new IllegalArgumentException("length less than zero")
+    if length < 0 then
+      throw IllegalArgumentException("length less than zero")
 
-    if (payload == null)
-      throw new NullPointerException("payload")
+    if payload == null then
+      throw NullPointerException("payload")
 
-    new WebSocketFrameImpl(isFinal, isCompressed, opcode, key, length, new BoundedInputStream(payload, length))
-  }
+    WebSocketFrameImpl(isFinal, isCompressed, opcode, key, length, BoundedInputStream(payload, length))
 
   /**
    * Creates WebSocket frame using supplied attributes.
@@ -110,10 +107,9 @@ object WebSocketFrame {
    *
    * @note If there is `Some` masking key, it is used to mask `data`.
    */
-  def apply(isFinal: Boolean, isCompressed: Boolean, opcode: Opcode, key: Option[MaskingKey], length: Int, data: Array[Byte]): WebSocketFrame = {
+  def apply(isFinal: Boolean, isCompressed: Boolean, opcode: Opcode, key: Option[MaskingKey], length: Int, data: Array[Byte]): WebSocketFrame =
     key.foreach(key => key(data, length, 0))
-    apply(isFinal, isCompressed, opcode, key, length, if (length == 0) EmptyInputStream else new ByteArrayInputStream(data, 0, length))
-  }
+    apply(isFinal, isCompressed, opcode, key, length, if length == 0 then EmptyInputStream else ByteArrayInputStream(data, 0, length))
 
   /**
    * Creates WebSocket frame using supplied attributes.
@@ -139,7 +135,6 @@ object WebSocketFrame {
    */
   def apply(statusCode: StatusCode, key: Option[MaskingKey]): WebSocketFrame =
     apply(true, false, Close, key, 2, statusCode.toData)
-}
 
 private case class WebSocketFrameImpl(
   isFinal: Boolean,

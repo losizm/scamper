@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,20 @@ package scamper.types
  *
  * @see [[scamper.headers.ContentRange]]
  */
-trait ContentRangeType {
+trait ContentRangeType:
   /** Gets range unit. */
   def unit: String
 
   /** Gets range response. */
   def resp: Any
-}
 
 /**
  * Standardized type for Content-Range header value.
  *
  * @see [[scamper.headers.ContentRange]]
  */
-trait ByteContentRange extends ContentRangeType {
-  import ByteContentRange._
+trait ByteContentRange extends ContentRangeType:
+  import ByteContentRange.*
 
   /** Gets byte range unit (i.e., "bytes"). */
   val unit: String = "bytes"
@@ -44,35 +43,32 @@ trait ByteContentRange extends ContentRangeType {
 
   /** Gets formatted range. */
   lazy override val toString: String =
-    unit + ' ' + (resp match {
+    unit + ' ' + (resp match
       case Satisfied(first, last, length) => s"$first-$last/${length.getOrElse('*')}"
       case Unsatisfied(length) => s"*/$length"
-    })
-}
+    )
 
 /** Provides factory for `ByteContentRange`. */
-object ByteContentRange {
+object ByteContentRange:
   private val syntax = """(?i:bytes)\s+(.+)""".r
   private val satisfied = """(\d+)-(\d+)/(\*|\d+)""".r
   private val unsatisfied = """\*/(\d+)""".r
 
   /** Parses formatted range. */
   def parse(range: String): ByteContentRange =
-    range match {
+    range match
       case syntax(resp) => ByteContentRangeImpl(parseResp(resp))
-      case _ => throw new IllegalArgumentException(s"Malformed byte content range: $range")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed byte content range: $range")
 
   /** Creates range from supplied response. */
   def apply(resp: ByteRangeResp): ByteContentRange =
     ByteContentRangeImpl(resp)
 
   private def parseResp(resp: String): ByteRangeResp =
-    resp match {
+    resp match
       case satisfied(first, last, "*")    => Satisfied(first.toLong, last.toLong, None)
       case satisfied(first, last, length) => Satisfied(first.toLong, last.toLong, Some(length.toLong))
       case unsatisfied(length)            => Unsatisfied(length.toLong)
-    }
 
   /**
    * Byte range response
@@ -86,6 +82,5 @@ object ByteContentRange {
 
   /** Unsatisfied byte range response. */
   case class Unsatisfied(completeLength: Long) extends ByteRangeResp
-}
 
 private case class ByteContentRangeImpl(resp: ByteContentRange.ByteRangeResp) extends ByteContentRange

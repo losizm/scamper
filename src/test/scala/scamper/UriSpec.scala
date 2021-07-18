@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper
 
-class UriSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class UriSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "create Uri from String" in {
     var uri = Uri("http://localhost:8080/index.html")
     assert { uri.getScheme == "http" }
@@ -157,4 +157,3 @@ class UriSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert { uri.getRawFragment == "top" }
     assert { uri.toString == "https://localhost:8080?a=1&b=2#top" }
   }
-}

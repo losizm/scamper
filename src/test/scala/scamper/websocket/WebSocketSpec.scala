@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,15 @@
  */
 package scamper.websocket
 
+import scala.language.implicitConversions
+
 import scamper.Implicits.{ stringToUri, tupleToHeader }
 import scamper.RequestMethod.Registry.{ Get, Post }
 import scamper.ResponseStatus.Registry.SwitchingProtocols
 import scamper.headers.{ Connection, Upgrade }
-import scamper.types.Implicits._
+import scamper.types.Implicits.given
 
-class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec:
   val req = Get("/websocket/example")
     .setUpgrade("websocket")
     .setConnection("Upgrade")
@@ -191,4 +193,3 @@ class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(list4(2).params.get("quux").contains(None))
     assert(list4(2).params.get("quuux").contains(Some("3")))
   }
-}

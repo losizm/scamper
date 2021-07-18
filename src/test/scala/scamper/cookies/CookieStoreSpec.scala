@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@ package scamper.cookies
 
 import java.time.Instant
 
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToUri
 import scamper.Uri
 
-class CookieStoreSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class CookieStoreSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "get cookies with matching host" in {
     val a = SetCookie("a", "1")
     val b = SetCookie("b", "2")
@@ -164,4 +166,3 @@ class CookieStoreSpec extends org.scalatest.flatspec.AnyFlatSpec {
   private def matches(plain: Seq[PlainCookie], set: SetCookie*): Boolean =
     set.size == plain.size &&
       set.forall(cookie => plain.contains(cookie.toPlainCookie))
-}

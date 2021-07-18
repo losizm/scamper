@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import java.io.File
 
 import scamper.types.{ DispositionType, MediaType }
 
-class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "TextPart" should "be created" in {
     val part = TextPart("id", "root")
     assert(part.name == "id")
@@ -44,9 +44,9 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   "FilePart" should "be created" in {
-    var part = FilePart("photo", new File("photo.jpg"))
+    var part = FilePart("photo", File("photo.jpg"))
     assert(part.name == "photo")
-    assert(part.content == new File("photo.jpg"))
+    assert(part.content == File("photo.jpg"))
     assert(part.getFileName.contains("photo.jpg"))
     assert(part.contentDisposition.name == "form-data")
     assert(part.contentDisposition.params("name") == "photo")
@@ -54,9 +54,9 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(part.contentType.isImage)
     assert(part.contentType.subtype == "jpeg")
 
-    part = FilePart("photo", new File("photo.jpg"), "my-photo.jpg")
+    part = FilePart("photo", File("photo.jpg"), "my-photo.jpg")
     assert(part.name == "photo")
-    assert(part.content == new File("photo.jpg"))
+    assert(part.content == File("photo.jpg"))
     assert(part.getFileName.contains("my-photo.jpg"))
     assert(part.contentDisposition.name == "form-data")
     assert(part.contentDisposition.params("name") == "photo")
@@ -64,9 +64,9 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(part.contentType.isImage)
     assert(part.contentType.subtype == "jpeg")
 
-    part = FilePart("photo", new File("photo.jpg"), Some("my-photo.jpg"))
+    part = FilePart("photo", File("photo.jpg"), Some("my-photo.jpg"))
     assert(part.name == "photo")
-    assert(part.content == new File("photo.jpg"))
+    assert(part.content == File("photo.jpg"))
     assert(part.getFileName.contains("my-photo.jpg"))
     assert(part.contentDisposition.name == "form-data")
     assert(part.contentDisposition.params("name") == "photo")
@@ -74,9 +74,9 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(part.contentType.isImage)
     assert(part.contentType.subtype == "jpeg")
 
-    part = FilePart("photo", new File("photo.jpg"), None)
+    part = FilePart("photo", File("photo.jpg"), None)
     assert(part.name == "photo")
-    assert(part.content == new File("photo.jpg"))
+    assert(part.content == File("photo.jpg"))
     assert(part.getFileName.isEmpty)
     assert(part.contentDisposition.name == "form-data")
     assert(part.contentDisposition.params("name") == "photo")
@@ -90,7 +90,7 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec {
     val formDataNoName = DispositionType("form-data")
     val attachment = DispositionType("attachment", "filename" -> "photo.jpg")
     val header = Header("Content-Type", "text/plain")
-    val content = new File("photo.jpg")
+    val content = File("photo.jpg")
 
     assertThrows[HttpException] { FilePart(formDataNoName, content) }
     assertThrows[HttpException] { FilePart(attachment, content) }
@@ -99,7 +99,7 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec {
 
   "Multipart" should "be created" in {
     val id = TextPart("id", "root")
-    val photo = FilePart("photo", new File("photo.jpg"))
+    val photo = FilePart("photo", File("photo.jpg"))
     val rap = TextPart("genre", "Rap")
     val rnb = TextPart("genre", "R&B")
     val reggae = TextPart("genre", "Reggae")
@@ -117,7 +117,7 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(multipart.getPart("photo").contains(photo))
     assert(multipart.getParts("photo").sameElements(Seq(photo)))
     assert(multipart.getFilePart("photo").contains(photo))
-    assert(multipart.getFile("photo").contains(new File("photo.jpg")))
+    assert(multipart.getFile("photo").contains(File("photo.jpg")))
     assertThrows[ClassCastException] { multipart.getTextPart("photo") }
     assertThrows[ClassCastException] { multipart.getText("photo") }
 
@@ -145,5 +145,3 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(query.getValues("genre").sameElements(Seq("Rap", "R&B", "Reggae")))
     assertThrows[NoSuchElementException] { query("photo") }
   }
-}
-

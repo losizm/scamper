@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,21 @@ package scamper
 
 import java.time.Instant
 
-import HeaderHelper._
+import HeaderHelper.*
 
 /** Defines HTTP header. */
-sealed trait Header {
+sealed trait Header:
   /** Gets header name. */
   def name: String
 
   /** Gets header value. */
   def value: String
+
+  /** Gets header value as `Int`. */
+  def intValue: Int = value.toInt
+
+  /** Gets header value as `Long`. */
+  def longValue: Long = value.toLong
 
   /**
    * Gets header value as `Instant`.
@@ -34,15 +40,15 @@ sealed trait Header {
    */
   def dateValue: Instant = DateValue.parse(value)
 
-  /** Gets header value as `Long`. */
-  def longValue: Long = value.toLong
-}
-
 /** Provides factory for `Header`. */
-object Header {
+object Header:
   /** Creates header using supplied name and value. */
   def apply(name: String, value: String): Header =
     HeaderImpl(Name(name), Value(value))
+
+  /** Creates header using supplied name and value. */
+  def apply(name: String, value: Int): Header =
+    apply(name, value.toString)
 
   /** Creates header using supplied name and value. */
   def apply(name: String, value: Long): Header =
@@ -58,12 +64,9 @@ object Header {
 
   /** Parses formatted header. */
   def apply(header: String): Header =
-    header.split(":", 2) match {
+    header.split(":", 2) match
       case Array(name, value) => apply(name.trim, value.trim)
       case _ => throw new IllegalArgumentException(s"Malformed header: $header")
-    }
-}
 
-private case class HeaderImpl(name: String, value: String) extends Header {
+private case class HeaderImpl(name: String, value: String) extends Header:
   override lazy val toString = s"$name: $value"
-}

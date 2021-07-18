@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package scamper.types
 
-import scamper.types.ByteRange._
+import scamper.types.ByteRange.*
 
-class RangeTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class RangeTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "ByteRange" should "be created with single spec" in {
     var range = ByteRange.parse("bytes=0-9")
     assert(range.unit == "bytes")
@@ -49,4 +49,3 @@ class RangeTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(range.set(2).asInstanceOf[Suffix] == Suffix(256))
     assert(range.toString == "bytes=0-9,100-124,-256")
   }
-}

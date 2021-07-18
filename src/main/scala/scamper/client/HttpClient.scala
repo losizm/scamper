@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import scamper.{ Entity, Header, HttpRequest, Uri }
 import scamper.Validate.notNull
 import scamper.cookies.{ CookieStore, PlainCookie }
 import scamper.types.{ ContentCodingRange, MediaRange }
-import scamper.websocket.WebSocketSessionHandler
+import scamper.websocket.WebSocketApplication
 
 /**
  * Defines HTTP client.
@@ -27,7 +27,7 @@ import scamper.websocket.WebSocketSessionHandler
  * A client is created using either the [[HttpClient$.apply HttpClient]] object
  * or [[ClientSettings]].
  */
-trait HttpClient {
+trait HttpClient:
   /** Gets accepted content types. */
   def accept: Seq[MediaRange]
 
@@ -120,27 +120,26 @@ trait HttpClient {
   def delete[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: ResponseHandler[T]): T
 
   /**
-   * Connects to WebSocket server at given target and passes established session
-   * to supplied handler.
+   * Connects to WebSocket server at target path and passes established session
+   * to supplied application.
    *
    * @param target WebSocket target
    * @param headers additional headers to include in WebSocket request
    * @param cookies cookies to include in WebSocket request
-   * @param handler WebSocket session handler
+   * @param application WebSocket application
    *
-   * @return value from session handler
+   * @return value from application
    *
    * @throws java.lang.IllegalArgumentException if `target` is not WebSocket URI
-   * (i.e., it must be absolute URI having scheme of either `"ws"` or `"wss"`)
+   * (i.e., it must be absolute URI with either "ws" or "wss" scheme)
    *
    * @throws scamper.websocket.WebSocketHandshakeFailure if WebSocket handshake
    * fails
    */
-  def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(handler: WebSocketSessionHandler[T]): T
-}
+  def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)(application: WebSocketApplication[T]): T
 
 /** Provides factory for `HttpClient`. */
-object HttpClient {
+object HttpClient:
   /** Gets new instance of client settings. */
   def settings(): ClientSettings = new ClientSettings()
 
@@ -160,10 +159,8 @@ object HttpClient {
    * @throws java.lang.IllegalArgumentException if `request.target` is not
    * absolute
    */
-  def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T = {
+  def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T =
     notNull(request, "request")
     notNull(handler, "handler")
 
     apply().send(request)(handler)
-  }
-}

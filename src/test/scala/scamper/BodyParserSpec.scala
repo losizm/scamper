@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,20 @@ package scamper
 
 import java.io.EOFException
 
+import scala.language.implicitConversions
+
 import scamper.Auxiliary.InputStreamType
 import scamper.Implicits.stringToUri
-import scamper.RequestMethod.Registry._
-import scamper.ResponseStatus.Registry._
-import scamper.headers._
-import scamper.types.Implicits._
+import scamper.RequestMethod.Registry.*
+import scamper.ResponseStatus.Registry.*
+import scamper.headers.*
+import scamper.types.Implicits.given
 
-class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "BodyParser" should "parse response with text body" in {
-    implicit val bodyParser = BodyParser.text()
+    given BodyParser[String] = BodyParser.text()
     val body = Entity("Hello, world!")
-    val message = Ok(body).setContentType("text/plain").setContentLength(body.getLength.get)
+    val message = Ok(body).setContentType("text/plain").setContentLength(body.knownSize.get)
 
     assert(message.status == Ok)
     assert(message.contentType.isText)
@@ -38,7 +40,7 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "parse response with chunked text body" in {
-    implicit val bodyParser = BodyParser.text()
+    given BodyParser[String] = BodyParser.text()
     val body = Entity("7\r\nHello, \r\n6\r\nworld!\r\n0\r\n")
     val message = Ok(body).setContentType("text/plain; charset=utf8").setTransferEncoding("chunked")
 
@@ -46,15 +48,15 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "detect truncation in chunked text body" in {
-    implicit val bodyParser = BodyParser.text()
+    given BodyParser[String] = BodyParser.text()
     val message = Ok(Entity("100\r\nHello, world!")).setContentType("text/plain; charset=utf8").setTransferEncoding("chunked")
     assertThrows[EOFException](message.as[String])
   }
 
   it should "parse request with form body" in {
-    implicit val bodyParser = BodyParser.form()
+    given BodyParser[Map[String, Seq[String]]] = BodyParser.form()
     val body = Entity("id" -> "0", "name" -> "root")
-    val request = Post("users").setBody(body).setContentLength(body.getLength.get)
+    val request = Post("users").setBody(body).setContentLength(body.knownSize.get)
     val form = request.as[Map[String, Seq[String]]]
 
     assert(form("id").head == "0")
@@ -62,9 +64,9 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "parse request with form body as query string" in {
-    implicit val bodyParser = BodyParser.query()
+    given BodyParser[QueryString] = BodyParser.query()
     val body = Entity("id" -> "0", "name" -> "root")
-    val request = Post("users").setBody(body).setContentLength(body.getLength.get)
+    val request = Post("users").setBody(body).setContentLength(body.knownSize.get)
     val form = request.as[QueryString]
 
     assert(form.get("id").contains("0"))
@@ -72,29 +74,27 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "not parse response with large body" in {
-    implicit val bodyParser = BodyParser.text(8)
+    given BodyParser[String] = BodyParser.text(8)
     val body = Entity("Hello, world!")
-    val message = Ok(body).setContentType("text/plain").setContentLength(body.getLength.get)
+    val message = Ok(body).setContentType("text/plain").setContentLength(body.knownSize.get)
 
     assertThrows[ReadLimitExceeded](message.as[String])
   }
 
   it should "not parse response with large entity" in {
-    implicit val bodyParser = BodyParser.text(256)
+    given BodyParser[String] = BodyParser.text(256)
     val body = Entity(getResourceBytes("/test.html.gz"))
 
     assertThrows[EntityTooLarge] {
       Ok(body)
         .setContentType("text/html")
         .setContentEncoding("gzip")
-        .setContentLength(body.getLength.get)
+        .setContentLength(body.knownSize.get)
         .as[String]
     }
   }
 
-  private def getResourceBytes(name: String): Array[Byte] = {
+  private def getResourceBytes(name: String): Array[Byte] =
     val in = getClass.getResourceAsStream(name)
     try in.getBytes()
     finally in.close()
-  }
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper
 
-class StatusLineSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class StatusLineSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "StatusLine" should "be created" in {
     var response = StatusLine("HTTP/1.1 200 OK")
     assert(response.version == HttpVersion(1, 1))
@@ -47,4 +47,3 @@ class StatusLineSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](StatusLine("HTTP/1.1-200"))
     assertThrows[IllegalArgumentException](StatusLine("HTTP/ OK"))
   }
-}

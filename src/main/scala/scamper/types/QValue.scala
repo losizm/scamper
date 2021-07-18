@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,9 @@
  */
 package scamper.types
 
-private object QValue {
+private object QValue:
   val key = "([Qq])".r
   val value = "(\\d+(?:\\.\\d*)?)".r
 
   def apply(value: Float): Float =
     (value.max(0f).min(1f) * 1000).floor / 1000
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper
 
-class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "create QueryString from map" in {
     val query = QueryString(Map("id" -> Seq("0"), "name" -> Seq("root"), "groups" -> Seq("wheel", "admin")))
 
@@ -348,5 +348,3 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec {
     val query = QueryString("id=0&name=root&groups=wheel&groups=admin")
     assertThrows[NoSuchElementException] { query("idx") }
   }
-}
-

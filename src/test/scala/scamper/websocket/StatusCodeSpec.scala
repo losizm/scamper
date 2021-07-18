@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package scamper.websocket
 
-import StatusCode.Registry._
+import StatusCode.Registry.*
 
-class StatusCodeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class StatusCodeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "check registered status codes" in {
     assert(StatusCode(1000) == NormalClosure)
     assert(StatusCode.get(1000).contains(NormalClosure))
@@ -126,4 +126,3 @@ class StatusCodeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(StatusCode.get(1014).isEmpty)
     assert(StatusCode.get(1016).isEmpty)
   }
-}

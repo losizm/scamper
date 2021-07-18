@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,30 +17,27 @@ package scamper
 
 import java.io.{ FilterInputStream, InputStream }
 
-private class BoundedInputStream(in: InputStream, limit: Long, capacity: Long) extends FilterInputStream(in) {
+private class BoundedInputStream(in: InputStream, limit: Long, capacity: Long) extends FilterInputStream(in):
   def this(in: InputStream, limit: Long) = this(in, limit, limit)
 
   private var position: Long = 0
 
   override def read(): Int =
-    if (position >= capacity) -1
+    if position >= capacity then -1
     else
-      in.read() match {
+      in.read() match
         case -1   => -1
         case byte => position += 1; byte
-      }
 
   override def read(buffer: Array[Byte], offset: Int, length: Int): Int =
-    if (position >= capacity) -1
+    if position >= capacity then -1
     else
-      in.read(buffer, offset, length.min(maxRead)) match {
+      in.read(buffer, offset, length.min(maxRead)) match
         case -1    => -1
         case count =>
           position += count
-          if (position > limit) throw ReadLimitExceeded(limit)
+          if position > limit then throw ReadLimitExceeded(limit)
           count
-      }
 
   private def maxRead: Int =
     (capacity - position).min(Int.MaxValue).toInt
-}

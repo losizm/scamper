@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package scamper.server
 import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.ContentLength
 
-class ResponseFilterSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class ResponseFilterSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "componse response filters" in {
     val f1: ResponseFilter = _.setContentLength(10)
     val f2: ResponseFilter = _.setContentLength(20)
@@ -29,4 +29,3 @@ class ResponseFilterSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert { f1.before(f2).apply(res).contentLength == 20 }
     assert { f2.before(f1).apply(res).contentLength == 10 }
   }
-}

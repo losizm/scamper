@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Ok
 import scamper.Uri
 
-class CookiesSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class CookiesSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "PlainCookie" should "be created from formatted value" in {
     val cookie = PlainCookie.parse("SID=31d4d96e407aad42")
     assert(cookie.name == "SID")
@@ -75,4 +75,3 @@ class CookiesSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(res.setCookies(Nil).getHeaderValue("Set-Cookie").isEmpty)
     assert(res.removeCookies("a", "c").cookies == Seq(SetCookie("b", "xyz")))
   }
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,22 +21,18 @@ import scala.collection.mutable.ArrayBuffer
 
 import Auxiliary.InputStreamType
 
-private object HeaderStream {
-  def getHeaders(in: InputStream, buffer: Array[Byte]): Seq[Header] = {
+private object HeaderStream:
+  def getHeaders(in: InputStream, buffer: Array[Byte]): Seq[Header] =
     val headers = new ArrayBuffer[Header]
     var line = ""
 
-    while ({ line = in.getLine(buffer); line != "" })
-      line.matches("[ \t]+.*") match {
+    while { line = in.getLine(buffer); line != "" } do
+      line.matches("[ \t]+.*") match
         case true =>
-          if (headers.isEmpty) throw new HttpException("Cannot parse headers")
+          if headers.isEmpty then throw HttpException("Cannot parse headers")
           val last = headers.last
           headers.update(headers.length - 1, Header(last.name, last.value + " " + line.trim()))
         case false =>
           headers += Header(line)
-      }
 
     headers.toSeq
-  }
-}
-

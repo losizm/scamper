@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package scamper.types
 
-import CodingHelper._
+import CodingHelper.*
 
 /**
  * Standardized type for Transfer-Encoding header value.
  *
  * @see [[scamper.headers.TransferEncoding]]
  */
-trait TransferCoding {
+trait TransferCoding:
   /** Gets coding name. */
   def name: String
 
@@ -43,15 +43,13 @@ trait TransferCoding {
 
   /** Returns formatted transfer coding. */
   override lazy val toString: String = name + FormatParams(params)
-}
 
 /** Provides factory for `TransferCoding`. */
-object TransferCoding {
+object TransferCoding:
   /** Parses formatted transfer coding. */
   def parse(coding: String): TransferCoding =
-    ParseTransferCoding(coding) match {
+    ParseTransferCoding(coding) match
       case (name, params) => apply(name, params)
-    }
 
   /** Creates transfer coding with supplied values. */
   def apply(name: String, params: Map[String, String]): TransferCoding =
@@ -60,6 +58,5 @@ object TransferCoding {
   /** Creates transfer coding with supplied values. */
   def apply(name: String, params: (String, String)*): TransferCoding =
     apply(name, params.toMap)
-}
 
 private case class TransferCodingImpl(name: String, params: Map[String, String]) extends TransferCoding

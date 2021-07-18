@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,7 @@ import scamper.types.KeepAliveParameters
  * application is modified and returned. After the desired settings are applied,
  * a server is created using one of several factory methods.
  *
- * @constructor Creates server application.
- *
- * === Default Configuration ===
+ * ### Default Configuration
  *
  * | Key         | Value |
  * | ---------   | ----- |
@@ -43,14 +41,15 @@ import scamper.types.KeepAliveParameters
  * | bufferSize  | `8192` |
  * | readTimeout | `5000` |
  * | headerLimit | `100` |
- * | keepAlive   | ''(Not configured)'' |
- * | secure      | ''(Not configured)'' |
- * | incoming    | ''(Not configured)'' |
- * | outgoing    | ''(Not configured)'' |
- * | error       | ''(Sends `500 Internal Server Error`)'' |
- * <br>
+ * | keepAlive   | _(Not configured)_ |
+ * | secure      | _(Not configured)_ |
+ * | incoming    | _(Not configured)_ |
+ * | outgoing    | _(Not configured)_ |
+ * | error       | _(Sends `500 Internal Server Error`)_ |
+ *
+ * @constructor Creates server application.
  */
-class ServerApplication extends Router {
+class ServerApplication extends Router:
   private var app = HttpServerImpl.Application()
 
   /**
@@ -353,11 +352,8 @@ class ServerApplication extends Router {
   def create(host: InetAddress, port: Int): HttpServer = synchronized {
     HttpServerImpl(host, port, app)
   }
-}
 
 /** Provides factory for `ServerApplication`. */
-object ServerApplication {
+object ServerApplication:
   /** Gets new instance of `ServerApplication`. */
-  def apply(): ServerApplication =
-    new ServerApplication()
-}
+  def apply(): ServerApplication = new ServerApplication()

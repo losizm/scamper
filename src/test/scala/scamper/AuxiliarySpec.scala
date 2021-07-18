@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package scamper
 
 import java.time.{ Instant, LocalDate }
 
-import Auxiliary._
+import Auxiliary.*
 
-class AuxiliarySpec extends org.scalatest.flatspec.AnyFlatSpec {
+class AuxiliarySpec extends org.scalatest.flatspec.AnyFlatSpec:
   val uri = Uri("http://localhost:8080/index.html")
   val uriPath = Uri("/index.html")
   val uriPathWithQuery = Uri("/index.html?name=guest")
@@ -49,4 +49,3 @@ class AuxiliarySpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(!"XYZ".matchesAny("123", "a.*", "xyz"))
     assert(!"XYZ".matchesAny())
   }
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-class ProtocolSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class ProtocolSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "Protocol" should "be created" in {
     var protocol = Protocol.parse("HTTP/2.0")
     assert(protocol.name == "HTTP")
@@ -40,4 +40,3 @@ class ProtocolSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](Protocol.parse("HTTP / 2.0"))
     assertThrows[IllegalArgumentException](Protocol.parse("HTTP/"))
   }
-}

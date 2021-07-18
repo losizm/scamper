@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,22 @@ import java.util.concurrent.atomic.AtomicReference
 
 import scala.collection.immutable.ListMap
 import scala.collection.mutable.ListBuffer
+import scala.language.implicitConversions
 
-import scamper._
-import scamper.Implicits._
+import scamper.*
+import scamper.Implicits.given
 import scamper.client.HttpClient
-import scamper.headers._
-import scamper.server.Implicits._
-import scamper.types._
-import scamper.types.Implicits._
-import scamper.websocket._
+import scamper.headers.*
+import scamper.server.Implicits.given
+import scamper.types.*
+import scamper.types.Implicits.given
+import scamper.websocket.*
 
 import Auxiliary.UriType
-import ResponseStatus.Registry._
-import StatusCode.Registry._
+import ResponseStatus.Registry.*
+import StatusCode.Registry.*
 
-class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
+class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer:
   it should "complete chat session with Normal Closure" in testNormalClosure(false)
 
   it should "complete chat session with Normal Closure with SSL/TLS" in testNormalClosure(true)
@@ -64,11 +65,11 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
       .trust(Resources.truststore)
       .create()
 
-  private val messages     = new ListBuffer[String]
-  private val pingData     = new ListBuffer[Byte]
-  private val pongData     = new ListBuffer[Byte]
-  private val pingReceived = new AtomicReference[Boolean]
-  private val closure      = new AtomicReference[StatusCode]
+  private val messages     = ListBuffer[String]()
+  private val pingData     = ListBuffer[Byte]()
+  private val pongData     = ListBuffer[Byte]()
+  private val pingReceived = AtomicReference[Boolean]()
+  private val closure      = AtomicReference[StatusCode]()
 
   private def testNormalClosure(secure: Boolean) = withSession(secure) { session =>
     val conversation = ListMap(
@@ -207,7 +208,7 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
       pingReceived.set(false)
       closure.set(Reserved)
 
-      val scheme  = if (server.isSecure) "wss" else "ws"
+      val scheme  = if server.isSecure then "wss" else "ws"
       val session = client.websocket(s"${serverUri.setScheme(scheme)}/chat/lupita") { session =>
         info("set up client session")
 
@@ -242,4 +243,3 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
       finally
         session.close()
     }
-}

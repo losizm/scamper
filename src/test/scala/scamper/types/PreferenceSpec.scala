@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package scamper.types
 
-import Preferences._
+import Preferences.*
 
-class PreferenceSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class PreferenceSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "Preference" should "be created name, value, and parameters" in {
     val pref = Preference.parse("Pref=value; param1=\"value1\"; param2=value2; param3=\"value three\"")
     assert(pref.name == "pref")
@@ -76,4 +76,3 @@ class PreferenceSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](Preference.parse("pref=value param1"))
     assertThrows[IllegalArgumentException](Preference.parse("pref=value; param1 value1"))
   }
-}

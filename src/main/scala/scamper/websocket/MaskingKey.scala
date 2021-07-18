@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package scamper.websocket
 
 /** Defines masking key for payload data. */
-trait MaskingKey {
+trait MaskingKey:
   /** Gets key value. */
   def value: Int
 
@@ -43,11 +43,10 @@ trait MaskingKey {
    * @return modified data
    */
   def apply(data: Array[Byte], length: Int, position: Long): Array[Byte]
-}
 
 /** Provides factory for `MaskingKey`. */
-object MaskingKey {
-  private val random = new java.security.SecureRandom()
+object MaskingKey:
+  private val random = java.security.SecureRandom()
 
   /**
    * Creates masking key with supplied value if nonzero.
@@ -55,32 +54,28 @@ object MaskingKey {
    * @return `Some` masking key if `value` is nonzero; `None` otherwise
    */
   def get(value: Int): Option[MaskingKey] =
-    value == 0 match {
+    value == 0 match
       case true  => None
       case fale  => Some(MaskingKeyImpl(value))
-    }
 
   /**
    * Creates masking key with supplied value.
    *
    * @throws java.lang.IllegalArgumentException if `value` is zero
    */
-  def apply(value: Int): MaskingKey = {
-    if (value == 0)
-      throw new IllegalArgumentException("value is 0")
+  def apply(value: Int): MaskingKey =
+    if value == 0 then
+      throw IllegalArgumentException("value is 0")
     MaskingKeyImpl(value)
-  }
 
   /** Creates masking key with randomly generated value. */
-  def apply(): MaskingKey = {
+  def apply(): MaskingKey =
     var value = 0
-    while (value == 0)
+    while value == 0 do
       value = random.nextInt()
     MaskingKeyImpl(value)
-  }
-}
 
-private case class MaskingKeyImpl(value: Int) extends MaskingKey {
+private case class MaskingKeyImpl(value: Int) extends MaskingKey:
   private val key = Array(
     ((value & 0xff000000) >> 24).toByte,
     ((value & 0x00ff0000) >> 16).toByte,
@@ -90,10 +85,8 @@ private case class MaskingKeyImpl(value: Int) extends MaskingKey {
 
   override lazy val toString: String = f"MaskingKey(0x$value%08x)"
 
-  def apply(data: Array[Byte], length: Int, position: Long): Array[Byte] = {
+  def apply(data: Array[Byte], length: Int, position: Long): Array[Byte] =
     val offset = (position % 4).toInt
-    for (i <- 0 until length)
+    for i <- 0 until length do
       data(i) = (data(i) ^ key((offset + i) % 4)).toByte
     data
-  }
-}

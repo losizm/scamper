@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,21 +22,20 @@ import scamper.ListParser
  *
  * @see [[scamper.headers.Range]]
  */
-trait RangeType {
+trait RangeType:
   /** Gets range unit. */
   def unit: String
 
   /** Gets range set. */
   def set: Any
-}
 
 /**
  * Standardized type for Range header value.
  *
  * @see [[scamper.headers.Range]]
  */
-trait ByteRange extends RangeType {
-  import ByteRange._
+trait ByteRange extends RangeType:
+  import ByteRange.*
 
   /** Gets byte range unit (i.e., "bytes"). */
   val unit: String = "bytes"
@@ -51,20 +50,18 @@ trait ByteRange extends RangeType {
       case Slice(first, None)       => s"$first-"
       case Suffix(length)           => s"-$length"
     } mkString ",")
-}
 
 /** Provides factory for `ByteRange`. */
-object ByteRange {
+object ByteRange:
   private val syntax = """(?i:bytes)\s*=\s*(.+)""".r
   private val slice = """(\d+)-(\d+)?""".r
   private val suffix = """-(\d+)?""".r
 
   /** Parses formatted byte range. */
   def parse(range: String): ByteRange =
-    range match {
+    range match
       case syntax(set) => ByteRangeImpl(parseSet(set))
-      case _           => throw new IllegalArgumentException(s"Malformed byte range: $range")
-    }
+      case _           => throw IllegalArgumentException(s"Malformed byte range: $range")
 
   /** Creates byte range from supplied specs. */
   def apply(specs: Seq[ByteRangeSpec]): ByteRange =
@@ -93,8 +90,6 @@ object ByteRange {
 
   /** Byte range spec with suffix length. */
   case class Suffix(length: Long) extends ByteRangeSpec
-}
 
-private case class ByteRangeImpl(set: Seq[ByteRange.ByteRangeSpec]) extends ByteRange {
+private case class ByteRangeImpl(set: Seq[ByteRange.ByteRangeSpec]) extends ByteRange:
   require(set.nonEmpty, "Invalid byte range: set is empty")
-}

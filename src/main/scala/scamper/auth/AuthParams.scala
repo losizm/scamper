@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,22 @@
  */
 package scamper.auth
 
-import scamper.Grammar._
+import scamper.Grammar.*
 import scamper.{ CaseInsensitiveKeyMap, ListParser }
 
-private object AuthParams {
+private object AuthParams:
   private val TokenParam = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val QuotedParam = """\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*"([^"]*)"\s*""".r
 
   def parse(params: String): Map[String, String] =
-    new CaseInsensitiveKeyMap(ListParser(params).map {
+    CaseInsensitiveKeyMap(ListParser(params).map {
       case TokenParam(name, value)  => name -> value
       case QuotedParam(name, value) => name -> value
-      case param => throw new IllegalArgumentException(s"Malformed auth parameters: $param")
+      case param => throw IllegalArgumentException(s"Malformed auth parameters: $param")
     })
 
   def format(params: Map[String, String]): String =
-    if (params.isEmpty) ""
+    if params.isEmpty then ""
     else
       params.map {
           case ("realm", value) => "realm=\"" + value + "\""
@@ -40,4 +40,3 @@ private object AuthParams {
         .mkString(" ", ", ", "")
 
   private def formatParamValue(value: String): String = Token(value).getOrElse(s"""\"$value\"""")
-}

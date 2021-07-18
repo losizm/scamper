@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,96 +17,82 @@ package scamper
 
 import java.io.{ EOFException, InputStream, IOException }
 
-private class ChunkedInputStream(in: InputStream) extends InputStream {
+private class ChunkedInputStream(in: InputStream) extends InputStream:
   private var chunkSize = 0
   private var position = 0
 
   nextChunk()
 
-  override def read(): Int = isReadable() match {
+  override def read(): Int = isReadable() match
     case true =>
-      in.read() match {
-        case -1   => throw new EOFException("Truncation detected")
+      in.read() match
+        case -1   => throw EOFException("Truncation detected")
         case byte => position += 1; byte
-      }
     case false => -1
-  }
 
   override def read(buffer: Array[Byte]): Int = read(buffer, 0, buffer.length)
 
-  override def read(buffer: Array[Byte], offset: Int, length: Int): Int = isReadable() match {
+  override def read(buffer: Array[Byte], offset: Int, length: Int): Int = isReadable() match
     case true =>
       var total = 0
-      while (total < length && isReadable())
-        in.read(buffer, offset + total, (length - total).min(chunkSize - position)) match {
-          case -1    => throw new EOFException("Truncation detected")
+      while total < length && isReadable() do
+        in.read(buffer, offset + total, (length - total).min(chunkSize - position)) match
+          case -1    => throw EOFException("Truncation detected")
           case count => total += count; position += count
-        }
       total
     case false => -1
-  }
 
-  override def available(): Int = isReadable() match {
+  override def available(): Int = isReadable() match
     case true  => chunkSize - position
     case false => 0
-  }
 
-  override def skip(count: Long): Long = isReadable() match {
+  override def skip(count: Long): Long = isReadable() match
     case true =>
       val buffer = new Array[Byte](count.max(0).min(8192).toInt)
       var skipCount = 0L
-      while (skipCount < count && isReadable())
+      while skipCount < count && isReadable() do
         skipCount += read(buffer, 0, (count - skipCount).min(buffer.length).toInt)
       skipCount
     case false => 0
-  }
 
   override def markSupported(): Boolean = false
   override def mark(limit: Int): Unit = ()
-  override def reset(): Unit = throw new IOException("Mark/reset not supported")
+  override def reset(): Unit = throw IOException("Mark/reset not supported")
   override def close(): Unit = in.close()
 
-  private def isReadable(): Boolean = {
-    if (position == chunkSize && chunkSize > 0)
+  private def isReadable(): Boolean =
+    if position == chunkSize && chunkSize > 0 then
       nextChunk()
     position < chunkSize
-  }
 
-  private def nextChunk(): Unit = {
+  private def nextChunk(): Unit =
     chunkSize = nextChunkSize
     position = 0
-  }
 
-  private def nextChunkSize: Int = {
-    if (chunkSize > 0 && readLine().length != 0)
-      throw new IOException("Invalid chunk termination")
+  private def nextChunkSize: Int =
+    if chunkSize > 0 && readLine().length != 0 then
+      throw IOException("Invalid chunk termination")
 
     val regex = "(\\p{XDigit}+)(\\s*;\\s*.+=.+)*".r
 
-    readLine() match {
+    readLine() match
       case regex(size, _) =>
-        Integer.parseInt(size, 16) match {
+        Integer.parseInt(size, 16) match
           case 0 => readLine(); 0
           case n => n
-        }
-      case line => throw new IOException(s"Invalid chunk size: $line")
-    }
-  }
+      case line => throw IOException(s"Invalid chunk size: $line")
 
-  private def readLine(): String = {
+  private def readLine(): String =
     val buffer = new Array[Byte](256)
     var byte = in.read()
     var length = 0
 
-    while (byte != '\n' && byte != -1) {
+    while byte != '\n' && byte != -1 do
       buffer(length) = byte.toByte
       byte = in.read()
       length += 1
-    }
 
-    if (length > 0 && buffer(length - 1) == '\r')
+    if length > 0 && buffer(length - 1) == '\r' then
       length -= 1
 
-    new String(buffer, 0, length)
-  }
-}
+    String(buffer, 0, length)

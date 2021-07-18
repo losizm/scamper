@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import scamper.logging.{ Logger, NullLogger }
 import StatusCode.Registry.NormalClosure
 
 /** Defines session for WebSocket connection. */
-trait WebSocketSession {
+trait WebSocketSession:
   /** Gets session identifer. */
   def id: String
 
@@ -264,10 +264,9 @@ trait WebSocketSession {
    * @return this session
    */
   def onClose[T](handler: StatusCode => T): this.type
-}
 
 /** Provides factory for `WebSocketSession`. */
-object WebSocketSession {
+object WebSocketSession:
   /**
    * Wraps WebSocket session around an already established client connection.
    *
@@ -279,7 +278,7 @@ object WebSocketSession {
    * @param logger optional logger
    */
   def forClient(conn: WebSocketConnection, id: String, target: Uri, version: String, deflate: Boolean, logger: Option[Logger]): WebSocketSession =
-    new WebSocketSessionImpl(id, target, version, logger.getOrElse(NullLogger))(conn, false, if (deflate) DeflateMode.Message else DeflateMode.None)
+    WebSocketSessionImpl(id, target, version, logger.getOrElse(NullLogger))(conn, false, if deflate then DeflateMode.Message else DeflateMode.None)
 
   /**
    * Wraps WebSocket session around an already established client connection.
@@ -305,7 +304,7 @@ object WebSocketSession {
    * @param logger optional logger
    */
   def forServer(conn: WebSocketConnection, id: String, target: Uri, version: String, deflate: Boolean, logger: Option[Logger]): WebSocketSession =
-    new WebSocketSessionImpl(id, target, version, logger.getOrElse(NullLogger))(conn, true, if (deflate) DeflateMode.Message else DeflateMode.None)
+    WebSocketSessionImpl(id, target, version, logger.getOrElse(NullLogger))(conn, true, if deflate then DeflateMode.Message else DeflateMode.None)
 
   /**
    * Wraps WebSocket session around an already established server connection.
@@ -321,5 +320,4 @@ object WebSocketSession {
     forServer(WebSocketConnection(socket), id, target, version, deflate, logger)
 
   private[scamper] def forServer(socket: Socket, id: String, target: Uri, version: String, deflate: DeflateMode, logger: Logger): WebSocketSession =
-    new WebSocketSessionImpl(id, target, version, new SessionLogger(id, logger))(WebSocketConnection(socket), true, deflate)
-}
+    WebSocketSessionImpl(id, target, version, SessionLogger(id, logger))(WebSocketConnection(socket), true, deflate)

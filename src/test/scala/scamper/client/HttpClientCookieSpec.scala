@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,26 @@
  */
 package scamper.client
 
-import scamper._
-import scamper.Implicits._
-import scamper.cookies._
+import scala.language.implicitConversions
+
+import scamper.*
+import scamper.Implicits.given
+import scamper.cookies.*
 import scamper.server.TestServer
 
 import ResponseStatus.Registry.Ok
 
-class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
+class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer:
   it should "validate cookies" in testClient(false)
 
   it should "validate cookies with SSL/TLS" in testClient(true)
 
   private def testClient(secure: Boolean) = withServer(secure) { implicit server =>
-    implicit val client =
+    given client: HttpClient =
       HttpClient
         .settings()
         .trust(Resources.truststore)
-        .outgoing(doCookieCheck(secure))
+        .outgoing(doCookieCheck(secure)(_))
         .cookies()
         .create()
 
@@ -44,10 +46,9 @@ class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestS
       assert(res.getCookieValue("bar_public").isEmpty)
       assert(res.getCookieValue("baz_public").isEmpty)
 
-      secure match {
+      secure match
         case true  => assert(res.getCookieValue("foo_secure").contains("foo_secure_value"))
         case false => assert(res.getCookieValue("foo_secure").isEmpty)
-      }
 
       assert(res.getCookieValue("bar_secure").isEmpty)
       assert(res.getCookieValue("baz_secure").isEmpty)
@@ -76,10 +77,9 @@ class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestS
 
       assert(res.getCookieValue("foo_secure").isEmpty)
 
-      secure match {
+      secure match
         case true  => assert(res.getCookieValue("bar_secure").contains("bar_secure_value"))
         case false => assert(res.getCookieValue("bar_secure").isEmpty)
-      }
 
       assert(res.getCookieValue("baz_secure").isEmpty)
     }
@@ -108,10 +108,9 @@ class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestS
       assert(res.getCookieValue("foo_secure").isEmpty)
       assert(res.getCookieValue("bar_secure").isEmpty)
 
-      secure match {
+      secure match
         case true  => assert(res.getCookieValue("baz_secure").contains("baz_secure_value"))
         case false => assert(res.getCookieValue("baz_secure").isEmpty)
-      }
     }
 
     info("send request to /cookies/foo/bar/baz/2")
@@ -150,20 +149,17 @@ class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestS
       assert(res.getCookieValue("bar_public").contains("bar_public_value"))
       assert(res.getCookieValue("baz_public").contains("baz_public_value"))
 
-      secure match {
+      secure match
         case true  => assert(res.getCookieValue("foo_secure").contains("foo_secure_value"))
         case false => assert(res.getCookieValue("foo_secure").isEmpty)
-      }
 
-      secure match {
+      secure match
         case true  => assert(res.getCookieValue("bar_secure").contains("bar_secure_value"))
         case false => assert(res.getCookieValue("bar_secure").isEmpty)
-      }
 
-      secure match {
+      secure match
         case true  => assert(res.getCookieValue("baz_secure").contains("baz_secure_value"))
         case false => assert(res.getCookieValue("baz_secure").isEmpty)
-      }
     }
 
     info("send request to /cookies/foo/bar/baz/qux/3")
@@ -179,20 +175,19 @@ class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestS
     }
   }
 
-  private def doCookieCheck(secure: Boolean)(req: HttpRequest): HttpRequest = {
+  private def doCookieCheck(secure: Boolean)(req: HttpRequest): HttpRequest =
     info(s"check request cookies")
     assert(req.cookies.sortBy(_.name) == getCookies(req.path, secure).sortBy(_.name))
     req
-  }
 
   private def getCookies(path: String, secure: Boolean): Seq[PlainCookie] =
-    path match {
+    path match
       case "/cookies/foo/1" =>
         Nil
 
       case "/cookies/foo/2" =>
         PlainCookie("foo_public", "foo_public_value") +:
-          (if (secure) Seq(PlainCookie("foo_secure", "foo_secure_value")) else Nil)
+          (if secure then Seq(PlainCookie("foo_secure", "foo_secure_value")) else Nil)
 
       case "/cookies/foo/bar/1" =>
         getCookies("/cookies/foo/2", secure)
@@ -200,7 +195,7 @@ class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestS
       case "/cookies/foo/bar/2" =>
         getCookies("/cookies/foo/bar/1", secure) ++
           (PlainCookie("bar_public", "bar_public_value") +:
-            (if (secure) Seq(PlainCookie("bar_secure", "bar_secure_value")) else Nil))
+            (if secure then Seq(PlainCookie("bar_secure", "bar_secure_value")) else Nil))
 
       case "/cookies/foo/bar/baz/1" =>
         getCookies("/cookies/foo/bar/2", secure)
@@ -208,7 +203,7 @@ class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestS
       case "/cookies/foo/bar/baz/2" =>
         getCookies("/cookies/foo/bar/baz/1", secure) ++
           (PlainCookie("baz_public", "baz_public_value") +:
-            (if (secure) Seq(PlainCookie("baz_secure", "baz_secure_value")) else Nil))
+            (if secure then Seq(PlainCookie("baz_secure", "baz_secure_value")) else Nil))
 
       case "/cookies/foo/bar/baz/qux/1" =>
         getCookies("/cookies/foo/bar/baz/2", secure)
@@ -220,6 +215,4 @@ class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestS
         getCookies("/cookies/foo/bar/baz/qux/1", secure)
 
       case _ =>
-        throw new IllegalArgumentException(s"Unexpected test path: $path")
-    }
-}
+        throw IllegalArgumentException(s"Unexpected test path: $path")

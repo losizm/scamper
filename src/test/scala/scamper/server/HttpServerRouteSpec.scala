@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,33 @@
 package scamper.server
 
 import scala.collection.immutable.ListMap
+import scala.language.implicitConversions
 
-import scamper._
-import scamper.Implicits._
+import scamper.*
+import scamper.Implicits.given
 import scamper.client.HttpClient
-import scamper.headers._
-import scamper.server.Implicits._
-import scamper.types._
-import scamper.types.Implicits._
+import scamper.headers.*
+import scamper.server.Implicits.given
+import scamper.types.*
+import scamper.types.Implicits.given
 
-import ResponseStatus.Registry._
+import ResponseStatus.Registry.*
 
-class HttpServerRouteSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
+class HttpServerRouteSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer:
   it should "test message application" in testApplication(false)
 
   it should "test message application with SSL/TLS" in testApplication(true)
 
-  private implicit val client =
+  private given client: HttpClient =
     HttpClient
       .settings()
       .trust(Resources.truststore)
       .create()
 
-  private implicit val bodyParser = BodyParser.text(8192)
+  private given bodyParser: BodyParser[String] = BodyParser.text(8192)
 
   private def testApplication(secure: Boolean) = withServer(secure) { implicit server =>
-    implicit object MessagesBodyParser extends BodyParser[Map[Int, String]] {
+    implicit object MessagesBodyParser extends BodyParser[Map[Int, String]]:
       private val message = """\s*(\d+):\s+(.+)\s*""".r
 
       def parse(msg: HttpMessage): Map[Int, String] =
@@ -50,7 +51,6 @@ class HttpServerRouteSpec extends org.scalatest.flatspec.AnyFlatSpec with TestSe
           .split("(\r\n)+")
           .collect { case message(id, text) => id.toInt -> text }
           .toMap
-    }
 
     val originalMessages = ListMap(
       1 -> "This is message #1.",
@@ -164,4 +164,3 @@ class HttpServerRouteSpec extends org.scalatest.flatspec.AnyFlatSpec with TestSe
       }
     }
   }
-}

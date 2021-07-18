@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package scamper
 
 import java.util.Base64.{ getDecoder, getEncoder }
 
-private object Base64 {
+private object Base64:
   private val encoder = getEncoder()
   private val decoder = getDecoder()
 
@@ -40,8 +40,7 @@ private object Base64 {
     decoder.decode(value)
 
   def decodeToString(value: Array[Byte]): String =
-    new String(decode(value), "UTF-8")
+    String(decode(value), "UTF-8")
 
   def decodeToString(value: String): String =
-    new String(decode(value), "UTF-8")
-}
+    String(decode(value), "UTF-8")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,58 +20,73 @@ import java.time.Instant
 
 import scamper.types.MediaType
 
-/** Includes implicit converter functions and type classes. */
-object Implicits {
+/** Includes implicit conversions and extension methods. */
+object Implicits:
   /** Converts string to `Uri`. */
-  implicit val stringToUri = (uri: String) => Uri(uri)
+  given stringToUri: Conversion[String, Uri] with
+    def apply(uri: String) = Uri(uri)
 
   /** Converts string to [[Header]]. */
-  implicit val stringToHeader = (header: String) => Header(header)
+  given stringToHeader: Conversion[String, Header] with
+    def apply(header: String) = Header(header)
 
   /** Converts tuple to [[Header]] where tuple is name-value pair. */
-  implicit val tupleToHeader = (header: (String, String)) => Header(header._1, header._2)
+  given tupleToHeader: Conversion[(String, String), Header] with
+    def apply(header: (String, String)) = Header(header._1, header._2)
 
   /** Converts tuple to [[Header]] where tuple is name-value pair. */
-  implicit val tupleToHeaderWithLongValue = (header: (String, Long)) => Header(header._1, header._2)
+  given tupleToHeaderWithLongValue: Conversion[(String, Long), Header] with
+    def apply(header: (String, Long)) = Header(header._1, header._2)
 
   /** Converts tuple to [[Header]] where tuple is name-value pair. */
-  implicit val tupleToHeaderWithIntValue = (header: (String, Int)) => Header(header._1, header._2)
+  given tupleToHeaderWithIntValue: Conversion[(String, Int), Header] with
+    def apply(header: (String, Int)) = Header(header._1, header._2)
 
   /** Converts tuple to [[Header]] where tuple is name-value pair. */
-  implicit val tupleToHeaderWithDateValue = (header: (String, Instant)) => Header(header._1, header._2)
+  given tupleToHeaderWithDateValue: Conversion[(String, Instant), Header] with
+    def apply(header: (String, Instant)) = Header(header._1, header._2)
 
   /** Converts tuple to [[TextPart]] where tuple is name-content pair. */
-  implicit val tupleToTextPart = (part: (String, String)) => TextPart(part._1, part._2)
+  given tupleToTextPart: Conversion[(String, String), TextPart] with
+    def apply(part: (String, String)) = TextPart(part._1, part._2)
 
   /** Converts tuple to [[FilePart]] where tuple is name-content pair. */
-  implicit val tupleToFilePart = (part: (String, File)) => FilePart(part._1, part._2)
+  given tupleToFilePart: Conversion[(String, File), FilePart] with
+    def apply(part: (String, File)) = FilePart(part._1, part._2)
 
   /** Converts byte array to [[Entity]]. */
-  implicit val bytesToEntity = (entity: Array[Byte]) => Entity(entity)
+  given bytesToEntity: Conversion[Array[Byte], Entity] with
+    def apply(entity: Array[Byte]) = Entity(entity)
 
   /** Converts string to [[Entity]]. */
-  implicit val stringToEntity = (entity: String) => Entity(entity, "UTF-8")
+  given stringToEntity: Conversion[String, Entity] with
+    def apply(entity: String) = Entity(entity, "UTF-8")
 
   /** Converts file to [[Entity]]. */
-  implicit val fileToEntity = (entity: File) => Entity(entity)
+  given fileToEntity: Conversion[File, Entity] with
+    def apply(entity: File) = Entity(entity)
 
   /** Converts input stream to [[Entity]]. */
-  implicit val inputStreamToEntity = (entity: InputStream) => Entity(entity)
+  given inputStreamToEntity: Conversion[InputStream, Entity] with
+    def apply(entity: InputStream) = Entity(entity)
 
   /** Converts writer to [[Entity]]. */
-  implicit val writerToEntity = (writer: OutputStream => Unit) => Entity(writer)
+  given writerToEntity: Conversion[(OutputStream => Unit), Entity] with
+    def apply(writer: OutputStream => Unit) = Entity(writer)
 
   /** Converts string to [[RequestMethod]]. */
-  implicit val stringToRequestMethod = (method: String) => RequestMethod(method)
+  given stringToRequestMethod: Conversion[String, RequestMethod] with
+    def apply(method: String) = RequestMethod(method)
 
   /** Converts int to [[ResponseStatus]]. */
-  implicit val intToResponseStatus = (statusCode: Int) => ResponseStatus(statusCode)
+  given intToResponseStatus: Conversion[Int, ResponseStatus] with
+    def apply(statusCode: Int) = ResponseStatus(statusCode)
 
   /**
    * Adds extension methods to HttpMessage for building messages with various
    * content types.
    */
-  implicit class HttpMessageType[T <: HttpMessage](private val message: T) extends AnyVal {
+  implicit class HttpMessageType[T <: HttpMessage](message: T) extends AnyVal:
     /**
      * Creates new message with supplied text as message body.
      *
@@ -82,14 +97,13 @@ object Implicits {
      * @param text message body
      * @param charset character set
      */
-    def setTextBody(text: String, charset: String = "UTF-8")(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+    def setTextBody(text: String, charset: String = "UTF-8")(implicit ev: <:<[T, MessageBuilder[T]]): T =
       val entity = Entity(text, charset)
       message.setBody(entity)
         .putHeaders(
           Header("Content-Type", s"text/plain; charset=$charset"),
-          Header("Content-Length", entity.getLength.get)
+          Header("Content-Length", entity.knownSize.get)
         )
-    }
 
     /**
      * Creates new message with content from supplied file as message body.
@@ -99,15 +113,14 @@ object Implicits {
      *
      * @param file message body
      */
-    def setFileBody(file: File)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+    def setFileBody(file: File)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       val entity = Entity(file)
       val mediaType = MediaType.forFile(file).getOrElse(Auxiliary.applicationOctetStream)
       message.setBody(entity)
         .putHeaders(
           Header("Content-Type", mediaType.toString),
-          Header("Content-Length", entity.getLength.get)
+          Header("Content-Length", entity.knownSize.get)
         )
-    }
 
     /**
      * Creates new message with supplied form data as message body.
@@ -155,14 +168,13 @@ object Implicits {
      *
      * @param query message body
      */
-    def setFormBody(query: QueryString)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+    def setFormBody(query: QueryString)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       val entity = Entity(query)
       message.setBody(entity)
         .putHeaders(
           Header("Content-Type", "application/x-www-form-urlencoded"),
-          Header("Content-Length", entity.getLength.get)
+          Header("Content-Length", entity.knownSize.get)
         )
-    }
 
     /**
      * Creates new message with supplied multipart as message body.
@@ -173,11 +185,10 @@ object Implicits {
      *
      * @param multipart message body
      */
-    def setMultipartBody(multipart: Multipart)(implicit ev: <:<[T, MessageBuilder[T]]): T = {
+    def setMultipartBody(multipart: Multipart)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       val boundary = Multipart.boundary()
       message.setBody(Entity(multipart, boundary))
         .putHeaders(Header("Content-Type", s"multipart/form-data; boundary=$boundary"))
-    }
 
     /**
      * Creates new message with supplied parts as message body, with the parts
@@ -205,5 +216,3 @@ object Implicits {
      */
     def setMultipartBody(one: Part, more: Part*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
       setMultipartBody(Multipart(one +: more))
-  }
-}

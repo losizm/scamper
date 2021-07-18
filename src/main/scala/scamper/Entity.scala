@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,30 +22,29 @@ import Auxiliary.{ FileType, OutputStreamType }
 import Validate.notNull
 
 /** Provides input stream to HTTP entity. */
-trait Entity {
-  /** Gets length in bytes if known. */
-  def getLength: Option[Long]
+trait Entity:
+  /** Gets size in bytes if known. */
+  def knownSize: Option[Long]
 
   /** Tests for known emptiness. */
   def isKnownEmpty: Boolean =
-    getLength.contains(0)
+    knownSize.contains(0)
 
-  /** Gets input stream. */
-  def inputStream: InputStream
+  /** Gets input stream to data. */
+  def data: InputStream
 
   /**
-   * Passes input stream to supplied function.
+   * Invokes function with input stream to data.
    *
    * @param f function
    *
    * @return applied function value
    */
-  def withInputStream[T](f: InputStream => T): T =
-    f(inputStream)
-}
+  def withData[T](f: InputStream => T): T =
+    f(data)
 
 /** Provides factory for `Entity`. */
-object Entity {
+object Entity:
   /** Creates entity from supplied bytes. */
   def apply(bytes: Array[Byte]): Entity =
     ByteArrayEntity(notNull(bytes, "bytes"))
@@ -61,7 +60,7 @@ object Entity {
    * output stream are used to build entity.
    */
   def apply(writer: OutputStream => Unit): Entity =
-    InputStreamEntity(new WriterInputStream(notNull(writer, "writer"))(Auxiliary.executor))
+    InputStreamEntity(WriterInputStream(notNull(writer, "writer"))(using Auxiliary.executor))
 
   /** Creates entity from supplied file. */
   def apply(file: File): Entity =
@@ -109,32 +108,26 @@ object Entity {
 
   /** Gets empty entity. */
   def empty: Entity = EmptyEntity
-}
 
-private object EmptyEntity extends Entity {
-  val getLength = Some(0L)
-  val inputStream = EmptyInputStream
-}
+private object EmptyEntity extends Entity:
+  val knownSize = Some(0L)
+  val data = EmptyInputStream
 
-private case class ByteArrayEntity(bytes: Array[Byte]) extends Entity {
-  val getLength = Some(bytes.length.toLong)
-  val inputStream = new ByteArrayInputStream(bytes)
-}
+private case class ByteArrayEntity(bytes: Array[Byte]) extends Entity:
+  val knownSize = Some(bytes.length.toLong)
+  val data = ByteArrayInputStream(bytes)
 
-private case class FileEntity(file: File) extends Entity {
-  lazy val getLength = Some(file.length)
-  lazy val inputStream = new FileInputStream(file)
-}
+private case class FileEntity(file: File) extends Entity:
+  lazy val (data, knownSize) = (FileInputStream(file), Some(file.length))
 
-private case class InputStreamEntity(inputStream: InputStream) extends Entity {
-  val getLength = None
-}
+private case class InputStreamEntity(data: InputStream) extends Entity:
+  val knownSize = None
 
-private case class MultipartEntity(multipart: Multipart, boundary: String) extends Entity {
-  val getLength = None
-  lazy val inputStream = new WriterInputStream(writeMultipart)(Auxiliary.executor)
+private case class MultipartEntity(multipart: Multipart, boundary: String) extends Entity:
+  val knownSize = None
+  lazy val data = WriterInputStream(writeMultipart)(using Auxiliary.executor)
 
-  private def writeMultipart(out: OutputStream): Unit = {
+  private def writeMultipart(out: OutputStream): Unit =
     val start = "--" + boundary
     val end = "--" + boundary + "--"
 
@@ -142,24 +135,21 @@ private case class MultipartEntity(multipart: Multipart, boundary: String) exten
       out.writeLine(start)
       out.writeLine("Content-Disposition: " + part.contentDisposition.toString)
 
-      if (!part.contentType.isText || part.contentType.subtype != "plain" || part.contentType.params.nonEmpty)
+      if !part.contentType.isText || part.contentType.subtype != "plain" || part.contentType.params.nonEmpty then
         out.writeLine("Content-Type: " + part.contentType.toString)
       out.writeLine()
 
-      part match {
+      part match
         case text: TextPart => out.writeLine(text.content)
         case file: FilePart =>
           file.content.withInputStream { in =>
             val buf = new Array[Byte](8192)
             var len = 0
-            while ({ len = in.read(buf); len != -1 })
+            while { len = in.read(buf); len != -1 } do
               out.write(buf, 0, len)
             out.writeLine()
           }
-      }
     }
 
     out.writeLine(end)
     out.flush()
-  }
-}

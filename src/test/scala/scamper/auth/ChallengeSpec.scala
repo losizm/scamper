@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package scamper.auth
 
 import scamper.Base64
 
-class ChallengeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class ChallengeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "Challenge" should "be created with basic scheme" in {
     val challenge = Challenge.parse("Basic realm=\"Admin Console\", charset=utf-8")
     assert(challenge.scheme == "Basic")
@@ -65,4 +65,3 @@ class ChallengeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](Challenge.parse("Insecure issa:rae"))
     assertThrows[IllegalArgumentException](Challenge.parse("Insecure aXNzYTpyYWUK realm=Insecure"))
   }
-}

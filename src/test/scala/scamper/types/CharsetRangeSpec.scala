@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-class CharsetRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class CharsetRangeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "CharsetRange" should "be created" in {
     var range = CharsetRange.parse("utf-8")
     assert(range.charset == "utf-8")
@@ -54,4 +54,3 @@ class CharsetRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](CharsetRange.parse("ascii; q="))
     assertThrows[IllegalArgumentException](CharsetRange.parse("ascii; =0.1"))
   }
-}

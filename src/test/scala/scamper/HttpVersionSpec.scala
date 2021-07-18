@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper
 
-class HttpVersionSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class HttpVersionSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "HttpVersion" should "be created" in {
     assert(HttpVersion("1.0") == HttpVersion(1, 0))
     assert(HttpVersion("1.1") == HttpVersion(1, 1))
@@ -39,4 +39,3 @@ class HttpVersionSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](HttpVersion("1.2999999999"))
     assertThrows[IllegalArgumentException](HttpVersion("2999999999.2999999999"))
   }
-}

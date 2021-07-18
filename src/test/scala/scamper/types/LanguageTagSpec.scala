@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-class LanguageTagSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class LanguageTagSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "LanguageTag" should "be created" in {
     var tag = LanguageTag.parse("en")
     assert(tag.primary == "en")
@@ -42,4 +42,3 @@ class LanguageTagSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](LanguageTag.parse("en US"))
     assertThrows[IllegalArgumentException](LanguageTag.parse("1995-en-US"))
   }
-}

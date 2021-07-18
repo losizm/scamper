@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import CodingHelper.Name
  *
  * @see [[scamper.headers.AcceptEncoding]]
  */
-trait ContentCodingRange {
+trait ContentCodingRange:
   /** Gets coding name. */
   def name: String
 
@@ -49,28 +49,24 @@ trait ContentCodingRange {
 
   /** Returns formatted range. */
   override lazy val toString: String =
-    if (weight == 1.0f) name
+    if weight == 1.0f then name
     else name + "; q=" + weight
-}
 
 /** Provides factory for `ContentCodingRange`. */
-object ContentCodingRange {
+object ContentCodingRange:
   private val syntax = """([^\s;=]+)(?:\s*;\s*q\s*=\s*(\d+(?:\.\d*)?))?""".r
 
   /** Parses formatted range. */
   def parse(range: String): ContentCodingRange =
-    range match {
+    range match
       case syntax(name, null) => apply(name, 1.0f)
       case syntax(name, weight) => apply(name, weight.toFloat)
-      case _ => throw new IllegalArgumentException(s"Malformed content coding range: $range")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed content coding range: $range")
 
   /** Creates range with supplied name and weight. */
   def apply(name: String, weight: Float): ContentCodingRange =
     ContentCodingRangeImpl(Name(name), QValue(weight))
-}
 
-private case class ContentCodingRangeImpl(name: String, weight: Float) extends ContentCodingRange {
+private case class ContentCodingRangeImpl(name: String, weight: Float) extends ContentCodingRange:
   def matches(coding: ContentCoding): Boolean =
     (isWildcard || name.equalsIgnoreCase(coding.name)) && weight > 0
-}

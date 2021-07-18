@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import scala.collection.mutable.ListBuffer
 
 import scamper.RequestMethod
 
-private class RouterImpl private (val mountPath: String) extends Router {
+private class RouterImpl private (val mountPath: String) extends Router:
   private val handlers = new ListBuffer[RequestHandler]
 
   def incoming(handler: RequestHandler): this.type = synchronized {
@@ -35,9 +35,7 @@ private class RouterImpl private (val mountPath: String) extends Router {
   private[server] def createRequestHandler(): RequestHandler = synchronized {
     RequestHandler.coalesce(handlers.toSeq)
   }
-}
 
-private object RouterImpl {
+private object RouterImpl:
   def apply(mountPath: String): RouterImpl =
     new RouterImpl(MountPath.normalize(mountPath))
-}

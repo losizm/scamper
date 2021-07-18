@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@ package scamper.server
 
 import scamper.HttpRequest
 import scamper.ResponseStatus.Registry.Ok
-import scamper.cookies._
-import scamper.server.Implicits._
+import scamper.cookies.*
+import scamper.server.Implicits.*
 
-object CookieApplication extends RoutingApplication {
-  def apply(router: Router): Unit = {
+object CookieApplication extends RoutingApplication:
+  def apply(router: Router): Unit =
     router.get("/foo/bar/baz/*") { implicit req =>
       Ok()
         .putCookies(getCookies(req, "foo", router.toAbsolutePath("/foo")))
@@ -39,13 +39,10 @@ object CookieApplication extends RoutingApplication {
       Ok()
         .putCookies(getCookies(req, "foo", router.toAbsolutePath("/foo")))
     }
-  }
 
-  private def getCookies(req: HttpRequest, name: String, path: String): Seq[SetCookie] = {
+  private def getCookies(req: HttpRequest, name: String, path: String): Seq[SetCookie] =
     val public = req.getCookieValue(s"${name}_public").isEmpty
     val secure = req.getCookieValue(s"${name}_secure").isEmpty && req.server.isSecure
 
-    (if (public) Seq(SetCookie(s"${name}_public", s"${name}_public_value", path = Some(path), secure = false)) else Nil) ++
-    (if (secure) Seq(SetCookie(s"${name}_secure", s"${name}_secure_value", path = Some(path), secure = true )) else Nil)
-  }
-}
+    (if public then Seq(SetCookie(s"${name}_public", s"${name}_public_value", path = Some(path), secure = false)) else Nil) ++
+    (if secure then Seq(SetCookie(s"${name}_secure", s"${name}_secure_value", path = Some(path), secure = true )) else Nil)

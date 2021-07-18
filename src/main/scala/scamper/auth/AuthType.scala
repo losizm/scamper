@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,12 @@ package scamper.auth
 import scala.util.Try
 
 import scamper.{ Base64, Uri }
-import AuthTypeHelper._
+import AuthTypeHelper.*
 
 /** Base type for authentication header types. */
-sealed trait AuthType {
+sealed trait AuthType:
   /** Gets scheme. */
   def scheme: String
-}
 
 /**
  * Standardized type for WWW-Authenticate and Proxy-Authenticate header value.
@@ -33,25 +32,23 @@ sealed trait AuthType {
  * @see [[ProxyAuthenticate]]
  * @see [[Credentials]]
  */
-trait Challenge extends AuthType {
+trait Challenge extends AuthType:
   /** Gets parameters. */
   def params: Map[String, String]
 
   /** Returns formatted challenge. */
   override lazy val toString: String =
     scheme + AuthParams.format(params)
-}
 
 /** Challenge for Basic authentication. */
-sealed trait BasicChallenge extends Challenge {
+sealed trait BasicChallenge extends Challenge:
   val scheme: String = "Basic"
 
   /** Gets realm. */
   def realm: String
-}
 
 /** Provides factory for `BasicChallenge`. */
-object BasicChallenge {
+object BasicChallenge:
   /** Creates challenge with realm and supplied parameters. */
   def apply(realm: String, params: Map[String, String]): BasicChallenge =
     BasicChallengeImpl(realm, Params(("realm" -> realm) +: params.toSeq))
@@ -59,12 +56,11 @@ object BasicChallenge {
   /** Creates challenge with realm and supplied parameters. */
   def apply(realm: String, params: (String, String)*): BasicChallenge =
     BasicChallengeImpl(realm, Params(("realm" -> realm) +: params))
-}
 
 private case class BasicChallengeImpl(realm: String, params: Map[String, String]) extends BasicChallenge
 
 /** Challenge for Bearer authentication. */
-sealed trait BearerChallenge extends Challenge {
+sealed trait BearerChallenge extends Challenge:
   val scheme: String = "Bearer"
 
   /** Gets realm. */
@@ -90,10 +86,9 @@ sealed trait BearerChallenge extends Challenge {
 
   /** Tests for `insufficient_scope` error. */
   def isInsufficientScope: Boolean
-}
 
 /** Provides factory for `BearerChallenge`. */
-object BearerChallenge {
+object BearerChallenge:
   /** Creates challenge with supplied parameters. */
   def apply(params: Map[String, String]): BearerChallenge =
     BearerChallengeImpl(Params(params.toSeq))
@@ -101,12 +96,11 @@ object BearerChallenge {
   /** Creates challenge with supplied parameters. */
   def apply(params: (String, String)*): BearerChallenge =
     BearerChallengeImpl(Params(params))
-}
 
-private case class BearerChallengeImpl(params: Map[String, String]) extends BearerChallenge {
+private case class BearerChallengeImpl(params: Map[String, String]) extends BearerChallenge:
   lazy val realm: Option[String] = params.get("realm")
   lazy val scope: Seq[String] = params.get("scope")
-    .map(_ split " ")
+    .map(_.split(" "))
     .map(_.map(_.trim).toSeq)
     .map(_.filterNot(_.isEmpty))
     .getOrElse(Nil)
@@ -117,15 +111,13 @@ private case class BearerChallengeImpl(params: Map[String, String]) extends Bear
   lazy val isInvalidRequest: Boolean = error.contains("invalid_request")
   lazy val isInvalidToken: Boolean = error.contains("invalid_token")
   lazy val isInsufficientScope: Boolean = error.contains("insufficient_scope")
-}
 
 /** Provides factory for `Challenge`. */
-object Challenge {
+object Challenge:
   /** Parses formatted challenge. */
   def parse(challenge: String): Challenge =
-    ParseAuthType(challenge) match {
+    ParseAuthType(challenge) match
       case (scheme, token, params) => apply(scheme, token, params)
-    }
 
   /** Parses formatted list of challenges. */
   def parseAll(challenges: String): Seq[Challenge] =
@@ -140,20 +132,18 @@ object Challenge {
     apply(scheme, None, Params(params))
 
   private def apply(scheme: String, token: Option[String], params: Map[String, String]): Challenge =
-    scheme.toLowerCase match {
+    scheme.toLowerCase match
       case "basic" =>
         require(token.isEmpty, s"Invalid basic challenge: token not allowed")
         params.get("realm")
           .map(BasicChallenge(_, params))
-          .getOrElse(throw new IllegalArgumentException("Invalid basic challenge: missing realm"))
+          .getOrElse(throw IllegalArgumentException("Invalid basic challenge: missing realm"))
       case "bearer" =>
         require(token.isEmpty, s"Invalid bearer challenge: token not allowed")
         BearerChallenge(params)
       case _ =>
         require(token.isEmpty, s"Invalid challenge: token not allowed")
         DefaultChallenge(scheme, params)
-    }
-}
 
 private case class DefaultChallenge(scheme: String, params: Map[String, String]) extends Challenge
 
@@ -164,17 +154,16 @@ private case class DefaultChallenge(scheme: String, params: Map[String, String])
  * @see [[ProxyAuthorization]]
  * @see [[Challenge]]
  */
-trait Credentials extends AuthType {
+trait Credentials extends AuthType:
   /** Gets token. */
   def token: String
 
   /** Returns formatted credentials. */
   override lazy val toString: String =
     scheme + " " + token
-}
 
 /** Credentials for Basic authorization. */
-sealed trait BasicCredentials extends Credentials {
+sealed trait BasicCredentials extends Credentials:
   val scheme: String = "Basic"
 
   /** Gets user. */
@@ -182,73 +171,64 @@ sealed trait BasicCredentials extends Credentials {
 
   /** Gets password. */
   def password: String
-}
 
 /** Provides factory for `BasicCredentials`. */
-object BasicCredentials {
+object BasicCredentials:
   /** Creates credentials with supplied token. */
-  def apply(token: String): BasicCredentials = {
+  def apply(token: String): BasicCredentials =
     val valid = "(.+):(.*)".r
 
     Try(Base64.decodeToString(token))
       .collect { case valid(_, _) => BasicCredentialsImpl(token) }
-      .getOrElse { throw new IllegalArgumentException(s"Invalid token: $token") }
-  }
+      .getOrElse { throw IllegalArgumentException(s"Invalid token: $token") }
 
   /** Creates credentials with supplied user and password. */
   def apply(user: String, password: String): BasicCredentials =
     BasicCredentialsImpl(Base64.encodeToString(user + ":" + password))
-}
 
-private case class BasicCredentialsImpl(token: String) extends BasicCredentials {
+private case class BasicCredentialsImpl(token: String) extends BasicCredentials:
   def user: String = detoken(0)
   def password: String = detoken(1)
 
   private def detoken(part: Int): String =
     Base64.decodeToString(token).split(":", 2)(part)
-}
 
 /** Credentials for Bearer authorization. */
-sealed trait BearerCredentials extends Credentials {
+sealed trait BearerCredentials extends Credentials:
   val scheme: String = "Bearer"
-}
 
 /** Provides factory for `BearerCredentials`. */
-object BearerCredentials {
+object BearerCredentials:
   /** Creates credentials with supplied token. */
   def apply(token: String): BearerCredentials =
     BearerCredentialsImpl(Token(token))
-}
 
 private case class BearerCredentialsImpl(token: String) extends BearerCredentials
 
 /** Provides factory for `Credentials`. */
-object Credentials {
+object Credentials:
   /** Parses formatted credentials. */
   def parse(credentials: String): Credentials =
-    ParseAuthType(credentials) match {
+    ParseAuthType(credentials) match
       case (scheme, token, params) => apply(scheme, token, params)
-    }
 
   /** Creates credentials with supplied scheme and token. */
   def apply(scheme: String, token: String): Credentials =
     apply(scheme, Some(Token(token)), Map.empty[String, String])
 
   private def apply(scheme: String, token: Option[String], params: Map[String, String]): Credentials =
-    scheme.toLowerCase match {
+    scheme.toLowerCase match
       case "basic" =>
         require(params.isEmpty, "Invalid basic credentials: params not allowed")
         token.map(BasicCredentials.apply)
-          .getOrElse(throw new IllegalArgumentException("Token required for basic credentials"))
+          .getOrElse(throw IllegalArgumentException("Token required for basic credentials"))
       case "bearer" =>
         require(params.isEmpty, "Invalid bearer credentials: params not allowed")
         token.map(BearerCredentials.apply)
-          .getOrElse(throw new IllegalArgumentException("Token required for bearer credentials"))
+          .getOrElse(throw IllegalArgumentException("Token required for bearer credentials"))
       case _ =>
         require(params.isEmpty, "Invalid credentials: params not allowed")
         token.map(DefaultCredentials(scheme, _))
-          .getOrElse(throw new IllegalArgumentException("Token required for credentials"))
-    }
-}
+          .getOrElse(throw IllegalArgumentException("Token required for credentials"))
 
 private case class DefaultCredentials(scheme: String, token: String) extends Credentials

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package scamper.types
 
 import scamper.DateValue
 
-class WarningTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class WarningTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   val date = DateValue.parse("Sat, 25 Aug 2012 23:34:45 GMT")
 
   "WarningType" should "be created" in {
@@ -59,4 +59,3 @@ class WarningTypeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](WarningType.parse("110 localhost:8000 Response is Stale"))
     assertThrows[IllegalArgumentException](WarningType.parse("100 localhost:8000 \"Response is Stale\" Sat, 25 Aug 2012 23:34:45 GMT"))
   }
-}

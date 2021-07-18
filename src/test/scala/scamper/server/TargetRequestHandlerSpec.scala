@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package scamper.server
 
+import scala.language.implicitConversions
+
 import scamper.Implicits.stringToUri
 import scamper.{ HttpRequest, HttpResponse }
 import scamper.RequestMethod.Registry.{ Delete, Get, Post, Put }
@@ -22,7 +24,7 @@ import scamper.ResponseStatus.Registry.Ok
 
 import Implicits.ServerHttpRequest
 
-class TargetRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class TargetRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "TargetRequestHandler" should "respond to request" in {
     val handler = TargetRequestHandler("/", Nil, req => Ok())
     assert { handler(Get("/")).asInstanceOf[HttpResponse].status == Ok }
@@ -139,4 +141,3 @@ class TargetRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](TargetRequestHandler("a/b/c", Nil, req => Ok()))
     assertThrows[IllegalArgumentException](TargetRequestHandler("/a/*b/c", Nil, req => Ok()))
   }
-}

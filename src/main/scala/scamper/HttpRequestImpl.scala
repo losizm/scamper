@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,32 +19,29 @@ import Auxiliary.UriType
 import RequestMethod.Registry.Options
 import Validate.{ noNulls, notNull }
 
-private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header], body: Entity, attributes: Map[String, Any] = Map.empty) extends HttpRequest {
+private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header], body: Entity, attributes: Map[String, Any] = Map.empty) extends HttpRequest:
   notNull(startLine, "startLine")
   noNulls(headers, "headers")
   notNull(body, "body")
   notNull(attributes, "attributes")
 
   lazy val path: String =
-    target.normalize.getRawPath match {
-      case ""   => if (method == Options) "*" else "/"
-      case path => path
-    }
+    target.normalize.getRawPath match
+      case ""    => if method == Options then "*" else "/"
+      case value => value
 
   lazy val query: QueryString =
-    target.getRawQuery match {
+    target.getRawQuery match
       case null  => QueryString.empty
       case value => QueryString(value)
-    }
 
   def setStartLine(newStartLine: RequestLine): HttpRequest =
     copy(startLine = newStartLine)
 
   def setPath(newPath: String): HttpRequest =
-    newPath match {
+    newPath match
       case "*" if method == Options => setTarget(target.setPath(""))
       case _   => setTarget(target.setPath(newPath))
-    }
 
   def setQuery(newQuery: QueryString): HttpRequest =
     setTarget(target.setQuery(newQuery.toString))
@@ -57,4 +54,3 @@ private case class HttpRequestImpl(startLine: RequestLine, headers: Seq[Header],
 
   def setAttributes(newAttributes: Map[String, Any]): HttpRequest =
     copy(attributes = newAttributes)
-}

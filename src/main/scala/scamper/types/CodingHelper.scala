@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,42 +15,39 @@
  */
 package scamper.types
 
-import scamper.Grammar._
+import scamper.Grammar.*
 
-private object CodingHelper {
+private object CodingHelper:
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)(\s*(?:;.*)?)""".r
 
   def Name(name: String): String =
     Token(name).getOrElse {
-      throw new IllegalArgumentException(s"Invalid name: $name")
-    }.toLowerCase match {
+      throw IllegalArgumentException(s"Invalid name: $name")
+    }.toLowerCase match
       case "x-compress" => "compress"
       case "x-gzip"     => "gzip"
       case name         => name
-    }
 
   def Params(params: Map[String, String]): Map[String, String] =
     params.map { case (name, value) => ParamName(name) -> ParamValue(value) }
 
   def ParamName(name: String): String =
     Token(name).getOrElse {
-      throw new IllegalArgumentException(s"Invalid parameter name: $name")
+      throw IllegalArgumentException(s"Invalid parameter name: $name")
     }.toLowerCase
 
   def ParamValue(value: String): String =
     Token(value) orElse QuotableString(value) getOrElse {
-      throw new IllegalArgumentException(s"Invalid parameter value: $value")
+      throw IllegalArgumentException(s"Invalid parameter value: $value")
     }
 
   def ParseTransferCoding(coding: String): (String, Map[String, String]) =
-    coding match {
+    coding match
       case syntax(name, params) => (name.trim, ParseParams(params))
-      case _ => throw new IllegalArgumentException(s"Malformed transfer coding: $coding")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed transfer coding: $coding")
 
   def ParseParams(params: String): Map[String, String] =
     StandardParams.parse(params)
 
   def FormatParams(params: Map[String, String]): String =
     StandardParams.format(params)
-}

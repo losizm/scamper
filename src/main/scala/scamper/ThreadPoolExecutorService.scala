@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package scamper
 
-import java.util.concurrent._
+import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicLong
 
 import scala.concurrent.{ ExecutionContext, ExecutionContextExecutorService }
 
-private object ThreadPoolExecutorService {
+private object ThreadPoolExecutorService:
   def fixed(
     name:        String,
     poolSize:    Int,
@@ -69,26 +69,24 @@ private object ThreadPoolExecutorService {
       val maxPoolSize      = inMaxPoolSize.max(corePoolSize).max(1)
       val keepAliveSeconds = inKeepAliveSeconds.max(0)
       val queueSize        = inQueueSize.max(0)
-      val threadGroup      = inThreadGroup.getOrElse(new ThreadGroup(name))
-      val threadCount      = new AtomicLong(0)
+      val threadGroup      = inThreadGroup.getOrElse(ThreadGroup(name))
+      val threadCount      = AtomicLong(0)
 
-      new ThreadPoolExecutor(
+      ThreadPoolExecutor(
         corePoolSize,
         maxPoolSize,
         keepAliveSeconds,
         TimeUnit.SECONDS,
-        queueSize match {
-          case 0 => new SynchronousQueue()
-          case n => new ArrayBlockingQueue(n)
-        },
-        new ThreadFactory {
-          def newThread(task: Runnable) = {
-            val thread = new Thread(threadGroup, task, s"$name-${threadCount.incrementAndGet()}")
+        queueSize match
+          case 0 => SynchronousQueue()
+          case n => ArrayBlockingQueue(n)
+        ,
+        new ThreadFactory:
+          def newThread(task: Runnable) =
+            val thread = Thread(threadGroup, task, s"$name-${threadCount.incrementAndGet()}")
             thread.setDaemon(true)
             thread
-          }
-        },
+        ,
         rejectedHandler
       )
     }
-}

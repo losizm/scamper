@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@
 package scamper.types
 
 /** Provides registered pragma directives. */
-case object PragmaDirectives {
+case object PragmaDirectives:
   /** Pragma directive for no-cache */
-  case object `no-cache` extends PragmaDirective {
+  case object `no-cache` extends PragmaDirective:
     val name: String = "no-cache"
     val value: Option[String] = None
-  }
-}

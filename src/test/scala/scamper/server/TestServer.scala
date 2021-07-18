@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,26 @@
 package scamper.server
 
 import scala.collection.concurrent.TrieMap
+import scala.language.implicitConversions
 
-import scamper._
-import scamper.Implicits._
-import scamper.auth._
-import scamper.headers._
-import scamper.logging._
-import scamper.server.Implicits._
-import scamper.types.Implicits._
+import scamper.*
+import scamper.Implicits.given
+import scamper.auth.*
+import scamper.headers.*
+import scamper.logging.*
+import scamper.server.Implicits.given
+import scamper.types.Implicits.given
 
-import ResponseStatus.Registry._
+import ResponseStatus.Registry.*
 import Uri.{ http, https }
 
-trait TestServer {
-  private implicit val bodyParser = BodyParser.bytes(8192)
+trait TestServer:
+  private given BodyParser[Array[Byte]] = BodyParser.bytes(8192)
 
-  def getServer(secure: Boolean = false, logging: Boolean = false): HttpServer = {
+  def getServer(secure: Boolean = false, logging: Boolean = false): HttpServer =
     val app = HttpServer
       .app()
-      .logger(if (logging) ConsoleLogger else NullLogger)
+      .logger(if logging then ConsoleLogger else NullLogger)
       .backlogSize(8)
       .poolSize(2)
       .queueSize(4)
@@ -43,39 +44,36 @@ trait TestServer {
       .headerLimit(20)
       .incoming(doAuditLog("Incoming request")(_))
       .outgoing(doAuditLog("Outgoing response")(_))
-      .get("/")(doHome)
-      .get("/about")(doAbout)
-      .post("/echo")(doEcho)
-      .get("/throwException")(doThrowException)
-      .incoming("/notImplemented")(doNotImplemented)
+      .get("/")(doHome(_))
+      .get("/about")(doAbout(_))
+      .post("/echo")(doEcho(_))
+      .get("/throwException")(doThrowException(_))
+      .incoming("/notImplemented")(doNotImplemented(_))
       .route("/api/messages")(MessageApplication)
       .route("/cookies")(CookieApplication)
       .websocket("/chat/:id")(WebSocketChatServer)
       .files("/files/riteshiff", Resources.riteshiff)
       .resources("/resources/riteshiff", "riteshiff")
-      .error(doError)
+      .error(doError(_, _))
 
-    if (secure)
+    if secure then
       app.secure(Resources.keystore, "letmein", "pkcs12")
 
     app.create("localhost", 0)
-  }
 
-  def withServer[T](secure: Boolean)(f: HttpServer => T): T = {
+  def withServer[T](secure: Boolean)(f: HttpServer => T): T =
     val server = getServer(secure)
     try
       f(server)
     finally
       server.close()
-  }
 
-  def serverUri(implicit server: HttpServer): Uri =
-    server.isSecure match {
+  def serverUri(using server: HttpServer): Uri =
+    server.isSecure match
       case true  => https(server.host.getHostAddress + ":" + server.port)
       case false => http (server.host.getHostAddress + ":" + server.port)
-    }
 
-  private def doAuditLog[T <: HttpMessage](prefix: String)(msg: T): T = {
+  private def doAuditLog[T <: HttpMessage](prefix: String)(msg: T): T =
     msg.logger.info {
       val eol = System.getProperty("line.separator")
       s"$prefix (correlate=${msg.correlate})" +
@@ -85,7 +83,6 @@ trait TestServer {
         .mkString(msg.startLine.toString + eol, eol, eol)
     }
     msg
-  }
 
   private def doHome(req: HttpRequest): HttpResponse =
     Ok()
@@ -99,16 +96,14 @@ trait TestServer {
       .setContentType("application/octet-stream")
 
   private def doThrowException(req: HttpRequest): HttpResponse =
-    throw new Exception("Something went wrong")
+    throw Exception("Something went wrong")
 
   private def doNotImplemented(req: HttpRequest): HttpResponse =
     ???
 
   private def doError(err: Throwable, req: HttpRequest): HttpResponse =
-    err match {
+    err match
       case _: NotImplementedError => NotImplemented()
       case _: ReadLimitExceeded   => PayloadTooLarge()
       case _: EntityTooLarge      => PayloadTooLarge()
       case _                      => InternalServerError()
-    }
-}

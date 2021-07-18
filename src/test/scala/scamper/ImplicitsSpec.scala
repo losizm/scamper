@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,14 @@ package scamper
 import java.io.File
 import java.time.Instant
 
+import scala.language.implicitConversions
+
 import RequestMethod.Registry.Get
 import ResponseStatus.Registry.Ok
 
-import Implicits._
+import Implicits.given
 
-class ImplicitsSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class ImplicitsSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "String" should "be converted to URI" in {
     val uri: Uri = "https://localhost:8080/index.html?q=free"
     assert(uri == Uri("https://localhost:8080/index.html?q=free"))
@@ -36,7 +38,7 @@ class ImplicitsSpec extends org.scalatest.flatspec.AnyFlatSpec {
 
   it should "be converted to Entity" in {
     val entity: Entity = "Hello, world!"
-    assert(entity.getLength.contains("Hello, world!".length))
+    assert(entity.knownSize.contains("Hello, world!".length))
   }
 
   it should "be converted to RequestMethod" in {
@@ -50,15 +52,15 @@ class ImplicitsSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   "File" should "be converted to Entity" in {
-    val file = new File("build.sbt")
+    val file = File("build.sbt")
     val entity: Entity = file
-    assert(entity.getLength.contains(file.length))
+    assert(entity.knownSize.contains(file.length))
   }
 
   "Bytes" should "be converted to Entity" in {
     val bytes = "Hello, world!".getBytes("utf-8")
     val entity: Entity = bytes
-    assert(entity.getLength.contains(bytes.size))
+    assert(entity.knownSize.contains(bytes.size))
   }
 
   "Tuple" should "be converted to Header" in {
@@ -82,8 +84,6 @@ class ImplicitsSpec extends org.scalatest.flatspec.AnyFlatSpec {
   }
 
   it should "be converted to FilePart" in {
-    val part: Part = "data" -> new File("data.txt")
-    assert(part == FilePart("data", new File("data.txt")))
+    val part: Part = "data" -> File("data.txt")
+    assert(part == FilePart("data", File("data.txt")))
   }
-}
-

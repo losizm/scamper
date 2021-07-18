@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package scamper.server
 import java.util.concurrent.atomic.AtomicInteger
 
 import scamper.RandomBytes
-import scamper.websocket._
+import scamper.websocket.*
 
-import StatusCode.Registry._
+import StatusCode.Registry.*
 
-class WebSocketChatServer(session: WebSocketSession) {
-  private val messageCount   = new AtomicInteger(0)
-  private val dontUnderstand = new AtomicInteger(0)
+class WebSocketChatServer(session: WebSocketSession):
+  private val messageCount   = AtomicInteger(0)
+  private val dontUnderstand = AtomicInteger(0)
   private val pingData       = RandomBytes(16).toSeq
 
   session.idleTimeout(3000)
@@ -41,10 +41,9 @@ class WebSocketChatServer(session: WebSocketSession) {
   session.pingAsync(pingData.toArray)
 
   private def doText(message: String): Unit =
-    messageCount.incrementAndGet() < 10 match {
+    messageCount.incrementAndGet() < 10 match
       case true  => replyTo(message)
       case false => session.close(PolicyViolation)
-    }
 
   private def doBinary(message: Array[Byte]): Unit =
     session.close(UnsupportedData)
@@ -53,30 +52,26 @@ class WebSocketChatServer(session: WebSocketSession) {
     session.pongAsync(data)
 
   private def doPong(data: Array[Byte]): Unit =
-    if (data.toSeq != pingData.toSeq)
+    if data.toSeq != pingData.toSeq then
       session.close(ProtocolError)
 
   private def doError(err: Throwable): Unit =
     session.close(InternalError)
 
   private def replyTo(message: String): Unit =
-    message match {
+    message match
       case "Hi." | "Hello."      => session.send("Hello.")
       case "What is your name?"  => session.send("My name is Lupita.")
       case "How are you?"        => session.send("I'm fine. How are you?")
       case "I am fine."          => session.send("Good to hear.")
       case "Do you like squash?" => session.send("No, not really.")
-      case "I love you."         => throw new RuntimeException("Abort!")
+      case "I love you."         => throw RuntimeException("Abort!")
       case "Bye." | "Goodbye."   => session.send("See ya."); session.close(NormalClosure)
       case _                     =>
-        dontUnderstand.incrementAndGet() < 3 match {
+        dontUnderstand.incrementAndGet() < 3 match
           case true  => session.send("I don't understand.")
           case false => session.send("Ok, goodbye."); session.close(GoingAway)
-        }
-    }
-}
 
-object WebSocketChatServer extends WebSocketApplication {
+object WebSocketChatServer extends WebSocketApplication[Unit]:
   def apply(session: WebSocketSession): Unit =
     new WebSocketChatServer(session)
-}

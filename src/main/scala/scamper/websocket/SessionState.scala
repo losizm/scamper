@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,15 @@
  */
 package scamper.websocket
 
-/**
- * Defines state of WebSocket session.
- *
- * @see [[SessionState$ SessionState]]
- */
-sealed trait SessionState
-
-/** Registry of `SessionState`. */
-object SessionState {
+/** Defines state of WebSocket session. */
+enum SessionState:
   /**
    * Session is pending.
    *
    * In this state, a session does not read incoming messages. However, it can
    * send messages.
    */
-  case object Pending extends SessionState
+  case Pending extends SessionState
 
   /**
    * Session is open.
@@ -38,12 +31,11 @@ object SessionState {
    * In this state, a session reads incoming messages. It can also send
    * messages.
    */
-  case object Open extends SessionState
+  case Open extends SessionState
 
   /**
    * Session is closed.
    *
    * In this state, a session can neither receive nor send messages.
    */
-  case object Closed extends SessionState
-}
+  case Closed extends SessionState

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,20 @@
  */
 package scamper.headers
 
-import java.time.Instant.{ parse => Instant }
+import java.time.Instant.parse as Instant
+
+import scala.language.implicitConversions
 
 import scamper.{ HeaderNotFound, Uri }
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.{ Get, Post }
 import scamper.ResponseStatus.Registry.Ok
-import scamper.types._
+import scamper.types.*
 import scamper.types.ByteContentRange.Satisfied
 import scamper.types.ByteRange.Slice
-import scamper.types.Implicits._
+import scamper.types.Implicits.given
 
-class HeadersSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class HeadersSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "create request with Accept header" in {
     val req1 = Get("/")
     assert(!req1.hasAccept)
@@ -950,4 +952,3 @@ class HeadersSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assert(res2.removeWarning == res1)
     assert(res2.getHeaderValue("Warning").contains("110 - \"Response is Stale\", 113 - \"Heuristic Expiration\""))
   }
-}

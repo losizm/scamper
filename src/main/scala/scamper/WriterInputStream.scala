@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,19 +32,18 @@ import scala.util.{ Failure, Try }
  * import scala.concurrent.ExecutionContext.Implicits.global
  * import scamper.WriterInputStream
  *
- * val in = new WriterInputStream(out => {
+ * val in = WriterInputStream(out => {
  *   val data = "Hello, world!"
  *   out.write(data.getBytes())
  * })
  *
- * try {
+ * try
  *   val buffer = new Array[Byte](32)
  *   val length = in.read(buffer)
  *
- *   assert(new String(buffer, 0, length) == "Hello, world!")
- * } finally {
+ *   assert(String(buffer, 0, length) == "Hello, world!")
+ * finally
  *   in.close()
- * }
  * }}}
  *
  * @constructor Creates WriterInputStream using supplied writer and buffer size.
@@ -53,22 +52,22 @@ import scala.util.{ Failure, Try }
  * @param bufferSize buffer size used by underlying input stream.
  * @param executor execution context
  */
-private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(implicit executor: ExecutionContext) extends InputStream {
+private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(using executor: ExecutionContext) extends InputStream:
   /**
    * Creates WriterInputStream using supplied writer.
    *
    * @param writer output stream handler
    * @param executor execution context
    */
-  def this(writer: OutputStream => Unit)(implicit executor: ExecutionContext) = this(8192, writer)
+  def this(writer: OutputStream => Unit)(using executor: ExecutionContext) = this(8192, writer)
 
-  private val in = new PipedInputStream(bufferSize)
-  private val out = new PipedOutputStream(in)
-  private val error = new AtomicReference[Throwable]
+  private val in = PipedInputStream(bufferSize)
+  private val out = PipedOutputStream(in)
+  private val error = AtomicReference[Throwable]()
 
   Future {
     try writer(out)
-    catch { case t: Throwable => error.set(t) }
+    catch case t: Throwable => error.set(t)
     finally Try(out.close())
   }
 
@@ -95,7 +94,7 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(i
    *
    * @throws IOException
    */
-  override def reset(): Unit = throw new IOException("mark/reset not supported")
+  override def reset(): Unit = throw IOException("mark/reset not supported")
 
   /** Mark/reset is not supported. */
   override def mark(readLimit: Int): Unit = ()
@@ -137,28 +136,23 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(i
     var eof = false
     var count = 0
 
-    while (!eof && count < length) {
-      in.read(buffer, offset + count, length - count) match {
+    while !eof && count < length do
+      in.read(buffer, offset + count, length - count) match
         case -1 => eof = propose(true)
         case n  => count += propose(n)
-      }
-    }
 
-    if (eof && count == 0)
+    if eof && count == 0 then
       -1
     else count
   }
 
   /** Closes input stream. */
-  override def close(): Unit = {
+  override def close(): Unit =
     Try(out.close())
     Try(in.close())
-  }
 
   @inline
   private def propose[T](value: => T): T =
-    error.get match {
+    error.get match
       case null  => value
-      case cause => throw new IOException("Writer exception", cause)
-    }
-}
+      case cause => throw IOException("Writer exception", cause)

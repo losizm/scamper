@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,44 +16,43 @@
 package scamper.auth
 
 import scamper.{ CaseInsensitiveKeyMap, ListParser }
-import scamper.Grammar.{ QuotableString, Token => StandardToken, Token68 }
+import scamper.Grammar.{ QuotableString, Token as StandardToken, Token68 }
 
-private object AuthTypeHelper {
+private object AuthTypeHelper:
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)(?:\s+(?:([\w!#$%&'*+.^`|~-]+=*)|([\w.~+/-]+\s*=\s*[^ =].*)))?\s*""".r
   private val StartSyntax = """((?:[\w!#$%&'*+.^`|~-]+)(?:\s+(?:.+))?)""".r
 
   def Scheme(value: String): String =
     StandardToken(value) getOrElse {
-      throw new IllegalArgumentException(s"Invalid auth scheme: $value")
+      throw IllegalArgumentException(s"Invalid auth scheme: $value")
     }
 
   def Token(value: String): String =
     Token68(value) getOrElse {
-      throw new IllegalArgumentException(s"Invalid auth token: $value")
+      throw IllegalArgumentException(s"Invalid auth token: $value")
     }
 
   def Params(params: Seq[(String, String)]): Map[String, String] =
-    new CaseInsensitiveKeyMap(params.map {
+    CaseInsensitiveKeyMap(params.map {
       case (name, value) => ParamName(name) -> ParamValue(value)
     })
 
   def ParamName(name: String): String =
     StandardToken(name) getOrElse {
-      throw new IllegalArgumentException(s"Invalid parameter name: $name")
+      throw IllegalArgumentException(s"Invalid parameter name: $name")
     }
 
   def ParamValue(value: String): String =
     StandardToken(value) orElse QuotableString(value) getOrElse {
-      throw new IllegalArgumentException(s"Invalid parameter value: $value")
+      throw IllegalArgumentException(s"Invalid parameter value: $value")
     }
 
   def ParseAuthType(auth: String): (String, Option[String], Map[String, String]) =
-    auth match {
+    auth match
       case syntax(scheme, null, null)   => (scheme, None, Map.empty)
       case syntax(scheme, token, null)  => (scheme, Some(token), Map.empty)
       case syntax(scheme, null, params) => (scheme, None, AuthParams.parse(params))
-      case _ => throw new IllegalArgumentException(s"Malformed auth type: $auth")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed auth type: $auth")
 
   def SplitAuthTypes(auths: String): Seq[String] =
     ListParser(auths).foldLeft(Seq.empty[String]) {
@@ -67,4 +66,3 @@ private object AuthTypeHelper {
 
   def FormatParams(params: Map[String, String]): String =
     AuthParams.format(params)
-}

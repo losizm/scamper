@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package scamper
 
 import Validate.{ noNulls, notNull }
 
-private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity, attributes: Map[String, Any] = Map.empty) extends HttpResponse {
+private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity, attributes: Map[String, Any] = Map.empty) extends HttpResponse:
   notNull(startLine, "startLine")
   noNulls(headers, "headers")
   notNull(body, "body")
@@ -34,4 +34,3 @@ private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header],
 
   def setAttributes(newAttributes: Map[String, Any]): HttpResponse =
     copy(attributes = newAttributes)
-}

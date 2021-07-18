@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,15 @@ package scamper
 import scala.util.Try
 
 /** Defines HTTP version. */
-sealed trait HttpVersion {
+sealed trait HttpVersion:
   /** Gets major version. */
   def major: Int
 
   /** Gets minor version. */
   def minor: Int
-}
 
 /** Provides factory for `HttpVersion`. */
-object HttpVersion {
+object HttpVersion:
   private val `HTTP/1.0` = HttpVersionImpl(1, 0)
   private val `HTTP/1.1` = HttpVersionImpl(1, 1)
   private val `HTTP/2.0` = HttpVersionImpl(2, 0)
@@ -37,24 +36,20 @@ object HttpVersion {
   /** Parses formatted HTTP version. */
   def apply(version: String): HttpVersion =
     Try {
-      version match {
+      version match
         case syntax(major, null)  => HttpVersionImpl(major.toInt, 0)
         case syntax(major, minor) => HttpVersionImpl(major.toInt, minor.toInt)
-      }
     } getOrElse {
-      throw new IllegalArgumentException(s"Invalid HTTP version: $version")
+      throw IllegalArgumentException(s"Invalid HTTP version: $version")
     }
 
   /** Creates HTTP version with supplied major and minor. */
   def apply(major: Int, minor: Int): HttpVersion =
-    (major, minor) match {
+    (major, minor) match
       case (1, 1) => `HTTP/1.1`
       case (2, 0) => `HTTP/2.0`
       case (1, 0) => `HTTP/1.0`
       case (_, _) => HttpVersionImpl(major, minor)
-    }
-}
 
-private case class HttpVersionImpl(major: Int, minor: Int) extends HttpVersion {
+private case class HttpVersionImpl(major: Int, minor: Int) extends HttpVersion:
   override val toString = s"$major.$minor"
-}

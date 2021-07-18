@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,23 +20,22 @@ package scamper
  *
  * @see [[RequestMethod.Registry]]
  */
-sealed trait RequestMethod {
+sealed trait RequestMethod:
   /** Gets method name. */
   def name: String
 
   /** Creates `HttpRequest` with this request method and supplied target. */
   def apply(target: Uri): HttpRequest =
     HttpRequest(this, target, Nil, Entity.empty)
-}
 
 /**
  * Provides factory for `RequestMethod`.
  *
  * @see [[RequestMethod.Registry]]
  */
-object RequestMethod {
+object RequestMethod:
   /** Contains registered request methods. */
-  object Registry {
+  object Registry:
     /** GET */
     val Get: RequestMethod = RequestMethodImpl("GET")
 
@@ -63,12 +62,12 @@ object RequestMethod {
 
     /** CONNECT */
     val Connect: RequestMethod = RequestMethodImpl("CONNECT")
-  }
-  import Registry._
+
+  import Registry.*
 
   /** Gets request method for given name. */
   def apply(name: String): RequestMethod =
-    name match {
+    name match
       case "GET"     => Get
       case "HEAD"    => Head
       case "POST"    => Post
@@ -78,12 +77,9 @@ object RequestMethod {
       case "OPTIONS" => Options
       case "TRACE"   => Trace
       case "CONNECT" => Connect
-      case _         => Grammar.Token(name).map(RequestMethodImpl).getOrElse {
-        throw new IllegalArgumentException(s"Invalid request method name: $name")
+      case _         => Grammar.Token(name).map(RequestMethodImpl(_)).getOrElse {
+        throw IllegalArgumentException(s"Invalid request method name: $name")
       }
-    }
-}
 
-private case class RequestMethodImpl(name: String) extends RequestMethod {
+private case class RequestMethodImpl(name: String) extends RequestMethod:
   override val toString = name
-}

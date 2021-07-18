@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import scamper.Grammar.Token
  *
  * @see [[scamper.headers.AcceptCharset]]
  */
-trait CharsetRange {
+trait CharsetRange:
   /** Gets charset. */
   def charset: String
 
@@ -37,30 +37,26 @@ trait CharsetRange {
 
   /** Returns formatted range. */
   override lazy val toString: String =
-    if (weight == 1.0f) charset
+    if weight == 1.0f then charset
     else charset + "; q=" + weight
-}
 
 /** Provides factory for `CharsetRange`. */
-object CharsetRange {
+object CharsetRange:
   private val syntax = """([^\s;=]+)(?:\s*;\s*q\s*=\s*(\d+(?:\.\d*)?))?""".r
 
   /** Parses formatted range. */
   def parse(range: String): CharsetRange =
-    range match {
+    range match
       case syntax(charset, null) => apply(charset, 1.0f)
       case syntax(charset, weight) => apply(charset, weight.toFloat)
-      case _ => throw new IllegalArgumentException(s"Malformed charset range: $range")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed charset range: $range")
 
   /** Creates range with supplied charset and weight. */
   def apply(charset: String, weight: Float): CharsetRange =
     Token(charset).map(charset => CharsetRangeImpl(charset, QValue(weight))).getOrElse {
-      throw new IllegalArgumentException(s"Invalid charset: $charset")
+      throw IllegalArgumentException(s"Invalid charset: $charset")
     }
-}
 
-private case class CharsetRangeImpl(charset: String, weight: Float) extends CharsetRange {
+private case class CharsetRangeImpl(charset: String, weight: Float) extends CharsetRange:
   def matches(that: String): Boolean =
     (isWildcard || charset.equalsIgnoreCase(that)) && weight > 0
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 package scamper.types
 
 import scala.annotation.tailrec
-import scamper.Grammar._
+import scamper.Grammar.*
 
-private object StandardParams {
+private object StandardParams:
   private val TokenParam = """\s*;\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*([\w!#$%&'*+.^`|~-]+)\s*""".r
   private val QuotedParam = """\s*;\s*([\w!#$%&'*+.^`|~-]+)\s*=\s*"([^"]*)"\s*""".r
 
@@ -30,12 +30,11 @@ private object StandardParams {
 
   @tailrec
   private def parseParams(params: String, collected: Map[String, String]): Map[String, String] =
-    findPrefixParam(params) match {
+    findPrefixParam(params) match
       case None =>
-        if (params.matches("\\s*")) collected
-        else throw new IllegalArgumentException(s"Malformed parameters: $params")
+        if params.matches("\\s*") then collected
+        else throw IllegalArgumentException(s"Malformed parameters: $params")
       case Some((name, value, suffix)) => parseParams(suffix, collected + (name -> value))
-    }
 
   private def findPrefixParam(text: String): Option[(String, String, String)] =
     TokenParam.findPrefixMatchOf(text).orElse(QuotedParam.findPrefixMatchOf(text)).map { m =>
@@ -43,4 +42,3 @@ private object StandardParams {
     }
 
   private def formatParamValue(value: String): String = Token(value).getOrElse(s"""\"$value\"""")
-}

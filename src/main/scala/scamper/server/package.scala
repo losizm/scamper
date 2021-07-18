@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,21 @@ package scamper
 /**
  * Defines HTTP server implementation.
  *
- * === Building HTTP Server ===
+ * ### Building HTTP Server
  *
  * To build a server, you begin with `ServerApplication`. This is a mutable
  * structure to which you apply changes to configure the server. Once the desired
  * settings are applied, you invoke one of several methods to create the server.
  *
  * {{{
+ * import scala.language.implicitConversions
+ *
  * import java.io.File
  * import scamper.BodyParser
  * import scamper.Implicits.stringToEntity
  * import scamper.ResponseStatus.Registry.{ NotFound, Ok }
  * import scamper.server.HttpServer
- * import scamper.server.Implicits._
+ * import scamper.server.Implicits.*
  *
  * // Get server application
  * val app = HttpServer.app()
@@ -50,15 +52,14 @@ package scamper
  * app.put("/data/:id") { req =>
  *   def update(id: Int, data: String): Boolean = ???
  *
- *   implicit val parser = BodyParser.text()
+ *   given BodyParser[String] = BodyParser.text()
  *
  *   // Get path parameter
  *   val id = req.params.getInt("id")
  *
- *   update(id, req.as[String]) match {
+ *   update(id, req.as[String]) match
  *     case true  => Ok()
  *     case false => NotFound()
- *   }
  * }
  *
  * // Serve static files
@@ -66,37 +67,37 @@ package scamper
  *
  * // Gzip response body if not empty
  * app.outgoing { res =>
- *   res.body.isKnownEmpty match {
+ *   res.body.isKnownEmpty match
  *     case true  => res
  *     case false => res.setGzipContentEncoding()
- *   }
  * }
  *
  * // Create server
  * val server = app.create(8080)
  *
- * printf("Host: %s%n", server.host)
- * printf("Port: %d%n", server.port)
+ * try
+ *   printf("Host: %s%n", server.host)
+ *   printf("Port: %d%n", server.port)
  *
- * // Run server for 60 seconds
- * Thread.sleep(60 * 1000)
- *
- * // Close server when done
- * server.close()
+ *   // Run server for 60 seconds
+ *   Thread.sleep(60 * 1000)
+ * finally
+ *   // Close server when done
+ *   server.close()
  * }}}
  */
-package object server {
-  /**
-   * Indicates response was aborted.
-   *
-   * A `RequestHandler` throws `ResponseAborted` if no response should be sent
-   * for the request.
-   */
-  case class ResponseAborted(message: String) extends HttpException(message)
+package server
 
-  /** Indicates parameter is not found. */
-  case class ParameterNotFound(name: String) extends HttpException(name)
+/**
+ * Indicates response was aborted.
+ *
+ * A `RequestHandler` throws `ResponseAborted` if no response should be sent
+ * for the request.
+ */
+case class ResponseAborted(message: String) extends HttpException(message)
 
-  /** Indicates parameter cannot be converted. */
-  case class ParameterNotConvertible(name: String, value: String) extends HttpException(s"$name=$value")
-}
+/** Indicates parameter is not found. */
+case class ParameterNotFound(name: String) extends HttpException(name)
+
+/** Indicates parameter cannot be converted. */
+case class ParameterNotConvertible(name: String, value: String) extends HttpException(s"$name=$value")

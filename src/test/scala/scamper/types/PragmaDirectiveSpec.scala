@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package scamper.types
 
-import PragmaDirectives._
+import PragmaDirectives.*
 
-class PragmaDirectiveSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class PragmaDirectiveSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "PragmaDirective" should "be created" in {
     val directive = PragmaDirective("No-Cache")
     assert(directive.name == "no-cache")
@@ -42,4 +42,3 @@ class PragmaDirectiveSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](PragmaDirective.parse("no/cache"))
     assertThrows[IllegalArgumentException](PragmaDirective.parse("no-cache ="))
   }
-}

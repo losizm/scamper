@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import scamper.Grammar.Token
  * @see [[scamper.headers.UserAgent]]
  * @see [[scamper.headers.Server]]
  */
-trait ProductType {
+trait ProductType:
   /** Gets product name. */
   def name: String
 
@@ -33,18 +33,16 @@ trait ProductType {
   /** Returns formatted product. */
   override lazy val toString: String =
     name + version.map("/" + _).getOrElse("")
-}
 
 /** Provides factory for `ProductType`. */
-object ProductType {
+object ProductType:
   private val syntax = """([\w!#$%&'*+.^`|~-]+)(?:/([\w!#$%&'*+.^`|~-]+))?(?:\s+\(.*\)\s*)?""".r
 
   /** Parses formatted product. */
   def parse(product: String): ProductType =
-    product match {
+    product match
       case syntax(name, version) => ProductTypeImpl(name, Option(version))
-      case _ => throw new IllegalArgumentException(s"Malformed product: $product")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed product: $product")
 
   /** Parses formatted list of products. */
   def parseAll(products: String): Seq[ProductType] =
@@ -56,8 +54,7 @@ object ProductType {
 
   private def CheckToken(token: String): String =
     Token(token).getOrElse {
-      throw new IllegalArgumentException(s"Invalid token: $token")
+      throw IllegalArgumentException(s"Invalid token: $token")
     }
-}
 
 private case class ProductTypeImpl(name: String, version: Option[String]) extends ProductType

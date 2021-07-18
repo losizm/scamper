@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,26 +17,22 @@ package scamper.server
 
 import scala.util.matching.Regex
 
-private class MountPath private (val value: String) {
-  private val regex = value match {
+private class MountPath private (val value: String):
+  private val regex = value match
     case "/" => "/.*"
     case _   => s"${Regex.quote(value)}(/.*)?"
-  }
 
   def matches(path: String): Boolean =
     path.matches(regex)
-}
 
-private object MountPath {
+private object MountPath:
   def apply(value: String): MountPath =
     new MountPath(normalize(value))
 
-  def normalize(value: String): String = {
+  def normalize(value: String): String =
     val path = NormalizePath(value)
 
-    if (!path.matches("""/|(/[\w+\-.~%]+)+""") || path.matches("""/\.\.(/.*)?"""))
-      throw new IllegalArgumentException(s"Invalid mount path: $path")
+    if !path.matches("""/|(/[\w+\-.~%]+)+""") || path.matches("""/\.\.(/.*)?""") then
+      throw IllegalArgumentException(s"Invalid mount path: $path")
 
     path
-  }
-}

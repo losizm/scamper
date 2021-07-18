@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 /**
  * Defines core types.
  *
- * === HTTP Messages ===
+ * ### HTTP Messages
  *
- * At the core of ''Scamper'' is [[HttpMessage]], which is a trait that defines
+ * At the core of _Scamper_ is [[HttpMessage]], which is a trait that defines
  * the fundamental characteristics of an HTTP message. [[HttpRequest]] and
  * [[HttpResponse]] extend the specification to define characteristics specific
  * to their respective message types.
@@ -29,6 +29,8 @@
  * further define the request.
  *
  * {{{
+ * import scala.language.implicitConversions
+ *
  * import scamper.Header
  * import scamper.Implicits.stringToUri
  * import scamper.RequestMethod.Registry.Get
@@ -51,6 +53,8 @@
  * methods to further define the response.
  *
  * {{{
+ * import scala.language.implicitConversions
+ *
  * import scamper.{ BodyParser, Header }
  * import scamper.Implicits.stringToEntity
  * import scamper.ResponseStatus.Registry.Ok
@@ -67,39 +71,38 @@
  *
  * val contentType: Option[String] = response.getHeaderValue("Content-Type")
  *
- * implicit val parser = BodyParser.text()
+ * given BodyParser[String] = BodyParser.text()
  *
  * printf("Body: %s%n", response.as[String])
  * }}}
  */
-package object scamper {
-  /** Defines alias to `java.net.URI`. */
-  type Uri = java.net.URI
+package scamper
 
-  /** Provides factory for `Uri`. */
-  object Uri {
-    /** Creates URI from supplied string. */
-    def apply(uri: String): Uri =
-      new Uri(uri)
+/** Defines alias to `java.net.URI`. */
+type Uri = java.net.URI
 
-    /** Creates URI with supplied scheme, scheme-specific part, and fragment. */
-    def apply(scheme: String, schemeSpecificPart: String, fragment: String = null): Uri =
-      new Uri(scheme, schemeSpecificPart, fragment)
+/** Provides factory for `Uri`. */
+object Uri:
+  /** Creates URI from supplied string. */
+  def apply(uri: String): Uri =
+    new Uri(uri)
 
-    /** Creates URI with `http` scheme and supplied components. */
-    def http(authority: String, path: String = null, query: String = null, fragment: String = null): Uri =
-      new Uri("http", authority, path, query, fragment)
+  /** Creates URI with supplied scheme, scheme-specific part, and fragment. */
+  def apply(scheme: String, schemeSpecificPart: String, fragment: String = null): Uri =
+    new Uri(scheme, schemeSpecificPart, fragment)
 
-    /** Creates URI with `https` scheme and supplied components. */
-    def https(authority: String, path: String = null, query: String = null, fragment: String = null): Uri =
-      new Uri("https", authority, path, query, fragment)
+  /** Creates URI with `http` scheme and supplied components. */
+  def http(authority: String, path: String = null, query: String = null, fragment: String = null): Uri =
+    new Uri("http", authority, path, query, fragment)
 
-    /** Creates URI with `ws` scheme and supplied components. */
-    def ws(authority: String, path: String = null, query: String = null): Uri =
-      new Uri("ws", authority, path, query)
+  /** Creates URI with `https` scheme and supplied components. */
+  def https(authority: String, path: String = null, query: String = null, fragment: String = null): Uri =
+    new Uri("https", authority, path, query, fragment)
 
-    /** Creates URI with `wss` scheme and supplied components. */
-    def wss(authority: String, path: String = null, query: String = null): Uri =
-      new Uri("wss", authority, path, query)
-  }
-}
+  /** Creates URI with `ws` scheme and supplied components. */
+  def ws(authority: String, path: String = null, query: String = null): Uri =
+    new Uri("ws", authority, path, query)
+
+  /** Creates URI with `wss` scheme and supplied components. */
+  def wss(authority: String, path: String = null, query: String = null): Uri =
+    new Uri("wss", authority, path, query)

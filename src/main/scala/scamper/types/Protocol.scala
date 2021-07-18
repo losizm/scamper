@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import scamper.Grammar.Token
  *
  * @see [[scamper.headers.Upgrade]]
  */
-trait Protocol {
+trait Protocol:
   /** Gets protocol name. */
   def name: String
 
@@ -32,18 +32,16 @@ trait Protocol {
   /** Returns formatted protocol. */
   override lazy val toString: String =
     name + version.map("/" + _).getOrElse("")
-}
 
 /** Provides factory for `Protocol`. */
-object Protocol {
+object Protocol:
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)(?:/([\w!#$%&'*+.^`|~-]+))?\s*""".r
 
   /** Parses formatted protocol. */
   def parse(protocol: String): Protocol =
-    protocol match {
+    protocol match
       case syntax(name, version) => ProtocolImpl(name, Option(version))
-      case _ => throw new IllegalArgumentException(s"Malformed protocol: $protocol")
-    }
+      case _ => throw IllegalArgumentException(s"Malformed protocol: $protocol")
 
   /** Creates protocol with supplied values. */
   def apply(name: String, version: Option[String]): Protocol =
@@ -51,8 +49,7 @@ object Protocol {
 
   private def CheckToken(token: String): String =
     Token(token).getOrElse {
-      throw new IllegalArgumentException(s"Invalid token: $token")
+      throw IllegalArgumentException(s"Invalid token: $token")
     }
-}
 
 private case class ProtocolImpl(name: String, version: Option[String]) extends Protocol

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper.types
 
-class MediaRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
+class MediaRangeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "MediaRange" should "be created without parameters" in {
     var range = MediaRange("text/html; q=1.0")
     assert(range.mainType == "text")
@@ -100,4 +100,3 @@ class MediaRangeSpec extends org.scalatest.flatspec.AnyFlatSpec {
     assertThrows[IllegalArgumentException](MediaRange("text/html; charset"))
     assertThrows[IllegalArgumentException](MediaRange("text/html; charset=iso 8859 1"))
   }
-}

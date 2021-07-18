@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package scamper
 
-private class CaseInsensitiveKeyMap[V](params: Seq[(String, V)]) extends Map[String, V] {
+private class CaseInsensitiveKeyMap[V](params: Seq[(String, V)]) extends Map[String, V]:
   def get(key: String): Option[V] =
     params.collectFirst { case (k, value) if k.equalsIgnoreCase(key) => value }
 
@@ -23,12 +23,10 @@ private class CaseInsensitiveKeyMap[V](params: Seq[(String, V)]) extends Map[Str
     params.distinctBy(_._1.toLowerCase).iterator
 
   def removed(key: String): Map[String, V] =
-    new CaseInsensitiveKeyMap(params.filterNot { case (k, _) => k.equalsIgnoreCase(key) })
+    CaseInsensitiveKeyMap(params.filterNot { case (k, _) => k.equalsIgnoreCase(key) })
 
   def updated[V1 >: V](key: String, value: V1): Map[String, V1] =
-    new CaseInsensitiveKeyMap(params :+ (key, value))
+    CaseInsensitiveKeyMap(params :+ (key, value))
 
   override def empty: Map[String, V] =
-    new CaseInsensitiveKeyMap(Nil)
-}
-
+    CaseInsensitiveKeyMap(Nil)

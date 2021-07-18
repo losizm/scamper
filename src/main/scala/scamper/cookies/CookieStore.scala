@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import scamper.Uri
  * @see [[CookieStore$.apply CookieStore.apply]],
  *  [[CookieStore$.alwaysEmpty CookieStore.alwaysEmpty]]
  */
-sealed trait CookieStore {
+sealed trait CookieStore:
   /** Gets number of cookies in cookie store. */
   def size: Int
 
@@ -82,10 +82,9 @@ sealed trait CookieStore {
    */
   def put(target: Uri, one: SetCookie, more: SetCookie*): this.type =
     put(target, one +: more)
-}
 
 /** Provides factory for `CookieStore`. */
-object CookieStore {
+object CookieStore:
   /**
    * Gets cookie store that is always empty.
    *
@@ -100,18 +99,16 @@ object CookieStore {
    * @param cookies initial collection of cookies
    */
   def apply(cookies: Seq[PersistentCookie] = Nil): CookieStore =
-    new DefaultCookieStore(new ArrayBuffer ++= cookies)
-}
+    DefaultCookieStore(new ArrayBuffer ++= cookies)
 
-private object AlwaysEmptyCookieStore extends CookieStore {
+private object AlwaysEmptyCookieStore extends CookieStore:
   val size = 0
   def list: Seq[PersistentCookie] = Nil
   def clear(expiredOnly: Boolean) =  this
   def get(target: Uri): Seq[PlainCookie] = Nil
   def put(target: Uri, cookies: Seq[SetCookie]) = this
-}
 
-private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentCookie]) extends CookieStore {
+private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentCookie]) extends CookieStore:
   private type Key = Tuple3[String, String, String]
 
   private val ordering: Ordering[PersistentCookie] =
@@ -124,10 +121,9 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
   }
 
   def clear(expiredOnly: Boolean = false): this.type = synchronized {
-    expiredOnly match {
+    expiredOnly match
       case true  => collection = collection.filter(checkExpiry)
       case false => collection.clear()
-    }
     this
   }
 
@@ -157,19 +153,18 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
     this
   }
 
-  private def normalize(target: Uri): Uri = {
+  private def normalize(target: Uri): Uri =
     require(target.isAbsolute, "target is not absolute")
     require(target.getScheme.matches("(http|ws)s?"), "invalid target scheme")
 
     target.setPath("/" + target.getRawPath).normalize()
-  }
 
   private def key(cookie: PersistentCookie): Key =
     (cookie.name, cookie.domain, cookie.path)
 
   private def create(cookie: SetCookie, target: Uri): Try[PersistentCookie] =
     Try {
-      new PersistentCookieImpl(
+      PersistentCookieImpl(
         cookie.name,
         cookie.value,
         hostOnly = cookie.domain
@@ -199,10 +194,9 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
       .foreach(collection.+=)
 
   private def remove(cookie: PersistentCookie): Option[PersistentCookie] =
-    collection.indexWhere(key(_) == key(cookie)) match {
+    collection.indexWhere(key(_) == key(cookie)) match
       case -1 => None
       case i  => Some(collection.remove(i))
-    }
 
   private def update(oldCookie: PersistentCookie, newCookie: PersistentCookie): PersistentCookie =
     newCookie.asInstanceOf[PersistentCookieImpl].copy(creation = oldCookie.creation)
@@ -211,19 +205,17 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
     !PublicSuffixList.check(cookie.domain)
 
   private def checkDomain(cookie: PersistentCookie, target: Uri): Boolean =
-    cookie.hostOnly match {
+    cookie.hostOnly match
       case true  => cookie.domain == target.getHost.toLowerCase
       case false => domainMatches(cookie.domain, target.getHost)
-    }
 
   private def checkPath(cookie: PersistentCookie, target: Uri): Boolean =
     pathMatches(cookie.path, target.getRawPath)
 
   private def checkSecure(cookie: PersistentCookie, target: Uri): Boolean =
-    cookie.secureOnly match {
+    cookie.secureOnly match
       case true  => target.getScheme.matches("(http|ws)s")
       case false => true
-    }
 
   private def checkExpiry(cookie: PersistentCookie): Boolean =
     cookie.expiry.isAfter(Instant.now())
@@ -235,8 +227,7 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
 
   private def pathMatches(cookiePath: String, requestPath: String): Boolean =
     cookiePath == requestPath ||
-      (cookiePath.endsWith("/") match {
+      (cookiePath.endsWith("/") match
         case true  => requestPath.startsWith(cookiePath)
         case false => requestPath.startsWith(cookiePath + "/")
-      })
-}
+      )

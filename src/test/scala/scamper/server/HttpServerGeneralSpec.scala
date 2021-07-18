@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,21 @@
  */
 package scamper.server
 
-import scamper._
-import scamper.Implicits._
+import scala.language.implicitConversions
+
+import scamper.*
+import scamper.Implicits.given
 import scamper.client.HttpClient
 import scamper.client.Implicits.ClientHttpRequest
-import scamper.headers._
-import scamper.server.Implicits._
-import scamper.types._
-import scamper.types.Implicits._
+import scamper.headers.*
+import scamper.server.Implicits.given
+import scamper.types.*
+import scamper.types.Implicits.given
 
-import RequestMethod.Registry._
-import ResponseStatus.Registry._
+import RequestMethod.Registry.*
+import ResponseStatus.Registry.*
 
-class HttpServerGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer {
+class HttpServerGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer:
   it should "handle /home endpoint" in testHome(false)
 
   it should "handle /home endpoint with SSL/TLS" in testHome(true)
@@ -98,15 +100,15 @@ class HttpServerGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
     }
   }
 
-  private implicit val client =
+  private given client: HttpClient =
     HttpClient
       .settings()
       .trust(Resources.truststore)
       .continueTimeout(1000)
       .create()
 
-  private implicit val textBodyParser = BodyParser.text(8192)
-  private implicit val byteBodyParser = BodyParser.bytes(8192)
+  private given textBodyParser: BodyParser[String] = BodyParser.text(8192)
+  private given byteBodyParser: BodyParser[Array[Byte]] = BodyParser.bytes(8192)
 
   private def testAbout(secure: Boolean) = withServer(secure) { implicit server =>
     client.get(s"$serverUri/about") { res =>
@@ -246,4 +248,3 @@ class HttpServerGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
         assert(res.hasDate)
       }
   }
-}

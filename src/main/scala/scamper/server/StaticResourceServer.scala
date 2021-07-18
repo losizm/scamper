@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,53 +21,47 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.time.Instant
 
 import scala.util.{ Failure, Success, Try }
+import scala.language.implicitConversions
 
 import scamper.{ HttpRequest, HttpResponse }
 import scamper.Auxiliary.{ InputStreamType, StringType }
-import scamper.Implicits._
+import scamper.Implicits.bytesToEntity
 import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.{ Accept, Allow, ContentLength, ContentType, Date, IfModifiedSince, LastModified }
 import scamper.types.{ MediaRange, MediaType }
 
-private class StaticResourceServer(mountPath: Path, sourceDirectory: Path, classLoader: ClassLoader) extends StaticFileServer(mountPath, sourceDirectory) {
+private class StaticResourceServer(mountPath: Path, sourceDirectory: Path, classLoader: ClassLoader) extends StaticFileServer(mountPath, sourceDirectory):
   override protected def exists(path: Path): Boolean =
     path.startsWith(sourceDirectory) &&
       path != Paths.get("") && {
-        classLoader.getResource(path.toString) match {
+        classLoader.getResource(path.toString) match
           case null => false
-          case url if url.getProtocol == "file" => new File(url.toString.stripPrefix("file:")).isFile
+          case url if url.getProtocol == "file" => File(url.toString.stripPrefix("file:")).isFile
           case url => classLoader.getResource(path.toString + "/") == null
-        }
       }
 
-  override protected def getResponse(path: Path, mediaType: MediaType, ifModifiedSince: Instant, headOnly: Boolean): HttpResponse = {
+  override protected def getResponse(path: Path, mediaType: MediaType, ifModifiedSince: Instant, headOnly: Boolean): HttpResponse =
     val bytes = getResource(path)
     val res = Ok().setContentType(mediaType)
       .setContentLength(bytes.size)
       .setLastModified(Instant.now())
 
-    headOnly match {
+    headOnly match
       case true  => res
       case false => res.setBody(bytes)
-    }
-  }
 
-  private def getResource(path: Path): Array[Byte] = {
+  private def getResource(path: Path): Array[Byte] =
     val in = classLoader.getResourceAsStream(path.toString)
     try in.getBytes()
     finally Try(in.close())
-  }
-}
 
-private object StaticResourceServer {
-  def apply(mountPath: String, sourceDirectory: String, classLoader: ClassLoader): StaticResourceServer = {
+private object StaticResourceServer:
+  def apply(mountPath: String, sourceDirectory: String, classLoader: ClassLoader): StaticResourceServer =
     val path = MountPath(mountPath)
     val directory = Paths.get(sourceDirectory).normalize()
-    val loader = if (classLoader == null) Thread.currentThread.getContextClassLoader else classLoader
+    val loader = if classLoader == null then Thread.currentThread.getContextClassLoader else classLoader
 
-    if (directory != Paths.get(""))
+    if directory != Paths.get("") then
       require(loader.getResource(s"$directory/") != null, s"Invalid source directory: $sourceDirectory")
 
     new StaticResourceServer(Paths.get(path.value), directory, loader)
-  }
-}

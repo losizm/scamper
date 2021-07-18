@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,36 +17,31 @@ package scamper
 
 import java.util.Objects.isNull
 
-private object Validate {
+private object Validate:
   @inline
-  def notNull[T](value: T): T = {
-    if (value == null)
-      throw new NullPointerException()
+  def notNull[T](value: T): T =
+    if value == null then
+      throw NullPointerException()
     value
-  }
 
   @inline
-  def notNull[T](value: T, message: => String): T = {
-    if (value == null)
-      throw new NullPointerException(message)
+  def notNull[T](value: T, message: => String): T =
+    if value == null then
+      throw NullPointerException(message)
     value
-  }
 
   @inline
-  def noNulls[T <: Seq[_]](values: T): T = {
-    if (values == null)
-      throw new NullPointerException()
-    if (values.contains(null))
-      throw new IllegalArgumentException()
+  def noNulls[T <: Seq[?]](values: T): T =
+    if values == null then
+      throw NullPointerException()
+    if values.contains(null) then
+      throw IllegalArgumentException()
     values
-  }
 
   @inline
-  def noNulls[T <: Seq[_]](values: T, message: => String): T = {
-    if (values == null)
-      throw new NullPointerException()
-    if (values.contains(null))
-      throw new IllegalArgumentException(message)
+  def noNulls[T <: Seq[?]](values: T, message: => String): T =
+    if values == null then
+      throw NullPointerException()
+    if values.contains(null) then
+      throw IllegalArgumentException(message)
     values
-  }
-}

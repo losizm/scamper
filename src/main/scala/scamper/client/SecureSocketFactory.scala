@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Carlos Conyers
+ * Copyright 2021 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,31 +22,26 @@ import javax.net.ssl.{ SSLContext, SSLSocketFactory, TrustManager, TrustManagerF
 
 import scala.util.Try
 
-private object SecureSocketFactory {
-  def create(keyStore: KeyStore): SSLSocketFactory = {
+private object SecureSocketFactory:
+  def create(keyStore: KeyStore): SSLSocketFactory =
     val trustManagerFactory = TrustManagerFactory.getInstance("SunX509")
     trustManagerFactory.init(keyStore)
 
     val sslContext = SSLContext.getInstance("TLS")
     sslContext.init(null, trustManagerFactory.getTrustManagers(), null)
     sslContext.getSocketFactory()
-  }
 
-  def create(storeFile: File, storeType: String, password: Option[String]): SSLSocketFactory = {
-    val storeStream = new FileInputStream(storeFile)
+  def create(storeFile: File, storeType: String, password: Option[String]): SSLSocketFactory =
+    val storeStream = FileInputStream(storeFile)
 
-    try {
+    try
       val keyStore = KeyStore.getInstance(storeType)
       keyStore.load(storeStream, password.map(_.toCharArray).getOrElse(null))
       create(keyStore)
-    } finally {
+    finally
       Try(storeStream.close())
-    }
-  }
 
-  def create(trustManager: TrustManager): SSLSocketFactory = {
+  def create(trustManager: TrustManager): SSLSocketFactory =
     val sslContext = SSLContext.getInstance("TLS")
     sslContext.init(null, Array(trustManager), null)
     sslContext.getSocketFactory()
-  }
-}
