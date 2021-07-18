@@ -14,12 +14,6 @@ Compile / doc / scalacOptions ++= Seq(
   "-doc-root-content", "src/main/scala/root.scala"
 )
 
-crossScalaVersions := Seq("2.12.14")
-
-Compile / unmanagedSourceDirectories += {
-  (Compile / sourceDirectory).value / s"scala-${scalaBinaryVersion.value}"
-}
-
 libraryDependencies += "org.scalatest" %% "scalatest-flatspec" % "3.2.9" % "test"
 
 scmInfo := Some(
