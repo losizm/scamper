@@ -51,7 +51,7 @@ and writing HTTP messages, and it provides [client](#HTTP-Client) and
 To get started, add **Scamper** to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "23.0.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "23.0.1"
 ```
 
 _**NOTE:** Starting with version 23, **scamper** is written for Scala 3
