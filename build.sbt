@@ -8,7 +8,12 @@ licenses     := List("Apache License, Version 2" -> url("http://www.apache.org/l
 scalaVersion := "3.0.1"
 scalacOptions ++= Seq("-deprecation", "-feature", "-new-syntax", "-Xfatal-warnings", "-Yno-experimental")
 
-Compile / doc / scalacOptions ++= Seq("-project-version", version.value)
+Compile / doc / scalacOptions ++= Seq(
+  "-project-version", {
+    val ver = version.value
+    ver.substring(0, ver.lastIndexOf('.')) ++ ".x"
+  }
+)
 
 libraryDependencies += "org.scalatest" %% "scalatest-flatspec" % "3.2.9" % "test"
 
