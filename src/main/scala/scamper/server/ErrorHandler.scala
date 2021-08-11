@@ -23,7 +23,48 @@ trait ErrorHandler:
   /**
    * Creates response for given error.
    *
-   * @param error error generated during request processing
    * @param request request for which error was generated
    */
-  def apply(error: Throwable, request: HttpRequest): HttpResponse
+  def apply(request: HttpRequest): PartialFunction[Throwable, HttpResponse]
+
+  /**
+   * Creates composite handler by applying `this` before `other`.
+   *
+   * If `this` is not defined, then error is applied to `other`.
+   *
+   * @param other fallback handler
+   */
+  def before(other: ErrorHandler): ErrorHandler =
+    req => apply(req).orElse(other(req))
+
+  /**
+   * Creates composite handler by applying `this` after `other`.
+   *
+   * If `other` is not defined, then error is applied to `this`.
+   *
+   * @param other initial handler
+   */
+  def after(other: ErrorHandler): ErrorHandler =
+    req => other(req).orElse(apply(req))
+
+/** Provides `ErrorHandler` utilities. */
+object ErrorHandler:
+  private val empty = new ErrorHandler:
+    def apply(req: HttpRequest) = PartialFunction.empty
+
+  /**
+   * Composes error handlers using tail handlers as fallbacks.
+   *
+   * @param handlers error handlers
+   */
+  def coalesce(handlers: Seq[ErrorHandler]): ErrorHandler =
+    handlers.foldRight(empty)(_ before _)
+
+  /**
+   * Composes `one` handler with `more` handlers using `more` as fallbacks.
+   *
+   * @param one error handler
+   * @param more additional error handlers
+   */
+  def coalesce(one: ErrorHandler, more: ErrorHandler*): ErrorHandler =
+    coalesce(one +: more)

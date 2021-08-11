@@ -294,29 +294,15 @@ class ServerApplication extends Router:
     this
   }
 
-  /**
-   * Adds supplied response filter.
-   *
-   * The filter is appended to existing response filter chain.
-   *
-   * @param filter response filter
-   *
-   * @return this application
-   */
+  /** @inheritdoc  */
   def outgoing(filter: ResponseFilter): this.type = synchronized {
     app = app.copy(responseFilters = app.responseFilters :+ notNull(filter, "filter"))
     this
   }
 
-  /**
-   * Sets error handler.
-   *
-   * @param handler error handler
-   *
-   * @return this application
-   */
-  def error(handler: ErrorHandler): this.type = synchronized {
-    app = app.copy(errorHandler = Option(handler))
+  /** @inheritdoc  */
+  def recover(handler: ErrorHandler): this.type = synchronized {
+    app = app.copy(errorHandlers = app.errorHandlers :+ notNull(handler, "handler"))
     this
   }
 

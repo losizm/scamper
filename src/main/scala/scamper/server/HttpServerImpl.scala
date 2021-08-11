@@ -51,7 +51,7 @@ private object HttpServerImpl:
     keepAlive:           Option[KeepAliveParameters] = None,
     requestHandlers:     Seq[RequestHandler] = Nil,
     responseFilters:     Seq[ResponseFilter] = Nil,
-    errorHandler:        Option[ErrorHandler] = None,
+    errorHandlers:       Seq[ErrorHandler] = Nil,
     serverSocketFactory: ServerSocketFactory = ServerSocketFactory.getDefault()
   )
 
@@ -91,13 +91,15 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
   private val requestHandler = RequestHandler.coalesce(app.requestHandlers)
   private val responseFilter = ResponseFilter.chain(app.responseFilters)
-  private val errorHandler = app.errorHandler.getOrElse(
+  private val errorHandler   = ErrorHandler.coalesce(app.errorHandlers :+
     new ErrorHandler:
-      def apply(err: Throwable, req: HttpRequest): HttpResponse =
-        val correlate = req.getAttribute[String]("scamper.server.message.correlate").getOrElse("<unknown>")
-        logger.error(s"$authority - Error while handling request (correlate=$correlate)", err)
-        InternalServerError()
+      def apply(req: HttpRequest): PartialFunction[Throwable, HttpResponse] =
+        case err: Throwable =>
+          val correlate = req.getAttribute[String]("scamper.server.message.correlate").getOrElse("<unknown>")
+          logger.error(s"$authority - Error while handling request (correlate=$correlate)", err)
+          InternalServerError()
   )
+
 
   private val chunked = TransferCoding("chunked")
   private var closed  = AtomicBoolean(false)
@@ -280,7 +282,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
           case err: SocketTimeoutException => RequestTimeout()
           case err: ResponseAborted        => throw err
           case err: SSLException           => throw err
-          case err                         => errorHandler(err, req)
+          case err                         => errorHandler(req)(err)
         }
 
       def onHandleResponse(res: HttpResponse): ConnectionManagement =

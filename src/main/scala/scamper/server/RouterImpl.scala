@@ -17,24 +17,51 @@ package scamper.server
 
 import scala.collection.mutable.ListBuffer
 
-import scamper.RequestMethod
+import scamper.{ HttpRequest, HttpResponse, RequestMethod }
+import scamper.Validate.notNull
 
 private class RouterImpl private (val mountPath: String) extends Router:
-  private val handlers = new ListBuffer[RequestHandler]
+  private val in  = new ListBuffer[RequestHandler]
+  private val out = new ListBuffer[ResponseFilter]
+  private val err = new ListBuffer[ErrorHandler]
 
   def incoming(handler: RequestHandler): this.type = synchronized {
-    handlers += handler
+    in += notNull(handler, "handler")
     this
   }
 
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type = synchronized {
-    handlers += TargetRequestHandler(toAbsolutePath(path), methods, handler)
+    in += TargetRequestHandler(
+      toAbsolutePath(notNull(path, "path")),
+      notNull(methods, "methods"),
+      notNull(handler, "handler")
+    )
+    this
+  }
+
+  def outgoing(filter: ResponseFilter): this.type = synchronized {
+    out += notNull(filter, "filter")
+    this
+  }
+
+  def recover(handler: ErrorHandler): this.type = synchronized {
+    err += notNull(handler, "handler")
     this
   }
 
   private[server] def createRequestHandler(): RequestHandler = synchronized {
-    RequestHandler.coalesce(handlers.toSeq)
+    RouterRequestHandler(
+      RequestHandler.coalesce(in.toSeq),
+      ResponseFilter.chain(out.toSeq),
+      ErrorHandler.coalesce(err.toSeq)
+    )
   }
+
+  private class RouterRequestHandler(in: RequestHandler, out: ResponseFilter, err: ErrorHandler) extends RequestHandler:
+    def apply(req: HttpRequest) =
+      (try in(req) catch err(req)) match
+        case req: HttpRequest  => req
+        case res: HttpResponse => out(res)
 
 private object RouterImpl:
   def apply(mountPath: String): RouterImpl =

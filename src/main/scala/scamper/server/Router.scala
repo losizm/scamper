@@ -28,8 +28,8 @@ import scamper.websocket.WebSocketApplication
  * import scala.language.implicitConversions
  *
  * import scamper.Implicits.stringToEntity
- * import scamper.ResponseStatus.Registry.{ NotFound, Ok }
- * import scamper.server.ServerApplication
+ * import scamper.ResponseStatus.Registry.{ BadRequest, NotFound, Ok }
+ * import scamper.server.{ ParameterNotConvertible, ServerApplication }
  * import scamper.server.Implicits.ServerHttpRequest
  *
  * val app = ServerApplication()
@@ -49,6 +49,10 @@ import scamper.websocket.WebSocketApplication
  *     messages.get(id)
  *      .map(Ok(_))
  *      .getOrElse(NotFound())
+ *   }
+ *
+ *   router.recover { req =>
+ *     { case _: ParameterNotConvertible => BadRequest(req.target.toString) }
  *   }
  * }
  * }}}
@@ -255,3 +259,25 @@ trait Router:
     val router = RouterImpl(mountPath + MountPath.normalize(path))
     app(router)
     incoming(MountRequestHandler(router.mountPath, router.createRequestHandler()))
+
+  /**
+   * Adds error handler.
+   *
+   * The handler is appended to existing error handler chain.
+   *
+   * @param handler error handler
+   *
+   * @return this router
+   */
+  def recover(handler: ErrorHandler): this.type
+
+  /**
+   * Adds supplied response filter.
+   *
+   * The filter is appended to existing response filter chain.
+   *
+   * @param filter response filter
+   *
+   * @return this router
+   */
+  def outgoing(filter: ResponseFilter): this.type

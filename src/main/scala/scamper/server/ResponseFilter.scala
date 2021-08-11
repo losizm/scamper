@@ -33,7 +33,7 @@ trait ResponseFilter:
    * @param other other filter
    */
   def before(other: ResponseFilter): ResponseFilter =
-    req => other(apply(req))
+    res => other(apply(res))
 
   /**
    * Creates composite filter by applying `this` after `other`.
@@ -41,7 +41,7 @@ trait ResponseFilter:
    * @param other other filter
    */
   def after(other: ResponseFilter): ResponseFilter =
-    req => apply(other(req))
+    res => apply(other(res))
 
 /** Provides `ResponseFilter` utilities. */
 object ResponseFilter:

@@ -42,19 +42,19 @@ trait TestServer:
       .bufferSize(1024)
       .readTimeout(500)
       .headerLimit(20)
-      .incoming(doAuditLog("Incoming request")(_))
-      .outgoing(doAuditLog("Outgoing response")(_))
-      .get("/")(doHome(_))
-      .get("/about")(doAbout(_))
-      .post("/echo")(doEcho(_))
-      .get("/throwException")(doThrowException(_))
-      .incoming("/notImplemented")(doNotImplemented(_))
+      .incoming(doAuditLog("Incoming request"))
+      .outgoing(doAuditLog("Outgoing response"))
+      .get("/")(doHome)
+      .get("/about")(doAbout)
+      .post("/echo")(doEcho)
+      .get("/throwException")(doThrowException)
+      .incoming("/notImplemented")(doNotImplemented)
       .route("/api/messages")(MessageApplication)
       .route("/cookies")(CookieApplication)
       .websocket("/chat/:id")(WebSocketChatServer)
       .files("/files/riteshiff", Resources.riteshiff)
       .resources("/resources/riteshiff", "riteshiff")
-      .error(doError(_, _))
+      .recover(doError)
 
     if secure then
       app.secure(Resources.keystore, "letmein", "pkcs12")
@@ -101,9 +101,8 @@ trait TestServer:
   private def doNotImplemented(req: HttpRequest): HttpResponse =
     ???
 
-  private def doError(err: Throwable, req: HttpRequest): HttpResponse =
-    err match
-      case _: NotImplementedError => NotImplemented()
-      case _: ReadLimitExceeded   => PayloadTooLarge()
-      case _: EntityTooLarge      => PayloadTooLarge()
-      case _                      => InternalServerError()
+  private def doError(req: HttpRequest): PartialFunction[Throwable, HttpResponse] =
+    case _: NotImplementedError => NotImplemented()
+    case _: ReadLimitExceeded   => PayloadTooLarge()
+    case _: EntityTooLarge      => PayloadTooLarge()
+    case _                      => InternalServerError()
