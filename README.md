@@ -51,7 +51,7 @@ and writing HTTP messages, and it provides [client](#HTTP-Client) and
 To get started, add **Scamper** to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "23.0.1"
+libraryDependencies += "com.github.losizm" %% "scamper" % "24.0.0"
 ```
 
 _**NOTE:** Starting with version 23, **scamper** is written for Scala 3
@@ -1171,12 +1171,12 @@ handlers.
 ```scala
 import scamper.ResponseStatus.Registry.{ BadRequest, InternalServerError }
 
-// Accept Throwable and HttpRequest; return HttpResponse
-app.error { (err, req) =>
-  def isClientError(err: Throwable): Boolean =
+app.recover {
+  def isClientError(err: Throwable) =
     err.isInstanceOf[NumberFormatException]
 
-  isClientError(err) match
+  // Define implementation of ErrorHandler
+  req => isClientError(_) match
     case true  => BadRequest("Your bad.")
     case false => InternalServerError("My bad.")
 }
@@ -1185,15 +1185,18 @@ app.error { (err, req) =>
 ### Router
 
 Use `Router` to structure the application routes hierarchically. `Router` works
-in much the same way as `ServerApplication`, except it is configured for request
-handling only, and all router paths are relative to its mount path.
+in much the same way as `ServerApplication`, and routes are relative to its
+mount path.
 
 ```scala
 import scala.language.implicitConversions
+
 import scamper.Implicits.stringToEntity
-import scamper.ResponseStatus.Registry.{ NotFound, Ok }
-import scamper.server.ServerApplication
+import scamper.ResponseStatus.Registry.{ BadRequest, NotFound, Ok }
+import scamper.headers.ContentType
+import scamper.server.{ ParameterNotConvertible, ServerApplication }
 import scamper.server.Implicits.ServerHttpRequest
+import scamper.types.Implicits.stringToMediaType
 
 // Mount router to /api
 val app = ServerApplication()
@@ -1212,6 +1215,16 @@ app.route("/api") { router =>
     messages.get(id)
      .map(Ok(_))
      .getOrElse(NotFound())
+  }
+
+  // Filter responses generated from router
+  router.outgoing { res =>
+    res.setContentType("text/plain")
+  }
+
+  // Recover from errors generated from router
+  router.recover { req =>
+    { case _: ParameterNotConvertible => BadRequest(req.target.toString) }
   }
 }
 ```
