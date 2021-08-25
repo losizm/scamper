@@ -54,9 +54,8 @@ To get started, add **Scamper** to your project:
 libraryDependencies += "com.github.losizm" %% "scamper" % "24.0.0"
 ```
 
-_**NOTE:** Starting with version 23, **scamper** is written for Scala 3
-exclusively. See previous releases for compatibility with Scala 2.12 and Scala
-2.13._
+_**NOTE:** Starting with 23.0.0, **Scamper** is written for Scala 3. See
+previous releases for compatibility with Scala 2.12 and Scala 2.13._
 
 ## HTTP Messages
 
@@ -104,7 +103,7 @@ val res = Ok("There is an answer.")
 ## Specialized Header Access
 
 `HttpMessage` provides a set of methods for generalized header access. Using
-these methods, the header value are represented as a `String`.
+these methods, the header name and value are represented as `String`.
 
 ```scala
 import scala.language.implicitConversions
@@ -140,7 +139,8 @@ def setContentType(value: MediaType): HttpMessage
 def removeContentType(): HttpMessage
 ```
 
-So, you can work with the header using a specialized header type.
+With them imported, you can work with the header using a specialized header
+type.
 
 ```scala
 import scala.language.implicitConversions
@@ -180,9 +180,9 @@ the case for cookies. Specialized access is provided by classes in
 ### Request Cookies
 
 In `HttpRequest`, cookies are stringed together in the **Cookie** header. You
-may access the cookies in their _unbaked_ form using generalized header access.
-Or, you can access them using extension methods provided by `RequestCookies`,
-with each cookie presented as `PlainCookie`.
+can access the cookies in their _unbaked_ form using generalized header access.
+Or, you can access them using extension methods provided by `RequestCookies`
+with each cookie represented as `PlainCookie`.
 
 ```scala
 import scala.language.implicitConversions
@@ -213,8 +213,8 @@ assert(req.getHeaderValue("Cookie").contains("ID=bG9zCg; Region=SE-US"))
 ### Response Cookies
 
 In `HttpResponse`, the cookies are a collection of **Set-Cookie** header values.
-Specialized access is provided by `ResponseCookies`, with each cookie
-represented as `SetCookie`.
+Specialized access is provided by `ResponseCookies` with each cookie represented
+as `SetCookie`.
 
 ```scala
 import scala.language.implicitConversions
@@ -470,7 +470,7 @@ val req = Get("/dev/projects").setAuthorization(credentials)
 
 _**Note:** The `Authorization` and `WwwAuthenticate` header classes are for
 authentication between user agent and origin server. There are other header
-classes available for proxy authentication &ndash; see
+classes available for proxy authentication. See
 [scaladoc](https://losizm.github.io/scamper/latest/api/scamper/auth.html) for
 details._
 
@@ -910,10 +910,10 @@ idle timeout seconds and max requests per connection.
 
 You define application-specific logic in instances of `RequestHandler` and add
 them to the application. The request handler accepts an `HttpRequest` and
-returns either an `HttpRequest` or an `HttpResponse`. If the handler does not
-satisfy the request, it returns an `HttpRequest` so that the next handler has
-its turn. Otherwise, it returns an `HttpResponse`, and any remaining handlers
-are effectively ignored.
+returns either an `HttpRequest` or an `HttpResponse`. The handler returns an
+`HttpRequest` if it doesn't satisfy the incoming request, allowing the next
+handler to have its turn. Otherwise, it returns an `HttpResponse`, and any
+remaining handlers are effectively ignored.
 
 ```scala
 import scamper.RequestMethod.Registry.{ Get, Head }
@@ -1106,7 +1106,7 @@ in scaladoc for additional details.)_
 
 #### Aborting Response
 
-At times, you may wish to omit a response for a particular request. On such
+At times, you may wish to omit a response to a particular request. On such
 occassions, you'd throw `ResponseAborted` from the request handler.
 
 ```scala
@@ -1185,7 +1185,7 @@ app.recover {
 ### Router
 
 Use `Router` to structure the application routes hierarchically. `Router` works
-in much the same way as `ServerApplication`, and routes are relative to its
+in much the same way as `ServerApplication` with all routes relative to its
 mount path.
 
 ```scala
