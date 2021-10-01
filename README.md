@@ -1083,10 +1083,10 @@ You can mount a file server as a specialized request handler.
 app.files("/app/main", File("/path/to/public"))
 ```
 
-This adds a handler to serve files from the directory at _/path/to/public_. The
-files are located using the request path minus the mount path. For example,
-_http://localhost:8080/app/main/images/logo.png_ would map to
-_/path/to/public/images/logo.png_.
+This adds a handler to serve files from the directory at _/path/to/public_.
+Files are located in the source directory by stripping the mount path from the
+request path. For example, _http://localhost:8080/app/main/images/logo.png_
+would map to _/path/to/public/images/logo.png_.
 
 #### Aborting Response
 

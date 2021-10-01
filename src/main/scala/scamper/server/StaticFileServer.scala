@@ -16,44 +16,47 @@
 package scamper.server
 
 import java.io.File
-import java.nio.file.{ Files, Path, Paths }
+import java.nio.file.{ Files, NotDirectoryException, Path }
 import java.nio.file.attribute.BasicFileAttributes
 import java.time.Instant
 
-import scala.util.{ Success, Try }
+import scala.util.Try
 import scala.language.implicitConversions
 
-import scamper.{ HttpMessage, HttpRequest, HttpResponse }
+import scamper.{ HttpMessage, HttpRequest, HttpResponse, Uri }
 import scamper.Auxiliary.{ StringType, applicationOctetStream }
-import scamper.Implicits.fileToEntity
-import scamper.RequestMethod.Registry.{ Get, Head, Options }
-import scamper.ResponseStatus.Registry.{ MethodNotAllowed, NotAcceptable, NotModified, Ok }
-import scamper.headers.{ Accept, Allow, ContentLength, ContentType, IfModifiedSince, LastModified }
+import scamper.Implicits.{ stringToEntity, fileToEntity }
+import scamper.RequestMethod.Registry.{ Get, Head }
+import scamper.ResponseStatus.Registry.*
+import scamper.Validate.noNulls
+import scamper.headers.*
 import scamper.types.{ MediaRange, MediaType }
 
-private class StaticFileServer(mountPath: Path, sourceDirectory: Path) extends RequestHandler:
-  private val `*/*` = MediaRange("*", "*")
+import Implicits.{ *, given }
 
-  def apply(req: HttpRequest): HttpMessage =
-    getRealPath(req.path)
-      .filter(exists)
-      .map { path =>
-        req.method match
-          case Get | Head =>
-            val mediaType = getMediaType(path)
+private class StaticFileServer(sourceDirectory: Path, defaults: Seq[String]) extends RoutingApplication:
+  private val `*/*` = MediaRange("*/*")
 
-            if getAccept(req).exists { range => range.matches(mediaType) } then
-              getResponse(path, mediaType, getIfModifiedSince(req), req.isHead)
-            else
-              NotAcceptable()
-          case Options => Ok().setAllow(Get, Head, Options).setContentLength(0)
-          case _ => MethodNotAllowed().setAllow(Get, Head, Options)
-      }.getOrElse(req)
+  def apply(router: Router): Unit =
+    router.incoming("/*path", Get, Head) { req =>
+      val sourceFile = toSourceFile(req.params.getString("path"))
 
-  protected def exists(path: Path): Boolean =
-    path.startsWith(sourceDirectory) && Files.isRegularFile(path) && !Files.isHidden(path)
+      isSafe(sourceFile) match
+        case true  => getSourceFile(req, sourceFile)
+        case false => req
+    }
 
-  protected def getResponse(path: Path, mediaType: MediaType, ifModifiedSince: Instant, headOnly: Boolean): HttpResponse =
+    router.incoming("/", Get, Head) { req =>
+      getDefaultFile(req, sourceDirectory)
+    }
+
+  protected def isFile(path: Path): Boolean = Files.isRegularFile(path)
+  protected def isDirectory(path: Path): Boolean = Files.isDirectory(path)
+  protected def isSafe(path: Path): Boolean = path.startsWith(sourceDirectory) && !Files.isHidden(path)
+  protected def isSafeFile(path: Path): Boolean = isFile(path) && isSafe(path)
+  protected def isSafeDirectory(path: Path): Boolean = isDirectory(path) && isSafe(path)
+
+  protected def createResponse(path: Path, mediaType: MediaType, ifModifiedSince: Instant, headOnly: Boolean): HttpResponse =
     val attrs = Files.readAttributes(path, classOf[BasicFileAttributes])
     val lastModified = attrs.lastModifiedTime.toInstant
     val size = attrs.size
@@ -70,14 +73,34 @@ private class StaticFileServer(mountPath: Path, sourceDirectory: Path) extends R
 
       case false => NotModified().setLastModified(lastModified)
 
-  private def getRealPath(path: String): Option[Path] =
-    val toPath = Paths.get(path.toUrlDecoded("utf-8")).normalize()
+  private def toSourceFile(path: String): Path =
+    sourceDirectory.resolve(path.toUrlDecoded("utf-8")).normalize()
 
-    toPath.startsWith(mountPath) match
-      case true  => Some(sourceDirectory.resolve(mountPath.relativize(toPath)))
-      case false => None
+  private def getSourceFile(req: HttpRequest, sourceFile: Path): HttpMessage =
+    if isFile(sourceFile) then
+      val mediaType = getMediaType(sourceFile)
 
-  private def getAccept(req: HttpRequest): Seq[MediaRange] =
+      getMediaRanges(req).exists(_.matches(mediaType)) match
+        case true  => createResponse(sourceFile, mediaType, getIfModifiedSince(req), req.isHead)
+        case false => NotAcceptable()
+
+    else if isDirectory(sourceFile) then
+      getDefaultFile(req, sourceFile)
+
+    else
+      req
+
+  private def getDefaultFile(req: HttpRequest, sourceFile: Path): HttpMessage =
+    defaults.find(name => isSafeFile(sourceFile.resolve(name)))
+      .map(name => Uri(req.path + "/" + name).normalize())
+      .map(uri  => SeeOther(s"See other: $uri").setLocation(uri))
+      .getOrElse(req)
+
+  private def getMediaType(path: Path): MediaType =
+    MediaType.forFileName(path.getFileName.toString)
+      .getOrElse(applicationOctetStream)
+
+  private def getMediaRanges(req: HttpRequest): Seq[MediaRange] =
     Try(req.accept)
       .filter(_.nonEmpty)
       .getOrElse(Seq(`*/*`))
@@ -85,15 +108,11 @@ private class StaticFileServer(mountPath: Path, sourceDirectory: Path) extends R
   private def getIfModifiedSince(req: HttpRequest): Instant =
     Try(req.ifModifiedSince).getOrElse(Instant.MIN)
 
-  private def getMediaType(path: Path): MediaType =
-    MediaType.forFileName(path.getFileName.toString)
-      .getOrElse(applicationOctetStream)
-
 private object StaticFileServer:
-  def apply(mountPath: String, sourceDirectory: File): StaticFileServer =
-    val path = MountPath(mountPath)
+  def apply(sourceDirectory: File, defaults: Seq[String]): StaticFileServer =
     val directory = sourceDirectory.toPath.toAbsolutePath.normalize()
 
-    require(Files.isDirectory(directory), s"Not a directory ($directory)")
+    if !Files.isDirectory(directory) then
+      throw NotDirectoryException(s"$directory")
 
-    new StaticFileServer(Paths.get(path.value), directory)
+    new StaticFileServer(directory, noNulls(defaults))

@@ -63,7 +63,6 @@ trait Router:
   /** Gets mount path. */
   def mountPath: String
 
-
   /**
    * Expands supplied router path to its absolute path.
    *
@@ -181,12 +180,17 @@ trait Router:
    * | /images    | /tmp             | /images/icons/warning.png | /tmp/icons/warning.png |
    *
    * @param path router path at which directory is mounted
-   * @param source base directory from which files are served
+   * @param source directory from which files are served
+   * @param defaults default file names used when request matches directory
    *
    * @return this router
+   *
+   * @note If a request matches a directory, and if a file with one of the
+   * default file names exists in that directory, the server sends 303 (See
+   * Other) with a Location header value set to path of default file.
    */
-  def files(path: String, source: File): this.type =
-    incoming(StaticFileServer(mountPath + MountPath.normalize(path), source))
+  def files(path: String, source: File, defaults: String*): this.type =
+    route(path)(StaticFileServer(source, defaults))
 
   /**
    * Mounts WebSocket application at given path.

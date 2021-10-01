@@ -52,7 +52,7 @@ trait TestServer:
       .route("/api/messages")(MessageApplication)
       .route("/cookies")(CookieApplication)
       .websocket("/chat/:id")(WebSocketChatServer)
-      .files("/files/riteshiff", Resources.riteshiff)
+      .files("/files/riteshiff", Resources.riteshiff, "home.html")
       .recover(doError)
 
     if secure then

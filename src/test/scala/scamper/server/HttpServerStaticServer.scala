@@ -42,10 +42,24 @@ class HttpServerStaticServerSpec extends org.scalatest.flatspec.AnyFlatSpec with
       .continueTimeout(1000)
       .create()
 
-  private given parser: BodyParser[Array[Byte]] = BodyParser.bytes(32 * 1024)
+  private given BodyParser[Array[Byte]] = BodyParser.bytes(32 * 1024)
+  private given BodyParser[String]      = BodyParser.text(32 * 1024)
 
   private def testStaticServer(secure: Boolean): Unit =
     withServer(secure) { implicit server =>
+      info(s"serve default files")
+      client.get(s"$serverUri/files/riteshiff") { res =>
+        assert(res.status == SeeOther)
+        assert(res.location == Uri("/files/riteshiff/home.html"))
+        assert(res.as[String] == "See other: /files/riteshiff/home.html")
+      }
+
+      client.get(s"$serverUri/files/riteshiff/") { res =>
+        assert(res.status == SeeOther)
+        assert(res.location == Uri("/files/riteshiff/home.html"))
+        assert(res.as[String] == "See other: /files/riteshiff/home.html")
+      }
+
       info(s"serve html files")
       client.get(s"$serverUri/files/riteshiff/home.html") { res =>
         assert(res.status == Ok)
