@@ -31,13 +31,9 @@ import scamper.types.Implicits.given
 import ResponseStatus.Registry.*
 
 class HttpServerStaticServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer:
-  it should "serve files" in testStaticServer("files", false)
+  it should "serve files" in testStaticServer(false)
 
-  it should "serve files with SSL/TLS" in testStaticServer("files", true)
-
-  it should "serve resources" in testStaticServer("resources", false)
-
-  it should "serve resources with SSL/TLS" in testStaticServer("resources", true)
+  it should "serve files with SSL/TLS" in testStaticServer(true)
 
   private given client: HttpClient =
     HttpClient
@@ -48,43 +44,43 @@ class HttpServerStaticServerSpec extends org.scalatest.flatspec.AnyFlatSpec with
 
   private given parser: BodyParser[Array[Byte]] = BodyParser.bytes(32 * 1024)
 
-  private def testStaticServer(kind: String, secure: Boolean): Unit =
+  private def testStaticServer(secure: Boolean): Unit =
     withServer(secure) { implicit server =>
-      info(s"serve html $kind")
-      client.get(s"$serverUri/$kind/riteshiff/home.html") { res =>
+      info(s"serve html files")
+      client.get(s"$serverUri/files/riteshiff/home.html") { res =>
         assert(res.status == Ok)
         assert(res.contentType == MediaType("text/html"))
         assert(res.as[Array[Byte]].toSeq == getBytes("home.html").toSeq)
       }
 
-      client.get(s"$serverUri/$kind/riteshiff/documentation.html") { res =>
+      client.get(s"$serverUri/files/riteshiff/documentation.html") { res =>
         assert(res.status == Ok)
         assert(res.contentType == MediaType("text/html"))
         assert(res.as[Array[Byte]].toSeq == getBytes("documentation.html").toSeq)
       }
 
-      client.get(s"$serverUri/$kind/riteshiff/download.html") { res =>
+      client.get(s"$serverUri/files/riteshiff/download.html") { res =>
         assert(res.status == Ok)
         assert(res.contentType == MediaType("text/html"))
         assert(res.as[Array[Byte]].toSeq == getBytes("download.html").toSeq)
       }
 
-      info(s"serve css $kind")
-      client.get(s"$serverUri/$kind/riteshiff/css/style.css") { res =>
+      info(s"serve css files")
+      client.get(s"$serverUri/files/riteshiff/css/style.css") { res =>
         assert(res.status == Ok)
         assert(res.contentType == MediaType("text/css"))
         assert(res.as[Array[Byte]].toSeq == getBytes("css/style.css").toSeq)
       }
 
-      info(s"serve image $kind")
-      client.get(s"$serverUri/$kind/riteshiff/images/logo.svg") { res =>
+      info(s"serve image files")
+      client.get(s"$serverUri/files/riteshiff/images/logo.svg") { res =>
         assert(res.status == Ok)
         assert(res.contentType == MediaType("image/svg+xml"))
         assert(res.as[Array[Byte]].toSeq == getBytes("images/logo.svg").toSeq)
       }
 
-      info(s"serve text $kind")
-      client.get(s"$serverUri/$kind/riteshiff/LICENSE.txt") { res =>
+      info(s"serve text files")
+      client.get(s"$serverUri/files/riteshiff/LICENSE.txt") { res =>
         assert(res.status == Ok)
         assert(res.contentType == MediaType("text/plain"))
         assert(res.as[Array[Byte]].toSeq == getBytes("LICENSE.txt").toSeq)

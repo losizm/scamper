@@ -35,7 +35,6 @@ and writing HTTP messages, and it provides [client](#HTTP-Client) and
     - [Target Handling](#Target-Handling)
     - [Path Parameters](#Path-Parameters)
     - [Serving Static Files](#Serving-Static-Files)
-    - [Serving Static Resources](#Serving-Static-Resources)
     - [Aborting Response](#Aborting-Response)
   - [WebSocket Session](#WebSocket-Session)
   - [Error Handler](#Error-Handler)
@@ -1088,21 +1087,6 @@ This adds a handler to serve files from the directory at _/path/to/public_. The
 files are located using the request path minus the mount path. For example,
 _http://localhost:8080/app/main/images/logo.png_ would map to
 _/path/to/public/images/logo.png_.
-
-#### Serving Static Resources
-
-If your web assets are bundled in a JAR file, just drop it on the classpath and
-add a handler to serve its contents.
-
-```scala
-app.resources("/app/main", "assets")
-```
-
-In the above configuration, requests prefixed with _/app/main_ are served
-resources from the _assets_ directory. The mapping works similiar to static
-files, only the resources are located using a class loader. _(See
-[ServerApplication.resources()](https://losizm.github.io/scamper/latest/api/scamper/server/ServerApplication.html#resources-73a)
-in scaladoc for additional details.)_
 
 #### Aborting Response
 

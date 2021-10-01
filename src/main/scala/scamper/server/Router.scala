@@ -171,8 +171,7 @@ trait Router:
    * Mounts file server at given path.
    *
    * At request time, the mount path is stripped from the router path, and the
-   * remaining path is used to locate a file in the source directory or one of
-   * its subdirectories.
+   * remaining path is used to locate a file in the source directory.
    *
    * ### File Mapping Examples
    *
@@ -188,53 +187,6 @@ trait Router:
    */
   def files(path: String, source: File): this.type =
     incoming(StaticFileServer(mountPath + MountPath.normalize(path), source))
-
-  /**
-   * Mounts file server (for resources) at given path.
-   *
-   * At request time, the mount path is stripped from the router path, and the
-   * remaining path is used to locate a resource in the source directory or one
-   * of its subdirectories.
-   *
-   * ### Resource Mapping Examples
-   *
-   * | Mount Path | Source Directory | Router Path               | Maps to |
-   * | ---------- | ---------------- | ------------------------- | ------- |
-   * | /images    | assets           | /images/logo.png          | assets/logo.png |
-   * | /images    | assets           | /images/icons/warning.png | assets/icons/warning.png |
-   *
-   * @param path router path at which directory is mounted
-   * @param source base directory from which resources are served
-   *
-   * @return this router
-   *
-   * @note The current thread's context class loader is used to load resources.
-   */
-  def resources(path: String, source: String): this.type =
-    resources(path, source, Thread.currentThread.getContextClassLoader)
-
-  /**
-   * Mounts file server (for resources) at given path.
-   *
-   * At request time, the mount path is stripped from the router path, and the
-   * remaining path is used to locate a resource in the source directory or one
-   * of its subdirectories.
-   *
-   * ### Resource Mapping Examples
-   *
-   * | Mount Path | Source Directory | Router Path               | Maps to |
-   * | ---------- | ---------------- | ------------------------- | ------- |
-   * | /images    | assets           | /images/logo.png          | assets/logo.png |
-   * | /images    | assets           | /images/icons/warning.png | assets/icons/warning.png |
-   *
-   * @param path router path at which directory is mounted
-   * @param source base directory from which resources are served
-   * @param loader class loader with which resources are loaded
-   *
-   * @return this router
-   */
-  def resources(path: String, source: String, loader: ClassLoader): this.type =
-    incoming(StaticResourceServer(mountPath + MountPath.normalize(path), source, loader))
 
   /**
    * Mounts WebSocket application at given path.
