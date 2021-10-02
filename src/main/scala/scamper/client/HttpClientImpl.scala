@@ -28,7 +28,6 @@ import scamper.*
 import scamper.Auxiliary.UriType
 import scamper.RequestMethod.Registry.*
 import scamper.Validate.notNull
-import scamper.client.Implicits.ClientHttpMessage
 import scamper.cookies.{ CookieStore, PlainCookie, RequestCookies, SetCookie }
 import scamper.headers.{ Accept, AcceptEncoding, Connection, ContentLength, Host, TE, TransferEncoding, Upgrade }
 import scamper.types.{ ContentCodingRange, MediaRange, TransferCoding }

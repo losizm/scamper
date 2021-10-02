@@ -633,8 +633,7 @@ import scala.language.implicitConversions
 import scamper.BodyParser
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Get
-import scamper.client.HttpClient
-import scamper.client.Implicits.ClientHttpRequest // Adds send method to request
+import scamper.client.{ ClientHttpRequest, HttpClient }
 import scamper.headers.{ Accept, AcceptLanguage }
 import scamper.types.{ stringToMediaRange, stringToLanguageRange }
 
@@ -736,8 +735,7 @@ filters to the client.
 
 ```scala
 import scamper.Uri
-import scamper.client.HttpClient
-import scamper.client.Implicits.*
+import scamper.client.*
 import scamper.cookies.*
 
 val settings = HttpClient.settings()

@@ -84,8 +84,7 @@ package scamper
  * import scamper.BodyParser
  * import scamper.Implicits.stringToUri
  * import scamper.RequestMethod.Registry.Get
- * import scamper.client.HttpClient
- * import scamper.client.Implicits.ClientHttpRequest // Adds send method to request
+ * import scamper.client.{ ClientHttpRequest, HttpClient }
  * import scamper.headers.{ Accept, AcceptLanguage }
  * import scamper.types.{ stringToMediaRange, stringToLanguageRange }
  *

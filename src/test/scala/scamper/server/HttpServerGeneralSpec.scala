@@ -19,8 +19,7 @@ import scala.language.implicitConversions
 
 import scamper.*
 import scamper.Implicits.given
-import scamper.client.HttpClient
-import scamper.client.Implicits.ClientHttpRequest
+import scamper.client.{ ClientHttpRequest, HttpClient }
 import scamper.headers.*
 import scamper.server.Implicits.given
 import scamper.types.{ *, given }
