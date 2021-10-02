@@ -19,8 +19,7 @@ import java.net.Socket
 
 import scala.language.implicitConversions
 
-import scamper.{ Entity, HttpRequest, HttpResponse }
-import scamper.Implicits.stringToEntity
+import scamper.{ Entity, HttpRequest, HttpResponse, stringToEntity }
 import scamper.ResponseStatus.Registry.{ BadRequest, SwitchingProtocols }
 import scamper.headers.{ Connection, Upgrade }
 import scamper.types.stringToProtocol

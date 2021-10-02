@@ -27,7 +27,7 @@ import scamper.websocket.WebSocketApplication
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.Implicits.stringToEntity
+ * import scamper.stringToEntity
  * import scamper.ResponseStatus.Registry.{ BadRequest, NotFound, Ok }
  * import scamper.server.{ ParameterNotConvertible, ServerApplication, ServerHttpRequest }
  *

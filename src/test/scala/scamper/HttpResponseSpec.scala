@@ -17,7 +17,6 @@ package scamper
 
 import scala.language.implicitConversions
 
-import scamper.Implicits.{ stringToEntity, stringToHeader, stringToUri }
 import scamper.ResponseStatus.Registry.*
 import scamper.headers.*
 

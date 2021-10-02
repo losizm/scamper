@@ -17,7 +17,7 @@ package scamper.websocket
 
 import scala.language.implicitConversions
 
-import scamper.Implicits.{ stringToUri, tupleToHeader }
+import scamper.{ stringToUri, tupleToHeader }
 import scamper.RequestMethod.Registry.{ Get, Post }
 import scamper.ResponseStatus.Registry.SwitchingProtocols
 import scamper.headers.{ Connection, Upgrade }

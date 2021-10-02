@@ -28,8 +28,7 @@ package scamper
  * import scala.language.implicitConversions
  *
  * import java.io.File
- * import scamper.BodyParser
- * import scamper.Implicits.stringToEntity
+ * import scamper.{ BodyParser, stringToEntity }
  * import scamper.ResponseStatus.Registry.{ NotFound, Ok }
  * import scamper.server.{ *, given }
  *

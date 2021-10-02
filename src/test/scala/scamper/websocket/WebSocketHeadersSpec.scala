@@ -17,8 +17,7 @@ package scamper.websocket
 
 import scala.language.implicitConversions
 
-import scamper.{ HeaderNotFound, HttpException }
-import scamper.Implicits.stringToUri
+import scamper.{ HeaderNotFound, HttpException, stringToUri }
 import scamper.RequestMethod.Registry.{ Get, Post }
 import scamper.ResponseStatus.Registry.Ok
 

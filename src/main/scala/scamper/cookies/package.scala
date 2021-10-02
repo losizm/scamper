@@ -27,7 +27,7 @@ package scamper
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.Implicits.stringToUri
+ * import scamper.stringToUri
  * import scamper.RequestMethod.Registry.Get
  * import scamper.cookies.{ PlainCookie, RequestCookies }
  *
@@ -57,7 +57,7 @@ package scamper
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.Implicits.stringToEntity
+ * import scamper.stringToEntity
  * import scamper.ResponseStatus.Registry.Ok
  * import scamper.cookies.{ ResponseCookies, SetCookie }
  *

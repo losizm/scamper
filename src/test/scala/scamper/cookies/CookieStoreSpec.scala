@@ -19,8 +19,7 @@ import java.time.Instant
 
 import scala.language.implicitConversions
 
-import scamper.Implicits.stringToUri
-import scamper.Uri
+import scamper.{ Uri, stringToUri }
 
 class CookieStoreSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "get cookies with matching host" in {

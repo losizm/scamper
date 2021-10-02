@@ -17,8 +17,7 @@ package scamper.client
 
 import scala.language.implicitConversions
 
-import scamper.*
-import scamper.Implicits.given
+import scamper.{ *, given }
 import scamper.cookies.*
 import scamper.server.TestServer
 

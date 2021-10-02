@@ -18,8 +18,7 @@ package scamper.server
 import scala.collection.concurrent.TrieMap
 import scala.language.implicitConversions
 
-import scamper.*
-import scamper.Implicits.given
+import scamper.{ *, given }
 import scamper.auth.*
 import scamper.headers.*
 import scamper.logging.*

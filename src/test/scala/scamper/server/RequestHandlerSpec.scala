@@ -17,8 +17,7 @@ package scamper.server
 
 import scala.language.implicitConversions
 
-import scamper.Implicits.stringToUri
-import scamper.{ Header, HttpRequest, HttpResponse }
+import scamper.{ Header, HttpRequest, HttpResponse, stringToUri }
 import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Ok
 

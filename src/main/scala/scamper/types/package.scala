@@ -21,7 +21,7 @@ package scamper
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.Implicits.{ stringToEntity, stringToUri }
+ * import scamper.{ stringToEntity, stringToUri }
  * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Ok
  * import scamper.headers.{ Accept, ContentType, TransferEncoding }
@@ -41,13 +41,13 @@ package scamper
  *   .setTransferEncoding(gzip)
  * }}}
  *
- * Using values defined in [[Implicits]], properly formatted strings
- * can be implicitly converted to standardized types.
+ * Using implicit conversions, properly formatted strings can be implicitly
+ * converted to standardized types.
  *
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.Implicits.{ stringToEntity, stringToUri }
+ * import scamper.{ stringToEntity, stringToUri }
  * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Ok
  * import scamper.headers.{ Accept, ContentType, TransferEncoding }

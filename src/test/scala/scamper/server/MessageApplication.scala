@@ -20,8 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable.LinkedHashMap
 import scala.language.implicitConversions
 
-import scamper.{ BodyParser, HttpRequest, HttpMessage }
-import scamper.Implicits.given
+import scamper.{ *, given }
 import scamper.ResponseStatus.Registry.*
 import scamper.headers.{ ContentType, Location }
 import scamper.types.given

@@ -18,8 +18,7 @@ package scamper.server
 import scala.collection.immutable.ListMap
 import scala.language.implicitConversions
 
-import scamper.*
-import scamper.Implicits.given
+import scamper.{ *, given }
 import scamper.client.HttpClient
 import scamper.headers.*
 import scamper.types.{ *, given }

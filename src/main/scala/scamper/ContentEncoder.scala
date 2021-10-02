@@ -18,8 +18,6 @@ package scamper
 import scala.concurrent.ExecutionContext
 import scala.language.implicitConversions
 
-import Implicits.inputStreamToEntity
-
 private object ContentEncoder:
   private val `Content-Encoding: gzip` = Header("Content-Encoding", "gzip")
   private val `Content-Encoding: deflate` = Header("Content-Encoding", "deflate")

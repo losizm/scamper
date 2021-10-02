@@ -20,8 +20,7 @@ import java.util.concurrent.atomic.{ AtomicBoolean, AtomicReference }
 
 import scala.language.implicitConversions
 
-import scamper.*
-import scamper.Implicits.given
+import scamper.{ *, given }
 import scamper.headers.*
 import scamper.server.TestServer
 import scamper.types.{ *, given }

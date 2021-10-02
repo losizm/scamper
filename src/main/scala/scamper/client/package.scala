@@ -26,8 +26,7 @@ package scamper
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.BodyParser
- * import scamper.Implicits.stringToUri
+ * import scamper.{ BodyParser, stringToUri }
  * import scamper.RequestMethod.Registry.Get
  * import scamper.client.HttpClient
  *
@@ -57,8 +56,7 @@ package scamper
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.BodyParser
- * import scamper.Implicits.stringToUri
+ * import scamper.{ BodyParser, stringToUri }
  * import scamper.client.HttpClient
  *
  * given BodyParser[String] = BodyParser.text()
@@ -81,8 +79,7 @@ package scamper
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.BodyParser
- * import scamper.Implicits.stringToUri
+ * import scamper.{ BodyParser, stringToUri }
  * import scamper.RequestMethod.Registry.Get
  * import scamper.client.{ ClientHttpRequest, HttpClient }
  * import scamper.headers.{ Accept, AcceptLanguage }

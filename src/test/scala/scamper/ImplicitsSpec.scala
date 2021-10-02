@@ -23,8 +23,6 @@ import scala.language.implicitConversions
 import RequestMethod.Registry.Get
 import ResponseStatus.Registry.Ok
 
-import Implicits.given
-
 class ImplicitsSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "String" should "be converted to URI" in {
     val uri: Uri = "https://localhost:8080/index.html?q=free"

@@ -20,7 +20,6 @@ import java.io.EOFException
 import scala.language.implicitConversions
 
 import scamper.Auxiliary.InputStreamType
-import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.*
 import scamper.ResponseStatus.Registry.*
 import scamper.headers.*

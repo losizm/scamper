@@ -27,7 +27,7 @@ package scamper
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.Implicits.stringToUri
+ * import scamper.stringToUri
  * import scamper.RequestMethod.Registry.Get
  * import scamper.headers.{ Accept, Host }
  * import scamper.types.stringToMediaRange

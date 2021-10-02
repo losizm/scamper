@@ -19,8 +19,7 @@ import java.security.InvalidParameterException
 
 import scala.language.implicitConversions
 
-import scamper.{ BodyParser, HttpRequest, HttpResponse }
-import scamper.Implicits.{ *, given }
+import scamper.{ *, given }
 import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.*
 

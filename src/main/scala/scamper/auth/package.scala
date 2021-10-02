@@ -27,7 +27,7 @@ package scamper
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.Implicits.stringToUri
+ * import scamper.stringToUri
  * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Unauthorized
  * import scamper.auth.{ Authorization, Challenge, Credentials, WwwAuthenticate }
@@ -49,7 +49,7 @@ package scamper
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.Implicits.stringToUri
+ * import scamper.stringToUri
  * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Unauthorized
  * import scamper.auth.{ Authorization, BasicChallenge, BasicCredentials, WwwAuthenticate }
@@ -69,7 +69,7 @@ package scamper
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.Implicits.stringToUri
+ * import scamper.stringToUri
  * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Unauthorized
  * import scamper.auth.{ Authorization, WwwAuthenticate }
@@ -98,7 +98,7 @@ package scamper
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.Implicits.stringToUri
+ * import scamper.stringToUri
  * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Unauthorized
  * import scamper.auth.{ Authorization, WwwAuthenticate }

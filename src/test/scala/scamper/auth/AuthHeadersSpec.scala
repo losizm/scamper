@@ -17,8 +17,7 @@ package scamper.auth
 
 import scala.language.implicitConversions
 
-import scamper.{ HeaderNotFound, HttpException }
-import scamper.Implicits.stringToUri
+import scamper.{ HeaderNotFound, HttpException, stringToUri }
 import scamper.RequestMethod.Registry.Get
 import scamper.ResponseStatus.Registry.Unauthorized
 

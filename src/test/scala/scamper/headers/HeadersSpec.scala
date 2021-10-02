@@ -19,8 +19,7 @@ import java.time.Instant.parse as Instant
 
 import scala.language.implicitConversions
 
-import scamper.{ HeaderNotFound, Uri }
-import scamper.Implicits.stringToUri
+import scamper.{ HeaderNotFound, Uri, stringToUri }
 import scamper.RequestMethod.Registry.{ Get, Post }
 import scamper.ResponseStatus.Registry.Ok
 import scamper.types.{ *, given }

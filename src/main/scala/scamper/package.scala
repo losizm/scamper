@@ -31,8 +31,7 @@
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.Header
- * import scamper.Implicits.stringToUri
+ * import scamper.{ Header, stringToUri }
  * import scamper.RequestMethod.Registry.Get
  *
  * val request = Get("/motd").setHeaders(
@@ -55,8 +54,7 @@
  * {{{
  * import scala.language.implicitConversions
  *
- * import scamper.{ BodyParser, Header }
- * import scamper.Implicits.stringToEntity
+ * import scamper.{ BodyParser, Header, stringToEntity }
  * import scamper.ResponseStatus.Registry.Ok
  *
  * val response = Ok("There is an answer.").setHeaders(

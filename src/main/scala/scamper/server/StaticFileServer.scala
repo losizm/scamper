@@ -23,9 +23,8 @@ import java.time.Instant
 import scala.util.Try
 import scala.language.implicitConversions
 
-import scamper.{ HttpMessage, HttpRequest, HttpResponse, Uri }
+import scamper.{ HttpMessage, HttpRequest, HttpResponse, Uri, stringToEntity, fileToEntity }
 import scamper.Auxiliary.{ StringType, applicationOctetStream }
-import scamper.Implicits.{ stringToEntity, fileToEntity }
 import scamper.RequestMethod.Registry.{ Get, Head }
 import scamper.ResponseStatus.Registry.*
 import scamper.Validate.noNulls
