@@ -24,7 +24,7 @@ import scamper.auth.*
 import scamper.headers.*
 import scamper.logging.*
 import scamper.server.Implicits.given
-import scamper.types.Implicits.given
+import scamper.types.given
 
 import ResponseStatus.Registry.*
 import Uri.{ http, https }

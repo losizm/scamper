@@ -25,8 +25,7 @@ import scamper.Implicits.given
 import scamper.client.Implicits.given
 import scamper.headers.*
 import scamper.server.TestServer
-import scamper.types.*
-import scamper.types.Implicits.given
+import scamper.types.{ *, given }
 
 import RequestMethod.Registry.*
 import ResponseStatus.Registry.*

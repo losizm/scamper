@@ -25,7 +25,7 @@ import scamper.Implicits.given
 import scamper.ResponseStatus.Registry.*
 import scamper.headers.{ ContentType, Location }
 import scamper.server.Implicits.given
-import scamper.types.Implicits.given
+import scamper.types.given
 
 object MessageApplication extends RoutingApplication:
   private given BodyParser[String] = BodyParser.text(8192)

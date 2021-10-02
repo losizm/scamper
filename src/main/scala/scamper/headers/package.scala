@@ -30,7 +30,7 @@ package scamper
  * import scamper.Implicits.stringToUri
  * import scamper.RequestMethod.Registry.Get
  * import scamper.headers.{ Accept, Host }
- * import scamper.types.Implicits.stringToMediaRange
+ * import scamper.types.stringToMediaRange
  *
  * // Build request using 'Host' and 'Accept' headers
  * val req = Get("/motd")

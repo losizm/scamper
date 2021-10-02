@@ -23,7 +23,7 @@ import scamper.{ Entity, HttpRequest, HttpResponse }
 import scamper.Implicits.stringToEntity
 import scamper.ResponseStatus.Registry.{ BadRequest, SwitchingProtocols }
 import scamper.headers.{ Connection, Upgrade }
-import scamper.types.Implicits.stringToProtocol
+import scamper.types.stringToProtocol
 import scamper.websocket.{ *, given }
 
 import Implicits.*

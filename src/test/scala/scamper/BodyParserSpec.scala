@@ -24,7 +24,7 @@ import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.*
 import scamper.ResponseStatus.Registry.*
 import scamper.headers.*
-import scamper.types.Implicits.given
+import scamper.types.given
 
 class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "BodyParser" should "parse response with text body" in {

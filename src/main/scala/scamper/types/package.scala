@@ -51,7 +51,7 @@ package scamper
  * import scamper.RequestMethod.Registry.Get
  * import scamper.ResponseStatus.Registry.Ok
  * import scamper.headers.{ Accept, ContentType, TransferEncoding }
- * import scamper.types.Implicits.{ *, given }
+ * import scamper.types.{ *, given }
  *
  * val req = Get("/motd")
  *   .setAccept("application/json; q=0.9", "text/html; q=0.1")

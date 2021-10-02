@@ -74,7 +74,7 @@ import scala.language.implicitConversions
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Get
 import scamper.headers.{ Accept, Host }
-import scamper.types.Implicits.stringToMediaRange
+import scamper.types.stringToMediaRange
 
 val req = Get("/motd")
   .setHost("localhost:8080")
@@ -92,7 +92,7 @@ import scala.language.implicitConversions
 import scamper.Implicits.stringToEntity
 import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.{ Connection, ContentType }
-import scamper.types.Implicits.stringToMediaType
+import scamper.types.stringToMediaType
 
 val res = Ok("There is an answer.")
   .setContentType("text/plain")
@@ -154,8 +154,8 @@ println(req.contentType.mainType) // application
 println(req.contentType.subtype) // json
 ```
 
-And, with utilities defined in `scamper.types.Implicits`, you can implicitly
-convert values to header types.
+And, with conversions defined in `scamper.types`, you can implicitly convert
+values to header types.
 
 ```scala
 import scala.language.implicitConversions
@@ -163,7 +163,7 @@ import scala.language.implicitConversions
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Post
 import scamper.headers.ContentType
-import scamper.types.Implicits.stringToMediaType
+import scamper.types.stringToMediaType
 
 val req = Post("/api/users").setContentType("application/json")
 println(req.contentType.mainType) // application
@@ -267,7 +267,7 @@ import scala.language.implicitConversions
 import scamper.Entity
 import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.ContentType
-import scamper.types.Implicits.stringToMediaType
+import scamper.types.stringToMediaType
 
 val body = Entity("""
 <!DOCTYPE html>
@@ -292,7 +292,7 @@ import java.io.File
 import scamper.Entity
 import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.ContentType
-import scamper.types.Implicits.stringToMediaType
+import scamper.types.stringToMediaType
 
 val body = Entity(File("./index.html"))
 val res = Ok(body).setContentType("text/html; charset=utf-8")
@@ -308,7 +308,7 @@ import java.io.File
 import scamper.Implicits.fileToEntity
 import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.ContentType
-import scamper.types.Implicits.stringToMediaType
+import scamper.types.stringToMediaType
 
 val res = Ok(File("./index.html")).setContentType("text/html; charset=utf-8")
 ```
@@ -581,7 +581,7 @@ import scamper.Implicits.{ stringToEntity, stringToUri }
 import scamper.RequestMethod.Registry.Post
 import scamper.client.HttpClient
 import scamper.headers.ContentType
-import scamper.types.Implicits.stringToMediaType
+import scamper.types.stringToMediaType
 
 val req = Post("https://localhost:8080/users")
   .setContentType("application/json")
@@ -636,7 +636,7 @@ import scamper.RequestMethod.Registry.Get
 import scamper.client.HttpClient
 import scamper.client.Implicits.ClientHttpRequest // Adds send method to request
 import scamper.headers.{ Accept, AcceptLanguage }
-import scamper.types.Implicits.{ stringToMediaRange, stringToLanguageRange }
+import scamper.types.{ stringToMediaRange, stringToLanguageRange }
 
 given HttpClient = HttpClient()
 given BodyParser[String] = BodyParser.text(4096)
@@ -659,7 +659,7 @@ import java.io.File
 import scamper.Implicits.{ stringToEntity, stringToUri }
 import scamper.client.HttpClient
 import scamper.cookies.CookieStore
-import scamper.types.Implicits.{ stringToContentCodingRange, stringToMediaRange }
+import scamper.types.{ stringToContentCodingRange, stringToMediaRange }
 
 // Build client from settings
 val client = HttpClient
@@ -951,8 +951,7 @@ accepted.
 import scamper.{ BodyParser, HttpMessage }
 import scamper.Implicits.stringToEntity
 import scamper.headers.ContentLanguage
-import scamper.types.LanguageTag
-import scamper.types.Implicits.stringToLanguageTag
+import scamper.types.{ LanguageTag, stringToLanguageTag }
 
 // Translate message body from French (Oui, oui.)
 app.incoming { req =>
@@ -1182,7 +1181,7 @@ import scamper.ResponseStatus.Registry.{ BadRequest, NotFound, Ok }
 import scamper.headers.ContentType
 import scamper.server.{ ParameterNotConvertible, ServerApplication }
 import scamper.server.Implicits.ServerHttpRequest
-import scamper.types.Implicits.stringToMediaType
+import scamper.types.stringToMediaType
 
 // Mount router to /api
 val app = ServerApplication()

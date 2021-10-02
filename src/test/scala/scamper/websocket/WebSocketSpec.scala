@@ -21,7 +21,7 @@ import scamper.Implicits.{ stringToUri, tupleToHeader }
 import scamper.RequestMethod.Registry.{ Get, Post }
 import scamper.ResponseStatus.Registry.SwitchingProtocols
 import scamper.headers.{ Connection, Upgrade }
-import scamper.types.Implicits.given
+import scamper.types.given
 
 class WebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec:
   val req = Get("/websocket/example")

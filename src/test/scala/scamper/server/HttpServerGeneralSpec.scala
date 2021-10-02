@@ -23,8 +23,7 @@ import scamper.client.HttpClient
 import scamper.client.Implicits.ClientHttpRequest
 import scamper.headers.*
 import scamper.server.Implicits.given
-import scamper.types.*
-import scamper.types.Implicits.given
+import scamper.types.{ *, given }
 
 import RequestMethod.Registry.*
 import ResponseStatus.Registry.*

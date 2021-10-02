@@ -23,10 +23,9 @@ import scamper.{ HeaderNotFound, Uri }
 import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.{ Get, Post }
 import scamper.ResponseStatus.Registry.Ok
-import scamper.types.*
+import scamper.types.{ *, given }
 import scamper.types.ByteContentRange.Satisfied
 import scamper.types.ByteRange.Slice
-import scamper.types.Implicits.given
 
 class HeadersSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "create request with Accept header" in {
