@@ -112,9 +112,13 @@ object MediaType:
       case fileNamePattern(suffix) => forSuffix(suffix)
       case _ => None
 
-  /** Gets media type for given file name suffix. */
+  /**
+   * Gets media type for given file name suffix.
+   *
+   * @note Leading `"."` (if present) is stripped before locating media type.
+   */
   def forSuffix(suffix: String): Option[MediaType] =
-    mappings.get(suffix.toLowerCase)
+    mappings.get(suffix.stripPrefix(".").toLowerCase)
 
   /** Parses formatted media type. */
   def apply(mediaType: String): MediaType =

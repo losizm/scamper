@@ -15,6 +15,8 @@
  */
 package scamper.types
 
+import java.io.File
+
 class MediaTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "create MediaType without parameters" in {
     val contentType = MediaType("text/html")
@@ -62,6 +64,52 @@ class MediaTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
   it should "get application/octet-stream" in {
     assert(MediaType.octetStream == MediaType("application/octet-stream"))
+  }
+
+  it should "get MediaType based on file" in {
+    assert(MediaType.forFile(File("test.xml"))  contains MediaType("application/xml"))
+    assert(MediaType.forFile(File("test.json")) contains MediaType("application/json"))
+    assert(MediaType.forFile(File("test.html")) contains MediaType("text/html"))
+    assert(MediaType.forFile(File("test.css"))  contains MediaType("text/css"))
+    assert(MediaType.forFile(File("test.js"))   contains MediaType("text/javascript"))
+    assert(MediaType.forFile(File("test.jpeg")) contains MediaType("image/jpeg"))
+    assert(MediaType.forFile(File("test.gif"))  contains MediaType("image/gif"))
+    assert(MediaType.forFile(File("test.exe"))  contains MediaType("application/octet-stream"))
+    assert(MediaType.forFile(File("test.xyz")).isEmpty)
+  }
+
+  it should "get MediaType based on file name" in {
+    assert(MediaType.forFileName("test.xml")  contains MediaType("application/xml"))
+    assert(MediaType.forFileName("test.json") contains MediaType("application/json"))
+    assert(MediaType.forFileName("test.html") contains MediaType("text/html"))
+    assert(MediaType.forFileName("test.css")  contains MediaType("text/css"))
+    assert(MediaType.forFileName("test.js")   contains MediaType("text/javascript"))
+    assert(MediaType.forFileName("test.jpeg") contains MediaType("image/jpeg"))
+    assert(MediaType.forFileName("test.gif")  contains MediaType("image/gif"))
+    assert(MediaType.forFileName("test.exe")  contains MediaType("application/octet-stream"))
+    assert(MediaType.forFileName("test.xyz").isEmpty)
+  }
+
+  it should "get MediaType based on file suffix" in {
+    assert(MediaType.forSuffix(".xml")  contains MediaType("application/xml"))
+    assert(MediaType.forSuffix(".json") contains MediaType("application/json"))
+    assert(MediaType.forSuffix(".html") contains MediaType("text/html"))
+    assert(MediaType.forSuffix(".css")  contains MediaType("text/css"))
+    assert(MediaType.forSuffix(".js")   contains MediaType("text/javascript"))
+    assert(MediaType.forSuffix(".jpeg") contains MediaType("image/jpeg"))
+    assert(MediaType.forSuffix(".gif")  contains MediaType("image/gif"))
+    assert(MediaType.forSuffix(".exe")  contains MediaType("application/octet-stream"))
+    assert(MediaType.forSuffix(".xyz").isEmpty)
+
+    assert(MediaType.forSuffix("xml")  contains MediaType("application/xml"))
+    assert(MediaType.forSuffix("json") contains MediaType("application/json"))
+    assert(MediaType.forSuffix("html") contains MediaType("text/html"))
+    assert(MediaType.forSuffix("css")  contains MediaType("text/css"))
+    assert(MediaType.forSuffix("js")   contains MediaType("text/javascript"))
+    assert(MediaType.forSuffix("jpeg") contains MediaType("image/jpeg"))
+    assert(MediaType.forSuffix("gif")  contains MediaType("image/gif"))
+    assert(MediaType.forSuffix("exe")  contains MediaType("application/octet-stream"))
+    assert(MediaType.forSuffix("xyz").isEmpty)
   }
 
   it should "not be created with malformed value" in {
