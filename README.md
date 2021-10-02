@@ -373,12 +373,13 @@ message, the **Content-Type** header is set to _multipart/form-data_ with a
 boundary parameter whose value is used to delimit parts in the encoded body.
 
 ```scala
+import java.io.File
+
 import scala.language.implicitConversions
 
-import java.io.File
-import scamper.{ Multipart, TextPart, FilePart }
-import scamper.Implicits.{ HttpMessageType, stringToUri }
+import scamper.Implicits.stringToUri
 import scamper.RequestMethod.Registry.Post
+import scamper.multipart.{ *, given }
 
 // Build multipart form-data with text and file content
 val formData = Multipart(
@@ -398,11 +399,12 @@ And, for an incoming message with multipart form-data, there's a standard
 ```scala
 import scala.language.implicitConversions
 
-import scamper.{ BodyParser, HttpRequest, Multipart }
+import scamper.{ BodyParser, HttpRequest }
+import scamper.multipart.Multipart
 
 def saveTrack(req: HttpRequest): Unit =
   // Get parser for multipart message body
-  given BodyParser[Multipart] = BodyParser.multipart()
+  given BodyParser[Multipart] = Multipart.getBodyParser()
 
   // Parse message to Multipart instance
   val multipart = req.as[Multipart]

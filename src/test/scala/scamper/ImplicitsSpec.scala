@@ -77,13 +77,3 @@ class ImplicitsSpec extends org.scalatest.flatspec.AnyFlatSpec:
     header = "Date" -> now
     assert(header == Header("Date", now))
   }
-
-  it should "be converted to TextPart" in {
-    val part: Part = "name" -> "guest"
-    assert(part == TextPart("name", "guest"))
-  }
-
-  it should "be converted to FilePart" in {
-    val part: Part = "data" -> File("data.txt")
-    assert(part == FilePart("data", File("data.txt")))
-  }

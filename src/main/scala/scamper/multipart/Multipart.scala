@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 package scamper
+package multipart
 
-import java.io.{ File, FileInputStream, InputStream }
+import java.io.File
 
-import scamper.Validate.{ noNulls, notNull }
 import scamper.types.{ DispositionType, MediaType }
+
+import Validate.{ noNulls, notNull }
 
 /**
  * Represents multipart form data.
@@ -37,6 +39,13 @@ sealed trait Multipart:
 
   /** Collects all text parts into query string. */
   def toQuery: QueryString
+
+  /**
+   * Collects all parts into entity.
+   *
+   * @param boundary part delimiter
+   */
+  def toEntity(boundary: String): Entity
 
   /**
    * Gets first part with given name.
@@ -138,6 +147,16 @@ object Multipart:
   def apply(one: Part, more: Part*): Multipart =
     apply(one +: more)
 
+  /**
+   * Gets body parser for multipart form data.
+   *
+   * @param dest destination directory in which file content is stored
+   * @param maxLength maximum length in bytes
+   * @param bufferSize buffer size in bytes
+   */
+  def getBodyParser(dest: File = File(sys.props("java.io.tmpdir")), maxLength: Long = 8388608, bufferSize: Int = 8192): BodyParser[Multipart] =
+    MultipartBodyParser(dest, maxLength.max(0), bufferSize.max(8192))
+
   /** Generates boundary. */
   def boundary(): String =
     prefix + String(random.ints(16, 0, 62).toArray.map(charset))
@@ -233,6 +252,9 @@ private case class MultipartImpl(parts: Seq[Part]) extends Multipart:
 
   lazy val toQuery: QueryString =
     QueryString(textParts.map(part => part.name -> part.content))
+
+  def toEntity(boundary: String): Entity =
+    MultipartEntity(this, notNull(boundary, "boundary"))
 
   def getPart(name: String): Option[Part] =
     parts.collectFirst { case part if part.name == name => part }

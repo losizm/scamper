@@ -16,9 +16,7 @@
 package scamper
 
 import java.io.{ ByteArrayInputStream, File, FileInputStream, InputStream, OutputStream }
-import java.nio.file.Path
 
-import Auxiliary.{ FileType, OutputStreamType }
 import Validate.notNull
 
 /** Provides input stream to HTTP entity. */
@@ -102,10 +100,6 @@ object Entity:
   def apply(query: QueryString): Entity =
     apply(query.toString)
 
-  /** Creates entity from supplied multipart form data. */
-  def apply(multipart: Multipart, boundary: String): Entity =
-    MultipartEntity(notNull(multipart, "multipart"), notNull(boundary, "boundary"))
-
   /** Gets empty entity. */
   def empty: Entity = EmptyEntity
 
@@ -122,34 +116,3 @@ private case class FileEntity(file: File) extends Entity:
 
 private case class InputStreamEntity(data: InputStream) extends Entity:
   val knownSize = None
-
-private case class MultipartEntity(multipart: Multipart, boundary: String) extends Entity:
-  val knownSize = None
-  lazy val data = WriterInputStream(writeMultipart)(using Auxiliary.executor)
-
-  private def writeMultipart(out: OutputStream): Unit =
-    val start = "--" + boundary
-    val end = "--" + boundary + "--"
-
-    multipart.parts.foreach { part =>
-      out.writeLine(start)
-      out.writeLine("Content-Disposition: " + part.contentDisposition.toString)
-
-      if !part.contentType.isText || part.contentType.subtype != "plain" || part.contentType.params.nonEmpty then
-        out.writeLine("Content-Type: " + part.contentType.toString)
-      out.writeLine()
-
-      part match
-        case text: TextPart => out.writeLine(text.content)
-        case file: FilePart =>
-          file.content.withInputStream { in =>
-            val buf = new Array[Byte](8192)
-            var len = 0
-            while { len = in.read(buf); len != -1 } do
-              out.write(buf, 0, len)
-            out.writeLine()
-          }
-    }
-
-    out.writeLine(end)
-    out.flush()

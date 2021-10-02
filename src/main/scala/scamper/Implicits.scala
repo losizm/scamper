@@ -46,14 +46,6 @@ object Implicits:
   given tupleToHeaderWithDateValue: Conversion[(String, Instant), Header] with
     def apply(header: (String, Instant)) = Header(header._1, header._2)
 
-  /** Converts tuple to [[TextPart]] where tuple is name-content pair. */
-  given tupleToTextPart: Conversion[(String, String), TextPart] with
-    def apply(part: (String, String)) = TextPart(part._1, part._2)
-
-  /** Converts tuple to [[FilePart]] where tuple is name-content pair. */
-  given tupleToFilePart: Conversion[(String, File), FilePart] with
-    def apply(part: (String, File)) = FilePart(part._1, part._2)
-
   /** Converts byte array to [[Entity]]. */
   given bytesToEntity: Conversion[Array[Byte], Entity] with
     def apply(entity: Array[Byte]) = Entity(entity)
@@ -175,44 +167,3 @@ object Implicits:
           Header("Content-Type", "application/x-www-form-urlencoded"),
           Header("Content-Length", entity.knownSize.get)
         )
-
-    /**
-     * Creates new message with supplied multipart as message body.
-     *
-     * After adding body to message, the Content-Type header is set to
-     * `multipart/form-data` with a boundary parameter whose value is used
-     * to delimit parts in encoded message body.
-     *
-     * @param multipart message body
-     */
-    def setMultipartBody(multipart: Multipart)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      val boundary = Multipart.boundary()
-      message.setBody(Entity(multipart, boundary))
-        .putHeaders(Header("Content-Type", s"multipart/form-data; boundary=$boundary"))
-
-    /**
-     * Creates new message with supplied parts as message body, with the parts
-     * encoded as multipart form data.
-     *
-     * After adding body to message, the Content-Type header is set to
-     * `multipart/form-data` with a boundary parameter whose value is used
-     * to delimit parts in encoded message body.
-     *
-     * @param parts message body
-     */
-    def setMultipartBody(parts: Seq[Part])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      setMultipartBody(Multipart(parts))
-
-    /**
-     * Creates new message with supplied parts as message body, with the parts
-     * encoded as multipart form data.
-     *
-     * After adding body to message, the Content-Type header is set to
-     * `multipart/form-data` with a boundary parameter whose value is used
-     * to delimit parts in encoded message body.
-     *
-     * @param one part
-     * @param more additional parts
-     */
-    def setMultipartBody(one: Part, more: Part*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-      setMultipartBody(Multipart(one +: more))

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package scamper
+package multipart
 
 import java.io.File
 
