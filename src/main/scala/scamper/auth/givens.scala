@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 package scamper
+package auth
 
-/** Defines WebSocket implementation. */
-package websocket
+/** Converts string to [[Challenge]]. */
+given stringToChallenge: Conversion[String, Challenge] with
+  def apply(challenge: String) = Challenge.parse(challenge)
 
-/** Provides reason for invalid WebSocket request. */
-case class InvalidWebSocketRequest(reason: String) extends HttpException(reason)
-
-/** Provides reason for WebSocket handshake failure. */
-case class WebSocketHandshakeFailure(reason: String) extends HttpException(reason)
-
-/** Provides status code of WebSocket error. */
-case class WebSocketError(statusCode: StatusCode) extends HttpException(statusCode.toString)
+/** Converts string to [[Credentials]]. */
+given stringToCredentials: Conversion[String, Credentials] with
+  def apply(credentials: String) = Credentials.parse(credentials)

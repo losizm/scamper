@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 package scamper
+package multipart
 
-/** Defines WebSocket implementation. */
-package websocket
+import java.io.File
 
-/** Provides reason for invalid WebSocket request. */
-case class InvalidWebSocketRequest(reason: String) extends HttpException(reason)
+/** Converts tuple to [[TextPart]] where tuple is name-content pair. */
+given tupleToTextPart: Conversion[(String, String), TextPart] with
+  def apply(part: (String, String)) = TextPart(part._1, part._2)
 
-/** Provides reason for WebSocket handshake failure. */
-case class WebSocketHandshakeFailure(reason: String) extends HttpException(reason)
-
-/** Provides status code of WebSocket error. */
-case class WebSocketError(statusCode: StatusCode) extends HttpException(statusCode.toString)
+/** Converts tuple to [[FilePart]] where tuple is name-content pair. */
+given tupleToFilePart: Conversion[(String, File), FilePart] with
+  def apply(part: (String, File)) = FilePart(part._1, part._2)

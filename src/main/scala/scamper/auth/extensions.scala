@@ -136,14 +136,6 @@ package scamper
  */
 package auth
 
-/** Converts string to [[Challenge]]. */
-given stringToChallenge: Conversion[String, Challenge] with
-  def apply(challenge: String) = Challenge.parse(challenge)
-
-/** Converts string to [[Credentials]]. */
-given stringToCredentials: Conversion[String, Credentials] with
-  def apply(credentials: String) = Credentials.parse(credentials)
-
 /** Provides standardized access to Authentication-Info header. */
 implicit class AuthenticationInfo(response: HttpResponse) extends AnyVal:
   /** Tests for Authentication-Info header. */

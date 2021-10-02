@@ -26,8 +26,8 @@ import scamper.types.{ DispositionType, MediaType }
 
 import Auxiliary.{ SocketType, StringType }
 
-/** Adds server-side extension methods to `HttpMessage`. */
-implicit class ServerHttpMessage(msg: HttpMessage) extends AnyVal:
+/** Adds server extensions to `HttpMessage`. */
+implicit class ServerHttpMessage(message: HttpMessage) extends AnyVal:
   /**
    * Gets message correlate.
    *
@@ -35,11 +35,11 @@ implicit class ServerHttpMessage(msg: HttpMessage) extends AnyVal:
    * reassigned to its outgoing response.
    */
   def correlate: String =
-    msg.getAttribute("scamper.server.message.correlate").get
+    message.getAttribute("scamper.server.message.correlate").get
 
   /** Gets message socket. */
   def socket: Socket =
-    msg.getAttribute("scamper.server.message.socket").get
+    message.getAttribute("scamper.server.message.socket").get
 
   /**
    * Gets request count.
@@ -48,7 +48,7 @@ implicit class ServerHttpMessage(msg: HttpMessage) extends AnyVal:
    * connection.
    */
   def requestCount: Int =
-    msg.getAttribute("scamper.server.message.requestCount").get
+    message.getAttribute("scamper.server.message.requestCount").get
 
   /**
    * Gets server logger.
@@ -56,17 +56,17 @@ implicit class ServerHttpMessage(msg: HttpMessage) extends AnyVal:
    * @see [[HttpServer.logger HttpServer.logger()]]
    */
   def logger: Logger =
-    msg.getAttributeOrElse("scamper.server.message.logger", NullLogger)
+    message.getAttributeOrElse("scamper.server.message.logger", NullLogger)
 
   /** Gets server to which this message belongs. */
   def server: HttpServer =
-    msg.getAttribute("scamper.server.message.server").get
+    message.getAttribute("scamper.server.message.server").get
 
-/** Adds server-side extension methods to `HttpRequest`. */
-implicit class ServerHttpRequest(req: HttpRequest) extends AnyVal:
+/** Adds server extensions to `HttpRequest`. */
+implicit class ServerHttpRequest(request: HttpRequest) extends AnyVal:
   /** Gets path parameters. */
   def params: PathParameters =
-    req.getAttributeOrElse("scamper.server.request.parameters", MapPathParameters(Map.empty))
+    request.getAttributeOrElse("scamper.server.request.parameters", MapPathParameters(Map.empty))
 
   /**
    * Sends interim 100 (Continue) response if request includes Expect header
@@ -75,16 +75,16 @@ implicit class ServerHttpRequest(req: HttpRequest) extends AnyVal:
    * @return `true` if response was sent; `false` otherwise
    */
   def continue(): Boolean =
-    req.getExpect
-      .collect { case value if value.toLowerCase == "100-continue" => req.socket }
+    request.getExpect
+      .collect { case value if value.toLowerCase == "100-continue" => request.socket }
       .map { socket =>
         socket.writeLine(StatusLine(Continue).toString)
         socket.writeLine()
         socket.flush()
       }.isDefined
 
-/** Adds server-side extension methods to `HttpResponse`. */
-implicit class ServerHttpResponse(res: HttpResponse) extends AnyVal:
+/** Adds server extensions to `HttpResponse`. */
+implicit class ServerHttpResponse(response: HttpResponse) extends AnyVal:
   /**
    * Optionally gets corresponding request.
    *
@@ -95,7 +95,7 @@ implicit class ServerHttpResponse(res: HttpResponse) extends AnyVal:
    * however, the message entity's input stream is an active object.
    */
   def request: Option[HttpRequest] =
-    res.getAttribute("scamper.server.response.request")
+    response.getAttribute("scamper.server.response.request")
 
   /**
    * Adds `gzip` to Content-Encoding header and encodes message body.
@@ -105,7 +105,7 @@ implicit class ServerHttpResponse(res: HttpResponse) extends AnyVal:
    * @return new response
    */
   def setGzipContentEncoding(bufferSize: Int = 8192): HttpResponse =
-    ContentEncoder.gzip(res, bufferSize)(using Auxiliary.executor)
+    ContentEncoder.gzip(response, bufferSize)(using Auxiliary.executor)
 
   /**
    * Adds `deflate` to Content-Encoding header and encodes message body.
@@ -115,7 +115,7 @@ implicit class ServerHttpResponse(res: HttpResponse) extends AnyVal:
    * @return new response
    */
   def setDeflateContentEncoding(bufferSize: Int = 8192): HttpResponse =
-    ContentEncoder.deflate(res, bufferSize)
+    ContentEncoder.deflate(response, bufferSize)
 
   /**
    * Creates new response with supplied file as attachment.
@@ -152,7 +152,7 @@ implicit class ServerHttpResponse(res: HttpResponse) extends AnyVal:
       "filename*" -> s"utf-8''${file.getName().toUrlEncoded("utf-8")}"
     )
 
-    res.setBody(entity)
+    response.setBody(entity)
       .setContentType(mediaType)
       .setContentLength(entity.knownSize.get)
       .setContentDisposition(disposition)

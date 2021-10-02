@@ -15,68 +15,11 @@
  */
 package scamper
 
-import java.io.{ File, InputStream, OutputStream }
-import java.time.Instant
+import java.io.File
 
 import scamper.types.MediaType
 
-/** Converts string to `Uri`. */
-given stringToUri: Conversion[String, Uri] with
-  def apply(uri: String) = Uri(uri)
-
-/** Converts string to [[Header]]. */
-given stringToHeader: Conversion[String, Header] with
-  def apply(header: String) = Header(header)
-
-/** Converts tuple to [[Header]] where tuple is name-value pair. */
-given tupleToHeader: Conversion[(String, String), Header] with
-  def apply(header: (String, String)) = Header(header._1, header._2)
-
-/** Converts tuple to [[Header]] where tuple is name-value pair. */
-given tupleToHeaderWithLongValue: Conversion[(String, Long), Header] with
-  def apply(header: (String, Long)) = Header(header._1, header._2)
-
-/** Converts tuple to [[Header]] where tuple is name-value pair. */
-given tupleToHeaderWithIntValue: Conversion[(String, Int), Header] with
-  def apply(header: (String, Int)) = Header(header._1, header._2)
-
-/** Converts tuple to [[Header]] where tuple is name-value pair. */
-given tupleToHeaderWithDateValue: Conversion[(String, Instant), Header] with
-  def apply(header: (String, Instant)) = Header(header._1, header._2)
-
-/** Converts byte array to [[Entity]]. */
-given bytesToEntity: Conversion[Array[Byte], Entity] with
-  def apply(entity: Array[Byte]) = Entity(entity)
-
-/** Converts string to [[Entity]]. */
-given stringToEntity: Conversion[String, Entity] with
-  def apply(entity: String) = Entity(entity, "UTF-8")
-
-/** Converts file to [[Entity]]. */
-given fileToEntity: Conversion[File, Entity] with
-  def apply(entity: File) = Entity(entity)
-
-/** Converts input stream to [[Entity]]. */
-given inputStreamToEntity: Conversion[InputStream, Entity] with
-  def apply(entity: InputStream) = Entity(entity)
-
-/** Converts writer to [[Entity]]. */
-given writerToEntity: Conversion[(OutputStream => Unit), Entity] with
-  def apply(writer: OutputStream => Unit) = Entity(writer)
-
-/** Converts string to [[RequestMethod]]. */
-given stringToRequestMethod: Conversion[String, RequestMethod] with
-  def apply(method: String) = RequestMethod(method)
-
-/** Converts int to [[ResponseStatus]]. */
-given intToResponseStatus: Conversion[Int, ResponseStatus] with
-  def apply(statusCode: Int) = ResponseStatus(statusCode)
-
-/**
- * Adds extension methods to HttpMessage for building messages with various
- * content types.
- */
-implicit class HttpMessageType[T <: HttpMessage](message: T) extends AnyVal:
+extension [T <: HttpMessage & MessageBuilder[T]](message: T)
   /**
    * Creates new message with supplied text as message body.
    *
@@ -87,7 +30,7 @@ implicit class HttpMessageType[T <: HttpMessage](message: T) extends AnyVal:
    * @param text message body
    * @param charset character set
    */
-  def setTextBody(text: String, charset: String = "UTF-8")(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setTextBody(text: String, charset: String = "UTF-8"): T =
     val entity = Entity(text, charset)
     message.setBody(entity)
       .putHeaders(
@@ -103,7 +46,7 @@ implicit class HttpMessageType[T <: HttpMessage](message: T) extends AnyVal:
    *
    * @param file message body
    */
-  def setFileBody(file: File)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setFileBody(file: File): T =
     val entity = Entity(file)
     val mediaType = MediaType.forFile(file).getOrElse(Auxiliary.applicationOctetStream)
     message.setBody(entity)
@@ -121,7 +64,7 @@ implicit class HttpMessageType[T <: HttpMessage](message: T) extends AnyVal:
    *
    * @param data message body
    */
-  def setFormBody(data: Map[String, Seq[String]])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setFormBody(data: Map[String, Seq[String]]): T =
     setFormBody(QueryString(data))
 
   /**
@@ -133,7 +76,7 @@ implicit class HttpMessageType[T <: HttpMessage](message: T) extends AnyVal:
    *
    * @param data message body
    */
-  def setFormBody(data: Seq[(String, String)])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setFormBody(data: Seq[(String, String)]): T =
     setFormBody(QueryString(data))
 
   /**
@@ -146,7 +89,7 @@ implicit class HttpMessageType[T <: HttpMessage](message: T) extends AnyVal:
    * @param one form data
    * @param more additional form data
    */
-  def setFormBody(one: (String, String), more: (String, String)*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setFormBody(one: (String, String), more: (String, String)*): T =
     setFormBody(QueryString(one +: more))
 
   /**
@@ -158,7 +101,7 @@ implicit class HttpMessageType[T <: HttpMessage](message: T) extends AnyVal:
    *
    * @param query message body
    */
-  def setFormBody(query: QueryString)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setFormBody(query: QueryString): T =
     val entity = Entity(query)
     message.setBody(entity)
       .putHeaders(

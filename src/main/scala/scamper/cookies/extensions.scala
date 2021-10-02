@@ -15,10 +15,13 @@
  */
 package scamper
 
+package cookies
+
+import java.time.Instant
+import scala.util.Try
+
 /**
- * Defines types for specialized access to message cookies.
- *
- * ### Request Cookies
+ * Provides access to request cookies in Cookie header.
  *
  * In [[HttpRequest]], cookies are stringed together in the Cookie header. You
  * can access them using extension methods provided by [[RequestCookies]], with
@@ -47,48 +50,7 @@ package scamper
  * assert(req.getCookieValue("ID").contains("bG9zCg"))
  * assert(req.getCookieValue("Region").contains("SE-US"))
  * }}}
- *
- * ### Response Cookies
- *
- * In [[HttpResponse]], the cookies are a collection of Set-Cookie header
- * values. Specialized access is provided by [[ResponseCookies]], with each
- * cookie represented as [[SetCookie]].
- *
- * {{{
- * import scala.language.implicitConversions
- *
- * import scamper.stringToEntity
- * import scamper.ResponseStatus.Registry.Ok
- * import scamper.cookies.{ ResponseCookies, SetCookie }
- *
- * // Build response with cookies
- * val res = Ok("There is an answer.").setCookies(
- *   SetCookie("ID", "bG9zCg", path = Some("/motd"), secure = true),
- *   SetCookie("Region", "SE-US")
- * )
- *
- * // Print all cookies
- * res.cookies.foreach(println)
- *
- * // Get cookies by name
- * val id: Option[SetCookie] = res.getCookie("ID")
- * val region: Option[SetCookie] = res.getCookie("Region")
- *
- * // Get attributes of ID cookie
- * val path: String = id.flatMap(_.path).getOrElse("/")
- * val secure: Boolean = id.map(_.secure).getOrElse(false)
- *
- * // Get cookie values by name
- * assert(res.getCookieValue("ID").contains("bG9zCg"))
- * assert(res.getCookieValue("Region").contains("SE-US"))
- * }}}
  */
-package cookies
-
-import java.time.Instant
-import scala.util.Try
-
-/** Provides access to request cookies in Cookie header. */
 implicit class RequestCookies(request: HttpRequest) extends AnyVal:
   /** Gets cookies. */
   def cookies: Seq[PlainCookie] =
@@ -173,7 +135,42 @@ implicit class RequestCookies(request: HttpRequest) extends AnyVal:
   def removeCookies(one: String, more: String*): HttpRequest =
     removeCookies(one +: more)
 
-/** Provides access to response cookies in Set-Cookie headers. */
+/**
+ * Provides access to response cookies in Set-Cookie headers.
+ *
+ * In [[HttpResponse]], the cookies are a collection of Set-Cookie header
+ * values. Specialized access is provided by [[ResponseCookies]], with each
+ * cookie represented as [[SetCookie]].
+ *
+ * {{{
+ * import scala.language.implicitConversions
+ *
+ * import scamper.stringToEntity
+ * import scamper.ResponseStatus.Registry.Ok
+ * import scamper.cookies.{ ResponseCookies, SetCookie }
+ *
+ * // Build response with cookies
+ * val res = Ok("There is an answer.").setCookies(
+ *   SetCookie("ID", "bG9zCg", path = Some("/motd"), secure = true),
+ *   SetCookie("Region", "SE-US")
+ * )
+ *
+ * // Print all cookies
+ * res.cookies.foreach(println)
+ *
+ * // Get cookies by name
+ * val id: Option[SetCookie] = res.getCookie("ID")
+ * val region: Option[SetCookie] = res.getCookie("Region")
+ *
+ * // Get attributes of ID cookie
+ * val path: String = id.flatMap(_.path).getOrElse("/")
+ * val secure: Boolean = id.map(_.secure).getOrElse(false)
+ *
+ * // Get cookie values by name
+ * assert(res.getCookieValue("ID").contains("bG9zCg"))
+ * assert(res.getCookieValue("Region").contains("SE-US"))
+ * }}}
+ */
 implicit class ResponseCookies(response: HttpResponse) extends AnyVal:
   /** Gets cookies. */
   def cookies: Seq[SetCookie] =

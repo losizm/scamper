@@ -18,10 +18,10 @@ package client
 
 import java.net.Socket
 
-/** Adds client-side extension methods to `HttpMessage`. */
-implicit class ClientHttpMessage(msg: HttpMessage) extends AnyVal:
+/** Adds client extensions to `HttpMessage`. */
+implicit class ClientHttpMessage(message: HttpMessage) extends AnyVal:
   /** Gets message socket. */
-  def socket: Socket = msg.getAttribute("scamper.client.message.socket").get
+  def socket: Socket = message.getAttribute("scamper.client.message.socket").get
 
   /**
    * Gets message correlate.
@@ -29,7 +29,7 @@ implicit class ClientHttpMessage(msg: HttpMessage) extends AnyVal:
    * Each outgoing request is assigned a tag (i.e., correlate), which is later
    * reassigned to its incoming response.
    */
-  def correlate: String = msg.getAttribute("scamper.client.message.correlate").get
+  def correlate: String = message.getAttribute("scamper.client.message.correlate").get
 
   /**
    * Gets absolute target.
@@ -37,13 +37,13 @@ implicit class ClientHttpMessage(msg: HttpMessage) extends AnyVal:
    * The absolute target (i.e., absolute URI) is assigned to each outgoing
    * request and later reassigned to its incoming response.
    */
-  def absoluteTarget: Uri = msg.getAttribute("scamper.client.message.absoluteTarget").get
+  def absoluteTarget: Uri = message.getAttribute("scamper.client.message.absoluteTarget").get
 
   /** Gets client to which this message belongs. */
-  def client: HttpClient = msg.getAttribute("scamper.client.message.client").get
+  def client: HttpClient = message.getAttribute("scamper.client.message.client").get
 
-/** Adds client-side extension methods to `HttpRequest`. */
-implicit class ClientHttpRequest(req: HttpRequest) extends AnyVal:
+/** Adds client extensions to `HttpRequest`. */
+implicit class ClientHttpRequest(request: HttpRequest) extends AnyVal:
   /**
    * Sends request and passes response to given handler.
    *
@@ -51,11 +51,11 @@ implicit class ClientHttpRequest(req: HttpRequest) extends AnyVal:
    *
    * @see [[HttpClient!.send HttpClient.send()]]
    *
-   * @note To make effective use of this method, `req.target` must be an
+   * @note To make effective use of this method, `request.target` must be an
    *   absolute URI.
    */
   def send[T](handler: ResponseHandler[T])(using client: HttpClient): T =
-    client.send(req)(handler)
+    client.send(request)(handler)
 
   /**
    * Adds `gzip` to Content-Encoding header and encodes message body.
@@ -65,7 +65,7 @@ implicit class ClientHttpRequest(req: HttpRequest) extends AnyVal:
    * @return new request
    */
   def setGzipContentEncoding(bufferSize: Int = 8192): HttpRequest =
-    ContentEncoder.gzip(req, bufferSize)(using Auxiliary.executor)
+    ContentEncoder.gzip(request, bufferSize)(using Auxiliary.executor)
 
   /**
    * Adds `deflate` to Content-Encoding header and encodes message body.
@@ -75,10 +75,10 @@ implicit class ClientHttpRequest(req: HttpRequest) extends AnyVal:
    * @return new request
    */
   def setDeflateContentEncoding(bufferSize: Int = 8192): HttpRequest =
-    ContentEncoder.deflate(req, bufferSize)
+    ContentEncoder.deflate(request, bufferSize)
 
-/** Adds client-side extension methods to `HttpResponse`. */
-implicit class ClientHttpResponse(res: HttpResponse) extends AnyVal:
+/** Adds client extensions to `HttpResponse`. */
+implicit class ClientHttpResponse(response: HttpResponse) extends AnyVal:
   /**
    * Gets corresponding request.
    *
@@ -86,4 +86,4 @@ implicit class ClientHttpResponse(res: HttpResponse) extends AnyVal:
    * the message entity's input stream is an active object.
    */
   def request: HttpRequest =
-    res.getAttribute("scamper.client.response.request").get
+    response.getAttribute("scamper.client.response.request").get

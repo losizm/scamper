@@ -16,21 +16,8 @@
 package scamper
 package multipart
 
-import java.io.File
-
-/** Converts tuple to [[TextPart]] where tuple is name-content pair. */
-given tupleToTextPart: Conversion[(String, String), TextPart] with
-  def apply(part: (String, String)) = TextPart(part._1, part._2)
-
-/** Converts tuple to [[FilePart]] where tuple is name-content pair. */
-given tupleToFilePart: Conversion[(String, File), FilePart] with
-  def apply(part: (String, File)) = FilePart(part._1, part._2)
-
-/**
- * Adds extension methods to HttpMessage for building messages with various
- * content types.
- */
-implicit class MultipartMessage[T <: HttpMessage](message: T) extends AnyVal:
+/** Adds multipart extensions to `HttpMessage`. */
+implicit class MultipartHttpMessage[T <: HttpMessage & MessageBuilder[T]](message: T) extends AnyVal:
   /**
    * Creates new message with supplied multipart as message body.
    *
@@ -40,7 +27,7 @@ implicit class MultipartMessage[T <: HttpMessage](message: T) extends AnyVal:
    *
    * @param multipart message body
    */
-  def setMultipartBody(multipart: Multipart)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setMultipartBody(multipart: Multipart): T =
     val boundary = Multipart.boundary()
     message.setBody(multipart.toEntity(boundary))
       .putHeaders(Header("Content-Type", s"multipart/form-data; boundary=$boundary"))
@@ -55,7 +42,7 @@ implicit class MultipartMessage[T <: HttpMessage](message: T) extends AnyVal:
    *
    * @param parts message body
    */
-  def setMultipartBody(parts: Seq[Part])(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setMultipartBody(parts: Seq[Part]): T =
     setMultipartBody(Multipart(parts))
 
   /**
@@ -69,5 +56,5 @@ implicit class MultipartMessage[T <: HttpMessage](message: T) extends AnyVal:
    * @param one part
    * @param more additional parts
    */
-  def setMultipartBody(one: Part, more: Part*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setMultipartBody(one: Part, more: Part*): T =
     setMultipartBody(Multipart(one +: more))

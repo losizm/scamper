@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package scamper
+package websocket
 
-/** Defines logging utilities. */
-package object logging
+/** Converts string to [[WebSocketExtension]]. */
+given stringToWebSocketExtension: Conversion[String, WebSocketExtension] with
+  def apply(ext: String) = WebSocketExtension.parse(ext)
