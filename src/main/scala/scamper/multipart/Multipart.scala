@@ -169,7 +169,7 @@ object TextPart:
 
   /** Creates text part with supplied disposition and content. */
   def apply(contentDisposition: DispositionType, content: String): TextPart =
-    apply(contentDisposition, Auxiliary.textPlain, content)
+    apply(contentDisposition, MediaType.plain, content)
 
   /** Creates text part with supplied disposition, content type, and content. */
   def apply(contentDisposition: DispositionType, contentType: MediaType, content: String): TextPart =
@@ -192,7 +192,7 @@ object TextPart:
 
     val contentType = headers.collectFirst {
       case header if header.name.equalsIgnoreCase("Content-Type") => MediaType(header.value)
-    }.getOrElse(Auxiliary.textPlain)
+    }.getOrElse(MediaType.plain)
 
     apply(contentDisposition, contentType, notNull(content, "content"))
 
@@ -241,7 +241,7 @@ object FilePart:
       .getOrElse(DispositionType("form-data", "name" -> name))
 
   private def getType(content: File): MediaType =
-    MediaType.forFile(content).getOrElse(Auxiliary.applicationOctetStream)
+    MediaType.forFile(content).getOrElse(MediaType.octetStream)
 
 private case class MultipartImpl(parts: Seq[Part]) extends Multipart:
   lazy val textParts: Seq[TextPart] =

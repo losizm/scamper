@@ -24,7 +24,7 @@ import scala.util.Try
 import scala.language.implicitConversions
 
 import scamper.{ HttpMessage, HttpRequest, HttpResponse, Uri, stringToEntity, fileToEntity }
-import scamper.Auxiliary.{ StringType, applicationOctetStream }
+import scamper.Auxiliary.StringType
 import scamper.RequestMethod.Registry.{ Get, Head }
 import scamper.ResponseStatus.Registry.*
 import scamper.Validate.noNulls
@@ -95,7 +95,7 @@ private class StaticFileServer(sourceDirectory: Path, defaults: Seq[String]) ext
 
   private def getMediaType(path: Path): MediaType =
     MediaType.forFileName(path.getFileName.toString)
-      .getOrElse(applicationOctetStream)
+      .getOrElse(MediaType.octetStream)
 
   private def getMediaRanges(req: HttpRequest): Seq[MediaRange] =
     Try(req.accept)

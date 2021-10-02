@@ -48,7 +48,7 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
    */
   def setFileBody(file: File): T =
     val entity = Entity(file)
-    val mediaType = MediaType.forFile(file).getOrElse(Auxiliary.applicationOctetStream)
+    val mediaType = MediaType.forFile(file).getOrElse(MediaType.octetStream)
     message.setBody(entity)
       .putHeaders(
         Header("Content-Type", mediaType.toString),

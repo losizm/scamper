@@ -145,7 +145,7 @@ implicit class ServerHttpResponse(response: HttpResponse) extends AnyVal:
 
   private def createWithContentDisposition(typeName: String, file: File): HttpResponse =
     val entity = Entity(file)
-    val mediaType = MediaType.forFile(file).getOrElse(Auxiliary.applicationOctetStream)
+    val mediaType = MediaType.forFile(file).getOrElse(MediaType.octetStream)
     val disposition = DispositionType(
       typeName,
       "filename" -> file.getName(),

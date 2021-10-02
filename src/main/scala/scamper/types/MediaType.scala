@@ -63,6 +63,14 @@ trait MediaType:
   /** Tests main type for message. */
   def isMessage: Boolean = mainType == "message"
 
+  /** Creates media types with new parameters. */
+  def setParams(params: Map[String, String]): MediaType =
+    MediaType(mainType, subtype, params)
+
+  /** Creates media types with new parameters. */
+  def setParams(params: (String, String)*): MediaType =
+    MediaType(mainType, subtype, params.toMap)
+
   /** Converts to range with supplied weight. */
   def toRange(weight: Float = 1.0f): MediaRange =
     MediaRange(mainType, subtype, weight, params)
@@ -87,6 +95,12 @@ object MediaType:
   }.getOrElse(Map.empty)
 
   private val fileNamePattern = ".+\\.(\\w+)".r
+
+  /** `text/plain` */
+  val plain = MediaType("text/plain")
+
+  /** `application/octet-stream` */
+  val octetStream = MediaType("application/octet-stream")
 
   /** Gets media type for given file. */
   def forFile(file: File): Option[MediaType] =

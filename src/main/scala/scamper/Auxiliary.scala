@@ -29,9 +29,6 @@ import RuntimeProperties.auxiliary.*
 private object Auxiliary:
   private val crlf = "\r\n".getBytes("UTF-8")
 
-  val applicationOctetStream = MediaType("application", "octet-stream")
-  val textPlain = MediaType("text", "plain")
-
   lazy val executor =
     ThreadPoolExecutorService
       .dynamic(
@@ -46,7 +43,7 @@ private object Auxiliary:
         executor.getThreadFactory.newThread(task).start()
       }
 
-  implicit class FileType(private val file: File) extends AnyVal:
+  implicit class FileType(file: File) extends AnyVal:
     def withOutputStream[T](f: OutputStream => T): T =
       val out = FileOutputStream(file)
       try f(out)
@@ -57,7 +54,7 @@ private object Auxiliary:
       try f(in)
       finally Try(in.close())
 
-  implicit class InputStreamType(private val in: InputStream) extends AnyVal:
+  implicit class InputStreamType(val in: InputStream) extends AnyVal:
     def getBytes(bufferSize: Int = 8192): Array[Byte] =
       val bytes = ArrayBuffer[Byte]()
       val buffer = new Array[Byte](bufferSize.max(1024))
@@ -126,7 +123,7 @@ private object Auxiliary:
 
       total
 
-  implicit class OutputStreamType(private val out: OutputStream) extends AnyVal:
+  implicit class OutputStreamType(val out: OutputStream) extends AnyVal:
     def writeLine(text: String): Unit =
       out.write(text.getBytes("UTF-8"))
       out.write(crlf)
@@ -134,7 +131,7 @@ private object Auxiliary:
     def writeLine(): Unit =
       out.write(crlf)
 
-  implicit class SocketType(private val socket: Socket) extends AnyVal:
+  implicit class SocketType(val socket: Socket) extends AnyVal:
     def read(): Int =
       socket.getInputStream().read()
 
@@ -171,7 +168,7 @@ private object Auxiliary:
     def flush(): Unit =
       socket.getOutputStream().flush()
 
-  implicit class StringType(private val string: String) extends AnyVal:
+  implicit class StringType(val string: String) extends AnyVal:
     def matchesAny(regexes: String*): Boolean =
       regexes.exists(string.matches)
 
@@ -181,7 +178,7 @@ private object Auxiliary:
     def toUrlDecoded(charset: String): String =
       URLDecoder.decode(string, charset)
 
-  implicit class UriType(private val uri: Uri) extends AnyVal:
+  implicit class UriType(val uri: Uri) extends AnyVal:
     def toTarget: Uri =
       buildUri(null, null, uri.getRawPath, uri.getRawQuery, null)
 
