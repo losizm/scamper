@@ -26,8 +26,8 @@ private class TargetPath private (val value: String):
     case "/" => "/"
     case "*" => ".*"
     case _   => "/" + segments.map {
-      case s if s.matches("(:\\w+)")   => """[\w+\-.~%]+"""
-      case s if s.matches("(\\*\\w*)") => """[\w+\-.~%/]*"""
+      case s if s.matches("(:\\w+)")   => TargetPath.one
+      case s if s.matches("(\\*\\w*)") => TargetPath.rest
       case s => Regex.quote(s)
     }.mkString("/")
 
@@ -56,13 +56,16 @@ private class TargetPath private (val value: String):
       case p   => p.tail.split("/").toSeq
 
 private object TargetPath:
+  private[TargetPath] val one  = """[\w!$%&'()+,\-.:;=@_~]+"""
+  private[TargetPath] val rest = """[\w!$%&'()+,\-./:;=@_~]*"""
+
   def apply(value: String): TargetPath =
     new TargetPath(normalize(value))
 
   def normalize(value: String): String =
     val path = NormalizePath(value)
 
-    if !path.matchesAny("/", "\\*", """(/:\w+|/[\w+\-.~%]+)+""", """(/:\w+|/[\w+\-.~%]+)*/\*\w*""") then
+    if !path.matchesAny("/", "\\*", s"""(/:\\w+|/$one)+""", s"""(/:\\w+|/$one)*/\\*\\w*""") then
       throw IllegalArgumentException(s"Invalid target path: $path")
 
     path
