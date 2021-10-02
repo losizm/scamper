@@ -18,7 +18,6 @@ package scamper.server
 import scamper.HttpRequest
 import scamper.ResponseStatus.Registry.Ok
 import scamper.cookies.*
-import scamper.server.Implicits.*
 
 object CookieApplication extends RoutingApplication:
   def apply(router: Router): Unit =

@@ -26,8 +26,6 @@ import scamper.headers.{ Connection, Upgrade }
 import scamper.types.stringToProtocol
 import scamper.websocket.{ *, given }
 
-import Implicits.*
-
 /**
  * Provides factory for upgrading request to WebSocket connection.
  *

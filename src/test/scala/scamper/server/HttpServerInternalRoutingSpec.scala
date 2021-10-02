@@ -24,7 +24,6 @@ import scamper.Implicits.given
 import scamper.client.HttpClient
 import scamper.headers.*
 import scamper.logging.NullLogger
-import scamper.server.Implicits.given
 
 import ResponseStatus.Registry.*
 

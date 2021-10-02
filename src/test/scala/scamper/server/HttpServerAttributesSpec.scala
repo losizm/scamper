@@ -24,7 +24,6 @@ import scamper.Implicits.given
 import scamper.client.HttpClient
 import scamper.headers.{ Server as _, * }
 import scamper.logging.*
-import scamper.server.Implicits.given
 
 import RequestMethod.Registry.*
 import ResponseStatus.Registry.*

@@ -24,7 +24,6 @@ import scamper.{ BodyParser, HttpRequest, HttpMessage }
 import scamper.Implicits.given
 import scamper.ResponseStatus.Registry.*
 import scamper.headers.{ ContentType, Location }
-import scamper.server.Implicits.given
 import scamper.types.given
 
 object MessageApplication extends RoutingApplication:

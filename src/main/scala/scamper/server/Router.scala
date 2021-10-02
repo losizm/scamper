@@ -29,8 +29,7 @@ import scamper.websocket.WebSocketApplication
  *
  * import scamper.Implicits.stringToEntity
  * import scamper.ResponseStatus.Registry.{ BadRequest, NotFound, Ok }
- * import scamper.server.{ ParameterNotConvertible, ServerApplication }
- * import scamper.server.Implicits.ServerHttpRequest
+ * import scamper.server.{ ParameterNotConvertible, ServerApplication, ServerHttpRequest }
  *
  * val app = ServerApplication()
  *

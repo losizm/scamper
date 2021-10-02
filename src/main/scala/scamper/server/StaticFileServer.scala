@@ -32,8 +32,6 @@ import scamper.Validate.noNulls
 import scamper.headers.*
 import scamper.types.{ MediaRange, MediaType }
 
-import Implicits.{ *, given }
-
 private class StaticFileServer(sourceDirectory: Path, defaults: Seq[String]) extends RoutingApplication:
   private val `*/*` = MediaRange("*/*")
 

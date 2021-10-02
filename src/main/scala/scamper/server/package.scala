@@ -31,8 +31,7 @@ package scamper
  * import scamper.BodyParser
  * import scamper.Implicits.stringToEntity
  * import scamper.ResponseStatus.Registry.{ NotFound, Ok }
- * import scamper.server.HttpServer
- * import scamper.server.Implicits.*
+ * import scamper.server.{ *, given }
  *
  * // Get server application
  * val app = HttpServer.app()

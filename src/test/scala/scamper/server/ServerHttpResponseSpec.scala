@@ -22,8 +22,6 @@ import scamper.ResponseStatus.Registry.Ok
 import scamper.headers.{ ContentDisposition, ContentLength, ContentType }
 import scamper.types.MediaType
 
-import Implicits.*
-
 class ServerHttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec:
   val file = File("./src/test/resources/test.html")
   val encodedFileName = s"utf-8''${file.getName.toUrlEncoded("utf-8")}"

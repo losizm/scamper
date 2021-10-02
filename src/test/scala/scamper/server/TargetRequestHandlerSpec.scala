@@ -22,8 +22,6 @@ import scamper.{ HttpRequest, HttpResponse }
 import scamper.RequestMethod.Registry.{ Delete, Get, Post, Put }
 import scamper.ResponseStatus.Registry.Ok
 
-import Implicits.ServerHttpRequest
-
 class TargetRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "TargetRequestHandler" should "respond to request" in {
     val handler = TargetRequestHandler("/", Nil, req => Ok())

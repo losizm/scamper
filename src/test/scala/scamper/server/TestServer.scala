@@ -23,7 +23,6 @@ import scamper.Implicits.given
 import scamper.auth.*
 import scamper.headers.*
 import scamper.logging.*
-import scamper.server.Implicits.given
 import scamper.types.given
 
 import ResponseStatus.Registry.*

@@ -1027,7 +1027,7 @@ remaining segments, including intervening path separators (i.e., **/**).
 ```scala
 import scamper.Implicits.fileToEntity
 import scamper.ResponseStatus.Registry.{ Accepted, NotFound, Ok }
-import scamper.server.Implicits.ServerHttpRequest
+import scamper.server.ServerHttpRequest
 
 // Match request method and parameterized path
 app.delete("/orders/:id") { req =>
@@ -1060,7 +1060,7 @@ specified.
 import scamper.BodyParser
 import scamper.Implicits.stringToEntity
 import scamper.ResponseStatus.Registry.Ok
-import scamper.server.Implicits.ServerHttpRequest
+import scamper.server.ServerHttpRequest
 
 // Match path with two parameters
 app.post("/translate/:in/to/:out") { req =>
@@ -1177,8 +1177,7 @@ import scala.language.implicitConversions
 import scamper.Implicits.stringToEntity
 import scamper.ResponseStatus.Registry.{ BadRequest, NotFound, Ok }
 import scamper.headers.ContentType
-import scamper.server.{ ParameterNotConvertible, ServerApplication }
-import scamper.server.Implicits.ServerHttpRequest
+import scamper.server.{ ParameterNotConvertible, ServerApplication, ServerHttpRequest }
 import scamper.types.stringToMediaType
 
 // Mount router to /api
@@ -1233,7 +1232,7 @@ This is pretty much the same as the request logger from earlier, only instead of
 And, the filter is not restricted to returning the same response it accepts.
 
 ```scala
-import scamper.server.Implicits.ServerHttpResponse
+import scamper.server.ServerHttpResponse
 
 // Gzip response body if not empty
 app.outgoing { res =>

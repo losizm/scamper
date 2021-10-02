@@ -21,7 +21,6 @@ import scamper.*
 import scamper.Implicits.given
 import scamper.client.{ ClientHttpRequest, HttpClient }
 import scamper.headers.*
-import scamper.server.Implicits.given
 import scamper.types.{ *, given }
 
 import RequestMethod.Registry.*

@@ -25,7 +25,6 @@ import scamper.*
 import scamper.Implicits.given
 import scamper.client.HttpClient
 import scamper.headers.*
-import scamper.server.Implicits.given
 import scamper.types.{ *, given }
 import scamper.websocket.*
 
