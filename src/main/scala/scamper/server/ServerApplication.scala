@@ -26,11 +26,10 @@ import scamper.types.KeepAliveParameters
 /**
  * Defines server application for creating `HttpServer`.
  *
- * `ServerApplication` is a mutable structure. With each applied change, the
- * application is modified and returned. After the desired settings are applied,
- * a server is created using one of several factory methods.
- *
  * ### Default Configuration
+ *
+ * The initial application is constructed with the following default
+ * configuration:
  *
  * | Key         | Value |
  * | ---------   | ----- |
@@ -45,9 +44,74 @@ import scamper.types.KeepAliveParameters
  * | secure      | _(Not configured)_ |
  * | incoming    | _(Not configured)_ |
  * | outgoing    | _(Not configured)_ |
- * | error       | _(Sends `500 Internal Server Error`)_ |
+ * | recover     | _(Sends `500 Internal Server Error`)_ |
  *
- * @constructor Creates server application.
+ * ### Building HTTP Server
+ *
+ * `ServerApplication` is a mutable structure. With each applied change, the
+ * application is modified and returned. After the desired configuration is
+ * applied, a server is created using a factory method.
+ *
+ * {{{
+ * import java.io.File
+ *
+ * import scala.language.implicitConversions
+ *
+ * import scamper.{ BodyParser, stringToEntity }
+ * import scamper.ResponseStatus.Registry.{ NotFound, NoContent, Ok }
+ * import scamper.server.{ *, given }
+ *
+ * // Get server application
+ * val app = ServerApplication()
+ *
+ * // Add request handler to log all requests
+ * app.incoming { req =>
+ *   println(req.startLine)
+ *   req
+ * }
+ *
+ * // Add request handler for GET requests at specified path
+ * app.get("/about") { req =>
+ *   Ok("This server is powered by Scamper.")
+ * }
+ *
+ * // Add request handler for PUT requests at specified path
+ * app.put("/data/:id") { req =>
+ *   def update(id: Int, data: String): Boolean = ???
+ *
+ *   given BodyParser[String] = BodyParser.text()
+ *
+ *   // Get path parameter
+ *   val id = req.params.getInt("id")
+ *
+ *   update(id, req.as[String]) match
+ *     case true  => NoContent()
+ *     case false => NotFound()
+ * }
+ *
+ * // Serve static files from file directory
+ * app.files("/main", File("/path/to/public"))
+ *
+ * // Gzip response body if not empty
+ * app.outgoing { res =>
+ *   res.body.isKnownEmpty match
+ *     case true  => res
+ *     case false => res.setGzipContentEncoding()
+ * }
+ *
+ * // Create server
+ * val server = app.create(8080)
+ *
+ * try
+ *   printf("Host: %s%n", server.host)
+ *   printf("Port: %d%n", server.port)
+ *
+ *   // Run server for 60 seconds
+ *   Thread.sleep(60 * 1000)
+ * finally
+ *   // Close server when done
+ *   server.close()
+ * }}}
  */
 class ServerApplication extends Router:
   private var app = HttpServerImpl.Application()

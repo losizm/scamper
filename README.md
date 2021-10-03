@@ -1,10 +1,10 @@
 # Scamper
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_3.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_3%22)
+
 **Scamper** is the HTTP library for Scala. It defines the interface for reading
 and writing HTTP messages, and it provides [client](#HTTP-Client) and
 [server](#HTTP-Server) implementations including WebSockets.
-
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_3.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_3%22)
 
 ## Table of Contents
 
@@ -102,7 +102,7 @@ val res = Ok("There is an answer.")
 ## Specialized Header Access
 
 `HttpMessage` provides a set of methods for generalized header access. Using
-these methods, the header name and value are represented as `String`.
+these methods, the header name and value are each represented as `String`.
 
 ```scala
 import scala.language.implicitConversions
@@ -149,7 +149,7 @@ import scamper.headers.ContentType
 import scamper.stringToUri
 import scamper.types.MediaType
 
-val req = Post("/api/users").setContentType(MediaType("application", "json"))
+val req = Post("/api/users").setContentType(MediaType("application/json"))
 println(req.contentType.mainType) // application
 println(req.contentType.subtype) // json
 ```

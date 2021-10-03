@@ -15,7 +15,13 @@
  */
 package scamper
 
-/** Defines HTTP message. */
+/**
+ * Defines HTTP message.
+ *
+ * `HttpMessage` defines fundamental characteristics of an HTTP message.
+ * [[HttpRequest]] and [[HttpResponse]] extend the specification to define
+ * characteristics specific to their respective message types.
+ */
 sealed trait HttpMessage:
   /** Type of start line in message */
   type LineType <: StartLine
@@ -101,9 +107,36 @@ sealed trait HttpMessage:
 /**
  * Defines HTTP request.
  *
+ * A request is created using one of its factory methods, or you can start with
+ * a [[RequestMethod]] and build from there.
+ *
+ * {{{
+ * import scala.language.implicitConversions
+ *
+ * import scamper.{ BodyParser, Header, stringToUri }
+ * import scamper.RequestMethod.Registry.Get
+ *
+ * val request = Get("/motd").setHeaders(
+ *   Header("Host: localhost:8080"),
+ *   Header("Accept: text/plain")
+ * )
+ *
+ * printf("Request Method: %s%n", request.method)
+ * printf("Target URI: %s%n", request.target)
+ *
+ * request.headers.foreach(println)
+ *
+ * val host: Option[String] = request.getHeaderValue("Host")
+ *
+ * given BodyParser[String] = BodyParser.text()
+ *
+ * printf("Body: %s%n", request.as[String])
+ * }}}
+ *
  * @see [[HttpResponse]]
  */
 trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest]:
+  /** @inheritdoc */
   type LineType = RequestLine
 
   /** Gets request method. */
@@ -232,9 +265,35 @@ object HttpRequest:
 /**
  * Defines HTTP response.
  *
+ * A response is created using one of its factory methods, or you can start with
+ * a [[ResponseStatus]] and build from there.
+ *
+ * {{{
+ * import scala.language.implicitConversions
+ *
+ * import scamper.{ BodyParser, Header, stringToEntity }
+ * import scamper.ResponseStatus.Registry.Ok
+ *
+ * val response = Ok("There is an answer.").setHeaders(
+ *   Header("Content-Type: text/plain"),
+ *   Header("Connection: close")
+ * )
+ *
+ * printf("Status Code: %d%n", response.statusCode)
+ * printf("Reason Phrase: %s%n", response.reasonPhrase)
+ *
+ * response.headers.foreach(println)
+ *
+ * val contentType: Option[String] = response.getHeaderValue("Content-Type")
+ *
+ * given BodyParser[String] = BodyParser.text()
+ *
+ * printf("Body: %s%n", response.as[String])
+ * }}}
  * @see [[HttpRequest]]
  */
 trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse]:
+  /** @inheritdoc */
   type LineType = StatusLine
 
   /** Gets response status. */
