@@ -78,7 +78,8 @@ class HttpClientGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
 
     info("send request")
     Post(s"$serverUri/echo")
-      .setTextBody("This is a test." * 100)
+      .setBody("This is a test." * 100)
+      .setContentType("text/plain; charset=UTF-8")
       .setGzipContentEncoding()
       .send { res =>
         info("check response status")
