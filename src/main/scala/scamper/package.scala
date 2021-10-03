@@ -81,26 +81,13 @@ type Uri = java.net.URI
 
 /** Provides factory for `Uri`. */
 object Uri:
-  /** Creates URI from supplied string. */
+  /** Creates normalized URI with supplied string. */
   def apply(uri: String): Uri =
-    new Uri(uri)
+    new Uri(uri).normalize()
 
-  /** Creates URI with supplied scheme, scheme-specific part, and fragment. */
+  /**
+   * Creates normalized URI with supplied scheme, scheme-specific part, and
+   * fragment.
+   */
   def apply(scheme: String, schemeSpecificPart: String, fragment: String = null): Uri =
-    new Uri(scheme, schemeSpecificPart, fragment)
-
-  /** Creates URI with `http` scheme and supplied components. */
-  def http(authority: String, path: String = null, query: String = null, fragment: String = null): Uri =
-    new Uri("http", authority, path, query, fragment)
-
-  /** Creates URI with `https` scheme and supplied components. */
-  def https(authority: String, path: String = null, query: String = null, fragment: String = null): Uri =
-    new Uri("https", authority, path, query, fragment)
-
-  /** Creates URI with `ws` scheme and supplied components. */
-  def ws(authority: String, path: String = null, query: String = null): Uri =
-    new Uri("ws", authority, path, query)
-
-  /** Creates URI with `wss` scheme and supplied components. */
-  def wss(authority: String, path: String = null, query: String = null): Uri =
-    new Uri("wss", authority, path, query)
+    new Uri(scheme, schemeSpecificPart, fragment).normalize()

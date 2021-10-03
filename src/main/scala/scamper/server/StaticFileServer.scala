@@ -89,7 +89,7 @@ private class StaticFileServer(sourceDirectory: Path, defaults: Seq[String]) ext
 
   private def getDefaultFile(req: HttpRequest, sourceFile: Path): HttpMessage =
     defaults.find(name => isSafeFile(sourceFile.resolve(name)))
-      .map(name => Uri(req.path + "/" + name).normalize())
+      .map(name => Uri(req.path + "/" + name))
       .map(uri  => SeeOther(s"See other: $uri").setLocation(uri))
       .getOrElse(req)
 

@@ -25,7 +25,6 @@ import scamper.logging.*
 import scamper.types.given
 
 import ResponseStatus.Registry.*
-import Uri.{ http, https }
 
 trait TestServer:
   private given BodyParser[Array[Byte]] = BodyParser.bytes(8192)
@@ -67,8 +66,8 @@ trait TestServer:
 
   def serverUri(using server: HttpServer): Uri =
     server.isSecure match
-      case true  => https(server.host.getHostAddress + ":" + server.port)
-      case false => http (server.host.getHostAddress + ":" + server.port)
+      case true  => Uri("https://" + server.host.getHostAddress + ":" + server.port)
+      case false => Uri("http://"  + server.host.getHostAddress + ":" + server.port)
 
   private def doAuditLog[T <: HttpMessage](prefix: String)(msg: T): T =
     msg.logger.info {
