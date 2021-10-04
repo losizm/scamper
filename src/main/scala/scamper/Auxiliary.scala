@@ -16,14 +16,15 @@
 package scamper
 
 import java.io.{ File, FileOutputStream, FileInputStream, InputStream, OutputStream }
-import java.net.{ Socket, URLDecoder, URLEncoder }
+import java.net.{ Socket, URI, URLDecoder, URLEncoder }
 import java.nio.file.{ Paths, Path }
 import java.time.Instant
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
-import scamper.types.MediaType
+import scamper.http.types.MediaType
+
 import RuntimeProperties.auxiliary.*
 
 private object Auxiliary:
@@ -178,26 +179,26 @@ private object Auxiliary:
     def toUrlDecoded(charset: String): String =
       URLDecoder.decode(string, charset)
 
-  implicit class UriType(val uri: Uri) extends AnyVal:
-    def toTarget: Uri =
+  implicit class UriType(val uri: URI) extends AnyVal:
+    def toTarget: URI =
       buildUri(null, null, uri.getRawPath, uri.getRawQuery, null)
 
-    def setScheme(scheme: String): Uri =
+    def setScheme(scheme: String): URI =
       buildUri(scheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
 
-    def setAuthority(authority: String): Uri =
+    def setAuthority(authority: String): URI =
       buildUri(uri.getScheme, authority, uri.getRawPath, uri.getRawQuery, uri.getRawFragment)
 
-    def setPath(path: String): Uri =
+    def setPath(path: String): URI =
       buildUri(uri.getScheme, uri.getRawAuthority, path, uri.getRawQuery, uri.getRawFragment)
 
-    def setQuery(query: String): Uri =
+    def setQuery(query: String): URI =
       buildUri(uri.getScheme, uri.getRawAuthority, uri.getRawPath, query, uri.getRawFragment)
 
-    def setFragment(fragment: String): Uri =
+    def setFragment(fragment: String): URI =
       buildUri(uri.getScheme, uri.getRawAuthority, uri.getRawPath, uri.getRawQuery, fragment)
 
-    private def buildUri(scheme: String, authority: String, path: String, query: String, fragment: String): Uri =
+    private def buildUri(scheme: String, authority: String, path: String, query: String, fragment: String): URI =
       val uri = StringBuilder()
 
       if scheme != null then
@@ -215,4 +216,4 @@ private object Auxiliary:
       if fragment != null && fragment != "" then
         uri.append('#').append(fragment)
 
-      Uri(uri.toString)
+      URI(uri.toString).normalize()

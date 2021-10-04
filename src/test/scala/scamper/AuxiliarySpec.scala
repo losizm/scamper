@@ -20,30 +20,14 @@ import java.time.{ Instant, LocalDate }
 import Auxiliary.*
 
 class AuxiliarySpec extends org.scalatest.flatspec.AnyFlatSpec:
-  val uri = Uri("http://localhost:8080/index.html")
-  val uriPath = Uri("/index.html")
-  val uriPathWithQuery = Uri("/index.html?name=guest")
-
-  it should "create URI with new path" in {
-    assert(uriPath.setPath("/home.html") == Uri("/home.html"))
-  }
-
-  it should "create URI with new query" in {
-    assert(uriPath.setQuery("name=guest") == uriPathWithQuery)
-  }
-
-  it should "create URI with new scheme and authority" in {
-    assert(uriPath.setScheme("http").setAuthority("localhost:8080") == uri)
-  }
-
-  it should "match a string with at least one regular expression" in {
+  it should "match string with at least one regular expression" in {
     assert("abc".matchesAny("a.c", "123", "xyz"))
     assert("abc".matchesAny("123", "a.c", "xyz"))
     assert("abc".matchesAny("123", "a.*", "xyz"))
     assert("abc".matchesAny("a.c"))
   }
 
-  it should "not match a string with any regular expression" in {
+  it should "not match string with any regular expression" in {
     assert(!"XYZ".matchesAny("a.c", "123", "xyz"))
     assert(!"XYZ".matchesAny("123", "a.c", "xyz"))
     assert(!"XYZ".matchesAny("123", "a.*", "xyz"))

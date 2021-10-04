@@ -29,14 +29,14 @@ private object RuntimeProperties:
     lazy val executorQueueSize        = getIntProperty("scamper.auxiliary.executor.queueSize", 0).max(0)
 
   object cookies:
-    lazy val getRemotePublicSuffixList = getBooleanProperty("scamper.cookies.getRemotePublicSuffixList", false)
-    lazy val publicSuffixListUrl       = getProperty("scamper.cookies.publicSuffixListUrl", "https://publicsuffix.org/list/public_suffix_list.dat")
+    lazy val getRemotePublicSuffixList = getBooleanProperty("scamper.http.cookies.getRemotePublicSuffixList", false)
+    lazy val publicSuffixListUrl       = getProperty("scamper.http.cookies.publicSuffixListUrl", "https://publicsuffix.org/list/public_suffix_list.dat")
 
   object server:
-    lazy val keepAlivePoolSizeFactor = getIntProperty("scamper.server.keepAlive.poolSizeFactor", 2).max(1)
-    lazy val upgradePoolSizeFactor   = getIntProperty("scamper.server.upgrade.poolSizeFactor", 2).max(1)
-    lazy val encoderPoolSizeFactor   = getIntProperty("scamper.server.encoder.poolSizeFactor", 2).max(1)
-    lazy val closerQueueSizeFactor   = getIntProperty("scamper.server.closer.queueSizeFactor", 2).max(0)
+    lazy val keepAlivePoolSizeFactor = getIntProperty("scamper.http.server.keepAlive.poolSizeFactor", 2).max(1)
+    lazy val upgradePoolSizeFactor   = getIntProperty("scamper.http.server.upgrade.poolSizeFactor", 2).max(1)
+    lazy val encoderPoolSizeFactor   = getIntProperty("scamper.http.server.encoder.poolSizeFactor", 2).max(1)
+    lazy val closerQueueSizeFactor   = getIntProperty("scamper.http.server.closer.queueSizeFactor", 2).max(0)
 
   private def getBooleanProperty(name: String, default: => Boolean): Boolean =
     Try(sys.props(name).toBoolean)

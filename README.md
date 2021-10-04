@@ -71,10 +71,10 @@ start with a `RequestMethod`.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.RequestMethod.Registry.Get
-import scamper.headers.{ Accept, Host }
-import scamper.stringToUri
-import scamper.types.stringToMediaRange
+import scamper.http.RequestMethod.Registry.Get
+import scamper.http.headers.{ Accept, Host }
+import scamper.http.stringToUri
+import scamper.http.types.stringToMediaRange
 
 val req = Get("/motd")
   .setHost("localhost:8080")
@@ -89,10 +89,10 @@ start with a `ResponseStatus`.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.ResponseStatus.Registry.Ok
-import scamper.headers.{ Connection, ContentType }
-import scamper.stringToEntity
-import scamper.types.stringToMediaType
+import scamper.http.ResponseStatus.Registry.Ok
+import scamper.http.headers.{ Connection, ContentType }
+import scamper.http.stringToEntity
+import scamper.http.types.stringToMediaType
 
 val res = Ok("There is an answer.")
   .setContentType("text/plain")
@@ -107,8 +107,8 @@ these methods, the header name and value are each represented as `String`.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.RequestMethod.Registry.Post
-import scamper.{ stringToUri, tupleToHeader }
+import scamper.http.RequestMethod.Registry.Post
+import scamper.http.{ stringToUri, tupleToHeader }
 
 val req = Post("/api/users").setHeaders("Content-Type" -> "application/json")
 
@@ -116,8 +116,8 @@ val contentType: Option[String] = req.getHeaderValue("Content-Type")
 ```
 
 This gets the job done in many cases. However, there are extension methods
-provided by implicit classes defined in `scamper.headers`, which can be imported
-for specialized header access.
+provided by implicit classes defined in `scamper.http.headers`, which can be
+imported for specialized header access.
 
 For example, `ContentType` adds the following methods:
 
@@ -144,26 +144,26 @@ type.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.RequestMethod.Registry.Post
-import scamper.headers.ContentType
-import scamper.stringToUri
-import scamper.types.MediaType
+import scamper.http.RequestMethod.Registry.Post
+import scamper.http.headers.ContentType
+import scamper.http.stringToUri
+import scamper.http.types.MediaType
 
 val req = Post("/api/users").setContentType(MediaType("application/json"))
 println(req.contentType.mainType) // application
 println(req.contentType.subtype) // json
 ```
 
-And, with conversions defined in `scamper.types`, you can implicitly convert
-values to header types.
+And, with conversions defined in `scamper.http.types`, you can implicitly
+convert values to header types.
 
 ```scala
 import scala.language.implicitConversions
 
-import scamper.RequestMethod.Registry.Post
-import scamper.headers.ContentType
-import scamper.stringToUri
-import scamper.types.stringToMediaType
+import scamper.http.RequestMethod.Registry.Post
+import scamper.http.headers.ContentType
+import scamper.http.stringToUri
+import scamper.http.types.stringToMediaType
 
 val req = Post("/api/users").setContentType("application/json")
 println(req.contentType.mainType) // application
@@ -174,7 +174,7 @@ println(req.contentType.subtype) // json
 
 In much the same way specialized access to headers is available, so too is
 the case for cookies. Specialized access is provided by classes in
-`scamper.cookies`.
+`scamper.http.cookies`.
 
 ### Request Cookies
 
@@ -186,9 +186,9 @@ with each cookie represented as `PlainCookie`.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.RequestMethod.Registry.Get
-import scamper.cookies.{ PlainCookie, RequestCookies }
-import scamper.stringToUri
+import scamper.http.RequestMethod.Registry.Get
+import scamper.http.cookies.{ PlainCookie, RequestCookies }
+import scamper.http.stringToUri
 
 val req = Get("https://localhost:8080/motd").setCookies(
   PlainCookie("ID", "bG9zCg"), PlainCookie("Region", "SE-US")
@@ -218,9 +218,9 @@ as `SetCookie`.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.ResponseStatus.Registry.Ok
-import scamper.cookies.{ ResponseCookies, SetCookie }
-import scamper.stringToEntity
+import scamper.http.ResponseStatus.Registry.Ok
+import scamper.http.cookies.{ ResponseCookies, SetCookie }
+import scamper.http.stringToEntity
 
 val res = Ok("There is an answer.").setCookies(
   SetCookie("ID", "bG9zCg", path = Some("/motd"), secure = true),
@@ -264,10 +264,10 @@ example, you can create a message with text content.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.Entity
-import scamper.ResponseStatus.Registry.Ok
-import scamper.headers.ContentType
-import scamper.types.stringToMediaType
+import scamper.http.Entity
+import scamper.http.ResponseStatus.Registry.Ok
+import scamper.http.headers.ContentType
+import scamper.http.types.stringToMediaType
 
 val body = Entity("""
 <!DOCTYPE html>
@@ -289,10 +289,10 @@ Or, create a message using file content.
 import scala.language.implicitConversions
 
 import java.io.File
-import scamper.Entity
-import scamper.ResponseStatus.Registry.Ok
-import scamper.headers.ContentType
-import scamper.types.stringToMediaType
+import scamper.http.Entity
+import scamper.http.ResponseStatus.Registry.Ok
+import scamper.http.headers.ContentType
+import scamper.http.types.stringToMediaType
 
 val body = Entity(File("./index.html"))
 val res = Ok(body).setContentType("text/html; charset=utf-8")
@@ -305,10 +305,10 @@ required to create them explicitly.
 import scala.language.implicitConversions
 
 import java.io.File
-import scamper.ResponseStatus.Registry.Ok
-import scamper.fileToEntity
-import scamper.headers.ContentType
-import scamper.types.stringToMediaType
+import scamper.http.ResponseStatus.Registry.Ok
+import scamper.http.fileToEntity
+import scamper.http.headers.ContentType
+import scamper.http.types.stringToMediaType
 
 val res = Ok(File("./index.html")).setContentType("text/html; charset=utf-8")
 ```
@@ -322,7 +322,7 @@ a text parser.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.{ BodyParser, HttpMessage }
+import scamper.http.{ BodyParser, HttpMessage }
 
 // Create text body parser
 given BodyParser[String] = BodyParser.text(maxLength = 1024)
@@ -342,8 +342,8 @@ import little.json.Implicits.given
 
 import scala.language.implicitConversions
 
-import scamper.{ BodyParser, HttpMessage, stringToEntity, stringToUri }
-import scamper.RequestMethod.Registry.Post
+import scamper.http.{ BodyParser, HttpMessage, stringToEntity, stringToUri }
+import scamper.http.RequestMethod.Registry.Post
 
 case class User(id: Int, name: String)
 
@@ -376,9 +376,9 @@ import java.io.File
 
 import scala.language.implicitConversions
 
-import scamper.RequestMethod.Registry.Post
-import scamper.multipart.{ *, given }
-import scamper.stringToUri
+import scamper.http.RequestMethod.Registry.Post
+import scamper.http.multipart.{ *, given }
+import scamper.http.stringToUri
 
 // Build multipart form-data with text and file content
 val formData = Multipart(
@@ -398,8 +398,8 @@ And, for an incoming message with multipart form-data, there's a standard
 ```scala
 import scala.language.implicitConversions
 
-import scamper.{ BodyParser, HttpRequest }
-import scamper.multipart.Multipart
+import scamper.http.{ BodyParser, HttpRequest }
+import scamper.http.multipart.Multipart
 
 def saveTrack(req: HttpRequest): Unit =
   // Get parser for multipart message body
@@ -425,8 +425,8 @@ Attributes are arbitrary key-value pairs associated with a message.
 import scala.language.implicitConversions
 
 import scala.concurrent.duration.{ Deadline, DurationInt }
-import scamper.{ HttpRequest, HttpResponse, stringToUri }
-import scamper.RequestMethod.Registry.Get
+import scamper.http.{ HttpRequest, HttpResponse, stringToUri }
+import scamper.http.RequestMethod.Registry.Get
 
 def send(req: HttpRequest): HttpResponse = ???
 
@@ -441,7 +441,7 @@ _**Note:** Attributes are not included in the transmitted message._
 
 ## HTTP Authentication
 
-**Scamper** includes a separate package (i.e., `scamper.auth`) for working with
+**Scamper** includes a separate package (i.e., `scamper.http.auth`) for working with
 authentication headers.
 
 ### Challenges and Credentials
@@ -453,10 +453,10 @@ associated with either a token or a set of parameters.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.RequestMethod.Registry.Get
-import scamper.ResponseStatus.Registry.Unauthorized
-import scamper.auth.{ Authorization, Challenge, Credentials, WwwAuthenticate }
-import scamper.stringToUri
+import scamper.http.RequestMethod.Registry.Get
+import scamper.http.ResponseStatus.Registry.Unauthorized
+import scamper.http.auth.{ Authorization, Challenge, Credentials, WwwAuthenticate }
+import scamper.http.stringToUri
 
 // Present response challenge (scheme and parameters)
 val challenge = Challenge("Bearer", "realm" -> "developer")
@@ -482,10 +482,10 @@ There are subclasses defined for Basic authentication: `BasicChallenge` and
 ```scala
 import scala.language.implicitConversions
 
-import scamper.RequestMethod.Registry.Get
-import scamper.ResponseStatus.Registry.Unauthorized
-import scamper.auth.{ Authorization, BasicChallenge, BasicCredentials, WwwAuthenticate }
-import scamper.stringToUri
+import scamper.http.RequestMethod.Registry.Get
+import scamper.http.ResponseStatus.Registry.Unauthorized
+import scamper.http.auth.{ Authorization, BasicChallenge, BasicCredentials, WwwAuthenticate }
+import scamper.http.stringToUri
 
 // Provide realm and optional parameters
 val challenge = BasicChallenge("admin", "title" -> "Admin Console")
@@ -502,10 +502,10 @@ classes.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.RequestMethod.Registry.Get
-import scamper.ResponseStatus.Registry.Unauthorized
-import scamper.auth.{ Authorization, WwwAuthenticate }
-import scamper.stringToUri
+import scamper.http.RequestMethod.Registry.Get
+import scamper.http.ResponseStatus.Registry.Unauthorized
+import scamper.http.auth.{ Authorization, WwwAuthenticate }
+import scamper.http.stringToUri
 
 // Provide realm and optional parameters
 val res = Unauthorized().setBasic("admin", "title" -> "Admin Console")
@@ -531,10 +531,10 @@ the header classes.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.RequestMethod.Registry.Get
-import scamper.ResponseStatus.Registry.Unauthorized
-import scamper.auth.{ Authorization, WwwAuthenticate }
-import scamper.stringToUri
+import scamper.http.RequestMethod.Registry.Get
+import scamper.http.ResponseStatus.Registry.Unauthorized
+import scamper.http.auth.{ Authorization, WwwAuthenticate }
+import scamper.http.stringToUri
 
 // Provide challenge parameters
 val res = Unauthorized().setBearer(
@@ -575,11 +575,11 @@ responses.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.RequestMethod.Registry.Post
-import scamper.client.HttpClient
-import scamper.headers.ContentType
-import scamper.{ stringToEntity, stringToUri }
-import scamper.types.stringToMediaType
+import scamper.http.RequestMethod.Registry.Post
+import scamper.http.client.HttpClient
+import scamper.http.headers.ContentType
+import scamper.http.{ stringToEntity, stringToUri }
+import scamper.http.types.stringToMediaType
 
 val req = Post("https://localhost:8080/users")
   .setContentType("application/json")
@@ -606,8 +606,8 @@ HTTP request methods.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.{ BodyParser, stringToUri }
-import scamper.client.HttpClient
+import scamper.http.{ BodyParser, stringToUri }
+import scamper.http.client.HttpClient
 
 given BodyParser[String] = BodyParser.text()
 
@@ -627,11 +627,11 @@ itself.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.{ BodyParser, stringToUri }
-import scamper.RequestMethod.Registry.Get
-import scamper.client.{ ClientHttpRequest, HttpClient }
-import scamper.headers.{ Accept, AcceptLanguage }
-import scamper.types.{ stringToMediaRange, stringToLanguageRange }
+import scamper.http.{ BodyParser, stringToUri }
+import scamper.http.RequestMethod.Registry.Get
+import scamper.http.client.{ ClientHttpRequest, HttpClient }
+import scamper.http.headers.{ Accept, AcceptLanguage }
+import scamper.http.types.{ stringToMediaRange, stringToLanguageRange }
 
 given HttpClient = HttpClient()
 given BodyParser[String] = BodyParser.text(4096)
@@ -651,10 +651,10 @@ configure the client before creating it.
 import scala.language.implicitConversions
 
 import java.io.File
-import scamper.{ stringToEntity, stringToUri }
-import scamper.client.HttpClient
-import scamper.cookies.CookieStore
-import scamper.types.{ stringToContentCodingRange, stringToMediaRange }
+import scamper.http.{ stringToEntity, stringToUri }
+import scamper.http.client.HttpClient
+import scamper.http.cookies.CookieStore
+import scamper.http.types.{ stringToContentCodingRange, stringToMediaRange }
 
 // Build client from settings
 val client = HttpClient
@@ -702,8 +702,8 @@ supply a trust manager instead.
 import scala.language.implicitConversions
 
 import javax.net.ssl.TrustManager
-import scamper.stringToUri
-import scamper.client.HttpClient
+import scamper.http.stringToUri
+import scamper.http.client.HttpClient
 
 class SingleSiteTrustManager(address: String) extends TrustManager {
   // Provide TrustManager implementation
@@ -730,9 +730,9 @@ To perform common operations on client requests and their responses, you can add
 filters to the client.
 
 ```scala
-import scamper.Uri
-import scamper.client.*
-import scamper.cookies.*
+import scamper.http.Uri
+import scamper.http.client.*
+import scamper.http.cookies.*
 
 val settings = HttpClient.settings()
 
@@ -770,8 +770,8 @@ The client instance can also be used as a WebSocket client.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.stringToUri
-import scamper.client.HttpClient
+import scamper.http.stringToUri
+import scamper.http.client.HttpClient
 
 HttpClient().websocket("ws://localhost:9090/hello") { session =>
   session.onText { message =>
@@ -830,9 +830,9 @@ with a simple example.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.ResponseStatus.Registry.Ok
-import scamper.stringToEntity
-import scamper.server.HttpServer
+import scamper.http.ResponseStatus.Registry.Ok
+import scamper.http.stringToEntity
+import scamper.http.server.HttpServer
 
 val server = HttpServer(8080) { req =>
   Ok("Hello, world!")
@@ -911,9 +911,9 @@ handler to have its turn. Otherwise, it returns an `HttpResponse`, and any
 remaining handlers are effectively ignored.
 
 ```scala
-import scamper.RequestMethod.Registry.{ Get, Head }
-import scamper.ResponseStatus.Registry.MethodNotAllowed
-import scamper.headers.Allow
+import scamper.http.RequestMethod.Registry.{ Get, Head }
+import scamper.http.ResponseStatus.Registry.MethodNotAllowed
+import scamper.http.headers.Allow
 
 // Add handler to log request line and headers to stdout
 app.incoming { req =>
@@ -944,9 +944,9 @@ accepted.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.{ BodyParser, HttpMessage, stringToEntity }
-import scamper.headers.ContentLanguage
-import scamper.types.{ LanguageTag, stringToLanguageTag }
+import scamper.http.{ BodyParser, HttpMessage, stringToEntity }
+import scamper.http.headers.ContentLanguage
+import scamper.http.types.{ LanguageTag, stringToLanguageTag }
 
 // Translate message body from French (Oui, oui.)
 app.incoming { req =>
@@ -967,9 +967,9 @@ app.incoming { req =>
 A handler can be added to a target path with or without a target request method.
 
 ```scala
-import scamper.RequestMethod.Registry.Get
-import scamper.ResponseStatus.Registry.{ Forbidden, Ok }
-import scamper.stringToEntity
+import scamper.http.RequestMethod.Registry.Get
+import scamper.http.ResponseStatus.Registry.{ Forbidden, Ok }
+import scamper.http.stringToEntity
 
 // Match request method and exact path
 app.incoming("/about", Get) { req =>
@@ -988,9 +988,9 @@ request methods.
 ```scala
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.concurrent.TrieMap
-import scamper.ResponseStatus.Registry.{ Created, Ok }
-import scamper.headers.Location
-import scamper.stringToUri
+import scamper.http.ResponseStatus.Registry.{ Created, Ok }
+import scamper.http.headers.Location
+import scamper.http.stringToUri
 
 // Match GET requests to given path
 app.get("/motd") { req =>
@@ -1022,9 +1022,9 @@ path segment; whereas, __*param__ matches the path segment along with any
 remaining segments, including intervening path separators (i.e., **/**).
 
 ```scala
-import scamper.ResponseStatus.Registry.{ Accepted, NotFound, Ok }
-import scamper.fileToEntity
-import scamper.server.ServerHttpRequest
+import scamper.http.ResponseStatus.Registry.{ Accepted, NotFound, Ok }
+import scamper.http.fileToEntity
+import scamper.http.server.ServerHttpRequest
 
 // Match request method and parameterized path
 app.delete("/orders/:id") { req =>
@@ -1054,9 +1054,9 @@ segment in the path; however, there can be multiple __:param__ instances
 specified.
 
 ```scala
-import scamper.{ BodyParser, stringToEntity }
-import scamper.ResponseStatus.Registry.Ok
-import scamper.server.ServerHttpRequest
+import scamper.http.{ BodyParser, stringToEntity }
+import scamper.http.ResponseStatus.Registry.Ok
+import scamper.http.server.ServerHttpRequest
 
 // Match path with two parameters
 app.post("/translate/:in/to/:out") { req =>
@@ -1089,8 +1089,8 @@ At times, you may wish to omit a response to a particular request. On such
 occassions, you'd throw `ResponseAborted` from the request handler.
 
 ```scala
-import scamper.headers.Referer
-import scamper.server.ResponseAborted
+import scamper.http.headers.Referer
+import scamper.http.server.ResponseAborted
 
 // Ignore requests originating from evil site
 app.incoming { req =>
@@ -1148,7 +1148,7 @@ You can define an `ErrorHandler` to handle exceptions thrown from your request
 handlers.
 
 ```scala
-import scamper.ResponseStatus.Registry.{ BadRequest, InternalServerError }
+import scamper.http.ResponseStatus.Registry.{ BadRequest, InternalServerError }
 
 app.recover {
   def isClientError(err: Throwable) =
@@ -1170,11 +1170,11 @@ mount path.
 ```scala
 import scala.language.implicitConversions
 
-import scamper.ResponseStatus.Registry.{ BadRequest, NotFound, Ok }
-import scamper.headers.ContentType
-import scamper.server.{ ParameterNotConvertible, ServerApplication, ServerHttpRequest }
-import scamper.stringToEntity
-import scamper.types.stringToMediaType
+import scamper.http.ResponseStatus.Registry.{ BadRequest, NotFound, Ok }
+import scamper.http.headers.ContentType
+import scamper.http.server.{ ParameterNotConvertible, ServerApplication, ServerHttpRequest }
+import scamper.http.stringToEntity
+import scamper.http.types.stringToMediaType
 
 // Mount router to /api
 val app = ServerApplication()
@@ -1228,7 +1228,7 @@ This is pretty much the same as the request logger from earlier, only instead of
 And, the filter is not restricted to returning the same response it accepts.
 
 ```scala
-import scamper.server.ServerHttpResponse
+import scamper.http.server.ServerHttpResponse
 
 // Gzip response body if not empty
 app.outgoing { res =>
