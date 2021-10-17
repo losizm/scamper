@@ -9,11 +9,12 @@ scalaVersion := "3.0.2"
 scalacOptions := Seq("-deprecation", "-feature", "-new-syntax", "-Xfatal-warnings", "-Yno-experimental")
 
 Compile / doc / scalacOptions := Seq(
-  "-project", name.value.capitalize,
+  "-project", name.value.toUpperCase,
   "-project-version", {
     val ver = version.value
     ver.substring(0, ver.lastIndexOf('.')) ++ ".x"
-  }
+  },
+  "-project-logo", "images/logo.svg"
 )
 
 libraryDependencies += "org.scalatest" %% "scalatest-flatspec" % "3.2.9" % "test"
