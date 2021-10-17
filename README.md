@@ -50,7 +50,7 @@ and writing HTTP messages, and it provides [client](#HTTP-Client) and
 To get started, add **Scamper** to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "24.0.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "25.0.0"
 ```
 
 _**NOTE:** Starting with 23.0.0, **Scamper** is written for Scala 3. See
@@ -470,7 +470,7 @@ val req = Get("/dev/projects").setAuthorization(credentials)
 _**Note:** The `Authorization` and `WwwAuthenticate` header classes are for
 authentication between user agent and origin server. There are other header
 classes available for proxy authentication. See
-[scaladoc](https://losizm.github.io/scamper/latest/api/scamper/auth.html) for
+[scaladoc](https://losizm.github.io/scamper/latest/api/scamper/http/auth.html) for
 details._
 
 
@@ -819,7 +819,7 @@ second span, the session will be closed automatically.
 Before the session begins reading incoming messages, it must first be opened.
 And, to kick things off, a simple text message is sent to the server.
 
-See [WebSocketSession](https://losizm.github.io/scamper/latest/api/scamper/websocket.html)
+See [WebSocketSession](https://losizm.github.io/scamper/latest/api/scamper/http/websocket.html)
 in scaladoc for additional details.
 
 ## HTTP Server
@@ -1139,7 +1139,7 @@ app.websocket("/hello") { session =>
 }
 ```
 
-See [WebSocketSession](https://losizm.github.io/scamper/latest/api/scamper/websocket/WebSocketSession.html)
+See [WebSocketSession](https://losizm.github.io/scamper/latest/api/scamper/http/websocket/WebSocketSession.html)
 in scaladoc for additional details.
 
 ### Error Handler

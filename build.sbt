@@ -1,6 +1,6 @@
 organization := "com.github.losizm"
 name         := "scamper"
-version      := "24.0.0"
+version      := "25.0.0"
 description  := "The HTTP library for Scala"
 homepage     := Some(url("https://github.com/losizm/scamper"))
 licenses     := List("Apache License, Version 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
@@ -10,10 +10,7 @@ scalacOptions := Seq("-deprecation", "-feature", "-new-syntax", "-Xfatal-warning
 
 Compile / doc / scalacOptions := Seq(
   "-project", name.value.toUpperCase,
-  "-project-version", {
-    val ver = version.value
-    ver.substring(0, ver.lastIndexOf('.')) ++ ".x"
-  },
+  "-project-version", version.value,
   "-project-logo", "images/logo.svg"
 )
 
