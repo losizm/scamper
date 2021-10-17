@@ -1,5 +1,5 @@
 :root {
-  font-size: 32px;
+  font-size: 14px;
 }
 
 body {
@@ -7,93 +7,79 @@ body {
   padding: 0;
   font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1em;
-  background-color: #fcfcfc;
-  color: #333;
-}
-
-.hero {
-  margin-top: 5%;
+  background-color: #014;
+  color: #bbb;
   text-align: center;
 }
 
-.hero > .brand {
-  color: #000;
-  font-size: 2em;
-  letter-spacing: -0.05em;
+header {
+  margin-top: 5%;
 }
 
-.hero > .brand > .sep {
-  color: #24d;
-}
-
-.hero > .brand > em {
-  font-style: normal;
-  color: #999;
-}
-
-.hero > .tagline {
-  color: #666;
-  font-weight: 300;
-  letter-spacing: 0.025em;
-}
-
-.hero > .stripe {
-  margin-top: 0.75rem;
-  padding: 2.5em;
-  border-top: 1px solid #e8e8e8;
-  border-bottom: 1px solid #e8e8e8;
-  background-color: #f8f8f8;
-  font-size: 0.45em;
-  letter-spacing: 0.075em;
-}
-
-.hero > .stripe > .quote {
-  color: #d24
-}
-
-.hero > .stripe > .op {
-  color: #24a;
-}
-
-.hero > .controls {
-  margin-top: 0.5rem;
-}
-
-.hero > .controls > a.btn, .hero > .controls > a.btn:visited  {
-  font-size: 0.5em;
+h1 {
+  margin: 0 0 .5rem 0;
+  color: #46d;
+  font-size: 4.5em;
   font-weight: normal;
-  padding: 0.75em 1.25em;
-  border: 1px solid #37e;
-  border-radius: 4px;
-  background-color: #26d;
+  letter-spacing: -.05em;
+}
+
+h2 {
+  margin: 0 0 1.5rem 0;
   color: #fff;
+  font-size: 2em;
+  font-weight: 300;
+  letter-spacing: .025em;
+}
+
+main {
+  margin-top: .75rem;
+  border-top: 1px solid #24b;
+  border-bottom: 1px solid #24b;
+  padding: 2.5em;
+  background-color: #000822;
+  color: #46d;
+  letter-spacing: .075em;
+}
+
+main > .quote {
+  color: #2b4
+}
+
+main > .op {
+  color: #46d;
+}
+
+nav {
+  margin-top: 2.25rem;
+}
+
+nav > a, nav > a:visited  {
+  border: 1px solid #24b;
+  border-radius: 4px;
+  padding: .75em 1.25em;
+  background-color: #014;
+  color: #46d;
+  font-size: .9em;
+  font-weight: normal;
   text-decoration: none;
 }
 
-.hero > .controls > a.btn:hover  {
-  background-color: #2f6fdf;
+nav > a:hover  {
+  background-color: #128;
   cursor: pointer;
 }
 
-.hero > .controls > a.btn:active  {
-  background-color: #37e;
+nav > a:active  {
+  background-color: #16278d;
 }
 
-.hero > .controls > a.btn.btn-alt, .hero > .controls > a.btn.btn-alt:visited {
-  border: 1px solid #ccc;
-  background-color: #fcfcfc;
-  color: #333;
-}
-
-.hero > .controls > a.btn.btn-alt:hover  {
-  background-color: #f0f0f0;
-  cursor: pointer;
-}
-
-.hero > .controls > a.btn.btn-alt:active  {
-  background-color: #eee;
-}
-
-.hero > .controls > a.btn + a.btn {
+nav > a + a {
   margin-left: 1em;
+}
+
+footer {
+  margin-top: 6rem;
+  color: #24b;
+  font-size: .75em;
 }

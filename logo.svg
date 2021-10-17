@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2021 Carlos Conyers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<svg version="1.1"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xml:space="preserve"
+     x="0"
+     y="0"
+     width="64"
+     height="64"
+     viewBox="0 0 100 100">
+  <title>Scamper</title>
+
+  <path id="scamper-head"
+    d="M26,66 Q50,122 74,66 Q114,34 78,6 Q50,18 54,42 L46,42 Q50,18 22,6 Q-14,34 26,66 Z"
+    style="stroke: #ddd; stroke-width: 4; fill: #111;"/>
+
+  <g id="scamper-ears-inner" style="stroke: #102060; stroke-width: 4; fill: #081858;">
+    <path id="scamper-ear-inner-left"  d="M36,44 Q36,18 22,18 Q 2,34 27,52 L36,44Z"/>
+    <path id="scamper-ear-inner-right" d="M64,44 Q64,18 78,18 Q98,34 73,52 L64,44Z"/>
+  </g>
+
+  <g id="scamper-eyes">
+    <g id="scamper-eyes-outer" style="stroke: none; fill: #57e;">
+      <ellipse id="scamper-eye-outer-left"  cx="41" cy="66" rx="6" ry="9" transform="rotate(-20,41,66)"/>
+      <ellipse id="scamper-eye-outer-right" cx="59" cy="66" rx="6" ry="9" transform="rotate(20,59,66)"/>
+    </g>
+
+    <g id="scamper-eyes-inner" style="stroke: none; fill: #46d;">
+      <ellipse id="scamper-eye-inner-left"  cx="41" cy="66" rx="5" ry="8" transform="rotate(-15,41,66)"/>
+      <ellipse id="scamper-eye-inner-right" cx="59" cy="66" rx="5" ry="8" transform="rotate(15,59,66)"/>
+    </g>
+  </g>
+
+  <path id="scamper-nose" d="M46,79 Q50,85 54,79 Q50,75 46,79 Z" style="stroke: none; fill: #239;"/>
+
+  <path id="scamper-mouth" d="M45,85 Q50,90 55,85 Z" style="stroke: none; fill: #fff;"/>
+</svg>
