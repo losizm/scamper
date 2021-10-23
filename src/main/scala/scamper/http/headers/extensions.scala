@@ -15,33 +15,6 @@
  */
 package scamper
 package http
-/**
- * Defines implicit classes for specialized access to message headers.
- *
- * ### Using Header Classes
- *
- * Specialized header access is provided by implicit classes. Some headers are
- * available to both requests and responses, and others are available only to a
- * specific message type. This behavior is driven by the HTTP specification.
- *
- * {{{
- * import scala.language.implicitConversions
- *
- * import scamper.http.RequestMethod.Registry.Get
- * import scamper.http.headers.{ Accept, Host }
- * import scamper.http.types.stringToMediaRange
- * import scamper.http.stringToUri
- *
- * // Build request using 'Host' and 'Accept' headers
- * val req = Get("/motd")
- *   .setHost("localhost:8080")
- *   .setAccept("text/plain")
- *
- * // Access and print header values
- * printf("Host: %s%n", req.host)
- * printf("Accept: %s%n", req.accept.mkString(", "))
- * }}}
- */
 package headers
 
 import java.time.Instant
