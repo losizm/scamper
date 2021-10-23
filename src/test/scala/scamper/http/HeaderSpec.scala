@@ -44,7 +44,7 @@ class HeaderSpec extends org.scalatest.flatspec.AnyFlatSpec:
     val header = Header("If-Modified-Since", DateValue.parse("Tue, 8 Nov 2016 21:00:00 -0500"))
     assert(header.name == "If-Modified-Since")
     assert(header.value == "Wed, 9 Nov 2016 02:00:00 GMT")
-    assert(header.dateValue == DateValue.parse("Wed, 9 Nov 2016 02:00:00 GMT"))
+    assert(header.instantValue == DateValue.parse("Wed, 9 Nov 2016 02:00:00 GMT"))
     assert(header.toString == "If-Modified-Since: Wed, 9 Nov 2016 02:00:00 GMT")
   }
 

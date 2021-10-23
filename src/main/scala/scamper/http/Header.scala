@@ -39,7 +39,7 @@ sealed trait Header:
    *
    * @note The header value is assumed formatted per &sect;3.3 of RFC5322.
    */
-  def dateValue: Instant = DateValue.parse(value)
+  def instantValue: Instant = DateValue.parse(value)
 
 /** Provides factory for `Header`. */
 object Header:

@@ -568,7 +568,7 @@ implicit class Date[T <: HttpMessage](message: T) extends AnyVal:
 
   /** Gets Date header value if present. */
   def getDate: Option[Instant] =
-    message.getHeader("Date").map(_.dateValue)
+    message.getHeader("Date").map(_.instantValue)
 
   /** Creates new message setting Date header to supplied value. */
   def setDate(value: Instant)(implicit ev: <:<[T, MessageBuilder[T]]): T =
@@ -672,7 +672,7 @@ implicit class Expires(response: HttpResponse) extends AnyVal:
 
   /** Gets Expires header value if present. */
   def getExpires: Option[Instant] =
-    response.getHeader("Expires").map(_.dateValue)
+    response.getHeader("Expires").map(_.instantValue)
 
   /** Creates new response setting Expires header to supplied value. */
   def setExpires(value: Instant): HttpResponse =
@@ -782,7 +782,7 @@ implicit class IfModifiedSince(request: HttpRequest) extends AnyVal:
 
   /** Gets If-Modified-Since header value if present. */
   def getIfModifiedSince: Option[Instant] =
-    request.getHeader("If-Modified-Since").map(_.dateValue)
+    request.getHeader("If-Modified-Since").map(_.instantValue)
 
   /** Creates new request setting If-Modified-Since header to supplied value. */
   def setIfModifiedSince(value: Instant): HttpRequest =
@@ -844,7 +844,7 @@ implicit class IfRange(request: HttpRequest) extends AnyVal:
       Try {
         Left(EntityTag.parse(header.value))
       }.orElse {
-        Try(Right(header.dateValue))
+        Try(Right(header.instantValue))
       }.get
     }
 
@@ -880,7 +880,7 @@ implicit class IfUnmodifiedSince(request: HttpRequest) extends AnyVal:
 
   /** Gets If-Unmodified-Since header value if present. */
   def getIfUnmodifiedSince: Option[Instant] =
-    request.getHeader("If-Unmodified-Since").map(_.dateValue)
+    request.getHeader("If-Unmodified-Since").map(_.instantValue)
 
   /**
    * Creates new request setting If-Unmodified-Since header to supplied value.
@@ -934,7 +934,7 @@ implicit class LastModified(response: HttpResponse) extends AnyVal:
 
   /** Gets Last-Modified header value if present. */
   def getLastModified: Option[Instant] =
-    response.getHeader("Last-Modified").map(_.dateValue)
+    response.getHeader("Last-Modified").map(_.instantValue)
 
   /** Creates new response setting Last-Modified header to supplied value. */
   def setLastModified(value: Instant): HttpResponse =
@@ -1190,7 +1190,7 @@ implicit class RetryAfter(response: HttpResponse) extends AnyVal:
 
   /** Gets Retry-After header value if present. */
   def getRetryAfter: Option[Instant] =
-    response.getHeader("Retry-After").map(_.dateValue)
+    response.getHeader("Retry-After").map(_.instantValue)
 
   /** Creates new response setting Retry-After header to supplied value. */
   def setRetryAfter(value: Instant): HttpResponse =
