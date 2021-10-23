@@ -404,8 +404,3 @@ class ServerApplication extends Router:
   def create(host: InetAddress, port: Int): HttpServer = synchronized {
     HttpServerImpl(host, port, app)
   }
-
-/** Provides factory for `ServerApplication`. */
-object ServerApplication:
-  /** Gets new instance of `ServerApplication`. */
-  def apply(): ServerApplication = new ServerApplication()

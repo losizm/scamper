@@ -176,8 +176,3 @@ class ClientSettings:
 
   /** Creates client using current settings. */
   def create(): HttpClient = synchronized { HttpClientImpl(settings) }
-
-/** Provides factory for `ClientSettings`. */
-object ClientSettings:
-  /** Gets new instance of client settings. */
-  def apply(): ClientSettings = new ClientSettings()

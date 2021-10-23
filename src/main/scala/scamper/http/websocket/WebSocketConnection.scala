@@ -30,9 +30,9 @@ import StatusCode.Registry.{ MessageTooBig, ProtocolError }
 /**
  * Represents endpoint of WebSocket connection.
  *
- * @see [[WebSocketConnection.apply WebSocketConnection]]
+ * @constructor Create WebSocket connection using supplied socket.
  */
-class WebSocketConnection private (socket: Socket):
+class WebSocketConnection(socket: Socket):
   private val finBits      = 0x80
   private val compressBits = 0x40
   private val reservedBits = 0x30
@@ -173,12 +173,3 @@ class WebSocketConnection private (socket: Socket):
    *  sending an appropriate Close frame before invoking this method.
    */
   def close(): Unit = Try(socket.close())
-
-/** Provides factory for `WebSocketConnection`. */
-object WebSocketConnection:
-  /**
-   * Creates WebSocket connection using supplied socket.
-   *
-   * @param socket socket connection
-   */
-  def apply(socket: Socket): WebSocketConnection = new WebSocketConnection(socket)
