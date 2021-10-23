@@ -173,11 +173,11 @@ private object Auxiliary:
     def matchesAny(regexes: String*): Boolean =
       regexes.exists(string.matches)
 
-    def toUrlEncoded(charset: String): String =
-      URLEncoder.encode(string, charset)
+    def toUrlEncoded: String =
+      URLEncoder.encode(string, "UTF-8")
 
-    def toUrlDecoded(charset: String): String =
-      URLDecoder.decode(string, charset)
+    def toUrlDecoded: String =
+      URLDecoder.decode(string, "UTF-8")
 
   implicit class UriType(val uri: URI) extends AnyVal:
     def toTarget: URI =

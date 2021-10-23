@@ -73,7 +73,7 @@ private class StaticFileServer(sourceDirectory: Path, defaults: Seq[String]) ext
       case false => NotModified().setLastModified(lastModified)
 
   private def toSourceFile(path: String): Path =
-    sourceDirectory.resolve(path.toUrlDecoded("utf-8")).normalize()
+    sourceDirectory.resolve(path.toUrlDecoded).normalize()
 
   private def getSourceFile(req: HttpRequest, sourceFile: Path): HttpMessage =
     if isFile(sourceFile) then

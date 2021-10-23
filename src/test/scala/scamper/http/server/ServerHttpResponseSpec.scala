@@ -27,7 +27,7 @@ import ResponseStatus.Registry.Ok
 
 class ServerHttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec:
   val file = File("./src/test/resources/test.html")
-  val encodedFileName = s"utf-8''${file.getName.toUrlEncoded("utf-8")}"
+  val encodedFileName = s"utf-8''${file.getName.toUrlEncoded}"
 
   it should "add file attachment to HttpResponse" in {
     val res = Ok().setAttachment(file)

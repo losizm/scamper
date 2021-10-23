@@ -150,7 +150,7 @@ implicit class ServerHttpResponse(response: HttpResponse) extends AnyVal:
     val disposition = DispositionType(
       typeName,
       "filename" -> file.getName(),
-      "filename*" -> s"utf-8''${file.getName().toUrlEncoded("utf-8")}"
+      "filename*" -> s"utf-8''${file.getName().toUrlEncoded}"
     )
 
     response.setBody(entity)
