@@ -220,9 +220,8 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   private def createCorrelate(requestId: Long): String =
     f"${System.currentTimeMillis}%x-$id%04x-$requestId%04x"
 
-  private def addAttributes[T <: HttpMessage](msg: T, conn: HttpClientConnection, correlate: String, absoluteTarget: Uri)
-      (implicit ev: <:<[T, MessageBuilder[T]]): T =
-    msg.putAttributes(
+  private def addAttributes[T <: HttpMessage](msg: T, conn: HttpClientConnection, correlate: String, absoluteTarget: Uri): T =
+    msg.asInstanceOf[MessageBuilder[T]].putAttributes(
       "scamper.http.client.message.client"         -> this,
       "scamper.http.client.message.connection"     -> conn,
       "scamper.http.client.message.socket"         -> conn.getSocket(),

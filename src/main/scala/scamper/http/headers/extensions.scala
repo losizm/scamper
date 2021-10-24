@@ -290,16 +290,16 @@ implicit class CacheControl[T <: HttpMessage](message: T) extends AnyVal:
     message.getHeaderValue("Cache-Control").map(CacheDirective.parseAll)
 
   /** Creates new message setting Cache-Control header to supplied values. */
-  def setCacheControl(values: Seq[CacheDirective])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Cache-Control", values.mkString(", ")))
+  def setCacheControl(values: Seq[CacheDirective]): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Cache-Control", values.mkString(", ")))
 
   /** Creates new message setting Cache-Control header to supplied values. */
-  def setCacheControl(one: CacheDirective, more: CacheDirective*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setCacheControl(one: CacheDirective, more: CacheDirective*): T =
     setCacheControl(one +: more)
 
   /** Creates new message removing Cache-Control header. */
-  def removeCacheControl(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Cache-Control")
+  def removeCacheControl: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Cache-Control")
 
 /** Provides standardized access to Content-Disposition header. */
 implicit class ContentDisposition(response: HttpResponse) extends AnyVal:
@@ -348,16 +348,16 @@ implicit class ContentEncoding[T <: HttpMessage](message: T) extends AnyVal:
       .map(_.map(ContentCoding.apply))
 
   /** Creates new message setting Content-Encoding header to supplied values. */
-  def setContentEncoding(values: Seq[ContentCoding])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Content-Encoding", values.mkString(", ")))
+  def setContentEncoding(values: Seq[ContentCoding]): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Content-Encoding", values.mkString(", ")))
 
   /** Creates new message setting Content-Encoding header to supplied values. */
-  def setContentEncoding(one: ContentCoding, more: ContentCoding*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setContentEncoding(one: ContentCoding, more: ContentCoding*): T =
     setContentEncoding(one +: more)
 
   /** Creates new message removing Content-Encoding header. */
-  def removeContentEncoding(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Content-Encoding")
+  def removeContentEncoding: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Content-Encoding")
 
 /** Provides standardized access to Content-Language header. */
 implicit class ContentLanguage[T <: HttpMessage](message: T) extends AnyVal:
@@ -380,16 +380,16 @@ implicit class ContentLanguage[T <: HttpMessage](message: T) extends AnyVal:
       .map(_.map(LanguageTag.parse))
 
   /** Creates new message setting Content-Language header to supplied values. */
-  def setContentLanguage(values: Seq[LanguageTag])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Content-Language", values.mkString(", ")))
+  def setContentLanguage(values: Seq[LanguageTag]): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Content-Language", values.mkString(", ")))
 
   /** Creates new message setting Content-Language header to supplied values. */
-  def setContentLanguage(one: LanguageTag, more: LanguageTag*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setContentLanguage(one: LanguageTag, more: LanguageTag*): T =
     setContentLanguage(one +: more)
 
   /** Creates new message removing Content-Language header. */
-  def removeContentLanguage(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Content-Language")
+  def removeContentLanguage: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Content-Language")
 
 /** Provides standardized access to Content-Length header. */
 implicit class ContentLength[T <: HttpMessage](message: T) extends AnyVal:
@@ -410,12 +410,12 @@ implicit class ContentLength[T <: HttpMessage](message: T) extends AnyVal:
     message.getHeader("Content-Length").map(_.longValue)
 
   /** Creates new message setting Content-Length header to supplied value. */
-  def setContentLength(value: Long)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Content-Length", value))
+  def setContentLength(value: Long): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Content-Length", value))
 
   /** Creates new message removing Content-Length header. */
-  def removeContentLength(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Content-Length")
+  def removeContentLength: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Content-Length")
 
 /** Provides standardized access to Content-Location header. */
 implicit class ContentLocation[T <: HttpMessage](message: T) extends AnyVal:
@@ -436,12 +436,12 @@ implicit class ContentLocation[T <: HttpMessage](message: T) extends AnyVal:
     message.getHeaderValue("Content-Location").map(Uri(_))
 
   /** Creates new message setting Content-Location header to supplied value. */
-  def setContentLocation(value: Uri)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Content-Location", value.toString))
+  def setContentLocation(value: Uri): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Content-Location", value.toString))
 
   /** Creates new message removing Content-Location header. */
-  def removeContentLocation(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Content-Location")
+  def removeContentLocation: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Content-Location")
 
 /** Provides standardized access to Content-Range header. */
 implicit class ContentRange[T <: HttpMessage](message: T) extends AnyVal:
@@ -462,12 +462,12 @@ implicit class ContentRange[T <: HttpMessage](message: T) extends AnyVal:
     message.getHeaderValue("Content-Range").map(ByteContentRange.parse)
 
   /** Creates new message setting Content-Range header to supplied value. */
-  def setContentRange(value: ByteContentRange)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Content-Range", value.toString))
+  def setContentRange(value: ByteContentRange): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Content-Range", value.toString))
 
   /** Creates new message removing Content-Range header. */
-  def removeContentRange(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Content-Range")
+  def removeContentRange: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Content-Range")
 
 /** Provides standardized access to Content-Type header. */
 implicit class ContentType[T <: HttpMessage](message: T) extends AnyVal:
@@ -488,12 +488,12 @@ implicit class ContentType[T <: HttpMessage](message: T) extends AnyVal:
     message.getHeaderValue("Content-Type").map(MediaType.apply)
 
   /** Creates new message setting Content-Type header to supplied value. */
-  def setContentType(value: MediaType)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Content-Type", value.toString))
+  def setContentType(value: MediaType): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Content-Type", value.toString))
 
   /** Creates new message removing Content-Type header. */
-  def removeContentType(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Content-Type")
+  def removeContentType: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Content-Type")
 
 /** Provides standardized access to Connection header. */
 implicit class Connection[T <: HttpMessage](message: T) extends AnyVal:
@@ -514,16 +514,16 @@ implicit class Connection[T <: HttpMessage](message: T) extends AnyVal:
     message.getHeaderValue("Connection").map(ListParser.apply)
 
   /** Creates new message setting Connection header to supplied values. */
-  def setConnection(values: Seq[String])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Connection", values.mkString(", ")))
+  def setConnection(values: Seq[String]): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Connection", values.mkString(", ")))
 
   /** Creates new message setting Connection header to supplied values. */
-  def setConnection(one: String, more: String*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setConnection(one: String, more: String*): T =
     setConnection(one +: more)
 
   /** Creates new message removing Connection header. */
-  def removeConnection(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Connection")
+  def removeConnection: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Connection")
 
 /** Provides standardized access to Date header. */
 implicit class Date[T <: HttpMessage](message: T) extends AnyVal:
@@ -544,12 +544,12 @@ implicit class Date[T <: HttpMessage](message: T) extends AnyVal:
     message.getHeader("Date").map(_.instantValue)
 
   /** Creates new message setting Date header to supplied value. */
-  def setDate(value: Instant)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Date", value))
+  def setDate(value: Instant): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Date", value))
 
   /** Creates new message removing Date header. */
-  def removeDate(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Date")
+  def removeDate: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Date")
 
 /** Provides standardized access to ETag header. */
 implicit class ETag(response: HttpResponse) extends AnyVal:
@@ -884,12 +884,12 @@ implicit class KeepAlive[T <: HttpMessage](message: T) extends AnyVal:
     message.getHeaderValue("Keep-Alive").map(KeepAliveParameters.parse)
 
   /** Creates new message setting Keep-Alive header to supplied value. */
-  def setKeepAlive(value: KeepAliveParameters)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Keep-Alive", value.toString))
+  def setKeepAlive(value: KeepAliveParameters): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Keep-Alive", value.toString))
 
   /** Creates new message removing Keep-Alive header. */
-  def removeKeepAlive(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Keep-Alive")
+  def removeKeepAlive: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Keep-Alive")
 
 /** Provides standardized access to Last-Modified header. */
 implicit class LastModified(response: HttpResponse) extends AnyVal:
@@ -1254,16 +1254,16 @@ implicit class Trailer[T <: HttpMessage](message: T) extends AnyVal:
     message.getHeaderValue("Trailer").map(ListParser.apply)
 
   /** Creates new message setting Trailer header to supplied values. */
-  def setTrailer(values: Seq[String])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Trailer", values.mkString(", ")))
+  def setTrailer(values: Seq[String]): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Trailer", values.mkString(", ")))
 
   /** Creates new message setting Trailer header to supplied values. */
-  def setTrailer(one: String, more: String*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setTrailer(one: String, more: String*): T =
     setTrailer(one +: more)
 
   /** Creates new message removing Trailer header. */
-  def removeTrailer(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Trailer")
+  def removeTrailer: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Trailer")
 
 /** Provides standardized access to Transfer-Encoding header. */
 implicit class TransferEncoding[T <: HttpMessage](message: T) extends AnyVal:
@@ -1286,16 +1286,16 @@ implicit class TransferEncoding[T <: HttpMessage](message: T) extends AnyVal:
       .map(_.map(TransferCoding.parse))
 
   /** Creates new message setting Transfer-Encoding header to supplied values. */
-  def setTransferEncoding(values: Seq[TransferCoding])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Transfer-Encoding", values.mkString(", ")))
+  def setTransferEncoding(values: Seq[TransferCoding]): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Transfer-Encoding", values.mkString(", ")))
 
   /** Creates new message setting Transfer-Encoding header to supplied values. */
-  def setTransferEncoding(one: TransferCoding, more: TransferCoding*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setTransferEncoding(one: TransferCoding, more: TransferCoding*): T =
     setTransferEncoding(one +: more)
 
   /** Creates new message removing Transfer-Encoding header. */
-  def removeTransferEncoding(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Transfer-Encoding")
+  def removeTransferEncoding: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Transfer-Encoding")
 
 /** Provides standardized access to Upgrade header. */
 implicit class Upgrade[T <: HttpMessage](message: T) extends AnyVal:
@@ -1318,16 +1318,16 @@ implicit class Upgrade[T <: HttpMessage](message: T) extends AnyVal:
       .map(_.map(Protocol.parse))
 
   /** Creates new message setting Upgrade header to supplied values. */
-  def setUpgrade(values: Seq[Protocol])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Upgrade", values.mkString(", ")))
+  def setUpgrade(values: Seq[Protocol]): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Upgrade", values.mkString(", ")))
 
   /** Creates new message setting Upgrade header to supplied values. */
-  def setUpgrade(one: Protocol, more: Protocol*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setUpgrade(one: Protocol, more: Protocol*): T =
     setUpgrade(one +: more)
 
   /** Creates new message removing Upgrade header. */
-  def removeUpgrade(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Upgrade")
+  def removeUpgrade: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Upgrade")
 
 /** Provides standardized access to User-Agent header. */
 implicit class UserAgent(request: HttpRequest) extends AnyVal:
@@ -1408,16 +1408,16 @@ implicit class Via[T <: HttpMessage](message: T) extends AnyVal:
     message.getHeaderValue("Via").map(ViaType.parseAll)
 
   /** Creates new message setting Via header to supplied values. */
-  def setVia(values: Seq[ViaType])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Via", values.mkString(", ")))
+  def setVia(values: Seq[ViaType]): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Via", values.mkString(", ")))
 
   /** Creates new message setting Via header to supplied values. */
-  def setVia(one: ViaType, more: ViaType*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setVia(one: ViaType, more: ViaType*): T =
     setVia(one +: more)
 
   /** Creates new message removing Via header. */
-  def removeVia(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Via")
+  def removeVia: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Via")
 
 /** Provides standardized access to Warning header. */
 implicit class Warning[T <: HttpMessage](message: T) extends AnyVal:
@@ -1438,13 +1438,13 @@ implicit class Warning[T <: HttpMessage](message: T) extends AnyVal:
     message.getHeaderValue("Warning").map(WarningType.parseAll)
 
   /** Creates new message setting Warning header to supplied values. */
-  def setWarning(values: Seq[WarningType])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Warning", values.mkString(", ")))
+  def setWarning(values: Seq[WarningType]): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Warning", values.mkString(", ")))
 
   /** Creates new message setting Warning header to supplied values. */
-  def setWarning(one: WarningType, more: WarningType*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setWarning(one: WarningType, more: WarningType*): T =
     setWarning(one +: more)
 
   /** Creates new message removing Warning header. */
-  def removeWarning(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Warning")
+  def removeWarning: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Warning")

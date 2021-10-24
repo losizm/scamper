@@ -23,8 +23,6 @@ import java.time.Instant
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
-import scamper.http.types.MediaType
-
 import RuntimeProperties.auxiliary.*
 
 private object Auxiliary:

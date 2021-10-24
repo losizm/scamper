@@ -64,16 +64,16 @@ implicit class SecWebSocketExtensions[T <: HttpMessage](message: T) extends AnyV
       .reduceLeftOption(_ ++ _)
 
   /** Creates new message setting Sec-WebSocket-Extensions header to supplied values. */
-  def setSecWebSocketExtensions(values: Seq[WebSocketExtension])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Sec-WebSocket-Extensions", values.mkString(", ")))
+  def setSecWebSocketExtensions(values: Seq[WebSocketExtension]): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Sec-WebSocket-Extensions", values.mkString(", ")))
 
   /** Creates new message setting Sec-WebSocket-Extensions header to supplied values. */
-  def setSecWebSocketExtensions(one: WebSocketExtension, more: WebSocketExtension*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setSecWebSocketExtensions(one: WebSocketExtension, more: WebSocketExtension*): T =
     setSecWebSocketExtensions(one +: more)
 
   /** Creates new message removing Sec-WebSocket-Extensions header. */
-  def removeSecWebSocketExtensions(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Sec-WebSocket-Extensions")
+  def removeSecWebSocketExtensions: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Sec-WebSocket-Extensions")
 
 /** Provides standardized access to Sec-WebSocket-Key header. */
 implicit class SecWebSocketKey(request: HttpRequest) extends AnyVal:
@@ -120,16 +120,16 @@ implicit class SecWebSocketProtocol[T <: HttpMessage](message: T) extends AnyVal
     message.getHeaderValue("Sec-WebSocket-Protocol").map(ListParser.apply)
 
   /** Creates new message setting Sec-WebSocket-Protocol header to supplied values. */
-  def setSecWebSocketProtocol(values: Seq[String])(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Sec-WebSocket-Protocol", values.mkString(", ")))
+  def setSecWebSocketProtocol(values: Seq[String]): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Sec-WebSocket-Protocol", values.mkString(", ")))
 
   /** Creates new message setting Sec-WebSocket-Protocol header to supplied values. */
-  def setSecWebSocketProtocol(one: String, more: String*)(implicit ev: <:<[T, MessageBuilder[T]]): T =
+  def setSecWebSocketProtocol(one: String, more: String*): T =
     setSecWebSocketProtocol(one +: more)
 
   /** Creates new message removing Sec-WebSocket-Protocol header. */
-  def removeSecWebSocketProtocol(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Sec-WebSocket-Protocol")
+  def removeSecWebSocketProtocol: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Sec-WebSocket-Protocol")
 
 /** Provides standardized access to Sec-WebSocket-Protocol-Client header. */
 implicit class SecWebSocketProtocolClient(request: HttpRequest) extends AnyVal:
@@ -202,12 +202,12 @@ implicit class SecWebSocketVersion[T <: HttpMessage](message: T) extends AnyVal:
     message.getHeaderValue("Sec-WebSocket-Version")
 
   /** Creates new message setting Sec-WebSocket-Version header to supplied value. */
-  def setSecWebSocketVersion(value: String)(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.putHeaders(Header("Sec-WebSocket-Version", value))
+  def setSecWebSocketVersion(value: String): T =
+    message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Sec-WebSocket-Version", value))
 
   /** Creates new message removing Sec-WebSocket-Version header. */
-  def removeSecWebSocketVersion(implicit ev: <:<[T, MessageBuilder[T]]): T =
-    message.removeHeaders("Sec-WebSocket-Version")
+  def removeSecWebSocketVersion: T =
+    message.asInstanceOf[MessageBuilder[T]].removeHeaders("Sec-WebSocket-Version")
 
 /** Provides standardized access to Sec-WebSocket-Version-Client header. */
 implicit class SecWebSocketVersionClient(request: HttpRequest) extends AnyVal:

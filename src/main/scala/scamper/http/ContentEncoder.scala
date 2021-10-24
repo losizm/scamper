@@ -23,7 +23,7 @@ private object ContentEncoder:
   private val `Content-Encoding: gzip` = Header("Content-Encoding", "gzip")
   private val `Content-Encoding: deflate` = Header("Content-Encoding", "deflate")
 
-  def gzip[T <: HttpMessage with MessageBuilder[T]](msg: T, bufferSize: Int = 8192)(using ec: ExecutionContext): T =
+  def gzip[T <: HttpMessage & MessageBuilder[T]](msg: T, bufferSize: Int = 8192)(using executor: ExecutionContext): T =
     msg.getHeaderValue("Content-Encoding")
       .map { enc => Header("Content-Encoding", enc + ", gzip") }
       .map(msg.putHeaders(_))
@@ -31,7 +31,7 @@ private object ContentEncoder:
       .removeHeaders("Content-Length")
       .setBody { Compressor.gzip(msg.body.data, bufferSize) }
 
-  def deflate[T <: HttpMessage with MessageBuilder[T]](msg: T, bufferSize: Int = 8192): T =
+  def deflate[T <: HttpMessage & MessageBuilder[T]](msg: T, bufferSize: Int = 8192): T =
     msg.getHeaderValue("Content-Encoding")
       .map { enc => Header("Content-Encoding", enc + ", deflate") }
       .map(msg.putHeaders(_))

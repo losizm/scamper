@@ -511,9 +511,8 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
           case Some(n) => res.setContentLength(n)
           case None    => res.setTransferEncoding(chunked)
 
-    private def addAttributes[T <: HttpMessage](msg: T, socket: Socket, requestCount: Int, correlate: String)
-        (implicit ev: <:<[T, MessageBuilder[T]]): T =
-      msg.putAttributes(
+    private def addAttributes[T <: HttpMessage](msg: T, socket: Socket, requestCount: Int, correlate: String): T =
+      msg.asInstanceOf[MessageBuilder[T]].putAttributes(
         "scamper.http.server.message.server"       -> HttpServerImpl.this,
         "scamper.http.server.message.socket"       -> socket,
         "scamper.http.server.message.requestCount" -> requestCount,
