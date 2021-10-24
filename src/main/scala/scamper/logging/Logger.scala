@@ -15,7 +15,7 @@
  */
 package scamper.logging
 
-/** Defines logger interface. */
+/** Defines logger. */
 trait Logger:
   /**
    * Logs trace message.

@@ -19,48 +19,63 @@ import java.time.Instant
 
 /** Provides logger to console. */
 object ConsoleLogger extends Logger:
+  /** @inheritdoc */
   def trace(message: String): Unit =
     log("trace", message)
 
+  /** @inheritdoc */
   def trace(format: String, args: Any*): Unit =
     log("trace", format.format(args*))
 
+  /** @inheritdoc */
   def trace(message: String, cause: Throwable): Unit =
     log("trace", message, cause)
 
+  /** @inheritdoc */
   def debug(message: String): Unit =
     log("debug", message)
 
+  /** @inheritdoc */
   def debug(format: String, args: Any*): Unit =
     log("debug", format.format(args*))
 
+  /** @inheritdoc */
   def debug(message: String, cause: Throwable): Unit =
     log("debug", message, cause)
 
+  /** @inheritdoc */
   def info(message: String): Unit =
     log("info", message)
 
+  /** @inheritdoc */
   def info(format: String, args: Any*): Unit =
     log("info", format.format(args*))
 
+  /** @inheritdoc */
   def info(message: String, cause: Throwable): Unit =
     log("info", message, cause)
 
+  /** @inheritdoc */
   def warn(message: String): Unit =
     log("warn", message)
 
+  /** @inheritdoc */
   def warn(format: String, args: Any*): Unit =
     log("warn", format.format(args*))
 
+  /** @inheritdoc */
   def warn(message: String, cause: Throwable): Unit =
     log("warn", message, cause)
 
+  /** @inheritdoc */
   def error(message: String): Unit =
     log("error", message)
 
+  /** @inheritdoc */
   def error(format: String, args: Any*): Unit =
     log("error", format.format(args*))
 
+  /** @inheritdoc */
   def error(message: String, cause: Throwable): Unit =
     log("error", message, cause)
 

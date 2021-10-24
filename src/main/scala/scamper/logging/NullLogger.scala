@@ -21,22 +21,47 @@ package scamper.logging
  * @note Each logger method is a noop.
  */
 object NullLogger extends Logger:
+  /** Logs nothing. */
   def trace(message: String): Unit = ()
+
+  /** Logs nothing. */
   def trace(format: String, args: Any*): Unit = ()
+
+  /** Logs nothing. */
   def trace(message: String, cause: Throwable): Unit = ()
 
+  /** Logs nothing. */
   def debug(message: String): Unit = ()
+
+  /** Logs nothing. */
   def debug(format: String, args: Any*): Unit = ()
+
+  /** Logs nothing. */
   def debug(message: String, cause: Throwable): Unit = ()
 
+  /** Logs nothing. */
   def info(message: String): Unit = ()
+
+  /** Logs nothing. */
   def info(format: String, args: Any*): Unit = ()
+
+  /** Logs nothing. */
   def info(message: String, cause: Throwable): Unit = ()
 
+  /** Logs nothing. */
   def warn(message: String): Unit = ()
+
+  /** Logs nothing. */
   def warn(format: String, args: Any*): Unit = ()
+
+  /** Logs nothing. */
   def warn(message: String, cause: Throwable): Unit = ()
 
+  /** Logs nothing. */
   def error(message: String): Unit = ()
+
+  /** Logs nothing. */
   def error(format: String, args: Any*): Unit = ()
+
+  /** Logs nothing. */
   def error(message: String, cause: Throwable): Unit = ()
