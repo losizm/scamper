@@ -17,8 +17,7 @@ package scamper
 package http
 package multipart
 
-/** Adds multipart extensions to `HttpMessage`. */
-implicit class MultipartHttpMessage[T <: HttpMessage & MessageBuilder[T]](message: T) extends AnyVal:
+extension [T <: HttpMessage & MessageBuilder[T]](message: T)
   /**
    * Creates new message with supplied multipart as message body.
    *
