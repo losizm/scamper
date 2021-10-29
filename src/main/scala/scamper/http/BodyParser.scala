@@ -109,7 +109,7 @@ private class TextBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser
 
   def parse(message: HttpMessage): String =
     message.getHeaderValue("Content-Type")
-      .map(MediaType.apply)
+      .map(MediaType(_))
       .flatMap(_.params.get("charset"))
       .orElse(Some("UTF-8"))
       .map(charset => String(parser.parse(message), charset))

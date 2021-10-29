@@ -19,8 +19,6 @@ package http
 import java.io.{ File, InputStream, OutputStream }
 import java.time.Instant
 
-import scamper.http.types.MediaType
-
 /** Converts string to `Uri`. */
 given stringToUri: Conversion[String, Uri] with
   def apply(uri: String) = Uri(uri)
