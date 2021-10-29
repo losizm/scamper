@@ -1,6 +1,6 @@
 organization := "com.github.losizm"
 name         := "scamper"
-version      := "26.0.0"
+version      := "27.0.0-SNAPSHOT"
 description  := "The HTTP library for Scala"
 homepage     := Some(url("https://github.com/losizm/scamper"))
 licenses     := List("Apache License, Version 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
@@ -9,7 +9,7 @@ scalaVersion := "3.1.0"
 scalacOptions := Seq("-deprecation", "-feature", "-new-syntax", "-Xfatal-warnings", "-Yno-experimental")
 
 Compile / doc / scalacOptions := Seq(
-  "-project", name.value.toUpperCase,
+  "-project", name.value.capitalize,
   "-project-version", version.value,
   "-project-logo", "images/logo.svg"
 )
