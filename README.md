@@ -50,7 +50,7 @@ and writing HTTP messages, and it provides [client](#HTTP-Client) and
 To get started, add **Scamper** to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "26.0.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "27.0.0"
 ```
 
 _**NOTE:** Starting with 23.0.0, **Scamper** is written for Scala 3. See
@@ -334,11 +334,12 @@ def printText(message: HttpMessage): Unit =
   println(text)
 ```
 
-And, you can implement your own. Here's one powered by [little-json](https://github.com/losizm/little-json):
+And, you can implement your own. Here's one for JSON powered by
+[Grapple](https://github.com/losizm/grapple):
 
 ```scala
-import little.json.{ Json, JsonInput }
-import little.json.Implicits.given
+import grapple.json.{ Json, JsonInput }
+import grapple.json.Implicits.given
 
 import scala.language.implicitConversions
 
