@@ -7,8 +7,8 @@ body {
   padding: 0;
   font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1em;
-  background-color: #014;
-  color: #bbb;
+  background-color: #220;
+  color: #999;
   text-align: center;
 }
 
@@ -18,7 +18,7 @@ header {
 
 h1 {
   margin: 0 0 .5rem 0;
-  color: #46d;
+  color: #771;
   font-size: 4.5em;
   font-weight: normal;
   letter-spacing: -.05em;
@@ -34,20 +34,20 @@ h2 {
 
 main {
   margin-top: .75rem;
-  border-top: 1px solid #24b;
-  border-bottom: 1px solid #24b;
+  border-top: 1px solid #666608;
+  border-bottom: 1px solid #666608;
   padding: 2.5em;
-  background-color: #000822;
-  color: #46d;
+  background-color: #181800;
+  color: #999;
   letter-spacing: .075em;
 }
 
 main > .quote {
-  color: #2b4
+  color: #a8a
 }
 
 main > .op {
-  color: #46d;
+  color: #771;
 }
 
 nav {
@@ -55,23 +55,23 @@ nav {
 }
 
 nav > a, nav > a:visited  {
-  border: 1px solid #24b;
+  border: 1px solid #666608;
   border-radius: 4px;
   padding: .75em 1.25em;
-  background-color: #014;
-  color: #46d;
+  background-color: #220;
+  color: #771;
   font-size: .9em;
   font-weight: normal;
   text-decoration: none;
 }
 
 nav > a:hover  {
-  background-color: #128;
+  background-color: #330;
   cursor: pointer;
 }
 
 nav > a:active  {
-  background-color: #16278d;
+  background-color: #3f3f00;
 }
 
 nav > a + a {
@@ -80,6 +80,6 @@ nav > a + a {
 
 footer {
   margin-top: 6rem;
-  color: #24b;
+  color: #771;
   font-size: .75em;
 }
