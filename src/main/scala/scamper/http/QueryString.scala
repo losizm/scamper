@@ -64,6 +64,18 @@ trait QueryString:
     get(name).map(_.toInt)
 
   /**
+   * Gets first parameter value with given name and parses it to `Int` if
+   * present; otherwise returns default value.
+   *
+   * @param name parameter name
+   *
+   * @throws java.lang.NumberFormatException if parameter value cannot be parsed
+   * to `Int`
+   */
+  def getIntOrElse(name: String, default: => Int): Int =
+    getInt(name).getOrElse(default)
+
+  /**
    * Gets first parameter value with given name and parses it to `Long` if
    * present.
    *
@@ -74,6 +86,18 @@ trait QueryString:
    */
   def getLong(name: String): Option[Long] =
     get(name).map(_.toLong)
+
+  /**
+   * Gets first parameter value with given name and parses it to `Long` if
+   * present; otherwise returns default value.
+   *
+   * @param name parameter name
+   *
+   * @throws java.lang.NumberFormatException if parameter value cannot be parsed
+   * to `Long`
+   */
+  def getLongOrElse(name: String, default: => Long): Long =
+    getLong(name).getOrElse(default)
 
   /**
    * Gets parameter values with given name.
