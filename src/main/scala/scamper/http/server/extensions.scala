@@ -20,8 +20,8 @@ package server
 import java.io.File
 import java.net.Socket
 
-import scamper.http.headers.{ ContentDisposition, ContentLength, ContentType, Expect }
-import scamper.http.types.{ DispositionType, MediaType }
+import scamper.http.headers.{ Accept, ContentDisposition, ContentLength, ContentType, Expect }
+import scamper.http.types.{ DispositionType, MediaRange, MediaType }
 import scamper.logging.{ Logger, NullLogger }
 
 import Auxiliary.{ SocketType, StringType }
@@ -83,6 +83,22 @@ implicit class ServerHttpRequest(request: HttpRequest) extends AnyVal:
         socket.writeLine()
         socket.flush()
       }.isDefined
+
+  /**
+   * Finds accepted media type among supplied media types.
+   *
+   * The matching media type with the highest weight is returned. If multiple
+   * matches are found with equal weight, the first match is returned.
+   */
+  def findAccepted(types: Seq[MediaType]): Option[MediaType] =
+    val ranges = request.accept match
+      case Nil    => Seq(MediaRange("*/*"))
+      case accept => accept.sortBy(_.weight * -1)
+
+    types.flatMap { t => ranges.find(_.matches(t)).map(_.weight -> t) }
+      .sortBy(_._1 * -1)
+      .headOption
+      .map(_._2)
 
 /** Adds server extensions to `HttpResponse`. */
 implicit class ServerHttpResponse(response: HttpResponse) extends AnyVal:
