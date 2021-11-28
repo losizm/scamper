@@ -36,7 +36,7 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
   def parse(message: HttpMessage): Multipart =
     val mediaType = message.contentType
 
-    (mediaType.isMultipart && mediaType.subtype == "form-data") match
+    (mediaType.isMultipart && mediaType.subtypeName == "form-data") match
       case true =>
         mediaType.params.get("boundary")
           .map(boundary => getMultipart(decode(message), boundary))

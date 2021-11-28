@@ -22,14 +22,14 @@ import Grammar.*
 private object MediaTypeHelper:
   private val syntax = """\s*([\w!#$%&'*+.^`|~-]+)/([\w!#$%&'*+.^`|~-]+)(\s*(?:;.*)?)""".r
 
-  def MainType(mainType: String): String =
-    Token(mainType) getOrElse {
-      throw IllegalArgumentException(s"Invalid main type: $mainType")
+  def TypeName(typeName: String): String =
+    Token(typeName) getOrElse {
+      throw IllegalArgumentException(s"Invalid type name: $typeName")
     }
 
-  def Subtype(subtype: String): String =
-    Token(subtype) getOrElse {
-      throw IllegalArgumentException(s"Invalid subtype: $subtype")
+  def SubtypeName(subtypeName: String): String =
+    Token(subtypeName) getOrElse {
+      throw IllegalArgumentException(s"Invalid subtype name: $subtypeName")
     }
 
   def Params(params: Map[String, String]): Map[String, String] =
@@ -47,7 +47,7 @@ private object MediaTypeHelper:
 
   def ParseMediaType(mediaType: String): (String, String, Map[String, String]) =
     mediaType match
-      case syntax(mainType, subtype, params) => (mainType, subtype, ParseParams(params))
+      case syntax(typeName, subtypeName, params) => (typeName, subtypeName, ParseParams(params))
       case _ => throw IllegalArgumentException(s"Malformed media type: $mediaType")
 
   def ParseParams(params: String): Map[String, String] =

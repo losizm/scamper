@@ -33,7 +33,7 @@ private case class MultipartEntity(multipart: Multipart, boundary: String) exten
       out.writeLine(start)
       out.writeLine("Content-Disposition: " + part.contentDisposition.toString)
 
-      if !part.contentType.isText || part.contentType.subtype != "plain" || part.contentType.params.nonEmpty then
+      if !part.contentType.isText || part.contentType.subtypeName != "plain" || part.contentType.params.nonEmpty then
         out.writeLine("Content-Type: " + part.contentType.toString)
       out.writeLine()
 

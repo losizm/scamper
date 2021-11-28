@@ -150,8 +150,8 @@ import scamper.http.stringToUri
 import scamper.http.types.MediaType
 
 val req = Post("/api/users").setContentType(MediaType("application/json"))
-println(req.contentType.mainType) // application
-println(req.contentType.subtype) // json
+println(req.contentType.typeName) // application
+println(req.contentType.subtypeName) // json
 ```
 
 And, with conversions defined in `scamper.http.types`, you can implicitly
@@ -166,8 +166,8 @@ import scamper.http.stringToUri
 import scamper.http.types.stringToMediaType
 
 val req = Post("/api/users").setContentType("application/json")
-println(req.contentType.mainType) // application
-println(req.contentType.subtype) // json
+println(req.contentType.typeName) // application
+println(req.contentType.subtypeName) // json
 ```
 
 ## Specialized Cookie Access

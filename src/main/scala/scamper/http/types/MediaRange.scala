@@ -30,73 +30,73 @@ trait MediaRange:
   /** Gets weight of media range. */
   def weight: Float
 
-  /** Gets main type of media range. */
-  def mainType: String
+  /** Gets type name of media range. */
+  def typeName: String
 
-  /** Gets subtype of media range. */
-  def subtype: String
+  /** Gets subtype name of media range. */
+  def subtypeName: String
 
   /** Gets media range parameters. */
   def params: Map[String, String]
 
-  /** Tests main type for text. */
-  def isText: Boolean = mainType == "text"
+  /** Tests type name for text. */
+  def isText: Boolean = typeName == "text"
 
-  /** Tests main type for audio. */
-  def isAudio: Boolean = mainType == "audio"
+  /** Tests type name for audio. */
+  def isAudio: Boolean = typeName == "audio"
 
-  /** Tests main type for video. */
-  def isVideo: Boolean = mainType == "video"
+  /** Tests type name for video. */
+  def isVideo: Boolean = typeName == "video"
 
-  /** Tests main type for image. */
-  def isImage: Boolean = mainType == "image"
+  /** Tests type name for image. */
+  def isImage: Boolean = typeName == "image"
 
-  /** Tests main type for font. */
-  def isFont: Boolean = mainType == "font"
+  /** Tests type name for font. */
+  def isFont: Boolean = typeName == "font"
 
-  /** Tests main type for application. */
-  def isApplication: Boolean = mainType == "application"
+  /** Tests type name for application. */
+  def isApplication: Boolean = typeName == "application"
 
-  /** Tests main type for multipart. */
-  def isMultipart: Boolean = mainType == "multipart"
+  /** Tests type name for multipart. */
+  def isMultipart: Boolean = typeName == "multipart"
 
-  /** Tests main type for message. */
-  def isMessage: Boolean = mainType == "message"
+  /** Tests type name for message. */
+  def isMessage: Boolean = typeName == "message"
 
-  /** Tests main type for wildcard (*). */
-  def isWildcard: Boolean = mainType == "*"
+  /** Tests type name for wildcard (*). */
+  def isWildcard: Boolean = typeName == "*"
 
   /** Tests whether range matches supplied media type. */
   def matches(mediaType: MediaType): Boolean
 
   /** Returns formatted range. */
   override lazy val toString: String =
-    if weight == 1.0f then mainType + '/' + subtype + FormatParams(params)
-    else mainType + '/' + subtype + "; q=" + weight + FormatParams(params)
+    if weight == 1.0f then typeName + '/' + subtypeName + FormatParams(params)
+    else typeName + '/' + subtypeName + "; q=" + weight + FormatParams(params)
 
 /** Provides factory for `MediaRange`. */
 object MediaRange:
   /** Parses formatted range. */
   def apply(mediaRange: String): MediaRange =
     ParseMediaType(mediaRange) match
-      case (mainType, subtype, params) =>
+      case (typeName, subtypeName, params) =>
         params.collectFirst {
           case (QValue.key(key), QValue.value(value)) => (value.toFloat, params - key)
         } map {
-          case (weight, params) => MediaRangeImpl(MainType(mainType), Subtype(subtype), QValue(weight), Params(params))
+          case (weight, params) => MediaRangeImpl(TypeName(typeName), SubtypeName(subtypeName), QValue(weight), Params(params))
         } getOrElse {
-          MediaRangeImpl(MainType(mainType), Subtype(subtype), 1.0f, Params(params))
+          MediaRangeImpl(TypeName(typeName), SubtypeName(subtypeName), 1.0f, Params(params))
         }
 
   /** Creates range with supplied values. */
-  def apply(mainType: String, subtype: String, weight: Float = 1.0f, params: Map[String, String] = Map.empty): MediaRange =
-    MediaRangeImpl(MainType(mainType), Subtype(subtype), QValue(weight), Params(params))
+  def apply(typeName: String, subtypeName: String, weight: Float = 1.0f, params: Map[String, String] = Map.empty): MediaRange =
+    MediaRangeImpl(TypeName(typeName), SubtypeName(subtypeName), QValue(weight), Params(params))
 
-private case class MediaRangeImpl(mainType: String, subtype: String, weight: Float, params: Map[String, String]) extends MediaRange:
-  private val range = (regex(mainType) + "/" + regex(subtype)).r
+private case class MediaRangeImpl(typeName: String, subtypeName: String, weight: Float, params: Map[String, String]) extends MediaRange:
+  private val range = (regex(typeName) + "/" + regex(subtypeName)).r
 
   def matches(mediaType: MediaType): Boolean =
-    ((mediaType.mainType + "/" + mediaType.subtype) match
+    ((mediaType.typeName + "/" + mediaType.subtypeName) match
       case range(_*) => params.forall { case (name, value) => exists(name, value, mediaType.params) }
       case _ => false
     ) && weight > 0

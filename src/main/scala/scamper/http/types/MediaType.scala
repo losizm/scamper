@@ -31,53 +31,53 @@ import MediaTypeHelper.*
  * @see [[scamper.http.headers.ContentType]]
  */
 trait MediaType:
-  /** Gets main type of media type. */
-  def mainType: String
+  /** Gets type name of media type. */
+  def typeName: String
 
-  /** Gets subtype of media type. */
-  def subtype: String
+  /** Gets subtype name of media type. */
+  def subtypeName: String
 
   /** Gets media type parameters. */
   def params: Map[String, String]
 
-  /** Tests main type for text. */
-  def isText: Boolean = mainType == "text"
+  /** Tests type name for text. */
+  def isText: Boolean = typeName == "text"
 
-  /** Tests main type for audio. */
-  def isAudio: Boolean = mainType == "audio"
+  /** Tests type name for audio. */
+  def isAudio: Boolean = typeName == "audio"
 
-  /** Tests main type for video. */
-  def isVideo: Boolean = mainType == "video"
+  /** Tests type name for video. */
+  def isVideo: Boolean = typeName == "video"
 
-  /** Tests main type for image. */
-  def isImage: Boolean = mainType == "image"
+  /** Tests type name for image. */
+  def isImage: Boolean = typeName == "image"
 
-  /** Tests main type for font. */
-  def isFont: Boolean = mainType == "font"
+  /** Tests type name for font. */
+  def isFont: Boolean = typeName == "font"
 
-  /** Tests main type for application. */
-  def isApplication: Boolean = mainType == "application"
+  /** Tests type name for application. */
+  def isApplication: Boolean = typeName == "application"
 
-  /** Tests main type for multipart. */
-  def isMultipart: Boolean = mainType == "multipart"
+  /** Tests type name for multipart. */
+  def isMultipart: Boolean = typeName == "multipart"
 
-  /** Tests main type for message. */
-  def isMessage: Boolean = mainType == "message"
+  /** Tests type name for message. */
+  def isMessage: Boolean = typeName == "message"
 
   /** Creates media types with new parameters. */
   def setParams(params: Map[String, String]): MediaType =
-    MediaType(mainType, subtype, params)
+    MediaType(typeName, subtypeName, params)
 
   /** Creates media types with new parameters. */
   def setParams(params: (String, String)*): MediaType =
-    MediaType(mainType, subtype, params.toMap)
+    MediaType(typeName, subtypeName, params.toMap)
 
   /** Converts to range with supplied weight. */
   def toRange(weight: Float = 1.0f): MediaRange =
-    MediaRange(mainType, subtype, weight, params)
+    MediaRange(typeName, subtypeName, weight, params)
 
   /** Returns formatted media type. */
-  override lazy val toString: String = mainType + '/' + subtype + FormatParams(params)
+  override lazy val toString: String = typeName + '/' + subtypeName + FormatParams(params)
 
 /** Provides factory for `MediaType`. */
 object MediaType:
@@ -124,14 +124,14 @@ object MediaType:
   /** Parses formatted media type. */
   def apply(mediaType: String): MediaType =
     ParseMediaType(mediaType) match
-      case (mainType, subtype, params) => apply(mainType, subtype, params)
+      case (typeName, subtypeName, params) => apply(typeName, subtypeName, params)
 
   /** Creates media type with supplied values. */
-  def apply(mainType: String, subtype: String, params: Map[String, String]): MediaType =
-    MediaTypeImpl(MainType(mainType), Subtype(subtype), Params(params))
+  def apply(typeName: String, subtypeName: String, params: Map[String, String]): MediaType =
+    MediaTypeImpl(TypeName(typeName), SubtypeName(subtypeName), Params(params))
 
   /** Creates media type with supplied values. */
-  def apply(mainType: String, subtype: String, params: (String, String)*): MediaType =
-    apply(mainType, subtype, params.toMap)
+  def apply(typeName: String, subtypeName: String, params: (String, String)*): MediaType =
+    apply(typeName, subtypeName, params.toMap)
 
-private case class MediaTypeImpl(mainType: String, subtype: String, params: Map[String, String]) extends MediaType
+private case class MediaTypeImpl(typeName: String, subtypeName: String, params: Map[String, String]) extends MediaType

@@ -35,8 +35,8 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
     assert(message.status == Ok)
     assert(message.contentType.isText)
-    assert(message.contentType.mainType == "text")
-    assert(message.contentType.subtype == "plain")
+    assert(message.contentType.typeName == "text")
+    assert(message.contentType.subtypeName == "plain")
     assert(message.as[String] == "Hello, world!")
   }
 

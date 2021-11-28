@@ -29,7 +29,7 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(part.contentDisposition.name == "form-data")
     assert(part.contentDisposition.params("name") == "id")
     assert(part.contentType.isText)
-    assert(part.contentType.subtype == "plain")
+    assert(part.contentType.subtypeName == "plain")
   }
 
   it should "not be created in" in {
@@ -54,7 +54,7 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(part.contentDisposition.params("name") == "photo")
     assert(part.contentDisposition.params("filename") == "photo.jpg")
     assert(part.contentType.isImage)
-    assert(part.contentType.subtype == "jpeg")
+    assert(part.contentType.subtypeName == "jpeg")
 
     part = FilePart("photo", File("photo.jpg"), "my-photo.jpg")
     assert(part.name == "photo")
@@ -64,7 +64,7 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(part.contentDisposition.params("name") == "photo")
     assert(part.contentDisposition.params("filename") == "my-photo.jpg")
     assert(part.contentType.isImage)
-    assert(part.contentType.subtype == "jpeg")
+    assert(part.contentType.subtypeName == "jpeg")
 
     part = FilePart("photo", File("photo.jpg"), Some("my-photo.jpg"))
     assert(part.name == "photo")
@@ -74,7 +74,7 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(part.contentDisposition.params("name") == "photo")
     assert(part.contentDisposition.params("filename") == "my-photo.jpg")
     assert(part.contentType.isImage)
-    assert(part.contentType.subtype == "jpeg")
+    assert(part.contentType.subtypeName == "jpeg")
 
     part = FilePart("photo", File("photo.jpg"), None)
     assert(part.name == "photo")
@@ -84,7 +84,7 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(part.contentDisposition.params("name") == "photo")
     assert(part.contentDisposition.params.get("filename").isEmpty)
     assert(part.contentType.isImage)
-    assert(part.contentType.subtype == "jpeg")
+    assert(part.contentType.subtypeName == "jpeg")
   }
 
   it should "not be created in" in {
