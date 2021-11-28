@@ -92,20 +92,25 @@ object MediaType:
     try props.load(in)
     finally Try(in.close())
 
-    asScala(props).map {
-      case (key, value) => key.toLowerCase -> Try(apply(value))
-    }.collect {
-      case (key, Success(value)) => key -> value
-    }.toMap
+    asScala(props)
+      .flatMap { (key, value) => Try(key.toLowerCase -> apply(value)).toOption }
+      .toMap
   }.getOrElse(Map.empty)
 
   private val fileNamePattern = ".+\\.(\\w+)".r
 
-  /** `text/plain` */
+  /** Gets `application/octet-stream` media type. */
+  val formUrlencoded = MediaType("application/x-www-form-urlencoded")
+
+  /** Gets `application/octet-stream` media type. */
+  val octetStream = MediaType("application/octet-stream")
+
+  /** Gets `text/plain` media type. */
   val plain = MediaType("text/plain")
 
-  /** `application/octet-stream` */
-  val octetStream = MediaType("application/octet-stream")
+  /** Gets `text/plain` media type with specified charset parameter. */
+  def plain(charset: String): MediaType =
+    plain.setParams("charset" -> charset)
 
   /** Gets media type for given file. */
   def forFile(file: File): Option[MediaType] =
