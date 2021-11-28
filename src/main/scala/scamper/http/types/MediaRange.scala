@@ -27,16 +27,20 @@ import MediaTypeHelper.*
  * @see [[scamper.http.headers.Accept]]
  */
 trait MediaRange:
-  /** Gets weight of media range. */
+  /** Gets weight. */
   def weight: Float
 
-  /** Gets type name of media range. */
+  /** Gets type name. */
   def typeName: String
 
-  /** Gets subtype name of media range. */
+  /** Gets subtype name. */
   def subtypeName: String
 
-  /** Gets media range parameters. */
+  /** Gets full name. */
+  def fullName: String =
+    typeName + '/' + subtypeName
+
+  /** Gets parameters. */
   def params: Map[String, String]
 
   /** Tests type name for text. */
@@ -71,8 +75,9 @@ trait MediaRange:
 
   /** Returns formatted range. */
   override lazy val toString: String =
-    if weight == 1.0f then typeName + '/' + subtypeName + FormatParams(params)
-    else typeName + '/' + subtypeName + "; q=" + weight + FormatParams(params)
+    weight == 1.0f match
+      case true  => fullName + FormatParams(params)
+      case false => fullName + "; q=" + weight + FormatParams(params)
 
 /** Provides factory for `MediaRange`. */
 object MediaRange:
@@ -96,9 +101,9 @@ private case class MediaRangeImpl(typeName: String, subtypeName: String, weight:
   private val range = (regex(typeName) + "/" + regex(subtypeName)).r
 
   def matches(mediaType: MediaType): Boolean =
-    ((mediaType.typeName + "/" + mediaType.subtypeName) match
+    (mediaType.fullName match
       case range(_*) => params.forall { case (name, value) => exists(name, value, mediaType.params) }
-      case _ => false
+      case _         => false
     ) && weight > 0
 
   private def exists(name: String, value: String, ps: Map[String, String]): Boolean =

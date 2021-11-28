@@ -31,13 +31,17 @@ import MediaTypeHelper.*
  * @see [[scamper.http.headers.ContentType]]
  */
 trait MediaType:
-  /** Gets type name of media type. */
+  /** Gets type name. */
   def typeName: String
 
-  /** Gets subtype name of media type. */
+  /** Gets subtype name. */
   def subtypeName: String
 
-  /** Gets media type parameters. */
+  /** Gets full name. */
+  def fullName: String =
+    typeName + '/' + subtypeName
+
+  /** Gets parameters. */
   def params: Map[String, String]
 
   /** Tests type name for text. */
@@ -72,12 +76,12 @@ trait MediaType:
   def setParams(params: (String, String)*): MediaType =
     MediaType(typeName, subtypeName, params.toMap)
 
-  /** Converts to range with supplied weight. */
+  /** Converts to media range with supplied weight. */
   def toRange(weight: Float = 1.0f): MediaRange =
     MediaRange(typeName, subtypeName, weight, params)
 
   /** Returns formatted media type. */
-  override lazy val toString: String = typeName + '/' + subtypeName + FormatParams(params)
+  override lazy val toString: String = fullName + FormatParams(params)
 
 /** Provides factory for `MediaType`. */
 object MediaType:
