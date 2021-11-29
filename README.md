@@ -390,7 +390,7 @@ val formData = Multipart(
 )
 
 // Create request with multipart body
-val req = Post("https://upload.musiclibrary.com/songs").setMultipartBody(formData)
+val req = Post("https://upload.musiclibrary.com/songs").setMultipart(formData)
 ```
 
 And, for an incoming message with multipart form-data, there's a standard

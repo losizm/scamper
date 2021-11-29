@@ -24,16 +24,30 @@ import RequestMethod.Registry.{ Post, Put }
 import ResponseStatus.Registry.{ Created, Ok }
 
 class HttpMessageExtensionsSpec extends org.scalatest.flatspec.AnyFlatSpec:
-  it should "create with text body" in {
+  it should "create with octet stream body" in {
     val text  = "Hello, world!"
     val utf8  = text.getBytes("UTF-8")
     val utf16 = text.getBytes("UTF-16")
 
-    val req = Post("/messages").setTextBody(text)
+    val req = Post("/messages").setOctetStream(utf8)
+    assert(req.getHeaderValue("Content-Type").contains("application/octet-stream"))
+    assert(req.getHeaderValue("Content-Length").contains(utf8.length.toString))
+
+    val res = Created().setOctetStream(utf16)
+    assert(res.getHeaderValue("Content-Type").contains("application/octet-stream"))
+    assert(res.getHeaderValue("Content-Length").contains(utf16.length.toString))
+  }
+
+  it should "create with plain body" in {
+    val text  = "Hello, world!"
+    val utf8  = text.getBytes("UTF-8")
+    val utf16 = text.getBytes("UTF-16")
+
+    val req = Post("/messages").setPlain(text)
     assert(req.getHeaderValue("Content-Type").contains("text/plain; charset=UTF-8"))
     assert(req.getHeaderValue("Content-Length").contains(utf8.length.toString))
 
-    val res = Created().setTextBody(text, "UTF-16")
+    val res = Created().setPlain(text, "UTF-16")
     assert(res.getHeaderValue("Content-Type").contains("text/plain; charset=UTF-16"))
     assert(res.getHeaderValue("Content-Length").contains(utf16.length.toString))
   }
@@ -41,7 +55,7 @@ class HttpMessageExtensionsSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "create with file body" in {
     val file = File("src/test/resources/test.html")
 
-    val req = Put("/messages").setFileBody(file)
+    val req = Put("/messages").setFile(file)
     try
       assert(req.getHeaderValue("Content-Type").contains("text/html"))
       assert(req.getHeaderValue("Content-Length").contains(file.length.toString))
@@ -49,7 +63,7 @@ class HttpMessageExtensionsSpec extends org.scalatest.flatspec.AnyFlatSpec:
       req.body.data.close()
   
 
-    val res = Ok().setFileBody(file)
+    val res = Ok().setFile(file)
     try
       assert(res.getHeaderValue("Content-Type").contains("text/html"))
       assert(res.getHeaderValue("Content-Length").contains(file.length.toString))
@@ -60,14 +74,14 @@ class HttpMessageExtensionsSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "create with form body" in {
     val query = QueryString("userId=1000&userName=lupita")
 
-    val req = Post("/messages").setFormBody(query)
+    val req = Post("/messages").setForm(query)
     try
       assert(req.getHeaderValue("Content-Type").contains("application/x-www-form-urlencoded"))
       assert(req.getHeaderValue("Content-Length").contains(query.toString.length.toString))
     finally
       req.body.data.close()
   
-    val res = Ok().setFormBody("userId" -> "1000", "userName" -> "lupita")
+    val res = Ok().setForm("userId" -> "1000", "userName" -> "lupita")
     try
       assert(res.getHeaderValue("Content-Type").contains("application/x-www-form-urlencoded"))
       assert(res.getHeaderValue("Content-Length").contains(query.toString.length.toString))
