@@ -28,7 +28,7 @@ import Auxiliary.UriType
  * Provides utilities for persistent cookies.
  *
  * @see [[CookieStore$.apply CookieStore.apply]],
- *  [[CookieStore$.alwaysEmpty CookieStore.alwaysEmpty]]
+ *  [[CookieStore$.Null CookieStore.Null]]
  */
 sealed trait CookieStore:
   /** Gets number of cookies in cookie store. */
@@ -87,12 +87,28 @@ sealed trait CookieStore:
 /** Provides factory for `CookieStore`. */
 object CookieStore:
   /**
-   * Gets cookie store that is always empty.
+   * A cookie store that effectively does nothing.
    *
-   * The cookie store never adds any cookies in `put`, nor does it retrieve any
-   * in `get`.
+   * It does not add cookies with `put`, nor does it retrieve any with `get`.
    */
-  def alwaysEmpty: CookieStore = AlwaysEmptyCookieStore
+  object Null extends CookieStore:
+    /** Returns `0`. */
+    def size = 0
+
+    /** Returns `Nil`. */
+    def list: Seq[PersistentCookie] = Nil
+
+    /** Does nothing; returns `this`. */
+    def clear(expiredOnly: Boolean) =  this
+
+    /** Returns `Nil`. */
+    def get(target: Uri): Seq[PlainCookie] = Nil
+
+    /** Does nothing; returns `this`. */
+    def put(target: Uri, cookies: Seq[SetCookie]) = this
+
+    /** Does nothing; returns `this`. */
+    override def put(target: Uri, one: SetCookie, more: SetCookie*) = this
 
   /**
    * Creates cookie store with initial collection of cookies.
@@ -101,13 +117,6 @@ object CookieStore:
    */
   def apply(cookies: Seq[PersistentCookie] = Nil): CookieStore =
     DefaultCookieStore(new ArrayBuffer ++= cookies)
-
-private object AlwaysEmptyCookieStore extends CookieStore:
-  val size = 0
-  def list: Seq[PersistentCookie] = Nil
-  def clear(expiredOnly: Boolean) =  this
-  def get(target: Uri): Seq[PlainCookie] = Nil
-  def put(target: Uri, cookies: Seq[SetCookie]) = this
 
 private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentCookie]) extends CookieStore:
   private type Key = Tuple3[String, String, String]

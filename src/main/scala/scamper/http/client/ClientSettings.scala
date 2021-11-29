@@ -42,7 +42,7 @@ import Validate.{ noNulls, notNull }
  * | bufferSize      | `8192` |
  * | readTimeout     | `30000` |
  * | continueTimeout | `1000` |
- * | coookies        | `CookieStore.alwaysEmpty` |
+ * | coookies        | `CookieStore.Null` |
  * | trust           | _(Not set)_ |
  * | incoming        | _(Not set)_ |
  * | outgoing        | _(Not set)_ |
