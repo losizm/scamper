@@ -48,22 +48,13 @@ object BodyParser:
     ByteArrayBodyParser(maxLength.max(0), bufferSize.max(8192))
 
   /**
-   * Gets body parser for text.
+   * Gets body parser for string.
    *
    * @param maxLength maximum length in bytes
    * @param bufferSize buffer size in bytes
    */
-  def text(maxLength: Int = 8388608, bufferSize: Int = 8192): BodyParser[String] =
-    TextBodyParser(maxLength.max(0), bufferSize.max(8192))
-
-  /**
-   * Gets body parser for form data.
-   *
-   * @param maxLength maximum length in bytes
-   * @param bufferSize buffer size in bytes
-   */
-  def form(maxLength: Int = 8388608, bufferSize: Int = 8192): BodyParser[Map[String, Seq[String]]] =
-    FormBodyParser(maxLength.max(0), bufferSize.max(8192))
+  def string(maxLength: Int = 8388608, bufferSize: Int = 8192): BodyParser[String] =
+    StringBodyParser(maxLength.max(0), bufferSize.max(8192))
 
   /**
    * Gets body parser for query string.
@@ -72,10 +63,10 @@ object BodyParser:
    * @param bufferSize buffer size in bytes
    */
   def query(maxLength: Int = 8388608, bufferSize: Int = 8192): BodyParser[QueryString] =
-    QueryBodyParser(maxLength.max(0), bufferSize.max(8192))
+    QueryStringBodyParser(maxLength.max(0), bufferSize.max(8192))
 
   /**
-   * Gets body parser for storing message body to file.
+   * Gets body parser for file storage.
    *
    * @param dest destination to which message body is stored
    * @param maxLength maximum length in bytes
@@ -104,7 +95,7 @@ private class ByteArrayBodyParser(val maxLength: Long, bufferSize: Int) extends 
       out.toArray
     }
 
-private class TextBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser[String]:
+private class StringBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser[String]:
   private val parser = ByteArrayBodyParser(maxLength, bufferSize)
 
   def parse(message: HttpMessage): String =
@@ -115,17 +106,11 @@ private class TextBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser
       .map(charset => String(parser.parse(message), charset))
       .get
 
-private class QueryBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser[QueryString]:
-  private val parser = TextBodyParser(maxLength, bufferSize)
+private class QueryStringBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser[QueryString]:
+  private val parser = StringBodyParser(maxLength, bufferSize)
 
   def parse(message: HttpMessage): QueryString =
     QueryString(parser.parse(message))
-
-private class FormBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser[Map[String, Seq[String]]]:
-  private val parser = QueryBodyParser(maxLength, bufferSize)
-
-  def parse(message: HttpMessage): Map[String, Seq[String]] =
-    parser.parse(message).toMap
 
 private class FileBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[File] with BodyDecoder:
   def parse(message: HttpMessage): File =

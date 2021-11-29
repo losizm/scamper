@@ -28,8 +28,8 @@ import RequestMethod.Registry.*
 import ResponseStatus.Registry.*
 
 class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
-  "BodyParser" should "parse response with text body" in {
-    given BodyParser[String] = BodyParser.text()
+  "BodyParser" should "parse response with string body" in {
+    given BodyParser[String] = BodyParser.string()
     val body = Entity("Hello, world!")
     val message = Ok(body).setContentType("text/plain").setContentLength(body.knownSize.get)
 
@@ -40,28 +40,18 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(message.as[String] == "Hello, world!")
   }
 
-  it should "parse response with chunked text body" in {
-    given BodyParser[String] = BodyParser.text()
+  it should "parse response with chunked string body" in {
+    given BodyParser[String] = BodyParser.string()
     val body = Entity("7\r\nHello, \r\n6\r\nworld!\r\n0\r\n")
     val message = Ok(body).setContentType("text/plain; charset=utf8").setTransferEncoding("chunked")
 
     assert(message.as[String] == "Hello, world!")
   }
 
-  it should "detect truncation in chunked text body" in {
-    given BodyParser[String] = BodyParser.text()
+  it should "detect truncation in chunked string body" in {
+    given BodyParser[String] = BodyParser.string()
     val message = Ok(Entity("100\r\nHello, world!")).setContentType("text/plain; charset=utf8").setTransferEncoding("chunked")
     assertThrows[EOFException](message.as[String])
-  }
-
-  it should "parse request with form body" in {
-    given BodyParser[Map[String, Seq[String]]] = BodyParser.form()
-    val body = Entity("id" -> "0", "name" -> "root")
-    val request = Post("users").setBody(body).setContentLength(body.knownSize.get)
-    val form = request.as[Map[String, Seq[String]]]
-
-    assert(form("id").head == "0")
-    assert(form("name").head == "root")
   }
 
   it should "parse request with form body as query string" in {
@@ -75,7 +65,7 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
   }
 
   it should "not parse response with large body" in {
-    given BodyParser[String] = BodyParser.text(8)
+    given BodyParser[String] = BodyParser.string(8)
     val body = Entity("Hello, world!")
     val message = Ok(body).setContentType("text/plain").setContentLength(body.knownSize.get)
 
@@ -83,7 +73,7 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
   }
 
   it should "not parse response with large entity" in {
-    given BodyParser[String] = BodyParser.text(256)
+    given BodyParser[String] = BodyParser.string(256)
     val body = Entity(getResourceBytes("/test.html.gz"))
 
     assertThrows[EntityTooLarge] {

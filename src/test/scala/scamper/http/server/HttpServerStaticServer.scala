@@ -41,7 +41,7 @@ class HttpServerStaticServerSpec extends org.scalatest.flatspec.AnyFlatSpec with
       .create()
 
   private given BodyParser[Array[Byte]] = BodyParser.bytes(32 * 1024)
-  private given BodyParser[String]      = BodyParser.text(32 * 1024)
+  private given BodyParser[String]      = BodyParser.string(32 * 1024)
 
   private def testStaticServer(secure: Boolean): Unit =
     withServer(secure) { implicit server =>

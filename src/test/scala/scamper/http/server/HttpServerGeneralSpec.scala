@@ -104,7 +104,7 @@ class HttpServerGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
       .continueTimeout(1000)
       .create()
 
-  private given textBodyParser: BodyParser[String] = BodyParser.text(8192)
+  private given textBodyParser: BodyParser[String] = BodyParser.string(8192)
   private given byteBodyParser: BodyParser[Array[Byte]] = BodyParser.bytes(8192)
 
   private def testAbout(secure: Boolean) = withServer(secure) { implicit server =>

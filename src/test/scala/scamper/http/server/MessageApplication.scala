@@ -28,7 +28,7 @@ import scamper.http.types.given
 import ResponseStatus.Registry.*
 
 object MessageApplication extends RoutingApplication:
-  private given BodyParser[String] = BodyParser.text(8192)
+  private given BodyParser[String] = BodyParser.string(8192)
 
   def apply(router: Router): Unit =
     val messages = LinkedHashMap[Int, String]()

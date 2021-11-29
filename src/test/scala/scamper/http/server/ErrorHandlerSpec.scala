@@ -25,7 +25,7 @@ import RequestMethod.Registry.Get
 import ResponseStatus.Registry.*
 
 class ErrorHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec:
-  given BodyParser[String] = BodyParser.text()
+  given BodyParser[String] = BodyParser.string()
 
   object InterruptedErrorHandler extends ErrorHandler:
     def apply(req: HttpRequest) =

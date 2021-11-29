@@ -37,7 +37,7 @@ class HttpServerRouteSpec extends org.scalatest.flatspec.AnyFlatSpec with TestSe
       .trust(Resources.truststore)
       .create()
 
-  private given bodyParser: BodyParser[String] = BodyParser.text(8192)
+  private given bodyParser: BodyParser[String] = BodyParser.string(8192)
 
   private def testApplication(secure: Boolean) = withServer(secure) { implicit server =>
     implicit object MessagesBodyParser extends BodyParser[Map[Int, String]]:

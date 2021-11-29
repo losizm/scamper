@@ -50,7 +50,7 @@ class HttpClientGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
   it should "validate request and response with SSL/TLS" in testClient(true)
 
   private def testClient(secure: Boolean) = withServer(secure) { implicit server =>
-    given bodyParser: BodyParser[String] = BodyParser.text(8192)
+    given bodyParser: BodyParser[String] = BodyParser.string(8192)
     given client: HttpClient = HttpClient
       .settings()
       .trust(Resources.truststore)

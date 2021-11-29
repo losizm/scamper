@@ -29,7 +29,7 @@ import ResponseStatus.Registry.*
 
 class HttpServerInternalRoutingSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "test internal routing" in withServer { server =>
-    given BodyParser[String] = BodyParser.text(256)
+    given BodyParser[String] = BodyParser.string(256)
     given BodyParser[Int]    = _.as[String].toInt
 
     val client  = HttpClient()

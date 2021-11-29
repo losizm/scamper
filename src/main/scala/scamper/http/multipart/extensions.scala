@@ -19,42 +19,37 @@ package multipart
 
 extension [T <: HttpMessage & MessageBuilder[T]](message: T)
   /**
-   * Creates new message with supplied multipart as message body.
+   * Creates new message with multipart message body.
    *
-   * After adding body to message, the Content-Type header is set to
-   * `multipart/form-data` with a boundary parameter whose value is used
-   * to delimit parts in encoded message body.
+   * __Content-Type__ is set to `multipart/form-data` with generated boundary
+   * parameter.
    *
    * @param multipart message body
    */
-  def setMultipartBody(multipart: Multipart): T =
+  def setMultipart(multipart: Multipart): T =
     val boundary = Multipart.boundary()
     message.setBody(multipart.toEntity(boundary))
       .putHeaders(Header("Content-Type", s"multipart/form-data; boundary=$boundary"))
 
   /**
-   * Creates new message with supplied parts as message body, with the parts
-   * encoded as multipart form data.
+   * Creates new message with multipart message body.
    *
-   * After adding body to message, the Content-Type header is set to
-   * `multipart/form-data` with a boundary parameter whose value is used
-   * to delimit parts in encoded message body.
+   * __Content-Type__ is set to `multipart/form-data` with generated boundary
+   * parameter.
    *
    * @param parts message body
    */
-  def setMultipartBody(parts: Seq[Part]): T =
-    setMultipartBody(Multipart(parts))
+  def setMultipart(parts: Seq[Part]): T =
+    setMultipart(Multipart(parts))
 
   /**
-   * Creates new message with supplied parts as message body, with the parts
-   * encoded as multipart form data.
+   * Creates new message with multipart message body.
    *
-   * After adding body to message, the Content-Type header is set to
-   * `multipart/form-data` with a boundary parameter whose value is used
-   * to delimit parts in encoded message body.
+   * __Content-Type__ is set to `multipart/form-data` with generated boundary
+   * parameter.
    *
    * @param one part
    * @param more additional parts
    */
-  def setMultipartBody(one: Part, more: Part*): T =
-    setMultipartBody(Multipart(one +: more))
+  def setMultipart(one: Part, more: Part*): T =
+    setMultipart(Multipart(one +: more))
