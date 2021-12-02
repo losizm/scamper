@@ -16,6 +16,8 @@
 package scamper
 package http
 
+import java.io.{ File, InputStream }
+
 /** Provides builder pattern for HTTP message. */
 trait MessageBuilder[T <: HttpMessage]:
   this: T =>
@@ -136,6 +138,46 @@ trait MessageBuilder[T <: HttpMessage]:
    * @return new message
    */
   def setBody(body: Entity): T
+
+  /**
+   * Creates message with supplied body.
+   *
+   * @param body message body
+   *
+   * @return new message
+   */
+  def setBody(body: InputStream): T =
+    setBody(Entity(body))
+
+  /**
+   * Creates message with supplied body.
+   *
+   * @param body message body
+   *
+   * @return new message
+   */
+  def setBody(body: Array[Byte]): T =
+    setBody(Entity(body))
+
+  /**
+   * Creates message with supplied body.
+   *
+   * @param body message body
+   *
+   * @return new message
+   */
+  def setBody(body: String): T =
+    setBody(Entity(body))
+
+  /**
+   * Creates message with supplied body.
+   *
+   * @param body message body
+   *
+   * @return new message
+   */
+  def setBody(body: File): T =
+    setBody(Entity(body))
 
   /**
    * Creates message with supplied attributes.

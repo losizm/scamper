@@ -16,6 +16,8 @@
 package scamper
 package http
 
+import java.io.{ File, FileInputStream }
+
 import scala.language.implicitConversions
 
 import scamper.http.headers.*
@@ -44,6 +46,24 @@ class HttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(res.attributes.contains("id"))
     assert(res.attributes.contains("success"))
     assert(!res.attributes.contains("name"))
+  }
+
+  it should "create HttpResponse and set body" in {
+    val res1 = Ok().setBody("Response #1".getBytes("UTF-8"))
+    assert(res1.status == Ok)
+    assert(res1.body.getBytes().sameElements("Response #1".getBytes("UTF-8")))
+
+    val res2 = NotFound().setBody("Response #2")
+    assert(res2.status == NotFound)
+    assert(res2.body.getBytes().sameElements("Response #2".getBytes("UTF-8")))
+
+    val res3 = InternalServerError().setBody(File("src/test/resources/test.html"))
+    assert(res3.status == InternalServerError)
+    assert(res3.body.getBytes().sameElements(Entity(File("src/test/resources/test.html")).getBytes()))
+
+    val res4 = InternalServerError().setBody(FileInputStream("src/test/resources/test.html"))
+    assert(res4.status == InternalServerError)
+    assert(res4.body.getBytes().sameElements(Entity(FileInputStream("src/test/resources/test.html")).getBytes()))
   }
 
   it should "get default value if header not found" in {

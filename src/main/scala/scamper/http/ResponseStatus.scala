@@ -16,6 +16,8 @@
 package scamper
 package http
 
+import java.io.{ File, InputStream }
+
 import scala.collection.mutable.TreeMap
 
 /**
@@ -53,6 +55,22 @@ sealed trait ResponseStatus:
   /** Creates `HttpResponse` with this status and supplied body. */
   def apply(body: Entity = Entity.empty): HttpResponse =
     HttpResponse(this, Nil, body)
+
+  /** Creates `HttpResponse` with this status and supplied body. */
+  def apply(body: InputStream): HttpResponse =
+    HttpResponse(this, Nil, Entity(body))
+
+  /** Creates `HttpResponse` with this status and supplied body. */
+  def apply(body: Array[Byte]): HttpResponse =
+    HttpResponse(this, Nil, Entity(body))
+
+  /** Creates `HttpResponse` with this status and supplied body. */
+  def apply(body: String): HttpResponse =
+    HttpResponse(this, Nil, Entity(body))
+
+  /** Creates `HttpResponse` with this status and supplied body. */
+  def apply(body: File): HttpResponse =
+    HttpResponse(this, Nil, Entity(body))
 
 /**
  * Provides factory for `ResponseStatus`.

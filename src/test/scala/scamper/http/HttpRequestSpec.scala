@@ -16,6 +16,8 @@
 package scamper
 package http
 
+import java.io.{ File, FileInputStream }
+
 import scala.language.implicitConversions
 
 import scamper.http.headers.*
@@ -80,6 +82,28 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(req.attributes.contains("id"))
     assert(req.attributes.contains("success"))
     assert(!req.attributes.contains("name"))
+  }
+
+  it should "create HttpRequest and set body" in {
+    val req1 = Post("/a").setBody("Request #1".getBytes("UTF-8"))
+    assert(req1.target == Uri("/a"))
+    assert(req1.method == Post)
+    assert(req1.body.getBytes().sameElements("Request #1".getBytes("UTF-8")))
+
+    val req2 = Put("/b").setBody("Request #2")
+    assert(req2.target == Uri("/b"))
+    assert(req2.method == Put)
+    assert(req2.body.getBytes().sameElements("Request #2".getBytes("UTF-8")))
+
+    val req3 = Post("/c").setBody(File("src/test/resources/test.html"))
+    assert(req3.target == Uri("/c"))
+    assert(req3.method == Post)
+    assert(req3.body.getBytes().sameElements(Entity(File("src/test/resources/test.html")).getBytes()))
+
+    val req4 = Put("/d").setBody(FileInputStream("src/test/resources/test.html"))
+    assert(req4.target == Uri("/d"))
+    assert(req4.method == Put)
+    assert(req4.body.getBytes().sameElements(Entity(FileInputStream("src/test/resources/test.html")).getBytes()))
   }
 
   it should "get default value if header not found" in {
