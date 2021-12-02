@@ -59,10 +59,26 @@ private class RouterImpl private (val mountPath: String) extends Router:
   }
 
   private class RouterRequestHandler(in: RequestHandler, out: ResponseFilter, err: ErrorHandler) extends RequestHandler:
+    private val attributes = Seq(
+      "scamper.http.server.message.server",
+      "scamper.http.server.message.socket",
+      "scamper.http.server.message.requestCount",
+      "scamper.http.server.message.correlate",
+      "scamper.http.server.message.logger"
+    )
+
     def apply(req: HttpRequest) =
       (try in(req) catch err(req)) match
         case req: HttpRequest  => req
-        case res: HttpResponse => out(res)
+        case res: HttpResponse => out(addAttributes(res, req))
+
+    private def addAttributes(res: HttpResponse, req: HttpRequest): HttpResponse =
+      res.putAttributes(getAttributes(req))
+
+    private def getAttributes(req: HttpRequest): Map[String, Any] =
+      attributes.flatMap(name => req.getAttribute[Any](name).map(value => name -> value))
+        .:+("scamper.http.server.response.request" -> req)
+        .toMap
 
 private object RouterImpl:
   def apply(mountPath: String): RouterImpl =
