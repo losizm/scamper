@@ -17,24 +17,30 @@ package scamper
 package http
 
 import scala.concurrent.ExecutionContext
-import scala.language.implicitConversions
+
+import scamper.http.headers.{ ContentEncoding, ContentLength, TransferEncoding }
+import scamper.http.types.{ ContentCoding, TransferCoding }
 
 private object ContentEncoder:
-  private val `Content-Encoding: gzip` = Header("Content-Encoding", "gzip")
-  private val `Content-Encoding: deflate` = Header("Content-Encoding", "deflate")
+  private val gzip    = ContentCoding("gzip")
+  private val deflate = ContentCoding("deflate")
+  private val chunked = TransferCoding("chunked")
 
   def gzip[T <: HttpMessage & MessageBuilder[T]](msg: T, bufferSize: Int = 8192)(using executor: ExecutionContext): T =
-    msg.getHeaderValue("Content-Encoding")
-      .map { enc => Header("Content-Encoding", enc + ", gzip") }
-      .map(msg.putHeaders(_))
-      .getOrElse { msg.putHeaders(`Content-Encoding: gzip`) }
-      .removeHeaders("Content-Length")
-      .setBody { Compressor.gzip(msg.body.data, bufferSize) }
+    addContentEncoding(msg, gzip)
+      .setBody(Entity(Compressor.gzip(msg.body.data, bufferSize)))
 
   def deflate[T <: HttpMessage & MessageBuilder[T]](msg: T, bufferSize: Int = 8192): T =
-    msg.getHeaderValue("Content-Encoding")
-      .map { enc => Header("Content-Encoding", enc + ", deflate") }
-      .map(msg.putHeaders(_))
-      .getOrElse { msg.putHeaders(`Content-Encoding: deflate`) }
-      .removeHeaders("Content-Length")
-      .setBody { Compressor.deflate(msg.body.data, bufferSize) }
+    addContentEncoding(msg, deflate)
+      .setBody(Entity(Compressor.deflate(msg.body.data, bufferSize)))
+
+  private def addContentEncoding[T <: HttpMessage & MessageBuilder[T]](msg: T, value: ContentCoding): T =
+    msg.getContentEncoding
+      .map(_ :+ value)
+      .map(msg.setContentEncoding)
+      .getOrElse(msg.setContentEncoding(value))
+      .setTransferEncoding(getTransferEncoding(msg))
+      .removeContentLength
+
+  private def getTransferEncoding(msg: HttpMessage): Seq[TransferCoding] =
+    msg.transferEncoding.filterNot(_.isChunked) :+ chunked
