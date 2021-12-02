@@ -35,6 +35,7 @@ import scamper.http.types.{ KeepAliveParameters, TransferCoding }
 import scamper.logging.{ ConsoleLogger, Logger, NullLogger }
 
 import Auxiliary.SocketType
+import RequestMethod.Registry.Connect
 import ResponseStatus.Registry.*
 import RuntimeProperties.server.*
 
@@ -506,10 +507,12 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
       else if res.hasContentLength then
         res
       else
-        res.body.knownSize match
-          case Some(0) => res.getContentType.map(_ => res.setContentLength(0)).getOrElse(res)
-          case Some(n) => res.setContentLength(n)
-          case None    => res.setTransferEncoding(chunked)
+        res.body.knownSize
+          .map(n => if excludeContentLength(res) then res else res.setContentLength(n))
+          .getOrElse(res.setTransferEncoding(chunked))
+
+    private def excludeContentLength(res: HttpResponse): Boolean =
+      res.isInformational || res.status == NoContent || res.request.exists(_.method == Connect)
 
     private def addAttributes[T <: HttpMessage](msg: T, socket: Socket, requestCount: Int, correlate: String): T =
       msg.asInstanceOf[MessageBuilder[T]].putAttributes(
