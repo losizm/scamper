@@ -81,7 +81,7 @@ import Validate.notNull
  * app.put("/data/:id") { req =>
  *   def update(id: Int, data: String): Boolean = ???
  *
- *   given BodyParser[String] = BodyParser.text()
+ *   given BodyParser[String] = BodyParser.string()
  *
  *   // Get path parameter
  *   val id = req.params.getInt("id")

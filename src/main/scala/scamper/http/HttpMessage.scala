@@ -129,7 +129,7 @@ sealed trait HttpMessage:
  *
  * val host: Option[String] = request.getHeaderValue("Host")
  *
- * given BodyParser[String] = BodyParser.text()
+ * given BodyParser[String] = BodyParser.string()
  *
  * printf("Body: %s%n", request.as[String])
  * }}}
@@ -287,7 +287,7 @@ object HttpRequest:
  *
  * val contentType: Option[String] = response.getHeaderValue("Content-Type")
  *
- * given BodyParser[String] = BodyParser.text()
+ * given BodyParser[String] = BodyParser.string()
  *
  * printf("Body: %s%n", response.as[String])
  * }}}

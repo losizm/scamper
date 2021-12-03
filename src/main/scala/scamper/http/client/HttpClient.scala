@@ -35,7 +35,7 @@ import Validate.notNull
  * import scamper.http.{ BodyParser, stringToUri }
  * import scamper.http.client.HttpClient
  *
- * given BodyParser[String] = BodyParser.text()
+ * given BodyParser[String] = BodyParser.string()
  *
  * // Create HttpClient instance
  * val client = HttpClient()
@@ -62,7 +62,7 @@ import Validate.notNull
  * import scamper.http.types.{ stringToMediaRange, stringToLanguageRange }
  *
  * given HttpClient = HttpClient()
- * given BodyParser[String] = BodyParser.text(4096)
+ * given BodyParser[String] = BodyParser.string(4096)
  *
  * Get("http://localhost:8080/motd")
  *   .setAccept("text/plain")
