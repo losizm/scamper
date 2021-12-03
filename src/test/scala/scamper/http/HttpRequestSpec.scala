@@ -18,8 +18,6 @@ package http
 
 import java.io.{ File, FileInputStream }
 
-import scala.language.implicitConversions
-
 import scamper.http.headers.*
 
 import RequestMethod.Registry.*
