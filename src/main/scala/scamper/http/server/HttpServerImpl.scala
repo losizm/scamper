@@ -97,11 +97,10 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
     new ErrorHandler:
       def apply(req: HttpRequest): PartialFunction[Throwable, HttpResponse] =
         case err: Throwable =>
-          val correlate = req.getAttribute[String]("scamper.http.server.message.correlate").getOrElse("<unknown>")
+          val correlate = req.getAttributeOrElse("scamper.http.server.message.correlate", "<unknown>")
           logger.error(s"$authority - Error while handling request (correlate=$correlate)", err)
           InternalServerError()
   )
-
 
   private val chunked = TransferCoding("chunked")
   private var closed  = AtomicBoolean(false)
@@ -232,19 +231,18 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         isKeepAliveSafe(req, res)
 
     private def isKeepAliveRequested(req: HttpRequest): Boolean =
-      req.connection.exists(_.equalsIgnoreCase("keep-alive"))
+      req.connection.exists("keep-alive".equalsIgnoreCase)
 
     private def isKeepAliveMaxLeft(req: HttpRequest): Boolean =
       req.getAttribute[Int]("scamper.http.server.message.requestCount")
-        .map(_ < keepAliveMax)
-        .getOrElse(false)
+        .exists(_ < keepAliveMax)
 
     private def isKeepAliveSafe(req: HttpRequest, res: HttpResponse): Boolean =
       res.isSuccessful || ((req.isGet || req.isHead) && res.isRedirection)
 
     private def isUpgrade(res: HttpResponse): Boolean =
       res.status == SwitchingProtocols && res.hasUpgrade &&
-        res.connection.exists(_.equalsIgnoreCase("upgrade"))
+        res.connection.exists("upgrade".equalsIgnoreCase)
 
   private object ServiceManager extends Thread(threadGroup, s"scamper-server-$id-service-manager"):
     private val connectionCount = AtomicLong(0)
@@ -301,9 +299,9 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
           val connection = res.connection
 
-          if connection.exists(_.equalsIgnoreCase("upgrade")) then
+          if connection.exists("upgrade".equalsIgnoreCase) then
             UpgradeConnection(res.getAttribute("scamper.http.server.connection.upgrade").get)
-          else if connection.exists(_.equalsIgnoreCase("keep-alive")) then
+          else if connection.exists("keep-alive".equalsIgnoreCase) then
             PersistConnection
           else
             CloseConnection
@@ -514,8 +512,8 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
     private def excludeContentLength(res: HttpResponse): Boolean =
       res.isInformational || res.status == NoContent || res.request.exists(_.method == Connect)
 
-    private def addAttributes[T <: HttpMessage](msg: T, socket: Socket, requestCount: Int, correlate: String): T =
-      msg.asInstanceOf[MessageBuilder[T]].putAttributes(
+    private def addAttributes[T <: HttpMessage & MessageBuilder[T]](msg: T, socket: Socket, requestCount: Int, correlate: String): T =
+      msg.putAttributes(
         "scamper.http.server.message.server"       -> HttpServerImpl.this,
         "scamper.http.server.message.socket"       -> socket,
         "scamper.http.server.message.requestCount" -> requestCount,
