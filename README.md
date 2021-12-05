@@ -332,12 +332,11 @@ And, you can implement your own. Here's one for JSON powered by
 [Grapple](https://github.com/losizm/grapple):
 
 ```scala
-import grapple.json.{ Json, JsonInput }
-import grapple.json.Implicits.given
-
 import scala.language.implicitConversions
 
-import scamper.http.{ BodyParser, HttpMessage, stringToEntity, stringToUri }
+import grapple.json.{ Json, JsonInput, given }
+
+import scamper.http.{ BodyParser, HttpMessage, stringToEntity }
 import scamper.http.RequestMethod.Registry.Post
 
 case class User(id: Int, name: String)
