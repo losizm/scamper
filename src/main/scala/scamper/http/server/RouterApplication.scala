@@ -17,9 +17,9 @@ package scamper
 package http
 package server
 
-/** Defines routing application. */
+/** Defines router application. */
 @FunctionalInterface
-trait RoutingApplication:
+trait RouterApplication:
   /**
    * Applies router.
    *

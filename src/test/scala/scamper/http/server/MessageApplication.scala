@@ -27,7 +27,7 @@ import scamper.http.types.given
 
 import ResponseStatus.Registry.*
 
-object MessageApplication extends RoutingApplication:
+object MessageApplication extends RouterApplication:
   private given BodyParser[String] = BodyParser.string(8192)
 
   def apply(router: Router): Unit =

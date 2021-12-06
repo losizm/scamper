@@ -33,7 +33,7 @@ import RequestMethod.Registry.{ Get, Head }
 import ResponseStatus.Registry.*
 import Validate.noNulls
 
-private class StaticFileServer(sourceDirectory: Path, defaults: Seq[String]) extends RoutingApplication:
+private class StaticFileServer(sourceDirectory: Path, defaults: Seq[String]) extends RouterApplication:
   private val `*/*` = MediaRange("*/*")
 
   def apply(router: Router): Unit =

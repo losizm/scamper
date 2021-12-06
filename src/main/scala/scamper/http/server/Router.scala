@@ -205,14 +205,14 @@ trait Router:
     incoming(path, Get)(WebSocketRequestHandler(app))
 
   /**
-   * Mounts routing application at given path.
+   * Mounts router application at given path.
    *
    * @param path router path at which application is mounted
-   * @param app routing application
+   * @param app router application
    *
    * @return this router
    */
-  def route(path: String)(app: RoutingApplication): this.type =
+  def route(path: String)(app: RouterApplication): this.type =
     val router = RouterImpl(mountPath + MountPath.normalize(path))
     app(router)
     incoming(MountRequestHandler(router.mountPath, router.createRequestHandler()))

@@ -128,4 +128,3 @@ class HttpServerInternalRoutingSpec extends org.scalatest.flatspec.AnyFlatSpec:
     router.recover { req =>
       { case _: ParameterNotConvertible => BadRequest(req.target.toString) }
     }
-
