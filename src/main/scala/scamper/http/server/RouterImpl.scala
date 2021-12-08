@@ -19,15 +19,30 @@ package server
 
 import scala.collection.mutable.ListBuffer
 
-import Validate.notNull
+import Validate.{ noNulls, notNull }
 
 private class RouterImpl private (val mountPath: String) extends Router:
   private val in  = new ListBuffer[RequestHandler]
   private val out = new ListBuffer[ResponseFilter]
   private val err = new ListBuffer[ErrorHandler]
+  private val svc = new ListBuffer[ManagedService]
+
+  def reset(): this.type = synchronized {
+    in.clear()
+    out.clear()
+    err.clear()
+    svc.clear()
+    this
+  }
+
+  def manage(services: Seq[ManagedService]): this.type = synchronized {
+    svc ++= noNulls(services, "services")
+    this
+  }
 
   def incoming(handler: RequestHandler): this.type = synchronized {
     in += notNull(handler, "handler")
+    toManagedService(handler).foreach(svc.+=)
     this
   }
 
@@ -37,18 +52,24 @@ private class RouterImpl private (val mountPath: String) extends Router:
       notNull(methods, "methods"),
       notNull(handler, "handler")
     )
+    toManagedService(handler).foreach(svc.+=)
     this
   }
 
   def outgoing(filter: ResponseFilter): this.type = synchronized {
     out += notNull(filter, "filter")
+    toManagedService(filter).foreach(svc.+=)
     this
   }
 
   def recover(handler: ErrorHandler): this.type = synchronized {
     err += notNull(handler, "handler")
+    toManagedService(handler).foreach(svc.+=)
     this
   }
+
+  private[server] def getManagedServices(): Seq[ManagedService] =
+    synchronized(svc.toSeq)
 
   private[server] def createRequestHandler(): RequestHandler = synchronized {
     RouterRequestHandler(
@@ -57,6 +78,11 @@ private class RouterImpl private (val mountPath: String) extends Router:
       ErrorHandler.coalesce(err.toSeq)
     )
   }
+
+  private def toManagedService[T](value: T): Option[ManagedService] =
+    value match
+      case service: ManagedService => Some(service)
+      case _                       => None
 
   private class RouterRequestHandler(in: RequestHandler, out: ResponseFilter, err: ErrorHandler) extends RequestHandler:
     private val attributes = Seq(

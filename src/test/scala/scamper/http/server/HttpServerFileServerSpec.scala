@@ -28,7 +28,7 @@ import scamper.http.types.{ *, given }
 
 import ResponseStatus.Registry.*
 
-class HttpServerStaticServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer:
+class HttpServerFileServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer:
   it should "serve files" in testStaticServer(false)
 
   it should "serve files with SSL/TLS" in testStaticServer(true)

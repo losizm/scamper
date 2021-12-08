@@ -77,8 +77,8 @@ trait Router:
   def toAbsolutePath(path: String): String =
     NormalizePath(path) match
       case ""   => mountPath
-      case "*"  => "*"
       case "/"  => mountPath
+      case "*"  => "*"
       case path =>
         if !path.startsWith("/") || path.matches("/\\.\\.(/.*)?") then
           throw IllegalArgumentException(s"Invalid router path: $path")
@@ -88,6 +88,45 @@ trait Router:
           case false => mountPath + path
 
   /**
+   * Resets router.
+   *
+   * @return this router
+   */
+  def reset(): this.type
+
+  /**
+   * Adds managed services to router.
+   *
+   * @param services managed services
+   *
+   * @return this router
+   *
+   * @note Services are started in the order they are added; they are stopped in
+   * reverse order.
+   *
+   * @note If service's startup routine fails, server creation halts unless
+   * service is [[NoncriticalService]].
+   */
+  def manage(services: Seq[ManagedService]): this.type
+
+  /**
+   * Adds managed services to router.
+   *
+   * @param one managed service
+   * @param more additional managed services
+   *
+   * @return this router
+   *
+   * @note Services are started in the order they are added; they are stopped in
+   * reverse order.
+   *
+   * @note If service's startup routine fails, server creation halts unless
+   * service is [[NoncriticalService]].
+   */
+  def manage(one: ManagedService, more: ManagedService*): this.type =
+    manage(one +: more)
+
+  /**
    * Adds supplied request handler.
    *
    * The handler is appended to existing request handler chain.
@@ -95,6 +134,9 @@ trait Router:
    * @param handler request handler
    *
    * @return this router
+   *
+   * @note If request handler implements [[ManagedService]], it is also added as
+   * managed service.
    */
   def incoming(handler: RequestHandler): this.type
 
@@ -112,6 +154,9 @@ trait Router:
    *
    * @note If no request methods are specified, then matches are limited to path
    * only.
+   *
+   * @note If request handler implements [[ManagedService]], it is also added as
+   * managed service.
    */
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type
 
@@ -124,6 +169,9 @@ trait Router:
    * @param handler request handler
    *
    * @return this router
+   *
+   * @note If request handler implements [[ManagedService]], it is also added as
+   * managed service.
    */
   def get(path: String)(handler: RequestHandler): this.type =
     incoming(path, Get)(handler)
@@ -137,6 +185,9 @@ trait Router:
    * @param handler request handler
    *
    * @return this router
+   *
+   * @note If request handler implements [[ManagedService]], it is also added as
+   * managed service.
    */
   def post(path: String)(handler: RequestHandler): this.type =
     incoming(path, Post)(handler)
@@ -150,6 +201,9 @@ trait Router:
    * @param handler request handler
    *
    * @return this router
+   *
+   * @note If request handler implements [[ManagedService]], it is also added as
+   * managed service.
    */
   def put(path: String)(handler: RequestHandler): this.type =
     incoming(path, Put)(handler)
@@ -163,6 +217,9 @@ trait Router:
    * @param handler request handler
    *
    * @return this router
+   *
+   * @note If request handler implements [[ManagedService]], it is also added as
+   * managed service.
    */
   def delete(path: String)(handler: RequestHandler): this.type =
     incoming(path, Delete)(handler)
@@ -200,6 +257,9 @@ trait Router:
    * @param app WebSocket application
    *
    * @return this router
+   *
+   * @note If WebSocket app implements [[ManagedService]], it is also added as
+   * managed service.
    */
   def websocket(path: String)(app: WebSocketApplication[?]): this.type =
     incoming(path, Get)(WebSocketRequestHandler(app))
@@ -211,11 +271,15 @@ trait Router:
    * @param app router application
    *
    * @return this router
+   *
+   * @note If router app implements [[ManagedService]], it is also added as
+   * managed service.
    */
   def route(path: String)(app: RouterApplication): this.type =
     val router = RouterImpl(mountPath + MountPath.normalize(path))
     app(router)
     incoming(MountRequestHandler(router.mountPath, router.createRequestHandler()))
+    manage(router.getManagedServices())
 
   /**
    * Adds error handler.
@@ -225,6 +289,9 @@ trait Router:
    * @param handler error handler
    *
    * @return this router
+   *
+   * @note If error handler implements [[ManagedService]], it is also added as
+   * managed service.
    */
   def recover(handler: ErrorHandler): this.type
 
@@ -236,5 +303,8 @@ trait Router:
    * @param filter response filter
    *
    * @return this router
+   *
+   * @note If response filter implements [[ManagedService]], it is also added as
+   * managed service.
    */
   def outgoing(filter: ResponseFilter): this.type

@@ -51,6 +51,7 @@ private object HttpServerImpl:
     readTimeout:         Int = 5000,
     headerLimit:         Int = 100,
     keepAlive:           Option[KeepAliveParameters] = None,
+    managedServices:     Seq[ManagedService] = Nil,
     requestHandlers:     Seq[RequestHandler] = Nil,
     responseFilters:     Seq[ResponseFilter] = Nil,
     errorHandlers:       Seq[ErrorHandler] = Nil,
@@ -68,6 +69,23 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
   private case object CloseConnection extends ConnectionManagement
   private case object PersistConnection extends ConnectionManagement
   private case class UpgradeConnection(upgrade: Socket => Unit) extends ConnectionManagement
+
+  private case class ServiceDelegate(service: ManagedService): //
+    private var started = false
+    private var stopped = false
+
+    def name = service.name
+    def isNoncritical = service.isInstanceOf[NoncriticalService]
+
+    def start() =
+      if !started then
+        service.start(HttpServerImpl.this)
+        started = true
+
+    def stop() =
+      if !stopped then
+        service.stop()
+        stopped = true
 
   val logger      = if app.logger == null then NullLogger else app.logger
   val backlogSize = app.backlogSize.max(1)
@@ -91,9 +109,10 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
   private val keepAliveMax     = keepAlive.map(_.max).getOrElse(1)
   private val keepAliveTimeout = keepAlive.map(_.timeout).getOrElse(0)
 
-  private val requestHandler = RequestHandler.coalesce(app.requestHandlers)
-  private val responseFilter = ResponseFilter.chain(app.responseFilters)
-  private val errorHandler   = ErrorHandler.coalesce(app.errorHandlers :+
+  private val managedServices = app.managedServices.map(ServiceDelegate(_))
+  private val requestHandler  = RequestHandler.coalesce(app.requestHandlers)
+  private val responseFilter  = ResponseFilter.chain(app.responseFilters)
+  private val errorHandler    = ErrorHandler.coalesce(app.errorHandlers :+
     new ErrorHandler:
       def apply(req: HttpRequest): PartialFunction[Throwable, HttpResponse] =
         case err: Throwable =>
@@ -185,12 +204,15 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
       Try(encoderExecutor.shutdownNow())
       Try(serviceExecutor.shutdownNow())
       Try(closerExecutor.shutdownNow())
+      Try(stopManagedServices())
       Try(logger.asInstanceOf[Closeable].close())
 
   override def toString(): String =
     s"HttpServer(host=$host, port=$port, isSecure=$isSecure, isClosed=$isClosed)"
 
   try
+    startManagedServices()
+
     logger.info(s"$authority - Starting server")
     logger.info(s"$authority - Secure: $isSecure")
     logger.info(s"$authority - Logger: $logger")
@@ -210,6 +232,23 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
       Try(logger.error(s"$authority - Failed to start server", e))
       close()
       throw e
+
+  private def startManagedServices(): Unit =
+    logger.info(s"$authority - Starting managed services")
+    managedServices.foreach { delegate =>
+      try
+        delegate.start()
+      catch case err: Exception =>
+        if delegate.isNoncritical then
+          logger.warn(s"$authority - Failed to start service ${delegate.name}", err)
+          Try(delegate.stop())
+        else
+          throw ServiceException(s"Failed to start service ${delegate.name}", err)
+    }
+
+  private def stopManagedServices(): Unit =
+    logger.info(s"$authority - Stopping managed services")
+    managedServices.reverse.foreach(delegate => Try(delegate.stop()))
 
   private object ConnectionManager:
     private val keepAliveHeader     = Header("Keep-Alive", s"timeout=$keepAliveTimeout, max=$keepAliveMax")

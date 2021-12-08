@@ -23,7 +23,7 @@ import java.net.InetAddress
 import scamper.http.types.KeepAliveParameters
 import scamper.logging.{ Logger, LogWriter }
 
-import Validate.notNull
+import Validate.{ noNulls, notNull }
 
 /**
  * Defines server application for creating `HttpServer`.
@@ -44,6 +44,7 @@ import Validate.notNull
  * | headerLimit | `100` |
  * | keepAlive   | _(Not configured)_ |
  * | secure      | _(Not configured)_ |
+ * | manage      | _(Not configured)_ |
  * | incoming    | _(Not configured)_ |
  * | outgoing    | _(Not configured)_ |
  * | recover     | _(Sends `500 Internal Server Error`)_ |
@@ -121,12 +122,12 @@ class ServerApplication extends Router:
   /**
    * @inheritdoc
    *
-   * @note Mount path is always `"/"`.
+   * @return `"/"`
    */
   def mountPath: String =
     "/"
 
-  /** Resets application to default configuration. */
+  /** @inheritdoc */
   def reset(): this.type = synchronized {
     app = HttpServerImpl.Application()
     this
@@ -326,49 +327,41 @@ class ServerApplication extends Router:
     this
   }
 
-  /**
-   * Adds supplied request handler.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param handler request handler
-   *
-   * @return this application
-   */
+  /** @inheritdoc */
+  def manage(services: Seq[ManagedService]): this.type = synchronized {
+    if services.nonEmpty then
+      app = app.copy(managedServices = app.managedServices ++ noNulls(services))
+    this
+  }
+
+  /** @inheritdoc */
   def incoming(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ handler)
+    app = app.copy(
+      requestHandlers = app.requestHandlers :+ handler,
+      managedServices = addManagedService(handler)
+    )
     this
   }
 
-  /**
-   * Adds supplied handler for requests with given path and any of supplied
-   * request methods.
-   *
-   * The handler is appended to existing request handler chain.
-   *
-   * @param path request path
-   * @param methods request methods
-   * @param handler request handler
-   *
-   * @return this application
-   *
-   * @note If no request methods are specified, then matches are limited to path
-   * only.
-   */
-  def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type = synchronized {
-    app = app.copy(requestHandlers = app.requestHandlers :+ TargetRequestHandler(path, methods, handler))
-    this
-  }
+  /** @inheritdoc */
+  def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type =
+    incoming(TargetRequestHandler(path, methods, handler))
 
-  /** @inheritdoc  */
+  /** @inheritdoc */
   def outgoing(filter: ResponseFilter): this.type = synchronized {
-    app = app.copy(responseFilters = app.responseFilters :+ notNull(filter, "filter"))
+    app = app.copy(
+      responseFilters = app.responseFilters :+ notNull(filter, "filter"),
+      managedServices = addManagedService(filter)
+    )
     this
   }
 
-  /** @inheritdoc  */
+  /** @inheritdoc */
   def recover(handler: ErrorHandler): this.type = synchronized {
-    app = app.copy(errorHandlers = app.errorHandlers :+ notNull(handler, "handler"))
+    app = app.copy(
+      errorHandlers   = app.errorHandlers :+ notNull(handler, "handler"),
+      managedServices = addManagedService(handler)
+    )
     this
   }
 
@@ -404,3 +397,8 @@ class ServerApplication extends Router:
   def create(host: InetAddress, port: Int): HttpServer = synchronized {
     HttpServerImpl(host, port, app)
   }
+
+  private def addManagedService[T](value: T): Seq[ManagedService] =
+    value match
+      case service: ManagedService => app.managedServices :+ service
+      case _                       => app.managedServices
