@@ -2,9 +2,10 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.losizm/scamper_3.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.losizm%22%20AND%20a:%22scamper_3%22)
 
-**Scamper** is the HTTP library for Scala. It defines the interface for reading
-and writing HTTP messages, and it provides [client](#HTTP-Client) and
-[server](#HTTP-Server) implementations including WebSockets.
+**Scamper** is the HTTP library for Scala.
+
+It defines an interface for reading and writing HTTP messages, and it provides
+client and server implementations including WebSockets.
 
 ## Table of Contents
 
@@ -41,6 +42,8 @@ and writing HTTP messages, and it provides [client](#HTTP-Client) and
   - [Router](#Router)
   - [Response Filters](#Response-Filters)
   - [Securing Server](#Securing-Server)
+  - [Managed Services](#Managed-Services)
+  - [More Managed Services](#More-Managed-Services)
   - [Creating Server](#Creating-Server)
 - [API Documentation](#API-Documentation)
 - [License](#License)
@@ -50,7 +53,7 @@ and writing HTTP messages, and it provides [client](#HTTP-Client) and
 To get started, add **Scamper** to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "28.1.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "29.0.0"
 ```
 
 _**NOTE:** Starting with 23.0.0, **Scamper** is written for Scala 3. See
@@ -408,7 +411,7 @@ def saveTrack(req: HttpRequest): Unit =
 
 ## Message Attributes
 
-Attributes are arbitrary key-value pairs associated with a message.
+Attributes are arbitrary key/value pairs associated with a message.
 
 ```scala
 import scala.concurrent.duration.{ Deadline, DurationInt }
@@ -428,8 +431,8 @@ _**Note:** Attributes are not included in the transmitted message._
 
 ## HTTP Authentication
 
-**Scamper** includes a separate package (i.e., `scamper.http.auth`) for working with
-authentication headers.
+The `scamper.http.auth` package is included for working with authentication
+headers.
 
 ### Challenges and Credentials
 
@@ -1205,6 +1208,65 @@ app.outgoing { res =>
     case false => res.setGzipContentEncoding()
 }
 ```
+### Managed Services
+
+A `ManagedService` is a backend service that runs while the server is running:
+it's started when the server starts; it's stopped when the server stops. The
+service operations are controlled by its `start()` and `stop()` methods.
+
+Here's an example implementation of a simple service:
+
+```scala
+import java.lang.System.currentTimeMillis as now
+
+import scamper.http.server.{ ManagedService, NoncriticalService }
+
+class UptimeService(val name: String) extends ManagedService:
+  private var startTime: Option[Long] = None
+  private var stopTime: Option[Long]  = None
+
+  def start(server: HttpServer) =
+    startTime = Some(now())
+
+  def stop() =
+    stopTime = Some(now())
+
+  /** Gets server's current uptime. */
+  def uptime =
+    startTime.map { time => stopTime.getOrElse(now()) - time }
+      .getOrElse(0)
+
+// Add instance of service to application
+app.manage(UptimeService("uptime"))
+```
+
+There isn't much happening inside this service, so it's likely nothing goes
+wrong when it's started. Otherwise, if the `start()` method were to in fact
+throw an exception, server creation would halt.
+
+If a service is not critical to the operations of the server, you can mark it
+as such by instead extending `NoncriticalService`. Or, if you want to make an
+already defined service not critical, simply tack on the trait:
+
+```scala
+class NoncriticalUptimeService(name: String) extends UptimeService(name) with NoncriticalService
+```
+
+### More Managed Services
+
+A request handler is also added as managed service if it extends `ManagedService`.
+
+```scala
+class UptimeRequestHandler(name: String) extends UptimeService(name) with RequestHandler:
+  def apply(req: HttpRequest) =
+    Ok(s"Uptime: $uptime")
+
+// Added as request handler and managed service
+app.get("/uptime")(UptimeRequestHandler("uptime"))
+```
+
+This behavior applies to `RequestHandler`, `ResponseFilter`, `WebSocketApplication`,
+`RouterApplication`, and `ErrorHandler`.
 
 ### Securing Server
 
