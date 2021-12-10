@@ -30,3 +30,7 @@ case class ParameterNotFound(name: String) extends HttpException(name)
 
 /** Indicates parameter cannot be converted. */
 case class ParameterNotConvertible(name: String, value: String) extends HttpException(s"$name=$value")
+
+private case class ReadError(status: ResponseStatus) extends HttpException(status.reasonPhrase)
+
+private case class ReadAborted(reason: String) extends HttpException(s"Read aborted with $reason")

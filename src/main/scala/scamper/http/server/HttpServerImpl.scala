@@ -62,31 +62,6 @@ private object HttpServerImpl:
     new HttpServerImpl(count.incrementAndGet(), InetSocketAddress(host, port), app)
 
 private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: HttpServerImpl.Application) extends HttpServer:
-  private case class ReadError(status: ResponseStatus) extends HttpException(status.reasonPhrase)
-  private case class ReadAborted(reason: String) extends HttpException(s"Read aborted with $reason")
-
-  private sealed trait ConnectionManagement
-  private case object CloseConnection extends ConnectionManagement
-  private case object PersistConnection extends ConnectionManagement
-  private case class UpgradeConnection(upgrade: Socket => Unit) extends ConnectionManagement
-
-  private case class ServiceDelegate(service: ManagedService): //
-    private var started = false
-    private var stopped = false
-
-    def name = service.name
-    def isNoncritical = service.isInstanceOf[NoncriticalService]
-
-    def start() =
-      if !started then
-        service.start(HttpServerImpl.this)
-        started = true
-
-    def stop() =
-      if !stopped then
-        service.stop()
-        stopped = true
-
   val logger      = if app.logger == null then NullLogger else app.logger
   val backlogSize = app.backlogSize.max(1)
   val poolSize    = app.poolSize.max(1)
@@ -95,6 +70,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
   val readTimeout = app.readTimeout.max(100)
   val headerLimit = app.headerLimit.max(10)
   val keepAlive   = app.keepAlive.map(params => KeepAliveParameters(params.timeout.max(1), params.max.max(1)))
+  val isSecure    = app.serverSocketFactory.isInstanceOf[SSLServerSocketFactory]
 
   private val serverSocket = app.serverSocketFactory.createServerSocket()
 
@@ -103,28 +79,22 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
   val host = serverSocket.getInetAddress
   val port = serverSocket.getLocalPort
 
-  private val authority = s"${host.getCanonicalHostName}:$port"
+  private val defaultErrorHandler = new ErrorHandler:
+    def apply(req: HttpRequest): PartialFunction[Throwable, HttpResponse] =
+      case err: Throwable =>
+        val correlate = req.getAttributeOrElse("scamper.http.server.message.correlate", "<unknown>")
+        logger.error(s"$authority - Error while handling request (correlate=$correlate)", err)
+        InternalServerError()
 
-  private val keepAliveEnabled = keepAlive.isDefined
-  private val keepAliveMax     = keepAlive.map(_.max).getOrElse(1)
-  private val keepAliveTimeout = keepAlive.map(_.timeout).getOrElse(0)
-
-  private val managedServices = app.managedServices.map(ServiceDelegate(_))
-  private val requestHandler  = RequestHandler.coalesce(app.requestHandlers)
-  private val responseFilter  = ResponseFilter.chain(app.responseFilters)
-  private val errorHandler    = ErrorHandler.coalesce(app.errorHandlers :+
-    new ErrorHandler:
-      def apply(req: HttpRequest): PartialFunction[Throwable, HttpResponse] =
-        case err: Throwable =>
-          val correlate = req.getAttributeOrElse("scamper.http.server.message.correlate", "<unknown>")
-          logger.error(s"$authority - Error while handling request (correlate=$correlate)", err)
-          InternalServerError()
-  )
-
-  private val chunked = TransferCoding("chunked")
-  private var closed  = AtomicBoolean(false)
-
-  private val threadGroup = ThreadGroup(s"scamper-server-$id")
+  private val authority         = s"${host.getCanonicalHostName}:$port"
+  private val connectionManager = ConnectionManager(keepAlive)
+  private val managedServices   = app.managedServices.map(ServiceDelegate(_, this))
+  private val requestHandler    = RequestHandler.coalesce(app.requestHandlers)
+  private val responseFilter    = ResponseFilter.chain(app.responseFilters)
+  private val errorHandler      = ErrorHandler.coalesce(app.errorHandlers :+ defaultErrorHandler)
+  private val chunked           = TransferCoding("chunked")
+  private val closed            = AtomicBoolean(false)
+  private val threadGroup       = ThreadGroup(s"scamper-server-$id")
 
   private val serviceExecutor =
     ThreadPoolExecutorService
@@ -189,27 +159,6 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         executor.getThreadFactory.newThread(task).start()
       }
 
-  val isSecure: Boolean =
-    app.serverSocketFactory.isInstanceOf[SSLServerSocketFactory]
-
-  def isClosed: Boolean =
-    closed.get()
-
-  def close(): Unit =
-    if closed.compareAndSet(false, true) then
-      Try(logger.info(s"$authority - Shutting down server"))
-      Try(serverSocket.close())
-      Try(keepAliveExecutor.shutdownNow())
-      Try(upgradeExecutor.shutdownNow())
-      Try(encoderExecutor.shutdownNow())
-      Try(serviceExecutor.shutdownNow())
-      Try(closerExecutor.shutdownNow())
-      Try(stopManagedServices())
-      Try(logger.asInstanceOf[Closeable].close())
-
-  override def toString(): String =
-    s"HttpServer(host=$host, port=$port, isSecure=$isSecure, isClosed=$isClosed)"
-
   try
     startManagedServices()
 
@@ -233,6 +182,24 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
       close()
       throw e
 
+  def isClosed: Boolean =
+    closed.get()
+
+  def close(): Unit =
+    if closed.compareAndSet(false, true) then
+      Try(logger.info(s"$authority - Shutting down server"))
+      Try(serverSocket.close())
+      Try(keepAliveExecutor.shutdownNow())
+      Try(upgradeExecutor.shutdownNow())
+      Try(encoderExecutor.shutdownNow())
+      Try(serviceExecutor.shutdownNow())
+      Try(closerExecutor.shutdownNow())
+      Try(stopManagedServices())
+      Try(logger.asInstanceOf[Closeable].close())
+
+  override def toString(): String =
+    s"HttpServer(host=$host, port=$port, isSecure=$isSecure, isClosed=$isClosed)"
+
   private def startManagedServices(): Unit =
     logger.info(s"$authority - Starting managed services")
     managedServices.foreach { delegate =>
@@ -250,40 +217,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
     logger.info(s"$authority - Stopping managed services")
     managedServices.reverse.foreach(delegate => Try(delegate.stop()))
 
-  private object ConnectionManager:
-    private val keepAliveHeader     = Header("Keep-Alive", s"timeout=$keepAliveTimeout, max=$keepAliveMax")
-    private val connectionKeepAlive = Header("Connection", "keep-alive")
-    private val connectionClose     = Header("Connection", "close")
-
-    def apply(req: HttpRequest, res: HttpResponse): HttpResponse =
-      if isUpgrade(res) then
-        res
-      else
-        doKeepAlive(req, res) match
-          case true  => res.putHeaders(connectionKeepAlive, keepAliveHeader)
-          case false => res.putHeaders(connectionClose)
-
-    private def doKeepAlive(req: HttpRequest, res: HttpResponse): Boolean =
-      keepAliveEnabled &&
-        isKeepAliveRequested(req) &&
-        isKeepAliveMaxLeft(req) &&
-        isKeepAliveSafe(req, res)
-
-    private def isKeepAliveRequested(req: HttpRequest): Boolean =
-      req.connection.exists("keep-alive".equalsIgnoreCase)
-
-    private def isKeepAliveMaxLeft(req: HttpRequest): Boolean =
-      req.getAttribute[Int]("scamper.http.server.message.requestCount")
-        .exists(_ < keepAliveMax)
-
-    private def isKeepAliveSafe(req: HttpRequest, res: HttpResponse): Boolean =
-      res.isSuccessful || ((req.isGet || req.isHead) && res.isRedirection)
-
-    private def isUpgrade(res: HttpResponse): Boolean =
-      res.status == SwitchingProtocols && res.hasUpgrade &&
-        res.connection.exists("upgrade".equalsIgnoreCase)
-
-  private object ServiceManager extends Thread(threadGroup, s"scamper-server-$id-service-manager"):
+  private object ServiceManager extends Thread(threadGroup, s"scamper-server-$id-service-manager"): //
     private val connectionCount = AtomicLong(0)
     private val serviceCount    = AtomicLong(0)
 
@@ -333,17 +267,9 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
           try
             write(res)
             logger.info(s"$authority - Response sent to $tag")
+            connectionManager.evaluate(res)
           finally
             Try(res.body.data.close()) // Close filtered response body
-
-          val connection = res.connection
-
-          if connection.exists("upgrade".equalsIgnoreCase) then
-            UpgradeConnection(res.getAttribute("scamper.http.server.connection.upgrade").get)
-          else if connection.exists("keep-alive".equalsIgnoreCase) then
-            PersistConnection
-          else
-            CloseConnection
         }.map { connectionManagement =>
           Try(res.body.data.close()) // Close unfiltered response body
           connectionManagement
@@ -424,7 +350,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
     private def readByte(keepingAlive: Boolean)(using socket: Socket): Byte =
       keepingAlive match
-        case true  => socket.setSoTimeout(keepAliveTimeout * 1000)
+        case true  => socket.setSoTimeout(connectionManager.keepAliveTimeout * 1000)
         case false => socket.setSoTimeout(readTimeout)
 
       try
@@ -527,8 +453,8 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
     private def handle(req: HttpRequest): HttpResponse =
       requestHandler(req) match
-        case req: HttpRequest  => ConnectionManager(req, NotFound())
-        case res: HttpResponse => ConnectionManager(req, res)
+        case req: HttpRequest  => connectionManager.filter(req, NotFound())
+        case res: HttpResponse => connectionManager.filter(req, res)
 
     private def filter(res: HttpResponse): HttpResponse =
       responseFilter {
