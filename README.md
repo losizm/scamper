@@ -53,7 +53,7 @@ client and server implementations including WebSockets.
 To get started, add **Scamper** to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "30.0.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "31.0.0"
 ```
 
 _**NOTE:** Starting with 23.0.0, **Scamper** is written for Scala 3. See
