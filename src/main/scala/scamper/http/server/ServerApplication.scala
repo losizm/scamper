@@ -328,9 +328,8 @@ class ServerApplication extends Router:
   }
 
   /** @inheritdoc */
-  def trigger(hooks: Seq[LifecycleHook]): this.type = synchronized {
-    if hooks.nonEmpty then
-      app = app.copy(lifecycleHooks = app.lifecycleHooks ++ noNulls(hooks))
+  def trigger(hook: LifecycleHook): this.type = synchronized {
+    app = app.copy(lifecycleHooks = app.lifecycleHooks :+ notNull(hook))
     this
   }
 

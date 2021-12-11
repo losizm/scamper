@@ -95,30 +95,16 @@ trait Router:
   def reset(): this.type
 
   /**
-   * Adds server lifecycle hooks.
+   * Adds server lifecycle hook.
    *
-   * @param hooks lifecycle hooks
-   *
-   * @return this router
-   *
-   * @note On startup, hooks are called in the order they are added; on
-   * shutdown, they are called in reverse order.
-   */
-  def trigger(hooks: Seq[LifecycleHook]): this.type
-
-  /**
-   * Adds server lifecycle hooks.
-   *
-   * @param one lifecycle hook
-   * @param more additional lifecycle hooks
+   * @param hook lifecycle hook
    *
    * @return this router
    *
    * @note On startup, hooks are called in the order they are added; on
    * shutdown, they are called in reverse order.
    */
-  def trigger(one: LifecycleHook, more: LifecycleHook*): this.type =
-    trigger(one +: more)
+  def trigger(hook: LifecycleHook): this.type
 
   /**
    * Adds supplied request handler.
@@ -277,7 +263,7 @@ trait Router:
     val hooks = router.getLifecycleHooks()
     val handler = MountRequestHandler(router.mountPath, router.getRequestHandler())
 
-    trigger(hooks)
+    hooks.foreach(trigger)
     incoming(handler)
 
   /**

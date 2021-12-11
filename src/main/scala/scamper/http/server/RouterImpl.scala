@@ -19,7 +19,7 @@ package server
 
 import scala.collection.mutable.ListBuffer
 
-import Validate.{ noNulls, notNull }
+import Validate.notNull
 
 private class RouterImpl private (val mountPath: String) extends Router:
   private val incomings = new ListBuffer[RequestHandler]
@@ -35,8 +35,8 @@ private class RouterImpl private (val mountPath: String) extends Router:
     this
   }
 
-  def trigger(hooks: Seq[LifecycleHook]): this.type = synchronized {
-    triggers ++= noNulls(hooks, "hooks")
+  def trigger(hook: LifecycleHook): this.type = synchronized {
+    triggers += notNull(hook, "hook")
     this
   }
 

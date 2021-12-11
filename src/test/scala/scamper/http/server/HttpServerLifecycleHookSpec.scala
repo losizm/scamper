@@ -159,3 +159,7 @@ class HttpServerLifecycleHookSpec extends org.scalatest.flatspec.AnyFlatSpec:
       .recover(TestErrorHandler())
       .create("localhost", 0)
       .close()
+
+  extension (app: ServerApplication)
+    def trigger(hooks: Seq[LifecycleHook]): app.type =
+      hooks.foldLeft(app)(_ trigger _)
