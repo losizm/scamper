@@ -44,7 +44,7 @@ import Validate.{ noNulls, notNull }
  * | headerLimit | `100` |
  * | keepAlive   | _(Not configured)_ |
  * | secure      | _(Not configured)_ |
- * | manage      | _(Not configured)_ |
+ * | trigger     | _(Not configured)_ |
  * | incoming    | _(Not configured)_ |
  * | outgoing    | _(Not configured)_ |
  * | recover     | _(Sends `500 Internal Server Error`)_ |
@@ -92,7 +92,7 @@ import Validate.{ noNulls, notNull }
  *     case false => NotFound()
  * }
  *
- * // Serve static files from file directory
+ * // Serve files from file directory
  * app.files("/main", File("/path/to/public"))
  *
  * // Gzip response body if not empty
@@ -328,9 +328,9 @@ class ServerApplication extends Router:
   }
 
   /** @inheritdoc */
-  def manage(services: Seq[ManagedService]): this.type = synchronized {
-    if services.nonEmpty then
-      app = app.copy(managedServices = app.managedServices ++ noNulls(services))
+  def trigger(hooks: Seq[LifecycleHook]): this.type = synchronized {
+    if hooks.nonEmpty then
+      app = app.copy(lifecycleHooks = app.lifecycleHooks ++ noNulls(hooks))
     this
   }
 
@@ -338,7 +338,7 @@ class ServerApplication extends Router:
   def incoming(handler: RequestHandler): this.type = synchronized {
     app = app.copy(
       requestHandlers = app.requestHandlers :+ handler,
-      managedServices = addManagedService(handler)
+      lifecycleHooks  = addLifecycleHook(handler)
     )
     this
   }
@@ -351,7 +351,7 @@ class ServerApplication extends Router:
   def outgoing(filter: ResponseFilter): this.type = synchronized {
     app = app.copy(
       responseFilters = app.responseFilters :+ notNull(filter, "filter"),
-      managedServices = addManagedService(filter)
+      lifecycleHooks  = addLifecycleHook(filter)
     )
     this
   }
@@ -359,8 +359,8 @@ class ServerApplication extends Router:
   /** @inheritdoc */
   def recover(handler: ErrorHandler): this.type = synchronized {
     app = app.copy(
-      errorHandlers   = app.errorHandlers :+ notNull(handler, "handler"),
-      managedServices = addManagedService(handler)
+      errorHandlers  = app.errorHandlers :+ notNull(handler, "handler"),
+      lifecycleHooks = addLifecycleHook(handler)
     )
     this
   }
@@ -398,7 +398,7 @@ class ServerApplication extends Router:
     HttpServerImpl(host, port, app)
   }
 
-  private def addManagedService[T](value: T): Seq[ManagedService] =
+  private def addLifecycleHook[T](value: T): Seq[LifecycleHook] =
     value match
-      case service: ManagedService => app.managedServices :+ service
-      case _                       => app.managedServices
+      case hook: LifecycleHook => app.lifecycleHooks :+ hook
+      case _                   => app.lifecycleHooks

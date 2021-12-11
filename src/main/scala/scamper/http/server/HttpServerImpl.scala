@@ -51,7 +51,7 @@ private object HttpServerImpl:
     readTimeout:         Int = 5000,
     headerLimit:         Int = 100,
     keepAlive:           Option[KeepAliveParameters] = None,
-    managedServices:     Seq[ManagedService] = Nil,
+    lifecycleHooks:      Seq[LifecycleHook] = Nil,
     requestHandlers:     Seq[RequestHandler] = Nil,
     responseFilters:     Seq[ResponseFilter] = Nil,
     errorHandlers:       Seq[ErrorHandler] = Nil,
@@ -88,7 +88,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
   private val authority         = s"${host.getCanonicalHostName}:$port"
   private val connectionManager = ConnectionManager(keepAlive)
-  private val managedServices   = app.managedServices.map(ServiceDelegate(_, this))
+  private val lifecycleHooks    = app.lifecycleHooks
   private val requestHandler    = RequestHandler.coalesce(app.requestHandlers)
   private val responseFilter    = ResponseFilter.chain(app.responseFilters)
   private val errorHandler      = ErrorHandler.coalesce(app.errorHandlers :+ defaultErrorHandler)
@@ -160,7 +160,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
       }
 
   try
-    startManagedServices()
+    startLifecycleHooks()
 
     logger.info(s"$authority - Starting server")
     logger.info(s"$authority - Secure: $isSecure")
@@ -194,28 +194,32 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
       Try(encoderExecutor.shutdownNow())
       Try(serviceExecutor.shutdownNow())
       Try(closerExecutor.shutdownNow())
-      Try(stopManagedServices())
+      Try(stopLifecycleHooks())
       Try(logger.asInstanceOf[Closeable].close())
 
   override def toString(): String =
     s"HttpServer(host=$host, port=$port, isSecure=$isSecure, isClosed=$isClosed)"
 
-  private def startManagedServices(): Unit =
-    logger.info(s"$authority - Starting managed services")
-    managedServices.foreach { delegate =>
+  private def startLifecycleHooks(): Unit =
+    logger.info(s"$authority - Calling start lifecycle hooks")
+    lifecycleHooks.foreach { hook =>
       try
-        delegate.start()
+        hook.process(LifecycleEvent.Start(this))
       catch case err: Exception =>
-        if delegate.isNoncritical then
-          logger.warn(s"$authority - Failed to start service ${delegate.name}", err)
-          Try(delegate.stop())
+        if hook.isCriticalService then
+          throw LifecycleException(s"Critical service failure: ${err.getClass.getName}", err)
         else
-          throw ServiceException(s"Failed to start service ${delegate.name}", err)
+          logger.warn(s"$authority - Start lifecycle hook failure", err)
     }
 
-  private def stopManagedServices(): Unit =
-    logger.info(s"$authority - Stopping managed services")
-    managedServices.reverse.foreach(delegate => Try(delegate.stop()))
+  private def stopLifecycleHooks(): Unit =
+    logger.info(s"$authority - Calling stop lifecycle hooks")
+    lifecycleHooks.reverse.foreach { hook =>
+      try
+        hook.process(LifecycleEvent.Stop(this))
+      catch case err: Exception =>
+        logger.warn(s"$authority - Stop lifecycle hook failure", err)
+    }
 
   private object ServiceManager extends Thread(threadGroup, s"scamper-server-$id-service-manager"): //
     private val connectionCount = AtomicLong(0)

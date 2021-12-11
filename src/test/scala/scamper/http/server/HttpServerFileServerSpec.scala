@@ -29,9 +29,9 @@ import scamper.http.types.{ *, given }
 import ResponseStatus.Registry.*
 
 class HttpServerFileServerSpec extends org.scalatest.flatspec.AnyFlatSpec with TestServer:
-  it should "serve files" in testStaticServer(false)
+  it should "serve files" in testFileServer(false)
 
-  it should "serve files with SSL/TLS" in testStaticServer(true)
+  it should "serve files with SSL/TLS" in testFileServer(true)
 
   private given client: HttpClient =
     HttpClient
@@ -43,7 +43,7 @@ class HttpServerFileServerSpec extends org.scalatest.flatspec.AnyFlatSpec with T
   private given BodyParser[Array[Byte]] = BodyParser.bytes(32 * 1024)
   private given BodyParser[String]      = BodyParser.string(32 * 1024)
 
-  private def testStaticServer(secure: Boolean): Unit =
+  private def testFileServer(secure: Boolean): Unit =
     withServer(secure) { implicit server =>
       info(s"serve default files")
       client.get(s"$serverUri/files/riteshiff") { res =>

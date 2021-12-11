@@ -35,15 +35,15 @@ client and server implementations including WebSockets.
   - [Request Handlers](#Request-Handlers)
     - [Target Handling](#Target-Handling)
     - [Path Parameters](#Path-Parameters)
-    - [Serving Static Files](#Serving-Static-Files)
+    - [Serving Files](#Serving-Files)
     - [Aborting Response](#Aborting-Response)
   - [WebSocket Session](#WebSocket-Session)
   - [Error Handler](#Error-Handler)
   - [Router](#Router)
   - [Response Filters](#Response-Filters)
   - [Securing Server](#Securing-Server)
-  - [Managed Services](#Managed-Services)
-  - [More Managed Services](#More-Managed-Services)
+  - [Lifecycle Hooks](#Lifecycle-Hooks)
+  - [More Lifecycle Hooks](#More-Lifecycle-Hooks)
   - [Creating Server](#Creating-Server)
 - [API Documentation](#API-Documentation)
 - [License](#License)
@@ -1042,7 +1042,7 @@ app.post("/translate/:in/to/:out") { req =>
 }
 ```
 
-#### Serving Static Files
+#### Serving Files
 
 You can mount a file server as a specialized request handler.
 
@@ -1208,61 +1208,65 @@ app.outgoing { res =>
     case false => res.setGzipContentEncoding()
 }
 ```
-### Managed Services
+### Lifecycle Hooks
 
-A `ManagedService` is a backend service that runs while the server is running:
-it's started when the server starts; it's stopped when the server stops. The
-service operations are controlled by its `start()` and `stop()` methods.
+A `LifecycleHook` is notified when the server is started and when it's stopped.
 
-Here's an example implementation of a simple service:
+Here's an example of a simple hook:
 
 ```scala
 import java.lang.System.currentTimeMillis as now
 
-import scamper.http.server.{ ManagedService, NoncriticalService }
+import scamper.http.server.LifecycleHook
 
-class UptimeService(val name: String) extends ManagedService:
+class UptimeService extends LifecycleHook:
   private var startTime: Option[Long] = None
   private var stopTime: Option[Long]  = None
 
-  def start(server: HttpServer) =
-    startTime = Some(now())
+  // Process lifecycle event
+  def process(event: LifecycleEvent) =
+    event match
+      case LifecycleEvent.Start(server) =>
+        startTime = Some(now())
 
-  def stop() =
-    stopTime = Some(now())
+      case LifecycleEvent.Stop(server)  =>
+        stopTime  = Some(now())
+        server.logger.info(s"Server was running for ${uptime / 1000} seconds")
 
-  /** Gets server's current uptime. */
+  // Get server's current uptime
   def uptime =
-    startTime.map { time => stopTime.getOrElse(now()) - time }
-      .getOrElse(0)
+    startTime.map { time => stopTime.getOrElse(now()) - time }.getOrElse(0L)
 
-// Add instance of service to application
-app.manage(UptimeService("uptime"))
+// Add lifecycle hook to application
+app.trigger(UptimeService())
 ```
 
-There isn't much happening inside this service, so it's likely nothing goes
-wrong when it's started. Otherwise, if the `start()` method were to in fact
-throw an exception, server creation would halt.
+There isn't much happening inside this hook, so it's likely nothing goes wrong
+when it processes the events. However, if an exception were in fact thrown from
+the event handler, the server would simply log a warning and continue its
+normal operations.
 
-If a service is not critical to the operations of the server, you can mark it
-as such by instead extending `NoncriticalService`. Or, if you want to make an
-already defined service not critical, simply tack on the trait:
+If a lifecycle hook is critical to server operations, you should tag it as such
+by also extending `CriticalService`:
 
 ```scala
-class NoncriticalUptimeService(name: String) extends UptimeService(name) with NoncriticalService
+class CriticalUptimeService extends UptimeService, CriticalService
 ```
 
-### More Managed Services
+Server creation is halted if a critical service fails to process the start
+event.
 
-A request handler is also added as managed service if it extends `ManagedService`.
+### More Lifecycle Hooks
+
+A request handler is also added as lifecycle hook if it extends `LifecycleHook`.
 
 ```scala
-class UptimeRequestHandler(name: String) extends UptimeService(name) with RequestHandler:
+class UptimeRequestHandler extends UptimeService with RequestHandler:
   def apply(req: HttpRequest) =
     Ok(s"Uptime: $uptime")
 
-// Added as request handler and managed service
-app.get("/uptime")(UptimeRequestHandler("uptime"))
+// Added as request handler and lifecycle hook
+app.get("/uptime")(UptimeRequestHandler())
 ```
 
 This behavior applies to `RequestHandler`, `ResponseFilter`, `WebSocketApplication`,

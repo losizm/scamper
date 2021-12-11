@@ -17,28 +17,21 @@ package scamper
 package http
 package server
 
-/**
- * Indicates exception in managed service.
- *
- * @constructor Constructs exception with supplied message and cause.
- *
- * @param message detail message
- * @param cause underlying cause
- */
-class ServiceException(message: String, cause: Throwable) extends RuntimeException(message, cause):
-  /** Constructs exception. */
-  def this() = this(null, null)
+/** Defines lifecycle event.  */
+enum LifecycleEvent:
+  /** Server for which event is generated. */
+  val source: HttpServer
 
   /**
-   * Constructs exception with supplied message.
+   * Provided as notification when server starts.
    *
-   * @param message detail message
+   * @param source server for which event is generated
    */
-  def this(message: String) = this(message, null)
+  case Start(source: HttpServer) extends LifecycleEvent
 
   /**
-   * Constructs exception with supplied cause.
+   * Provided as notification when server stops.
    *
-   * @param cause underlying cause
+   * @param source server for which event is generated
    */
-  def this(cause: Throwable) = this(null, cause)
+  case Stop(source: HttpServer) extends LifecycleEvent

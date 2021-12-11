@@ -95,36 +95,30 @@ trait Router:
   def reset(): this.type
 
   /**
-   * Adds managed services to router.
+   * Adds server lifecycle hooks.
    *
-   * @param services managed services
+   * @param hooks lifecycle hooks
    *
    * @return this router
    *
-   * @note Services are started in the order they are added; they are stopped in
-   * reverse order.
-   *
-   * @note If service's startup routine fails, server creation halts unless
-   * service is [[NoncriticalService]].
+   * @note On startup, hooks are called in the order they are added; on
+   * shutdown, they are called in reverse order.
    */
-  def manage(services: Seq[ManagedService]): this.type
+  def trigger(hooks: Seq[LifecycleHook]): this.type
 
   /**
-   * Adds managed services to router.
+   * Adds server lifecycle hooks.
    *
-   * @param one managed service
-   * @param more additional managed services
+   * @param one lifecycle hook
+   * @param more additional lifecycle hooks
    *
    * @return this router
    *
-   * @note Services are started in the order they are added; they are stopped in
-   * reverse order.
-   *
-   * @note If service's startup routine fails, server creation halts unless
-   * service is [[NoncriticalService]].
+   * @note On startup, hooks are called in the order they are added; on
+   * shutdown, they are called in reverse order.
    */
-  def manage(one: ManagedService, more: ManagedService*): this.type =
-    manage(one +: more)
+  def trigger(one: LifecycleHook, more: LifecycleHook*): this.type =
+    trigger(one +: more)
 
   /**
    * Adds supplied request handler.
@@ -135,8 +129,8 @@ trait Router:
    *
    * @return this router
    *
-   * @note If request handler implements [[ManagedService]], it is also added as
-   * managed service.
+   * @note If request handler implements [[LifecycleHook]], it is also added as
+   * a lifecycle hook.
    */
   def incoming(handler: RequestHandler): this.type
 
@@ -155,8 +149,8 @@ trait Router:
    * @note If no request methods are specified, then matches are limited to path
    * only.
    *
-   * @note If request handler implements [[ManagedService]], it is also added as
-   * managed service.
+   * @note If request handler implements [[LifecycleHook]], it is also added as
+   * a lifecycle hook.
    */
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type
 
@@ -170,8 +164,8 @@ trait Router:
    *
    * @return this router
    *
-   * @note If request handler implements [[ManagedService]], it is also added as
-   * managed service.
+   * @note If request handler implements [[LifecycleHook]], it is also added as
+   * a lifecycle hook.
    */
   def get(path: String)(handler: RequestHandler): this.type =
     incoming(path, Get)(handler)
@@ -186,8 +180,8 @@ trait Router:
    *
    * @return this router
    *
-   * @note If request handler implements [[ManagedService]], it is also added as
-   * managed service.
+   * @note If request handler implements [[LifecycleHook]], it is also added as
+   * a lifecycle hook.
    */
   def post(path: String)(handler: RequestHandler): this.type =
     incoming(path, Post)(handler)
@@ -202,8 +196,8 @@ trait Router:
    *
    * @return this router
    *
-   * @note If request handler implements [[ManagedService]], it is also added as
-   * managed service.
+   * @note If request handler implements [[LifecycleHook]], it is also added as
+   * a lifecycle hook.
    */
   def put(path: String)(handler: RequestHandler): this.type =
     incoming(path, Put)(handler)
@@ -218,8 +212,8 @@ trait Router:
    *
    * @return this router
    *
-   * @note If request handler implements [[ManagedService]], it is also added as
-   * managed service.
+   * @note If request handler implements [[LifecycleHook]], it is also added as
+   * a lifecycle hook.
    */
   def delete(path: String)(handler: RequestHandler): this.type =
     incoming(path, Delete)(handler)
@@ -248,7 +242,7 @@ trait Router:
    * Other) with a Location header value set to path of default file.
    */
   def files(path: String, source: File, defaults: String*): this.type =
-    route(path)(StaticFileServer(source, defaults))
+    route(path)(FileServer(source, defaults))
 
   /**
    * Mounts WebSocket application at given path.
@@ -258,8 +252,8 @@ trait Router:
    *
    * @return this router
    *
-   * @note If WebSocket app implements [[ManagedService]], it is also added as
-   * managed service.
+   * @note If WebSocket app implements [[LifecycleHook]], it is also added as a
+   * lifecycle hook.
    */
   def websocket(path: String)(app: WebSocketApplication[?]): this.type =
     incoming(path, Get)(WebSocketRequestHandler(app))
@@ -272,14 +266,19 @@ trait Router:
    *
    * @return this router
    *
-   * @note If router app implements [[ManagedService]], it is also added as
-   * managed service.
+   * @note If router app implements [[LifecycleHook]], it is also added as a
+   * lifecycle hook.
    */
   def route(path: String)(app: RouterApplication): this.type =
     val router = RouterImpl(mountPath + MountPath.normalize(path))
+
     app(router)
-    incoming(MountRequestHandler(router.mountPath, router.createRequestHandler()))
-    manage(router.getManagedServices())
+
+    val hooks = router.getLifecycleHooks()
+    val handler = MountRequestHandler(router.mountPath, router.getRequestHandler())
+
+    trigger(hooks)
+    incoming(handler)
 
   /**
    * Adds error handler.
@@ -290,8 +289,8 @@ trait Router:
    *
    * @return this router
    *
-   * @note If error handler implements [[ManagedService]], it is also added as
-   * managed service.
+   * @note If error handler implements [[LifecycleHook]], it is also added as a
+   * lifecycle hook.
    */
   def recover(handler: ErrorHandler): this.type
 
@@ -304,7 +303,7 @@ trait Router:
    *
    * @return this router
    *
-   * @note If response filter implements [[ManagedService]], it is also added as
-   * managed service.
+   * @note If response filter implements [[LifecycleHook]], it is also added as
+   * a lifecycle hook.
    */
   def outgoing(filter: ResponseFilter): this.type

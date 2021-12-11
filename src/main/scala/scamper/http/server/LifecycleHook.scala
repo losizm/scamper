@@ -17,19 +17,34 @@ package scamper
 package http
 package server
 
-private case class ServiceDelegate(service: ManagedService, server: HttpServer): //
-  private var started = false
-  private var stopped = false
+/**
+ * Defines lifecycle hook.
+ *
+ * @see [[CriticalService]]
+ */
+@FunctionalInterface
+trait LifecycleHook:
+  /**
+   * Test whether hook is a critical service.
+   *
+   * @see [[CriticalService]]
+   */
+  final def isCriticalService: Boolean =
+    isInstanceOf[CriticalService]
 
-  def name = service.name
-  def isNoncritical = service.isInstanceOf[NoncriticalService]
+  /**
+   * Processes lifecycle event.
+   *
+   * @param event lifecycle event
+   */
+  def process(event: LifecycleEvent): Unit
 
-  def start() =
-    if !started then
-      service.start(server)
-      started = true
-
-  def stop() =
-    if !stopped then
-      service.stop()
-      stopped = true
+/**
+ * Tags lifecycle hook as a critical service.
+ *
+ * Server creation is halted if a critical service fails to process the start
+ * event.
+ *
+ * @see [[LifecycleEvent.Start]]
+ */
+trait CriticalService { this: LifecycleHook => }

@@ -33,7 +33,7 @@ import RequestMethod.Registry.{ Get, Head }
 import ResponseStatus.Registry.*
 import Validate.noNulls
 
-private class StaticFileServer(sourceDirectory: Path, defaults: Seq[String]) extends RouterApplication:
+private class FileServer(sourceDirectory: Path, defaults: Seq[String]) extends RouterApplication:
   private val `*/*` = MediaRange("*/*")
 
   def apply(router: Router): Unit =
@@ -107,11 +107,11 @@ private class StaticFileServer(sourceDirectory: Path, defaults: Seq[String]) ext
   private def getIfModifiedSince(req: HttpRequest): Instant =
     Try(req.ifModifiedSince).getOrElse(Instant.MIN)
 
-private object StaticFileServer:
-  def apply(sourceDirectory: File, defaults: Seq[String]): StaticFileServer =
+private object FileServer:
+  def apply(sourceDirectory: File, defaults: Seq[String]): FileServer =
     val directory = sourceDirectory.toPath.toAbsolutePath.normalize()
 
     if !Files.isDirectory(directory) then
       throw NotDirectoryException(s"$directory")
 
-    new StaticFileServer(directory, noNulls(defaults))
+    new FileServer(directory, noNulls(defaults))

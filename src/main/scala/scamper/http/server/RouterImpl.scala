@@ -22,67 +22,67 @@ import scala.collection.mutable.ListBuffer
 import Validate.{ noNulls, notNull }
 
 private class RouterImpl private (val mountPath: String) extends Router:
-  private val in  = new ListBuffer[RequestHandler]
-  private val out = new ListBuffer[ResponseFilter]
-  private val err = new ListBuffer[ErrorHandler]
-  private val svc = new ListBuffer[ManagedService]
+  private val incomings = new ListBuffer[RequestHandler]
+  private val outgoings = new ListBuffer[ResponseFilter]
+  private val recovers  = new ListBuffer[ErrorHandler]
+  private val triggers  = new ListBuffer[LifecycleHook]
 
   def reset(): this.type = synchronized {
-    in.clear()
-    out.clear()
-    err.clear()
-    svc.clear()
+    incomings.clear()
+    outgoings.clear()
+    recovers.clear()
+    triggers.clear()
     this
   }
 
-  def manage(services: Seq[ManagedService]): this.type = synchronized {
-    svc ++= noNulls(services, "services")
+  def trigger(hooks: Seq[LifecycleHook]): this.type = synchronized {
+    triggers ++= noNulls(hooks, "hooks")
     this
   }
 
   def incoming(handler: RequestHandler): this.type = synchronized {
-    in += notNull(handler, "handler")
-    toManagedService(handler).foreach(svc.+=)
+    incomings += notNull(handler, "handler")
+    toLifecycleHook(handler).foreach(triggers.+=)
     this
   }
 
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type = synchronized {
-    in += TargetRequestHandler(
+    incomings += TargetRequestHandler(
       toAbsolutePath(notNull(path, "path")),
       notNull(methods, "methods"),
       notNull(handler, "handler")
     )
-    toManagedService(handler).foreach(svc.+=)
+    toLifecycleHook(handler).foreach(triggers.+=)
     this
   }
 
   def outgoing(filter: ResponseFilter): this.type = synchronized {
-    out += notNull(filter, "filter")
-    toManagedService(filter).foreach(svc.+=)
+    outgoings += notNull(filter, "filter")
+    toLifecycleHook(filter).foreach(triggers.+=)
     this
   }
 
   def recover(handler: ErrorHandler): this.type = synchronized {
-    err += notNull(handler, "handler")
-    toManagedService(handler).foreach(svc.+=)
+    recovers += notNull(handler, "handler")
+    toLifecycleHook(handler).foreach(triggers.+=)
     this
   }
 
-  private[server] def getManagedServices(): Seq[ManagedService] =
-    synchronized(svc.toSeq)
+  private[server] def getLifecycleHooks(): Seq[LifecycleHook] =
+    synchronized(triggers.toSeq)
 
-  private[server] def createRequestHandler(): RequestHandler = synchronized {
+  private[server] def getRequestHandler(): RequestHandler = synchronized {
     RouterRequestHandler(
-      RequestHandler.coalesce(in.toSeq),
-      ResponseFilter.chain(out.toSeq),
-      ErrorHandler.coalesce(err.toSeq)
+      RequestHandler.coalesce(incomings.toSeq),
+      ResponseFilter.chain(outgoings.toSeq),
+      ErrorHandler.coalesce(recovers.toSeq)
     )
   }
 
-  private def toManagedService[T](value: T): Option[ManagedService] =
+  private def toLifecycleHook[T](value: T): Option[LifecycleHook] =
     value match
-      case service: ManagedService => Some(service)
-      case _                       => None
+      case hook: LifecycleHook => Some(hook)
+      case _                   => None
 
   private class RouterRequestHandler(in: RequestHandler, out: ResponseFilter, err: ErrorHandler) extends RequestHandler:
     private val attributes = Seq(

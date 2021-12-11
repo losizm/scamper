@@ -18,34 +18,27 @@ package http
 package server
 
 /**
- * Defines managed service.
+ * Indicates lifecycle exception.
  *
- * A managed service is started when the server is created; it is stopped when
- * the server is shut down.
+ * @constructor Creates exception with supplied message and cause.
+ *
+ * @param message detail message
+ * @param cause underlying cause
  */
-trait ManagedService:
-  /** Gets service name. */
-  def name: String
+class LifecycleException(message: String, cause: Throwable) extends RuntimeException(message, cause):
+  /** Creates exception. */
+  def this() = this(null, null)
 
   /**
-   * Starts service.
+   * Creates exception with supplied message.
    *
-   * @param server associated server
+   * @param message detail message
    */
-  def start(server: HttpServer): Unit
+  def this(message: String) = this(message, null)
 
   /**
-   * Stops service.
+   * Creates exception with supplied cause.
    *
-   * @note A service's `stop()` method may be invoked without prior invocation
-   * of `start()`.
+   * @param cause underlying cause
    */
-  def stop(): Unit
-
-/**
- * Defines noncritical service.
- *
- * If a noncritical service fails during startup, it does not halt server
- * creation.
- */
-trait NoncriticalService extends ManagedService
+  def this(cause: Throwable) = this(null, cause)
