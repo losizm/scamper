@@ -25,7 +25,7 @@ import javax.net.ssl.{ KeyManagerFactory, SSLContext, SSLServerSocketFactory }
 
 import scala.util.Try
 
-import Auxiliary.InputStreamType
+import Auxiliary.FileType
 
 private object SecureServerSocketFactory:
   def create(keyStore: KeyStore, password: Array[Char]): SSLServerSocketFactory =
@@ -72,10 +72,7 @@ private object Keys:
   def create(file: File): PrivateKey =
     if file.length > 8388608 then
       throw IllegalArgumentException(s"Key file too large: ${file.length} bytes")
-
-    val in = FileInputStream(file)
-    try create(in.getBytes())
-    finally Try(in.close())
+    create(file.getBytes())
 
 private object Certificates:
   private val factory = CertificateFactory.getInstance("X509")

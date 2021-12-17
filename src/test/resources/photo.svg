@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2021 Carlos Conyers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<svg version="1.1"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xml:space="preserve"
+     x="0"
+     y="0"
+     width="400"
+     height="200"
+     viewBox="0 0 400 200">
+  <title>Photo</title>
+
+  <rect id="sky" x="0" y="0" width="400" height="200" style="stroke: none; fill: #0dd;"/>
+  <g id="sun">
+    <circle id="sun-core" cx="320" cy="45" r="15" style="stroke: #bb0; fill: #cc0;"/>
+    <g id="sun-rays" style="stroke: #cc0; stroke-dasharray: 4 2 2 4 2 1 1 2; fill: none;">
+      <circle id="sun-ray-1" cx="320" cy="45" r="18"/>
+      <circle id="sun-ray-2" cx="320" cy="45" r="21"/>
+      <circle id="sun-ray-3" cx="320" cy="45" r="24"/>
+      <circle id="sun-ray-4" cx="320" cy="45" r="27"/>
+    </g>
+  </g>
+  <g id="clouds" style="stroke: #ccc; fill: #eee;">
+    <ellipse id="cloud-1" cx="40" cy="20" rx="20" ry="5"/>
+    <ellipse id="cloud-2" cx="80" cy="20" rx="30" ry="7.5"/>
+
+    <ellipse id="cloud-2" cx="130" cy="45" rx="30" ry="7.5"/>
+    <ellipse id="cloud-3" cx="150" cy="50" rx="20" ry="5"/>
+    <ellipse id="cloud-4" cx="110" cy="52" rx="20" ry="5"/>
+
+    <ellipse id="cloud-5" cx="215" cy="30" rx="30" ry="8"/>
+    <ellipse id="cloud-6" cx="230" cy="35" rx="20" ry="5"/>
+    <ellipse id="cloud-7" cx="250" cy="47" rx="35" ry="8"/>
+
+    <ellipse id="cloud-8" cx="380" cy="25" rx="35" ry="8"/>
+    <ellipse id="cloud-9" cx="400" cy="55" rx="35" ry="8"/>
+  </g>
+  <path id="ground" d="M -10,200 L -10,160 Q 200,140 410,160 L 410,200" style="stroke: #070; stroke-width: 1; fill: #080;"/>
+  <g id="tree">
+    <path id="tree-trunk" d="M 73,160 Q 78,140 75,120 L 95,120 Q 90,140 97,160" style="stroke: #330; stroke-width: 1; fill: #440;"/>
+    <g id="tree-leaves" style="stroke: #030; stroke-width: 1; fill: #040;">
+      <ellipse id="tree-leaves-1" cx="85" cy="85" rx="30" ry="40"/>
+      <ellipse id="tree-leaves-2" cx="85" cy="85" rx="30" ry="40" transform="rotate(-20,85,125)"/>
+      <ellipse id="tree-leaves-3" cx="85" cy="85" rx="30" ry="40" transform="rotate(20,85,125)"/>
+    </g>
+  </g>
+  <g id="apple">
+    <circle id="apple-body" cx="110" cy="159" r="3" style="stroke: #200; stroke-width: 0.5; fill: #400;"/>
+    <path id="apple-stem"  d="M 110,157 L 112,155" style="stroke: #330; stroke-width: 0.5;"/>
+    <path id="apple-leave" d="M 112,155 Q 113,153 115,155 Q 113,157 112,155" style="stroke: #030; stroke-width: 0.5; fill: #040;"/>
+  </g>
+  <g id="grass" style="stroke: #030; stroke-width: 1;">
+    <line id="grass-1" x1="69"  y1="162" x2="68"  y2="159"/>
+    <line id="grass-2" x1="73"  y1="162" x2="72"  y2="158"/>
+    <line id="grass-3" x1="77"  y1="162" x2="76"  y2="159"/>
+    <line id="grass-4" x1="81"  y1="162" x2="80"  y2="158"/>
+    <line id="grass-5" x1="85"  y1="162" x2="85"  y2="159"/>
+    <line id="grass-6" x1="89"  y1="162" x2="90"  y2="158"/>
+    <line id="grass-7" x1="93"  y1="162" x2="94"  y2="159"/>
+    <line id="grass-8" x1="97"  y1="162" x2="98"  y2="158"/>
+    <line id="grass-9" x1="101" y1="162" x2="102" y2="159"/>
+  </g>
+</svg>

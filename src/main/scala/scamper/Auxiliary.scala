@@ -53,20 +53,26 @@ private object Auxiliary:
       try f(in)
       finally Try(in.close())
 
-  implicit class InputStreamType(val in: InputStream) extends AnyVal:
     def getBytes(bufferSize: Int = 8192): Array[Byte] =
-      val bytes = ArrayBuffer[Byte]()
-      val buffer = new Array[Byte](bufferSize.max(1024))
-      var len = 0
+      withInputStream { in =>
+        val bytes = ArrayBuffer[Byte]()
+        val buffer = new Array[Byte](bufferSize.max(1024))
+        var len = 0
 
-      while { len = in.read(buffer); len != -1 } do
-        bytes ++= buffer.take(len)
+        while { len = in.read(buffer); len != -1 } do
+          bytes ++= buffer.take(len)
 
-      bytes.toArray
+        bytes.toArray
+      }
 
-    def getText(bufferSize: Int = 8192): String =
-      String(getBytes(bufferSize), "UTF-8")
+    def setBytes(bytes: Array[Byte]): File =
+      withOutputStream { out =>
+        out.write(bytes)
+        out.flush()
+        file
+      }
 
+  implicit class InputStreamType(val in: InputStream) extends AnyVal:
     def getToken(delimiters: String, buffer: Array[Byte], offset: Int = 0): String =
       var length = offset
       var byte = -1

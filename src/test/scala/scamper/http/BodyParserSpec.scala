@@ -87,5 +87,5 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
   private def getResourceBytes(name: String): Array[Byte] =
     val in = getClass.getResourceAsStream(name)
-    try in.getBytes()
+    try in.readBytes()
     finally in.close()

@@ -1,0 +1,4 @@
+[
+  { "id": 0,     "name": "root",   "groups": "root" },
+  { "id": 65534, "name": "nobody", "groups": "nobody" }
+]

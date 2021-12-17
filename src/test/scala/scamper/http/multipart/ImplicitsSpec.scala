@@ -22,12 +22,26 @@ import java.io.File
 import scala.language.implicitConversions
 
 class ImplicitsSpec extends org.scalatest.flatspec.AnyFlatSpec:
-  it should "convert tuple to TextPart" in {
-    val part: Part = "name" -> "guest"
-    assert(part == TextPart("name", "guest"))
+  it should "convert (String, String) to Part" in {
+    val part: Part = "user" -> "nobody"
+    assert(part.name == "user")
+    assert(part.getString() == "nobody")
+    assert(part.fileName.isEmpty)
+    assert(part.contentType.fullName == "text/plain")
   }
 
-  it should "convert tuple to FilePart" in {
-    val part: Part = "data" -> File("data.txt")
-    assert(part == FilePart("data", File("data.txt")))
+  it should "convert (String, Array[Byte]) to Part" in {
+    val part: Part = "passwd" -> Array[Byte](0, 1, 2)
+    assert(part.name == "passwd")
+    assert(part.fileName.isEmpty)
+    assert(part.getBytes() sameElements Array[Byte](0, 1, 2))
+    assert(part.contentType.fullName == "application/octet-stream")
+  }
+
+  it should "convert (String, File) to Part" in {
+    val part: Part = "passwd" -> File("test.json")
+    assert(part.name == "passwd")
+    assert(part.getFile() == File("test.json"))
+    assert(part.fileName.contains("test.json"))
+    assert(part.contentType.fullName == "application/json")
   }

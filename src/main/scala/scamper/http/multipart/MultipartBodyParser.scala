@@ -56,19 +56,21 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
         while status.continue do
           val headers = HeaderStream.getHeaders(in, buffer)
 
-          val disposition = headers.collectFirst {
-            case header if header.name.equalsIgnoreCase("Content-Disposition") => DispositionType.parse(header.value)
-          }.getOrElse(throw HeaderNotFound("Content-Disposition"))
+          val contentDisposition = headers.getHeaderValue("Content-Disposition")
+            .map(DispositionType.parse)
+            .getOrElse(throw HeaderNotFound("Content-Disposition"))
 
-          val contentType = headers.collectFirst {
-            case header if header.name.equalsIgnoreCase("Content-Type") => MediaType(header.value)
-          }.getOrElse(MediaType.plain)
+          val contentType = headers.getHeaderValue("Content-Type")
+            .map(MediaType(_))
+            .getOrElse(MediaType.plain)
 
-          if contentType.isText && disposition.params.get("filename").isEmpty then
-            val charset = contentType.params.getOrElse("charset", "UTF-8")
-            parts += TextPart(headers, getTextContent(in, buffer, charset, status))
-          else
-            parts += FilePart(headers, getFileContent(in, buffer, status))
+          contentType.fullName == "text/plain" && contentDisposition.params.get("filename").isEmpty match
+            case true =>
+              val charset = contentType.params.getOrElse("charset", "UTF-8")
+              parts += Part(contentDisposition, contentType, getStringContent(in, buffer, charset, status))
+
+            case false =>
+              parts += Part(contentDisposition, contentType, getFileContent(in, buffer, status))
 
         Multipart(parts.toSeq)
 
@@ -76,7 +78,7 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
 
       case line => throw HttpException("Invalid start of multipart")
 
-  private def getTextContent(in: InputStream, buffer: Array[Byte], charset: String, status: Status): String =
+  private def getStringContent(in: InputStream, buffer: Array[Byte], charset: String, status: Status): String =
     var content = new ArrayBuffer[Byte]
 
     var length = in.readLine(buffer)

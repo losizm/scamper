@@ -22,6 +22,7 @@ import scala.language.implicitConversions
 
 import scamper.http.headers.*
 
+import Auxiliary.FileType
 import ResponseStatus.Registry.*
 
 class HttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec:
@@ -49,21 +50,23 @@ class HttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec:
   }
 
   it should "create HttpResponse and set body" in {
+    val htmlFile = File("src/test/resources/test.html")
+
     val res1 = Ok().setBody("Response #1".getBytes("UTF-8"))
     assert(res1.status == Ok)
-    assert(res1.body.getBytes().sameElements("Response #1".getBytes("UTF-8")))
+    assert(res1.body.toByteArray.sameElements("Response #1".getBytes("UTF-8")))
 
     val res2 = NotFound().setBody("Response #2")
     assert(res2.status == NotFound)
-    assert(res2.body.getBytes().sameElements("Response #2".getBytes("UTF-8")))
+    assert(res2.body.toByteArray.sameElements("Response #2".getBytes("UTF-8")))
 
-    val res3 = InternalServerError().setBody(File("src/test/resources/test.html"))
+    val res3 = InternalServerError().setBody(htmlFile)
     assert(res3.status == InternalServerError)
-    assert(res3.body.getBytes().sameElements(Entity(File("src/test/resources/test.html")).getBytes()))
+    assert(res3.body.toByteArray.sameElements(htmlFile.getBytes()))
 
-    val res4 = InternalServerError().setBody(FileInputStream("src/test/resources/test.html"))
+    val res4 = InternalServerError().setBody(FileInputStream(htmlFile))
     assert(res4.status == InternalServerError)
-    assert(res4.body.getBytes().sameElements(Entity(FileInputStream("src/test/resources/test.html")).getBytes()))
+    assert(res4.body.toByteArray.sameElements(htmlFile.getBytes()))
   }
 
   it should "get default value if header not found" in {

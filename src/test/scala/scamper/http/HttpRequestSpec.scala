@@ -20,6 +20,7 @@ import java.io.{ File, FileInputStream }
 
 import scamper.http.headers.*
 
+import Auxiliary.FileType
 import RequestMethod.Registry.*
 
 class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec:
@@ -83,25 +84,27 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec:
   }
 
   it should "create HttpRequest and set body" in {
+    val htmlFile = File("src/test/resources/test.html")
+
     val req1 = Post("/a").setBody("Request #1".getBytes("UTF-8"))
     assert(req1.target == Uri("/a"))
     assert(req1.method == Post)
-    assert(req1.body.getBytes().sameElements("Request #1".getBytes("UTF-8")))
+    assert(req1.body.toByteArray.sameElements("Request #1".getBytes("UTF-8")))
 
     val req2 = Put("/b").setBody("Request #2")
     assert(req2.target == Uri("/b"))
     assert(req2.method == Put)
-    assert(req2.body.getBytes().sameElements("Request #2".getBytes("UTF-8")))
+    assert(req2.body.toByteArray.sameElements("Request #2".getBytes("UTF-8")))
 
-    val req3 = Post("/c").setBody(File("src/test/resources/test.html"))
+    val req3 = Post("/c").setBody(htmlFile)
     assert(req3.target == Uri("/c"))
     assert(req3.method == Post)
-    assert(req3.body.getBytes().sameElements(Entity(File("src/test/resources/test.html")).getBytes()))
+    assert(req3.body.toByteArray.sameElements(htmlFile.getBytes()))
 
-    val req4 = Put("/d").setBody(FileInputStream("src/test/resources/test.html"))
+    val req4 = Put("/d").setBody(FileInputStream(htmlFile))
     assert(req4.target == Uri("/d"))
     assert(req4.method == Put)
-    assert(req4.body.getBytes().sameElements(Entity(FileInputStream("src/test/resources/test.html")).getBytes()))
+    assert(req4.body.toByteArray.sameElements(htmlFile.getBytes()))
   }
 
   it should "get default value if header not found" in {

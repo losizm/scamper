@@ -18,6 +18,7 @@ package http
 
 import java.io.{ File, FileInputStream }
 
+import Auxiliary.FileType
 import ResponseStatus.Registry.*
 
 class ResponseStatusSpec extends org.scalatest.flatspec.AnyFlatSpec:
@@ -44,19 +45,21 @@ class ResponseStatusSpec extends org.scalatest.flatspec.AnyFlatSpec:
   }
 
   it should "create response with message body" in {
+    val htmlFile = File("src/test/resources/test.html")
+
     val res1 = NotFound("Not Found".getBytes("UTF-8"))
     assert(res1.status == NotFound)
-    assert(res1.body.getBytes().sameElements("Not Found".getBytes("UTF-8")))
+    assert(res1.body.toByteArray.sameElements("Not Found".getBytes("UTF-8")))
 
     val res2 = BadRequest("Bad Request")
     assert(res2.status == BadRequest)
-    assert(res2.body.getBytes().sameElements("Bad Request".getBytes("UTF-8")))
+    assert(res2.body.toByteArray.sameElements("Bad Request".getBytes("UTF-8")))
 
-    val res3 = Ok(File("src/test/resources/test.html"))
+    val res3 = Ok(htmlFile)
     assert(res3.status == Ok)
-    assert(res3.body.getBytes().sameElements(Entity(File("src/test/resources/test.html")).getBytes()))
+    assert(res3.body.toByteArray.sameElements(htmlFile.getBytes()))
 
-    val res4 = Ok(FileInputStream("src/test/resources/test.html"))
+    val res4 = Ok(FileInputStream(htmlFile))
     assert(res4.status == Ok)
-    assert(res4.body.getBytes().sameElements(Entity(FileInputStream("src/test/resources/test.html")).getBytes()))
+    assert(res4.body.toByteArray.sameElements(htmlFile.getBytes()))
   }

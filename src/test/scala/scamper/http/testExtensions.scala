@@ -16,9 +16,20 @@
 package scamper
 package http
 
+import java.io.InputStream
+import scala.collection.mutable.ArrayBuffer
+
+extension (in: InputStream)
+  def readBytes(bufferSize: Int = 8192): Array[Byte] =
+    val bytes = ArrayBuffer[Byte]()
+    val buffer = new Array[Byte](bufferSize.max(1024))
+    var len = 0
+
+    while { len = in.read(buffer); len != -1 } do
+      bytes ++= buffer.take(len)
+
+    bytes.toArray
+
 extension (body: Entity)
-  def getBytes(bufferSize: Int = 8192): Array[Byte] =
-    val buffer = new Array[Byte](bufferSize)
-    val length = body.data.read(buffer)
-    body.data.close()
-    buffer.take(length)
+  def toByteArray: Array[Byte] =
+    try body.data.readBytes() finally body.data.close()

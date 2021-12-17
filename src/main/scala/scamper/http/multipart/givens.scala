@@ -19,10 +19,14 @@ package multipart
 
 import java.io.File
 
-/** Converts tuple to [[TextPart]] where tuple is name-content pair. */
-given tupleToTextPart: Conversion[(String, String), TextPart] with
-  def apply(part: (String, String)) = TextPart(part._1, part._2)
+/** Converts `Tuple` to `Part` using string content. */
+given tupleToStringPart: Conversion[(String, String), Part] with
+  def apply(part: (String, String)) = Part(part._1, part._2)
 
-/** Converts tuple to [[FilePart]] where tuple is name-content pair. */
-given tupleToFilePart: Conversion[(String, File), FilePart] with
-  def apply(part: (String, File)) = FilePart(part._1, part._2)
+/** Converts `Tuple` to `Part` using byte content. */
+given tupleToByteArrayPart: Conversion[(String, Array[Byte]), Part] with
+  def apply(part: (String, Array[Byte])) = Part(part._1, part._2)
+
+/** Converts `Tuple` to `Part` using file content. */
+given tupleToFilePart: Conversion[(String, File), Part] with
+  def apply(part: (String, File)) = Part(part._1, part._2)

@@ -27,7 +27,7 @@ private case class MultipartEntity(multipart: Multipart, boundary: String) exten
 
   private def writeMultipart(out: OutputStream): Unit =
     val start = "--" + boundary
-    val end = "--" + boundary + "--"
+    val end   = "--" + boundary + "--"
 
     multipart.parts.foreach { part =>
       out.writeLine(start)
@@ -38,9 +38,15 @@ private case class MultipartEntity(multipart: Multipart, boundary: String) exten
       out.writeLine()
 
       part match
-        case text: TextPart => out.writeLine(text.content)
-        case file: FilePart =>
-          file.content.withInputStream { in =>
+        case _: StringPart =>
+          out.writeLine(part.getString())
+
+        case _: ByteArrayPart =>
+          out.write(part.getBytes())
+          out.writeLine()
+
+        case _: FilePart =>
+          part.withInputStream { in =>
             val buf = new Array[Byte](8192)
             var len = 0
             while { len = in.read(buf); len != -1 } do
