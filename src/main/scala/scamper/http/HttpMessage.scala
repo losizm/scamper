@@ -58,34 +58,34 @@ sealed trait HttpMessage:
 
   /** Tests for header with given name. */
   def hasHeader(name: String): Boolean =
-    headers.exists(_.name.equalsIgnoreCase(name))
+    headers.hasHeader(name)
 
   /** Gets first header with given name. */
   def getHeader(name: String): Option[Header] =
-    headers.find(_.name.equalsIgnoreCase(name))
+    headers.getHeader(name)
 
   /** Gets first header with given name, or returns default if header not present. */
   def getHeaderOrElse(name: String, default: => Header): Header =
-    getHeader(name).getOrElse(default)
+    headers.getHeaderOrElse(name, default)
 
   /** Gets first header value with given name. */
   def getHeaderValue(name: String): Option[String] =
-    getHeader(name).map(_.value)
+    headers.getHeaderValue(name)
 
   /**
    * Gets first header value with given name, or returns default if header not
    * present.
    */
   def getHeaderValueOrElse(name: String, default: => String): String =
-    getHeaderValue(name).getOrElse(default)
+    headers.getHeaderValueOrElse(name, default)
 
   /** Gets headers with given name. */
   def getHeaders(name: String): Seq[Header] =
-    headers.filter(_.name.equalsIgnoreCase(name))
+    headers.getHeaders(name)
 
   /** Gets header values with given name. */
   def getHeaderValues(name: String): Seq[String] =
-    getHeaders(name).map(_.value)
+    headers.getHeaderValues(name)
 
   /**
    * Gets attribute value with given name.
