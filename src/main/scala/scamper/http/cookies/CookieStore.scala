@@ -22,8 +22,6 @@ import java.time.Instant
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
-import Auxiliary.UriType
-
 /**
  * Provides utilities for persistent cookies.
  *

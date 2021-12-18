@@ -28,7 +28,6 @@ import scamper.http.headers.*
 import scamper.http.types.{ *, given }
 import scamper.http.websocket.*
 
-import Auxiliary.UriType
 import ResponseStatus.Registry.*
 import StatusCode.Registry.*
 

@@ -25,8 +25,6 @@ import scala.util.Try
 import scamper.http.headers.ContentType
 import scamper.http.types.{ DispositionType, MediaType }
 
-import Auxiliary.{ FileType, InputStreamType }
-
 private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[Multipart] with BodyDecoder:
   private class Status(val boundary: String):
     val start = ("--" + boundary).getBytes("UTF-8")

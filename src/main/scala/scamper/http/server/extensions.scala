@@ -24,7 +24,6 @@ import scamper.http.headers.{ Accept, ContentDisposition, ContentLength, Content
 import scamper.http.types.{ DispositionType, MediaRange, MediaType }
 import scamper.logging.{ Logger, NullLogger }
 
-import Auxiliary.{ SocketType, StringType }
 import ResponseStatus.Registry.Continue
 
 /** Adds server extensions to `HttpMessage`. */

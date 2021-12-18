@@ -31,7 +31,6 @@ import scamper.http.headers.{ Accept, AcceptEncoding, Connection, ContentLength,
 import scamper.http.types.{ ContentCodingRange, MediaRange, TransferCoding }
 import scamper.http.websocket.*
 
-import Auxiliary.UriType
 import RequestMethod.Registry.*
 import Validate.notNull
 

@@ -29,8 +29,6 @@ import scamper.logging.Logger
 import Opcode.Registry.*
 import StatusCode.Registry.*
 
-import Auxiliary.InputStreamType
-
 private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val protocolVersion: String, val logger: Logger)
     (conn: WebSocketConnection, serverMode: Boolean, deflate: DeflateMode) extends WebSocketSession:
 

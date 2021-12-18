@@ -26,7 +26,6 @@ import scala.concurrent.Future
 import scamper.http.headers.TransferEncoding
 import scamper.http.types.TransferCoding
 
-import Auxiliary.{ SocketType, executor }
 import ResponseStatus.Registry.Continue
 
 private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTimeout: Int) extends AutoCloseable:
@@ -51,7 +50,7 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
 
         if continue.get then
           writeBody(request)
-      }(using executor)
+      }(using Auxiliary.executor)
 
     getResponse(request.isHead) match
       case res if res.status == Continue =>
@@ -94,7 +93,7 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
   private def encodeInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
     encoding.foldLeft(in) { (in, enc) =>
       if      enc.isChunked then in
-      else if enc.isGzip    then Compressor.gzip(in)(using executor)
+      else if enc.isGzip    then Compressor.gzip(in)(using Auxiliary.executor)
       else if enc.isDeflate then Compressor.deflate(in)
       else throw HttpException(s"Unsupported transfer encoding: $enc")
     }

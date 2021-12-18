@@ -25,8 +25,6 @@ import javax.net.ssl.{ KeyManagerFactory, SSLContext, SSLServerSocketFactory }
 
 import scala.util.Try
 
-import Auxiliary.FileType
-
 private object SecureServerSocketFactory:
   def create(keyStore: KeyStore, password: Array[Char]): SSLServerSocketFactory =
     val keyManagerFactory = KeyManagerFactory.getInstance("SunX509")

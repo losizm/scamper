@@ -23,7 +23,6 @@ import scala.language.implicitConversions
 import scamper.http.headers.*
 import scamper.http.types.given
 
-import Auxiliary.InputStreamType
 import RequestMethod.Registry.*
 import ResponseStatus.Registry.*
 

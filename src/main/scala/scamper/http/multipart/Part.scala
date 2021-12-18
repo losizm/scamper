@@ -22,7 +22,6 @@ import java.util.Arrays
 
 import scamper.http.types.{ DispositionType, MediaType }
 
-import Auxiliary.FileType
 import Validate.notNull
 
 /**

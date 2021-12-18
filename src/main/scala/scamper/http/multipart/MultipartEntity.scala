@@ -19,8 +19,6 @@ package multipart
 
 import java.io.OutputStream
 
-import Auxiliary.{ FileType, OutputStreamType }
-
 private case class MultipartEntity(multipart: Multipart, boundary: String) extends Entity:
   val knownSize = None
   lazy val data = WriterInputStream(writeMultipart)(using Auxiliary.executor)

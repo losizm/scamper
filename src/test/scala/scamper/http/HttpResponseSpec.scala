@@ -22,7 +22,6 @@ import scala.language.implicitConversions
 
 import scamper.http.headers.*
 
-import Auxiliary.FileType
 import ResponseStatus.Registry.*
 
 class HttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec:

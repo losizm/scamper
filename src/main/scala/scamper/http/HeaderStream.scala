@@ -20,8 +20,6 @@ import java.io.InputStream
 
 import scala.collection.mutable.ArrayBuffer
 
-import Auxiliary.InputStreamType
-
 private object HeaderStream:
   def getHeaders(in: InputStream, buffer: Array[Byte]): Seq[Header] =
     val headers = new ArrayBuffer[Header]

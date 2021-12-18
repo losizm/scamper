@@ -16,7 +16,6 @@
 package scamper
 package http
 
-import Auxiliary.UriType
 import RequestMethod.Registry.Options
 import Validate.{ noNulls, notNull }
 

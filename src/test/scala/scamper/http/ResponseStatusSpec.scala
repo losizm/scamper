@@ -18,7 +18,6 @@ package http
 
 import java.io.{ File, FileInputStream }
 
-import Auxiliary.FileType
 import ResponseStatus.Registry.*
 
 class ResponseStatusSpec extends org.scalatest.flatspec.AnyFlatSpec:

@@ -17,9 +17,7 @@ package scamper
 
 import java.time.{ Instant, LocalDate }
 
-import Auxiliary.*
-
-class AuxiliarySpec extends org.scalatest.flatspec.AnyFlatSpec:
+class StringExtensionsSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "match string with at least one regular expression" in {
     assert("abc".matchesAny("a.c", "123", "xyz"))
     assert("abc".matchesAny("123", "a.c", "xyz"))

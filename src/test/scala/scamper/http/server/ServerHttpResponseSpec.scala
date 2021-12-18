@@ -22,7 +22,6 @@ import java.io.File
 import scamper.http.headers.{ ContentDisposition, ContentLength, ContentType }
 import scamper.http.types.MediaType
 
-import Auxiliary.StringType
 import ResponseStatus.Registry.Ok
 
 class ServerHttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec:

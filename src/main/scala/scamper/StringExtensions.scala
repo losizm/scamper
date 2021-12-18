@@ -15,19 +15,14 @@
  */
 package scamper
 
-import RuntimeProperties.auxiliary.*
+import java.net.{ URLDecoder, URLEncoder }
 
-private object Auxiliary:
-  lazy val executor =
-    ThreadPoolExecutorService
-      .dynamic(
-        name             = "scamper-auxiliary",
-        corePoolSize     = executorCorePoolSize,
-        maxPoolSize      = executorMaxPoolSize,
-        keepAliveSeconds = executorKeepAliveSeconds,
-        queueSize        = executorQueueSize
-      ) { (task, executor) =>
-        if executorShowWarning then
-          System.err.println(s"[WARNING] Running rejected scamper-auxiliary task on dedicated thread.")
-        executor.getThreadFactory.newThread(task).start()
-      }
+private implicit class StringExtensions(string: String) extends AnyVal:
+  def matchesAny(regexes: String*): Boolean =
+    regexes.exists(string.matches)
+
+  def toUrlEncoded: String =
+    URLEncoder.encode(string, "UTF-8")
+
+  def toUrlDecoded: String =
+    URLDecoder.decode(string, "UTF-8")

@@ -28,7 +28,6 @@ import scala.language.implicitConversions
 import scamper.http.headers.*
 import scamper.http.types.{ MediaRange, MediaType }
 
-import Auxiliary.StringType
 import RequestMethod.Registry.{ Get, Head }
 import ResponseStatus.Registry.*
 import Validate.noNulls

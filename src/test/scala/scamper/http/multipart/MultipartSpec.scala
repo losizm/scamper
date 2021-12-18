@@ -21,8 +21,6 @@ import java.io.File
 
 import scamper.http.types.{ DispositionType, MediaType }
 
-import Auxiliary.FileType
-
 class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
   it should "create part with string content" in {
     val part1 = Part("id", "root")

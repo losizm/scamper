@@ -34,7 +34,6 @@ import scamper.http.headers.*
 import scamper.http.types.{ KeepAliveParameters, TransferCoding }
 import scamper.logging.{ ConsoleLogger, Logger, NullLogger }
 
-import Auxiliary.SocketType
 import RequestMethod.Registry.Connect
 import ResponseStatus.Registry.*
 import RuntimeProperties.server.*

@@ -20,7 +20,6 @@ import java.io.{ File, FileInputStream }
 
 import scamper.http.headers.*
 
-import Auxiliary.FileType
 import RequestMethod.Registry.*
 
 class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec:

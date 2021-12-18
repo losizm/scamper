@@ -22,8 +22,6 @@ import scala.collection.mutable.ArrayBuffer
 
 import scamper.http.types.MediaType
 
-import Auxiliary.FileType
-
 /** Provides utility for parsing message body. */
 @FunctionalInterface
 trait BodyParser[T]:

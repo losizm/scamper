@@ -19,8 +19,6 @@ package server
 
 import scala.util.matching.Regex
 
-import Auxiliary.StringType
-
 private class TargetPath private (val value: String):
   private val segments = segmentize(value)
 

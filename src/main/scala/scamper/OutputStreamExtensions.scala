@@ -15,19 +15,12 @@
  */
 package scamper
 
-import RuntimeProperties.auxiliary.*
+import java.io.OutputStream
 
-private object Auxiliary:
-  lazy val executor =
-    ThreadPoolExecutorService
-      .dynamic(
-        name             = "scamper-auxiliary",
-        corePoolSize     = executorCorePoolSize,
-        maxPoolSize      = executorMaxPoolSize,
-        keepAliveSeconds = executorKeepAliveSeconds,
-        queueSize        = executorQueueSize
-      ) { (task, executor) =>
-        if executorShowWarning then
-          System.err.println(s"[WARNING] Running rejected scamper-auxiliary task on dedicated thread.")
-        executor.getThreadFactory.newThread(task).start()
-      }
+private implicit class OutputStreamExtensions(out: OutputStream) extends AnyVal:
+  def writeLine(text: String): Unit =
+    out.write(text.getBytes("UTF-8"))
+    out.write(Array[Byte](13, 10))
+
+  def writeLine(): Unit =
+    out.write(Array[Byte](13, 10))
