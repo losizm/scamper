@@ -22,24 +22,24 @@ import HeaderHelper.*
 
 /** Defines HTTP header. */
 sealed trait Header:
-  /** Gets header name. */
+  /** Gets field name. */
   def name: String
 
-  /** Gets header value. */
+  /** Gets field value. */
   def value: String
 
-  /** Gets header value as `Int`. */
+  /** Gets field value as `Int`. */
   def intValue: Int = value.toInt
 
-  /** Gets header value as `Long`. */
+  /** Gets field value as `Long`. */
   def longValue: Long = value.toLong
 
   /**
-   * Gets header value as `Instant`.
+   * Gets field value as date (i.e., `Instant`).
    *
-   * @note The header value is assumed formatted per &sect;3.3 of RFC5322.
+   * @note The field value is assumed formatted per &sect;3.3 of RFC5322.
    */
-  def instantValue: Instant = DateValue.parse(value)
+  def dateValue: Instant = DateValue.parse(value)
 
 /** Provides factory for `Header`. */
 object Header:
@@ -58,7 +58,7 @@ object Header:
   /**
    * Creates header using supplied name and value.
    *
-   * @note The header value is formatted per &sect;3.3 of RFC5322.
+   * @note The field value is formatted per &sect;3.3 of RFC5322.
    */
   def apply(name: String, value: Instant): Header =
     apply(name, DateValue.format(value))

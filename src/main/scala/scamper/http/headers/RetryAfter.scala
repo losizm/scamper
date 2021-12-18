@@ -35,7 +35,7 @@ implicit class RetryAfter(response: HttpResponse) extends AnyVal:
 
   /** Gets Retry-After header value if present. */
   def getRetryAfter: Option[Instant] =
-    response.getHeader("Retry-After").map(_.instantValue)
+    response.getHeader("Retry-After").map(_.dateValue)
 
   /** Creates new response with Retry-After header set to supplied value. */
   def setRetryAfter(value: Instant): HttpResponse =

@@ -35,7 +35,7 @@ implicit class Date[T <: HttpMessage](message: T) extends AnyVal:
 
   /** Gets Date header value if present. */
   def getDate: Option[Instant] =
-    message.getHeader("Date").map(_.instantValue)
+    message.getHeader("Date").map(_.dateValue)
 
   /** Creates new message with Date header set to supplied value. */
   def setDate(value: Instant): T =

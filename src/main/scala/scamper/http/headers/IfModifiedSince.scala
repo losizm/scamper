@@ -35,7 +35,7 @@ implicit class IfModifiedSince(request: HttpRequest) extends AnyVal:
 
   /** Gets If-Modified-Since header value if present. */
   def getIfModifiedSince: Option[Instant] =
-    request.getHeader("If-Modified-Since").map(_.instantValue)
+    request.getHeader("If-Modified-Since").map(_.dateValue)
 
   /** Creates new request with If-Modified-Since header set to supplied value. */
   def setIfModifiedSince(value: Instant): HttpRequest =

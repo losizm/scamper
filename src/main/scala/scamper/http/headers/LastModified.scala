@@ -35,7 +35,7 @@ implicit class LastModified(response: HttpResponse) extends AnyVal:
 
   /** Gets Last-Modified header value if present. */
   def getLastModified: Option[Instant] =
-    response.getHeader("Last-Modified").map(_.instantValue)
+    response.getHeader("Last-Modified").map(_.dateValue)
 
   /** Creates new response with Last-Modified header set to supplied value. */
   def setLastModified(value: Instant): HttpResponse =
