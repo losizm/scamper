@@ -45,6 +45,6 @@ trait LifecycleHook:
  * Server creation is halted if a critical service fails to process the start
  * event.
  *
- * @see [[LifecycleEvent.Start]]
+ * @see [[LifecycleHook]], [[LifecycleEvent]]
  */
 trait CriticalService { this: LifecycleHook => }

@@ -99,7 +99,7 @@ object MediaType:
 
   private val fileNamePattern = ".+\\.(\\w+)".r
 
-  /** Gets `application/octet-stream` media type. */
+  /** Gets `application/x-www-form-urlencoded` media type. */
   val formUrlencoded = MediaType("application/x-www-form-urlencoded")
 
   /** Gets `application/octet-stream` media type. */

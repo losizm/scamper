@@ -363,10 +363,8 @@ assert(user.name == "lupita")
 
 ## Multipart Message Body
 
-You can create a message with multipart form-data, which is generally required for
-form submission containing file content. When the multipart body is added to the
-message, the **Content-Type** header is set to _multipart/form-data_ with a
-boundary parameter whose value is used to delimit parts in the encoded body.
+You can create a message with multipart form data, which is generally required for
+form submission containing file content.
 
 ```scala
 import java.io.File
@@ -374,37 +372,37 @@ import java.io.File
 import scamper.http.RequestMethod.Registry.Post
 import scamper.http.multipart.*
 
-// Build multipart form-data with text and file content
-val formData = Multipart(
-  TextPart("title", "Form Of Intellect"),
-  TextPart("artist", "Gang Starr"),
-  TextPart("album", "Step In The Arena"),
-  FilePart("media", File("/music/gang_starr/form_of_intellect.m4a"))
+// Build multipart form data with text and file content
+val song = Multipart(
+  Part("title", "Form Of Intellect"),
+  Part("artist", "Gang Starr"),
+  Part("album", "Step In The Arena"),
+  Part("media", File("/music/gang_starr/form_of_intellect.mp3"))
 )
 
 // Create request with multipart body
-val req = Post("https://upload.musiclibrary.com/songs").setMultipart(formData)
+val req = Post("https://musiclibrary.example.com/songs").setMultipart(song)
 ```
 
-And, for an incoming message with multipart form-data, there's a standard
-`BodyParser` for parsing the message content.
+And, there's a standard `BodyParser` for reading an incoming message with
+multipart body.
 
 ```scala
 import scamper.http.{ BodyParser, HttpRequest }
 import scamper.http.multipart.Multipart
 
-def saveTrack(req: HttpRequest): Unit =
+def save(req: HttpRequest): Unit =
   // Get parser for multipart message body
   given BodyParser[Multipart] = Multipart.getBodyParser()
 
   // Parse message to Multipart instance
-  val multipart = req.as[Multipart]
+  val song = req.as[Multipart]
 
-  // Extracts content from the parts
-  val title = multipart.getText("title")
-  val artist = multipart.getText("artist")
-  val album = multipart.getText("album")
-  val track = multipart.getFile("media")
+  // Extracts content from parts
+  val title  = song.getString("title")
+  val artist = song.getString("artist")
+  val album  = song.getString("album")
+  val media  = song.getFile("media")
 
   ...
 ```
@@ -560,7 +558,7 @@ import scamper.http.types.stringToMediaType
 
 val req = Post("https://localhost:8080/users")
   .setContentType("application/json")
-  .setBody(s"""{ "id": 500, "name": "guest" }""")
+  .setBody(s"""{ "id": 65534, "name": "nobody" }""")
 
 // Send request and print response status
 HttpClient.send(req) { res =>
