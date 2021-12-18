@@ -39,7 +39,7 @@ sealed trait RequestLine extends StartLine:
 
 /** Provides factory for `RequestLine`. */
 object RequestLine:
-  private val syntax = """([\w!#$%&'*+.^`|~-]+)\h+(\p{Graph}+)\h+HTTP/(\d+(?:\.\d+)?)\h*""".r
+  private val syntax = """([\w!#$%&'*+.^`|~-]+)\h+(\p{Graph}+)\h+(HTTP/\d+(?:\.\d+)?)\h*""".r
 
   /** Parses formatted request line. */
   def apply(line: String): RequestLine =
@@ -82,7 +82,7 @@ object RequestLine:
               Uri("/" + uri)
 
 private case class RequestLineImpl(method: RequestMethod, target: Uri, version: HttpVersion) extends RequestLine:
-  override lazy val toString: String = s"$method $target HTTP/$version"
+  override lazy val toString: String = s"$method $target $version"
 
 /**
  * Defines HTTP status line.
@@ -95,7 +95,7 @@ sealed trait StatusLine extends StartLine:
 
 /** Provides factory for `StatusLine`. */
 object StatusLine:
-  private val syntax = """HTTP/(\d+(?:\.\d+)?)\h+(\d+)(?:\h+(\p{Print}*?))?\h*""".r
+  private val syntax = """(HTTP/\d+(?:\.\d+)?)\h+(\d+)(?:\h+(\p{Print}*?))?\h*""".r
 
   /** Parses formatted status line. */
   def apply(line: String): StatusLine =
@@ -127,4 +127,4 @@ object StatusLine:
       notNull(status, "status"))
 
 private case class StatusLineImpl(version: HttpVersion, status: ResponseStatus) extends StatusLine:
-  override lazy val toString = s"HTTP/$version ${status.statusCode} ${status.reasonPhrase}"
+  override lazy val toString = s"$version ${status.statusCode} ${status.reasonPhrase}"

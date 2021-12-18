@@ -377,7 +377,12 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
       HttpRequest(startLine, headers, Entity(socket.getInputStream))
 
     private def readMethod(buffer: Array[Byte], offset: Int)(using socket: Socket): RequestMethod =
-      RequestMethod(socket.getToken(" ", buffer, offset))
+      try
+        RequestMethod(socket.getToken(" ", buffer, offset))
+      catch
+        case _: IndexOutOfBoundsException => throw ReadError(NotImplemented)
+        case _: IllegalArgumentException  => throw ReadError(BadRequest)
+
 
     private def readTarget(buffer: Array[Byte])(using socket: Socket): Uri =
       try
@@ -387,11 +392,11 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         case _: URISyntaxException        => throw ReadError(BadRequest)
 
     private def readVersion(buffer: Array[Byte])(using socket: Socket): HttpVersion =
-      val regex = "HTTP/(.+)".r
-
-      socket.getLine(buffer) match
-        case regex(version) => HttpVersion(version)
-        case _              => throw ReadError(BadRequest)
+      try
+        HttpVersion(socket.getLine(buffer))
+      catch
+        case _: IndexOutOfBoundsException => throw ReadError(BadRequest)
+        case _: IllegalArgumentException  => throw ReadError(BadRequest)
 
     private def readHeaders(buffer: Array[Byte])(using socket: Socket): Seq[Header] =
       val headers   = new ArrayBuffer[Header]

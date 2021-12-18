@@ -18,16 +18,16 @@ package http
 
 class HttpVersionSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "HttpVersion" should "be created" in {
-    assert(HttpVersion("1.0") == HttpVersion(1, 0))
-    assert(HttpVersion("1.1") == HttpVersion(1, 1))
-    assert(HttpVersion("2.0") == HttpVersion(2, 0))
-    assert(HttpVersion("2") == HttpVersion(2, 0))
+    assert(HttpVersion("HTTP/1.0") == HttpVersion(1, 0))
+    assert(HttpVersion("HTTP/1.1") == HttpVersion(1, 1))
+    assert(HttpVersion("HTTP/2.0") == HttpVersion(2, 0))
+    assert(HttpVersion("HTTP/2")   == HttpVersion(2, 0))
   }
 
   it should "be formatted" in {
-    assert(HttpVersion(1, 0).toString == "1.0")
-    assert(HttpVersion(1, 1).toString == "1.1")
-    assert(HttpVersion(2, 0).toString == "2.0")
+    assert(HttpVersion(1, 0).toString == "HTTP/1.0")
+    assert(HttpVersion(1, 1).toString == "HTTP/1.1")
+    assert(HttpVersion(2, 0).toString == "HTTP/2.0")
   }
 
   it should "not be created" in {

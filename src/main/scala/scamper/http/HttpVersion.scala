@@ -32,7 +32,7 @@ object HttpVersion:
   private val `HTTP/1.1` = HttpVersionImpl(1, 1)
   private val `HTTP/2.0` = HttpVersionImpl(2, 0)
 
-  private val syntax = """(\d+)(?:\.(\d+))?""".r
+  private val syntax = """(?:HTTP/)(\d+)(?:\.(\d+))?""".r
 
   /** Parses formatted HTTP version. */
   def apply(version: String): HttpVersion =
@@ -53,4 +53,4 @@ object HttpVersion:
       case (_, _) => HttpVersionImpl(major, minor)
 
 private case class HttpVersionImpl(major: Int, minor: Int) extends HttpVersion:
-  override val toString = s"$major.$minor"
+  override val toString = s"HTTP/$major.$minor"
