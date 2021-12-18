@@ -18,86 +18,9 @@ package http
 package server
 
 import java.io.File
-import java.net.Socket
 
-import scamper.http.headers.{ Accept, ContentDisposition, ContentLength, ContentType, Expect }
-import scamper.http.types.{ DispositionType, MediaRange, MediaType }
-import scamper.logging.{ Logger, NullLogger }
-
-import ResponseStatus.Registry.Continue
-
-/** Adds server extensions to `HttpMessage`. */
-implicit class ServerHttpMessage(message: HttpMessage) extends AnyVal:
-  /**
-   * Gets message correlate.
-   *
-   * Each incoming request is assigned a tag (i.e., correlate), which is later
-   * reassigned to its outgoing response.
-   */
-  def correlate: String =
-    message.getAttribute("scamper.http.server.message.correlate").get
-
-  /** Gets message socket. */
-  def socket: Socket =
-    message.getAttribute("scamper.http.server.message.socket").get
-
-  /**
-   * Gets request count.
-   *
-   * The request count is the number of requests that have been received from
-   * connection.
-   */
-  def requestCount: Int =
-    message.getAttribute("scamper.http.server.message.requestCount").get
-
-  /**
-   * Gets server logger.
-   *
-   * @see [[HttpServer.logger HttpServer.logger()]]
-   */
-  def logger: Logger =
-    message.getAttributeOrElse("scamper.http.server.message.logger", NullLogger)
-
-  /** Gets server to which this message belongs. */
-  def server: HttpServer =
-    message.getAttribute("scamper.http.server.message.server").get
-
-/** Adds server extensions to `HttpRequest`. */
-implicit class ServerHttpRequest(request: HttpRequest) extends AnyVal:
-  /** Gets path parameters. */
-  def params: PathParameters =
-    request.getAttributeOrElse("scamper.http.server.request.parameters", MapPathParameters(Map.empty))
-
-  /**
-   * Sends interim 100 (Continue) response if request includes Expect header
-   * set to 100-Continue.
-   *
-   * @return `true` if response was sent; `false` otherwise
-   */
-  def continue(): Boolean =
-    request.getExpect
-      .collect { case value if value.toLowerCase == "100-continue" => request.socket }
-      .map { socket =>
-        socket.writeLine(StatusLine(Continue).toString)
-        socket.writeLine()
-        socket.flush()
-      }.isDefined
-
-  /**
-   * Finds accepted media type among supplied media types.
-   *
-   * The matching media type with the highest weight is returned. If multiple
-   * matches are found with equal weight, the first match is returned.
-   */
-  def findAccepted(types: Seq[MediaType]): Option[MediaType] =
-    val ranges = request.accept match
-      case Nil    => Seq(MediaRange("*/*"))
-      case accept => accept.sortBy(_.weight * -1)
-
-    types.flatMap { t => ranges.find(_.matches(t)).map(_.weight -> t) }
-      .sortBy(_._1 * -1)
-      .headOption
-      .map(_._2)
+import scamper.http.headers.{ ContentDisposition, ContentLength, ContentType }
+import scamper.http.types.{ DispositionType, MediaType }
 
 /** Adds server extensions to `HttpResponse`. */
 implicit class ServerHttpResponse(response: HttpResponse) extends AnyVal:
