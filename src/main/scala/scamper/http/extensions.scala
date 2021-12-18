@@ -137,7 +137,7 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
   def setForm(data: (String, String), more: (String, String)*): T =
     setForm(QueryString(data +: more))
 
-  private inline def setBody(entity: Entity, contentType: MediaType): T =
+  private def setBody(entity: Entity, contentType: MediaType): T =
     message.setBody(entity).putHeaders(
       Header("Content-Type", contentType.toString),
       Header("Content-Length", entity.knownSize.get)

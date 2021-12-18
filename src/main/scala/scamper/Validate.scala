@@ -18,28 +18,24 @@ package scamper
 import java.util.Objects.isNull
 
 private object Validate:
-  @inline
-  def notNull[T](value: T): T =
+  inline def notNull[T](value: T): T =
     if value == null then
       throw NullPointerException()
     value
 
-  @inline
-  def notNull[T](value: T, message: => String): T =
+  inline def notNull[T](value: T, message: => String): T =
     if value == null then
       throw NullPointerException(message)
     value
 
-  @inline
-  def noNulls[T <: Seq[?]](values: T): T =
+  inline def noNulls[T <: Seq[?]](values: T): T =
     if values == null then
       throw NullPointerException()
     if values.contains(null) then
       throw IllegalArgumentException()
     values
 
-  @inline
-  def noNulls[T <: Seq[?]](values: T, message: => String): T =
+  inline def noNulls[T <: Seq[?]](values: T, message: => String): T =
     if values == null then
       throw NullPointerException()
     if values.contains(null) then

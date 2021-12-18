@@ -17,8 +17,6 @@ package scamper
 package http
 package types
 
-import scala.annotation.tailrec
-
 import Grammar.*
 
 private object StandardParams:
@@ -31,7 +29,7 @@ private object StandardParams:
   def format(params: Map[String, String]): String =
     params.map { case (name, value) => s"; $name=${formatParamValue(value)}" }.mkString
 
-  @tailrec
+  @annotation.tailrec
   private def parseParams(params: String, collected: Map[String, String]): Map[String, String] =
     findPrefixParam(params) match
       case None =>

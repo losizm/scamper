@@ -151,7 +151,6 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(u
     Try(out.close())
     Try(in.close())
 
-  @inline
   private def propose[T](value: => T): T =
     error.get match
       case null  => value
