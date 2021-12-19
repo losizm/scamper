@@ -36,7 +36,7 @@ implicit class ServerHttpRequest(request: HttpRequest) extends AnyVal:
    */
   def continue(): Boolean =
     request.getExpect
-      .collect { case value if value.toLowerCase == "100-continue" => request.socket }
+      .collect { case value if value.equalsIgnoreCase("100-continue") => request.socket }
       .map { socket =>
         socket.writeLine(StatusLine(Continue).toString)
         socket.writeLine()

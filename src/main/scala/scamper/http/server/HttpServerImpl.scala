@@ -428,7 +428,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
     private def write(res: HttpResponse)(using socket: Socket): Unit =
       socket.writeLine(res.startLine.toString)
-      res.headers.map(_.toString).foreach(socket.writeLine)
+      res.headers.foreach(header => socket.writeLine(header.toString))
       socket.writeLine()
 
       if !res.body.isKnownEmpty then

@@ -37,7 +37,7 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
 
   def send(request: HttpRequest): HttpResponse =
     socket.writeLine(request.startLine.toString)
-    request.headers.map(_.toString).foreach(socket.writeLine)
+    request.headers.foreach(header => socket.writeLine(header.toString))
     socket.writeLine()
     socket.flush()
 
@@ -45,7 +45,7 @@ private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTime
 
     if !request.body.isKnownEmpty then
       Future {
-        if request.getHeaderValues("Expect").exists { _.toLowerCase == "100-continue" } then
+        if request.getHeaderValues("Expect").exists("100-continue".equalsIgnoreCase) then
           continue.synchronized { continue.wait(continueTimeout) }
 
         if continue.get then

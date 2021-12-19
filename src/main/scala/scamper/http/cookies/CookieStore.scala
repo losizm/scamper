@@ -214,7 +214,7 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
 
   private def checkDomain(cookie: PersistentCookie, target: Uri): Boolean =
     cookie.hostOnly match
-      case true  => cookie.domain == target.getHost.toLowerCase
+      case true  => cookie.domain.equalsIgnoreCase(target.getHost)
       case false => domainMatches(cookie.domain, target.getHost)
 
   private def checkPath(cookie: PersistentCookie, target: Uri): Boolean =
