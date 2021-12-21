@@ -8,7 +8,7 @@ body {
   font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1em;
   background-color: #220;
-  color: #999;
+  color: #a0a0a0;
   text-align: center;
 }
 
@@ -38,7 +38,7 @@ main {
   border-bottom: 1px solid #666608;
   padding: 2.5em;
   background-color: #181800;
-  color: #999;
+  color: #a0a0a0;
   letter-spacing: .075em;
 }
 
@@ -55,14 +55,16 @@ nav {
 }
 
 nav > a, nav > a:visited  {
+  display: inline-block;
   border: 1px solid #666608;
   border-radius: 4px;
-  padding: .75em 1.25em;
+  padding: .75em .5em;
   background-color: #220;
   color: #771;
   font-size: .9em;
   font-weight: normal;
   text-decoration: none;
+  min-width: 11em;
 }
 
 nav > a:hover  {
