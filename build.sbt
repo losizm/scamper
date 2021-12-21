@@ -1,6 +1,6 @@
 organization := "com.github.losizm"
 name         := "scamper"
-version      := "31.0.0"
+version      := "32.0.0"
 description  := "The HTTP library for Scala"
 homepage     := Some(url("https://github.com/losizm/scamper"))
 licenses     := List("Apache License, Version 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
