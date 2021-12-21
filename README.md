@@ -640,6 +640,7 @@ val client = HttpClient
   .readTimeout(3000)
   .continueTimeout(1000)
   .cookies(CookieStore())
+  .keepAlive(true)
   .trust(File("/path/to/truststore"))
   .create()
 
@@ -665,13 +666,15 @@ _100 (Continue)_ response from the server before the client sends the
 request body. This behavior is effected only if the request includes an
 **Expect** header set to _100-Continue_.
 
-The `cookies` is used to store cookies included in HTTP responses. Using the
-cookie store, the client automatically adds the appropriate cookies to each
-outgoing request.
+The cookie store supplied to `cookies` is used to store cookies included in HTTP
+responses. Using the cookie store, the client automatically adds the appropriate
+cookies to each outgoing request.
 
-You can supply a truststore using `trust`, as demonstrated in the previous
-example. Or, if greater control is required for securing connections, you can
-supply a trust manager instead.
+The `keepAlive` setting is used to enable persistence connections, which are
+disabled by default.
+
+You can supply a truststore to `trust`, as demonstrated in the previous example.
+Or, if greater control is required, you can supply a trust manager instead.
 
 ```scala
 import scala.language.implicitConversions
