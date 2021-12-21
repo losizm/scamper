@@ -43,6 +43,7 @@ private object HttpClientImpl:
     bufferSize:          Int = 8192,
     readTimeout:         Int = 30000,
     continueTimeout:     Int = 1000,
+    keepAlive:           Boolean = false,
     cookies:             CookieStore = CookieStore.Null,
     outgoing:            Seq[RequestFilter] = Nil,
     incoming:            Seq[ResponseFilter] = Nil,
@@ -59,6 +60,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   val readTimeout     = settings.readTimeout.max(0)
   val continueTimeout = settings.continueTimeout.max(0)
   val cookies         = settings.cookies
+  val keepAlive       = settings.keepAlive
 
   private val outgoing = settings.outgoing
   private val incoming = settings.incoming
@@ -74,13 +76,11 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     require(target.isAbsolute, s"Request target not absolute: $target")
     require(target.getScheme.matches("(http|ws)s?"), s"Unsupported scheme: ${target.getScheme}")
 
-    val secure     = target.getScheme.matches("https|wss")
-    val host       = getEffectiveHost(target)
-    val userAgent  = request.getHeaderValueOrElse("User-Agent", "Scamper/31.0.0")
-    val reqCookies = request.cookies ++ cookies.get(target)
-    val connection = target.getScheme.matches("wss?") match
-      case true  => WebSocket.validate(request).connection.mkString(", ")
-      case false => getEffectiveConnection(request)
+    val secure         = target.getScheme.matches("https|wss")
+    val host           = getEffectiveHost(target)
+    val userAgent      = request.getHeaderValueOrElse("User-Agent", "Scamper/31.0.0")
+    val requestCookies = request.cookies ++ cookies.get(target)
+    val connection     = getEffectiveConnection(request)
 
     var effectiveRequest = request.method match
       case Get     => toBodilessRequest(request)
@@ -98,26 +98,24 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       Header("User-Agent", userAgent) +:
       effectiveRequest.headers.filterNot(_.name.matches("(?i)Host|User-Agent|Cookie|Connection")) :+
       Header("Connection", connection)
-    ).setCookies(reqCookies)
+    ).setCookies(requestCookies)
 
     effectiveRequest = effectiveRequest.setTarget(target.toTarget)
 
     if !effectiveRequest.path.startsWith("/") && effectiveRequest.path != "*" then
       effectiveRequest = effectiveRequest.setPath("/" + effectiveRequest.path)
 
-    val conn = createClientConnection(
-      secure match
-        case true  => secureSocketFactory
-        case false => SocketFactory.getDefault()
-      ,
-      target.getHost,
-      target.getPort match
-        case -1   => if secure then 443 else 80
-        case port => port
-    )
+    val realHost = target.getHost.toLowerCase
+    val realPort = target.getPort match
+      case -1   => if secure then 443 else 80
+      case port => port
+
+    val conn = getClientConnection(secure, realHost, realPort)
 
     try
       val correlate = createCorrelate(requestCount.incrementAndGet)
+
+      conn.configure(bufferSize, readTimeout, continueTimeout)
 
       Try(addAttributes(effectiveRequest, conn, correlate, target))
         .map(addAccept)
@@ -127,11 +125,13 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
         .map(conn.send)
         .map(addAttributes(_, conn, correlate, target))
         .map(addRequestAttribute(_, effectiveRequest))
-        .map(storeCookies(target, _))
+        .map(persistCookies(target, _))
+        .map(persistConnection(secure, realHost, realPort, _))
         .map(incoming.foldLeft(_) { (res, filter) => filter(res) })
-        .map(handler.apply)
+        .map(handler(_))
         .get
-    finally Try(conn.close())
+    finally
+      Try(conn.close())
 
   def get[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
     (handler: ResponseHandler[T]): T = send(Get, target, headers, cookies, Entity.empty)(handler)
@@ -194,27 +194,57 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       case -1   => target.getHost
       case port => target.getHost + ":" + port
 
-  private def getEffectiveConnection(request: HttpRequest): String =
-    request.getConnection
-      .orElse(Some(Nil))
-      .map { values => values.filterNot(_.matches("(?i)close|keep-alive|TE")) }
-      .map { values => if request.hasTE then values :+ "TE" else values }
-      .map(_ :+ "close")
-      .map(_.mkString(", "))
-      .get
+  private def getEffectiveConnection(req: HttpRequest): String =
+    req.target.getScheme.matches("wss?") match
+      case true  => WebSocket.validate(req).connection.mkString(", ")
+      case false =>
+        req.getConnection
+          .orElse(Some(Nil))
+          .map { values => values.filterNot(_.matches("(?i)close|keep-alive|TE")) }
+          .map { values => if req.hasTE then values :+ "TE" else values }
+          .map { _ :+ (if shouldKeepAlive(req) then "keep-alive" else "close") }
+          .map(_.mkString(", "))
+          .get
 
-  private def createClientConnection(factory: SocketFactory, host: String, port: Int): HttpClientConnection =
-    val socket = factory.createSocket(host, port)
+  private def toBodilessRequest(req: HttpRequest): HttpRequest =
+    req.setBody(Entity.empty).removeContentLength.removeTransferEncoding
 
-    try
-      socket.setSoTimeout(readTimeout)
-      socket.setSendBufferSize(bufferSize)
-      socket.setReceiveBufferSize(bufferSize)
-    catch case cause: Throwable =>
-      Try(socket.close())
-      throw cause
+  private def toBodyRequest(req: HttpRequest): HttpRequest =
+    req.getTransferEncoding.map { encoding =>
+      req.setTransferEncoding(encoding.filterNot(_.isChunked) :+ TransferCoding("chunked"))
+        .removeContentLength
+    }.orElse {
+      req.getContentLength.map {
+        case 0          => req.setBody(Entity.empty)
+        case n if n > 0 => req
+        case length     => throw RequestAborted(s"Invalid Content-Length: $length")
+      }
+    }.orElse {
+      req.body.knownSize.collect {
+        case 0          => req.setBody(Entity.empty).setContentLength(0)
+        case n if n > 0 => req.setContentLength(n)
+      }
+    }.getOrElse {
+      req.setTransferEncoding(TransferCoding("chunked"))
+    }
 
-    HttpClientConnection(socket, bufferSize, continueTimeout)
+  private def shouldKeepAlive(req: HttpRequest): Boolean =
+    keepAlive && !req.connection.exists("close".equalsIgnoreCase)
+
+  private def shouldKeepAlive(res: HttpResponse): Boolean =
+    keepAlive && !res.connection.exists("close".equalsIgnoreCase) &&
+      (res.isSuccessful || res.statusCode == 304)
+
+  private def getClientConnection(secure: Boolean, host: String, port: Int): HttpClientConnection =
+    ConnectionManager.get(secure, host, port).getOrElse {
+      val factory = getSocketFactory(secure)
+      val socket  = factory.createSocket(host, port)
+
+      HttpClientConnection(socket)
+    }
+
+  private def getSocketFactory(secure: Boolean): SocketFactory =
+    if secure then secureSocketFactory else SocketFactory.getDefault()
 
   private def createCorrelate(requestId: Long): String =
     f"${System.currentTimeMillis}%x-$id%04x-$requestId%04x"
@@ -231,11 +261,6 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   private def addRequestAttribute(res: HttpResponse, req: HttpRequest): HttpResponse =
     res.putAttributes("scamper.http.client.response.request" -> req)
 
-  private def setCloseGuard(msg: HttpMessage, enabled: Boolean): Unit =
-    msg.getAttribute[HttpClientConnection]("scamper.http.client.message.connection")
-      .map(_.setCloseGuard(enabled))
-      .getOrElse(throw new NoSuchElementException("No such attribute: scamper.http.client.message.connection"))
-
   private def addAccept(req: HttpRequest): HttpRequest =
     (req.hasAccept || accept.isEmpty) match
       case true  => req
@@ -246,30 +271,22 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       case true  => req
       case false => req.setAcceptEncoding(acceptEncoding)
 
-  private def storeCookies(target: Uri, res: HttpResponse): HttpResponse =
+  private def persistCookies(target: Uri, res: HttpResponse): HttpResponse =
     res.getHeaderValues("Set-Cookie")
       .flatMap { value => Try(SetCookie.parse(value)).toOption }
       .foreach { cookie => cookies.put(target, cookie) }
     res
 
-  private def toBodilessRequest(request: HttpRequest): HttpRequest =
-    request.setBody(Entity.empty).removeContentLength.removeTransferEncoding
+  private def persistConnection(secure: Boolean, host: String, port: Int, res: HttpResponse): HttpResponse =
+    if shouldKeepAlive(res) then
+      res.getAttribute[HttpClientConnection]("scamper.http.client.message.connection")
+        .foreach { conn =>
+          ConnectionManager.add(secure, host, port, conn)
+          conn.setCloseGuard(true)
+        }
+    res
 
-  private def toBodyRequest(request: HttpRequest): HttpRequest =
-    request.getTransferEncoding.map { encoding =>
-      request.setTransferEncoding(encoding.filterNot(_.isChunked) :+ TransferCoding("chunked"))
-        .removeContentLength
-    }.orElse {
-      request.getContentLength.map {
-        case 0          => request.setBody(Entity.empty)
-        case n if n > 0 => request
-        case length     => throw RequestAborted(s"Invalid Content-Length: $length")
-      }
-    }.orElse {
-      request.body.knownSize.collect {
-        case 0          => request.setBody(Entity.empty).setContentLength(0)
-        case n if n > 0 => request.setContentLength(n)
-      }
-    }.getOrElse {
-      request.setTransferEncoding(TransferCoding("chunked"))
-    }
+  private def setCloseGuard(msg: HttpMessage, enabled: Boolean): Unit =
+    msg.getAttribute[HttpClientConnection]("scamper.http.client.message.connection")
+      .map(_.setCloseGuard(enabled))
+      .getOrElse(throw new NoSuchElementException("No such attribute: scamper.http.client.message.connection"))

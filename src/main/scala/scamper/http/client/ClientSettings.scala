@@ -42,6 +42,7 @@ import Validate.{ noNulls, notNull }
  * | bufferSize      | `8192` |
  * | readTimeout     | `30000` |
  * | continueTimeout | `1000` |
+ * | keepAlive       | `false` |
  * | coookies        | `CookieStore.Null` |
  * | trust           | _(Not set)_ |
  * | incoming        | _(Not set)_ |
@@ -127,6 +128,12 @@ class ClientSettings:
    */
   def continueTimeout(timeout: Int): this.type = synchronized {
     settings = settings.copy(continueTimeout = timeout)
+    this
+  }
+
+  /** Enables or disables persistent connections. */
+  def keepAlive(enable: Boolean = true): this.type = synchronized {
+    settings = settings.copy(keepAlive = enable)
     this
   }
 

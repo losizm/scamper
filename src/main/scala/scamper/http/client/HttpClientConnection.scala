@@ -28,14 +28,33 @@ import scamper.http.types.TransferCoding
 
 import ResponseStatus.Registry.Continue
 
-private class HttpClientConnection(socket: Socket, bufferSize: Int, continueTimeout: Int) extends AutoCloseable:
-  private val closeGuard = AtomicBoolean(false)
+private class HttpClientConnection(socket: Socket) extends AutoCloseable:
+  private val closeGuard      = AtomicBoolean(false)
+  private var bufferSize      = 8192
+  private var readTimeout     = 30000
+  private var continueTimeout = 1000
 
-  def getSocket(): Socket = socket
-  def getCloseGuard(): Boolean = closeGuard.get()
-  def setCloseGuard(enable: Boolean): Unit = closeGuard.set(enable)
+  def getSocket(): Socket =
+    socket
+
+  def getCloseGuard(): Boolean =
+    closeGuard.get()
+
+  def setCloseGuard(enable: Boolean): this.type =
+    closeGuard.set(enable)
+    this
+
+  def configure(bufferSize: Int, readTimeout: Int, continueTimeout: Int): this.type =
+    this.bufferSize      = bufferSize
+    this.readTimeout     = readTimeout
+    this.continueTimeout = continueTimeout
+    this
 
   def send(request: HttpRequest): HttpResponse =
+    socket.setSendBufferSize(bufferSize)
+    socket.setReceiveBufferSize(bufferSize)
+    socket.setSoTimeout(readTimeout)
+
     socket.writeLine(request.startLine.toString)
     request.headers.foreach(header => socket.writeLine(header.toString))
     socket.writeLine()

@@ -89,6 +89,9 @@ trait HttpClient:
   /** Gets continue timeout. */
   def continueTimeout: Int
 
+  /** Tests whether persistent connections are enabled. */
+  def keepAlive: Boolean
+
   /** Gets cookie store. */
   def cookies: CookieStore
 

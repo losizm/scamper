@@ -76,6 +76,7 @@ class HttpClientGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
     assert(client.continueTimeout == 1000)
     assert(client.readTimeout == 5000)
     assert(client.bufferSize == 1024)
+    assert(!client.keepAlive)
 
     info("send request")
     Post(s"$serverUri/echo")
