@@ -35,6 +35,8 @@ private object ConnectionManager:
     connection: HttpClientConnection,
     queueTime:  Long = now()
   ): //
+    connection.setCloseGuard(true)
+
     def matches(secure: Boolean, host: String, port: Int): Boolean =
       this.secure == secure && this.host == host && this.port == port
 

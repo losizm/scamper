@@ -36,7 +36,7 @@ private object RuntimeProperties:
     lazy val connectionEvictionInterval = getIntProperty("scamper.http.client.connection.evictionInterval", 5000).max(1000)
     lazy val connectionIdleTimeout      = getIntProperty("scamper.http.client.connection.idleTimeout", 60000).max(0)
     lazy val connectionQueueSize        = getIntProperty("scamper.http.client.connection.queueSize", 50).max(1)
-    lazy val connectionTestTimeout      = getIntProperty("scamper.http.client.connection.testTimeout", 100).max(10)
+    lazy val connectionTestTimeout      = getIntProperty("scamper.http.client.connection.testTimeout", 20).max(1)
 
   object server:
     lazy val keepAlivePoolSizeFactor = getIntProperty("scamper.http.server.keepAlive.poolSizeFactor", 2).max(1)

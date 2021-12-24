@@ -126,9 +126,8 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
         .map(addAttributes(_, conn, correlate, target))
         .map(addRequestAttribute(_, effectiveRequest))
         .map(persistCookies(target, _))
-        .map(persistConnection(secure, realHost, realPort, _))
         .map(incoming.foldLeft(_) { (res, filter) => filter(res) })
-        .map(handler(_))
+        .map(persistConnection(handler, secure, realHost, realPort, _))
         .get
     finally
       Try(conn.close())
@@ -277,14 +276,14 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       .foreach { cookie => cookies.put(target, cookie) }
     res
 
-  private def persistConnection(secure: Boolean, host: String, port: Int, res: HttpResponse): HttpResponse =
+  private def persistConnection[T](handler: ResponseHandler[T], secure: Boolean, host: String, port: Int, res: HttpResponse): T =
+    val result = handler(res)
+
     if shouldKeepAlive(res) then
       res.getAttribute[HttpClientConnection]("scamper.http.client.message.connection")
-        .foreach { conn =>
-          ConnectionManager.add(secure, host, port, conn)
-          conn.setCloseGuard(true)
-        }
-    res
+        .foreach(ConnectionManager.add(secure, host, port, _))
+
+    result
 
   private def setCloseGuard(msg: HttpMessage, enabled: Boolean): Unit =
     msg.getAttribute[HttpClientConnection]("scamper.http.client.message.connection")
