@@ -78,7 +78,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
     val secure         = target.getScheme.matches("https|wss")
     val host           = getEffectiveHost(target)
-    val userAgent      = request.getHeaderValueOrElse("User-Agent", "Scamper/32.0.1")
+    val userAgent      = request.getHeaderValueOrElse("User-Agent", "Scamper/32.0.2")
     val requestCookies = request.cookies ++ cookies.get(target)
     val connection     = getEffectiveConnection(request)
 
