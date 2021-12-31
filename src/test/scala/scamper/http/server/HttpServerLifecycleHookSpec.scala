@@ -18,6 +18,7 @@ package http
 package server
 
 import logging.NullLogger
+import websocket.{ WebSocketApplication, WebSocketSession }
 import ResponseStatus.Registry.InternalServerError
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -45,13 +46,19 @@ class HttpServerLifecycleHookSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
   private class TestCriticalService(error: Option[Exception]) extends TestHook(error), CriticalService
 
-  private class TestRequestHandler extends TestHook(None) with RequestHandler: //
+  private class TestRequestHandler extends TestHook(None), RequestHandler:
     def apply(req: HttpRequest): HttpMessage = req
 
-  private class TestResponseFilter extends TestHook(None) with ResponseFilter: //
+  private class TestRouterApplication extends TestHook(None), RouterApplication:
+    def apply(router: Router): Unit = ()
+
+  private class TestWebSocketApplication extends TestHook(None), WebSocketApplication[Unit]:
+    def apply(session: WebSocketSession): Unit = ()
+
+  private class TestResponseFilter extends TestHook(None), ResponseFilter:
     def apply(res: HttpResponse): HttpResponse = res
 
-  private class TestErrorHandler extends TestHook(None) with ErrorHandler: //
+  private class TestErrorHandler extends TestHook(None), ErrorHandler:
     def apply(req: HttpRequest): PartialFunction[Throwable, HttpResponse] =
       case _ => InternalServerError()
 
@@ -77,11 +84,11 @@ class HttpServerLifecycleHookSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(hook4.started == 5)
     assert(hook5.started == 6)
 
-    assert(hook1.stopped == 7)
-    assert(hook2.stopped == 6)
-    assert(hook3.stopped == 5)
-    assert(hook4.stopped == 4)
-    assert(hook5.stopped == 3)
+    assert(hook1.stopped == 17)
+    assert(hook2.stopped == 16)
+    assert(hook3.stopped == 15)
+    assert(hook4.stopped == 14)
+    assert(hook5.stopped == 13)
   }
 
   it should "create server with failed lifecycle hook" in {
@@ -106,11 +113,11 @@ class HttpServerLifecycleHookSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(hook4.started == 4)
     assert(hook5.started == 5)
 
-    assert(hook1.stopped == 7)
-    assert(hook2.stopped == 6)
-    assert(hook3.stopped == 5)
-    assert(hook4.stopped == 4)
-    assert(hook5.stopped == 3)
+    assert(hook1.stopped == 17)
+    assert(hook2.stopped == 16)
+    assert(hook3.stopped == 15)
+    assert(hook4.stopped == 14)
+    assert(hook5.stopped == 13)
   }
 
   it should "not create server with failed critical service" in {
@@ -139,11 +146,11 @@ class HttpServerLifecycleHookSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(hook4.started == 0)
     assert(hook5.started == 0)
 
-    assert(hook1.stopped == 7)
-    assert(hook2.stopped == 6)
-    assert(hook3.stopped == 5)
-    assert(hook4.stopped == 4)
-    assert(hook5.stopped == 3)
+    assert(hook1.stopped == 17)
+    assert(hook2.stopped == 16)
+    assert(hook3.stopped == 15)
+    assert(hook4.stopped == 14)
+    assert(hook5.stopped == 13)
   }
 
   private def reset(): Unit =
@@ -157,6 +164,18 @@ class HttpServerLifecycleHookSpec extends org.scalatest.flatspec.AnyFlatSpec:
       .trigger(hook +: more)
       .outgoing(TestResponseFilter())
       .recover(TestErrorHandler())
+      .get("/test")(TestRequestHandler())
+      .websocket("/websocket")(TestWebSocketApplication())
+      .route("/route1")(TestRouterApplication())
+      .route("/route2") { router =>
+        router.trigger(TestHook(None))
+        router.incoming(TestRequestHandler())
+        router.post("/test2")(TestRequestHandler())
+        router.websocket("/websocket2")(TestWebSocketApplication())
+        router.route("/route3")(TestRouterApplication())
+        router.outgoing(TestResponseFilter())
+        router.recover(TestErrorHandler())
+      }
       .create("localhost", 0)
       .close()
 

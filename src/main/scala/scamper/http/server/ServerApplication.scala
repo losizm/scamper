@@ -344,7 +344,11 @@ class ServerApplication extends Router:
 
   /** @inheritdoc */
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type =
-    incoming(TargetRequestHandler(path, methods, handler))
+    app = app.copy(
+      requestHandlers = app.requestHandlers :+ TargetRequestHandler(path, methods, handler),
+      lifecycleHooks  = addLifecycleHook(handler)
+    )
+    this
 
   /** @inheritdoc */
   def outgoing(filter: ResponseFilter): this.type = synchronized {

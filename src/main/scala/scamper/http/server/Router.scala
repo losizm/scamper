@@ -242,7 +242,13 @@ trait Router:
    * lifecycle hook.
    */
   def websocket(path: String)(app: WebSocketApplication[?]): this.type =
-    incoming(path, Get)(WebSocketRequestHandler(app))
+    app match
+      case hook: LifecycleHook =>
+        trigger(hook)
+        incoming(path, Get)(WebSocketRequestHandler(app))
+
+      case _ =>
+        incoming(path, Get)(WebSocketRequestHandler(app))
 
   /**
    * Mounts router application at given path.
@@ -263,8 +269,15 @@ trait Router:
     val hooks = router.getLifecycleHooks()
     val handler = MountRequestHandler(router.mountPath, router.getRequestHandler())
 
-    hooks.foreach(trigger)
-    incoming(handler)
+    app match
+      case hook: LifecycleHook =>
+        trigger(hook)
+        hooks.foreach(trigger)
+        incoming(handler)
+
+      case _ =>
+        hooks.foreach(trigger)
+        incoming(handler)
 
   /**
    * Adds error handler.
