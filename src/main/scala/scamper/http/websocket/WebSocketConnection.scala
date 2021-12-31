@@ -32,7 +32,7 @@ import StatusCode.Registry.{ MessageTooBig, ProtocolError }
  *
  * @constructor Create WebSocket connection using supplied socket.
  */
-class WebSocketConnection(socket: Socket):
+class WebSocketConnection(socket: Socket) extends AutoCloseable:
   private val finBits      = 0x80
   private val compressBits = 0x40
   private val reservedBits = 0x30

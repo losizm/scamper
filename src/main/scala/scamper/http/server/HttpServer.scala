@@ -28,7 +28,7 @@ import scamper.logging.Logger
  *
  * @see [[HttpServer$ HttpServer]], [[ServerApplication]]
  */
-trait HttpServer:
+trait HttpServer extends AutoCloseable:
   /** Gets logger. */
   def logger: Logger
 
