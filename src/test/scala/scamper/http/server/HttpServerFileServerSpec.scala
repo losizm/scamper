@@ -25,6 +25,7 @@ import scala.language.implicitConversions
 import scamper.http.client.HttpClient
 import scamper.http.headers.*
 import scamper.http.types.{ *, given }
+import scamper.logging.NullLogger
 
 import ResponseStatus.Registry.*
 
@@ -32,6 +33,25 @@ class HttpServerFileServerSpec extends org.scalatest.flatspec.AnyFlatSpec with T
   it should "serve files" in testFileServer(false)
 
   it should "serve files with SSL/TLS" in testFileServer(true)
+
+  it should "serve default file" in withSimpleFileServer { implicit server =>
+    def serverUri(using server: HttpServer): Uri =
+      server.isSecure match
+        case true  => Uri("https://" + server.host.getHostAddress + ":" + server.port)
+        case false => Uri("http://"  + server.host.getHostAddress + ":" + server.port)
+
+    client.get(s"$serverUri") { res =>
+      assert(res.status == SeeOther)
+      assert(res.location == Uri("/home.html"))
+      assert(res.as[String] == "See other: /home.html")
+    }
+
+    client.get(s"$serverUri/") { res =>
+      assert(res.status == SeeOther)
+      assert(res.location == Uri("/home.html"))
+      assert(res.as[String] == "See other: /home.html")
+    }
+  }
 
   private given client: HttpClient =
     HttpClient
@@ -101,3 +121,15 @@ class HttpServerFileServerSpec extends org.scalatest.flatspec.AnyFlatSpec with T
 
   private def getBytes(path: String): Array[Byte] =
     Files.readAllBytes(Resources.riteshiff.toPath.resolve(path))
+
+  private def withSimpleFileServer[T](f: HttpServer => T): T =
+    val server = HttpServer
+      .app()
+      .logger(NullLogger)
+      .backlogSize(8)
+      .poolSize(2)
+      .queueSize(4)
+      .files("/", Resources.riteshiff, "home.html")
+      .create(0)
+
+    try f(server) finally server.close()
