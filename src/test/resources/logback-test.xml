@@ -1,0 +1,40 @@
+<configuration>
+  <variable
+    scope="CONTEXT"
+    name="PATTERN"
+    value="[%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}][%level] %logger - %message%n%xException"/>
+
+  <timestamp key="timestamp" datePattern="yyyyMMdd'T'HHmmss"/>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="SERVER" class="ch.qos.logback.core.FileAppender">
+    <file>${user.dir}/target/test-logs/server-${timestamp}.log</file>
+    <encoder>
+      <pattern>${PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="CLIENT" class="ch.qos.logback.core.FileAppender">
+    <file>${user.dir}/target/test-logs/client-${timestamp}.log</file>
+    <encoder>
+      <pattern>${PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="scamper.http.server" level="DEBUG" additivity="false">
+    <appender-ref ref="SERVER"/>
+  </logger>
+
+  <logger name="scamper.http.client" level="DEBUG" additivity="false">
+    <appender-ref ref="CLIENT"/>
+  </logger>
+
+  <root level="INFO">
+    <appender-ref ref="STDOUT"/>
+  </root>
+</configuration>

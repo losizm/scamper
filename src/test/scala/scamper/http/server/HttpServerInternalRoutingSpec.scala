@@ -23,7 +23,6 @@ import scala.language.implicitConversions
 
 import scamper.http.client.HttpClient
 import scamper.http.headers.*
-import scamper.logging.NullLogger
 
 import ResponseStatus.Registry.*
 
@@ -93,7 +92,6 @@ class HttpServerInternalRoutingSpec extends org.scalatest.flatspec.AnyFlatSpec:
   private def withServer[T](f: HttpServer => T): T =
     val server = HttpServer
       .app()
-      .logger(NullLogger)
       .route("/messages")(doRouting)
       .create("localhost", 0)
 

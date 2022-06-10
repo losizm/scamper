@@ -18,6 +18,7 @@ package scamper
 import RuntimeProperties.auxiliary.*
 
 private object Auxiliary:
+  lazy val logger   = org.slf4j.LoggerFactory.getLogger(getClass)
   lazy val executor =
     ThreadPoolExecutorService
       .dynamic(
@@ -28,6 +29,6 @@ private object Auxiliary:
         queueSize        = executorQueueSize
       ) { (task, executor) =>
         if executorShowWarning then
-          System.err.println(s"[WARNING] Running rejected scamper-auxiliary task on dedicated thread.")
+          logger.warn("Running rejected scamper-auxiliary task on dedicated thread.")
         executor.getThreadFactory.newThread(task).start()
       }

@@ -32,7 +32,6 @@ import scala.util.{ Failure, Success, Try }
 
 import scamper.http.headers.*
 import scamper.http.types.{ KeepAliveParameters, TransferCoding }
-import scamper.logging.{ ConsoleLogger, Logger, NullLogger }
 
 import RequestMethod.Registry.Connect
 import ResponseStatus.Registry.*
@@ -42,7 +41,6 @@ private object HttpServerImpl:
   private val count = AtomicLong(0)
 
   case class Application(
-    logger:              Logger = ConsoleLogger,
     backlogSize:         Int = 50,
     poolSize:            Int = Runtime.getRuntime.availableProcessors(),
     queueSize:           Int = Runtime.getRuntime.availableProcessors() * 4,
@@ -61,7 +59,8 @@ private object HttpServerImpl:
     new HttpServerImpl(count.incrementAndGet(), InetSocketAddress(host, port), app)
 
 private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: HttpServerImpl.Application) extends HttpServer:
-  val logger      = if app.logger == null then NullLogger else app.logger
+  private val logger = org.slf4j.LoggerFactory.getLogger(getClass)
+
   val backlogSize = app.backlogSize.max(1)
   val poolSize    = app.poolSize.max(1)
   val queueSize   = app.queueSize.max(0)
@@ -163,7 +162,6 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
     logger.info(s"$authority - Starting server")
     logger.info(s"$authority - Secure: $isSecure")
-    logger.info(s"$authority - Logger: $logger")
     logger.info(s"$authority - Backlog Size: $backlogSize")
     logger.info(s"$authority - Pool Size: $poolSize")
     logger.info(s"$authority - Queue Size: $queueSize")
@@ -194,7 +192,6 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
       Try(serviceExecutor.shutdownNow())
       Try(closerExecutor.shutdownNow())
       Try(stopLifecycleHooks())
-      Try(logger.asInstanceOf[Closeable].close())
 
   override def toString(): String =
     s"HttpServer(host=$host, port=$port, isSecure=$isSecure, isClosed=$isClosed)"
@@ -490,8 +487,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         "scamper.http.server.message.server"       -> HttpServerImpl.this,
         "scamper.http.server.message.socket"       -> socket,
         "scamper.http.server.message.requestCount" -> requestCount,
-        "scamper.http.server.message.correlate"    -> correlate,
-        "scamper.http.server.message.logger"       -> logger
+        "scamper.http.server.message.correlate"    -> correlate
       )
 
     private def addRequestAttribute(res: HttpResponse, req: HttpRequest): HttpResponse =

@@ -17,7 +17,6 @@ package scamper
 package http
 package server
 
-import logging.NullLogger
 import websocket.{ WebSocketApplication, WebSocketSession }
 import ResponseStatus.Registry.InternalServerError
 
@@ -159,7 +158,6 @@ class HttpServerLifecycleHookSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
   private def createServer(hook: LifecycleHook, more: LifecycleHook*): Unit =
     ServerApplication()
-      .logger(NullLogger)
       .incoming(TestRequestHandler())
       .trigger(hook +: more)
       .outgoing(TestResponseFilter())

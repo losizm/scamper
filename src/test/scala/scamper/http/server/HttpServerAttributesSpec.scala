@@ -23,7 +23,6 @@ import scala.language.implicitConversions
 
 import scamper.http.client.HttpClient
 import scamper.http.headers.{ Server as _, * }
-import scamper.logging.*
 
 import RequestMethod.Registry.*
 import ResponseStatus.Registry.*
@@ -119,13 +118,12 @@ class HttpServerAttributesSpec extends org.scalatest.flatspec.AnyFlatSpec with T
     }
   }
 
-  override def getServer(secure: Boolean = false, logging: Boolean = false): HttpServer =
+  override def getServer(secure: Boolean = false): HttpServer =
     val app =
       HttpServer
         .app()
         .bufferSize(1024)
         .headerLimit(10)
-        .logger(if logging then ConsoleLogger else NullLogger)
         .incoming { req => request.set(req); req }
         .incoming(_.putAttributes("after" -> 0))
         .incoming("/error") { _ => throw Exception("Internal Error") }

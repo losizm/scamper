@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger
 import scala.language.implicitConversions
 
 import scamper.http.headers.*
-import scamper.logging.NullLogger
 import scamper.http.server.{ HttpServer, ServerApplication }
 import scamper.http.types.{ *, given }
 
@@ -148,7 +147,6 @@ class HttpClientKeepAliveSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
   private def withServer[T](f: HttpServer => T): T =
     val server = ServerApplication()
-      .logger(NullLogger)
       .keepAlive(30, 3)
       .get("/switching-protocols")(_ => SwitchingProtocols())
       .get("/ok")(_ => Ok())

@@ -90,8 +90,7 @@ object WebSocketUpgrade:
           id      = req.correlate,
           target  = req.target,
           version = req.secWebSocketVersion,
-          deflate = deflateMode,
-          logger  = req.logger
+          deflate = deflateMode
         )
 
         application(session)

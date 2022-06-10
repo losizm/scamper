@@ -25,7 +25,6 @@ import scala.language.implicitConversions
 import scamper.http.client.HttpClient
 import scamper.http.headers.*
 import scamper.http.types.{ *, given }
-import scamper.logging.NullLogger
 
 import ResponseStatus.Registry.*
 
@@ -125,7 +124,6 @@ class HttpServerFileServerSpec extends org.scalatest.flatspec.AnyFlatSpec with T
   private def withSimpleFileServer[T](f: HttpServer => T): T =
     val server = HttpServer
       .app()
-      .logger(NullLogger)
       .backlogSize(8)
       .poolSize(2)
       .queueSize(4)

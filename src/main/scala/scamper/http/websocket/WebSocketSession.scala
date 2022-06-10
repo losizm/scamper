@@ -23,8 +23,6 @@ import java.net.Socket
 import scala.concurrent.Future
 import scala.util.Try
 
-import scamper.logging.{ Logger, NullLogger }
-
 import StatusCode.Registry.NormalClosure
 
 /** Defines session for WebSocket connection. */
@@ -37,9 +35,6 @@ trait WebSocketSession:
 
   /** Gets WebSocket protocol version. */
   def protocolVersion: String
-
-  /** Gets logger associated with session. */
-  def logger: Logger
 
   /** Tests for secure WebSocket session. */
   def isSecure: Boolean
@@ -277,10 +272,9 @@ object WebSocketSession:
    * @param target target URI for which connection was established
    * @param version WebSocket protocol version
    * @param deflate indicates whether `permessage-deflate` is enabled
-   * @param logger optional logger
    */
-  def forClient(conn: WebSocketConnection, id: String, target: Uri, version: String, deflate: Boolean, logger: Option[Logger]): WebSocketSession =
-    WebSocketSessionImpl(id, target, version, logger.getOrElse(NullLogger))(conn, false, if deflate then DeflateMode.Message else DeflateMode.None)
+  def forClient(conn: WebSocketConnection, id: String, target: Uri, version: String, deflate: Boolean): WebSocketSession =
+    WebSocketSessionImpl(id, target, version)(conn, false, if deflate then DeflateMode.Message else DeflateMode.None)
 
   /**
    * Wraps WebSocket session around an already established client connection.
@@ -290,10 +284,9 @@ object WebSocketSession:
    * @param target target URI for which connection was established
    * @param version WebSocket protocol version
    * @param deflate indicates whether `permessage-deflate` is enabled
-   * @param logger optional logger
    */
-  def forClient(socket: Socket, id: String, target: Uri, version: String, deflate: Boolean, logger: Option[Logger]): WebSocketSession =
-    forClient(WebSocketConnection(socket), id, target, version, deflate, logger)
+  def forClient(socket: Socket, id: String, target: Uri, version: String, deflate: Boolean): WebSocketSession =
+    forClient(WebSocketConnection(socket), id, target, version, deflate)
 
   /**
    * Wraps WebSocket session around an already established server connection.
@@ -303,10 +296,9 @@ object WebSocketSession:
    * @param target target URI for which connection was established
    * @param version WebSocket protocol version
    * @param deflate indicates whether `permessage-deflate` is enabled
-   * @param logger optional logger
    */
-  def forServer(conn: WebSocketConnection, id: String, target: Uri, version: String, deflate: Boolean, logger: Option[Logger]): WebSocketSession =
-    WebSocketSessionImpl(id, target, version, logger.getOrElse(NullLogger))(conn, true, if deflate then DeflateMode.Message else DeflateMode.None)
+  def forServer(conn: WebSocketConnection, id: String, target: Uri, version: String, deflate: Boolean): WebSocketSession =
+    WebSocketSessionImpl(id, target, version)(conn, true, if deflate then DeflateMode.Message else DeflateMode.None)
 
   /**
    * Wraps WebSocket session around an already established server connection.
@@ -316,10 +308,9 @@ object WebSocketSession:
    * @param target target URI for which connection was established
    * @param version WebSocket protocol version
    * @param deflate indicates whether `permessage-deflate` is enabled
-   * @param logger optional logger
    */
-  def forServer(socket: Socket, id: String, target: Uri, version: String, deflate: Boolean, logger: Option[Logger]): WebSocketSession =
-    forServer(WebSocketConnection(socket), id, target, version, deflate, logger)
+  def forServer(socket: Socket, id: String, target: Uri, version: String, deflate: Boolean): WebSocketSession =
+    forServer(WebSocketConnection(socket), id, target, version, deflate)
 
-  private[scamper] def forServer(socket: Socket, id: String, target: Uri, version: String, deflate: DeflateMode, logger: Logger): WebSocketSession =
-    WebSocketSessionImpl(id, target, version, SessionLogger(id, logger))(WebSocketConnection(socket), true, deflate)
+  private[scamper] def forServer(socket: Socket, id: String, target: Uri, version: String, deflate: DeflateMode): WebSocketSession =
+    WebSocketSessionImpl(id, target, version)(WebSocketConnection(socket), true, deflate)

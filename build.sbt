@@ -16,7 +16,11 @@ Compile / doc / scalacOptions := Seq(
   "-project-logo", "images/logo.svg"
 )
 
-libraryDependencies += "org.scalatest" %% "scalatest-flatspec" % "3.2.12" % "test"
+libraryDependencies ++= Seq(
+  "org.slf4j"      %  "slf4j-api"          % "1.7.36",
+  "ch.qos.logback" %  "logback-classic"    % "1.2.11" % Test,
+  "org.scalatest"  %% "scalatest-flatspec" % "3.2.12" % Test
+)
 
 scmInfo := Some(
   ScmInfo(

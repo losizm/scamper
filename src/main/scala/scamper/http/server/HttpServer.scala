@@ -21,7 +21,6 @@ import java.io.File
 import java.net.InetAddress
 
 import scamper.http.types.KeepAliveParameters
-import scamper.logging.Logger
 
 /**
  * Defines handle to server instance.
@@ -29,9 +28,6 @@ import scamper.logging.Logger
  * @see [[HttpServer$ HttpServer]], [[ServerApplication]]
  */
 trait HttpServer extends AutoCloseable:
-  /** Gets logger. */
-  def logger: Logger
-
   /** Gets backlog size. */
   def backlogSize: Int
 

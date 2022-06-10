@@ -24,6 +24,8 @@ import scamper.http.websocket.{ StatusCode, WebSocket, WebSocketApplication }
 import Validate.notNull
 
 private class WebSocketRequestHandler(app: WebSocketApplication[?]) extends RequestHandler:
+  private lazy val logger = org.slf4j.LoggerFactory.getLogger(getClass)
+
   def apply(req: HttpRequest): HttpMessage =
     WebSocket.isUpgrade(req) match
       case true =>
@@ -31,8 +33,8 @@ private class WebSocketRequestHandler(app: WebSocketApplication[?]) extends Requ
           try
             app(session)
           catch case err: Exception =>
-              Try(session.logger.error(s"Error in WebSocket application: $err", err))
-              Try(session.close(StatusCode.Registry.InternalError))
+            logger.error(s"Error encountered in WebSocket session ${session.id} (correlate=${req.correlate})", err)
+            Try(session.close(StatusCode.Registry.InternalError))
         }
 
       case false => req

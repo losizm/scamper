@@ -24,12 +24,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Try
 
-import scamper.logging.Logger
-
 import Opcode.Registry.*
 import StatusCode.Registry.*
 
-private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val protocolVersion: String, val logger: Logger)
+private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val protocolVersion: String)
     (conn: WebSocketConnection, serverMode: Boolean, deflate: DeflateMode) extends WebSocketSession:
 
   private var _idleTimeout: Int = 0

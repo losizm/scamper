@@ -23,17 +23,17 @@ import scala.language.implicitConversions
 import scamper.http.auth.*
 import scamper.http.headers.*
 import scamper.http.types.given
-import scamper.logging.*
 
 import ResponseStatus.Registry.*
 
 trait TestServer:
-  private given BodyParser[Array[Byte]] = BodyParser.bytes(8192)
+  private lazy val logger = org.slf4j.LoggerFactory.getLogger(getClass)
 
-  def getServer(secure: Boolean = false, logging: Boolean = false): HttpServer =
+  private given BodyParser[Array[Byte]] = BodyParser.bytes(8192)
+  
+  def getServer(secure: Boolean = false): HttpServer =
     val app = HttpServer
       .app()
-      .logger(if logging then ConsoleLogger else NullLogger)
       .backlogSize(8)
       .poolSize(2)
       .queueSize(4)
@@ -71,7 +71,7 @@ trait TestServer:
       case false => Uri("http://"  + server.host.getHostAddress + ":" + server.port)
 
   private def doAuditLog[T <: HttpMessage](prefix: String)(msg: T): T =
-    msg.logger.info {
+    logger.info {
       val eol = System.getProperty("line.separator")
       s"$prefix (correlate=${msg.correlate})" +
       eol +

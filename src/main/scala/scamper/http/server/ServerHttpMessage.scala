@@ -19,8 +19,6 @@ package server
 
 import java.net.Socket
 
-import scamper.logging.{ Logger, NullLogger }
-
 /** Adds server extensions to `HttpMessage`. */
 implicit class ServerHttpMessage(message: HttpMessage) extends AnyVal:
   /**
@@ -44,14 +42,6 @@ implicit class ServerHttpMessage(message: HttpMessage) extends AnyVal:
    */
   def requestCount: Int =
     message.getAttribute("scamper.http.server.message.requestCount").get
-
-  /**
-   * Gets server logger.
-   *
-   * @see [[HttpServer.logger HttpServer.logger()]]
-   */
-  def logger: Logger =
-    message.getAttributeOrElse("scamper.http.server.message.logger", NullLogger)
 
   /** Gets server to which this message belongs. */
   def server: HttpServer =

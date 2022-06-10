@@ -168,8 +168,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
             res.correlate,
             res.absoluteTarget,
             req.secWebSocketVersion,
-            WebSocket.enablePermessageDeflate(res),
-            None
+            WebSocket.enablePermessageDeflate(res)
           )
           setCloseGuard(res, true)
           try app(session)

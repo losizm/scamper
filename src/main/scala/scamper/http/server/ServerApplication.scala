@@ -21,7 +21,6 @@ import java.io.File
 import java.net.InetAddress
 
 import scamper.http.types.KeepAliveParameters
-import scamper.logging.{ Logger, LogWriter }
 
 import Validate.{ noNulls, notNull }
 
@@ -35,7 +34,6 @@ import Validate.{ noNulls, notNull }
  *
  * | Key         | Value |
  * | ---------   | ----- |
- * | logger      | `scamper.logging.ConsoleLogger` |
  * | backlogSize | `50` |
  * | poolSize    | `Runtime.getRuntime().availableProcessors()` |
  * | queueSize   | `Runtime.getRuntime().availableProcessors() * 4` |
@@ -130,32 +128,6 @@ class ServerApplication extends Router:
   /** @inheritdoc */
   def reset(): this.type = synchronized {
     app = HttpServerImpl.Application()
-    this
-  }
-
-  /**
-   * Sets logger to given file.
-   *
-   * @param file file to which server logs are written
-   *
-   * @return this application
-   *
-   * @note If file exists, it is opened in append mode.
-   */
-  def logger(file: File): this.type = synchronized {
-    app = app.copy(logger = LogWriter(file, true))
-    this
-  }
-
-  /**
-   * Sets logger.
-   *
-   * @param logger logger to which server logs are written
-   *
-   * @return this application
-   */
-  def logger(logger: Logger): this.type = synchronized {
-    app = app.copy(logger = logger)
     this
   }
 

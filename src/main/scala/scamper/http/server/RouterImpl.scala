@@ -89,8 +89,7 @@ private class RouterImpl private (val mountPath: String) extends Router:
       "scamper.http.server.message.server",
       "scamper.http.server.message.socket",
       "scamper.http.server.message.requestCount",
-      "scamper.http.server.message.correlate",
-      "scamper.http.server.message.logger"
+      "scamper.http.server.message.correlate"
     )
 
     def apply(req: HttpRequest) =

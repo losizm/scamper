@@ -161,8 +161,8 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
   private def createSession(socket: Socket, title: String, server: Boolean, deflate: Boolean): WebSocketSession =
     val session = server match
-      case true  => WebSocketSession.forServer(socket, title, Uri("/"), "13", deflate, None)
-      case false => WebSocketSession.forClient(socket, title, Uri("/"), "13", deflate, None)
+      case true  => WebSocketSession.forServer(socket, title, Uri("/"), "13", deflate)
+      case false => WebSocketSession.forClient(socket, title, Uri("/"), "13", deflate)
 
     info(s"set up $title session")
     assert(session.state == SessionState.Pending)
