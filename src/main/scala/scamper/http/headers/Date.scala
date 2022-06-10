@@ -38,7 +38,7 @@ implicit class Date[T <: HttpMessage](message: T) extends AnyVal:
     message.getHeader("Date").map(_.dateValue)
 
   /** Creates new message with Date header set to supplied value. */
-  def setDate(value: Instant): T =
+  def setDate(value: Instant = Instant.now()): T =
     message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Date", value))
 
   /** Creates new message with Date header removed. */

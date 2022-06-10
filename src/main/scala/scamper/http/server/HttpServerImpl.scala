@@ -265,7 +265,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         Try(filter(res)).recover {
           case err =>
             logger.error(s"$authority - Error while filtering response to $tag", err)
-            InternalServerError().setDate(Instant.now).setConnection("close")
+            InternalServerError().setDate().setConnection("close")
         }.map { res =>
           try
             write(res)
@@ -467,8 +467,8 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
     private def filter(res: HttpResponse): HttpResponse =
       responseFilter {
         res.hasConnection match
-          case true  => prepare(res).setDate(Instant.now)
-          case false => prepare(res).setDate(Instant.now).setConnection("close")
+          case true  => prepare(res).setDate()
+          case false => prepare(res).setDate().setConnection("close")
       }
 
     private def prepare(res: HttpResponse): HttpResponse =
