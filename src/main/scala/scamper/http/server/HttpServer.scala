@@ -90,7 +90,7 @@ object HttpServer:
    * @return server
    */
   def apply(port: Int)(handler: RequestHandler): HttpServer =
-    apply("0.0.0.0", port)(handler)
+    app().incoming(handler).create(port)
 
   /**
    * Creates secure server at given port using supplied handler.
@@ -105,60 +105,4 @@ object HttpServer:
    * @return server
    */
   def apply(port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
-    apply("0.0.0.0", port, key, cert)(handler)
-
-  /**
-   * Creates server at given host and port using supplied handler.
-   *
-   * @param host host address
-   * @param port port number
-   * @param handler request handler
-   *
-   * @return server
-   */
-  def apply(host: String, port: Int)(handler: RequestHandler): HttpServer =
-    apply(InetAddress.getByName(host), port)(handler)
-
-  /**
-   * Creates secure server at given host and port using supplied handler.
-   *
-   * The SSL/TLS server connection is created with supplied key and certificate.
-   *
-   * @param host host address
-   * @param port port number
-   * @param key private key
-   * @param cert public key certificate
-   * @param handler request handler
-   *
-   * @return server
-   */
-  def apply(host: String, port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
-    apply(InetAddress.getByName(host), port, key, cert)(handler)
-
-  /**
-   * Creates server at given host and port using supplied handler.
-   *
-   * @param host host address
-   * @param port port number
-   * @param handler request handler
-   *
-   * @return server
-   */
-  def apply(host: InetAddress, port: Int)(handler: RequestHandler): HttpServer =
-    app().incoming(handler).create(host, port)
-
-  /**
-   * Creates secure server at given host and port using supplied handler.
-   *
-   * The SSL/TLS server connection is created with supplied key and certificate.
-   *
-   * @param host host address
-   * @param port port number
-   * @param key private key
-   * @param cert public key certificate
-   * @param handler request handler
-   *
-   * @return server
-   */
-  def apply(host: InetAddress, port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
-    app().secure(key, cert).incoming(handler).create(host, port)
+    app().incoming(handler).secure(key, cert).create(port)
