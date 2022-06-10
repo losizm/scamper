@@ -23,7 +23,7 @@ package server
  * @see [[CriticalService]]
  */
 @FunctionalInterface
-trait LifecycleHook:
+trait LifecycleHook extends java.util.EventListener:
   /**
    * Test whether hook is a critical service.
    *

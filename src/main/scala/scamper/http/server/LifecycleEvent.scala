@@ -17,21 +17,18 @@ package scamper
 package http
 package server
 
-/** Defines lifecycle event.  */
-enum LifecycleEvent:
-  /** Server for which event is generated. */
-  val source: HttpServer
-
+/** Defines lifecycle event. */
+enum LifecycleEvent(server: HttpServer) extends java.util.EventObject(server):
   /**
    * Provided as notification when server starts.
    *
-   * @param source server for which event is generated
+   * @param server server for which event is generated
    */
-  case Start(source: HttpServer) extends LifecycleEvent
+  case Start(server: HttpServer) extends LifecycleEvent(server)
 
   /**
    * Provided as notification when server stops.
    *
-   * @param source server for which event is generated
+   * @param server server for which event is generated
    */
-  case Stop(source: HttpServer) extends LifecycleEvent
+  case Stop(server: HttpServer) extends LifecycleEvent(server)
