@@ -41,31 +41,31 @@ sealed trait RequestMethod:
 object RequestMethod:
   /** Contains registered request methods. */
   object Registry:
-    /** GET */
+    /** Request method for GET. */
     val Get: RequestMethod = RequestMethodImpl("GET")
 
-    /** HEAD */
+    /** Request method for HEAD. */
     val Head: RequestMethod = RequestMethodImpl("HEAD")
 
-    /** POST */
+    /** Request method for POST. */
     val Post: RequestMethod = RequestMethodImpl("POST")
 
-    /** PUT */
+    /** Request method for PUT. */
     val Put: RequestMethod = RequestMethodImpl("PUT")
 
-    /** PATCH */
+    /** Request method for PATCH. */
     val Patch: RequestMethod = RequestMethodImpl("PATCH")
 
-    /** DELETE */
+    /** Request method for DELETE. */
     val Delete: RequestMethod = RequestMethodImpl("DELETE")
 
-    /** OPTIONS */
+    /** Request method for OPTIONS. */
     val Options: RequestMethod = RequestMethodImpl("OPTIONS")
 
-    /** TRACE */
+    /** Request method for TRACE. */
     val Trace: RequestMethod = RequestMethodImpl("TRACE")
 
-    /** CONNECT */
+    /** Request method for CONNECT. */
     val Connect: RequestMethod = RequestMethodImpl("CONNECT")
 
   import Registry.*

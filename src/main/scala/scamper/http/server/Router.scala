@@ -57,8 +57,6 @@ import RequestMethod.Registry.{ Delete, Get, Post, Put }
  *   }
  * }
  * }}}
- *
- * @see [[ServerApplication.route]]
  */
 trait Router:
   /** Gets mount path. */

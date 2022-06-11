@@ -33,10 +33,6 @@ client and server implementations including WebSockets.
 - [HTTP Server](#HTTP-Server)
   - [Server Application](#Server-Application)
   - [Request Handlers](#Request-Handlers)
-    - [Target Handling](#Target-Handling)
-    - [Path Parameters](#Path-Parameters)
-    - [Serving Files](#Serving-Files)
-    - [Aborting Response](#Aborting-Response)
   - [WebSocket Session](#WebSocket-Session)
   - [Error Handler](#Error-Handler)
   - [Router](#Router)
@@ -56,8 +52,20 @@ To get started, add **Scamper** to your project:
 libraryDependencies += "com.github.losizm" %% "scamper" % "32.1.2"
 ```
 
-_**NOTE:** Starting with 23.0.0, **Scamper** is written for Scala 3. See
-previous releases for compatibility with Scala 2.12 and Scala 2.13._
+**Scamper** uses SLF4J logging abstraction under the hood, so you'll need to
+bind it to an implementation if you wish to enable logging.
+
+Here's how to bind to [Logback](https://logback.qos.ch):
+
+```scala
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.11"
+```
+
+See [SLF4J Documentation](https://www.slf4j.org/manual.html#projectDep) for
+binding to other logging frameworks.
+
+<small>_**NOTE:** Starting with 23.0.0, **Scamper** is written for Scala 3. See
+previous releases for compatibility with Scala 2.12 and Scala 2.13._</small>
 
 ## HTTP Messages
 
@@ -118,9 +126,8 @@ val req = Post("/api/users").setHeaders("Content-Type" -> "application/json")
 val contentType: Option[String] = req.getHeaderValue("Content-Type")
 ```
 
-This gets the job done in many cases. However, there are extension methods
-provided by implicit classes defined in `scamper.http.headers`, which can be
-imported for specialized header access.
+Although this gets the job done, there are implicit classes defined in
+`scamper.http.headers` for specialized header access.
 
 For example, `ContentType` adds the following methods:
 
@@ -835,13 +842,7 @@ val app = HttpServer.app()
 ```
 
 This gives you the default application as a starting point. With this in hand,
-you can set the location of the server log.
-
-```scala
-app.logger(File("/tmp/server.log"))
-```
-
-And, there are performance-related settings that can be tweaked as well.
+you can adjust the server settings.
 
 ```scala
 app.backlogSize(50)
@@ -1083,25 +1084,25 @@ the session to your handler.
 app.websocket("/hello") { session =>
   // Log ping message and send corresponding pong
   session.onPing { data =>
-    session.logger.info("Received ping message.")
+    println("Received ping message.")
     session.pong(data)
   }
 
   // Log pong message
   session.onPong { data =>
-    session.logger.info("Received pong message.")
+    println("Received pong message.")
   }
 
   // Log text message and close session after sending reply
   session.onText { message =>
-    session.logger.info(s"Received text message: $message")
+    println(s"Received text message: $message")
     session.send("Goodbye.")
     session.close()
   }
 
   // Log status code when session is closed
   session.onClose { status =>
-    session.logger.info(s"Session closed: $status")
+    println(s"Session closed: $status")
   }
 
   // Open session to incoming messages
@@ -1232,7 +1233,7 @@ class UptimeService extends LifecycleHook:
 
       case LifecycleEvent.Stop(server)  =>
         stopTime  = Some(now())
-        server.logger.info(s"Server was running for ${uptime / 1000} seconds")
+        println(s"Server was running for ${uptime / 1000} seconds")
 
   // Get server's current uptime
   def uptime =
@@ -1312,7 +1313,6 @@ details.
 printf("Host: %s%n", server.host)
 printf("Port: %d%n", server.port)
 printf("Secure: %s%n", server.isSecure)
-printf("Logger: %s%n", server.logger)
 printf("Backlog Size: %d%n", server.backlogSize)
 printf("Pool Size: %d%n", server.poolSize)
 printf("Queue Size: %d%n", server.queueSize)
@@ -1326,7 +1326,7 @@ printf("Closed: %s%n", server.isClosed)
 And, ultimately, it is used to gracefully shut down the server.
 
 ```scala
-server.close() // Good-bye, cruel world.
+server.close() // Goodbye, cruel world.
 ```
 
 ## API Documentation

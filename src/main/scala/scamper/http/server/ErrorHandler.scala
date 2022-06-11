@@ -21,7 +21,7 @@ package server
 @FunctionalInterface
 trait ErrorHandler:
   /**
-   * Creates response for given error.
+   * Creates response for error generated while processing given request.
    *
    * @param request request for which error was generated
    */
