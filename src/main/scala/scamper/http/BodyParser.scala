@@ -37,6 +37,17 @@ trait BodyParser[T]:
 /** Provides factory for `BodyParser`. */
 object BodyParser:
   /**
+   * Gets body parser for unit.
+   *
+   * Such parsers effectively drain message body.
+   *
+   * @param maxLength maximum length
+   * @param bufferSize buffer size in bytes
+   */
+  def unit(maxLength: Long = 8388608, bufferSize: Int = 8192): BodyParser[Unit] =
+    UnitBodyParser(maxLength.max(0), bufferSize.max(8192))
+
+  /**
    * Gets body parser for byte array.
    *
    * @param maxLength maximum length
@@ -76,6 +87,13 @@ object BodyParser:
    */
   def file(dest: File = File(sys.props("java.io.tmpdir")), maxLength: Long = 8388608, bufferSize: Int = 8192): BodyParser[File] =
     FileBodyParser(dest, maxLength.max(0), bufferSize.max(8192))
+
+private class UnitBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[Unit] with BodyDecoder:
+  def parse(message: HttpMessage): Unit =
+    withDecode(message) { in =>
+      val bufffer = new Array[Byte](bufferSize)
+      while in.read(bufffer) != -1 do ()
+    }
 
 private class ByteArrayBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[Array[Byte]] with BodyDecoder:
   def parse(message: HttpMessage): Array[Byte] =
