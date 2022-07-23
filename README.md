@@ -49,7 +49,7 @@ client and server implementations including WebSockets.
 To get started, add **Scamper** to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "33.0.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "33.1.0"
 ```
 
 **Scamper** uses SLF4J logging abstraction under the hood, so you'll need to
@@ -704,8 +704,7 @@ val client = HttpClient
   .create()
 
 client.get("https://192.168.0.2:3000/messages") { res =>
-  // Handle response
-  ???
+  res.drain(System.out)
 }
 ```
 
