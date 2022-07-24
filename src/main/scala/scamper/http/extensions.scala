@@ -64,7 +64,7 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
    * @param charset character set
    */
   def setOctetStream(bytes: Array[Byte]): T =
-    setBody(Entity(bytes), MediaType.octetStream)
+    setBodyContent(Entity(bytes), MediaType.octetStream)
 
   /**
    * Creates new message with supplied text as message body.
@@ -76,7 +76,7 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
    * @param charset character set
    */
   def setPlain(text: String, charset: String = "UTF-8"): T =
-    setBody(Entity(text.getBytes(charset)), MediaType.plain(charset))
+    setBodyContent(Entity(text.getBytes(charset)), MediaType.plain(charset))
 
   /**
    * Creates new message with supplied file as message body.
@@ -87,7 +87,7 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
    * @param file message body
    */
   def setFile(file: File): T =
-    setBody(Entity(file), MediaType.forFile(file).getOrElse(MediaType.octetStream))
+    setBodyContent(Entity(file), MediaType.forFile(file).getOrElse(MediaType.octetStream))
 
   /**
    * Creates new message with form data from supplied query string as message
@@ -101,7 +101,7 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
    * @note Content-Type and Content-Length headers are set accordingly.
    */
   def setForm(query: QueryString): T =
-    setBody(Entity(query), MediaType.formUrlencoded)
+    setBodyContent(Entity(query), MediaType.formUrlencoded)
 
   /**
    * Creates new message with supplied form data as message body.
@@ -137,7 +137,7 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
   def setForm(data: (String, String), more: (String, String)*): T =
     setForm(QueryString(data +: more))
 
-  private def setBody(entity: Entity, contentType: MediaType): T =
+  private def setBodyContent(entity: Entity, contentType: MediaType): T =
     message.setBody(entity).putHeaders(
       Header("Content-Type", contentType.toString),
       Header("Content-Length", entity.knownSize.get)

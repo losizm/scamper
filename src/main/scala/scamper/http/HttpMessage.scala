@@ -16,6 +16,10 @@
 package scamper
 package http
 
+import java.io.OutputStream
+import java.nio.ByteBuffer
+import java.nio.channels.{ Channels, WritableByteChannel }
+
 /**
  * Defines HTTP message.
  *
@@ -24,7 +28,7 @@ package http
  * characteristics specific to their respective message types.
  */
 sealed trait HttpMessage:
-  /** Type of start line in message */
+  /** Specifies start line type. */
   type LineType <: StartLine
 
   /** Gets message start line. */
@@ -104,6 +108,105 @@ sealed trait HttpMessage:
    */
   def getAttributeOrElse[T](name: String, default: => T): T =
     getAttribute(name).getOrElse(default)
+
+  /**
+   * Drains decoded message body.
+   *
+   * @param maxLength maximum number of bytes
+   *
+   * @return this message
+   *
+   * @throws ReadLimitExceeded if body exceeds `maxLength`
+   */
+  def drain(maxLength: Long): this.type =
+    BodyDecoder(maxLength).withDecode(this) { in =>
+      val buffer = new Array[Byte](8192)
+      while in.read(buffer) != -1 do ()
+      this
+    }
+
+  /**
+   * Drains decoded message body to supplied sink.
+   *
+   * @param sink buffer to which message body is written
+   *
+   * @return number of bytes written
+   *
+   * @throws BufferOverflowException &nbsp; if sink not large enough to hold
+   * decoded message body
+   */
+  def drain(sink: Array[Byte]): Int =
+    drain(ByteBuffer.wrap(sink)).position()
+
+  /**
+   * Drains decoded message body to supplied sink.
+   *
+   * @param sink   buffer to which message body is written
+   * @param offset buffer position
+   * @param length buffer size (starting at offset)
+   *
+   * @return number of bytes written
+   *
+   * @throws IndexOutOfBoundsException &nbsp; if offset or length is illegal
+   *
+   * @throws BufferOverflowException &nbsp; if sink not large enough to hold
+   * decoded message body
+   */
+  def drain(sink: Array[Byte], offset: Int, length: Int): Int =
+    drain(ByteBuffer.wrap(sink, offset, length)).position() - offset
+
+  /**
+   * Drains decoded message body to supplied sink.
+   *
+   * @param sink buffer to which message body is written
+   *
+   * @return this message
+   *
+   * @throws BufferOverflowException &nbsp; if sink not large enough to hold
+   * decoded message body
+   */
+  def drain(sink: ByteBuffer): sink.type =
+    BodyDecoder(Int.MaxValue).withDecode(this) { in =>
+      val buffer = new Array[Byte](8192)
+      var length = 0
+
+      while { length = in.read(buffer); length != -1 } do
+        sink.put(buffer, 0, length)
+      sink
+    }
+
+  /**
+   * Drains decoded message body to supplied sink.
+   *
+   * @param sink      stream to which message body is written
+   * @param maxLength maximum number of bytes
+   *
+   * @throws ReadLimitExceeded if body exceeds `maxLength`
+   */
+  def drain(sink: OutputStream, maxLength: Long): sink.type =
+    drain(Channels.newChannel(sink), maxLength)
+    sink
+
+  /**
+   * Drains decoded message body to supplied sink.
+   *
+   * @param sink      channel to which message body is written
+   * @param maxLength maximum number of bytes
+   *
+   * @throws ReadLimitExceeded if body exceeds `maxLength`
+   */
+  def drain(sink: WritableByteChannel, maxLength: Long): sink.type =
+    BodyDecoder(maxLength).withDecode(this) { in =>
+      val source = Channels.newChannel(in)
+      val buffer = ByteBuffer.allocate(8192)
+
+      while source.read(buffer) != -1 do
+        buffer.flip()
+        while buffer.hasRemaining() do
+          sink.write(buffer)
+        buffer.clear()
+      sink
+    }
 
 /**
  * Defines HTTP request.
