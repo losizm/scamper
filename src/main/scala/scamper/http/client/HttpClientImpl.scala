@@ -231,7 +231,9 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
   private def shouldKeepAlive(res: HttpResponse): Boolean =
     keepAlive && !res.connection.exists("close".equalsIgnoreCase) &&
-      (res.isSuccessful || res.statusCode == 304)
+      (res.isSuccessful || res.statusCode == 304) &&
+      res.getAttribute[HttpClientConnection]("scamper.http.client.message.connection")
+        .forall(_.getManaged())
 
   private def getClientConnection(secure: Boolean, host: String, port: Int): HttpClientConnection =
     ConnectionManager.get(secure, host, port).getOrElse {

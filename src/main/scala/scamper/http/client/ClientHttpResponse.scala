@@ -27,3 +27,15 @@ implicit class ClientHttpResponse(response: HttpResponse) extends AnyVal:
    */
   def request: HttpRequest =
     response.getAttribute("scamper.http.client.response.request").get
+
+  /**
+   * Claims ownership of response.
+   *
+   * The owner is responsible for managing message resources, such
+   * as underlying socket connection.
+   */
+  def claim(): HttpResponse =
+    response.getAttribute[HttpClientConnection]("scamper.http.client.message.connection")
+      .get
+      .setManaged(false)
+    response

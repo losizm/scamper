@@ -19,7 +19,7 @@ package client
 
 import java.io.InputStream
 import java.net.Socket
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.{ AtomicBoolean, AtomicReference }
 
 import scala.concurrent.Future
 
@@ -29,7 +29,8 @@ import scamper.http.types.TransferCoding
 import ResponseStatus.Registry.Continue
 
 private class HttpClientConnection(socket: Socket) extends AutoCloseable:
-  private val closeGuard      = AtomicBoolean(false)
+  private enum State { case CloseGuardOff, CloseGuardOn, Unmanaged }
+  private val state           = AtomicReference(State.CloseGuardOff)
   private var bufferSize      = 8192
   private var readTimeout     = 30000
   private var continueTimeout = 1000
@@ -38,10 +39,17 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable:
     socket
 
   def getCloseGuard(): Boolean =
-    closeGuard.get()
+    state.get() != State.CloseGuardOff
 
   def setCloseGuard(enable: Boolean): this.type =
-    closeGuard.set(enable)
+    state.set(if enable then State.CloseGuardOn else State.CloseGuardOff)
+    this
+
+  def getManaged(): Boolean =
+    state.get() != State.Unmanaged
+
+  def setManaged(enable: Boolean): this.type =
+    state.set(if enable then State.CloseGuardOff else State.Unmanaged)
     this
 
   def configure(bufferSize: Int, readTimeout: Int, continueTimeout: Int): this.type =
@@ -83,7 +91,7 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable:
         res
 
   def close(): Unit =
-    if !closeGuard.get() then
+    if state.get() == State.CloseGuardOff then
       socket.close()
 
   private def writeBody(request: HttpRequest): Unit =
