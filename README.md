@@ -49,7 +49,7 @@ client and server implementations including WebSockets.
 To get started, add **Scamper** to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "33.3.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "33.4.0"
 ```
 
 **Scamper** uses SLF4J logging abstraction under the hood, so you'll need to
