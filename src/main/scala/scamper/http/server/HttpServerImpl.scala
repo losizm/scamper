@@ -26,6 +26,8 @@ import java.util.concurrent.atomic.{ AtomicBoolean, AtomicLong }
 import javax.net.ServerSocketFactory
 import javax.net.ssl.{ SSLException, SSLServerSocketFactory }
 
+import org.slf4j.LoggerFactory.getLogger
+
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
@@ -41,6 +43,7 @@ private object HttpServerImpl:
   private val count = AtomicLong(0)
 
   case class Application(
+    loggerName:          Option[String] = None,
     backlogSize:         Int = 50,
     poolSize:            Int = Runtime.getRuntime.availableProcessors(),
     queueSize:           Int = Runtime.getRuntime.availableProcessors() * 4,
@@ -59,7 +62,7 @@ private object HttpServerImpl:
     new HttpServerImpl(count.incrementAndGet(), InetSocketAddress(host, port), app)
 
 private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: HttpServerImpl.Application) extends HttpServer:
-  private val logger = org.slf4j.LoggerFactory.getLogger(getClass)
+  private val logger = app.loggerName.map(getLogger).getOrElse(getLogger(getClass))
 
   val backlogSize = app.backlogSize.max(1)
   val poolSize    = app.poolSize.max(1)

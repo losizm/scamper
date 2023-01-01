@@ -132,7 +132,7 @@ sealed trait HttpMessage:
    *
    * @return number of bytes written
    *
-   * @throws BufferOverflowException &nbsp; if sink not large enough to hold
+   * @throws java.nio.BufferOverflowException if sink not large enough to hold
    * decoded message body
    */
   def drain(sink: Array[Byte]): Int =
@@ -147,9 +147,9 @@ sealed trait HttpMessage:
    *
    * @return number of bytes written
    *
-   * @throws IndexOutOfBoundsException &nbsp; if offset or length is illegal
+   * @throws IndexOutOfBoundsException if offset or length is illegal
    *
-   * @throws BufferOverflowException &nbsp; if sink not large enough to hold
+   * @throws java.nio.BufferOverflowException if sink not large enough to hold
    * decoded message body
    */
   def drain(sink: Array[Byte], offset: Int, length: Int): Int =
@@ -162,7 +162,7 @@ sealed trait HttpMessage:
    *
    * @return this message
    *
-   * @throws BufferOverflowException &nbsp; if sink not large enough to hold
+   * @throws java.nio.BufferOverflowException if sink not large enough to hold
    * decoded message body
    */
   def drain(sink: ByteBuffer): sink.type =

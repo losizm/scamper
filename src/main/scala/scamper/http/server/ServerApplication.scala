@@ -132,6 +132,16 @@ class ServerApplication extends Router:
   }
 
   /**
+   * Sets logger name.
+   *
+   * @param name logger name
+   */
+  def logger(name: String): this.type = synchronized {
+    app = app.copy(loggerName = Option(name))
+    this
+  }
+
+  /**
    * Sets backlog size.
    *
    * The `backlogSize` specifies the maximum number of incoming connections that
