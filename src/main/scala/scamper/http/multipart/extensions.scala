@@ -26,7 +26,7 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
    *
    * @param multipart message body
    */
-  def setMultipart(multipart: Multipart): T =
+  def setMultipartBody(multipart: Multipart): T =
     val boundary = Multipart.boundary()
     message.setBody(multipart.toEntity(boundary))
       .putHeaders(Header("Content-Type", s"multipart/form-data; boundary=$boundary"))
@@ -39,8 +39,8 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
    *
    * @param parts message body
    */
-  def setMultipart(parts: Seq[Part]): T =
-    setMultipart(Multipart(parts))
+  def setMultipartBody(parts: Seq[Part]): T =
+    setMultipartBody(Multipart(parts))
 
   /**
    * Creates new message with multipart message body.
@@ -51,5 +51,5 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
    * @param one part
    * @param more additional parts
    */
-  def setMultipart(one: Part, more: Part*): T =
-    setMultipart(Multipart(one +: more))
+  def setMultipartBody(one: Part, more: Part*): T =
+    setMultipartBody(Multipart(one +: more))

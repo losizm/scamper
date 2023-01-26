@@ -63,79 +63,78 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
    * @param text message body
    * @param charset character set
    */
-  def setOctetStream(bytes: Array[Byte]): T =
+  def setOctetBody(bytes: Array[Byte]): T =
     setBodyContent(Entity(bytes), MediaType.octetStream)
 
   /**
    * Creates new message with supplied text as message body.
    *
-   * __Content-Type__ is set to `text/plain` with specified charset;
+   * __Content-Type__ is set to `text/plain` with specified charset, and
    * __Content-Length__ is set to length of encoded text.
    *
    * @param text message body
    * @param charset character set
    */
-  def setPlain(text: String, charset: String = "UTF-8"): T =
+  def setPlainBody(text: String, charset: String = "UTF-8"): T =
     setBodyContent(Entity(text.getBytes(charset)), MediaType.plain(charset))
 
   /**
    * Creates new message with supplied file as message body.
    *
-   * __Content-Type__ is set according to file type; __Content-Length__ is
+   * __Content-Type__ is set according to file name, and __Content-Length__ is
    * set to length of file.
    *
    * @param file message body
+   *
+   * @see [[scamper.http.types.MediaType$.forFile MediaType.forFile]]
    */
-  def setFile(file: File): T =
+  def setFileBody(file: File): T =
     setBodyContent(Entity(file), MediaType.forFile(file).getOrElse(MediaType.octetStream))
 
   /**
-   * Creates new message with form data from supplied query string as message
-   * body.
+   * Creates new message with supplied query string as message body.
    *
-   * __Content-Type__ is set to `application/x-www-form-urlencoded`;
+   * __Content-Type__ is set to `application/x-www-form-urlencoded`, and
    * __Content-Length__ is set to length of encoded form data.
    *
    * @param query message body
-   *
-   * @note Content-Type and Content-Length headers are set accordingly.
    */
-  def setForm(query: QueryString): T =
+  def setFormBody(query: QueryString): T =
     setBodyContent(Entity(query), MediaType.formUrlencoded)
 
   /**
    * Creates new message with supplied form data as message body.
    *
-   * __Content-Type__ is set to `application/x-www-form-urlencoded`;
+   * __Content-Type__ is set to `application/x-www-form-urlencoded`, and
    * __Content-Length__ is set to length of encoded form data.
    *
    * @param data message body
    */
-  def setForm(data: Map[String, Seq[String]]): T =
-    setForm(QueryString(data))
+  def setFormBody(data: Map[String, Seq[String]]): T =
+    setFormBody(QueryString(data))
 
   /**
    * Creates new message with supplied form data as message body.
    *
-   * __Content-Type__ is set to `application/x-www-form-urlencoded`;
+   * __Content-Type__ is set to `application/x-www-form-urlencoded`, and
    * __Content-Length__ is set to length of encoded form data.
    *
    * @param data message body
    */
-  def setForm(data: Seq[(String, String)]): T =
-    setForm(QueryString(data))
+  def setFormBody(data: Seq[(String, String)]): T =
+    setFormBody(QueryString(data))
 
   /**
    * Creates new message with supplied form data as message body.
    *
-   * __Content-Type__ is set to `application/x-www-form-urlencoded`;
+   * __Content-Type__ is set to `application/x-www-form-urlencoded`, and
    * __Content-Length__ is set to length of encoded form data.
    *
    * @param data form data
    * @param more additional form data
    */
-  def setForm(data: (String, String), more: (String, String)*): T =
-    setForm(QueryString(data +: more))
+  def setFormBody(data: (String, String), more: (String, String)*): T =
+    setFormBody(QueryString(data +: more))
 
   private def setBodyContent(entity: Entity, contentType: MediaType): T =
     message.setBody(entity).putHeaders(
