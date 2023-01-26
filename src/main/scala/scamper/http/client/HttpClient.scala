@@ -194,22 +194,3 @@ object HttpClient:
 
   /** Creates client using default settings. */
   def apply(): HttpClient = settings().create()
-
-  /**
-   * Sends request and passes response to supplied handler.
-   *
-   * The request is sent using a client created with default settings.
-   *
-   * @param request HTTP request
-   * @param handler response handler
-   *
-   * @return value from supplied handler
-   *
-   * @throws java.lang.IllegalArgumentException if `request.target` is not
-   * absolute
-   */
-  def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T =
-    notNull(request, "request")
-    notNull(handler, "handler")
-
-    apply().send(request)(handler)

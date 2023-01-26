@@ -359,12 +359,8 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest]:
 /** Provides factory for `HttpRequest`. */
 object HttpRequest:
   /** Creates request with supplied message parts. */
-  def apply(requestLine: RequestLine, headers: Seq[Header], body: Entity): HttpRequest =
+  def apply(requestLine: RequestLine, headers: Seq[Header] = Nil, body: Entity = Entity.empty): HttpRequest =
     HttpRequestImpl(requestLine, headers, body)
-
-  /** Creates request with supplied message parts. */
-  def apply(method: RequestMethod, target: Uri = Uri("/"), headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: HttpVersion = HttpVersion(1, 1)): HttpRequest =
-    HttpRequestImpl(RequestLine(method, target, version), headers, body)
 
 /**
  * Defines HTTP response.
@@ -453,7 +449,3 @@ object HttpResponse:
   /** Creates response with supplied message parts. */
   def apply(statusLine: StatusLine, headers: Seq[Header], body: Entity): HttpResponse =
     HttpResponseImpl(statusLine, headers, body)
-
-  /** Creates response with supplied message parts. */
-  def apply(status: ResponseStatus, headers: Seq[Header] = Nil, body: Entity = Entity.empty, version: HttpVersion = HttpVersion(1, 1)): HttpResponse =
-    HttpResponseImpl(StatusLine(version, status), headers, body)

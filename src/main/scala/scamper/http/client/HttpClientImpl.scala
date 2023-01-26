@@ -150,8 +150,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     require(target.getScheme == "ws" || target.getScheme == "wss", s"Invalid WebSocket scheme: ${target.getScheme}")
 
     val req = HttpRequest(
-      Get,
-      target,
+      RequestLine(Get, target),
       Header("Upgrade", "websocket") +:
       Header("Connection", "Upgrade") +:
       Header("Sec-WebSocket-Key", WebSocket.generateKey()) +:
@@ -182,8 +181,8 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   private def send[T](method: RequestMethod, target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)
       (handler: ResponseHandler[T]): T =
     val req = cookies match
-      case Nil => HttpRequest(method, target, headers, body)
-      case _   => HttpRequest(method, target, headers, body).setCookies(cookies)
+      case Nil => HttpRequest(RequestLine(method, target), headers, body)
+      case _   => HttpRequest(RequestLine(method, target), headers, body).setCookies(cookies)
 
     send(req)(handler)
 

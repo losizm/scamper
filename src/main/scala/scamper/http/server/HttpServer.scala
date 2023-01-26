@@ -76,29 +76,3 @@ trait HttpServer extends AutoCloseable:
 object HttpServer:
   /** Gets new instance of server application. */
   def app(): ServerApplication = ServerApplication()
-
-  /**
-   * Creates server at given port using supplied handler.
-   *
-   * @param port port number
-   * @param handler request handler
-   *
-   * @return server
-   */
-  def apply(port: Int)(handler: RequestHandler): HttpServer =
-    app().incoming(handler).create(port)
-
-  /**
-   * Creates secure server at given port using supplied handler.
-   *
-   * The SSL/TLS server connection is created with supplied key and certificate.
-   *
-   * @param port port number
-   * @param key private key
-   * @param cert public key certificate
-   * @param handler request handler
-   *
-   * @return server
-   */
-  def apply(port: Int, key: File, cert: File)(handler: RequestHandler): HttpServer =
-    app().incoming(handler).secure(key, cert).create(port)

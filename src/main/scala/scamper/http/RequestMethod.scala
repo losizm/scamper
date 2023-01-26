@@ -27,11 +27,11 @@ sealed trait RequestMethod:
 
   /** Creates `HttpRequest` with this request method and supplied target. */
   def apply(target: Uri): HttpRequest =
-    HttpRequest(this, target, Nil, Entity.empty)
+    HttpRequest(RequestLine(this, target), Nil, Entity.empty)
 
   /** Creates `HttpRequest` with this request method and supplied target. */
   def apply(target: String): HttpRequest =
-    HttpRequest(this, Uri(target), Nil, Entity.empty)
+    apply(Uri(target))
 
 /**
  * Provides factory for `RequestMethod`.
