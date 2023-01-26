@@ -28,7 +28,7 @@ class UriSpec extends org.scalatest.flatspec.AnyFlatSpec:
   }
 
   it should "create Uri from scheme, scheme-specific part, and fragment" in {
-    var uri = Uri("http", "//localhost:8080/index.html?a=1&b=2", "top")
+    var uri = Uri("http", "//localhost:8080/index.html?a=1&b=2", Some("top"))
     assert { uri.getScheme == "http" }
     assert { uri.getSchemeSpecificPart == "//localhost:8080/index.html?a=1&b=2" }
     assert { uri.getRawAuthority == "localhost:8080" }

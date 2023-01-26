@@ -29,5 +29,5 @@ object Uri:
    * Creates normalized URI with supplied scheme, scheme-specific part, and
    * fragment.
    */
-  def apply(scheme: String, schemeSpecificPart: String, fragment: String = null): Uri =
-    new Uri(scheme, schemeSpecificPart, fragment).normalize()
+  def apply(scheme: String, schemeSpecificPart: String, fragment: Option[String] = None): Uri =
+    new Uri(scheme, schemeSpecificPart, fragment.getOrElse(null)).normalize()
