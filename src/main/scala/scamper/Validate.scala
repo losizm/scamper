@@ -15,8 +15,6 @@
  */
 package scamper
 
-import java.util.Objects.isNull
-
 private object Validate:
   inline def notNull[T](value: T): T =
     if value == null then
