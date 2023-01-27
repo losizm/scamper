@@ -1,18 +1,17 @@
-# IntelliJ IDEA
-.idea/
-
-# Eclipse IDE
-.settings/
-.cache-main
-.classpath
-.project
+# Metals
+.metals/
+metals.sbt
 
 # Vim
 *.swp
+
+# VS Code
+.vscode/
 
 # macOS
 .DS_Store
 
 # Miscellaneous
 target/
+.bloop/
 .bsp/
