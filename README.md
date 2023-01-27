@@ -26,7 +26,6 @@ client and server implementations including WebSockets.
   - [Basic Authentication](#Basic-Authentication)
   - [Bearer Authentication](#Bearer-Authentication)
 - [HTTP Client](#HTTP-Client)
-  - [Creating Client](#Creating-Client)
   - [Configuring Client](#Configuring-Client)
   - [Adding Request and Response Filters](#Adding-Request-and-Response-Filters)
   - [Using WebSocket Client](#Using-WebSocket-Client)
@@ -49,7 +48,7 @@ client and server implementations including WebSockets.
 To get started, add **Scamper** to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "33.4.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "34.0.0"
 ```
 
 **Scamper** uses SLF4J logging abstraction under the hood, so you'll need to
@@ -58,7 +57,7 @@ bind it to an implementation if you wish to enable logging.
 Here's how to bind to [Logback](https://logback.qos.ch):
 
 ```scala
-libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.11"
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.3.5"
 ```
 
 See [SLF4J Documentation](https://www.slf4j.org/manual.html#projectDep) for
@@ -76,8 +75,8 @@ message types.
 
 ### Building Requests
 
-An `HttpRequest` can be created using one of its factory methods, or you can
-start with a `RequestMethod`.
+An `HttpRequest` can be created using a factory method defined in the companion
+object, or you can start building from a `RequestMethod`.
 
 ```scala
 import scala.language.implicitConversions
@@ -94,8 +93,8 @@ val req = Get("/motd")
 
 ### Building Responses
 
-An `HttpResponse` can be created using one of its factory methods, or you can
-start with a `ResponseStatus`.
+An `HttpResponse` can be created using a factory method defined in the companion
+object, or you can start building from a `ResponseStatus`.
 
 ```scala
 import scala.language.implicitConversions
@@ -129,7 +128,7 @@ val contentType: Option[String] = req.getHeaderValue("Content-Type")
 Although this gets the job done, there are implicit classes defined in
 `scamper.http.headers` for specialized header access.
 
-For example, `ContentType` adds the following methods:
+For example, `ContentType` adds the following methods to `HttpMessage`:
 
 ```scala
 /** Tests for Content-Type header. */
@@ -148,7 +147,7 @@ def setContentType(value: MediaType): HttpMessage
 def removeContentType(): HttpMessage
 ```
 
-With them imported, you can work with the header using a specialized header
+With them imported, you can work with the header using its specialized header
 type.
 
 ```scala
@@ -165,7 +164,7 @@ println(req.contentType.subtypeName) // json
 ```
 
 And, with conversions defined in `scamper.http.types`, you can implicitly
-convert values to header types.
+convert values to the header types.
 
 ```scala
 import scala.language.implicitConversions
@@ -323,7 +322,7 @@ val res = Ok(File("./index.html")).setContentType("text/html; charset=utf-8")
 
 When handling an incoming message, use an appropriate `BodyParser` to parse the
 message body. There are factory methods available, such as one used for creating
-a text parser.
+a parser that parses the message body to a `String`.
 
 ```scala
 import scamper.http.{ BodyParser, HttpMessage }
@@ -388,10 +387,10 @@ val song = Multipart(
 )
 
 // Create request with multipart body
-val req = Post("https://musiclibrary.example.com/songs").setMultipart(song)
+val req = Post("https://musiclibrary.example.com/songs").setMultipartBody(song)
 ```
 
-And, there's a standard `BodyParser` for reading an incoming message with
+And, there's a standard `BodyParser` for reading an incoming message with a
 multipart body.
 
 ```scala
@@ -458,13 +457,6 @@ val res = Unauthorized().setWwwAuthenticate(challenge)
 val credentials = Credentials("Bearer", "QWxsIEFjY2VzcyEhIQo=")
 val req = Get("/dev/projects").setAuthorization(credentials)
 ```
-
-_**Note:** The `Authorization` and `WwwAuthenticate` header classes are for
-authentication between user agent and origin server. There are other header
-classes available for proxy authentication. See
-[scaladoc](https://losizm.github.io/scamper/latest/api/scamper/http/auth.html) for
-details._
-
 
 ### Basic Authentication
 
@@ -552,7 +544,7 @@ printf("Token: %s%n", req.bearer.token)
 
 ## HTTP Client
 
-**Scamper** provides `HttpClient` for sending requests and handling the
+**Scamper** provides the `HttpClient` for sending requests and handling the
 responses.
 
 ```scala
@@ -563,27 +555,20 @@ import scamper.http.client.HttpClient
 import scamper.http.headers.ContentType
 import scamper.http.types.stringToMediaType
 
+val client = HttpClient()
+
 val req = Post("https://localhost:8080/users")
   .setContentType("application/json")
   .setBody(s"""{ "id": 65534, "name": "nobody" }""")
 
 // Send request and print response status
-HttpClient.send(req) { res =>
-  println(res.status)
-}
+client.send(req) { res => println(res.status) }
 ```
 
-_**Note:** The outgoing request must be created with an absolute URI to make
-effective use of the client._
-
-### Creating Client
-
-In the previous example, the `HttpClient` object is used as the client. Behind
-the scenes, this creates an `HttpClient` instance for one-time usage.
-
-If you plan to send multiple requests, you can create and maintain a reference
-to a client. With it, you also get access to methods corresponding to standard
-HTTP request methods.
+In the previous example, an instance of `HttpRequest` is explicitly created and
+passed to the client. However, `HttpClient` provides methods corresponding to
+standard HTTP request methods that can be used instead of explicitly building
+the request first.
 
 ```scala
 import scala.language.implicitConversions
@@ -603,27 +588,6 @@ def messageOfTheDay: Either[Int, String] =
   }
 ```
 
-And, if a given client is in scope, you can make use of `send()` on the request
-itself.
-
-```scala
-import scala.language.implicitConversions
-
-import scamper.http.BodyParser
-import scamper.http.RequestMethod.Registry.Get
-import scamper.http.client.{ ClientHttpRequest, HttpClient }
-import scamper.http.headers.{ Accept, AcceptLanguage }
-import scamper.http.types.{ stringToMediaRange, stringToLanguageRange }
-
-given HttpClient = HttpClient()
-given BodyParser[String] = BodyParser.string(4096)
-
-Get("http://localhost:8080/motd")
-  .setAccept("text/plain")
-  .setAcceptLanguage("fr-CA; q=0.6", "en-CA; q=0.4")
-  .send(res => println(res.as[String])) // Send request and print response
-```
-
 ### Configuring Client
 
 You can also create a client using `ClientSettings`, which allows you to
@@ -639,8 +603,7 @@ import scamper.http.cookies.CookieStore
 import scamper.http.types.{ stringToContentCodingRange, stringToMediaRange }
 
 // Build client from settings
-val client = HttpClient
-  .settings()
+val client = HttpClient.settings()
   .accept("text/plain; q=0.9", "application/json; q=0.1")
   .acceptEncoding("gzip", "deflate")
   .bufferSize(8192)
@@ -656,8 +619,8 @@ client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
 }
 ```
 
-The `accept` provides a list of accepted media types, which are used to set the
-**Accept** header on each outgoing request.
+The `accept` setting provides a list of accepted media types, which are used to
+set the **Accept** header on each outgoing request.
 
 The `acceptEncoding` provides a list of accepted content encodings, which are
 used to set the **Accept-Encoding** header on each outgoing request.
@@ -704,7 +667,7 @@ val client = HttpClient
   .create()
 
 client.get("https://192.168.0.2:3000/messages") { res =>
-  res.drain(System.out)
+  res.drain(System.out, 16 * 1024)
 }
 ```
 
@@ -815,14 +778,14 @@ with a simple example.
 import scamper.http.ResponseStatus.Registry.Ok
 import scamper.http.server.HttpServer
 
-val server = HttpServer(8080) { req =>
-  Ok("Hello, world!")
-}
+val server = HttpServer.app()
+  .incoming { req => Ok("Hello, world!") }
+  .create(8080)
 ```
 
-This is as bare-bones as it gets. We create a server at port 8080, and on each
-incoming request, we send a simple text message back to the client. Although
-trite, it demonstrates how easy it is to get going.
+This is as bare-bones as it gets. We create a server at port 8080 that sends a
+simple message back to the client for each incoming request. Although trite, it
+demonstrates how easy it is to get going.
 
 We'll use the remainder of this documentation to describe what goes into
 creating more practical applications.
@@ -996,6 +959,7 @@ path segment; whereas, __*param__ matches the path segment along with any
 remaining segments, including intervening path separators (i.e., **/**).
 
 ```scala
+import java.io.File
 import scamper.http.ResponseStatus.Registry.{ Accepted, NotFound, Ok }
 import scamper.http.server.ServerHttpRequest
 
@@ -1218,7 +1182,7 @@ Here's an example of a simple hook:
 ```scala
 import java.lang.System.currentTimeMillis as now
 
-import scamper.http.server.LifecycleHook
+import scamper.http.server.{ LifecycleEvent, LifecycleHook }
 
 class UptimeService extends LifecycleHook:
   private var startTime: Option[Long] = None
