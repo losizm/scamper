@@ -112,18 +112,15 @@ object Uri:
   /**
    * Creates normalized URI with supplied string.
    *
-   * @throws IllegalArgumentException if absolute and scheme is not one of http,
-   * https, wss, or ws.
+   * @throws IllegalArgumentException if absolute and scheme not one of http, https, wss, or ws.
    */
   def apply(uri: String): Uri =
     UriImpl(URI(uri).normalize())
 
   /**
-   * Creates normalized URI with supplied scheme, scheme-specific part, and
-   * fragment.
+   * Creates normalized URI with supplied scheme, scheme-specific part, and fragment.
    *
-   * @throws IllegalArgumentException if scheme is not one of http, https, wss,
-   * or ws.
+   * @throws IllegalArgumentException if scheme not one of http, https, wss, or ws.
    */
   def apply(scheme: String, schemePart: String, fragment: Option[String] = None): Uri =
     UriImpl(URI(scheme, schemePart, fragment.getOrElse(null)).normalize())
@@ -227,17 +224,10 @@ private case class UriImpl(toURI: URI) extends Uri:
       case Array(host, port) => (Some(host), Some(port.toInt).filterNot(-1.==))
 
   private def buildUri(schemeOption: Option[String], authorityOption: Option[String], path: String, query: QueryString, fragmentOption: Option[String]): Uri =
-    val uri = StringBuilder()
-
-    schemeOption.foreach { scheme => uri.append(scheme).append(":") }
-    authorityOption.foreach { authority => uri.append("//").append(authority) }
-
-    if path.nonEmpty then
-      uri.append('/').append(path.dropWhile(_ == '/'))
-
-    if ! query.isEmpty then
-      uri.append('?').append(query)
-
-    fragmentOption.foreach { fragment => uri.append('#').append(fragment) }
-
-    UriImpl(URI(uri.toString).normalize())
+    UriBuilder()
+      .scheme(schemeOption)
+      .authority(authorityOption)
+      .path(path)
+      .query(query)
+      .fragment(fragmentOption)
+      .toUri
