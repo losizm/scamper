@@ -38,6 +38,7 @@ private object HttpClientImpl:
   private val count = AtomicLong(0)
 
   case class Settings(
+    resolveTo:           Option[Uri] = None,
     accept:              Seq[MediaRange] = Seq(MediaRange("*/*")),
     acceptEncoding:      Seq[ContentCodingRange] = Nil,
     bufferSize:          Int = 8192,
@@ -54,6 +55,7 @@ private object HttpClientImpl:
     new HttpClientImpl(count.incrementAndGet, settings)
 
 private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extends HttpClient:
+  val resolveTo       = settings.resolveTo
   val accept          = settings.accept
   val acceptEncoding  = settings.acceptEncoding
   val bufferSize      = settings.bufferSize.max(1024)
@@ -69,6 +71,82 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   private val requestCount        = AtomicLong(0)
 
   def send[T](request: HttpRequest)(handler: ResponseHandler[T]): T =
+    resolveTargetSend(request, handler)
+
+  def get[T](target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie])(handler: ResponseHandler[T]): T =
+    send(createRequest(Get, target, headers, cookies, Entity.empty))(handler)
+
+  def post[T](target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T =
+    send(createRequest(Post, target, headers, cookies, body))(handler)
+
+  def put[T](target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T =
+    send(createRequest(Put, target, headers, cookies, body))(handler)
+
+  def delete[T](target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie])(handler: ResponseHandler[T]): T =
+    send(createRequest(Delete, target, headers, cookies, Entity.empty))(handler)
+
+  def websocket[T](target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie])(app: WebSocketApplication[T]): T =
+    val targetResolved = resolveWebSocketTarget(target)
+
+    require(targetResolved.isAbsolute, "Absolute WebSocket URI required")
+    require(targetResolved.scheme.matches("wss?"), "WebSocket scheme required")
+
+    val req = createRequest(
+      Get,
+      targetResolved,
+      Header("Upgrade", "websocket") +:
+      Header("Connection", "Upgrade") +:
+      Header("Sec-WebSocket-Key", WebSocket.generateKey()) +:
+      Header("Sec-WebSocket-Version", "13") +:
+      Header("Sec-WebSocket-Extensions", "permessage-deflate; client_no_context_takeover; server_no_context_takeover") +:
+      headers,
+      cookies,
+      Entity.empty
+    )
+
+    sendRequest(
+      req,
+      res => WebSocket.checkHandshake(req, res) match
+        case true =>
+          val session = WebSocketSession.forClient(
+            res.socket,
+            res.correlate,
+            res.absoluteTarget,
+            req.secWebSocketVersion,
+            WebSocket.enablePermessageDeflate(res)
+          )
+          setCloseGuard(res, true)
+          try app(session)
+          catch case cause: Throwable =>
+            setCloseGuard(res, false)
+            throw cause
+
+        case false => throw WebSocketHandshakeFailure(s"Connection upgrade not accepted: ${res.status}")
+    )
+
+  private def createRequest(method: RequestMethod, target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity): HttpRequest =
+    cookies.isEmpty match
+      case true  => HttpRequest(RequestLine(method, target), headers, body)
+      case false => HttpRequest(RequestLine(method, target), headers, body).setCookies(cookies)
+
+  private def resolveTarget(target: Uri): Uri =
+    target.isAbsolute match
+      case true  => target
+      case false =>
+        resolveTo.map { baseUri => target.toAbsoluteUri(baseUri.scheme, baseUri.authority) }
+          .getOrElse(target)
+
+  private def resolveWebSocketTarget(target: Uri): Uri =
+    target.isAbsolute match
+      case true  => target
+      case false =>
+        resolveTo.map { baseUri => target.toAbsoluteUri(baseUri.scheme.replace("http", "ws"), baseUri.authority) }
+          .getOrElse(target)
+
+  private def resolveTargetSend[T](request: HttpRequest, handler: ResponseHandler[T]): T =
+    sendRequest(request.setTarget(resolveTarget(request.target)), handler)
+
+  private def sendRequest[T](request: HttpRequest, handler: ResponseHandler[T]): T =
     notNull(handler)
 
     val target = request.target
@@ -127,61 +205,6 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
         .get
     finally
       Try(conn.close())
-
-  def get[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
-    (handler: ResponseHandler[T]): T = send(Get, target, headers, cookies, Entity.empty)(handler)
-
-  def post[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
-    (handler: ResponseHandler[T]): T = send(Post, target, headers, cookies, body)(handler)
-
-  def put[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil, body: Entity = Entity.empty)
-    (handler: ResponseHandler[T]): T = send(Put, target, headers, cookies, body)(handler)
-
-  def delete[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
-    (handler: ResponseHandler[T]): T = send(Delete, target, headers, cookies, Entity.empty)(handler)
-
-  def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
-    (app: WebSocketApplication[T]): T =
-
-    require(target.isAbsolute, "Absolute WebSocket URI required")
-    require(target.scheme == "ws" || target.scheme == "wss", s"Invalid WebSocket scheme: ${target.scheme}")
-
-    val req = HttpRequest(
-      RequestLine(Get, target),
-      Header("Upgrade", "websocket") +:
-      Header("Connection", "Upgrade") +:
-      Header("Sec-WebSocket-Key", WebSocket.generateKey()) +:
-      Header("Sec-WebSocket-Version", "13") +:
-      Header("Sec-WebSocket-Extensions", "permessage-deflate; client_no_context_takeover; server_no_context_takeover") +:
-      headers
-    ).setCookies(cookies)
-
-    send(req) { res =>
-      WebSocket.checkHandshake(req, res) match
-        case true =>
-          val session = WebSocketSession.forClient(
-            res.socket,
-            res.correlate,
-            res.absoluteTarget,
-            req.secWebSocketVersion,
-            WebSocket.enablePermessageDeflate(res)
-          )
-          setCloseGuard(res, true)
-          try app(session)
-          catch case cause: Throwable =>
-            setCloseGuard(res, false)
-            throw cause
-
-        case false => throw WebSocketHandshakeFailure(s"Connection upgrade not accepted: ${res.status}")
-      }
-
-  private def send[T](method: RequestMethod, target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)
-      (handler: ResponseHandler[T]): T =
-    val req = cookies match
-      case Nil => HttpRequest(RequestLine(method, target), headers, body)
-      case _   => HttpRequest(RequestLine(method, target), headers, body).setCookies(cookies)
-
-    send(req)(handler)
 
   private def getEffectiveConnection(req: HttpRequest): String =
     req.target.scheme.matches("wss?") match

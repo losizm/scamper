@@ -44,6 +44,7 @@ import Validate.{ noNulls, notNull }
  * | continueTimeout | `1000` |
  * | keepAlive       | `false` |
  * | coookies        | `CookieStore.Null` |
+ * | resolveTo       | _(Not set)_ |
  * | trust           | _(Not set)_ |
  * | incoming        | _(Not set)_ |
  * | outgoing        | _(Not set)_ |
@@ -56,6 +57,51 @@ class ClientSettings:
   /** Resets to default settings. */
   def reset(): this.type = synchronized {
     settings = HttpClientImpl.Settings()
+    this
+  }
+
+  /**
+   * Sets authority to which relative targets are resolved.
+   *
+   * @param secure use https and wss schemes
+   */
+  def resolveTo(authority: String, secure: Boolean): this.type = synchronized {
+    val baseUri = UriBuilder()
+      .scheme(if secure then "https" else "http")
+      .authority(authority)
+      .toUri
+
+    settings = settings.copy(resolveTo = Some(baseUri))
+    this
+  }
+
+  /**
+   * Sets host and port to which relative targets are resolved.
+   *
+   * @param secure use https and wss schemes
+   */
+  def resolveTo(host: String, port: Int, secure: Boolean): this.type = synchronized {
+    val baseUri = UriBuilder()
+      .scheme(if secure then "https" else "http")
+      .authority(host, port)
+      .toUri
+
+    settings = settings.copy(resolveTo = Some(baseUri))
+    this
+  }
+
+  /**
+   * Sets host and port to which relative targets are resolved.
+   *
+   * @param secure use https and wss schemes
+   */
+  def resolveTo(host: String, port: Option[Int], secure: Boolean): this.type = synchronized {
+    val baseUri = UriBuilder()
+      .scheme(if secure then "https" else "http")
+      .authority(host, port)
+      .toUri
+
+    settings = settings.copy(resolveTo = Some(baseUri))
     this
   }
 
