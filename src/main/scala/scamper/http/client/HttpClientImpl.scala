@@ -187,7 +187,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     req.target.scheme.matches("wss?") match
       case true  => WebSocket.validate(req).connection.mkString(", ")
       case false =>
-        req.getConnection
+        req.connectionOption
           .orElse(Some(Nil))
           .map { values => values.filterNot(_.matches("(?i)close|keep-alive|TE")) }
           .map { values => if req.hasTE then values :+ "TE" else values }
@@ -196,14 +196,14 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
           .get
 
   private def toBodilessRequest(req: HttpRequest): HttpRequest =
-    req.setBody(Entity.empty).removeContentLength.removeTransferEncoding
+    req.setBody(Entity.empty).contentLengthRemoved.transferEncodingRemoved
 
   private def toBodyRequest(req: HttpRequest): HttpRequest =
-    req.getTransferEncoding.map { encoding =>
+    req.transferEncodingOption.map { encoding =>
       req.setTransferEncoding(encoding.filterNot(_.isChunked) :+ TransferCoding("chunked"))
-        .removeContentLength
+        .contentLengthRemoved
     }.orElse {
-      req.getContentLength.map {
+      req.contentLengthOption.map {
         case 0          => req.setBody(Entity.empty)
         case n if n > 0 => req
         case length     => throw RequestAborted(s"Invalid Content-Length: $length")

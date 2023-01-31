@@ -29,10 +29,10 @@ implicit class Trailer[T <: HttpMessage](message: T) extends AnyVal:
    * @return header values or empty sequence if Trailer is not present
    */
   def trailer: Seq[String] =
-    getTrailer.getOrElse(Nil)
+    trailerOption.getOrElse(Nil)
 
   /** Gets Trailer header values if present. */
-  def getTrailer: Option[Seq[String]] =
+  def trailerOption: Option[Seq[String]] =
     message.getHeaderValue("Trailer").map(ListParser.apply)
 
   /** Creates new message with Trailer header set to supplied values. */
@@ -44,5 +44,5 @@ implicit class Trailer[T <: HttpMessage](message: T) extends AnyVal:
     setTrailer(one +: more)
 
   /** Creates new message with Trailer header removed. */
-  def removeTrailer: T =
+  def trailerRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Trailer")

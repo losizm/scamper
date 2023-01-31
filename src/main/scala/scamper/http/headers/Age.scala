@@ -29,10 +29,10 @@ implicit class Age(response: HttpResponse) extends AnyVal:
    * @throws HeaderNotFound if Age is not present
    */
   def age: Long =
-    getAge.getOrElse(throw HeaderNotFound("Age"))
+    ageOption.getOrElse(throw HeaderNotFound("Age"))
 
   /** Gets Age header value if present. */
-  def getAge: Option[Long] =
+  def ageOption: Option[Long] =
     response.getHeader("Age").map(_.longValue)
 
   /** Creates new response with Age header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class Age(response: HttpResponse) extends AnyVal:
     response.putHeaders(Header("Age", value))
 
   /** Creates new response with Age header removed. */
-  def removeAge: HttpResponse =
+  def ageRemoved: HttpResponse =
     response.removeHeaders("Age")

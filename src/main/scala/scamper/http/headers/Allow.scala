@@ -29,10 +29,10 @@ implicit class Allow(response: HttpResponse) extends AnyVal:
    * @return header values or empty sequence if Allow is not present
    */
   def allow: Seq[RequestMethod] =
-    getAllow.getOrElse(Nil)
+    allowOption.getOrElse(Nil)
 
   /** Gets Allow header values if present. */
-  def getAllow: Option[Seq[RequestMethod]] =
+  def allowOption: Option[Seq[RequestMethod]] =
     response.getHeaderValue("Allow")
       .map(ListParser.apply)
       .map(_.map(RequestMethod.apply))
@@ -46,5 +46,5 @@ implicit class Allow(response: HttpResponse) extends AnyVal:
     setAllow(one +: more)
 
   /** Creates new response with Allow header removed. */
-  def removeAllow: HttpResponse =
+  def allowRemoved: HttpResponse =
     response.removeHeaders("Allow")

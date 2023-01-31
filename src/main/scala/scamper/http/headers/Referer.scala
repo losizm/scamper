@@ -29,10 +29,10 @@ implicit class Referer(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if Referer is not present
    */
   def referer: Uri =
-    getReferer.getOrElse(throw HeaderNotFound("Referer"))
+    refererOption.getOrElse(throw HeaderNotFound("Referer"))
 
   /** Gets Referer header value if present. */
-  def getReferer: Option[Uri] =
+  def refererOption: Option[Uri] =
     request.getHeaderValue("Referer").map(Uri(_))
 
   /** Creates new request with Referer header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class Referer(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("Referer", value.toString))
 
   /** Creates new request with Referer header removed. */
-  def removeReferer: HttpRequest =
+  def refererRemoved: HttpRequest =
     request.removeHeaders("Referer")

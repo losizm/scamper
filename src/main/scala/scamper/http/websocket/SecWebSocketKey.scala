@@ -29,10 +29,10 @@ implicit class SecWebSocketKey(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if Sec-WebSocket-Key is not present
    */
   def secWebSocketKey: String =
-    getSecWebSocketKey.getOrElse(throw HeaderNotFound("Sec-WebSocket-Key"))
+    secWebSocketKeyOption.getOrElse(throw HeaderNotFound("Sec-WebSocket-Key"))
 
   /** Gets Sec-WebSocket-Key header value if present. */
-  def getSecWebSocketKey: Option[String] =
+  def secWebSocketKeyOption: Option[String] =
     request.getHeaderValue("Sec-WebSocket-Key")
 
   /** Creates new request with Sec-WebSocket-Key header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class SecWebSocketKey(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("Sec-WebSocket-Key", value))
 
   /** Creates new request with Sec-WebSocket-Key header removed. */
-  def removeSecWebSocketKey: HttpRequest =
+  def secWebSocketKeyRemoved: HttpRequest =
     request.removeHeaders("Sec-WebSocket-Key")

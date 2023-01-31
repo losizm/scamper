@@ -31,10 +31,10 @@ implicit class Expires(response: HttpResponse) extends AnyVal:
    * @throws HeaderNotFound if Expires is not present
    */
   def expires: Instant =
-    getExpires.getOrElse(throw HeaderNotFound("Expires"))
+    expiresOption.getOrElse(throw HeaderNotFound("Expires"))
 
   /** Gets Expires header value if present. */
-  def getExpires: Option[Instant] =
+  def expiresOption: Option[Instant] =
     response.getHeader("Expires").map(_.dateValue)
 
   /** Creates new response with Expires header set to supplied value. */
@@ -42,5 +42,5 @@ implicit class Expires(response: HttpResponse) extends AnyVal:
     response.putHeaders(Header("Expires", value))
 
   /** Creates new response with Expires header removed. */
-  def removeExpires: HttpResponse =
+  def expiresRemoved: HttpResponse =
     response.removeHeaders("Expires")

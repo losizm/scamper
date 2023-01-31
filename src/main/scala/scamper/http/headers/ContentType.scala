@@ -31,10 +31,10 @@ implicit class ContentType[T <: HttpMessage](message: T) extends AnyVal:
    * @throws HeaderNotFound if Content-Type is not present
    */
   def contentType: MediaType =
-    getContentType.getOrElse(throw HeaderNotFound("Content-Type"))
+    contentTypeOption.getOrElse(throw HeaderNotFound("Content-Type"))
 
   /** Gets Content-Type header value if present. */
-  def getContentType: Option[MediaType] =
+  def contentTypeOption: Option[MediaType] =
     message.getHeaderValue("Content-Type").map(MediaType.apply)
 
   /** Creates new message with Content-Type header set to supplied value. */
@@ -42,5 +42,5 @@ implicit class ContentType[T <: HttpMessage](message: T) extends AnyVal:
     message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Content-Type", value.toString))
 
   /** Creates new message with Content-Type header removed. */
-  def removeContentType: T =
+  def contentTypeRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Content-Type")

@@ -31,10 +31,10 @@ implicit class RetryAfter(response: HttpResponse) extends AnyVal:
    * @throws HeaderNotFound if Retry-After is not present
    */
   def retryAfter: Instant =
-    getRetryAfter.getOrElse(throw HeaderNotFound("Retry-After"))
+    retryAfterOption.getOrElse(throw HeaderNotFound("Retry-After"))
 
   /** Gets Retry-After header value if present. */
-  def getRetryAfter: Option[Instant] =
+  def retryAfterOption: Option[Instant] =
     response.getHeader("Retry-After").map(_.dateValue)
 
   /** Creates new response with Retry-After header set to supplied value. */
@@ -42,5 +42,5 @@ implicit class RetryAfter(response: HttpResponse) extends AnyVal:
     response.putHeaders(Header("Retry-After", value))
 
   /** Creates new response with Retry-After header removed. */
-  def removeRetryAfter: HttpResponse =
+  def retryAfterRemoved: HttpResponse =
     response.removeHeaders("Retry-After")

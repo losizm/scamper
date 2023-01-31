@@ -31,10 +31,10 @@ implicit class Via[T <: HttpMessage](message: T) extends AnyVal:
    * @return header values or empty sequence if Via is not present
    */
   def via: Seq[ViaType] =
-    getVia.getOrElse(Nil)
+    viaOption.getOrElse(Nil)
 
   /** Gets Via header values if present. */
-  def getVia: Option[Seq[ViaType]] =
+  def viaOption: Option[Seq[ViaType]] =
     message.getHeaderValue("Via").map(ViaType.parseAll)
 
   /** Creates new message with Via header set to supplied values. */
@@ -46,5 +46,5 @@ implicit class Via[T <: HttpMessage](message: T) extends AnyVal:
     setVia(one +: more)
 
   /** Creates new message with Via header removed. */
-  def removeVia: T =
+  def viaRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Via")

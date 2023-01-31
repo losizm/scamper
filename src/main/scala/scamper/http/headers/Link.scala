@@ -31,10 +31,10 @@ implicit class Link(response: HttpResponse) extends AnyVal:
    * @return header values or empty sequence if Link is not present
    */
   def link: Seq[LinkType] =
-    getLink.getOrElse(Nil)
+    linkOption.getOrElse(Nil)
 
   /** Gets Link header values if present. */
-  def getLink: Option[Seq[LinkType]] =
+  def linkOption: Option[Seq[LinkType]] =
     response.getHeaderValue("Link").map(LinkType.parseAll)
 
   /** Creates new response with Link header set to supplied values. */
@@ -46,5 +46,5 @@ implicit class Link(response: HttpResponse) extends AnyVal:
     setLink(one +: more)
 
   /** Creates new response with Link header removed. */
-  def removeLink: HttpResponse =
+  def linkRemoved: HttpResponse =
     response.removeHeaders("Link")

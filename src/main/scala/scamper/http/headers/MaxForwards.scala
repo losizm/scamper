@@ -29,10 +29,10 @@ implicit class MaxForwards(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if Max-Forwards is not present
    */
   def maxForwards: Long =
-    getMaxForwards.getOrElse(throw HeaderNotFound("Max-Forwards"))
+    maxForwardsOption.getOrElse(throw HeaderNotFound("Max-Forwards"))
 
   /** Gets Max-Forwards header value if present. */
-  def getMaxForwards: Option[Long] =
+  def maxForwardsOption: Option[Long] =
     request.getHeader("Max-Forwards").map(_.longValue)
 
   /** Creates new request with Max-Forwards header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class MaxForwards(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("Max-Forwards", value))
 
   /** Creates new request with Max-Forwards header removed. */
-  def removeMaxForwards: HttpRequest =
+  def maxForwardsRemoved: HttpRequest =
     request.removeHeaders("Max-Forwards")

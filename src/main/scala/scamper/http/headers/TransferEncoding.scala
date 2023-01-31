@@ -31,10 +31,10 @@ implicit class TransferEncoding[T <: HttpMessage](message: T) extends AnyVal:
    * @return header values or empty sequence if Transfer-Encoding is not present
    */
   def transferEncoding: Seq[TransferCoding] =
-    getTransferEncoding.getOrElse(Nil)
+    transferEncodingOption.getOrElse(Nil)
 
   /** Gets Transfer-Encoding header values if present. */
-  def getTransferEncoding: Option[Seq[TransferCoding]] =
+  def transferEncodingOption: Option[Seq[TransferCoding]] =
     message.getHeaderValue("Transfer-Encoding")
       .map(ListParser.apply)
       .map(_.map(TransferCoding.parse))
@@ -48,5 +48,5 @@ implicit class TransferEncoding[T <: HttpMessage](message: T) extends AnyVal:
     setTransferEncoding(one +: more)
 
   /** Creates new message with Transfer-Encoding header removed. */
-  def removeTransferEncoding: T =
+  def transferEncodingRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Transfer-Encoding")

@@ -31,10 +31,10 @@ implicit class Range(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if Range is not present
    */
   def range: ByteRange =
-    getRange.getOrElse(throw HeaderNotFound("Range"))
+    rangeOption.getOrElse(throw HeaderNotFound("Range"))
 
   /** Gets Range header value if present. */
-  def getRange: Option[ByteRange] =
+  def rangeOption: Option[ByteRange] =
     request.getHeaderValue("Range").map(ByteRange.parse)
 
   /** Creates new request with Range header set to supplied value. */
@@ -42,5 +42,5 @@ implicit class Range(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("Range", value.toString))
 
   /** Creates new request with Range header removed. */
-  def removeRange: HttpRequest =
+  def rangeRemoved: HttpRequest =
     request.removeHeaders("Range")

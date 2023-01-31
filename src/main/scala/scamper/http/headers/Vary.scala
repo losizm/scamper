@@ -29,10 +29,10 @@ implicit class Vary(response: HttpResponse) extends AnyVal:
    * @return header values or empty sequence if Vary is not present
    */
   def vary: Seq[String] =
-    getVary.getOrElse(Nil)
+    varyOption.getOrElse(Nil)
 
   /** Gets Vary header values if present. */
-  def getVary: Option[Seq[String]] =
+  def varyOption: Option[Seq[String]] =
     response.getHeaderValue("Vary").map(ListParser.apply)
 
   /** Creates new response with Vary header set to supplied values. */
@@ -44,5 +44,5 @@ implicit class Vary(response: HttpResponse) extends AnyVal:
     setVary(one +: more)
 
   /** Creates new response with Vary header removed. */
-  def removeVary: HttpResponse =
+  def varyRemoved: HttpResponse =
     response.removeHeaders("Vary")

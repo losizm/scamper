@@ -31,10 +31,10 @@ implicit class IfUnmodifiedSince(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if If-Unmodified-Since is not present
    */
   def ifUnmodifiedSince: Instant =
-    getIfUnmodifiedSince.getOrElse(throw HeaderNotFound("If-Unmodified-Since"))
+    ifUnmodifiedSinceOption.getOrElse(throw HeaderNotFound("If-Unmodified-Since"))
 
   /** Gets If-Unmodified-Since header value if present. */
-  def getIfUnmodifiedSince: Option[Instant] =
+  def ifUnmodifiedSinceOption: Option[Instant] =
     request.getHeader("If-Unmodified-Since").map(_.dateValue)
 
   /**
@@ -44,5 +44,5 @@ implicit class IfUnmodifiedSince(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("If-Unmodified-Since", value))
 
   /** Creates new request with If-Unmodified-Since header removed. */
-  def removeIfUnmodifiedSince: HttpRequest =
+  def ifUnmodifiedSinceRemoved: HttpRequest =
     request.removeHeaders("If-Unmodified-Since")

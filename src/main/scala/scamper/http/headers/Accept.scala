@@ -31,10 +31,10 @@ implicit class Accept(request: HttpRequest) extends AnyVal:
    * @return header values or empty sequence if Accept is not present
    */
   def accept: Seq[MediaRange] =
-    getAccept.getOrElse(Nil)
+    acceptOption.getOrElse(Nil)
 
   /** Gets Accept header values if present. */
-  def getAccept: Option[Seq[MediaRange]] =
+  def acceptOption: Option[Seq[MediaRange]] =
     request.getHeaderValue("Accept")
       .map(ListParser.apply)
       .map(_.map(MediaRange.apply))
@@ -48,5 +48,5 @@ implicit class Accept(request: HttpRequest) extends AnyVal:
     setAccept(one +: more)
 
   /** Creates new request with Accept header removed. */
-  def removeAccept: HttpRequest =
+  def acceptRemoved: HttpRequest =
     request.removeHeaders("Accept")

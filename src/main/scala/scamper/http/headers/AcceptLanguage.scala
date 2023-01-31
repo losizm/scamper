@@ -31,10 +31,10 @@ implicit class AcceptLanguage(request: HttpRequest) extends AnyVal:
    * @return header values or empty sequence if Accept-Language is not present
    */
   def acceptLanguage: Seq[LanguageRange] =
-    getAcceptLanguage.getOrElse(Nil)
+    acceptLanguageOption.getOrElse(Nil)
 
   /** Gets Accept-Language header values if present. */
-  def getAcceptLanguage: Option[Seq[LanguageRange]] =
+  def acceptLanguageOption: Option[Seq[LanguageRange]] =
     request.getHeaderValue("Accept-Language")
       .map(ListParser.apply)
       .map(_.map(LanguageRange.parse))
@@ -48,5 +48,5 @@ implicit class AcceptLanguage(request: HttpRequest) extends AnyVal:
     setAcceptLanguage(one +: more)
 
   /** Creates new request with Accept-Language header removed. */
-  def removeAcceptLanguage: HttpRequest =
+  def acceptLanguageRemoved: HttpRequest =
     request.removeHeaders("Accept-Language")

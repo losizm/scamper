@@ -29,10 +29,10 @@ implicit class SecWebSocketProtocolServer(response: HttpResponse) extends AnyVal
    * @throws HeaderNotFound if Sec-WebSocket-Protocol-Server is not present
    */
   def secWebSocketProtocolServer: String =
-    getSecWebSocketProtocolServer.getOrElse(throw HeaderNotFound("Sec-WebSocket-Protocol-Server"))
+    secWebSocketProtocolServerOption.getOrElse(throw HeaderNotFound("Sec-WebSocket-Protocol-Server"))
 
   /** Gets Sec-WebSocket-Protocol-Server header value if present. */
-  def getSecWebSocketProtocolServer: Option[String] =
+  def secWebSocketProtocolServerOption: Option[String] =
     response.getHeaderValue("Sec-WebSocket-Protocol-Server")
 
   /** Creates new response with Sec-WebSocket-Protocol-Server header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class SecWebSocketProtocolServer(response: HttpResponse) extends AnyVal
     response.putHeaders(Header("Sec-WebSocket-Protocol-Server", value))
 
   /** Creates new response with Sec-WebSocket-Protocol-Server header removed. */
-  def removeSecWebSocketProtocolServer: HttpResponse =
+  def secWebSocketProtocolServerRemoved: HttpResponse =
     response.removeHeaders("Sec-WebSocket-Protocol-Server")

@@ -31,10 +31,10 @@ implicit class ContentEncoding[T <: HttpMessage](message: T) extends AnyVal:
    * @return header values or empty sequence if Content-Encoding is not present
    */
   def contentEncoding: Seq[ContentCoding] =
-    getContentEncoding.getOrElse(Nil)
+    contentEncodingOption.getOrElse(Nil)
 
   /** Gets Content-Encoding header values if present. */
-  def getContentEncoding: Option[Seq[ContentCoding]] =
+  def contentEncodingOption: Option[Seq[ContentCoding]] =
     message.getHeaderValue("Content-Encoding")
       .map(ListParser.apply)
       .map(_.map(ContentCoding.apply))
@@ -48,5 +48,5 @@ implicit class ContentEncoding[T <: HttpMessage](message: T) extends AnyVal:
     setContentEncoding(one +: more)
 
   /** Creates new message with Content-Encoding header removed. */
-  def removeContentEncoding: T =
+  def contentEncodingRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Content-Encoding")

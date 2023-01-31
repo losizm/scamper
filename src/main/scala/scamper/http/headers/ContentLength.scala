@@ -29,10 +29,10 @@ implicit class ContentLength[T <: HttpMessage](message: T) extends AnyVal:
    * @throws HeaderNotFound if Content-Length is not present
    */
   def contentLength: Long =
-    getContentLength.getOrElse(throw HeaderNotFound("Content-Length"))
+    contentLengthOption.getOrElse(throw HeaderNotFound("Content-Length"))
 
   /** Gets Content-Length header value if present. */
-  def getContentLength: Option[Long] =
+  def contentLengthOption: Option[Long] =
     message.getHeader("Content-Length").map(_.longValue)
 
   /** Creates new message with Content-Length header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class ContentLength[T <: HttpMessage](message: T) extends AnyVal:
     message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Content-Length", value))
 
   /** Creates new message with Content-Length header removed. */
-  def removeContentLength: T =
+  def contentLengthRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Content-Length")

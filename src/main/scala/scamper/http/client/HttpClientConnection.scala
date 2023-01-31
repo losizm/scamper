@@ -95,7 +95,7 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable:
       socket.close()
 
   private def writeBody(request: HttpRequest): Unit =
-    request.getTransferEncoding.map { encoding =>
+    request.transferEncodingOption.map { encoding =>
       val buffer = new Array[Byte](bufferSize)
       val in = encodeInputStream(request.body.data, encoding)
       var chunkSize = 0

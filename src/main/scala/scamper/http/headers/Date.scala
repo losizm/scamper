@@ -31,10 +31,10 @@ implicit class Date[T <: HttpMessage](message: T) extends AnyVal:
    * @throws HeaderNotFound if Date is not present
    */
   def date: Instant =
-    getDate.getOrElse(throw HeaderNotFound("Date"))
+    dateOption.getOrElse(throw HeaderNotFound("Date"))
 
   /** Gets Date header value if present. */
-  def getDate: Option[Instant] =
+  def dateOption: Option[Instant] =
     message.getHeader("Date").map(_.dateValue)
 
   /** Creates new message with Date header set to supplied value. */
@@ -42,5 +42,5 @@ implicit class Date[T <: HttpMessage](message: T) extends AnyVal:
     message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Date", value))
 
   /** Creates new message with Date header removed. */
-  def removeDate: T =
+  def dateRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Date")

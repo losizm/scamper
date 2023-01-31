@@ -31,10 +31,10 @@ implicit class AcceptPatch(response: HttpResponse) extends AnyVal:
    * @return header values or empty sequence if Accept-Patch is not present
    */
   def acceptPatch: Seq[MediaType] =
-    getAcceptPatch.getOrElse(Nil)
+    acceptPatchOption.getOrElse(Nil)
 
   /** Gets Accept-Patch header values if present. */
-  def getAcceptPatch: Option[Seq[MediaType]] =
+  def acceptPatchOption: Option[Seq[MediaType]] =
     response.getHeaderValue("Accept-Patch")
       .map(ListParser.apply)
       .map(_.map(MediaType.apply))
@@ -48,5 +48,5 @@ implicit class AcceptPatch(response: HttpResponse) extends AnyVal:
     setAcceptPatch(one +: more)
 
   /** Creates new response with Accept-Patch header removed. */
-  def removeAcceptPatch: HttpResponse =
+  def acceptPatchRemoved: HttpResponse =
     response.removeHeaders("Accept-Patch")

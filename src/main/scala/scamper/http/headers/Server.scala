@@ -31,10 +31,10 @@ implicit class Server(response: HttpResponse) extends AnyVal:
    * @return header values or empty sequence if Server is not present
    */
   def server: Seq[ProductType] =
-    getServer.getOrElse(Nil)
+    serverOption.getOrElse(Nil)
 
   /** Gets Server header values if present. */
-  def getServer: Option[Seq[ProductType]] =
+  def serverOption: Option[Seq[ProductType]] =
     response.getHeaderValue("Server").map(ProductType.parseAll)
 
   /** Creates new response with Server header set to supplied values. */
@@ -46,5 +46,5 @@ implicit class Server(response: HttpResponse) extends AnyVal:
     setServer(one +: more)
 
   /** Creates new response with Server header removed. */
-  def removeServer: HttpResponse =
+  def serverRemoved: HttpResponse =
     response.removeHeaders("Server")

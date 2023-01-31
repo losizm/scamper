@@ -31,10 +31,10 @@ implicit class Prefer(request: HttpRequest) extends AnyVal:
    * @return header values or empty sequence if Prefer is not present
    */
   def prefer: Seq[Preference] =
-    getPrefer.getOrElse(Nil)
+    preferOption.getOrElse(Nil)
 
   /** Gets Prefer header values if present. */
-  def getPrefer: Option[Seq[Preference]] =
+  def preferOption: Option[Seq[Preference]] =
     request.getHeaderValues("Prefer")
       .flatMap(Preference.parseAll) match
         case Nil => None
@@ -49,5 +49,5 @@ implicit class Prefer(request: HttpRequest) extends AnyVal:
     setPrefer(one +: more)
 
   /** Creates new request with Prefer header removed. */
-  def removePrefer: HttpRequest =
+  def preferRemoved: HttpRequest =
     request.removeHeaders("Prefer")

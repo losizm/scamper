@@ -116,13 +116,13 @@ object WebSocket:
     msg.connection.exists("upgrade".equalsIgnoreCase)
 
   private def checkWebSocketKey(req: HttpRequest): Boolean =
-    req.getSecWebSocketKey.exists(checkWebSocketKeyValue)
+    req.secWebSocketKeyOption.exists(checkWebSocketKeyValue)
 
   private def checkWebSocketKeyValue(key: String): Boolean =
     Try(Base64.decode(key).size == 16).getOrElse(false)
 
   private def checkWebSocketVersion(msg: HttpMessage): Boolean =
-    msg.getSecWebSocketVersion.contains("13")
+    msg.secWebSocketVersionOption.contains("13")
 
   private def checkWebSocketExtensions(msg: HttpMessage): Boolean =
     msg.secWebSocketExtensions.forall { ext =>
@@ -130,7 +130,7 @@ object WebSocket:
     }
 
   private def checkWebSocketAccept(res: HttpResponse, key: String): Boolean =
-    res.getSecWebSocketAccept.exists(checkWebSocketAcceptValue(_, key))
+    res.secWebSocketAcceptOption.exists(checkWebSocketAcceptValue(_, key))
 
   private def checkWebSocketAcceptValue(value: String, key: String): Boolean =
     value == acceptKey(key)

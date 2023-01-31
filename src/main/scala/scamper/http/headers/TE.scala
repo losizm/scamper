@@ -31,10 +31,10 @@ implicit class TE(request: HttpRequest) extends AnyVal:
    * @return header values or empty sequence if TE is not present
    */
   def te: Seq[TransferCodingRange] =
-    getTE.getOrElse(Nil)
+    teOption.getOrElse(Nil)
 
   /** Gets TE header values if present. */
-  def getTE: Option[Seq[TransferCodingRange]] =
+  def teOption: Option[Seq[TransferCodingRange]] =
     request.getHeaderValue("TE")
       .map(ListParser.apply)
       .map(_.map(TransferCodingRange.parse))
@@ -48,5 +48,5 @@ implicit class TE(request: HttpRequest) extends AnyVal:
     setTE(one +: more)
 
   /** Creates new request with TE header removed. */
-  def removeTE: HttpRequest =
+  def teRemoved: HttpRequest =
     request.removeHeaders("TE")

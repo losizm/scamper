@@ -29,10 +29,10 @@ implicit class ContentLocation[T <: HttpMessage](message: T) extends AnyVal:
    * @throws HeaderNotFound if Content-Location is not present
    */
   def contentLocation: Uri =
-    getContentLocation.getOrElse(throw HeaderNotFound("Content-Location"))
+    contentLocationOption.getOrElse(throw HeaderNotFound("Content-Location"))
 
   /** Gets Content-Location header value if present. */
-  def getContentLocation: Option[Uri] =
+  def contentLocationOption: Option[Uri] =
     message.getHeaderValue("Content-Location").map(Uri(_))
 
   /** Creates new message with Content-Location header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class ContentLocation[T <: HttpMessage](message: T) extends AnyVal:
     message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Content-Location", value.toString))
 
   /** Creates new message with Content-Location header removed. */
-  def removeContentLocation: T =
+  def contentLocationRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Content-Location")

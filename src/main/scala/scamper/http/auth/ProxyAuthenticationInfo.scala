@@ -29,10 +29,10 @@ implicit class ProxyAuthenticationInfo(response: HttpResponse) extends AnyVal:
    * @return header value or empty map if Proxy-Authentication-Info is not present
    */
   def proxyAuthenticationInfo: Map[String, String] =
-    getProxyAuthenticationInfo.getOrElse(Map.empty)
+    proxyAuthenticationInfoOption.getOrElse(Map.empty)
 
   /** Gets Proxy-Authentication-Info header value if present. */
-  def getProxyAuthenticationInfo: Option[Map[String, String]] =
+  def proxyAuthenticationInfoOption: Option[Map[String, String]] =
     response.getHeaderValue("Proxy-Authentication-Info").map(AuthParams.parse)
 
   /** Creates new response with Proxy-Authentication-Info header set to supplied values. */
@@ -44,5 +44,5 @@ implicit class ProxyAuthenticationInfo(response: HttpResponse) extends AnyVal:
     setProxyAuthenticationInfo((one +: more).toMap)
 
   /** Creates new response with Proxy-Authentication-Info header removed. */
-  def removeProxyAuthenticationInfo: HttpResponse =
+  def proxyAuthenticationInfoRemoved: HttpResponse =
     response.removeHeaders("Proxy-Authentication-Info")

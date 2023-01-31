@@ -31,10 +31,10 @@ implicit class IfNoneMatch(request: HttpRequest) extends AnyVal:
    * @return header values or empty sequence if If-None-Match is not present
    */
   def ifNoneMatch: Seq[EntityTag] =
-    getIfNoneMatch.getOrElse(Nil)
+    ifNoneMatchOption.getOrElse(Nil)
 
   /** Gets If-None-Match header values if present. */
-  def getIfNoneMatch: Option[Seq[EntityTag]] =
+  def ifNoneMatchOption: Option[Seq[EntityTag]] =
     request.getHeaderValue("If-None-Match")
       .map(ListParser.apply)
       .map(_.map(EntityTag.parse))
@@ -48,5 +48,5 @@ implicit class IfNoneMatch(request: HttpRequest) extends AnyVal:
     setIfNoneMatch(one +: more)
 
   /** Creates new request with If-None-Match header removed. */
-  def removeIfNoneMatch: HttpRequest =
+  def ifNoneMatchRemoved: HttpRequest =
     request.removeHeaders("If-None-Match")

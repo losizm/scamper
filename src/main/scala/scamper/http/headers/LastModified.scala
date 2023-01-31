@@ -31,10 +31,10 @@ implicit class LastModified(response: HttpResponse) extends AnyVal:
    * @throws HeaderNotFound if Last-Modified is not present
    */
   def lastModified: Instant =
-    getLastModified.getOrElse(throw HeaderNotFound("Last-Modified"))
+    lastModifiedOption.getOrElse(throw HeaderNotFound("Last-Modified"))
 
   /** Gets Last-Modified header value if present. */
-  def getLastModified: Option[Instant] =
+  def lastModifiedOption: Option[Instant] =
     response.getHeader("Last-Modified").map(_.dateValue)
 
   /** Creates new response with Last-Modified header set to supplied value. */
@@ -42,5 +42,5 @@ implicit class LastModified(response: HttpResponse) extends AnyVal:
     response.putHeaders(Header("Last-Modified", value))
 
   /** Creates new response with Last-Modified header removed. */
-  def removeLastModified: HttpResponse =
+  def lastModifiedRemoved: HttpResponse =
     response.removeHeaders("Last-Modified")

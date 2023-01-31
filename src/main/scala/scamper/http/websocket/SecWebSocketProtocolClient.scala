@@ -29,10 +29,10 @@ implicit class SecWebSocketProtocolClient(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if Sec-WebSocket-Protocol-Client is not present
    */
   def secWebSocketProtocolClient: String =
-    getSecWebSocketProtocolClient.getOrElse(throw HeaderNotFound("Sec-WebSocket-Protocol-Client"))
+    secWebSocketProtocolClientOption.getOrElse(throw HeaderNotFound("Sec-WebSocket-Protocol-Client"))
 
   /** Gets Sec-WebSocket-Protocol-Client header value if present. */
-  def getSecWebSocketProtocolClient: Option[String] =
+  def secWebSocketProtocolClientOption: Option[String] =
     request.getHeaderValue("Sec-WebSocket-Protocol-Client")
 
   /** Creates new request with Sec-WebSocket-Protocol-Client header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class SecWebSocketProtocolClient(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("Sec-WebSocket-Protocol-Client", value))
 
   /** Creates new request with Sec-WebSocket-Protocol-Client header removed. */
-  def removeSecWebSocketProtocolClient: HttpRequest =
+  def secWebSocketProtocolClientRemoved: HttpRequest =
     request.removeHeaders("Sec-WebSocket-Protocol-Client")

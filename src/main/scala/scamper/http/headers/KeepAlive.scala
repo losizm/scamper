@@ -31,10 +31,10 @@ implicit class KeepAlive[T <: HttpMessage](message: T) extends AnyVal:
    * @throws HeaderNotFound if Keep-Alive is not present
    */
   def keepAlive: KeepAliveParameters =
-    getKeepAlive.getOrElse(throw HeaderNotFound("Keep-Alive"))
+    keepAliveOption.getOrElse(throw HeaderNotFound("Keep-Alive"))
 
   /** Gets Keep-Alive header value if present. */
-  def getKeepAlive: Option[KeepAliveParameters] =
+  def keepAliveOption: Option[KeepAliveParameters] =
     message.getHeaderValue("Keep-Alive").map(KeepAliveParameters.parse)
 
   /** Creates new message with Keep-Alive header set to supplied value. */
@@ -42,5 +42,5 @@ implicit class KeepAlive[T <: HttpMessage](message: T) extends AnyVal:
     message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Keep-Alive", value.toString))
 
   /** Creates new message with Keep-Alive header removed. */
-  def removeKeepAlive: T =
+  def keepAliveRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Keep-Alive")

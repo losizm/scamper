@@ -29,10 +29,10 @@ implicit class From(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if From is not present
    */
   def from: String =
-    getFrom.getOrElse(throw HeaderNotFound("From"))
+    fromOption.getOrElse(throw HeaderNotFound("From"))
 
   /** Gets From header value if present. */
-  def getFrom: Option[String] =
+  def fromOption: Option[String] =
     request.getHeaderValue("From")
 
   /** Creates new request with From header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class From(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("From", value))
 
   /** Creates new request with From header removed. */
-  def removeFrom: HttpRequest =
+  def fromRemoved: HttpRequest =
     request.removeHeaders("From")

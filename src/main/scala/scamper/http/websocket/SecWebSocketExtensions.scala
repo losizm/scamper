@@ -29,10 +29,10 @@ implicit class SecWebSocketExtensions[T <: HttpMessage](message: T) extends AnyV
    * @throws HeaderNotFound if Sec-WebSocket-Extensions is not present
    */
   def secWebSocketExtensions: Seq[WebSocketExtension] =
-    getSecWebSocketExtensions.getOrElse(Nil)
+    secWebSocketExtensionsOption.getOrElse(Nil)
 
   /** Gets Sec-WebSocket-Extensions header values if present. */
-  def getSecWebSocketExtensions: Option[Seq[WebSocketExtension]] =
+  def secWebSocketExtensionsOption: Option[Seq[WebSocketExtension]] =
     message.getHeaderValues("Sec-WebSocket-Extensions")
       .map(WebSocketExtension.parseAll)
       .reduceLeftOption(_ ++ _)
@@ -46,5 +46,5 @@ implicit class SecWebSocketExtensions[T <: HttpMessage](message: T) extends AnyV
     setSecWebSocketExtensions(one +: more)
 
   /** Creates new message with Sec-WebSocket-Extensions header removed. */
-  def removeSecWebSocketExtensions: T =
+  def secWebSocketExtensionsRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Sec-WebSocket-Extensions")

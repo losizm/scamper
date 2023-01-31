@@ -29,10 +29,10 @@ implicit class Connection[T <: HttpMessage](message: T) extends AnyVal:
    * @return header values or empty sequence if Connection is not present
    */
   def connection: Seq[String] =
-    getConnection.getOrElse(Nil)
+    connectionOption.getOrElse(Nil)
 
   /** Gets Connection header values if present. */
-  def getConnection: Option[Seq[String]] =
+  def connectionOption: Option[Seq[String]] =
     message.getHeaderValue("Connection").map(ListParser.apply)
 
   /** Creates new message with Connection header set to supplied values. */
@@ -44,5 +44,5 @@ implicit class Connection[T <: HttpMessage](message: T) extends AnyVal:
     setConnection(one +: more)
 
   /** Creates new message with Connection header removed. */
-  def removeConnection: T =
+  def connectionRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Connection")

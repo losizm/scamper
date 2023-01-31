@@ -31,10 +31,10 @@ implicit class ContentLanguage[T <: HttpMessage](message: T) extends AnyVal:
    * @return header values or empty sequence if Content-Language is not present
    */
   def contentLanguage: Seq[LanguageTag] =
-    getContentLanguage.getOrElse(Nil)
+    contentLanguageOption.getOrElse(Nil)
 
   /** Gets Content-Language header values if present. */
-  def getContentLanguage: Option[Seq[LanguageTag]] =
+  def contentLanguageOption: Option[Seq[LanguageTag]] =
     message.getHeaderValue("Content-Language")
       .map(ListParser.apply)
       .map(_.map(LanguageTag.parse))
@@ -48,5 +48,5 @@ implicit class ContentLanguage[T <: HttpMessage](message: T) extends AnyVal:
     setContentLanguage(one +: more)
 
   /** Creates new message with Content-Language header removed. */
-  def removeContentLanguage: T =
+  def contentLanguageRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Content-Language")

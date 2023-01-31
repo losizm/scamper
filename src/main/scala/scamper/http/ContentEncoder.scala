@@ -35,12 +35,12 @@ private object ContentEncoder:
       .setBody(Entity(Compressor.deflate(msg.body.data, bufferSize)))
 
   private def addContentEncoding[T <: HttpMessage & MessageBuilder[T]](msg: T, value: ContentCoding): T =
-    msg.getContentEncoding
+    msg.contentEncodingOption
       .map(_ :+ value)
       .map(msg.setContentEncoding)
       .getOrElse(msg.setContentEncoding(value))
       .setTransferEncoding(getTransferEncoding(msg))
-      .removeContentLength
+      .contentLengthRemoved
 
   private def getTransferEncoding(msg: HttpMessage): Seq[TransferCoding] =
     msg.transferEncoding.filterNot(_.isChunked) :+ chunked

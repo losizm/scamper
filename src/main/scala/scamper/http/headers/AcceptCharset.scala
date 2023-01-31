@@ -31,10 +31,10 @@ implicit class AcceptCharset(request: HttpRequest) extends AnyVal:
    * @return header values or empty sequence if Accept-Charset is not present
    */
   def acceptCharset: Seq[CharsetRange] =
-    getAcceptCharset.getOrElse(Nil)
+    acceptCharsetOption.getOrElse(Nil)
 
   /** Gets Accept-Charset header values if present. */
-  def getAcceptCharset: Option[Seq[CharsetRange]] =
+  def acceptCharsetOption: Option[Seq[CharsetRange]] =
     request.getHeaderValue("Accept-Charset")
       .map(ListParser.apply)
       .map(_.map(CharsetRange.parse))
@@ -48,5 +48,5 @@ implicit class AcceptCharset(request: HttpRequest) extends AnyVal:
     setAcceptCharset(one +: more)
 
   /** Creates new request with Accept-Charset header removed. */
-  def removeAcceptCharset: HttpRequest =
+  def acceptCharsetRemoved: HttpRequest =
     request.removeHeaders("Accept-Charset")

@@ -29,10 +29,10 @@ implicit class SecWebSocketProtocol[T <: HttpMessage](message: T) extends AnyVal
    * @throws HeaderNotFound if Sec-WebSocket-Protocol is not present
    */
   def secWebSocketProtocol: Seq[String] =
-    getSecWebSocketProtocol.getOrElse(Nil)
+    secWebSocketProtocolOption.getOrElse(Nil)
 
   /** Gets Sec-WebSocket-Protocol header values if present. */
-  def getSecWebSocketProtocol: Option[Seq[String]] =
+  def secWebSocketProtocolOption: Option[Seq[String]] =
     message.getHeaderValue("Sec-WebSocket-Protocol").map(ListParser.apply)
 
   /** Creates new message with Sec-WebSocket-Protocol header set to supplied values. */
@@ -44,5 +44,5 @@ implicit class SecWebSocketProtocol[T <: HttpMessage](message: T) extends AnyVal
     setSecWebSocketProtocol(one +: more)
 
   /** Creates new message with Sec-WebSocket-Protocol header removed. */
-  def removeSecWebSocketProtocol: T =
+  def secWebSocketProtocolRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Sec-WebSocket-Protocol")

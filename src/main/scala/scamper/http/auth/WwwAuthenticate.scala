@@ -29,10 +29,10 @@ implicit class WwwAuthenticate(response: HttpResponse) extends AnyVal:
    * @return header values or empty sequence if WWW-Authenticate is not present
    */
   def wwwAuthenticate: Seq[Challenge] =
-    getWwwAuthenticate.getOrElse(Nil)
+    wwwAuthenticateOption.getOrElse(Nil)
 
   /** Gets WWW-Authenticate header values if present. */
-  def getWwwAuthenticate: Option[Seq[Challenge]] =
+  def wwwAuthenticateOption: Option[Seq[Challenge]] =
     response.getHeaderValues("WWW-Authenticate")
       .flatMap(Challenge.parseAll) match
         case Nil => None
@@ -47,12 +47,12 @@ implicit class WwwAuthenticate(response: HttpResponse) extends AnyVal:
     setWwwAuthenticate(one +: more)
 
   /** Creates new response with WWW-Authenticate header removed. */
-  def removeWwwAuthenticate: HttpResponse =
+  def wwwAuthenticateRemoved: HttpResponse =
     response.removeHeaders("WWW-Authenticate")
 
   /** Tests for basic authentication. */
   def hasBasic: Boolean =
-    getBasic.isDefined
+    basicOption.isDefined
 
   /**
    * Gets basic authentication.
@@ -60,10 +60,10 @@ implicit class WwwAuthenticate(response: HttpResponse) extends AnyVal:
    * @throws HttpException if basic authentication is not present
    */
   def basic: BasicChallenge =
-    getBasic.getOrElse(throw HttpException("Basic authentication not found"))
+    basicOption.getOrElse(throw HttpException("Basic authentication not found"))
 
   /** Gets basic authentication if present. */
-  def getBasic: Option[BasicChallenge] =
+  def basicOption: Option[BasicChallenge] =
     wwwAuthenticate.collectFirst { case challenge: BasicChallenge => challenge }
 
   /** Creates new response with basic authentication. */
@@ -80,7 +80,7 @@ implicit class WwwAuthenticate(response: HttpResponse) extends AnyVal:
 
   /** Tests for bearer authentication. */
   def hasBearer: Boolean =
-    getBearer.isDefined
+    bearerOption.isDefined
 
   /**
    * Gets bearer authentication.
@@ -88,10 +88,10 @@ implicit class WwwAuthenticate(response: HttpResponse) extends AnyVal:
    * @throws HttpException if bearer authentication is not present
    */
   def bearer: BearerChallenge =
-    getBearer.getOrElse(throw HttpException("Bearer authentication not found"))
+    bearerOption.getOrElse(throw HttpException("Bearer authentication not found"))
 
   /** Gets bearer authentication if present. */
-  def getBearer: Option[BearerChallenge] =
+  def bearerOption: Option[BearerChallenge] =
     wwwAuthenticate.collectFirst { case challenge: BearerChallenge => challenge }
 
   /** Creates new response with bearer authentication. */

@@ -29,10 +29,10 @@ implicit class ProxyAuthenticate(response: HttpResponse) extends AnyVal:
    * @return header values or empty sequence if Proxy-Authenticate is not present
    */
   def proxyAuthenticate: Seq[Challenge] =
-    getProxyAuthenticate.getOrElse(Nil)
+    proxyAuthenticateOption.getOrElse(Nil)
 
   /** Gets Proxy-Authenticate header values if present. */
-  def getProxyAuthenticate: Option[Seq[Challenge]] =
+  def proxyAuthenticateOption: Option[Seq[Challenge]] =
     response.getHeaderValues("Proxy-Authenticate")
       .flatMap(Challenge.parseAll) match
         case Nil => None
@@ -47,12 +47,12 @@ implicit class ProxyAuthenticate(response: HttpResponse) extends AnyVal:
     setProxyAuthenticate(one +: more)
 
   /** Creates new response with Proxy-Authenticate header removed. */
-  def removeProxyAuthenticate: HttpResponse =
+  def proxyAuthenticateRemoved: HttpResponse =
     response.removeHeaders("Proxy-Authenticate")
 
   /** Tests for basic proxy authentication. */
   def hasProxyBasic: Boolean =
-    getProxyBasic.isDefined
+    proxyBasicOption.isDefined
 
   /**
    * Gets basic proxy authentication.
@@ -60,10 +60,10 @@ implicit class ProxyAuthenticate(response: HttpResponse) extends AnyVal:
    * @throws HttpException if basic proxy authentication is not present
    */
   def proxyBasic: BasicChallenge =
-    getProxyBasic.getOrElse(throw HttpException("Basic proxy authentication not found"))
+    proxyBasicOption.getOrElse(throw HttpException("Basic proxy authentication not found"))
 
   /** Gets basic proxy authentication if present. */
-  def getProxyBasic: Option[BasicChallenge] =
+  def proxyBasicOption: Option[BasicChallenge] =
     proxyAuthenticate.collectFirst { case challenge: BasicChallenge => challenge }
 
   /** Creates new response with basic proxy authentication. */
@@ -80,7 +80,7 @@ implicit class ProxyAuthenticate(response: HttpResponse) extends AnyVal:
 
   /** Tests for bearer proxy authentication. */
   def hasProxyBearer: Boolean =
-    getProxyBearer.isDefined
+    proxyBearerOption.isDefined
 
   /**
    * Gets bearer proxy authentication.
@@ -88,10 +88,10 @@ implicit class ProxyAuthenticate(response: HttpResponse) extends AnyVal:
    * @throws HttpException if bearer proxy authentication is not present
    */
   def proxyBearer: BearerChallenge =
-    getProxyBearer.getOrElse(throw HttpException("Bearer proxy authentication not found"))
+    proxyBearerOption.getOrElse(throw HttpException("Bearer proxy authentication not found"))
 
   /** Gets bearer proxy authentication if present. */
-  def getProxyBearer: Option[BearerChallenge] =
+  def proxyBearerOption: Option[BearerChallenge] =
     proxyAuthenticate.collectFirst { case challenge: BearerChallenge => challenge }
 
   /** Creates new response with bearer proxy authentication. */

@@ -83,7 +83,7 @@ trait BodyDecoder:
     }
 
   private def getContentLength(message: HttpMessage): Long =
-    message.getContentLength
+    message.contentLengthOption
       .orElse(message.body.knownSize)
       .orElse(Option.when(message.isInstanceOf[HttpResponse])(Long.MaxValue))
       .getOrElse(0)

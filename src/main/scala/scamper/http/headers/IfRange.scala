@@ -35,10 +35,10 @@ implicit class IfRange(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if If-Range is not present
    */
   def ifRange: Either[EntityTag, Instant] =
-    getIfRange.getOrElse(throw HeaderNotFound("If-Range"))
+    ifRangeOption.getOrElse(throw HeaderNotFound("If-Range"))
 
   /** Gets If-Range header value if present. */
-  def getIfRange: Option[Either[EntityTag, Instant]] =
+  def ifRangeOption: Option[Either[EntityTag, Instant]] =
     request.getHeader("If-Range").map { header =>
       Try { Left(EntityTag.parse(header.value)) }
         .orElse { Try(Right(header.dateValue)) }
@@ -58,5 +58,5 @@ implicit class IfRange(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("If-Range", value))
 
   /** Creates new request with If-Range header removed. */
-  def removeIfRange: HttpRequest =
+  def ifRangeRemoved: HttpRequest =
     request.removeHeaders("If-Range")

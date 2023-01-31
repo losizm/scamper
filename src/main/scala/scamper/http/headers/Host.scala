@@ -29,10 +29,10 @@ implicit class Host(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if Host is not present
    */
   def host: String =
-    getHost.getOrElse(throw HeaderNotFound("Host"))
+    hostOption.getOrElse(throw HeaderNotFound("Host"))
 
   /** Gets Host header value if present. */
-  def getHost: Option[String] =
+  def hostOption: Option[String] =
     request.getHeaderValue("Host")
 
   /** Creates new request with Host header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class Host(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("Host", value))
 
   /** Creates new request with Host header removed. */
-  def removeHost: HttpRequest =
+  def hostRemoved: HttpRequest =
     request.removeHeaders("Host")

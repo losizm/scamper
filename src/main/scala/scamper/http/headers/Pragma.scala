@@ -31,10 +31,10 @@ implicit class Pragma(request: HttpRequest) extends AnyVal:
    * @return header values or empty sequence if Pragma is not present
    */
   def pragma: Seq[PragmaDirective] =
-    getPragma.getOrElse(Nil)
+    pragmaOption.getOrElse(Nil)
 
   /** Gets Pragma header values if present. */
-  def getPragma: Option[Seq[PragmaDirective]] =
+  def pragmaOption: Option[Seq[PragmaDirective]] =
     request.getHeaderValue("Pragma").map(PragmaDirective.parseAll)
 
   /** Creates new request with Pragma header set to supplied values. */
@@ -46,5 +46,5 @@ implicit class Pragma(request: HttpRequest) extends AnyVal:
     setPragma(one +: more)
 
   /** Creates new request with Pragma header removed. */
-  def removePragma: HttpRequest =
+  def pragmaRemoved: HttpRequest =
     request.removeHeaders("Pragma")

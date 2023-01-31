@@ -31,10 +31,10 @@ implicit class UserAgent(request: HttpRequest) extends AnyVal:
    * @return header values or empty sequence if User-Agent is not present
    */
   def userAgent: Seq[ProductType] =
-    getUserAgent.getOrElse(Nil)
+    userAgentOption.getOrElse(Nil)
 
   /** Gets User-Agent header values if present. */
-  def getUserAgent: Option[Seq[ProductType]] =
+  def userAgentOption: Option[Seq[ProductType]] =
     request.getHeaderValue("User-Agent").map(ProductType.parseAll)
 
   /** Creates new request with User-Agent header set to supplied value. */
@@ -46,5 +46,5 @@ implicit class UserAgent(request: HttpRequest) extends AnyVal:
     setUserAgent(one +: more)
 
   /** Creates new request with User-Agent header removed. */
-  def removeUserAgent: HttpRequest =
+  def userAgentRemoved: HttpRequest =
     request.removeHeaders("User-Agent")

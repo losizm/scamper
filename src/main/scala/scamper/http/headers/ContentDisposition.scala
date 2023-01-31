@@ -31,10 +31,10 @@ implicit class ContentDisposition(response: HttpResponse) extends AnyVal:
    * @throws HeaderNotFound if Content-Disposition is not present
    */
   def contentDisposition: DispositionType =
-    getContentDisposition.getOrElse(throw HeaderNotFound("Content-Disposition"))
+    contentDispositionOption.getOrElse(throw HeaderNotFound("Content-Disposition"))
 
   /** Gets Content-Disposition header value if present. */
-  def getContentDisposition: Option[DispositionType] =
+  def contentDispositionOption: Option[DispositionType] =
     response.getHeaderValue("Content-Disposition").map(DispositionType.parse)
 
   /** Creates new response with Content-Disposition header set to supplied value. */
@@ -42,5 +42,5 @@ implicit class ContentDisposition(response: HttpResponse) extends AnyVal:
     response.putHeaders(Header("Content-Disposition", value.toString))
 
   /** Creates new response with Content-Disposition header removed. */
-  def removeContentDisposition: HttpResponse =
+  def contentDispositionRemoved: HttpResponse =
     response.removeHeaders("Content-Disposition")

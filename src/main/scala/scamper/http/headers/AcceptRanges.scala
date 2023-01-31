@@ -29,10 +29,10 @@ implicit class AcceptRanges(response: HttpResponse) extends AnyVal:
    * @return header values or empty sequence if Accept-Ranges is not present
    */
   def acceptRanges: Seq[String] =
-    getAcceptRanges.getOrElse(Nil)
+    acceptRangesOption.getOrElse(Nil)
 
   /** Gets Accept-Ranges header values if present. */
-  def getAcceptRanges: Option[Seq[String]] =
+  def acceptRangesOption: Option[Seq[String]] =
     response.getHeaderValue("Accept-Ranges").map(ListParser.apply)
 
   /** Creates new response with Accept-Ranges header set to supplied values. */
@@ -44,5 +44,5 @@ implicit class AcceptRanges(response: HttpResponse) extends AnyVal:
     setAcceptRanges(one +: more)
 
   /** Creates new response with Accept-Ranges header removed. */
-  def removeAcceptRanges: HttpResponse =
+  def acceptRangesRemoved: HttpResponse =
     response.removeHeaders("Accept-Ranges")

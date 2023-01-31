@@ -435,7 +435,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         val buffer = new Array[Byte](bufferSize)
         var length = 0
 
-        res.getTransferEncoding.map { encoding =>
+        res.transferEncodingOption.map { encoding =>
           val in = encode(res.body.data, encoding)
           while { length = in.read(buffer); length != -1 } do
             socket.writeLine(length.toHexString)
@@ -474,7 +474,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
     private def prepare(res: HttpResponse): HttpResponse =
       if res.hasTransferEncoding then
         res.setTransferEncoding(res.transferEncoding.filterNot(_.isChunked) :+ chunked)
-          .removeContentLength
+          .contentLengthRemoved
       else if res.hasContentLength then
         res
       else

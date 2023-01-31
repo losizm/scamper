@@ -35,7 +35,7 @@ implicit class ServerHttpRequest(request: HttpRequest) extends AnyVal:
    * @return `true` if response was sent; `false` otherwise
    */
   def continue(): Boolean =
-    request.getExpect
+    request.expectOption
       .collect { case value if value.equalsIgnoreCase("100-continue") => request.socket }
       .map { socket =>
         socket.writeLine(StatusLine(Continue).toString)

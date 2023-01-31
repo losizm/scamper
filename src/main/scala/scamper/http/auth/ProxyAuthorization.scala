@@ -29,10 +29,10 @@ implicit class ProxyAuthorization(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if Proxy-Authorization is not present
    */
   def proxyAuthorization: Credentials =
-    getProxyAuthorization.getOrElse(throw HeaderNotFound("Proxy-Authorization"))
+    proxyAuthorizationOption.getOrElse(throw HeaderNotFound("Proxy-Authorization"))
 
   /** Gets Proxy-Authorization header value if present. */
-  def getProxyAuthorization: Option[Credentials] =
+  def proxyAuthorizationOption: Option[Credentials] =
     request.getHeaderValue("Proxy-Authorization").map(Credentials.parse)
 
   /**
@@ -42,12 +42,12 @@ implicit class ProxyAuthorization(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("Proxy-Authorization", value.toString))
 
   /** Creates new request with Proxy-Authorization header removed. */
-  def removeProxyAuthorization: HttpRequest =
+  def proxyAuthorizationRemoved: HttpRequest =
     request.removeHeaders("Proxy-Authorization")
 
   /** Tests for basic proxy authorization. */
   def hasProxyBasic: Boolean =
-    getProxyBasic.isDefined
+    proxyBasicOption.isDefined
 
   /**
    * Gets basic proxy authorization.
@@ -55,11 +55,11 @@ implicit class ProxyAuthorization(request: HttpRequest) extends AnyVal:
    * @throws HttpException if basic proxy authorization is not present
    */
   def proxyBasic: BasicCredentials =
-    getProxyBasic.getOrElse(throw HttpException("Basic proxy authorization not found"))
+    proxyBasicOption.getOrElse(throw HttpException("Basic proxy authorization not found"))
 
   /** Gets basic proxy authorization if present. */
-  def getProxyBasic: Option[BasicCredentials] =
-    getProxyAuthorization.collect { case credentials: BasicCredentials => credentials }
+  def proxyBasicOption: Option[BasicCredentials] =
+    proxyAuthorizationOption.collect { case credentials: BasicCredentials => credentials }
 
   /** Creates new request with basic proxy authorization. */
   def setProxyBasic(token: String): HttpRequest =
@@ -75,7 +75,7 @@ implicit class ProxyAuthorization(request: HttpRequest) extends AnyVal:
 
   /** Tests for bearer proxy authorization. */
   def hasProxyBearer: Boolean =
-    getProxyBearer.isDefined
+    proxyBearerOption.isDefined
 
   /**
    * Gets bearer proxy authorization.
@@ -83,11 +83,11 @@ implicit class ProxyAuthorization(request: HttpRequest) extends AnyVal:
    * @throws HttpException if bearer proxy authorization is not present
    */
   def proxyBearer: BearerCredentials =
-    getProxyBearer.getOrElse(throw HttpException("Bearer proxy authorization not found"))
+    proxyBearerOption.getOrElse(throw HttpException("Bearer proxy authorization not found"))
 
   /** Gets bearer proxy authorization if present. */
-  def getProxyBearer: Option[BearerCredentials] =
-    getProxyAuthorization.collect { case credentials: BearerCredentials => credentials }
+  def proxyBearerOption: Option[BearerCredentials] =
+    proxyAuthorizationOption.collect { case credentials: BearerCredentials => credentials }
 
   /** Creates new request with bearer proxy authorization. */
   def setProxyBearer(token: String): HttpRequest =

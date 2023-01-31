@@ -31,10 +31,10 @@ implicit class Warning[T <: HttpMessage](message: T) extends AnyVal:
    * @return header values or empty sequence if Warning is not present
    */
   def warning: Seq[WarningType] =
-    getWarning.getOrElse(Nil)
+    warningOption.getOrElse(Nil)
 
   /** Gets Warning header values if present. */
-  def getWarning: Option[Seq[WarningType]] =
+  def warningOption: Option[Seq[WarningType]] =
     message.getHeaderValue("Warning").map(WarningType.parseAll)
 
   /** Creates new message with Warning header set to supplied values. */
@@ -46,5 +46,5 @@ implicit class Warning[T <: HttpMessage](message: T) extends AnyVal:
     setWarning(one +: more)
 
   /** Creates new message with Warning header removed. */
-  def removeWarning: T =
+  def warningRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Warning")

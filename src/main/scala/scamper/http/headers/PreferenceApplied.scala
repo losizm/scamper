@@ -31,10 +31,10 @@ implicit class PreferenceApplied(response: HttpResponse) extends AnyVal:
    * @return header values or empty sequence if Preference-Applied is not present
    */
   def preferenceApplied: Seq[Preference] =
-    getPreferenceApplied.getOrElse(Nil)
+    preferenceAppliedOption.getOrElse(Nil)
 
   /** Gets Preference-Applied header values if present. */
-  def getPreferenceApplied: Option[Seq[Preference]] =
+  def preferenceAppliedOption: Option[Seq[Preference]] =
     response.getHeaderValues("Preference-Applied")
       .flatMap(Preference.parseAll) match
         case Nil => None
@@ -49,5 +49,5 @@ implicit class PreferenceApplied(response: HttpResponse) extends AnyVal:
     setPreferenceApplied(one +: more)
 
   /** Creates new response with Preference-Applied header removed. */
-  def removePreferenceApplied: HttpResponse =
+  def preferenceAppliedRemoved: HttpResponse =
     response.removeHeaders("Preference-Applied")

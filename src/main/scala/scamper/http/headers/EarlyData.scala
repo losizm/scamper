@@ -29,10 +29,10 @@ implicit class EarlyData(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if Early-Data is not present
    */
   def earlyData: Int =
-    getEarlyData.getOrElse(throw HeaderNotFound("Early-Data"))
+    earlyDataOption.getOrElse(throw HeaderNotFound("Early-Data"))
 
   /** Gets Early-Data header value if present. */
-  def getEarlyData: Option[Int] =
+  def earlyDataOption: Option[Int] =
     request.getHeaderValue("Early-Data").map(_.toInt)
 
   /** Creates new request with Early-Data header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class EarlyData(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("Early-Data", value))
 
   /** Creates new request with Early-Data header removed. */
-  def removeEarlyData: HttpRequest =
+  def earlyDataRemoved: HttpRequest =
     request.removeHeaders("Early-Data")

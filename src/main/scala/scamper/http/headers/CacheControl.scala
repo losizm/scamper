@@ -31,10 +31,10 @@ implicit class CacheControl[T <: HttpMessage](message: T) extends AnyVal:
    * @return header values or empty sequence if Cache-Control is not present
    */
   def cacheControl: Seq[CacheDirective] =
-    getCacheControl.getOrElse(Nil)
+    cacheControlOption.getOrElse(Nil)
 
   /** Gets Cache-Control header values if present. */
-  def getCacheControl: Option[Seq[CacheDirective]] =
+  def cacheControlOption: Option[Seq[CacheDirective]] =
     message.getHeaderValue("Cache-Control").map(CacheDirective.parseAll)
 
   /** Creates new message with Cache-Control header set to supplied values. */
@@ -46,5 +46,5 @@ implicit class CacheControl[T <: HttpMessage](message: T) extends AnyVal:
     setCacheControl(one +: more)
 
   /** Creates new message with Cache-Control header removed. */
-  def removeCacheControl: T =
+  def cacheControlRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Cache-Control")

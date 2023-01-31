@@ -29,10 +29,10 @@ implicit class SecWebSocketVersionServer(response: HttpResponse) extends AnyVal:
    * @throws HeaderNotFound if Sec-WebSocket-Version-Server is not present
    */
   def secWebSocketVersionServer: Seq[String] =
-    getSecWebSocketVersionServer.getOrElse(Nil)
+    secWebSocketVersionServerOption.getOrElse(Nil)
 
   /** Gets Sec-WebSocket-Version-Server header values if present. */
-  def getSecWebSocketVersionServer: Option[Seq[String]] =
+  def secWebSocketVersionServerOption: Option[Seq[String]] =
     response.getHeaderValue("Sec-WebSocket-Version-Server")
       .map(ListParser.apply)
 
@@ -45,5 +45,5 @@ implicit class SecWebSocketVersionServer(response: HttpResponse) extends AnyVal:
     setSecWebSocketVersionServer(one +: more)
 
   /** Creates new response with Sec-WebSocket-Version-Server header removed. */
-  def removeSecWebSocketVersionServer: HttpResponse =
+  def secWebSocketVersionServerRemoved: HttpResponse =
     response.removeHeaders("Sec-WebSocket-Version-Server")

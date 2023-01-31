@@ -31,10 +31,10 @@ implicit class IfMatch(request: HttpRequest) extends AnyVal:
    * @return header values or empty sequence if If-Match is not present
    */
   def ifMatch: Seq[EntityTag] =
-    getIfMatch.getOrElse(Nil)
+    ifMatchOption.getOrElse(Nil)
 
   /** Gets If-Match header values if present. */
-  def getIfMatch: Option[Seq[EntityTag]] =
+  def ifMatchOption: Option[Seq[EntityTag]] =
     request.getHeaderValue("If-Match")
       .map(ListParser.apply)
       .map(_.map(EntityTag.parse))
@@ -48,5 +48,5 @@ implicit class IfMatch(request: HttpRequest) extends AnyVal:
     setIfMatch(one +: more)
 
   /** Creates new request with If-Match header removed. */
-  def removeIfMatch: HttpRequest =
+  def ifMatchRemoved: HttpRequest =
     request.removeHeaders("If-Match")

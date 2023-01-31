@@ -29,10 +29,10 @@ implicit class SecWebSocketAccept(response: HttpResponse) extends AnyVal:
    * @throws HeaderNotFound if Sec-WebSocket-Accept is not present
    */
   def secWebSocketAccept: String =
-    getSecWebSocketAccept.getOrElse(throw HeaderNotFound("Sec-WebSocket-Accept"))
+    secWebSocketAcceptOption.getOrElse(throw HeaderNotFound("Sec-WebSocket-Accept"))
 
   /** Gets Sec-WebSocket-Accept header value if present. */
-  def getSecWebSocketAccept: Option[String] =
+  def secWebSocketAcceptOption: Option[String] =
     response.getHeaderValue("Sec-WebSocket-Accept")
 
   /** Creates new response with Sec-WebSocket-Accept header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class SecWebSocketAccept(response: HttpResponse) extends AnyVal:
     response.putHeaders(Header("Sec-WebSocket-Accept", value))
 
   /** Creates new response with Sec-WebSocket-Accept header removed. */
-  def removeSecWebSocketAccept: HttpResponse =
+  def secWebSocketAcceptRemoved: HttpResponse =
     response.removeHeaders("Sec-WebSocket-Accept")

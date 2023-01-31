@@ -29,10 +29,10 @@ implicit class SecWebSocketVersion[T <: HttpMessage](message: T) extends AnyVal:
    * @throws HeaderNotFound if Sec-WebSocket-Version is not present
    */
   def secWebSocketVersion: String =
-    getSecWebSocketVersion.getOrElse(throw HeaderNotFound("Sec-WebSocket-Version"))
+    secWebSocketVersionOption.getOrElse(throw HeaderNotFound("Sec-WebSocket-Version"))
 
   /** Gets Sec-WebSocket-Version header value if present. */
-  def getSecWebSocketVersion: Option[String] =
+  def secWebSocketVersionOption: Option[String] =
     message.getHeaderValue("Sec-WebSocket-Version")
 
   /** Creates new message with Sec-WebSocket-Version header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class SecWebSocketVersion[T <: HttpMessage](message: T) extends AnyVal:
     message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Sec-WebSocket-Version", value))
 
   /** Creates new message with Sec-WebSocket-Version header removed. */
-  def removeSecWebSocketVersion: T =
+  def secWebSocketVersionRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Sec-WebSocket-Version")

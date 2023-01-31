@@ -29,10 +29,10 @@ implicit class Authorization(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if Authorization is not present
    */
   def authorization: Credentials =
-    getAuthorization.getOrElse(throw HeaderNotFound("Authorization"))
+    authorizationOption.getOrElse(throw HeaderNotFound("Authorization"))
 
   /** Gets Authorization header value if present. */
-  def getAuthorization: Option[Credentials] =
+  def authorizationOption: Option[Credentials] =
     request.getHeaderValue("Authorization").map(Credentials.parse)
 
   /** Creates new request with Authorization header set to supplied value. */
@@ -40,12 +40,12 @@ implicit class Authorization(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("Authorization", value.toString))
 
   /** Creates new request with Authorization header removed. */
-  def removeAuthorization: HttpRequest =
+  def authorizationRemoved: HttpRequest =
     request.removeHeaders("Authorization")
 
   /** Tests for basic authorization. */
   def hasBasic: Boolean =
-    getBasic.isDefined
+    basicOption.isDefined
 
   /**
    * Gets basic authorization.
@@ -53,11 +53,11 @@ implicit class Authorization(request: HttpRequest) extends AnyVal:
    * @throws HttpException if basic authorization is not present
    */
   def basic: BasicCredentials =
-    getBasic.getOrElse(throw HttpException("Basic authorization not found"))
+    basicOption.getOrElse(throw HttpException("Basic authorization not found"))
 
   /** Gets basic authorization if present. */
-  def getBasic: Option[BasicCredentials] =
-    getAuthorization.collect { case credentials: BasicCredentials => credentials }
+  def basicOption: Option[BasicCredentials] =
+    authorizationOption.collect { case credentials: BasicCredentials => credentials }
 
   /** Creates new request with basic authorization. */
   def setBasic(token: String): HttpRequest =
@@ -73,7 +73,7 @@ implicit class Authorization(request: HttpRequest) extends AnyVal:
 
   /** Tests for bearer authorization. */
   def hasBearer: Boolean =
-    getBearer.isDefined
+    bearerOption.isDefined
 
   /**
    * Gets bearer authorization.
@@ -81,11 +81,11 @@ implicit class Authorization(request: HttpRequest) extends AnyVal:
    * @throws HttpException if bearer authorization is not present
    */
   def bearer: BearerCredentials =
-    getBearer.getOrElse(throw HttpException("Bearer authorization not found"))
+    bearerOption.getOrElse(throw HttpException("Bearer authorization not found"))
 
   /** Gets bearer authorization if present. */
-  def getBearer: Option[BearerCredentials] =
-    getAuthorization.collect { case credentials: BearerCredentials => credentials }
+  def bearerOption: Option[BearerCredentials] =
+    authorizationOption.collect { case credentials: BearerCredentials => credentials }
 
   /** Creates new request with bearer authorization. */
   def setBearer(token: String): HttpRequest =

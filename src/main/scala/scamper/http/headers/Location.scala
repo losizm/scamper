@@ -29,10 +29,10 @@ implicit class Location(response: HttpResponse) extends AnyVal:
    * @throws HeaderNotFound if Location is not present
    */
   def location: Uri =
-    getLocation.getOrElse(throw HeaderNotFound("Location"))
+    locationOption.getOrElse(throw HeaderNotFound("Location"))
 
   /** Gets Location header value if present. */
-  def getLocation: Option[Uri] =
+  def locationOption: Option[Uri] =
     response.getHeaderValue("Location").map(Uri(_))
 
   /** Creates new response with Location header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class Location(response: HttpResponse) extends AnyVal:
     response.putHeaders(Header("Location", value.toString))
 
   /** Creates new response with Location header removed. */
-  def removeLocation: HttpResponse =
+  def locationRemoved: HttpResponse =
     response.removeHeaders("Location")

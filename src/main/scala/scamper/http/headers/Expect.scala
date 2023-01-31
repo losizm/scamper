@@ -29,10 +29,10 @@ implicit class Expect(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if Expect is not present
    */
   def expect: String =
-    getExpect.getOrElse(throw HeaderNotFound("Expect"))
+    expectOption.getOrElse(throw HeaderNotFound("Expect"))
 
   /** Gets Expect header value if present. */
-  def getExpect: Option[String] =
+  def expectOption: Option[String] =
     request.getHeaderValue("Expect")
 
   /** Creates new request with Expect header set to supplied value. */
@@ -40,5 +40,5 @@ implicit class Expect(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("Expect", value))
 
   /** Creates new request with Expect header removed. */
-  def removeExpect: HttpRequest =
+  def expectRemoved: HttpRequest =
     request.removeHeaders("Expect")

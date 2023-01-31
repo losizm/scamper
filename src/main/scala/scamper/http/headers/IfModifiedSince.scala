@@ -31,10 +31,10 @@ implicit class IfModifiedSince(request: HttpRequest) extends AnyVal:
    * @throws HeaderNotFound if If-Modified-Since is not present
    */
   def ifModifiedSince: Instant =
-    getIfModifiedSince.getOrElse(throw HeaderNotFound("If-Modified-Since"))
+    ifModifiedSinceOption.getOrElse(throw HeaderNotFound("If-Modified-Since"))
 
   /** Gets If-Modified-Since header value if present. */
-  def getIfModifiedSince: Option[Instant] =
+  def ifModifiedSinceOption: Option[Instant] =
     request.getHeader("If-Modified-Since").map(_.dateValue)
 
   /** Creates new request with If-Modified-Since header set to supplied value. */
@@ -42,5 +42,5 @@ implicit class IfModifiedSince(request: HttpRequest) extends AnyVal:
     request.putHeaders(Header("If-Modified-Since", value))
 
   /** Creates new request with If-Modified-Since header removed. */
-  def removeIfModifiedSince: HttpRequest =
+  def ifModifiedSinceRemoved: HttpRequest =
     request.removeHeaders("If-Modified-Since")

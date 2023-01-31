@@ -31,10 +31,10 @@ implicit class ETag(response: HttpResponse) extends AnyVal:
    * @throws HeaderNotFound if ETag is not present
    */
   def eTag: EntityTag =
-    getETag.getOrElse(throw HeaderNotFound("ETag"))
+    eTagOption.getOrElse(throw HeaderNotFound("ETag"))
 
   /** Gets ETag header value if present. */
-  def getETag: Option[EntityTag] =
+  def eTagOption: Option[EntityTag] =
     response.getHeaderValue("ETag").map(EntityTag.parse)
 
   /** Creates new response with ETag header set to supplied value. */
@@ -42,5 +42,5 @@ implicit class ETag(response: HttpResponse) extends AnyVal:
     response.putHeaders(Header("ETag", value.toString))
 
   /** Creates new response with ETag header removed. */
-  def removeETag: HttpResponse =
+  def eTagRemoved: HttpResponse =
     response.removeHeaders("ETag")

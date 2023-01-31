@@ -31,10 +31,10 @@ implicit class Upgrade[T <: HttpMessage](message: T) extends AnyVal:
    * @return header values or empty sequence if Upgrade is not present
    */
   def upgrade: Seq[Protocol] =
-    getUpgrade.getOrElse(Nil)
+    upgradeOption.getOrElse(Nil)
 
   /** Gets Upgrade header values if present. */
-  def getUpgrade: Option[Seq[Protocol]] =
+  def upgradeOption: Option[Seq[Protocol]] =
     message.getHeaderValue("Upgrade")
       .map(ListParser.apply)
       .map(_.map(Protocol.parse))
@@ -48,5 +48,5 @@ implicit class Upgrade[T <: HttpMessage](message: T) extends AnyVal:
     setUpgrade(one +: more)
 
   /** Creates new message with Upgrade header removed. */
-  def removeUpgrade: T =
+  def upgradeRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Upgrade")

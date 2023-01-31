@@ -29,10 +29,10 @@ implicit class AuthenticationInfo(response: HttpResponse) extends AnyVal:
    * @return header value or empty map if Authentication-Info is not present
    */
   def authenticationInfo: Map[String, String] =
-    getAuthenticationInfo.getOrElse(Map.empty)
+    authenticationInfoOption.getOrElse(Map.empty)
 
   /** Gets Authentication-Info header value if present. */
-  def getAuthenticationInfo: Option[Map[String, String]] =
+  def authenticationInfoOption: Option[Map[String, String]] =
     response.getHeaderValue("Authentication-Info").map(AuthParams.parse)
 
   /** Creates new response with Authentication-Info header set to supplied values. */
@@ -44,5 +44,5 @@ implicit class AuthenticationInfo(response: HttpResponse) extends AnyVal:
     setAuthenticationInfo((one +: more).toMap)
 
   /** Creates new response with Authentication-Info header removed. */
-  def removeAuthenticationInfo: HttpResponse =
+  def authenticationInfoRemoved: HttpResponse =
     response.removeHeaders("Authentication-Info")

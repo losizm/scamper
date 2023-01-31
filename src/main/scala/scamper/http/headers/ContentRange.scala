@@ -31,10 +31,10 @@ implicit class ContentRange[T <: HttpMessage](message: T) extends AnyVal:
    * @throws HeaderNotFound if Content-Range is not present
    */
   def contentRange: ByteContentRange =
-    getContentRange.getOrElse(throw HeaderNotFound("Content-Range"))
+    contentRangeOption.getOrElse(throw HeaderNotFound("Content-Range"))
 
   /** Gets Content-Range header value if present. */
-  def getContentRange: Option[ByteContentRange] =
+  def contentRangeOption: Option[ByteContentRange] =
     message.getHeaderValue("Content-Range").map(ByteContentRange.parse)
 
   /** Creates new message with Content-Range header set to supplied value. */
@@ -42,5 +42,5 @@ implicit class ContentRange[T <: HttpMessage](message: T) extends AnyVal:
     message.asInstanceOf[MessageBuilder[T]].putHeaders(Header("Content-Range", value.toString))
 
   /** Creates new message with Content-Range header removed. */
-  def removeContentRange: T =
+  def contentRangeRemoved: T =
     message.asInstanceOf[MessageBuilder[T]].removeHeaders("Content-Range")

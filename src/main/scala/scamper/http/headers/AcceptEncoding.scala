@@ -31,10 +31,10 @@ implicit class AcceptEncoding(request: HttpRequest) extends AnyVal:
    * @return header values or empty sequence if Accept-Encoding is not present
    */
   def acceptEncoding: Seq[ContentCodingRange] =
-    getAcceptEncoding.getOrElse(Nil)
+    acceptEncodingOption.getOrElse(Nil)
 
   /** Gets Accept-Encoding header values if present. */
-  def getAcceptEncoding: Option[Seq[ContentCodingRange]] =
+  def acceptEncodingOption: Option[Seq[ContentCodingRange]] =
     request.getHeaderValue("Accept-Encoding")
       .map(ListParser.apply)
       .map(_.map(ContentCodingRange.parse))
@@ -48,5 +48,5 @@ implicit class AcceptEncoding(request: HttpRequest) extends AnyVal:
     setAcceptEncoding(one +: more)
 
   /** Creates new request with Accept-Encoding header removed. */
-  def removeAcceptEncoding: HttpRequest =
+  def acceptEncodingRemoved: HttpRequest =
     request.removeHeaders("Accept-Encoding")
