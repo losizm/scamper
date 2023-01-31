@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Carlos Conyers
+ * Copyright 2023 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,36 +136,35 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
   }
 
   def get(target: Uri): Seq[PlainCookie] = synchronized {
-    val normalized = normalize(target)
+    validate(target)
 
     collection
       .filter(checkExpiry)
-      .filter(checkDomain(_, normalized))
-      .filter(checkPath(_, normalized))
-      .filter(checkSecure(_, normalized))
+      .filter(checkDomain(_, target))
+      .filter(checkPath(_, target))
+      .filter(checkSecure(_, target))
       .sorted(ordering)
       .map(_.touch().toPlainCookie)
       .toSeq
   }
 
   def put(target: Uri, cookies: Seq[SetCookie]): this.type = synchronized {
-    val normalized = normalize(target)
+    validate(target)
 
     cookies.foreach { cookie =>
-      create(cookie, normalized)
+      create(cookie, target)
         .filter(checkNotPublicSuffix)
-        .filter(it => domainMatches(it.domain, normalized.getHost))
+        .filter(it => domainMatches(it.domain, target.host))
         .foreach(store)
     }
 
     this
   }
 
-  private def normalize(target: Uri): Uri =
+  private def validate(target: Uri): Uri =
     require(target.isAbsolute, "target is not absolute")
-    require(target.getScheme.matches("(http|ws)s?"), "invalid target scheme")
-
-    target.setPath("/" + target.getRawPath).normalize()
+    require(target.scheme.matches("(http|ws)s?"), "invalid target scheme")
+    target
 
   private def key(cookie: PersistentCookie): Key =
     (cookie.name, cookie.domain, cookie.path)
@@ -180,11 +179,11 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
           .forall(_ == ""),
         domain = cookie.domain
           .map(_.stripPrefix("."))
-          .getOrElse(target.getHost)
+          .getOrElse(target.host)
           .toLowerCase,
         path = cookie.path
           .filter(_.startsWith("/"))
-          .getOrElse(target.getRawPath),
+          .getOrElse(target.path),
         secureOnly = cookie.secure,
         httpOnly = cookie.httpOnly,
         persistent = cookie.maxAge.isDefined || cookie.expires.isDefined,
@@ -214,15 +213,15 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
 
   private def checkDomain(cookie: PersistentCookie, target: Uri): Boolean =
     cookie.hostOnly match
-      case true  => cookie.domain.equalsIgnoreCase(target.getHost)
-      case false => domainMatches(cookie.domain, target.getHost)
+      case true  => cookie.domain.equalsIgnoreCase(target.host)
+      case false => domainMatches(cookie.domain, target.host)
 
   private def checkPath(cookie: PersistentCookie, target: Uri): Boolean =
-    pathMatches(cookie.path, target.getRawPath)
+    pathMatches(cookie.path, target.path)
 
   private def checkSecure(cookie: PersistentCookie, target: Uri): Boolean =
     cookie.secureOnly match
-      case true  => target.getScheme.matches("(http|ws)s")
+      case true  => target.scheme.matches("(http|ws)s")
       case false => true
 
   private def checkExpiry(cookie: PersistentCookie): Boolean =

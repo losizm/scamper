@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Carlos Conyers
+ * Copyright 2023 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,7 +153,7 @@ class HttpClientGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
 
   private def checkHostHeader(req: HttpRequest): Unit =
     info("check Host header")
-    hostHeaderCheck.set(req.host == req.absoluteTarget.getAuthority)
+    hostHeaderCheck.set(req.host.contains(req.absoluteTarget.authority))
 
   private def checkUserAgentHeader(req: HttpRequest): Unit =
     info("check User-Agent header")

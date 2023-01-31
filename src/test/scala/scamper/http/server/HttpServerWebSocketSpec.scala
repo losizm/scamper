@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Carlos Conyers
+ * Copyright 2023 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -206,7 +206,7 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
       closure.set(Reserved)
 
       val scheme  = if server.isSecure then "wss" else "ws"
-      val session = client.websocket(s"${serverUri.setScheme(scheme)}/chat/lupita") { session =>
+      val session = client.websocket(s"${serverUri.toAbsoluteUri(scheme, serverUri.authority)}/chat/lupita") { session =>
         info("set up client session")
 
         assert(session.state == SessionState.Pending)

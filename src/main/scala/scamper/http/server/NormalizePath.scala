@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Carlos Conyers
+ * Copyright 2023 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@ package server
 
 private object NormalizePath:
   def apply(path: String): String =
-    Uri(path.replaceAll("//+", "/"))
-      .normalize()
-      .toString match
-        case ""   => ""
-        case "/"  => "/"
-        case path => if path.last == '/' then path.init else path
+    Uri(path.replaceAll("//+", "/")).toString match
+      case ""   => ""
+      case "/"  => "/"
+      case path => if path.last == '/' then path.init else path

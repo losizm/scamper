@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Carlos Conyers
+ * Copyright 2023 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,11 +74,10 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     val target = request.target
 
     require(target.isAbsolute, s"Request target not absolute: $target")
-    require(target.getScheme.matches("(http|ws)s?"), s"Unsupported scheme: ${target.getScheme}")
 
-    val secure         = target.getScheme.matches("https|wss")
-    val host           = getEffectiveHost(target)
-    val userAgent      = request.getHeaderValueOrElse("User-Agent", "Scamper/34.0.0")
+    val secure         = target.scheme.matches("https|wss")
+    val authority      = target.authority
+    val userAgent      = request.getHeaderValueOrElse("User-Agent", "Scamper/35.0.0")
     val requestCookies = request.cookies ++ cookies.get(target)
     val connection     = getEffectiveConnection(request)
 
@@ -94,23 +93,20 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
       case _       => request
 
     effectiveRequest = effectiveRequest.setHeaders(
-      Header("Host", host) +:
+      Header("Host", authority) +:
       Header("User-Agent", userAgent) +:
       effectiveRequest.headers.filterNot(_.name.matches("(?i)Host|User-Agent|Cookie|Connection")) :+
       Header("Connection", connection)
     ).setCookies(requestCookies)
 
-    effectiveRequest = effectiveRequest.setTarget(target.toTarget)
+    effectiveRequest = effectiveRequest.setTarget(target.toTargetUri)
 
     if !effectiveRequest.path.startsWith("/") && effectiveRequest.path != "*" then
       effectiveRequest = effectiveRequest.setPath("/" + effectiveRequest.path)
 
-    val realHost = target.getHost.toLowerCase
-    val realPort = target.getPort match
-      case -1   => if secure then 443 else 80
-      case port => port
-
-    val conn = getClientConnection(secure, realHost, realPort)
+    val host = target.host
+    val port = target.portOption.getOrElse(if secure then 443 else 80)
+    val conn = getClientConnection(secure, host, port)
 
     try
       val correlate = createCorrelate(requestCount.incrementAndGet)
@@ -127,7 +123,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
         .map(addRequestAttribute(_, effectiveRequest))
         .map(persistCookies(target, _))
         .map(incoming.foldLeft(_) { (res, filter) => filter(res) })
-        .map(persistConnection(handler, secure, realHost, realPort, _))
+        .map(persistConnection(handler, secure, host, port, _))
         .get
     finally
       Try(conn.close())
@@ -147,7 +143,8 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
   def websocket[T](target: Uri, headers: Seq[Header] = Nil, cookies: Seq[PlainCookie] = Nil)
     (app: WebSocketApplication[T]): T =
 
-    require(target.getScheme == "ws" || target.getScheme == "wss", s"Invalid WebSocket scheme: ${target.getScheme}")
+    require(target.isAbsolute, "Absolute WebSocket URI required")
+    require(target.scheme == "ws" || target.scheme == "wss", s"Invalid WebSocket scheme: ${target.scheme}")
 
     val req = HttpRequest(
       RequestLine(Get, target),
@@ -186,13 +183,8 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
     send(req)(handler)
 
-  private def getEffectiveHost(target: Uri): String =
-    target.getPort match
-      case -1   => target.getHost
-      case port => target.getHost + ":" + port
-
   private def getEffectiveConnection(req: HttpRequest): String =
-    req.target.getScheme.matches("wss?") match
+    req.target.scheme.matches("wss?") match
       case true  => WebSocket.validate(req).connection.mkString(", ")
       case false =>
         req.getConnection

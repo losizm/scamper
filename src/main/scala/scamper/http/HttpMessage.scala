@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Carlos Conyers
+ * Copyright 2023 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -240,6 +240,8 @@ sealed trait HttpMessage:
  * @see [[HttpResponse]]
  */
 trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest]:
+  import RequestMethod.Registry.*
+
   /** @inheritdoc */
   type LineType = RequestLine
 
@@ -249,49 +251,53 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest]:
 
   /** Tests for GET method. */
   def isGet: Boolean =
-    method == RequestMethod.Registry.Get
+    method == Get
 
   /** Tests for POST method. */
   def isPost: Boolean =
-    method == RequestMethod.Registry.Post
+    method == Post
 
   /** Tests for PUT method. */
   def isPut: Boolean =
-    method == RequestMethod.Registry.Put
+    method == Put
 
   /** Tests for PATCH method. */
   def isPatch: Boolean =
-    method == RequestMethod.Registry.Patch
+    method == Patch
 
   /** Tests for DELETE method. */
   def isDelete: Boolean =
-    method == RequestMethod.Registry.Delete
+    method == Delete
 
   /** Tests for HEAD method. */
   def isHead: Boolean =
-    method == RequestMethod.Registry.Head
+    method == Head
 
   /** Tests for OPTIONS method. */
   def isOptions: Boolean =
-    method == RequestMethod.Registry.Options
+    method == Options
 
   /** Tests for TRACE method. */
   def isTrace: Boolean =
-    method == RequestMethod.Registry.Trace
+    method == Trace
 
   /** Tests for CONNECT method. */
   def isConnect: Boolean =
-    method == RequestMethod.Registry.Connect
+    method == Connect
 
   /** Gets request target. */
   def target: Uri =
     startLine.target
 
   /** Gets target path. */
-  def path: String
+  def path: String =
+    target.path match
+      case ""    => if isOptions then "*" else "/"
+      case value => value
 
   /** Gets query string. */
-  def query: QueryString
+  def query: QueryString =
+    target.query
 
   /**
    * Creates request with new method.
@@ -314,14 +320,18 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest]:
    *
    * @return new request
    */
-  def setPath(path: String): HttpRequest
+  def setPath(path: String): HttpRequest =
+    path match
+      case "*" if isOptions => setTarget(target.setPath(""))
+      case _                => setTarget(target.setPath(path))
 
   /**
    * Creates request with new query.
    *
    * @return new request
    */
-  def setQuery(query: QueryString): HttpRequest
+  def setQuery(query: QueryString): HttpRequest =
+    setTarget(target.setQuery(query))
 
   /**
    * Creates request with new query using supplied parameters.
