@@ -48,7 +48,7 @@ client and server implementations including WebSockets.
 To get started, add **Scamper** to your project:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "34.0.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "35.0.0"
 ```
 
 **Scamper** uses SLF4J logging abstraction under the hood, so you'll need to
@@ -138,13 +138,13 @@ def hasContentType: Boolean
 def contentType: MediaType
 
 /** Optionally gets Content-Type header value. */
-def getContentType: Option[MediaType]
+def contentTypeOption: Option[MediaType]
 
 /** Creates message setting Content-Type header. */
 def setContentType(value: MediaType): HttpMessage
 
 /** Creates message removing Content-Type header. */
-def removeContentType(): HttpMessage
+def contentTypeRemoved: HttpMessage
 ```
 
 With them imported, you can work with the header using its specialized header
@@ -399,7 +399,7 @@ import scamper.http.multipart.Multipart
 
 def save(req: HttpRequest): Unit =
   // Get parser for multipart message body
-  given BodyParser[Multipart] = Multipart.getBodyParser()
+  given BodyParser[Multipart] = Multipart.bodyParser()
 
   // Parse message to Multipart instance
   val song = req.as[Multipart]
@@ -612,7 +612,7 @@ val client = HttpClient.settings()
   .cookies(CookieStore())
   .keepAlive(true)
   .trust(File("/path/to/truststore"))
-  .create()
+  .toHttpClient()
 
 client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
   assert(res.isSuccessful, s"Message not posted: ${res.statusCode}")
@@ -664,7 +664,7 @@ val client = HttpClient
   .readTimeout(5000)
   // Use supplied trust manager
   .trust(SingleSiteTrustManager("192.168.0.2"))
-  .create()
+  .toHttpClient()
 
 client.get("https://192.168.0.2:3000/messages") { res =>
   res.drain(System.out, 16 * 1024)
@@ -703,7 +703,7 @@ settings.incoming { res =>
 }
 
 // Create client
-val client = settings.create()
+val client = settings.toHttpClient()
 ```
 
 You can add multiple request and response filters. If multiple filters are
@@ -780,7 +780,7 @@ import scamper.http.server.HttpServer
 
 val server = HttpServer.app()
   .incoming { req => Ok("Hello, world!") }
-  .create(8080)
+  .toHttpServer(8080)
 ```
 
 This is as bare-bones as it gets. We create a server at port 8080 that sends a
@@ -1031,7 +1031,7 @@ import scamper.http.server.ResponseAborted
 
 // Ignore requests originating from evil site
 app.incoming { req =>
-  if req.referer.getHost == "www.phishing.com" then
+  if req.referer.host == "www.phishing.com" then
     throw ResponseAborted("Not trusted")
   req
 }
@@ -1259,14 +1259,14 @@ app.secure(File("/path/to/keystore"), "s3cr3t", "pkcs12")
 When the application has been configured, you can create the server.
 
 ```scala
-val server = app.create(8080)
+val server = app.toHttpServer(8080)
 ```
 
 If the server must bind to a particular host, you can provide the host name or
 IP address.
 
 ```scala
-val server = app.create("192.168.0.2", 8080)
+val server = app.toHttpServer("192.168.0.2", 8080)
 ```
 
 An instance of `HttpServer` is returned, which can be used to query server
