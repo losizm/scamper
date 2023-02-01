@@ -174,7 +174,7 @@ class HttpServerLifecycleHookSpec extends org.scalatest.flatspec.AnyFlatSpec:
         router.outgoing(TestResponseFilter())
         router.recover(TestErrorHandler())
       }
-      .create("localhost", 0)
+      .toHttpServer("localhost", 0)
       .close()
 
   extension (app: ServerApplication)

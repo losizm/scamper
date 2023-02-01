@@ -68,7 +68,7 @@ class HttpClientGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
       .incoming(_.addHeaders("Response-Test-2: test"))
       .incoming(_.putHeaders("Response-Test-2: update-1"))
       .incoming(_.addHeaders("Response-Test-2: update-2"))
-      .create()
+      .toHttpClient()
 
     info("check client settings")
     assert(client.accept == Seq[MediaRange]("text/html; q=0.9", "text/plain; q=0.1"))

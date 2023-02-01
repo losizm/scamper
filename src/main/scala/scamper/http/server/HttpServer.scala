@@ -25,7 +25,7 @@ import scamper.http.types.KeepAliveParameters
 /**
  * Defines handle to server instance.
  *
- * @see [[HttpServer$ HttpServer]], [[ServerApplication]]
+ * @see [[HttpServer$.app HttpServer.app()]], [[ServerApplication]]
  */
 trait HttpServer extends AutoCloseable:
   /** Gets backlog size. */

@@ -101,7 +101,7 @@ import Validate.{ noNulls, notNull }
  * }
  *
  * // Create server
- * val server = app.create(8080)
+ * val server = app.toHttpServer(8080)
  *
  * try
  *   printf("Host: %s%n", server.host)
@@ -357,8 +357,8 @@ class ServerApplication extends Router:
    *
    * @return new server
    */
-  def create(port: Int): HttpServer =
-    create("0.0.0.0", port)
+  def toHttpServer(port: Int): HttpServer =
+    toHttpServer("0.0.0.0", port)
 
   /**
    * Creates server at given host and port.
@@ -368,8 +368,8 @@ class ServerApplication extends Router:
    *
    * @return new server
    */
-  def create(host: String, port: Int): HttpServer =
-    create(InetAddress.getByName(host), port)
+  def toHttpServer(host: String, port: Int): HttpServer =
+    toHttpServer(InetAddress.getByName(host), port)
 
   /**
    * Creates server at given host and port.
@@ -379,7 +379,7 @@ class ServerApplication extends Router:
    *
    * @return new server
    */
-  def create(host: InetAddress, port: Int): HttpServer = synchronized {
+  def toHttpServer(host: InetAddress, port: Int): HttpServer = synchronized {
     HttpServerImpl(host, port, app)
   }
 

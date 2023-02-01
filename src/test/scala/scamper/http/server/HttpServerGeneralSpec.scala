@@ -102,7 +102,7 @@ class HttpServerGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
       .settings()
       .trust(Resources.truststore)
       .continueTimeout(1000)
-      .create()
+      .toHttpClient()
 
   private given textBodyParser: BodyParser[String] = BodyParser.string(8192)
   private given byteBodyParser: BodyParser[Array[Byte]] = BodyParser.bytes(8192)

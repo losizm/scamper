@@ -37,7 +37,7 @@ class HttpServerAttributesSpec extends org.scalatest.flatspec.AnyFlatSpec with T
     HttpClient
       .settings()
       .trust(Resources.truststore)
-      .create()
+      .toHttpClient()
 
   private val request  = AtomicReference[HttpRequest]()
   private val response = AtomicReference[HttpResponse]()
@@ -135,4 +135,4 @@ class HttpServerAttributesSpec extends org.scalatest.flatspec.AnyFlatSpec with T
     if secure then
       app.secure(Resources.keystore, "letmein", "pkcs12")
 
-    app.create("localhost", 0)
+    app.toHttpServer("localhost", 0)

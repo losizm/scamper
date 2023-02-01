@@ -56,7 +56,7 @@ trait TestServer:
     if secure then
       app.secure(Resources.keystore, "letmein", "pkcs12")
 
-    app.create("localhost", 0)
+    app.toHttpServer("localhost", 0)
 
   def withServer[T](secure: Boolean)(f: HttpServer => T): T =
     val server = getServer(secure)

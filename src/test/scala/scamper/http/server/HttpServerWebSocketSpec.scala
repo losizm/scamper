@@ -60,7 +60,7 @@ class HttpServerWebSocketSpec extends org.scalatest.flatspec.AnyFlatSpec with Te
     HttpClient
       .settings()
       .trust(Resources.truststore)
-      .create()
+      .toHttpClient()
 
   private val messages     = ListBuffer[String]()
   private val pingData     = ListBuffer[Byte]()

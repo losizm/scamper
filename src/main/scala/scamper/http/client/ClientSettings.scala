@@ -228,4 +228,4 @@ class ClientSettings:
   }
 
   /** Creates client using current settings. */
-  def create(): HttpClient = synchronized { HttpClientImpl(settings) }
+  def toHttpClient(): HttpClient = synchronized { HttpClientImpl(settings) }

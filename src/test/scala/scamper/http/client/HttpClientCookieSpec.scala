@@ -36,7 +36,7 @@ class HttpClientCookieSpec extends org.scalatest.flatspec.AnyFlatSpec with TestS
         .trust(Resources.truststore)
         .outgoing(doCookieCheck(secure)(_))
         .cookies()
-        .create()
+        .toHttpClient()
 
     info("send request to /cookies/foo/1")
     client.get(s"$serverUri/cookies/foo/1") { res =>

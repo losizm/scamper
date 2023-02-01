@@ -57,7 +57,7 @@ class HttpServerFileServerSpec extends org.scalatest.flatspec.AnyFlatSpec with T
       .settings()
       .trust(Resources.truststore)
       .continueTimeout(1000)
-      .create()
+      .toHttpClient()
 
   private given BodyParser[Array[Byte]] = BodyParser.bytes(32 * 1024)
   private given BodyParser[String]      = BodyParser.string(32 * 1024)
@@ -128,6 +128,6 @@ class HttpServerFileServerSpec extends org.scalatest.flatspec.AnyFlatSpec with T
       .poolSize(2)
       .queueSize(4)
       .files("/", Resources.riteshiff, "home.html")
-      .create(0)
+      .toHttpServer(0)
 
     try f(server) finally server.close()

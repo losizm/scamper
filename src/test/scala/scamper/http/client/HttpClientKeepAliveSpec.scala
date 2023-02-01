@@ -32,7 +32,7 @@ class HttpClientKeepAliveSpec extends org.scalatest.flatspec.AnyFlatSpec:
   private given BodyParser[String]      = BodyParser.string(16 * 1024)
 
   it should "send requests using persistent connections" in withServer { server =>
-    given HttpClient = HttpClient.settings().keepAlive().create()
+    given HttpClient = HttpClient.settings().keepAlive().toHttpClient()
 
     val serverUrl = getUrl(server)
     val count     = AtomicInteger(0)
@@ -155,7 +155,7 @@ class HttpClientKeepAliveSpec extends org.scalatest.flatspec.AnyFlatSpec:
       .get("/bad-request")(_ => BadRequest("Your bad"))
       .get("/internal-server-error")(_ => InternalServerError("My bad"))
       .post("/echo")(doEcho)
-      .create("localhost", 0)
+      .toHttpServer("localhost", 0)
 
     try f(server) finally server.close()
 

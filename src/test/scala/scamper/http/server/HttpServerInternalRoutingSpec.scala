@@ -93,7 +93,7 @@ class HttpServerInternalRoutingSpec extends org.scalatest.flatspec.AnyFlatSpec:
     val server = HttpServer
       .app()
       .route("/messages")(doRouting)
-      .create("localhost", 0)
+      .toHttpServer("localhost", 0)
 
     try
       f(server)

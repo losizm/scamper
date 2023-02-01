@@ -190,7 +190,7 @@ trait HttpClient:
 /** Provides factory for `HttpClient`. */
 object HttpClient:
   /** Gets new instance of client settings. */
-  def settings(): ClientSettings = new ClientSettings()
+  def settings(): ClientSettings = ClientSettings()
 
   /** Creates client using default settings. */
-  def apply(): HttpClient = settings().create()
+  def apply(): HttpClient = settings().toHttpClient()

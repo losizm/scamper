@@ -35,7 +35,7 @@ class HttpServerRouteSpec extends org.scalatest.flatspec.AnyFlatSpec with TestSe
     HttpClient
       .settings()
       .trust(Resources.truststore)
-      .create()
+      .toHttpClient()
 
   private given bodyParser: BodyParser[String] = BodyParser.string(8192)
 
