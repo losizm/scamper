@@ -117,14 +117,6 @@ object Uri:
   def apply(uri: String): Uri =
     UriImpl(URI(uri).normalize())
 
-  /**
-   * Creates normalized URI with supplied scheme, scheme-specific part, and fragment.
-   *
-   * @throws IllegalArgumentException if scheme not one of http, https, wss, or ws.
-   */
-  def apply(scheme: String, schemePart: String, fragment: Option[String] = None): Uri =
-    UriImpl(URI(scheme, schemePart, fragment.getOrElse(null)).normalize())
-
 private case class UriImpl(toURI: URI) extends Uri:
   val isAbsolute = toURI.isAbsolute
 
@@ -150,7 +142,7 @@ private case class UriImpl(toURI: URI) extends Uri:
   val (hostOption, portOption) = authorityOption.map(parseAuthority).getOrElse((None, None))
 
   portOption.foreach { value =>
-    if value < 1 || value > 65335 then
+    if value < 1 || value > 65535 then
       throw IllegalArgumentException(s"Invalid port number: $value")
   }
 

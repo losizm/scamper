@@ -16,8 +16,6 @@
 package scamper
 package http
 
-import java.net.URI
-
 import Validate.notNull
 
 /**
@@ -37,7 +35,7 @@ class UriBuilder(uri: Uri): //
 
   /** Sets scheme. */
   def scheme(value: String): this.type =
-    schemeOption = Some(notNull(value))
+    schemeOption = Some(notNull(value).trim)
     this
 
   /** Sets scheme. */
@@ -47,7 +45,7 @@ class UriBuilder(uri: Uri): //
 
   /** Sets authority. */
   def authority(value: String): this.type =
-    authorityOption = Some(notNull(value))
+    authorityOption = Some(notNull(value).trim)
     this
 
   /** Sets authority. */
@@ -66,7 +64,7 @@ class UriBuilder(uri: Uri): //
 
   /** Sets path. */
   def path(value: String): this.type =
-    pathValue = notNull(value)
+    pathValue = notNull(value).trim
     this
 
   /** Sets query. */
@@ -76,7 +74,7 @@ class UriBuilder(uri: Uri): //
 
   /** Sets fragment. */
   def fragment(value: String): this.type =
-    fragmentOption = Some(notNull(value))
+    fragmentOption = Some(notNull(value).trim)
     this
 
   /** Sets fragment. */
@@ -108,4 +106,4 @@ class UriBuilder(uri: Uri): //
 
     fragmentOption.foreach { fragment => uri.append('#').append(fragment) }
 
-    UriImpl(URI(uri.toString).normalize())
+    Uri(uri.toString)

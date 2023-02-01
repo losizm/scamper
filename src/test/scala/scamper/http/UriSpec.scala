@@ -69,19 +69,6 @@ class UriSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assertThrows[NoSuchElementException] { uri.fragment }
   }
 
-  it should "create absolute URI from scheme, scheme-specific part, and fragment" in {
-    val uri = ShowUri("http", "//localhost:8080/index.html?a=1&b=2", Some("top"))
-    assert { uri.isAbsolute }
-    assert { uri.scheme == "http" }
-    assert { uri.authority == "localhost:8080" }
-    assert { uri.host == "localhost" }
-    assert { uri.port == 8080 }
-    assert { uri.path == "/index.html" }
-    assert { uri.query == QueryString("a=1&b=2") }
-    assert { uri.fragment == "top" }
-    assert { uri.toString == "http://localhost:8080/index.html?a=1&b=2#top" }
-  }
-
   it should "create relative URI from absolute URI" in {
     val uri = ShowUri(Uri("http://localhost:8080/index.html?a=1&b=2#top").toRelativeUri)
 
@@ -134,9 +121,6 @@ class UriSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assertThrows[IllegalArgumentException] { Uri("//localhost:8080/index.html") }
     assertThrows[IllegalArgumentException] { Uri("//localhost:8080/websocket") }
   }
-
-  private def ShowUri(scheme: String, schemePart: String, fragment: Option[String] = None): Uri =
-    ShowUri(Uri(scheme, schemePart, fragment))
 
   private def ShowUri(uri: String): Uri =
     ShowUri(Uri(uri))
