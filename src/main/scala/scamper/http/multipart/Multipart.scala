@@ -104,7 +104,7 @@ object Multipart:
    * @param maxLength maximum length in bytes
    * @param bufferSize buffer size in bytes
    */
-  def getBodyParser(dest: File = File(sys.props("java.io.tmpdir")), maxLength: Long = 8388608, bufferSize: Int = 8192): BodyParser[Multipart] =
+  def bodyParser(dest: File = File(sys.props("java.io.tmpdir")), maxLength: Long = 8388608, bufferSize: Int = 8192): BodyParser[Multipart] =
     MultipartBodyParser(dest, maxLength.max(0), bufferSize.max(8192))
 
   /** Generates boundary. */
