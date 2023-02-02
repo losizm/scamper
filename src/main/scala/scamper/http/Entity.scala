@@ -16,7 +16,7 @@
 package scamper
 package http
 
-import java.io.{ ByteArrayInputStream, File, FileInputStream, InputStream, OutputStream }
+import java.io.*
 
 import Validate.notNull
 
@@ -50,7 +50,7 @@ object Entity:
 
   /** Creates entity from supplied input stream. */
   def apply(in: InputStream): Entity =
-    InputStreamEntity(notNull(in, "bytes"))
+    InputStreamEntity(notNull(in, "in"))
 
   /**
    * Creates entity from supplied writer.

@@ -16,7 +16,7 @@
 package scamper
 package http
 
-import java.io.File
+import java.io.*
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -48,10 +48,32 @@ object BodyParser:
     UnitBodyParser(maxLength.max(0), bufferSize.max(8192))
 
   /**
+   * Gets body parser for buffered input stream.
+   *
+   * @param maxLength maximum length in bytes
+   * @param bufferSize buffer size in bytes
+   *
+   * @note The input stream returned from parser is decoded.
+   */
+  def stream(maxLength: Int = 8388608, bufferSize: Int = 8192): BodyParser[InputStream] =
+    InputStreamBodyParser(maxLength, bufferSize)
+
+  /**
+   * Gets body parser for buffered reader.
+   *
+   * @param maxLength maximum length in bytes
+   * @param bufferSize buffer size in bytes
+   */
+  def reader(maxLength: Int = 8388608, bufferSize: Int = 8192): BodyParser[BufferedReader] =
+    BufferedReaderBodyParser(maxLength, bufferSize)
+
+  /**
    * Gets body parser for byte array.
    *
    * @param maxLength maximum length
    * @param bufferSize buffer size in bytes
+   *
+   * @note The bytes returned from parser are decoded.
    */
   def bytes(maxLength: Int = 8388608, bufferSize: Int = 8192): BodyParser[Array[Byte]] =
     ByteArrayBodyParser(maxLength.max(0), bufferSize.max(8192))
@@ -81,9 +103,10 @@ object BodyParser:
    * @param maxLength maximum length in bytes
    * @param bufferSize buffer size in bytes
    *
-   * @note If `dest` is a directory, then the parser creates a new file in the
-   * specified directory on each parsing invocation. Otherwise, the parser
-   * overwrites the specified file on each invocation.
+   * @note If `dest` is a directory, then the parser creates a new file in
+   * specified directory on each parsing invocation; otherwise, the parser
+   * overwrites specified file on each invocation. In either case, the bytes in
+   * file are decoded.
    */
   def file(dest: File = File(sys.props("java.io.tmpdir")), maxLength: Long = 8388608, bufferSize: Int = 8192): BodyParser[File] =
     FileBodyParser(dest, maxLength.max(0), bufferSize.max(8192))
@@ -94,6 +117,14 @@ private class UnitBodyParser(val maxLength: Long, bufferSize: Int) extends BodyP
       val bufffer = new Array[Byte](bufferSize)
       while in.read(bufffer) != -1 do ()
     }
+
+private class InputStreamBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[InputStream] with BodyDecoder:
+  def parse(message: HttpMessage): InputStream =
+    BufferedInputStream(decode(message), bufferSize)
+
+private class BufferedReaderBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[BufferedReader] with BodyDecoder:
+  def parse(message: HttpMessage): BufferedReader =
+    BufferedReader(InputStreamReader(decode(message)), bufferSize)
 
 private class ByteArrayBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[Array[Byte]] with BodyDecoder:
   def parse(message: HttpMessage): Array[Byte] =

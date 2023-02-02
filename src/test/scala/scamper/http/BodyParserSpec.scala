@@ -16,7 +16,7 @@
 package scamper
 package http
 
-import java.io.EOFException
+import java.io.{ BufferedReader, EOFException, InputStream }
 
 import scala.language.implicitConversions
 
@@ -27,7 +27,7 @@ import RequestMethod.Registry.*
 import ResponseStatus.Registry.*
 
 class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
-  "BodyParser" should "parse response with string body" in {
+  it should "parse response with string body" in {
     given BodyParser[String] = BodyParser.string()
     val body = Entity("Hello, world!")
     val message = Ok(body).setContentType("text/plain").setContentLength(body.knownSize.get)
@@ -61,6 +61,40 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
     assert(form.get("id").contains("0"))
     assert(form.get("name").contains("root"))
+  }
+
+  it should "parse response to input stream" in {
+    given BodyParser[InputStream] = BodyParser.stream()
+    val body = Entity("Hello, world!")
+    val message = Ok(body).setContentType("text/plain").setContentLength(body.knownSize.get)
+
+    assert(message.status == Ok)
+    assert(message.contentType.isText)
+    assert(message.contentType.typeName == "text")
+    assert(message.contentType.subtypeName == "plain")
+
+    val in  = message.as[InputStream]
+    val buf = new Array[Byte](256)
+    val len = in.read(buf)
+
+    assert(String(buf, 0, len, "utf-8") == "Hello, world!")
+    assert(in.read() == -1)
+  }
+
+  it should "parse response to buffered reader" in {
+    given BodyParser[BufferedReader] = BodyParser.reader()
+    val body = Entity("Hello, world!")
+    val message = Ok(body).setContentType("text/plain").setContentLength(body.knownSize.get)
+
+    assert(message.status == Ok)
+    assert(message.contentType.isText)
+    assert(message.contentType.typeName == "text")
+    assert(message.contentType.subtypeName == "plain")
+
+    val in = message.as[BufferedReader]
+
+    assert(in.readLine() == "Hello, world!")
+    assert(in.readLine() == null)
   }
 
   it should "parse request as unit" in {
