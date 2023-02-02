@@ -15,7 +15,7 @@
  */
 package scamper
 
-private object Validate:
+private object Values:
   inline def notNull[T](value: T): T =
     if value == null then
       throw NullPointerException()

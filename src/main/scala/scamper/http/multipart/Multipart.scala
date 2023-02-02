@@ -19,7 +19,7 @@ package multipart
 
 import java.io.File
 
-import Validate.{ noNulls, notNull }
+import Values.{ noNulls, notNull }
 
 /**
  * Represents multipart form data.

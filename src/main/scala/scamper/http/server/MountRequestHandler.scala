@@ -17,7 +17,7 @@ package scamper
 package http
 package server
 
-import Validate.notNull
+import Values.notNull
 
 private class MountRequestHandler private (path: MountPath, handler: RequestHandler) extends RequestHandler:
   def apply(req: HttpRequest): HttpMessage =

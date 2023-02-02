@@ -18,7 +18,7 @@ package http
 
 import scala.util.Try
 
-import Validate.notNull
+import Values.notNull
 
 /** Defines HTTP message start line. */
 sealed trait StartLine:

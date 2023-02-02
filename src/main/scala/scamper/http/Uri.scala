@@ -18,7 +18,7 @@ package http
 
 import java.net.URI
 
-import Validate.{ noNulls, notNull }
+import Values.{ noNulls, notNull }
 
 /** Defines URI. */
 sealed trait Uri:

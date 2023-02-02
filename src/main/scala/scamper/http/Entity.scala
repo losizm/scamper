@@ -18,7 +18,7 @@ package http
 
 import java.io.*
 
-import Validate.notNull
+import Values.notNull
 
 /** Provides input stream to HTTP entity. */
 trait Entity:

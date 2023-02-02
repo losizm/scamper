@@ -21,7 +21,7 @@ import scala.util.Try
 
 import scamper.http.websocket.{ StatusCode, WebSocket, WebSocketApplication }
 
-import Validate.notNull
+import Values.notNull
 
 private class WebSocketRequestHandler(app: WebSocketApplication[?]) extends RequestHandler:
   private lazy val logger = org.slf4j.LoggerFactory.getLogger(getClass)

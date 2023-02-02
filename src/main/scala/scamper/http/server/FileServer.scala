@@ -30,7 +30,7 @@ import scamper.http.types.{ MediaRange, MediaType }
 
 import RequestMethod.Registry.{ Get, Head }
 import ResponseStatus.Registry.*
-import Validate.noNulls
+import Values.noNulls
 
 private class FileServer(sourceDirectory: Path, defaults: Seq[String]) extends RouterApplication:
   private val `*/*` = MediaRange("*/*")

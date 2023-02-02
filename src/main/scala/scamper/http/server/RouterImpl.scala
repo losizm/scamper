@@ -19,7 +19,7 @@ package server
 
 import scala.collection.mutable.ListBuffer
 
-import Validate.notNull
+import Values.notNull
 
 private class RouterImpl private (val mountPath: String) extends Router:
   private val incomings = new ListBuffer[RequestHandler]

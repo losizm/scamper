@@ -17,7 +17,7 @@ package scamper
 package http
 package server
 
-import Validate.*
+import Values.*
 
 private class TargetRequestHandler private (path: TargetPath, methods: Seq[RequestMethod], handler: RequestHandler) extends RequestHandler:
   def apply(req: HttpRequest): HttpMessage =

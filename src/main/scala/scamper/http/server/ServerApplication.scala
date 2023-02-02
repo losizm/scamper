@@ -22,7 +22,7 @@ import java.net.InetAddress
 
 import scamper.http.types.KeepAliveParameters
 
-import Validate.{ noNulls, notNull }
+import Values.{ noNulls, notNull }
 
 /**
  * Defines server application for creating `HttpServer`.

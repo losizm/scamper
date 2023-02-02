@@ -32,7 +32,7 @@ import scamper.http.types.{ ContentCodingRange, MediaRange, TransferCoding }
 import scamper.http.websocket.*
 
 import RequestMethod.Registry.*
-import Validate.notNull
+import Values.notNull
 
 private object HttpClientImpl:
   private val count = AtomicLong(0)
