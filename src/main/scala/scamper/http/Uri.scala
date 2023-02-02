@@ -18,7 +18,7 @@ package http
 
 import java.net.URI
 
-import Validate.notNull
+import Validate.{ noNulls, notNull }
 
 /** Defines URI. */
 sealed trait Uri:
@@ -156,29 +156,23 @@ private case class UriImpl(toURI: URI) extends Uri:
 
   lazy val fragmentOption = Option(toURI.getRawFragment)
 
-  def scheme = schemeOption.get
+  def scheme    = schemeOption.get
   def authority = authorityOption.get
-  def host = hostOption.get
-  def port = portOption.get
-  def fragment = fragmentOption.get
+  def host      = hostOption.get
+  def port      = portOption.get
+  def fragment  = fragmentOption.get
 
   def setPath(path: String) =
-    if path == null then
-      throw NullPointerException("path")
-    buildUri(schemeOption, authorityOption, path, query, fragmentOption)
+    buildUri(schemeOption, authorityOption, notNull(path), query, fragmentOption)
 
   def setQuery(query: QueryString) =
-    if query == null then
-      throw NullPointerException("query")
-    buildUri(schemeOption, authorityOption, path, query, fragmentOption)
+    buildUri(schemeOption, authorityOption, path, notNull(query), fragmentOption)
 
   def setFragment(fragment: String) =
     setFragment(Some(fragment))
 
   def setFragment(fragmentOption: Option[String]) =
-    if fragment == null || fragment.contains(null) then
-      throw NullPointerException("fragment")
-    buildUri(schemeOption, authorityOption, path, query, fragmentOption)
+    buildUri(schemeOption, authorityOption, path, query, noNulls(fragmentOption))
 
   def toAbsoluteUri(scheme: String, authority: String) =
     (notNull(scheme, "scheme").trim, notNull(authority, "authority").trim) match

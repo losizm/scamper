@@ -26,16 +26,22 @@ private object Validate:
       throw NullPointerException(message)
     value
 
-  inline def noNulls[T <: Seq[?]](values: T): T =
-    if values == null then
+  inline def noNulls[T <: Option[?]](value: T): T =
+    if value == null || value.contains(null) then
       throw NullPointerException()
-    if values.contains(null) then
-      throw IllegalArgumentException()
+    value
+
+  inline def noNulls[T <: Option[?]](value: T, message: => String): T =
+    if value == null || value.contains(null) then
+      throw NullPointerException(message)
+    value
+
+  inline def noNulls[T <: Seq[?]](values: T): T =
+    if values == null || values.contains(null) then
+      throw NullPointerException()
     values
 
   inline def noNulls[T <: Seq[?]](values: T, message: => String): T =
-    if values == null then
-      throw NullPointerException()
-    if values.contains(null) then
-      throw IllegalArgumentException(message)
+    if values == null || values.contains(null) then
+      throw NullPointerException(message)
     values

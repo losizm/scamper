@@ -35,22 +35,20 @@ class UriBuilder(uri: Uri): //
 
   /** Sets scheme. */
   def scheme(value: String): this.type =
-    schemeOption = Some(notNull(value).trim)
-    this
+    scheme(Some(value))
 
   /** Sets scheme. */
   def scheme(value: Option[String]): this.type =
-    value.foreach(scheme)
+    schemeOption = value.map(_.trim)
     this
 
   /** Sets authority. */
   def authority(value: String): this.type =
-    authorityOption = Some(notNull(value).trim)
-    this
+    authority(Some(value))
 
   /** Sets authority. */
   def authority(value: Option[String]): this.type =
-    value.foreach(authority)
+    authorityOption = value.map(_.trim)
     this
 
   /** Sets authority. */
@@ -59,12 +57,12 @@ class UriBuilder(uri: Uri): //
 
   /** Sets authority. */
   def authority(host: String, port: Option[Int]): this.type =
-    notNull(host, "host").trim match
-      case host => authority(port.map(port => s"$host:$port").getOrElse(host))
+    host.trim match
+      case host => authority(port.map(n => s"$host:$n").getOrElse(host))
 
   /** Sets path. */
   def path(value: String): this.type =
-    pathValue = notNull(value).trim
+    pathValue = value.trim
     this
 
   /** Sets query. */
@@ -74,12 +72,11 @@ class UriBuilder(uri: Uri): //
 
   /** Sets fragment. */
   def fragment(value: String): this.type =
-    fragmentOption = Some(notNull(value).trim)
-    this
+    fragment(Some(value))
 
   /** Sets fragment. */
   def fragment(value: Option[String]): this.type =
-    value.foreach(fragment)
+    fragmentOption = value.map(_.trim)
     this
 
   /** Clears previously set values. */
