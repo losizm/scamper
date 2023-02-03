@@ -581,6 +581,7 @@ import scamper.http.types.{ stringToContentCodingRange, stringToMediaRange }
 
 // Build client from settings
 val client = HttpClient.settings()
+  .resolveTo("localhost", 8080, secure = false)
   .accept("text/plain; q=0.9", "application/json; q=0.1")
   .acceptEncoding("gzip", "deflate")
   .bufferSize(8192)
@@ -595,6 +596,9 @@ client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
   assert(res.isSuccessful, s"Message not posted: ${res.statusCode}")
 }
 ```
+
+The `resolveTo` setting provides a default authority to resolve relative request
+URIs.
 
 The `accept` setting provides a list of accepted media types, which are used to
 set the **Accept** header on each outgoing request.

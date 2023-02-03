@@ -12,7 +12,7 @@ It includes client and server implementations along with WebSockets.
 To get started, add **Scamper** to your sbt project&dagger;:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "35.0.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "36.0.0"
 ```
 
 **Scamper** uses SLF4J logging abstraction under the hood, so you'll need to
@@ -46,7 +46,6 @@ only scratches the surface; however, it does capture the general programming
 style.
 
 ```scala
-import java.io.File
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
@@ -55,27 +54,28 @@ import scamper.http.{ *, given }
 import scamper.http.server.{ *, given }
 import ResponseStatus.Registry.{ BadRequest, Ok }
 
-// Define utility to log HTTP messages
+// Define utility to log HTTP message
 def logHttpMessage[T <: HttpMessage](msg: T): T =
   println()
   println(msg.startLine)
   msg.headers.foreach(println)
+  println()
   msg
 
-// Starting point for creating HTTP server
+// Starting point to build HTTP server
 val app = ServerApplication()
 
-// Log all incoming requests
+// Log incoming request
 app.incoming(logHttpMessage)
 
-// Handle GET requests
+// Handle GET request
 app.get("/greet") { req =>
   req.query.get("name") match
     case Some(name) => Ok(s"Hello, $name!")
     case None       => Ok("Hello, world!")
 }
 
-// Handle POST requests at different endpoint
+// Handle POST request at different endpoint
 app.post("/echo") { req =>
   given BodyParser[String] = BodyParser.string(maxLength = 1024)
 
@@ -84,7 +84,7 @@ app.post("/echo") { req =>
     case message => Ok(message)
 }
 
-// Log all outgoing responses
+// Log outgoing response
 app.outgoing(logHttpMessage)
 
 Future {
@@ -118,10 +118,10 @@ import scamper.http.client.{ *, given }
 import scamper.http.types.{ *, given }
 import RequestMethod.Registry.{ Get, Post }
 
-// Define parser for incoming messages
+// Define parser for incoming message
 given BodyParser[String] = BodyParser.string(maxLength = 1024)
 
-// Create client using a few custom settings
+// Create HTTP client using custom settings
 val httpClient = ClientSettings()
   .resolveTo("localhost", 8080, secure = false)
   .accept("*/*")
@@ -137,12 +137,12 @@ httpClient.get("http://localhost:8080/greet?name=developer") { res =>
 val greetRequest = Get("/greet").setQuery("name" -> "Big Dawg")
 httpClient.send(greetRequest) { res => println(res.as[String]) }
 
-// Send POST request and include message body
+// Send POST request with message body
 httpClient.post("/echo", body = "Hello, it's me.") { res =>
   println(res.as[String])
 }
 
-// Manually create POST request
+// Manually create POST request and add message body
 val echoRequest = Post("/echo").setPlainBody("Just me again.")
 httpClient.send(echoRequest) { res => println(res.as[String]) }
 
