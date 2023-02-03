@@ -55,7 +55,7 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
   it should "parse request with form body as query string" in {
     given BodyParser[QueryString] = BodyParser.query()
-    val body = Entity("id" -> "0", "name" -> "root")
+    val body = Entity(QueryString("id" -> "0", "name" -> "root"))
     val request = Post("users").setBody(body).setContentLength(body.knownSize.get)
     val form = request.as[QueryString]
 
@@ -95,23 +95,6 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
     assert(in.readLine() == "Hello, world!")
     assert(in.readLine() == null)
-  }
-
-  it should "parse request as unit" in {
-    given BodyParser[Unit] = BodyParser.unit()
-    val body = Entity("The quick brown fox jumps over the lazy dog.")
-    val request = Get("/pangram").setBody(body).setContentLength(body.knownSize.get)
-
-    request.as[Unit]
-    assert(body.data.read() == -1)
-  }
-
-  it should "not parse request as unit with large body" in {
-    given BodyParser[Unit] = BodyParser.unit(maxLength = 20)
-    val body = Entity("The quick brown fox jumps over the lazy dog.")
-    val request = Get("/pangram").setBody(body).setContentLength(body.knownSize.get)
-
-    assertThrows[ReadLimitExceeded](request.as[Unit])
   }
 
   it should "not parse response with large body" in {

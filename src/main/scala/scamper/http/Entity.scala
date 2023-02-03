@@ -22,25 +22,15 @@ import Values.notNull
 
 /** Provides input stream to HTTP entity. */
 trait Entity:
-  /** Gets size in bytes if known. */
-  def knownSize: Option[Long]
-
   /** Tests for known emptiness. */
   def isKnownEmpty: Boolean =
     knownSize.contains(0)
 
+  /** Gets size in bytes if known. */
+  def knownSize: Option[Long]
+
   /** Gets input stream to data. */
   def data: InputStream
-
-  /**
-   * Invokes function with input stream to data.
-   *
-   * @param f function
-   *
-   * @return applied function value
-   */
-  def withData[T](f: InputStream => T): T =
-    f(data)
 
 /** Provides factory for `Entity`. */
 object Entity:
@@ -68,30 +58,6 @@ object Entity:
   /** Creates entity from supplied text. */
   def apply(text: String, charset: String = "UTF-8"): Entity =
     ByteArrayEntity(text.getBytes(charset))
-
-  /**
-   * Creates entity from supplied form data.
-   *
-   * @note The data is encoded as `application/x-www-form-urlencoded`.
-   */
-  def apply(data: Map[String, Seq[String]]): Entity =
-    apply(QueryString.format(data))
-
-  /**
-   * Creates entity from supplied form data.
-   *
-   * @note The data is encoded as `application/x-www-form-urlencoded`.
-   */
-  def apply(data: Seq[(String, String)]): Entity =
-    apply(QueryString.format(data))
-
-  /**
-   * Creates entity from supplied form data.
-   *
-   * @note The data is encoded as `application/x-www-form-urlencoded`.
-   */
-  def apply(one: (String, String), more: (String, String)*): Entity =
-    apply(QueryString.format(one +: more))
 
   /**
    * Creates entity from supplied query string.

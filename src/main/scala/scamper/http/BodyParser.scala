@@ -37,17 +37,6 @@ trait BodyParser[T]:
 /** Provides factory for `BodyParser`. */
 object BodyParser:
   /**
-   * Gets body parser for unit.
-   *
-   * Such parsers effectively drain message body.
-   *
-   * @param maxLength maximum length
-   * @param bufferSize buffer size in bytes
-   */
-  def unit(maxLength: Long = 8388608, bufferSize: Int = 8192): BodyParser[Unit] =
-    UnitBodyParser(maxLength.max(0), bufferSize.max(8192))
-
-  /**
    * Gets body parser for buffered input stream.
    *
    * @param maxLength maximum length in bytes
@@ -111,13 +100,6 @@ object BodyParser:
   def file(dest: File = File(sys.props("java.io.tmpdir")), maxLength: Long = 8388608, bufferSize: Int = 8192): BodyParser[File] =
     FileBodyParser(dest, maxLength.max(0), bufferSize.max(8192))
 
-private class UnitBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[Unit] with BodyDecoder:
-  def parse(message: HttpMessage): Unit =
-    withDecode(message) { in =>
-      val bufffer = new Array[Byte](bufferSize)
-      while in.read(bufffer) != -1 do ()
-    }
-
 private class InputStreamBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[InputStream] with BodyDecoder:
   def parse(message: HttpMessage): InputStream =
     BufferedInputStream(decode(message), bufferSize)
@@ -128,19 +110,18 @@ private class BufferedReaderBodyParser(val maxLength: Long, bufferSize: Int) ext
 
 private class ByteArrayBodyParser(val maxLength: Long, bufferSize: Int) extends BodyParser[Array[Byte]] with BodyDecoder:
   def parse(message: HttpMessage): Array[Byte] =
-    withDecode(message) { in =>
-      val out = new ArrayBuffer[Byte](bufferSize)
-      val buf = new Array[Byte](bufferSize)
-      var len = 0
-      var tot = 0
+    val in  = decode(message)
+    val out = new ArrayBuffer[Byte](bufferSize)
+    val buf = new Array[Byte](bufferSize)
+    var len = 0
+    var tot = 0
 
-      while { len = in.read(buf); len != -1 } do
-        tot += len
-        if tot > maxLength then throw EntityTooLarge(maxLength)
-        out ++= buf.take(len)
+    while { len = in.read(buf); len != -1 } do
+      tot += len
+      if tot > maxLength then throw EntityTooLarge(maxLength)
+      out ++= buf.take(len)
 
-      out.toArray
-    }
+    out.toArray
 
 private class StringBodyParser(maxLength: Int, bufferSize: Int) extends BodyParser[String]:
   private val parser = ByteArrayBodyParser(maxLength, bufferSize)
@@ -161,21 +142,20 @@ private class QueryStringBodyParser(maxLength: Int, bufferSize: Int) extends Bod
 
 private class FileBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[File] with BodyDecoder:
   def parse(message: HttpMessage): File =
-    withDecode(message) { in =>
-      val destFile = getDestFile()
+    val in       = decode(message)
+    val destFile = getDestFile()
 
-      destFile.withOutputStream { out =>
-        val buffer = new Array[Byte](bufferSize)
-        var length = 0
-        var total = 0
+    destFile.withOutputStream { out =>
+      val buffer = new Array[Byte](bufferSize)
+      var length = 0
+      var total = 0
 
-        while { length = in.read(buffer); length != -1 } do
-          total += length
-          if total > maxLength then throw EntityTooLarge(maxLength)
-          out.write(buffer, 0, length)
+      while { length = in.read(buffer); length != -1 } do
+        total += length
+        if total > maxLength then throw EntityTooLarge(maxLength)
+        out.write(buffer, 0, length)
 
-        destFile
-      }
+      destFile
     }
 
   private def getDestFile(): File =

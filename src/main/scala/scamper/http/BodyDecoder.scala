@@ -44,27 +44,11 @@ trait BodyDecoder:
         case res: HttpResponse if res.statusCode == 204 => EmptyInputStream
         case res: HttpResponse if res.statusCode == 304 => EmptyInputStream
         case _ =>
-          message.body.withData { in =>
-            val transferIn = message.transferEncoding match
-              case Nil      => BoundedInputStream(in, maxLength, getContentLength(message))
-              case encoding => transferInputStream(BoundedInputStream(in, maxLength, Long.MaxValue), encoding)
+          val transferIn = message.transferEncoding match
+            case Nil      => BoundedInputStream(message.body.data, maxLength, getContentLength(message))
+            case encoding => transferInputStream(BoundedInputStream(message.body.data, maxLength, Long.MaxValue), encoding)
 
-            contentInputStream(transferIn, message.contentEncoding)
-          }
-
-  /**
-   * Passes decoded message body to supplied function.
-   *
-   * @param message HTTP message
-   * @param f function
-   *
-   * @return applied function value
-   *
-   * @note The input stream throws [[ReadLimitExceeded]] if the decoder reads
-   * beyond `maxLength` of message body.
-   */
-  def withDecode[T](message: HttpMessage)(f: InputStream => T): T =
-    f { decode(message) }
+          contentInputStream(transferIn, message.contentEncoding)
 
   private def transferInputStream(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
     encoding.takeRight(6).foldRight(in) { (encoding, in) =>
@@ -97,5 +81,17 @@ object BodyDecoder:
    */
   def apply(maxLength: Long): BodyDecoder =
     BodyDecoderImpl(maxLength)
+
+  /**
+   * Gets decoded message body.
+   *
+   * @param message HTTP message
+   * @param maxLength maximum length of message body
+   *
+   * @note The input stream throws [[ReadLimitExceeded]] if the decoder reads
+   * beyond `maxLength` of message body.
+   */
+  def decode(message: HttpMessage, maxLength: Long): InputStream =
+    BodyDecoderImpl(maxLength).decode(message)
 
 private class BodyDecoderImpl(val maxLength: Long) extends BodyDecoder

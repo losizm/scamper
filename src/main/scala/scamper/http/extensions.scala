@@ -60,7 +60,7 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
    * __Content-Type__ is set to `application/octet-stream`; __Content-Length__
    * is set to length of bytes.
    *
-   * @param text message body
+   * @param bytes message body
    * @param charset character set
    */
   def setOctetBody(bytes: Array[Byte]): T =
@@ -101,28 +101,6 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
    */
   def setFormBody(query: QueryString): T =
     setBodyContent(Entity(query), MediaType.formUrlencoded)
-
-  /**
-   * Creates new message with supplied form data as message body.
-   *
-   * __Content-Type__ is set to `application/x-www-form-urlencoded`, and
-   * __Content-Length__ is set to length of encoded form data.
-   *
-   * @param data message body
-   */
-  def setFormBody(data: Map[String, Seq[String]]): T =
-    setFormBody(QueryString(data))
-
-  /**
-   * Creates new message with supplied form data as message body.
-   *
-   * __Content-Type__ is set to `application/x-www-form-urlencoded`, and
-   * __Content-Length__ is set to length of encoded form data.
-   *
-   * @param data message body
-   */
-  def setFormBody(data: Seq[(String, String)]): T =
-    setFormBody(QueryString(data))
 
   /**
    * Creates new message with supplied form data as message body.
