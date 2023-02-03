@@ -62,15 +62,15 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(removed.contains("groups"))
     assert(!removed.contains("description"))
 
-    val toMap = query.toMap
-    assert(toMap("id") == Seq("0"))
-    assert(toMap("name") == Seq("root"))
-    assert(toMap("groups") == Seq("wheel", "admin"))
+    val toMultiMap = query.toMultiMap
+    assert(toMultiMap("id") == Seq("0"))
+    assert(toMultiMap("name") == Seq("root"))
+    assert(toMultiMap("groups") == Seq("wheel", "admin"))
 
-    val toSimpleMap = query.toSimpleMap
-    assert(toSimpleMap("id") == "0")
-    assert(toSimpleMap("name") == "root")
-    assert(toSimpleMap("groups") == "wheel")
+    val toMap = query.toMap
+    assert(toMap("id") == "0")
+    assert(toMap("name") == "root")
+    assert(toMap("groups") == "wheel")
 
     val empty = QueryString(Map.empty[String, Seq[String]])
     assert(empty.isEmpty)
@@ -122,15 +122,15 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(removed.contains("groups"))
     assert(!removed.contains("description"))
 
-    val toMap = query.toMap
-    assert(toMap("id") == Seq("0"))
-    assert(toMap("name") == Seq("root"))
-    assert(toMap("groups") == Seq("wheel", "admin"))
+    val toMultiMap = query.toMultiMap
+    assert(toMultiMap("id") == Seq("0"))
+    assert(toMultiMap("name") == Seq("root"))
+    assert(toMultiMap("groups") == Seq("wheel", "admin"))
 
-    val toSimpleMap = query.toSimpleMap
-    assert(toSimpleMap("id") == "0")
-    assert(toSimpleMap("name") == "root")
-    assert(toSimpleMap("groups") == "wheel")
+    val toMap = query.toMap
+    assert(toMap("id") == "0")
+    assert(toMap("name") == "root")
+    assert(toMap("groups") == "wheel")
 
     val empty = QueryString(Nil)
     assert(empty.isEmpty)
@@ -182,15 +182,15 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(removed.contains("groups"))
     assert(!removed.contains("description"))
 
-    val toMap = query.toMap
-    assert(toMap("id") == Seq("0"))
-    assert(toMap("name") == Seq("root"))
-    assert(toMap("groups") == Seq("wheel", "admin"))
+    val toMultiMap = query.toMultiMap
+    assert(toMultiMap("id") == Seq("0"))
+    assert(toMultiMap("name") == Seq("root"))
+    assert(toMultiMap("groups") == Seq("wheel", "admin"))
 
-    val toSimpleMap = query.toSimpleMap
-    assert(toSimpleMap("id") == "0")
-    assert(toSimpleMap("name") == "root")
-    assert(toSimpleMap("groups") == "wheel")
+    val toMap = query.toMap
+    assert(toMap("id") == "0")
+    assert(toMap("name") == "root")
+    assert(toMap("groups") == "wheel")
 
     val empty = QueryString(Nil)
     assert(empty.isEmpty)
@@ -213,20 +213,20 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(!removed.contains("name"))
 
     assert(query.toSeq.isEmpty)
+    assert(query.toMultiMap.isEmpty)
     assert(query.toMap.isEmpty)
-    assert(query.toSimpleMap.isEmpty)
   }
 
   it should "concatenate query strings" in {
-    val toMap = Map("a" -> Seq("1"), "b" -> Seq("2", "3"))
+    val toMultiMap = Map("a" -> Seq("1"), "b" -> Seq("2", "3"))
     val toSeq = Seq("b" -> "4", "b" -> "5", "c" -> "6")
 
-    val q1 = QueryString(toMap)
+    val q1 = QueryString(toMultiMap)
     val q2 = QueryString(toSeq)
     val q3 = q1 ++ q2
     val q4 = q2 ++ q1
     val q5 = q1 ++ toSeq
-    val q6 = q2 ++ toMap
+    val q6 = q2 ++ toMultiMap
 
     assert(q3("a") == "1")
     assert(q3.getValues("a") == Seq("1"))
@@ -262,15 +262,15 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec:
   }
 
   it should "merge query strings" in {
-    val toMap = Map("a" -> Seq("1"), "b" -> Seq("2", "3"))
+    val toMultiMap = Map("a" -> Seq("1"), "b" -> Seq("2", "3"))
     val toSeq = Seq("b" -> "4", "b" -> "5", "c" -> "6")
 
-    val q1 = QueryString(toMap)
+    val q1 = QueryString(toMultiMap)
     val q2 = QueryString(toSeq)
     val q3 = q1 << q2
     val q4 = q2 << q1
     val q5 = q1 << toSeq
-    val q6 = q2 << toMap
+    val q6 = q2 << toMultiMap
 
     assert(q3("a") == "1")
     assert(q3.getValues("a") == Seq("1"))

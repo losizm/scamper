@@ -262,7 +262,7 @@ trait QueryString:
   def merge(that: QueryString): QueryString =
     that.isEmpty match
       case true  => this
-      case false => QueryString(toMap ++ that.toMap)
+      case false => QueryString(toMultiMap ++ that.toMultiMap)
 
   /**
    * Creates new query string by merging supplied parameters.
@@ -313,10 +313,10 @@ trait QueryString:
    * Gets `Map` of query string mapping each parameter to its sequence of
    * values.
    */
-  def toMap: Map[String, Seq[String]]
+  def toMultiMap: Map[String, Seq[String]]
 
   /** Gets `Map` of query string mapping each parameter to its first value. */
-  def toSimpleMap: Map[String, String]
+  def toMap: Map[String, String]
 
   /**
    * Creates new query string by concatenating supplied query string.
@@ -451,8 +451,8 @@ private object EmptyQueryString extends QueryString:
   def contains(name: String) = false
   val isEmpty = true
   val toSeq = Nil
+  val toMultiMap = Map.empty
   val toMap = Map.empty
-  val toSimpleMap = Map.empty
 
   def add(name: String, values: Seq[String]) =
     SeqQueryString(values.map(value => name -> value))
@@ -469,39 +469,39 @@ private object EmptyQueryString extends QueryString:
 
   override val toString = ""
 
-private case class MapQueryString(toMap: Map[String, Seq[String]]) extends QueryString:
-  lazy val names = toMap.keys.toSeq
+private case class MapQueryString(toMultiMap: Map[String, Seq[String]]) extends QueryString:
+  lazy val names = toMultiMap.keys.toSeq
 
-  def get(name: String) = toMap.get(name).flatMap(_.headOption)
-  def getValues(name: String) = toMap.get(name).getOrElse(Nil)
-  def contains(name: String) = toMap.contains(name)
-  def isEmpty = toMap.isEmpty
+  def get(name: String) = toMultiMap.get(name).flatMap(_.headOption)
+  def getValues(name: String) = toMultiMap.get(name).getOrElse(Nil)
+  def contains(name: String) = toMultiMap.contains(name)
+  def isEmpty = toMultiMap.isEmpty
 
   def add(name: String, values: Seq[String]) =
-    MapQueryString(toMap + { name -> (getValues(name) ++ values) })
+    MapQueryString(toMultiMap + { name -> (getValues(name) ++ values) })
 
   def put(name: String, values: Seq[String]) =
-    MapQueryString(toMap + { name -> values })
+    MapQueryString(toMultiMap + { name -> values })
 
   def remove(names: Seq[String]) =
     names.isEmpty match
       case true  => this
-      case false => MapQueryString(toMap.filterNot(x => names.contains(x._1)))
+      case false => MapQueryString(toMultiMap.filterNot(x => names.contains(x._1)))
 
   def retain(names: Seq[String]) =
     names.isEmpty match
       case true  => this
-      case false => MapQueryString(toMap.filter(x => names.contains(x._1)))
+      case false => MapQueryString(toMultiMap.filter(x => names.contains(x._1)))
 
   lazy val toSeq =
-    toMap.toSeq
+    toMultiMap.toSeq
       .flatMap { case (name, values) => values.map(value => name -> value) }
 
-  lazy val toSimpleMap =
-    toMap.collect { case (name, Seq(value, _*)) => name -> value }
+  lazy val toMap =
+    toMultiMap.collect { case (name, Seq(value, _*)) => name -> value }
       .toMap
 
-  override lazy val toString = QueryString.format(toMap)
+  override lazy val toString = QueryString.format(toMultiMap)
 
 private case class SeqQueryString(toSeq: Seq[(String, String)]) extends QueryString:
   lazy val names = toSeq.map(_._1).distinct
@@ -527,12 +527,12 @@ private case class SeqQueryString(toSeq: Seq[(String, String)]) extends QueryStr
       case true  => this
       case false => SeqQueryString(toSeq.filter(x => names.contains(x._1)))
 
-  lazy val toMap =
+  lazy val toMultiMap =
     toSeq.groupBy(_._1)
       .collect { case (name, params) => name -> params.map(_._2) }
       .toMap
 
-  lazy val toSimpleMap =
+  lazy val toMap =
     toSeq.groupBy(_._1)
       .collect { case (name, params) => name -> params.head._2 }
       .toMap
