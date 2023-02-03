@@ -95,7 +95,7 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(req2.method == Put)
     assert(req2.body.toByteArray.sameElements("Request #2".getBytes("UTF-8")))
 
-    val req3 = Post("/c").setBody(htmlFile)
+    val req3 = Post("/c").setBody(Entity(htmlFile))
     assert(req3.target == Uri("/c"))
     assert(req3.method == Post)
     assert(req3.body.toByteArray.sameElements(htmlFile.getBytes()))
