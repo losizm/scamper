@@ -31,17 +31,17 @@ private class TargetPath private (val value: String):
       case s => Regex.quote(s)
     }.mkString("/")
 
-  private val params = segments.zipWithIndex.collect {
+  private val pathParams = segments.zipWithIndex.collect {
     case (s, i) if s.matches("(:\\w+)")   => s.tail -> { (xs: Seq[String]) => xs(i) }
     case (s, i) if s.matches("(\\*\\w+)") => s.tail -> { (xs: Seq[String]) => xs.drop(i).mkString("/") }
   }
 
-  def getParams(path: String): PathParameters =
-    MapPathParameters(params.isEmpty match
+  def getPathParams(path: String): PathParameters =
+    MapPathParameters(pathParams.isEmpty match
       case true  => Map.empty
       case false =>
         val segments = segmentize(path)
-        params.map {
+        pathParams.map {
           case (name, getValue) => name -> getValue(segments)
         }.toMap
     )

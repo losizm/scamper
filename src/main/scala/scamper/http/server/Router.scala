@@ -46,7 +46,7 @@ import RequestMethod.Registry.{ Delete, Get, Post, Put }
  *
  *   // Map handler to /api/messages/:id
  *   router.get("/messages/:id") { req =>
- *     val id = req.params.getInt("id")
+ *     val id = req.pathParams.getInt("id")
  *     messages.get(id)
  *      .map(Ok(_))
  *      .getOrElse(NotFound())

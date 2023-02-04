@@ -37,7 +37,7 @@ private class FileServer(sourceDirectory: Path, defaults: Seq[String]) extends R
 
   def apply(router: Router): Unit =
     router.incoming("/*path", Get, Head) { req =>
-      val sourceFile = toSourceFile(req.params.getString("path"))
+      val sourceFile = toSourceFile(req.pathParams.getString("path"))
 
       isSafe(sourceFile) match
         case true  => getSourceFile(req, sourceFile)

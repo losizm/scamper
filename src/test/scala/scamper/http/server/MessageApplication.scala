@@ -101,7 +101,7 @@ object MessageApplication extends RouterApplication:
     }
 
   private def getPathInt(name: String)(using req: HttpRequest): Int =
-    req.params.getInt("id")
+    req.pathParams.getInt("id")
 
   private def getQueryInt(name: String, default: => Int = 0)(using req: HttpRequest): Int =
     try

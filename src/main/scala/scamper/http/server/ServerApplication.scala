@@ -83,7 +83,7 @@ import Values.{ noNulls, notNull }
  *   given BodyParser[String] = BodyParser.string()
  *
  *   // Get path parameter
- *   val id = req.params.getInt("id")
+ *   val id = req.pathParams.getInt("id")
  *
  *   update(id, req.as[String]) match
  *     case true  => NoContent()

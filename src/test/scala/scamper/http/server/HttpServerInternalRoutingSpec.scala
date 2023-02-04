@@ -112,7 +112,7 @@ class HttpServerInternalRoutingSpec extends org.scalatest.flatspec.AnyFlatSpec:
     }
 
     router.get("/:id") { req =>
-      val id = req.params.getInt("id")
+      val id = req.pathParams.getInt("id")
 
       id >= 1 && id <= 3 match
         case true  => Ok(id.toString)

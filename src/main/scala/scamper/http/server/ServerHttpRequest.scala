@@ -25,8 +25,8 @@ import ResponseStatus.Registry.Continue
 /** Adds server extensions to `HttpRequest`. */
 implicit class ServerHttpRequest(request: HttpRequest) extends AnyVal:
   /** Gets path parameters. */
-  def params: PathParameters =
-    request.getAttributeOrElse("scamper.http.server.request.parameters", MapPathParameters(Map.empty))
+  def pathParams: PathParameters =
+    request.getAttributeOrElse("scamper.http.server.request.pathParams", MapPathParameters(Map.empty))
 
   /**
    * Sends interim 100 (Continue) response if request includes Expect header

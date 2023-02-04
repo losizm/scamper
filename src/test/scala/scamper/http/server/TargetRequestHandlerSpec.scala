@@ -60,9 +60,9 @@ class TargetRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec:
       "/A/B/C/:a/:b/:c/d",
       Nil,
       { req =>
-        assert(req.params.getString("a") == "One")
-        assert(req.params.getInt("b") == 200)
-        assert(req.params.getLong("c") == 3000)
+        assert(req.pathParams.getString("a") == "One")
+        assert(req.pathParams.getInt("b") == 200)
+        assert(req.pathParams.getLong("c") == 3000)
         Ok()
       }
     )
@@ -81,7 +81,7 @@ class TargetRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec:
       "/A/B/C/*abc",
       Nil,
       { req =>
-        assert(req.params.getString("abc") == "One/200/3000/d")
+        assert(req.pathParams.getString("abc") == "One/200/3000/d")
         Ok()
       }
     )
@@ -100,8 +100,8 @@ class TargetRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec:
       "/A/B/C/:a/:b/*",
       Nil,
       { req =>
-        assert(req.params.getString("a") == "One")
-        assert(req.params.getInt("b") == 200)
+        assert(req.pathParams.getString("a") == "One")
+        assert(req.pathParams.getInt("b") == 200)
         Ok()
       }
     )
@@ -118,17 +118,17 @@ class TargetRequestHandlerSpec extends org.scalatest.flatspec.AnyFlatSpec:
   }
 
   it should "not have access to non-convertible parameter" in {
-    val h1 = TargetRequestHandler("/:id", Nil, { req => req.params.getInt("id"); Ok() })
-    val h2 = TargetRequestHandler("/:id", Nil, { req => req.params.getLong("id"); Ok() })
+    val h1 = TargetRequestHandler("/:id", Nil, { req => req.pathParams.getInt("id"); Ok() })
+    val h2 = TargetRequestHandler("/:id", Nil, { req => req.pathParams.getLong("id"); Ok() })
 
     assertThrows[ParameterNotConvertible](h1(Get("/a")))
     assertThrows[ParameterNotConvertible](h2(Get("/a")))
   }
 
   it should "not have access to missing parameter" in {
-    val h1 = TargetRequestHandler("/:identifier", Nil, { req => req.params.getString("id"); Ok() })
-    val h2 = TargetRequestHandler("/:identifier", Nil, { req => req.params.getInt("id"); Ok() })
-    val h3 = TargetRequestHandler("/:identifier", Nil, { req => req.params.getLong("id"); Ok() })
+    val h1 = TargetRequestHandler("/:identifier", Nil, { req => req.pathParams.getString("id"); Ok() })
+    val h2 = TargetRequestHandler("/:identifier", Nil, { req => req.pathParams.getInt("id"); Ok() })
+    val h3 = TargetRequestHandler("/:identifier", Nil, { req => req.pathParams.getLong("id"); Ok() })
 
     assertThrows[ParameterNotFound](h1(Get("/a")))
     assertThrows[ParameterNotFound](h2(Get("/a")))
