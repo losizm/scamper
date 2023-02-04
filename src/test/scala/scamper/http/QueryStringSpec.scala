@@ -227,6 +227,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec:
     val q4 = q2 ++ q1
     val q5 = q1 ++ toSeq
     val q6 = q2 ++ toMultiMap
+    val q7 = q1.concat(toSeq.head, toSeq.tail*)
 
     assert(q3("a") == "1")
     assert(q3.getValues("a") == Seq("1"))
@@ -256,6 +257,13 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(q6("c") == "6")
     assert(q6.getValues("c") == Seq("6"))
 
+    assert(q7("a") == "1")
+    assert(q7.getValues("a") == Seq("1"))
+    assert(q7("b") == "2")
+    assert(q7.getValues("b") == Seq("2", "3", "4", "5"))
+    assert(q7("c") == "6")
+    assert(q7.getValues("c") == Seq("6"))
+
     assert(q1 ++ QueryString.empty == q1)
     assert(QueryString.empty ++ q1 == q1)
     assert(QueryString.empty ++ QueryString.empty == QueryString.empty)
@@ -271,6 +279,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec:
     val q4 = q2 << q1
     val q5 = q1 << toSeq
     val q6 = q2 << toMultiMap
+    val q7 = q1.merge(toSeq.head, toSeq.tail*)
 
     assert(q3("a") == "1")
     assert(q3.getValues("a") == Seq("1"))
@@ -299,6 +308,13 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(q6.getValues("b") == Seq("2", "3"))
     assert(q6("c") == "6")
     assert(q6.getValues("c") == Seq("6"))
+
+    assert(q7("a") == "1")
+    assert(q7.getValues("a") == Seq("1"))
+    assert(q7("b") == "4")
+    assert(q7.getValues("b") == Seq("4", "5"))
+    assert(q7("c") == "6")
+    assert(q7.getValues("c") == Seq("6"))
 
     assert(q1 << QueryString.empty == q1)
     assert(QueryString.empty << q1 == q1)

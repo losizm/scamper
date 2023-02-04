@@ -250,6 +250,17 @@ trait QueryString:
     concat(QueryString(params))
 
   /**
+   * Creates new query string by concatenating supplied parameters.
+   *
+   * @param one parameter
+   * @param more additional parameters
+   *
+   * @return new query string
+   */
+  def concat(one: (String, String), more: (String, String)*): QueryString =
+    concat(QueryString(one +: more))
+
+  /**
    * Creates new query string by merging supplied query string.
    *
    * @param that query string
@@ -283,6 +294,17 @@ trait QueryString:
    */
   def merge(params: Seq[(String, String)]): QueryString =
     merge(QueryString(params))
+
+  /**
+   * Creates new query string by merging supplied parameters.
+   *
+   * @param one parameter
+   * @param more additional parameters
+   *
+   * @return new query string
+   */
+  def merge(one: (String, String), more: (String, String)*): QueryString =
+    merge(QueryString(one +: more))
 
   /**
    * Creates new query string by selecting parameters which satisfy supplied
@@ -419,7 +441,7 @@ object QueryString:
     apply(one +: more)
 
   /**
-   * Creates query string from urlencoded query string.
+   * Creates query string from encoded query string.
    *
    * @param query encoded query string
    */
