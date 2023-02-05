@@ -12,7 +12,7 @@ It includes client and server implementations along with WebSockets.
 To get started, add **Scamper** to your sbt project&dagger;:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "36.0.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "37.0.0"
 ```
 
 **Scamper** uses SLF4J logging abstraction under the hood, so you'll need to
@@ -54,7 +54,7 @@ import scamper.http.{ *, given }
 import scamper.http.server.{ *, given }
 import ResponseStatus.Registry.{ BadRequest, Ok }
 
-// Define utility to log HTTP message
+// Define utility to log HTTP messages
 def logHttpMessage[T <: HttpMessage](msg: T): T =
   println()
   println(msg.startLine)
@@ -65,17 +65,17 @@ def logHttpMessage[T <: HttpMessage](msg: T): T =
 // Starting point to build HTTP server
 val app = ServerApplication()
 
-// Log incoming request
+// Log incoming requests
 app.incoming(logHttpMessage)
 
-// Handle GET request
+// Handle GET requests
 app.get("/greet") { req =>
   req.query.get("name") match
     case Some(name) => Ok(s"Hello, $name!")
     case None       => Ok("Hello, world!")
 }
 
-// Handle POST request at different endpoint
+// Handle POST requests at different endpoint
 app.post("/echo") { req =>
   given BodyParser[String] = BodyParser.string(maxLength = 1024)
 
@@ -84,7 +84,7 @@ app.post("/echo") { req =>
     case message => Ok(message)
 }
 
-// Log outgoing response
+// Log outgoing responses
 app.outgoing(logHttpMessage)
 
 Future {
@@ -118,7 +118,7 @@ import scamper.http.client.{ *, given }
 import scamper.http.types.{ *, given }
 import RequestMethod.Registry.{ Get, Post }
 
-// Define parser for incoming message
+// Define parser for incoming messages
 given BodyParser[String] = BodyParser.string(maxLength = 1024)
 
 // Create HTTP client using custom settings

@@ -89,7 +89,7 @@ val res = Ok("There is an answer.")
 ## Specialized Header Access
 
 `HttpMessage` provides a set of methods for generalized header access. Using
-these methods, the header name and value are each represented as `String`.
+these methods, the header name and value are each `String` values.
 
 ```scala
 import scala.language.implicitConversions
@@ -140,8 +140,8 @@ println(req.contentType.typeName) // application
 println(req.contentType.subtypeName) // json
 ```
 
-And, with conversions defined in `scamper.http.types`, you can implicitly
-convert values to the header types.
+And, with conversions in `scamper.http.types`, you can implicitly convert values
+to header types.
 
 ```scala
 import scala.language.implicitConversions
@@ -251,7 +251,7 @@ import scamper.http.ResponseStatus.Registry.Ok
 import scamper.http.headers.ContentType
 import scamper.http.types.stringToMediaType
 
-val body = Entity("""
+val htmlBody = Entity("""
 <!DOCTYPE html>
 <html>
   <head>
@@ -262,7 +262,7 @@ val body = Entity("""
   </body>
 </html>
 """)
-val res = Ok(body).setContentType("text/html; charset=utf-8")
+val res = Ok(htmlBody).setContentType("text/html; charset=utf-8")
 ```
 
 Or, create a message using file content.
@@ -276,8 +276,8 @@ import scamper.http.ResponseStatus.Registry.Ok
 import scamper.http.headers.ContentType
 import scamper.http.types.stringToMediaType
 
-val body = Entity(File("./index.html"))
-val res = Ok(body).setContentType("text/html; charset=utf-8")
+val fileBody = Entity(File("./index.html"))
+val res = Ok(fileBody).setContentType("text/html; charset=utf-8")
 ```
 
 There are implicit conversions available for common entity types, so you aren't
@@ -322,7 +322,7 @@ import scala.language.implicitConversions
 
 import grapple.json.{ Json, JsonInput, given }
 
-import scamper.http.{ BodyParser, HttpMessage, stringToEntity }
+import scamper.http.{ BodyParser, HttpMessage }
 import scamper.http.RequestMethod.Registry.Post
 
 case class User(id: Int, name: String)
@@ -392,7 +392,9 @@ def save(req: HttpRequest): Unit =
 
 ## Message Attributes
 
-Attributes are arbitrary key/value pairs associated with a message.
+Attributes are arbitrary key/value pairs associated with a message. They can be
+used in message processing; however, they are not included in the transmitted
+message.
 
 ```scala
 import scala.concurrent.duration.{ Deadline, DurationInt }
@@ -407,8 +409,6 @@ val res = req.getAttribute[Deadline]("send-before")
   .filter(_.hasTimeLeft())
   .map(_ => send(req))
 ```
-
-_**Note:** Attributes are not included in the transmitted message._
 
 ## HTTP Authentication
 
@@ -624,7 +624,7 @@ cookies to each outgoing request.
 The `keepAlive` setting is used to enable persistence connections, which are
 disabled by default.
 
-You can supply a truststore to `trust`, as demonstrated in the previous example.
+You can supply a truststore in `trust`, as demonstrated in the previous example.
 Or, if greater control is required, you can supply a trust manager instead.
 
 ```scala
@@ -632,7 +632,7 @@ import scala.language.implicitConversions
 
 import javax.net.ssl.TrustManager
 import scamper.http.stringToUri
-import scamper.http.client.HttpClient
+import scamper.http.client.ClientSettings
 
 class SingleSiteTrustManager(address: String) extends TrustManager {
   // Provide TrustManager implementation
@@ -640,8 +640,7 @@ class SingleSiteTrustManager(address: String) extends TrustManager {
 }
 
 // Build client from settings
-val client = HttpClient
-  .settings()
+val client = ClientSettings()
   .readTimeout(5000)
   // Use supplied trust manager
   .trust(SingleSiteTrustManager("192.168.0.2"))
@@ -745,6 +744,7 @@ It then sets the session's idle timeout. If no messages are received in any 5
 second span, the session will be closed automatically.
 
 Before the session begins reading incoming messages, it must first be opened.
+
 And, to kick things off, a simple text message is sent to the server.
 
 See [WebSocketSession](https://losizm.github.io/scamper/latest/api/scamper/http/websocket.html)
@@ -949,7 +949,7 @@ app.delete("/orders/:id") { req =>
   def deleteOrder(id: Int): Boolean = ???
 
   // Get resolved parameter
-  val id = req.params.getInt("id")
+  val id = req.pathParams.getInt("id")
 
   deleteOrder(id) match
     case true  => Accepted()
@@ -961,7 +961,7 @@ app.get("/archive/*path") { req =>
   def findFile(path: String): Option[File] = ???
 
   // Get resolved parameter
-  val path = req.params.getString("path")
+  val path = req.pathParams.getString("path")
 
   findFile(path).map(Ok(_)).getOrElse(NotFound())
 }
@@ -980,8 +980,8 @@ import scamper.http.server.ServerHttpRequest
 app.post("/translate/:in/to/:out") { req =>
   def translate(from: String, to: String): BodyParser[String] = ???
 
-  val from   = req.params.getString("in")
-  val to     = req.params.getString("out")
+  val from   = req.pathParams.getString("in")
+  val to     = req.pathParams.getString("out")
   val result = req.as(using translate(from, to))
 
   Ok(result)
@@ -1106,7 +1106,7 @@ app.route("/api") { router =>
 
   // Map handler to /api/messages/:id
   router.get("/messages/:id") { req =>
-    val id = req.params.getInt("id")
+    val id = req.pathParams.getInt("id")
     messages.get(id)
      .map(Ok(_))
      .getOrElse(NotFound())
