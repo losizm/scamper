@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Carlos Conyers
+ * Copyright 2023 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,10 @@ package multipart
 import java.io.File
 
 /** Converts `Tuple` to `Part` using string content. */
-given tupleToStringPart: Conversion[(String, String), Part] with
-  def apply(part: (String, String)) = Part(part._1, part._2)
+given tupleToStringPart: Conversion[(String, String), Part] = Part(_, _)
 
 /** Converts `Tuple` to `Part` using byte content. */
-given tupleToByteArrayPart: Conversion[(String, Array[Byte]), Part] with
-  def apply(part: (String, Array[Byte])) = Part(part._1, part._2)
+given tupleToByteArrayPart: Conversion[(String, Array[Byte]), Part] = Part(_, _)
 
 /** Converts `Tuple` to `Part` using file content. */
-given tupleToFilePart: Conversion[(String, File), Part] with
-  def apply(part: (String, File)) = Part(part._1, part._2)
+given tupleToFilePart: Conversion[(String, File), Part] = Part(_, _)

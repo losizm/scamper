@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Carlos Conyers
+ * Copyright 2023 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@ package http
 package auth
 
 /** Converts string to [[Challenge]]. */
-given stringToChallenge: Conversion[String, Challenge] with
-  def apply(challenge: String) = Challenge.parse(challenge)
+given stringToChallenge: Conversion[String, Challenge] = Challenge.parse(_)
 
 /** Converts string to [[Credentials]]. */
-given stringToCredentials: Conversion[String, Credentials] with
-  def apply(credentials: String) = Credentials.parse(credentials)
+given stringToCredentials: Conversion[String, Credentials] = Credentials.parse(_)
