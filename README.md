@@ -66,7 +66,7 @@ def logHttpMessage[T <: HttpMessage](msg: T): T =
 val app = ServerApplication()
 
 // Log incoming requests
-app.incoming(logHttpMessage)
+app.incoming(req => logHttpMessage(req))
 
 // Handle GET requests
 app.get("/greet") { req =>
@@ -85,7 +85,7 @@ app.post("/echo") { req =>
 }
 
 // Log outgoing responses
-app.outgoing(logHttpMessage)
+app.outgoing(res => logHttpMessage(res))
 
 Future {
   // Create HTTP server at port 8080

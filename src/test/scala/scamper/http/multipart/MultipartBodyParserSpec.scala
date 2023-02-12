@@ -53,8 +53,8 @@ class MultipartBodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
   private def usingTestHttpServer[T](f: HttpServer => T): T =
     val server = HttpServer.app()
-      .incoming(logMessage)
-      .outgoing(logMessage)
+      .incoming(req => logMessage(req))
+      .outgoing(res => logMessage(res))
       .post("/multipart")(readMultipart)
       .toHttpServer("localhost", 0)
 

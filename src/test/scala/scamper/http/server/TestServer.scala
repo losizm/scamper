@@ -40,8 +40,8 @@ trait TestServer:
       .bufferSize(1024)
       .readTimeout(500)
       .headerLimit(20)
-      .incoming(doAuditLog("Incoming request"))
-      .outgoing(doAuditLog("Outgoing response"))
+      .incoming(req => doAuditLog(req, "Incoming request"))
+      .outgoing(res => doAuditLog(res, "Outgoing response"))
       .get("/")(doHome)
       .get("/about")(doAbout)
       .post("/echo")(doEcho)
@@ -70,7 +70,7 @@ trait TestServer:
       case true  => Uri("https://" + server.host.getHostAddress + ":" + server.port)
       case false => Uri("http://"  + server.host.getHostAddress + ":" + server.port)
 
-  private def doAuditLog[T <: HttpMessage](prefix: String)(msg: T): T =
+  private def doAuditLog[T <: HttpMessage](msg: T, prefix: String): T =
     logger.info {
       val eol = System.getProperty("line.separator")
       s"$prefix (correlate=${msg.correlate})" +

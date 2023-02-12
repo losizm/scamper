@@ -532,14 +532,14 @@ import scamper.http.client.HttpClient
 import scamper.http.headers.ContentType
 import scamper.http.types.stringToMediaType
 
-val client = HttpClient()
+val httpClient = HttpClient()
 
 val req = Post("https://localhost:8080/users")
   .setContentType("application/json")
   .setBody(s"""{ "id": 65534, "name": "nobody" }""")
 
 // Send request and print response status
-client.send(req) { res => println(res.status) }
+httpClient.send(req) { res => println(res.status) }
 ```
 
 In the previous example, an instance of `HttpRequest` is explicitly created and
@@ -556,10 +556,10 @@ import scamper.http.client.HttpClient
 given BodyParser[String] = BodyParser.string()
 
 // Create client instance
-val client = HttpClient()
+val httpClient = HttpClient()
 
 def messageOfTheDay: Either[Int, String] =
-  client.get("http://localhost:8080/motd") {
+  httpClient.get("http://localhost:8080/motd") {
     case res if res.isSuccessful => Right(res.as[String])
     case res                     => Left(res.statusCode)
   }
@@ -580,7 +580,7 @@ import scamper.http.cookies.CookieStore
 import scamper.http.types.{ stringToContentCodingRange, stringToMediaRange }
 
 // Build client from settings
-val client = HttpClient.settings()
+val httpClient = HttpClient.settings()
   .resolveTo("localhost", 8080, secure = false)
   .accept("text/plain; q=0.9", "application/json; q=0.1")
   .acceptEncoding("gzip", "deflate")
@@ -592,7 +592,7 @@ val client = HttpClient.settings()
   .trust(File("/path/to/truststore"))
   .toHttpClient()
 
-client.post("https://localhost:3000/messages", body = "Hello there!") { res =>
+httpClient.post("/messages", body = "Hello there!") { res =>
   assert(res.isSuccessful, s"Message not posted: ${res.statusCode}")
 }
 ```
@@ -640,13 +640,13 @@ class SingleSiteTrustManager(address: String) extends TrustManager {
 }
 
 // Build client from settings
-val client = ClientSettings()
+val httpClient = ClientSettings()
   .readTimeout(5000)
   // Use supplied trust manager
   .trust(SingleSiteTrustManager("192.168.0.2"))
   .toHttpClient()
 
-client.get("https://192.168.0.2:3000/messages") { res =>
+httpClient.get("https://192.168.0.2:3000/messages") { res =>
   res.drain(System.out, 16 * 1024)
 }
 ```
@@ -683,7 +683,7 @@ settings.incoming { res =>
 }
 
 // Create client
-val client = settings.toHttpClient()
+val httpClient = settings.toHttpClient()
 ```
 
 You can add multiple request and response filters. If multiple filters are
@@ -1240,37 +1240,37 @@ app.secure(File("/path/to/keystore"), "s3cr3t", "pkcs12")
 When the application has been configured, you can create the server.
 
 ```scala
-val server = app.toHttpServer(8080)
+val httpServer = app.toHttpServer(8080)
 ```
 
 If the server must bind to a particular host, you can provide the host name or
 IP address.
 
 ```scala
-val server = app.toHttpServer("192.168.0.2", 8080)
+val httpServer = app.toHttpServer("192.168.0.2", 8080)
 ```
 
 An instance of `HttpServer` is returned, which can be used to query server
 details.
 
 ```scala
-printf("Host: %s%n", server.host)
-printf("Port: %d%n", server.port)
-printf("Secure: %s%n", server.isSecure)
-printf("Backlog Size: %d%n", server.backlogSize)
-printf("Pool Size: %d%n", server.poolSize)
-printf("Queue Size: %d%n", server.queueSize)
-printf("Buffer Size: %d%n", server.bufferSize)
-printf("Read Timeout: %d%n", server.readTimeout)
-printf("Header Limit: %d%n", server.headerLimit)
-printf("Keep-Alive: %s%n", server.keepAlive.getOrElse("disabled"))
-printf("Closed: %s%n", server.isClosed)
+printf("Host: %s%n", httpServer.host)
+printf("Port: %d%n", httpServer.port)
+printf("Secure: %s%n", httpServer.isSecure)
+printf("Backlog Size: %d%n", httpServer.backlogSize)
+printf("Pool Size: %d%n", httpServer.poolSize)
+printf("Queue Size: %d%n", httpServer.queueSize)
+printf("Buffer Size: %d%n", httpServer.bufferSize)
+printf("Read Timeout: %d%n", httpServer.readTimeout)
+printf("Header Limit: %d%n", httpServer.headerLimit)
+printf("Keep-Alive: %s%n", httpServer.keepAlive.getOrElse("disabled"))
+printf("Closed: %s%n", httpServer.isClosed)
 ```
 
 And, ultimately, it is used to gracefully shut down the server.
 
 ```scala
-server.close() // Goodbye, cruel world.
+httpServer.close() // Goodbye, cruel world.
 ```
 
 ## API Documentation
