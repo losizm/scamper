@@ -47,13 +47,13 @@ object Entity:
     InputStreamEntity(notNull(ReaderInputStream(in), "in"))
 
   /**
-   * Creates entity from supplied writer.
+   * Creates entity from supplied body writer.
    *
    * @note An output stream is passed to `writer`, and bytes written to the
    * output stream are used to build entity.
    */
-  def apply(writer: OutputStream => Unit): Entity =
-    InputStreamEntity(WriterInputStream(notNull(writer, "writer"))(using Auxiliary.executor))
+  def apply(writer: BodyWriter): Entity =
+    InputStreamEntity(WriterInputStream(notNull(writer, "writer").write(_))(using Auxiliary.executor))
 
   /** Creates entity from supplied file. */
   def apply(file: File): Entity =

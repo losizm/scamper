@@ -35,7 +35,7 @@ given tupleToHeaderWithLongValue: Conversion[(String, Long), Header] = Header(_,
 given tupleToHeaderWithIntValue: Conversion[(String, Int), Header] = Header(_, _)
 
 /** Converts tuple to [[Header]] where tuple is name-value pair. */
-given tupleToHeaderWithDateValue: Conversion[(String, Instant), Header] = Header(_, _)
+given tupleToHeaderWithInstantValue: Conversion[(String, Instant), Header] = Header(_, _)
 
 /** Converts byte array to [[Entity]]. */
 given bytesToEntity: Conversion[Array[Byte], Entity] = Entity(_)
@@ -49,8 +49,8 @@ given fileToEntity: Conversion[File, Entity] = Entity(_)
 /** Converts input stream to [[Entity]]. */
 given inputStreamToEntity: Conversion[InputStream, Entity] = Entity(_)
 
-/** Converts writer to [[Entity]]. */
-given writerToEntity: Conversion[(OutputStream => Unit), Entity] = Entity(_)
+/** Converts body writer to [[Entity]]. */
+given bodyWriterToEntity: Conversion[BodyWriter, Entity] = Entity(_)
 
 /** Converts string to [[RequestMethod]]. */
 given stringToRequestMethod: Conversion[String, RequestMethod] = RequestMethod(_)
