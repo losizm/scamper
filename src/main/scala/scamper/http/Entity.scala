@@ -42,6 +42,10 @@ object Entity:
   def apply(in: InputStream): Entity =
     InputStreamEntity(notNull(in, "in"))
 
+  /** Creates entity from supplied reader. */
+  def apply(in: Reader): Entity =
+    InputStreamEntity(notNull(ReaderInputStream(in), "in"))
+
   /**
    * Creates entity from supplied writer.
    *

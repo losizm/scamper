@@ -17,7 +17,7 @@ package scamper
 package http
 package websocket
 
-import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, EOFException, InputStream }
+import java.io.*
 import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -103,11 +103,17 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
   def sendAsync[T](message: Array[Byte]): Future[Unit] =
     Future(send(message))
 
-  def send(message: InputStream, binary: Boolean = false): Unit =
-    sendData(message, binary)
+  def send(message: Reader): Unit =
+    sendData(ReaderInputStream(message), false)
 
-  def sendAsync[T](message: InputStream, binary: Boolean = false): Future[Unit] =
-    Future(send(message, binary))
+  def sendAsync[T](message: Reader): Future[Unit] =
+    Future(send(message))
+
+  def send(message: InputStream): Unit =
+    sendData(message, true)
+
+  def sendAsync[T](message: InputStream): Future[Unit] =
+    Future(send(message))
 
   def ping(data: Array[Byte] = Array.empty): Unit =
     require(data.length <= 125, "data length must not exceed 125 bytes")

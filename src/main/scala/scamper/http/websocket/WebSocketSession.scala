@@ -17,7 +17,7 @@ package scamper
 package http
 package websocket
 
-import java.io.InputStream
+import java.io.{ InputStream, Reader }
 import java.net.Socket
 
 import scala.concurrent.Future
@@ -128,11 +128,9 @@ trait WebSocketSession:
   def send(message: String): Unit
 
   /**
-   * Sends text message asynchronously and on completion passes result to
-   * supplied callback.
+   * Sends text message asynchronously.
    *
    * @param message text message
-   * @param callback result handler
    */
   def sendAsync[T](message: String): Future[Unit]
 
@@ -144,37 +142,39 @@ trait WebSocketSession:
   def send(message: Array[Byte]): Unit
 
   /**
-   * Sends binary message asynchronously and on completion passes result to
-   * supplied callback.
+   * Sends binary message asynchronously.
    *
    * @param message binary message
-   * @param callback result handler
    */
   def sendAsync[T](message: Array[Byte]): Future[Unit]
 
   /**
-   * Sends message.
+   * Sends text message.
    *
-   * If `binary` is `true`, then binary message is sent; otherwise, text message
-   * is sent.
-   *
-   * @param message input stream to message
-   * @param binary indicator for binary message
+   * @param message reader to message
    */
-  def send(message: InputStream, binary: Boolean = false): Unit
+  def send(message: Reader): Unit
 
   /**
-   * Sends message asynchronously and on completion passes result to supplied
-   * callback.
+   * Sends text message asynchronously.
    *
-   * If `binary` is `true`, then binary message is sent; otherwise, text message
-   * is sent.
+   * @param message reader to message
+   */
+  def sendAsync[T](message: Reader): Future[Unit]
+
+  /**
+   * Sends binary message.
    *
    * @param message input stream to message
-   * @param binary indicator for binary message
-   * @param callback result handler
    */
-  def sendAsync[T](message: InputStream, binary: Boolean = false): Future[Unit]
+  def send(message: InputStream): Unit
+
+  /**
+   * Sends binary message asynchronously.
+   *
+   * @param message input stream to message
+   */
+  def sendAsync[T](message: InputStream): Future[Unit]
 
   /**
    * Sends ping message.
@@ -184,11 +184,9 @@ trait WebSocketSession:
   def ping(data: Array[Byte] = Array.empty): Unit
 
   /**
-   * Sends ping message asynchronously and on completion passes result to
-   * supplied callback.
+   * Sends ping message asynchronously.
    *
    * @param data application data to accompany ping message
-   * @param callback result handler
    */
   def pingAsync[T](data: Array[Byte] = Array.empty): Future[Unit]
 
@@ -200,11 +198,9 @@ trait WebSocketSession:
   def pong(data: Array[Byte] = Array.empty): Unit
 
   /**
-   * Sends pong message asynchronously and on completion passes result to
-   * supplied callback.
+   * Sends pong message asynchronously.
    *
    * @param data application data to accompany pong message
-   * @param callback result handler
    */
   def pongAsync[T](data: Array[Byte] = Array.empty): Future[Unit]
 
