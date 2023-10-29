@@ -217,7 +217,7 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
       case false => domainMatches(cookie.domain, target.host)
 
   private def checkPath(cookie: PersistentCookie, target: Uri): Boolean =
-    pathMatches(cookie.path, target.path)
+    pathMatches(cookie.path, if target.path == "" then "/" else target.path)
 
   private def checkSecure(cookie: PersistentCookie, target: Uri): Boolean =
     cookie.secureOnly match
