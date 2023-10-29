@@ -41,7 +41,7 @@ implicit class IfRange(request: HttpRequest) extends AnyVal:
   def ifRangeOption: Option[Either[EntityTag, Instant]] =
     request.getHeader("If-Range").map { header =>
       Try { Left(EntityTag.parse(header.value)) }
-        .orElse { Try(Right(header.dateValue)) }
+        .orElse { Try(Right(header.instantValue)) }
         .get
     }
 

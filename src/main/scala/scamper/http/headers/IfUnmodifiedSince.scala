@@ -35,7 +35,7 @@ implicit class IfUnmodifiedSince(request: HttpRequest) extends AnyVal:
 
   /** Gets If-Unmodified-Since header value if present. */
   def ifUnmodifiedSinceOption: Option[Instant] =
-    request.getHeader("If-Unmodified-Since").map(_.dateValue)
+    request.getHeader("If-Unmodified-Since").map(_.instantValue)
 
   /**
    * Creates new request with If-Unmodified-Since header set to supplied value.

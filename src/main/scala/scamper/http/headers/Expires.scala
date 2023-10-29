@@ -35,7 +35,7 @@ implicit class Expires(response: HttpResponse) extends AnyVal:
 
   /** Gets Expires header value if present. */
   def expiresOption: Option[Instant] =
-    response.getHeader("Expires").map(_.dateValue)
+    response.getHeader("Expires").map(_.instantValue)
 
   /** Creates new response with Expires header set to supplied value. */
   def setExpires(value: Instant): HttpResponse =
