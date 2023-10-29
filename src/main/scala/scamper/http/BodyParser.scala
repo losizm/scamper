@@ -44,7 +44,7 @@ object BodyParser:
    *
    * @note The input stream returned from parser is decoded.
    */
-  def stream(maxLength: Int = 8388608, bufferSize: Int = 8192): BodyParser[InputStream] =
+  def stream(maxLength: Long = 8388608, bufferSize: Int = 8192): BodyParser[InputStream] =
     InputStreamBodyParser(maxLength, bufferSize)
 
   /**
@@ -53,7 +53,7 @@ object BodyParser:
    * @param maxLength maximum length in bytes
    * @param bufferSize buffer size in bytes
    */
-  def reader(maxLength: Int = 8388608, bufferSize: Int = 8192): BodyParser[BufferedReader] =
+  def reader(maxLength: Long = 8388608, bufferSize: Int = 8192): BodyParser[BufferedReader] =
     BufferedReaderBodyParser(maxLength, bufferSize)
 
   /**
