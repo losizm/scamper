@@ -5,7 +5,7 @@ description  := "The HTTP library for Scala"
 homepage     := Some(url("https://github.com/losizm/scamper"))
 licenses     := List("Apache License, Version 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
-scalaVersion := "3.1.3"
+scalaVersion := "3.3.1"
 scalacOptions := Seq("-deprecation", "-feature", "-new-syntax", "-Werror", "-Yno-experimental")
 
 versionScheme := Some("early-semver")
@@ -17,9 +17,9 @@ Compile / doc / scalacOptions := Seq(
 )
 
 libraryDependencies ++= Seq(
-  "org.slf4j"      %  "slf4j-api"          % "1.7.36",
-  "ch.qos.logback" %  "logback-classic"    % "1.3.5"  % Test,
-  "org.scalatest"  %% "scalatest-flatspec" % "3.2.12" % Test
+  "org.slf4j"      %  "slf4j-api"          % "2.0.9",
+  "ch.qos.logback" %  "logback-classic"    % "1.4.11"  % Test,
+  "org.scalatest"  %% "scalatest-flatspec" % "3.2.17"  % Test
 )
 
 scmInfo := Some(
