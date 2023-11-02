@@ -18,7 +18,10 @@ package http
 package client
 
 /** Adds client extensions to `HttpRequest`. */
-implicit class ClientHttpRequest(request: HttpRequest) extends AnyVal:
+given toClientHttpRequest: Conversion[HttpRequest, ClientHttpRequest] = ClientHttpRequest(_)
+
+/** Adds client extensions to `HttpRequest`. */
+class ClientHttpRequest(request: HttpRequest) extends AnyVal:
   /**
    * Sends request and passes response to given handler.
    *

@@ -20,7 +20,10 @@ package client
 import java.net.Socket
 
 /** Adds client extensions to `HttpMessage`. */
-implicit class ClientHttpMessage(message: HttpMessage) extends AnyVal:
+given toClientHttpMessage: Conversion[HttpMessage, ClientHttpMessage] = ClientHttpMessage(_)
+
+/** Adds client extensions to `HttpMessage`. */
+class ClientHttpMessage(message: HttpMessage) extends AnyVal:
   /** Gets message socket. */
   def socket: Socket = message.getAttribute("scamper.http.client.message.socket").get
 

@@ -18,7 +18,10 @@ package http
 package client
 
 /** Adds client extensions to `HttpResponse`. */
-implicit class ClientHttpResponse(response: HttpResponse) extends AnyVal:
+given toClientHttpResponse: Conversion[HttpResponse, ClientHttpResponse] = ClientHttpResponse(_)
+
+/** Adds client extensions to `HttpResponse`. */
+class ClientHttpResponse(response: HttpResponse) extends AnyVal:
   /**
    * Gets corresponding request.
    *
