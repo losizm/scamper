@@ -18,7 +18,10 @@ package http
 package websocket
 
 /** Provides standardized access to Sec-WebSocket-Accept header. */
-implicit class SecWebSocketAccept(response: HttpResponse) extends AnyVal:
+given toSecWebSocketAccept: Conversion[HttpResponse, SecWebSocketAccept] = SecWebSocketAccept(_)
+
+/** Provides standardized access to Sec-WebSocket-Accept header. */
+class SecWebSocketAccept(response: HttpResponse) extends AnyVal:
   /** Tests for Sec-WebSocket-Accept header. */
   def hasSecWebSocketAccept: Boolean =
     response.hasHeader("Sec-WebSocket-Accept")

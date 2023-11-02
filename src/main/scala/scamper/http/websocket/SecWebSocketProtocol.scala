@@ -18,7 +18,10 @@ package http
 package websocket
 
 /** Provides standardized access to Sec-WebSocket-Protocol header. */
-implicit class SecWebSocketProtocol[T <: HttpMessage](message: T) extends AnyVal:
+given toSecWebSocketProtocol[T <: HttpMessage]: Conversion[T, SecWebSocketProtocol[T]] = SecWebSocketProtocol(_)
+
+/** Provides standardized access to Sec-WebSocket-Protocol header. */
+class SecWebSocketProtocol[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Sec-WebSocket-Protocol header. */
   def hasSecWebSocketProtocol: Boolean =
     message.hasHeader("Sec-WebSocket-Protocol")

@@ -19,6 +19,7 @@ package websocket
 
 import java.security.{ MessageDigest, SecureRandom }
 
+import scala.language.implicitConversions
 import scala.util.Try
 
 import scamper.http.headers.{ Connection, Upgrade }

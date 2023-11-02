@@ -18,7 +18,10 @@ package http
 package websocket
 
 /** Provides standardized access to Sec-WebSocket-Key header. */
-implicit class SecWebSocketKey(request: HttpRequest) extends AnyVal:
+given toSecWebSocketKey: Conversion[HttpRequest, SecWebSocketKey] = SecWebSocketKey(_)
+
+/** Provides standardized access to Sec-WebSocket-Key header. */
+class SecWebSocketKey(request: HttpRequest) extends AnyVal:
   /** Tests for Sec-WebSocket-Key header. */
   def hasSecWebSocketKey: Boolean =
     request.hasHeader("Sec-WebSocket-Key")

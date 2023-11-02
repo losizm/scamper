@@ -18,7 +18,10 @@ package http
 package websocket
 
 /** Provides standardized access to Sec-WebSocket-Protocol-Client header. */
-implicit class SecWebSocketProtocolClient(request: HttpRequest) extends AnyVal:
+given toSecWebSocketProtocolClient: Conversion[HttpRequest, SecWebSocketProtocolClient] = SecWebSocketProtocolClient(_)
+
+/** Provides standardized access to Sec-WebSocket-Protocol-Client header. */
+class SecWebSocketProtocolClient(request: HttpRequest) extends AnyVal:
   /** Tests for Sec-WebSocket-Protocol-Client header. */
   def hasSecWebSocketProtocolClient: Boolean =
     request.hasHeader("Sec-WebSocket-Protocol-Client")

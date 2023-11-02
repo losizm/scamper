@@ -30,7 +30,7 @@ import scala.language.implicitConversions
 import scamper.http.cookies.{ *, given }
 import scamper.http.headers.{ Accept, AcceptEncoding, Connection, ContentLength, Host, TE, TransferEncoding, Upgrade }
 import scamper.http.types.{ ContentCodingRange, MediaRange, TransferCoding }
-import scamper.http.websocket.*
+import scamper.http.websocket.{ *, given }
 
 import RequestMethod.Registry.*
 import Values.notNull

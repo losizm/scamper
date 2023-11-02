@@ -18,7 +18,10 @@ package http
 package websocket
 
 /** Provides standardized access to Sec-WebSocket-Version header. */
-implicit class SecWebSocketVersion[T <: HttpMessage](message: T) extends AnyVal:
+given toSecWebSocketVersion[T <: HttpMessage]: Conversion[T, SecWebSocketVersion[T]] = SecWebSocketVersion(_)
+
+/** Provides standardized access to Sec-WebSocket-Version header. */
+class SecWebSocketVersion[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Sec-WebSocket-Version header. */
   def hasSecWebSocketVersion: Boolean =
     message.hasHeader("Sec-WebSocket-Version")
