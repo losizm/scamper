@@ -17,8 +17,11 @@ package scamper
 package http
 package auth
 
+/** Adds standardized access to Authorization header. */
+given toAuthorization: Conversion[HttpRequest, Authorization] = Authorization(_)
+
 /** Provides standardized access to Authorization header. */
-implicit class Authorization(request: HttpRequest) extends AnyVal:
+class Authorization(request: HttpRequest) extends AnyVal:
   /** Tests for Authorization header. */
   def hasAuthorization: Boolean =
     request.hasHeader("Authorization")

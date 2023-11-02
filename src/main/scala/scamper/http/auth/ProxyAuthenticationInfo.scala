@@ -17,8 +17,11 @@ package scamper
 package http
 package auth
 
+/** Adds standardized access to Proxy-Authentication-Info header. */
+given toProxyAuthenticationInfo: Conversion[HttpResponse, ProxyAuthenticationInfo] = ProxyAuthenticationInfo(_)
+
 /** Provides standardized access to Proxy-Authentication-Info header. */
-implicit class ProxyAuthenticationInfo(response: HttpResponse) extends AnyVal:
+class ProxyAuthenticationInfo(response: HttpResponse) extends AnyVal:
   /** Tests for Proxy-Authentication-Info header. */
   def hasProxyAuthenticationInfo: Boolean =
     response.hasHeader("Proxy-Authentication-Info")

@@ -17,8 +17,11 @@ package scamper
 package http
 package auth
 
+/** Adds standardized access to WWW-Authenticate header. */
+given toWwwAuthenticate: Conversion[HttpResponse, WwwAuthenticate] = WwwAuthenticate(_)
+
 /** Provides standardized access to WWW-Authenticate header. */
-implicit class WwwAuthenticate(response: HttpResponse) extends AnyVal:
+class WwwAuthenticate(response: HttpResponse) extends AnyVal:
   /** Tests for WWW-Authenticate header. */
   def hasWwwAuthenticate: Boolean =
     response.hasHeader("WWW-Authenticate")

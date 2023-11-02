@@ -17,8 +17,11 @@ package scamper
 package http
 package auth
 
+/** Adds standardized access to Proxy-Authorization header. */
+given toProxyAuthorization: Conversion[HttpRequest, ProxyAuthorization] = ProxyAuthorization(_)
+
 /** Provides standardized access to Proxy-Authorization header. */
-implicit class ProxyAuthorization(request: HttpRequest) extends AnyVal:
+class ProxyAuthorization(request: HttpRequest) extends AnyVal:
   /** Tests for Proxy-Authorization header. */
   def hasProxyAuthorization: Boolean =
     request.hasHeader("Proxy-Authorization")
