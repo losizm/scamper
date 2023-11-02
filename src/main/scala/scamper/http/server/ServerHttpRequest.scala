@@ -17,13 +17,18 @@ package scamper
 package http
 package server
 
+import scala.language.implicitConversions
+
 import scamper.http.headers.{ Accept, Expect }
 import scamper.http.types.{ MediaRange, MediaType }
 
 import ResponseStatus.Registry.Continue
 
 /** Adds server extensions to `HttpRequest`. */
-implicit class ServerHttpRequest(request: HttpRequest) extends AnyVal:
+given toServerHttpRequest: Conversion[HttpRequest, ServerHttpRequest] = ServerHttpRequest(_)
+
+/** Adds server extensions to `HttpRequest`. */
+class ServerHttpRequest(request: HttpRequest) extends AnyVal:
   /** Gets path parameters. */
   def pathParams: PathParameters =
     request.getAttributeOrElse("scamper.http.server.request.pathParams", MapPathParameters(Map.empty))

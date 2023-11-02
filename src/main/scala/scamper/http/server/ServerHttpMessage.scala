@@ -20,7 +20,10 @@ package server
 import java.net.Socket
 
 /** Adds server extensions to `HttpMessage`. */
-implicit class ServerHttpMessage(message: HttpMessage) extends AnyVal:
+given toServerHttpMessage: Conversion[HttpMessage, ServerHttpMessage] = ServerHttpMessage(_)
+
+/** Adds server extensions to `HttpMessage`. */
+class ServerHttpMessage(message: HttpMessage) extends AnyVal:
   /**
    * Gets message correlate.
    *

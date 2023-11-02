@@ -19,6 +19,8 @@ package server
 
 import java.io.File
 
+import scala.language.implicitConversions
+
 import scamper.http.headers.{ ContentDisposition, ContentLength, ContentType }
 import scamper.http.types.MediaType
 

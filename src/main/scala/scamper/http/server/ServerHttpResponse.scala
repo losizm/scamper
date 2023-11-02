@@ -23,7 +23,10 @@ import scamper.http.headers.{ ContentDisposition, ContentLength, ContentType }
 import scamper.http.types.{ DispositionType, MediaType }
 
 /** Adds server extensions to `HttpResponse`. */
-implicit class ServerHttpResponse(response: HttpResponse) extends AnyVal:
+given toServerHttpResponse: Conversion[HttpResponse, ServerHttpResponse] = ServerHttpResponse(_)
+
+/** Adds server extensions to `HttpResponse`. */
+class ServerHttpResponse(response: HttpResponse) extends AnyVal:
   /**
    * Optionally gets corresponding request.
    *

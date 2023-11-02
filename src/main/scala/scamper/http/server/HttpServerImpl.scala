@@ -483,6 +483,8 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
           .getOrElse(res.setTransferEncoding(chunked))
 
     private def excludeContentLength(res: HttpResponse): Boolean =
+      import scala.language.implicitConversions
+
       res.isInformational || res.status == NoContent || res.request.exists(_.method == Connect)
 
     private def addAttributes[T <: HttpMessage & MessageBuilder[T]](msg: T, socket: Socket, requestCount: Int, correlate: String): T =

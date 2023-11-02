@@ -17,7 +17,9 @@ package scamper
 package http
 package server
 
+import scala.language.implicitConversions
 import scala.util.Try
+
 
 import scamper.http.websocket.{ StatusCode, WebSocket, WebSocketApplication }
 
