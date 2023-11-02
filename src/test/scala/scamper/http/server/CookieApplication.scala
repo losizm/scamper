@@ -17,7 +17,9 @@ package scamper
 package http
 package server
 
-import scamper.http.cookies.*
+import scala.language.implicitConversions
+
+import scamper.http.cookies.{ *, given }
 
 import ResponseStatus.Registry.Ok
 

@@ -17,6 +17,9 @@ package scamper
 package http
 package cookies
 
+/** Adds standardized access to Set-Cookie headers. */
+given toResponseCookies: Conversion[HttpResponse, ResponseCookies] = ResponseCookies(_)
+
 /**
  * Provides access to response cookies in Set-Cookie headers.
  *
@@ -53,7 +56,7 @@ package cookies
  * assert(res.getCookieValue("Region").contains("SE-US"))
  * }}}
  */
-implicit class ResponseCookies(response: HttpResponse) extends AnyVal:
+class ResponseCookies(response: HttpResponse) extends AnyVal:
   /** Gets cookies. */
   def cookies: Seq[SetCookie] =
     response.getHeaderValues("Set-Cookie").map(SetCookie.parse)

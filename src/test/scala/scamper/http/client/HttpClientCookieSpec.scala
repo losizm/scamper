@@ -19,7 +19,7 @@ package client
 
 import scala.language.implicitConversions
 
-import scamper.http.cookies.*
+import scamper.http.cookies.{ *, given }
 import scamper.http.server.TestServer
 
 import ResponseStatus.Registry.Ok

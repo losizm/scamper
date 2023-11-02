@@ -19,6 +19,8 @@ package cookies
 
 import java.time.OffsetDateTime
 
+import scala.language.implicitConversions
+
 import RequestMethod.Registry.Get
 import ResponseStatus.Registry.Ok
 

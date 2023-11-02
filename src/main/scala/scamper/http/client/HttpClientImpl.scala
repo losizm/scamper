@@ -25,8 +25,9 @@ import javax.net.SocketFactory
 import javax.net.ssl.{ SSLSocketFactory, TrustManager }
 
 import scala.util.Try
+import scala.language.implicitConversions
 
-import scamper.http.cookies.{ CookieStore, PlainCookie, RequestCookies, SetCookie }
+import scamper.http.cookies.{ *, given }
 import scamper.http.headers.{ Accept, AcceptEncoding, Connection, ContentLength, Host, TE, TransferEncoding, Upgrade }
 import scamper.http.types.{ ContentCodingRange, MediaRange, TransferCoding }
 import scamper.http.websocket.*
