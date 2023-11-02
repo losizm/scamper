@@ -19,7 +19,7 @@ package server
 
 import java.io.File
 
-import scamper.http.headers.{ ContentDisposition, ContentLength, ContentType }
+import scamper.http.headers.{ toContentDisposition, toContentLength, toContentType }
 import scamper.http.types.{ DispositionType, MediaType }
 
 /** Adds server extensions to `HttpResponse`. */
@@ -86,6 +86,8 @@ class ServerHttpResponse(response: HttpResponse) extends AnyVal:
     createWithContentDisposition("inline", file)
 
   private def createWithContentDisposition(typeName: String, file: File): HttpResponse =
+    import scala.language.implicitConversions
+
     val entity = Entity(file)
     val mediaType = MediaType.forFile(file).getOrElse(MediaType.octetStream)
     val disposition = DispositionType(

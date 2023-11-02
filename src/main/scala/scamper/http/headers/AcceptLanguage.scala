@@ -20,7 +20,10 @@ package headers
 import scamper.http.types.LanguageRange
 
 /** Provides standardized access to Accept-Language header. */
-implicit class AcceptLanguage(request: HttpRequest) extends AnyVal:
+given toAcceptLanguage: Conversion[HttpRequest, AcceptLanguage] = AcceptLanguage(_)
+
+/** Provides standardized access to Accept-Language header. */
+class AcceptLanguage(request: HttpRequest) extends AnyVal:
   /** Tests for Accept-Language header. */
   def hasAcceptLanguage: Boolean =
     request.hasHeader("Accept-Language")

@@ -20,7 +20,10 @@ package headers
 import java.time.Instant
 
 /** Provides standardized access to If-Modified-Since header. */
-implicit class IfModifiedSince(request: HttpRequest) extends AnyVal:
+given toIfModifiedSince: Conversion[HttpRequest, IfModifiedSince] = IfModifiedSince(_)
+
+/** Provides standardized access to If-Modified-Since header. */
+class IfModifiedSince(request: HttpRequest) extends AnyVal:
   /** Tests for If-Modified-Since header. */
   def hasIfModifiedSince: Boolean =
     request.hasHeader("If-Modified-Since")

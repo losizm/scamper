@@ -19,7 +19,9 @@ package http
 import java.io.InputStream
 import java.util.zip.{ GZIPInputStream, InflaterInputStream }
 
-import scamper.http.headers.{ ContentEncoding, ContentLength, TransferEncoding }
+import scala.language.implicitConversions
+
+import scamper.http.headers.{ toContentEncoding, toContentLength, toTransferEncoding }
 import scamper.http.types.{ ContentCoding, TransferCoding }
 
 /** Provides access to decoded message body. */

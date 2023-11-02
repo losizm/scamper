@@ -18,7 +18,10 @@ package http
 package headers
 
 /** Provides standardized access to Connection header. */
-implicit class Connection[T <: HttpMessage](message: T) extends AnyVal:
+given toConnection[T <: HttpMessage]: Conversion[T, Connection[T]] = Connection(_)
+
+/** Provides standardized access to Connection header. */
+class Connection[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Connection header. */
   def hasConnection: Boolean =
     message.hasHeader("Connection")

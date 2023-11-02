@@ -18,7 +18,10 @@ package http
 package headers
 
 /** Provides standardized access to Expect header. */
-implicit class Expect(request: HttpRequest) extends AnyVal:
+given toExpect: Conversion[HttpRequest, Expect] = Expect(_)
+
+/** Provides standardized access to Expect header. */
+class Expect(request: HttpRequest) extends AnyVal:
   /** Tests for Expect header. */
   def hasExpect: Boolean =
     request.hasHeader("Expect")

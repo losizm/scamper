@@ -18,7 +18,10 @@ package http
 package headers
 
 /** Provides standardized access to Location header. */
-implicit class Location(response: HttpResponse) extends AnyVal:
+given toLocation: Conversion[HttpResponse, Location] = Location(_)
+
+/** Provides standardized access to Location header. */
+class Location(response: HttpResponse) extends AnyVal:
   /** Tests for Location header. */
   def hasLocation: Boolean =
     response.hasHeader("Location")

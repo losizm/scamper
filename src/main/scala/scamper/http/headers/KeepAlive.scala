@@ -20,7 +20,10 @@ package headers
 import scamper.http.types.KeepAliveParameters
 
 /** Provides standardized access to Keep-Alive header. */
-implicit class KeepAlive[T <: HttpMessage](message: T) extends AnyVal:
+given toKeepAlive[T <: HttpMessage]: Conversion[T, KeepAlive[T]] = KeepAlive(_)
+
+/** Provides standardized access to Keep-Alive header. */
+class KeepAlive[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Keep-Alive header. */
   def hasKeepAlive: Boolean =
     message.hasHeader("Keep-Alive")

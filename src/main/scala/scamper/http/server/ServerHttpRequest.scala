@@ -19,7 +19,7 @@ package server
 
 import scala.language.implicitConversions
 
-import scamper.http.headers.{ Accept, Expect }
+import scamper.http.headers.{ toAccept, toExpect }
 import scamper.http.types.{ MediaRange, MediaType }
 
 import ResponseStatus.Registry.Continue

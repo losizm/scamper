@@ -22,7 +22,7 @@ import java.io.{ File, InputStream }
 import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 import scala.util.Try
 
-import scamper.http.headers.ContentType
+import scamper.http.headers.toContentType
 import scamper.http.types.{ DispositionType, MediaType }
 
 private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: Int) extends BodyParser[Multipart] with BodyDecoder:
@@ -32,6 +32,8 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
     var continue = true
 
   def parse(message: HttpMessage): Multipart =
+    import scala.language.implicitConversions
+
     val mediaType = message.contentType
 
     (mediaType.isMultipart && mediaType.subtypeName == "form-data") match

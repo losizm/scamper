@@ -18,7 +18,10 @@ package http
 package headers
 
 /** Provides standardized access to Allow header. */
-implicit class Allow(response: HttpResponse) extends AnyVal:
+given toAllow: Conversion[HttpResponse, Allow] = Allow(_)
+
+/** Provides standardized access to Allow header. */
+class Allow(response: HttpResponse) extends AnyVal:
   /** Tests for Allow header. */
   def hasAllow: Boolean =
     response.hasHeader("Allow")

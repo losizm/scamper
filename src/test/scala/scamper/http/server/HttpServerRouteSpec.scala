@@ -21,7 +21,7 @@ import scala.collection.immutable.ListMap
 import scala.language.implicitConversions
 
 import scamper.http.client.HttpClient
-import scamper.http.headers.*
+import scamper.http.headers.{ *, given }
 import scamper.http.types.{ *, given }
 
 import ResponseStatus.Registry.*

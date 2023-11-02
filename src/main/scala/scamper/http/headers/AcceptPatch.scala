@@ -20,7 +20,10 @@ package headers
 import scamper.http.types.MediaType
 
 /** Provides standardized access to Accept-Patch header. */
-implicit class AcceptPatch(response: HttpResponse) extends AnyVal:
+given toAcceptPatch: Conversion[HttpResponse, AcceptPatch] = AcceptPatch(_)
+
+/** Provides standardized access to Accept-Patch header. */
+class AcceptPatch(response: HttpResponse) extends AnyVal:
   /** Tests for Accept-Patch header. */
   def hasAcceptPatch: Boolean =
     response.hasHeader("Accept-Patch")

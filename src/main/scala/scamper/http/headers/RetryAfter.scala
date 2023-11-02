@@ -20,7 +20,10 @@ package headers
 import java.time.Instant
 
 /** Provides standardized access to Retry-After header. */
-implicit class RetryAfter(response: HttpResponse) extends AnyVal:
+given toRetryAfter: Conversion[HttpResponse, RetryAfter] = RetryAfter(_)
+
+/** Provides standardized access to Retry-After header. */
+class RetryAfter(response: HttpResponse) extends AnyVal:
   /** Tests for Retry-After header. */
   def hasRetryAfter: Boolean =
     response.hasHeader("Retry-After")

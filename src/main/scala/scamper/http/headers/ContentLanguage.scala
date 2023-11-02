@@ -20,7 +20,10 @@ package headers
 import scamper.http.types.LanguageTag
 
 /** Provides standardized access to Content-Language header. */
-implicit class ContentLanguage[T <: HttpMessage](message: T) extends AnyVal:
+given toContentLanguage[T <: HttpMessage]: Conversion[T, ContentLanguage[T]] = ContentLanguage(_)
+
+/** Provides standardized access to Content-Language header. */
+class ContentLanguage[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Content-Language header. */
   def hasContentLanguage: Boolean =
     message.hasHeader("Content-Language")

@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.{ AtomicBoolean, AtomicReference }
 
 import scala.concurrent.Future
 
-import scamper.http.headers.TransferEncoding
+import scamper.http.headers.toTransferEncoding
 import scamper.http.types.TransferCoding
 
 import ResponseStatus.Registry.Continue
@@ -95,6 +95,8 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable:
       socket.close()
 
   private def writeBody(request: HttpRequest): Unit =
+    import scala.language.implicitConversions
+
     request.transferEncodingOption.map { encoding =>
       val buffer = new Array[Byte](bufferSize)
       val in = encodeInputStream(request.body.data, encoding)

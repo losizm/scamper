@@ -20,7 +20,10 @@ package headers
 import scamper.http.types.DispositionType
 
 /** Provides standardized access to Content-Disposition header. */
-implicit class ContentDisposition(response: HttpResponse) extends AnyVal:
+given toContentDisposition: Conversion[HttpResponse, ContentDisposition] = ContentDisposition(_)
+
+/** Provides standardized access to Content-Disposition header. */
+class ContentDisposition(response: HttpResponse) extends AnyVal:
   /** Tests for Content-Disposition header. */
   def hasContentDisposition: Boolean =
     response.hasHeader("Content-Disposition")

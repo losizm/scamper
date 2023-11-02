@@ -22,7 +22,7 @@ import java.nio.channels.Channels
 
 import scala.language.implicitConversions
 
-import scamper.http.headers.*
+import scamper.http.headers.given
 import scamper.http.types.given
 
 import RequestMethod.Registry.*

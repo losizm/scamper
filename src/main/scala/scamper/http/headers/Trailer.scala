@@ -18,7 +18,10 @@ package http
 package headers
 
 /** Provides standardized access to Trailer header. */
-implicit class Trailer[T <: HttpMessage](message: T) extends AnyVal:
+given toTrailer[T <: HttpMessage]: Conversion[T, Trailer[T]] = Trailer(_)
+
+/** Provides standardized access to Trailer header. */
+class Trailer[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Trailer header. */
   def hasTrailer: Boolean =
     message.hasHeader("Trailer")

@@ -20,7 +20,10 @@ package headers
 import scamper.http.types.MediaType
 
 /** Provides standardized access to Content-Type header. */
-implicit class ContentType[T <: HttpMessage](message: T) extends AnyVal:
+given toContentType[T <: HttpMessage]: Conversion[T, ContentType[T]] = ContentType(_)
+
+/** Provides standardized access to Content-Type header. */
+class ContentType[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Content-Type header. */
   def hasContentType: Boolean =
     message.hasHeader("Content-Type")

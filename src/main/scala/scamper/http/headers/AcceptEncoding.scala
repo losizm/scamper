@@ -20,7 +20,10 @@ package headers
 import scamper.http.types.ContentCodingRange
 
 /** Provides standardized access to Accept-Encoding header. */
-implicit class AcceptEncoding(request: HttpRequest) extends AnyVal:
+given toAcceptEncoding: Conversion[HttpRequest, AcceptEncoding] = AcceptEncoding(_)
+
+/** Provides standardized access to Accept-Encoding header. */
+class AcceptEncoding(request: HttpRequest) extends AnyVal:
   /** Tests for Accept-Encoding header. */
   def hasAcceptEncoding: Boolean =
     request.hasHeader("Accept-Encoding")

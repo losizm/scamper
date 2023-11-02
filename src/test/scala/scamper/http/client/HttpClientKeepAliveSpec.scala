@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import scala.language.implicitConversions
 
-import scamper.http.headers.*
+import scamper.http.headers.given
 import scamper.http.server.{ HttpServer, ServerApplication }
 import scamper.http.types.{ *, given }
 

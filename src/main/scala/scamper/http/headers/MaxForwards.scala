@@ -18,7 +18,10 @@ package http
 package headers
 
 /** Provides standardized access to Max-Forwards header. */
-implicit class MaxForwards(request: HttpRequest) extends AnyVal:
+given toMaxForwards: Conversion[HttpRequest, MaxForwards] = MaxForwards(_)
+
+/** Provides standardized access to Max-Forwards header. */
+class MaxForwards(request: HttpRequest) extends AnyVal:
   /** Tests for Max-Forwards header. */
   def hasMaxForwards: Boolean =
     request.hasHeader("Max-Forwards")

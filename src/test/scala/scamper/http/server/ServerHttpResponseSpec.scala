@@ -21,7 +21,7 @@ import java.io.File
 
 import scala.language.implicitConversions
 
-import scamper.http.headers.{ ContentDisposition, ContentLength, ContentType }
+import scamper.http.headers.{ toContentDisposition, toContentLength, toContentType }
 import scamper.http.types.MediaType
 
 import ResponseStatus.Registry.Ok

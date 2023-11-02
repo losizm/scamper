@@ -20,7 +20,10 @@ package headers
 import java.time.Instant
 
 /** Provides standardized access to Expires header. */
-implicit class Expires(response: HttpResponse) extends AnyVal:
+given toExpires: Conversion[HttpResponse, Expires] = Expires(_)
+
+/** Provides standardized access to Expires header. */
+class Expires(response: HttpResponse) extends AnyVal:
   /** Tests for Expires header. */
   def hasExpires: Boolean =
     response.hasHeader("Expires")

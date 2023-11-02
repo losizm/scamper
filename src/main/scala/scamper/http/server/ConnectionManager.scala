@@ -17,7 +17,9 @@ package scamper
 package http
 package server
 
-import scamper.http.headers.{ Connection, Upgrade }
+import scala.language.implicitConversions
+
+import scamper.http.headers.{ toConnection, toUpgrade }
 import scamper.http.types.KeepAliveParameters
 
 import ResponseStatus.Registry.SwitchingProtocols

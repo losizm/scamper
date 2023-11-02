@@ -18,7 +18,10 @@ package http
 package headers
 
 /** Provides standardized access to From header. */
-implicit class From(request: HttpRequest) extends AnyVal:
+given toFrom: Conversion[HttpRequest, From] = From(_)
+
+/** Provides standardized access to From header. */
+class From(request: HttpRequest) extends AnyVal:
   /** Tests for From header. */
   def hasFrom: Boolean =
     request.hasHeader("From")

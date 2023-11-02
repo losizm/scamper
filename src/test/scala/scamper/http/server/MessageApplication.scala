@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable.LinkedHashMap
 import scala.language.implicitConversions
 
-import scamper.http.headers.{ ContentType, Location }
+import scamper.http.headers.{ toContentType, toLocation }
 import scamper.http.types.given
 
 import ResponseStatus.Registry.*

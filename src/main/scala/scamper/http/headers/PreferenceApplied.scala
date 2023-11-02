@@ -20,7 +20,10 @@ package headers
 import scamper.http.types.Preference
 
 /** Provides standardized access to Preference-Applied header. */
-implicit class PreferenceApplied(response: HttpResponse) extends AnyVal:
+given toPreferenceApplied: Conversion[HttpResponse, PreferenceApplied] = PreferenceApplied(_)
+
+/** Provides standardized access to Preference-Applied header. */
+class PreferenceApplied(response: HttpResponse) extends AnyVal:
   /** Tests for Preference-Applied header. */
   def hasPreferenceApplied: Boolean =
     response.hasHeader("Preference-Applied")

@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.{ AtomicBoolean, AtomicReference }
 
 import scala.language.implicitConversions
 
-import scamper.http.headers.*
+import scamper.http.headers.given
 import scamper.http.server.TestServer
 import scamper.http.types.{ *, given }
 

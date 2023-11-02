@@ -22,7 +22,7 @@ import java.security.{ MessageDigest, SecureRandom }
 import scala.language.implicitConversions
 import scala.util.Try
 
-import scamper.http.headers.{ Connection, Upgrade }
+import scamper.http.headers.{ toConnection, toUpgrade }
 
 import ResponseStatus.Registry.*
 

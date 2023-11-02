@@ -19,7 +19,7 @@ package websocket
 
 import scala.language.implicitConversions
 
-import scamper.http.headers.{ Connection, Upgrade }
+import scamper.http.headers.{ toConnection, toUpgrade }
 import scamper.http.types.given
 
 import RequestMethod.Registry.{ Get, Post }

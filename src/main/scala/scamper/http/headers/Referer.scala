@@ -18,7 +18,10 @@ package http
 package headers
 
 /** Provides standardized access to Referer header. */
-implicit class Referer(request: HttpRequest) extends AnyVal:
+given toReferer: Conversion[HttpRequest, Referer] = Referer(_)
+
+/** Provides standardized access to Referer header. */
+class Referer(request: HttpRequest) extends AnyVal:
   /** Tests for Referer header. */
   def hasReferer: Boolean =
     request.hasHeader("Referer")

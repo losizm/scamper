@@ -18,7 +18,10 @@ package http
 package headers
 
 /** Provides standardized access to Content-Location header. */
-implicit class ContentLocation[T <: HttpMessage](message: T) extends AnyVal:
+given toContentLocation[T <: HttpMessage]: Conversion[T, ContentLocation[T]] = ContentLocation(_)
+
+/** Provides standardized access to Content-Location header. */
+class ContentLocation[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Content-Location header. */
   def hasContentLocation: Boolean =
     message.hasHeader("Content-Location")

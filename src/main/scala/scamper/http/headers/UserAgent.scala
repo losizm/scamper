@@ -20,7 +20,10 @@ package headers
 import scamper.http.types.ProductType
 
 /** Provides standardized access to User-Agent header. */
-implicit class UserAgent(request: HttpRequest) extends AnyVal:
+given toUserAgent: Conversion[HttpRequest, UserAgent] = UserAgent(_)
+
+/** Provides standardized access to User-Agent header. */
+class UserAgent(request: HttpRequest) extends AnyVal:
   /** Tests for User-Agent header. */
   def hasUserAgent: Boolean =
     request.hasHeader("User-Agent")

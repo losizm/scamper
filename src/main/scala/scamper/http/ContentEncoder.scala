@@ -17,8 +17,9 @@ package scamper
 package http
 
 import scala.concurrent.ExecutionContext
+import scala.language.implicitConversions
 
-import scamper.http.headers.{ ContentEncoding, ContentLength, TransferEncoding }
+import scamper.http.headers.{ toContentEncoding, toContentLength, toTransferEncoding }
 import scamper.http.types.{ ContentCoding, TransferCoding }
 
 private object ContentEncoder:

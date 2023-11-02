@@ -18,7 +18,10 @@ package http
 package headers
 
 /** Provides standardized access to Early-Data header. */
-implicit class EarlyData(request: HttpRequest) extends AnyVal:
+given toEarlyData: Conversion[HttpRequest, EarlyData] = EarlyData(_)
+
+/** Provides standardized access to Early-Data header. */
+class EarlyData(request: HttpRequest) extends AnyVal:
   /** Tests for Early-Data header. */
   def hasEarlyData: Boolean =
     request.hasHeader("Early-Data")

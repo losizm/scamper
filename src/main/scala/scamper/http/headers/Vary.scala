@@ -18,7 +18,10 @@ package http
 package headers
 
 /** Provides standardized access to Vary header. */
-implicit class Vary(response: HttpResponse) extends AnyVal:
+given toVary: Conversion[HttpResponse, Vary] = Vary(_)
+
+/** Provides standardized access to Vary header. */
+class Vary(response: HttpResponse) extends AnyVal:
   /** Tests for Vary header. */
   def hasVary: Boolean =
     response.hasHeader("Vary")

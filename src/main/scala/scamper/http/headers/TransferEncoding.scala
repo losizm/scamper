@@ -20,7 +20,10 @@ package headers
 import scamper.http.types.TransferCoding
 
 /** Provides standardized access to Transfer-Encoding header. */
-implicit class TransferEncoding[T <: HttpMessage](message: T) extends AnyVal:
+given toTransferEncoding[T <: HttpMessage]: Conversion[T, TransferEncoding[T]] = TransferEncoding(_)
+
+/** Provides standardized access to Transfer-Encoding header. */
+class TransferEncoding[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Transfer-Encoding header. */
   def hasTransferEncoding: Boolean =
     message.hasHeader("Transfer-Encoding")

@@ -17,7 +17,9 @@ package scamper
 package http
 package server
 
-import scamper.http.headers.ContentLength
+import scala.language.implicitConversions
+
+import scamper.http.headers.toContentLength
 
 import ResponseStatus.Registry.Ok
 

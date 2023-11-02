@@ -30,9 +30,10 @@ import org.slf4j.LoggerFactory.getLogger
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.language.implicitConversions
 import scala.util.{ Failure, Success, Try }
 
-import scamper.http.headers.*
+import scamper.http.headers.{ *, given }
 import scamper.http.types.{ KeepAliveParameters, TransferCoding }
 
 import RequestMethod.Registry.Connect
@@ -340,6 +341,8 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
           Try(socket.close())
 
         case Failure(err: RejectedExecutionException) =>
+          import scala.language.implicitConversions
+
           logger.warn(s"$authority - Request overflow while servicing request from $tag")
           val res = ServiceUnavailable().setRetryAfter(Instant.now.plusSeconds(300))
           Try(addAttributes(res, socket, requestCount, correlate)).map(onHandleResponse)
@@ -483,8 +486,6 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
           .getOrElse(res.setTransferEncoding(chunked))
 
     private def excludeContentLength(res: HttpResponse): Boolean =
-      import scala.language.implicitConversions
-
       res.isInformational || res.status == NoContent || res.request.exists(_.method == Connect)
 
     private def addAttributes[T <: HttpMessage & MessageBuilder[T]](msg: T, socket: Socket, requestCount: Int, correlate: String): T =

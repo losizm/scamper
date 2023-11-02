@@ -18,7 +18,9 @@ package http
 
 import java.io.{ File, FileInputStream }
 
-import scamper.http.headers.*
+import scala.language.implicitConversions
+
+import scamper.http.headers.given
 
 import RequestMethod.Registry.*
 

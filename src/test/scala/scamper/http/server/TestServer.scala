@@ -20,8 +20,8 @@ package server
 import scala.collection.concurrent.TrieMap
 import scala.language.implicitConversions
 
-import scamper.http.auth.*
-import scamper.http.headers.*
+import scamper.http.auth.given
+import scamper.http.headers.given
 import scamper.http.types.given
 
 import ResponseStatus.Registry.*

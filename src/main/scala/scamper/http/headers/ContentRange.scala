@@ -20,7 +20,10 @@ package headers
 import scamper.http.types.ByteContentRange
 
 /** Provides standardized access to Content-Range header. */
-implicit class ContentRange[T <: HttpMessage](message: T) extends AnyVal:
+given toContentRange[T <: HttpMessage]: Conversion[T, ContentRange[T]] = ContentRange(_)
+
+/** Provides standardized access to Content-Range header. */
+class ContentRange[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Content-Range header. */
   def hasContentRange: Boolean =
     message.hasHeader("Content-Range")
