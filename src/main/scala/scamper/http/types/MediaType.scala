@@ -20,9 +20,9 @@ package types
 import java.io.File
 import java.util.Properties
 
+import scala.jdk.javaapi.CollectionConverters.asScala
 import scala.util.{ Success, Try }
 
-import CollectionConverters.*
 import MediaTypeHelper.*
 
 /**
