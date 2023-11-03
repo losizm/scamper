@@ -46,12 +46,7 @@ object Entity:
   def apply(in: Reader): Entity =
     InputStreamEntity(notNull(ReaderInputStream(in), "in"))
 
-  /**
-   * Creates entity from supplied body writer.
-   *
-   * @note An output stream is passed to `writer`, and bytes written to the
-   * output stream are used to build entity.
-   */
+  /** Creates entity from supplied body writer. */
   def apply(writer: BodyWriter): Entity =
     InputStreamEntity(WriterInputStream(notNull(writer, "writer").write(_))(using Auxiliary.executor))
 

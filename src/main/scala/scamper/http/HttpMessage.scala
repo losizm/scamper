@@ -18,6 +18,8 @@ package http
 
 import java.io.OutputStream
 
+import cookies.{ PlainCookie, SetCookie, toRequestCookies, toResponseCookies }
+
 /**
  * Defines HTTP message.
  *
@@ -300,12 +302,29 @@ trait HttpRequest extends HttpMessage with MessageBuilder[HttpRequest]:
   def setVersion(version: HttpVersion): HttpRequest =
     setStartLine(RequestLine(method, target, version))
 
-
 /** Provides factory for `HttpRequest`. */
 object HttpRequest:
-  /** Creates request with supplied message parts. */
-  def apply(requestLine: RequestLine, headers: Seq[Header] = Nil, body: Entity = Entity.empty): HttpRequest =
+  /** Creates request with supplied values. */
+  def apply(requestLine: RequestLine, headers: Seq[Header], body: Entity): HttpRequest =
     HttpRequestImpl(requestLine, headers, body)
+
+  /** Creates request with supplied values. */
+  def apply(
+    method: RequestMethod,
+    target: Uri,
+    headers: Seq[Header] = Nil,
+    cookies: Seq[PlainCookie] = Nil,
+    body: Entity = Entity.empty,
+    attributes: Map[String, Any] = Map.empty
+  ): HttpRequest =
+    import scala.language.implicitConversions
+
+    HttpRequestImpl(
+      RequestLine(method, target, HttpVersion(1, 1)),
+      headers,
+      body,
+      attributes
+    ).putCookies(cookies)
 
 /**
  * Defines HTTP response.
@@ -391,6 +410,23 @@ trait HttpResponse extends HttpMessage with MessageBuilder[HttpResponse]:
 
 /** Provides factory for `HttpResponse`. */
 object HttpResponse:
-  /** Creates response with supplied message parts. */
+  /** Creates response with supplied values. */
   def apply(statusLine: StatusLine, headers: Seq[Header], body: Entity): HttpResponse =
     HttpResponseImpl(statusLine, headers, body)
+
+  /** Creates request with supplied values. */
+  def apply(
+    status: ResponseStatus,
+    headers: Seq[Header] = Nil,
+    cookies: Seq[SetCookie] = Nil,
+    body: Entity = Entity.empty,
+    attributes: Map[String, Any] = Map.empty
+  ): HttpResponse =
+    import scala.language.implicitConversions
+
+    HttpResponseImpl(
+      StatusLine(HttpVersion(1, 1), status),
+      headers,
+      body,
+      attributes
+    ).putCookies(cookies)

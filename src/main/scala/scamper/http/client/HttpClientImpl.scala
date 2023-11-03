@@ -126,9 +126,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     )
 
   private def createRequest(method: RequestMethod, target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity): HttpRequest =
-    cookies.isEmpty match
-      case true  => HttpRequest(RequestLine(method, target), headers, body)
-      case false => HttpRequest(RequestLine(method, target), headers, body).setCookies(cookies)
+    HttpRequest(method, target, headers = headers, cookies = cookies, body = body)
 
   private def resolveTarget(target: Uri): Uri =
     target.isAbsolute match
@@ -156,7 +154,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
     val secure         = target.scheme.matches("https|wss")
     val authority      = target.authority
-    val userAgent      = request.getHeaderValueOrElse("User-Agent", "Scamper/39.0.0")
+    val userAgent      = request.getHeaderValueOrElse("User-Agent", "Scamper/40.0.0")
     val requestCookies = request.cookies ++ cookies.get(target)
     val connection     = getEffectiveConnection(request)
 

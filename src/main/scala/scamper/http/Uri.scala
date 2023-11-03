@@ -16,7 +16,7 @@
 package scamper
 package http
 
-import java.net.URI
+import java.net.{ URI, URL }
 
 import Values.{ noNulls, notNull }
 
@@ -116,6 +116,22 @@ object Uri:
    */
   def apply(uri: String): Uri =
     UriImpl(URI(uri).normalize())
+
+  /**
+   * Creates normalized URI with supplied URL.
+   *
+   * @throws IllegalArgumentException if absolute and scheme not one of http, https, wss, or ws.
+   */
+  def apply(url: URL): Uri =
+    UriImpl(url.toURI.normalize())
+
+  /**
+   * Creates normalized URI with supplied URI.
+   *
+   * @throws IllegalArgumentException if absolute and scheme not one of http, https, wss, or ws.
+   */
+  def apply(uri: URI): Uri =
+    UriImpl(uri.normalize())
 
 private case class UriImpl(toURI: URI) extends Uri:
   val isAbsolute = toURI.isAbsolute
