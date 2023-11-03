@@ -23,10 +23,10 @@ import scala.util.Try
 
 import scamper.http.types.EntityTag
 
-/** Provides standardized access to If-Range header. */
+/** Adds standardized access to If-Range header. */
 given toIfRange: Conversion[HttpRequest, IfRange] = IfRange(_)
 
-/** Provides standardized access to If-Range header. */
+/** Adds standardized access to If-Range header. */
 class IfRange(request: HttpRequest) extends AnyVal:
   /** Tests for If-Range header. */
   def hasIfRange: Boolean =

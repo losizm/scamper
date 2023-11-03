@@ -30,7 +30,7 @@ import RequestMethod.Registry.{ Delete, Get, Post, Put }
  * import scala.language.implicitConversions
  *
  * import scamper.http.ResponseStatus.Registry.{ BadRequest, NotFound, Ok }
- * import scamper.http.server.{ ParameterNotConvertible, ServerApplication, ServerHttpRequest }
+ * import scamper.http.server.{ ParameterNotConvertible, ServerApplication, toServerHttpRequest }
  * import scamper.http.stringToEntity
  *
  * val app = ServerApplication()

@@ -17,10 +17,10 @@ package scamper
 package http
 package headers
 
-/** Provides standardized access to Accept-Ranges header. */
+/** Adds standardized access to Accept-Ranges header. */
 given toAcceptRanges: Conversion[HttpResponse, AcceptRanges] = AcceptRanges(_)
 
-/** Provides standardized access to Accept-Ranges header. */
+/** Adds standardized access to Accept-Ranges header. */
 class AcceptRanges(response: HttpResponse) extends AnyVal:
   /** Tests for Accept-Ranges header. */
   def hasAcceptRanges: Boolean =

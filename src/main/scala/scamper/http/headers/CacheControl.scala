@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.CacheDirective
 
-/** Provides standardized access to Cache-Control header. */
+/** Adds standardized access to Cache-Control header. */
 given toCacheControl[T <: HttpMessage]: Conversion[T, CacheControl[T]] = CacheControl(_)
 
-/** Provides standardized access to Cache-Control header. */
+/** Adds standardized access to Cache-Control header. */
 class CacheControl[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Cache-Control header. */
   def hasCacheControl: Boolean =

@@ -17,10 +17,10 @@ package scamper
 package http
 package headers
 
-/** Provides standardized access to Content-Length header. */
+/** Adds standardized access to Content-Length header. */
 given toContentLength[T <: HttpMessage]: Conversion[T, ContentLength[T]] = ContentLength(_)
 
-/** Provides standardized access to Content-Length header. */
+/** Adds standardized access to Content-Length header. */
 class ContentLength[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Content-Length header. */
   def hasContentLength: Boolean =

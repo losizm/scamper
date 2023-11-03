@@ -17,10 +17,10 @@ package scamper
 package http
 package headers
 
-/** Provides standardized access to Location header. */
+/** Adds standardized access to Location header. */
 given toLocation: Conversion[HttpResponse, Location] = Location(_)
 
-/** Provides standardized access to Location header. */
+/** Adds standardized access to Location header. */
 class Location(response: HttpResponse) extends AnyVal:
   /** Tests for Location header. */
   def hasLocation: Boolean =

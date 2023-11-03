@@ -57,8 +57,8 @@ import Values.notNull
  *
  * import scamper.http.{ BodyParser, stringToUri }
  * import scamper.http.RequestMethod.Registry.Get
- * import scamper.http.client.{ ClientHttpRequest, HttpClient }
- * import scamper.http.headers.{ Accept, AcceptLanguage }
+ * import scamper.http.client.{ HttpClient, toClientHttpRequest }
+ * import scamper.http.headers.{ toAccept, toAcceptLanguage }
  * import scamper.http.types.{ stringToMediaRange, stringToLanguageRange }
  *
  * given HttpClient = HttpClient()

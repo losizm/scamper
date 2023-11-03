@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.Protocol
 
-/** Provides standardized access to Upgrade header. */
+/** Adds standardized access to Upgrade header. */
 given toUpgrade[T <: HttpMessage]: Conversion[T, Upgrade[T]] = Upgrade(_)
 
-/** Provides standardized access to Upgrade header. */
+/** Adds standardized access to Upgrade header. */
 class Upgrade[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Upgrade header. */
   def hasUpgrade: Boolean =

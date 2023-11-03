@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.ProductType
 
-/** Provides standardized access to Server header. */
+/** Adds standardized access to Server header. */
 given toServer: Conversion[HttpResponse, Server] = Server(_)
 
-/** Provides standardized access to Server header. */
+/** Adds standardized access to Server header. */
 class Server(response: HttpResponse) extends AnyVal:
   /** Tests for Server header. */
   def hasServer: Boolean =

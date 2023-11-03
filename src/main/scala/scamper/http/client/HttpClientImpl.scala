@@ -28,7 +28,7 @@ import scala.util.Try
 import scala.language.implicitConversions
 
 import scamper.http.cookies.{ *, given }
-import scamper.http.headers.{ *, given }
+import scamper.http.headers.given
 import scamper.http.types.{ ContentCodingRange, MediaRange, TransferCoding }
 import scamper.http.websocket.{ *, given }
 

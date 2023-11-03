@@ -17,10 +17,10 @@ package scamper
 package http
 package headers
 
-/** Provides standardized access to Content-Location header. */
+/** Adds standardized access to Content-Location header. */
 given toContentLocation[T <: HttpMessage]: Conversion[T, ContentLocation[T]] = ContentLocation(_)
 
-/** Provides standardized access to Content-Location header. */
+/** Adds standardized access to Content-Location header. */
 class ContentLocation[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Content-Location header. */
   def hasContentLocation: Boolean =

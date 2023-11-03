@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.WarningType
 
-/** Provides standardized access to Warning header. */
+/** Adds standardized access to Warning header. */
 given toWarning[T <: HttpMessage]: Conversion[T, Warning[T]] = Warning(_)
 
-/** Provides standardized access to Warning header. */
+/** Adds standardized access to Warning header. */
 class Warning[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Warning header. */
   def hasWarning: Boolean =

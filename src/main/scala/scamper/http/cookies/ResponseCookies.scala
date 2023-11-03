@@ -17,11 +17,11 @@ package scamper
 package http
 package cookies
 
-/** Adds standardized access to Set-Cookie headers. */
+/** Adds standardized access to cookies Set-Cookie headers. */
 given toResponseCookies: Conversion[HttpResponse, ResponseCookies] = ResponseCookies(_)
 
 /**
- * Provides access to response cookies in Set-Cookie headers.
+ * Adds standardized access to cookies in Set-Cookie headers.
  *
  * In [[HttpResponse]], the cookies are a collection of Set-Cookie header
  * values. Specialized access is provided by [[ResponseCookies]], with each
@@ -31,7 +31,7 @@ given toResponseCookies: Conversion[HttpResponse, ResponseCookies] = ResponseCoo
  * import scala.language.implicitConversions
  *
  * import scamper.http.ResponseStatus.Registry.Ok
- * import scamper.http.cookies.{ ResponseCookies, SetCookie }
+ * import scamper.http.cookies.{ SetCookie, toResponseCookies }
  * import scamper.http.stringToEntity
  *
  * // Build response with cookies

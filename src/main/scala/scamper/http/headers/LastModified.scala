@@ -19,10 +19,10 @@ package headers
 
 import java.time.Instant
 
-/** Provides standardized access to Last-Modified header. */
+/** Adds standardized access to Last-Modified header. */
 given toLastModified: Conversion[HttpResponse, LastModified] = LastModified(_)
 
-/** Provides standardized access to Last-Modified header. */
+/** Adds standardized access to Last-Modified header. */
 class LastModified(response: HttpResponse) extends AnyVal:
   /** Tests for Last-Modified header. */
   def hasLastModified: Boolean =

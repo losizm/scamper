@@ -17,10 +17,10 @@ package scamper
 package http
 package websocket
 
-/** Provides standardized access to Sec-WebSocket-Key header. */
+/** Adds standardized access to Sec-WebSocket-Key header. */
 given toSecWebSocketKey: Conversion[HttpRequest, SecWebSocketKey] = SecWebSocketKey(_)
 
-/** Provides standardized access to Sec-WebSocket-Key header. */
+/** Adds standardized access to Sec-WebSocket-Key header. */
 class SecWebSocketKey(request: HttpRequest) extends AnyVal:
   /** Tests for Sec-WebSocket-Key header. */
   def hasSecWebSocketKey: Boolean =

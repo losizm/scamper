@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.MediaRange
 
-/** Provides standardized access to Accept header. */
+/** Adds standardized access to Accept header. */
 given toAccept: Conversion[HttpRequest, Accept] = Accept(_)
 
-/** Provides standardized access to Accept header. */
+/** Adds standardized access to Accept header. */
 class Accept(request: HttpRequest) extends AnyVal:
   /** Tests for Accept header. */
   def hasAccept: Boolean =

@@ -17,10 +17,10 @@ package scamper
 package http
 package websocket
 
-/** Provides standardized access to Sec-WebSocket-Version-Client header. */
+/** Adds standardized access to Sec-WebSocket-Version-Client header. */
 given toSecWebSocketVersionServer: Conversion[HttpResponse, SecWebSocketVersionServer] = SecWebSocketVersionServer(_)
 
-/** Provides standardized access to Sec-WebSocket-Version-Server header. */
+/** Adds standardized access to Sec-WebSocket-Version-Server header. */
 class SecWebSocketVersionServer(response: HttpResponse) extends AnyVal:
   /** Tests for Sec-WebSocket-Version-Server header. */
   def hasSecWebSocketVersionServer: Boolean =

@@ -17,10 +17,10 @@ package scamper
 package http
 package headers
 
-/** Provides standardized access to Host header. */
+/** Adds standardized access to Host header. */
 given toHost: Conversion[HttpRequest, Host] = Host(_)
 
-/** Provides standardized access to Host header. */
+/** Adds standardized access to Host header. */
 class Host(request: HttpRequest) extends AnyVal:
   /** Tests for Host header. */
   def hasHost: Boolean =

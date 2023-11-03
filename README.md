@@ -12,7 +12,7 @@ It includes client and server implementations along with WebSockets.
 To get started, add **Scamper** to your sbt project&dagger;:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "39.0.0"
+libraryDependencies += "com.github.losizm" %% "scamper" % "40.0.0"
 ```
 
 **Scamper** uses SLF4J logging abstraction under the hood, so you'll need to
@@ -21,7 +21,7 @@ bind to an implementation if you wish to enable logging.
 Here's how to bind to [Logback](https://logback.qos.ch):
 
 ```scala
-libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.3.5"
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.11"
 ```
 
 See [SLF4J Documentation](https://www.slf4j.org/manual.html#projectDep) for
@@ -32,18 +32,18 @@ releases for compatibility with Scala 2.12 and Scala 2.13.</small>_
 
 ## Let's Scamper!
 
-As a quick introduction, the following two subsections provide examples on how
-to use the library. In particular, the first section builds and runs an HTTP
-server, and the next creates a client to send requests to it.
+As a quick introduction, two examples are presented here.
+
+The first creates, configures, and runs an HTTP server. The other uses an HTTP
+client to send requests to it.
 
 See also [Developer Guide](DeveloperGuide.md) for a systematic review of the
 library.
 
 ### HTTP Server
 
-First is an example of how to build and run an HTTP server. It's a bit trite and
-only scratches the surface; however, it does capture the general programming
-style.
+Here we build and run an HTTP server. It's a bit trite and only scratches the
+surface; however, it does capture the general programming style.
 
 ```scala
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -108,8 +108,8 @@ Future {
 
 ### HTTP Client
 
-Next are some examples of how to use the HTTP client. It sends requests to the
-server created in the previous section, so make sure the server is running.
+Next is the HTTP client. We send requests to the server created in the previous
+section.
 
 ```scala
 import scala.language.implicitConversions

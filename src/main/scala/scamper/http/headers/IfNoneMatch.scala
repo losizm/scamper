@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.EntityTag
 
-/** Provides standardized access to If-None-Match header. */
+/** Adds standardized access to If-None-Match header. */
 given toIfNoneMatch: Conversion[HttpRequest, IfNoneMatch] = IfNoneMatch(_)
 
-/** Provides standardized access to If-None-Match header. */
+/** Adds standardized access to If-None-Match header. */
 class IfNoneMatch(request: HttpRequest) extends AnyVal:
   /** Tests for If-None-Match header. */
   def hasIfNoneMatch: Boolean =

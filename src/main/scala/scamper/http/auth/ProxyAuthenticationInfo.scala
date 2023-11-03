@@ -20,7 +20,7 @@ package auth
 /** Adds standardized access to Proxy-Authentication-Info header. */
 given toProxyAuthenticationInfo: Conversion[HttpResponse, ProxyAuthenticationInfo] = ProxyAuthenticationInfo(_)
 
-/** Provides standardized access to Proxy-Authentication-Info header. */
+/** Adds standardized access to Proxy-Authentication-Info header. */
 class ProxyAuthenticationInfo(response: HttpResponse) extends AnyVal:
   /** Tests for Proxy-Authentication-Info header. */
   def hasProxyAuthenticationInfo: Boolean =

@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.CharsetRange
 
-/** Provides standardized access to Accept-Charset header. */
+/** Adds standardized access to Accept-Charset header. */
 given toAcceptCharset: Conversion[HttpRequest, AcceptCharset] = AcceptCharset(_)
 
-/** Provides standardized access to Accept-Charset header. */
+/** Adds standardized access to Accept-Charset header. */
 class AcceptCharset(request: HttpRequest) extends AnyVal:
   /** Tests for Accept-Charset header. */
   def hasAcceptCharset: Boolean =

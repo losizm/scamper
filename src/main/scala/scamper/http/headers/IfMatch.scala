@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.EntityTag
 
-/** Provides standardized access to If-Match header. */
+/** Adds standardized access to If-Match header. */
 given toIfMatch: Conversion[HttpRequest, IfMatch] = IfMatch(_)
 
-/** Provides standardized access to If-Match header. */
+/** Adds standardized access to If-Match header. */
 class IfMatch(request: HttpRequest) extends AnyVal:
   /** Tests for If-Match header. */
   def hasIfMatch: Boolean =

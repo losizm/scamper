@@ -17,10 +17,10 @@ package scamper
 package http
 package websocket
 
-/** Provides standardized access to Sec-WebSocket-Accept header. */
+/** Adds standardized access to Sec-WebSocket-Accept header. */
 given toSecWebSocketAccept: Conversion[HttpResponse, SecWebSocketAccept] = SecWebSocketAccept(_)
 
-/** Provides standardized access to Sec-WebSocket-Accept header. */
+/** Adds standardized access to Sec-WebSocket-Accept header. */
 class SecWebSocketAccept(response: HttpResponse) extends AnyVal:
   /** Tests for Sec-WebSocket-Accept header. */
   def hasSecWebSocketAccept: Boolean =

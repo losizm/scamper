@@ -20,7 +20,7 @@ package auth
 /** Adds standardized access to Authorization header. */
 given toAuthorization: Conversion[HttpRequest, Authorization] = Authorization(_)
 
-/** Provides standardized access to Authorization header. */
+/** Adds standardized access to Authorization header. */
 class Authorization(request: HttpRequest) extends AnyVal:
   /** Tests for Authorization header. */
   def hasAuthorization: Boolean =

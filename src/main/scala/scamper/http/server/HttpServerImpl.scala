@@ -33,7 +33,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.implicitConversions
 import scala.util.{ Failure, Success, Try }
 
-import scamper.http.headers.{ *, given }
+import scamper.http.headers.given
 import scamper.http.types.{ KeepAliveParameters, TransferCoding }
 
 import RequestMethod.Registry.Connect

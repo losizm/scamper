@@ -20,7 +20,7 @@ package auth
 /** Adds standardized access to Proxy-Authorization header. */
 given toProxyAuthorization: Conversion[HttpRequest, ProxyAuthorization] = ProxyAuthorization(_)
 
-/** Provides standardized access to Proxy-Authorization header. */
+/** Adds standardized access to Proxy-Authorization header. */
 class ProxyAuthorization(request: HttpRequest) extends AnyVal:
   /** Tests for Proxy-Authorization header. */
   def hasProxyAuthorization: Boolean =

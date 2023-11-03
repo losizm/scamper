@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.PragmaDirective
 
-/** Provides standardized access to Pragma header. */
+/** Adds standardized access to Pragma header. */
 given toPragma: Conversion[HttpRequest, Pragma] = Pragma(_)
 
-/** Provides standardized access to Pragma header. */
+/** Adds standardized access to Pragma header. */
 class Pragma(request: HttpRequest) extends AnyVal:
   /** Tests for Pragma header. */
   def hasPragma: Boolean =

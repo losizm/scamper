@@ -20,7 +20,7 @@ package server
 import scala.language.implicitConversions
 
 import scamper.http.client.{ *, given }
-import scamper.http.headers.{ *, given }
+import scamper.http.headers.given
 import scamper.http.types.{ *, given }
 
 import RequestMethod.Registry.*

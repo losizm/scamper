@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.ContentCoding
 
-/** Provides standardized access to Content-Encoding header. */
+/** Adds standardized access to Content-Encoding header. */
 given toContentEncoding[T <: HttpMessage]: Conversion[T, ContentEncoding[T]] = ContentEncoding(_)
 
-/** Provides standardized access to Content-Encoding header. */
+/** Adds standardized access to Content-Encoding header. */
 class ContentEncoding[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Content-Encoding header. */
   def hasContentEncoding: Boolean =

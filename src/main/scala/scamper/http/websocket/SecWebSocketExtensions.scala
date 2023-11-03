@@ -17,10 +17,10 @@ package scamper
 package http
 package websocket
 
-/** Provides standardized access to Sec-WebSocket-Extensions header. */
+/** Adds standardized access to Sec-WebSocket-Extensions header. */
 given toSecWebSocketExtensions[T <: HttpMessage]: Conversion[T, SecWebSocketExtensions[T]] = SecWebSocketExtensions(_)
 
-/** Provides standardized access to Sec-WebSocket-Extensions header. */
+/** Adds standardized access to Sec-WebSocket-Extensions header. */
 class SecWebSocketExtensions[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Sec-WebSocket-Extensions header. */
   def hasSecWebSocketExtensions: Boolean =

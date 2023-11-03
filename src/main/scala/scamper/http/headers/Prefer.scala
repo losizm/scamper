@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.Preference
 
-/** Provides standardized access to Prefer header. */
+/** Adds standardized access to Prefer header. */
 given toPrefer: Conversion[HttpRequest, Prefer] = Prefer(_)
 
-/** Provides standardized access to Prefer header. */
+/** Adds standardized access to Prefer header. */
 class Prefer(request: HttpRequest) extends AnyVal:
   /** Tests for Prefer header. */
   def hasPrefer: Boolean =

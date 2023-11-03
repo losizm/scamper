@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.EntityTag
 
-/** Provides standardized access to ETag header. */
+/** Adds standardized access to ETag header. */
 given toETag: Conversion[HttpResponse, ETag] = ETag(_)
 
-/** Provides standardized access to ETag header. */
+/** Adds standardized access to ETag header. */
 class ETag(response: HttpResponse) extends AnyVal:
   /** Tests for ETag header. */
   def hasETag: Boolean =

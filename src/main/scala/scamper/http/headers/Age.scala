@@ -17,10 +17,10 @@ package scamper
 package http
 package headers
 
-/** Provides standardized access to Age header. */
+/** Adds standardized access to Age header. */
 given toAge: Conversion[HttpResponse, Age] = Age(_)
 
-/** Provides standardized access to Age header. */
+/** Adds standardized access to Age header. */
 class Age(response: HttpResponse) extends AnyVal:
   /** Tests for Age header. */
   def hasAge: Boolean =

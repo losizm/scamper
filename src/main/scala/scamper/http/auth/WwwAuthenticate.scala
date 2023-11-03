@@ -20,7 +20,7 @@ package auth
 /** Adds standardized access to WWW-Authenticate header. */
 given toWwwAuthenticate: Conversion[HttpResponse, WwwAuthenticate] = WwwAuthenticate(_)
 
-/** Provides standardized access to WWW-Authenticate header. */
+/** Adds standardized access to WWW-Authenticate header. */
 class WwwAuthenticate(response: HttpResponse) extends AnyVal:
   /** Tests for WWW-Authenticate header. */
   def hasWwwAuthenticate: Boolean =

@@ -17,10 +17,10 @@ package scamper
 package http
 package headers
 
-/** Provides standardized access to Referer header. */
+/** Adds standardized access to Referer header. */
 given toReferer: Conversion[HttpRequest, Referer] = Referer(_)
 
-/** Provides standardized access to Referer header. */
+/** Adds standardized access to Referer header. */
 class Referer(request: HttpRequest) extends AnyVal:
   /** Tests for Referer header. */
   def hasReferer: Boolean =

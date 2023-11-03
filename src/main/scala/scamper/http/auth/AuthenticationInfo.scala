@@ -20,7 +20,7 @@ package auth
 /** Adds standardized access to Authentication-Info header. */
 given toAuthenticationInfo: Conversion[HttpResponse, AuthenticationInfo] =  AuthenticationInfo(_)
 
-/** Provides standardized access to Authentication-Info header. */
+/** Adds standardized access to Authentication-Info header. */
 class AuthenticationInfo(response: HttpResponse) extends AnyVal:
   /** Tests for Authentication-Info header. */
   def hasAuthenticationInfo: Boolean =

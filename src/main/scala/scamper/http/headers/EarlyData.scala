@@ -17,10 +17,10 @@ package scamper
 package http
 package headers
 
-/** Provides standardized access to Early-Data header. */
+/** Adds standardized access to Early-Data header. */
 given toEarlyData: Conversion[HttpRequest, EarlyData] = EarlyData(_)
 
-/** Provides standardized access to Early-Data header. */
+/** Adds standardized access to Early-Data header. */
 class EarlyData(request: HttpRequest) extends AnyVal:
   /** Tests for Early-Data header. */
   def hasEarlyData: Boolean =

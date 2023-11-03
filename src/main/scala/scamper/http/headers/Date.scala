@@ -19,10 +19,10 @@ package headers
 
 import java.time.Instant
 
-/** Provides standardized access to Date header. */
+/** Adds standardized access to Date header. */
 given toDate[T <: HttpMessage]: Conversion[T, Date[T]] = Date(_)
 
-/** Provides standardized access to Date header. */
+/** Adds standardized access to Date header. */
 class Date[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Date header. */
   def hasDate: Boolean =

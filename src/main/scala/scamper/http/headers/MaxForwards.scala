@@ -17,10 +17,10 @@ package scamper
 package http
 package headers
 
-/** Provides standardized access to Max-Forwards header. */
+/** Adds standardized access to Max-Forwards header. */
 given toMaxForwards: Conversion[HttpRequest, MaxForwards] = MaxForwards(_)
 
-/** Provides standardized access to Max-Forwards header. */
+/** Adds standardized access to Max-Forwards header. */
 class MaxForwards(request: HttpRequest) extends AnyVal:
   /** Tests for Max-Forwards header. */
   def hasMaxForwards: Boolean =

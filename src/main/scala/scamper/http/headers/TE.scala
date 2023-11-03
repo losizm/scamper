@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.TransferCodingRange
 
-/** Provides standardized access to TE header. */
+/** Adds standardized access to TE header. */
 given toTE: Conversion[HttpRequest, TE] = TE(_)
 
-/** Provides standardized access to TE header. */
+/** Adds standardized access to TE header. */
 class TE(request: HttpRequest) extends AnyVal:
   /** Tests for TE header. */
   def hasTE: Boolean =

@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.LinkType
 
-/** Provides standardized access to Link header. */
+/** Adds standardized access to Link header. */
 given toLink: Conversion[HttpResponse, Link] = Link(_)
 
-/** Provides standardized access to Link header. */
+/** Adds standardized access to Link header. */
 class Link(response: HttpResponse) extends AnyVal:
   /** Tests for Link header. */
   def hasLink: Boolean =

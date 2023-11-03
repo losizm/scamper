@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.ByteRange
 
-/** Provides standardized access to Range header. */
+/** Adds standardized access to Range header. */
 given toRange: Conversion[HttpRequest, Range] = Range(_)
 
-/** Provides standardized access to Range header. */
+/** Adds standardized access to Range header. */
 class Range(request: HttpRequest) extends AnyVal:
   /** Tests for Range header. */
   def hasRange: Boolean =

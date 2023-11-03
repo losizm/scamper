@@ -17,11 +17,11 @@ package scamper
 package http
 package cookies
 
-/** Adds standardized access to Cookie header. */
+/** Adds standardized access to cookies in Cookie header. */
 given toRequestCookies: Conversion[HttpRequest, RequestCookies] = RequestCookies(_)
 
 /**
- * Provides access to request cookies in Cookie header.
+ * Adds standardized access to cookies in Cookie header.
  *
  * In [[HttpRequest]], cookies are stringed together in the Cookie header. You
  * can access them using extension methods provided by [[RequestCookies]], with
@@ -31,7 +31,7 @@ given toRequestCookies: Conversion[HttpRequest, RequestCookies] = RequestCookies
  * import scala.language.implicitConversions
  *
  * import scamper.http.RequestMethod.Registry.Get
- * import scamper.http.cookies.{ PlainCookie, RequestCookies }
+ * import scamper.http.cookies.{ PlainCookie, toRequestCookies }
  * import scamper.http.stringToUri
  *
  * // Build request with cookies

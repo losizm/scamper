@@ -19,10 +19,10 @@ package headers
 
 import scamper.http.types.ViaType
 
-/** Provides standardized access to Via header. */
+/** Adds standardized access to Via header. */
 given toVia[T <: HttpMessage]: Conversion[T, Via[T]] = Via(_)
 
-/** Provides standardized access to Via header. */
+/** Adds standardized access to Via header. */
 class Via[T <: HttpMessage](message: T) extends AnyVal:
   /** Tests for Via header. */
   def hasVia: Boolean =

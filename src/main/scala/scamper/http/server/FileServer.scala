@@ -25,7 +25,7 @@ import java.time.Instant
 import scala.util.Try
 import scala.language.implicitConversions
 
-import scamper.http.headers.{ *, given }
+import scamper.http.headers.given
 import scamper.http.types.{ MediaRange, MediaType }
 
 import RequestMethod.Registry.{ Get, Head }
