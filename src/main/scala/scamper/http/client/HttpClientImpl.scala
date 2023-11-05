@@ -75,16 +75,16 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     resolveTargetSend(request, handler)
 
   def get[T](target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie])(handler: ResponseHandler[T]): T =
-    send(createRequest(Get, target, headers, cookies, Entity.empty))(handler)
+    send(HttpRequest(Get, target, headers, cookies, Entity.empty))(handler)
 
   def post[T](target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T =
-    send(createRequest(Post, target, headers, cookies, body))(handler)
+    send(HttpRequest(Post, target, headers, cookies, body))(handler)
 
   def put[T](target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity)(handler: ResponseHandler[T]): T =
-    send(createRequest(Put, target, headers, cookies, body))(handler)
+    send(HttpRequest(Put, target, headers, cookies, body))(handler)
 
   def delete[T](target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie])(handler: ResponseHandler[T]): T =
-    send(createRequest(Delete, target, headers, cookies, Entity.empty))(handler)
+    send(HttpRequest(Delete, target, headers, cookies, Entity.empty))(handler)
 
   def websocket[T](target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie])(app: WebSocketApplication[T]): T =
     val targetResolved = resolveWebSocketTarget(target)
@@ -92,7 +92,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     require(targetResolved.isAbsolute, "Absolute WebSocket URI required")
     require(targetResolved.scheme.matches("wss?"), "WebSocket scheme required")
 
-    val req = createRequest(
+    val req = HttpRequest(
       Get,
       targetResolved,
       Header("Upgrade", "websocket") +:
@@ -125,9 +125,6 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
         case false => throw WebSocketHandshakeFailure(s"Connection upgrade not accepted: ${res.status}")
     )
 
-  private def createRequest(method: RequestMethod, target: Uri, headers: Seq[Header], cookies: Seq[PlainCookie], body: Entity): HttpRequest =
-    HttpRequest(method, target, headers = headers, cookies = cookies, body = body)
-
   private def resolveTarget(target: Uri): Uri =
     target.isAbsolute match
       case true  => target
@@ -154,7 +151,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
 
     val secure         = target.scheme.matches("https|wss")
     val authority      = target.authority
-    val userAgent      = request.getHeaderValueOrElse("User-Agent", "Scamper/40.0.0")
+    val userAgent      = request.getHeaderValueOrElse("User-Agent", "Scamper/40.0.1")
     val requestCookies = request.cookies ++ cookies.get(target)
     val connection     = getEffectiveConnection(request)
 
