@@ -15,7 +15,7 @@
  */
 package scamper
 
-import java.io.{ BufferedReader, InputStream, IOException, Reader }
+import java.io.{ InputStream, IOException, Reader }
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
@@ -57,10 +57,8 @@ private class ReaderInputStream private (in: Reader, bufsize: Int) extends Input
     read(bin, 0, 1) == -1 match
       case true  => -1
       case false =>
-        if bin(0) < 0 then
-          bin(0) + 256
-        else
-          bin(0).toInt
+        if bin(0) < 0 then bin(0) + 256
+        else               bin(0)
 
   override def read(buf: Array[Byte], off: Int, len: Int): Int =
     if bytes.hasRemaining then
@@ -81,7 +79,4 @@ private class ReaderInputStream private (in: Reader, bufsize: Int) extends Input
 
 private object ReaderInputStream:
   def apply(in: Reader, bufsize: Int = 8192): ReaderInputStream =
-    val size = bufsize.max(1024)
-    in.isInstanceOf[BufferedReader] match
-      case true  => new ReaderInputStream(in, size)
-      case false => new ReaderInputStream(BufferedReader(in, size), size)
+    new ReaderInputStream(in, bufsize.max(1024))

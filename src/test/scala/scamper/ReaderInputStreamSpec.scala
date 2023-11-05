@@ -38,3 +38,20 @@ class ReaderInputStreamSpec extends org.scalatest.flatspec.AnyFlatSpec:
     finally
       in.close()
   }
+
+  it should "read file on byte at a time" in {
+    val file = File("src/main/scala/scamper/http/websocket/WebSocketSessionImpl.scala")
+    val in   = ReaderInputStream(FileReader(file))
+
+    try
+      var tot = 0
+      while in.read() != -1 do
+        tot += 1
+
+      info(s"File size:  ${file.length}")
+      info(s"Bytes read: $tot")
+
+      assert(tot == file.length)
+    finally
+      in.close()
+  }
