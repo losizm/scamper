@@ -196,6 +196,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
       Try(serviceExecutor.shutdownNow())
       Try(closerExecutor.shutdownNow())
       Try(stopLifecycleHooks())
+      Try(logger.info(s"$authority - Server is shut down"))
 
   override def toString(): String =
     s"HttpServer(host=$host, port=$port, isSecure=$isSecure, isClosed=$isClosed)"
