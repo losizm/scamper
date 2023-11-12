@@ -20,11 +20,10 @@ package server
 import Values.*
 
 private class TargetRequestHandler private (path: TargetPath, methods: Seq[RequestMethod], handler: RequestHandler) extends RequestHandler:
+  def this(path: String, methods: Seq[RequestMethod], handler: RequestHandler) =
+    this(TargetPath(path), noNulls(methods), notNull(handler))
+
   def apply(req: HttpRequest): HttpMessage =
     path.matches(req.path) && (methods.isEmpty || methods.contains(req.method)) match
       case true  => handler(req.putAttributes("scamper.http.server.request.pathParams" -> path.getPathParams(req.path)))
       case false => req
-
-private object TargetRequestHandler:
-  def apply(path: String, methods: Seq[RequestMethod], handler: RequestHandler): TargetRequestHandler =
-    new TargetRequestHandler(TargetPath(path), noNulls(methods), notNull(handler))

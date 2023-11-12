@@ -20,12 +20,13 @@ package server
 import scala.language.implicitConversions
 import scala.util.Try
 
-
 import scamper.http.websocket.{ StatusCode, WebSocket, WebSocketApplication }
 
 import Values.notNull
 
 private class WebSocketRequestHandler(app: WebSocketApplication[?]) extends RequestHandler:
+  notNull(app)
+
   private lazy val logger = org.slf4j.LoggerFactory.getLogger(getClass)
 
   def apply(req: HttpRequest): HttpMessage =
@@ -40,7 +41,3 @@ private class WebSocketRequestHandler(app: WebSocketApplication[?]) extends Requ
         }
 
       case false => req
-
-private object WebSocketRequestHandler:
-  def apply(app: WebSocketApplication[?]): WebSocketRequestHandler =
-    new WebSocketRequestHandler(notNull(app))

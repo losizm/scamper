@@ -19,7 +19,9 @@ import java.io.{ InputStream, IOException, Reader }
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-private class ReaderInputStream private (in: Reader, bufsize: Int) extends InputStream:
+private class ReaderInputStream(in: Reader, bufsize: Int = 8192) extends InputStream:
+  require(bufsize > 0, s"Invalid buffer size: $bufsize")
+
   private val encoder = Charset.forName("UTF-8").newEncoder()
   private val chars   = ByteBuffer.allocate(bufsize).asCharBuffer()
   private val bytes   = ByteBuffer.allocate(bufsize)
@@ -76,7 +78,3 @@ private class ReaderInputStream private (in: Reader, bufsize: Int) extends Input
           bytes.flip()
           bytes.get(buf, off, bytes.limit.min(len))
           bytes.position
-
-private object ReaderInputStream:
-  def apply(in: Reader, bufsize: Int = 8192): ReaderInputStream =
-    new ReaderInputStream(in, bufsize.max(1024))

@@ -32,7 +32,13 @@ import RequestMethod.Registry.{ Get, Head }
 import ResponseStatus.Registry.*
 import Values.noNulls
 
-private class FileServer(sourceDirectory: Path, defaults: Seq[String]) extends RouterApplication:
+private class FileServer private (sourceDirectory: Path, defaults: Seq[String]) extends RouterApplication:
+  def this(sourceDirectory: File, defaults: Seq[String]) =
+    this(sourceDirectory.toPath.toAbsolutePath.normalize(), noNulls(defaults))
+
+  if !Files.isDirectory(sourceDirectory) then
+    throw NotDirectoryException(s"$sourceDirectory")
+
   private val `*/*` = MediaRange("*/*")
 
   def apply(router: Router): Unit =
@@ -105,12 +111,3 @@ private class FileServer(sourceDirectory: Path, defaults: Seq[String]) extends R
 
   private def getIfModifiedSince(req: HttpRequest): Instant =
     Try(req.ifModifiedSince).getOrElse(Instant.MIN)
-
-private object FileServer:
-  def apply(sourceDirectory: File, defaults: Seq[String]): FileServer =
-    val directory = sourceDirectory.toPath.toAbsolutePath.normalize()
-
-    if !Files.isDirectory(directory) then
-      throw NotDirectoryException(s"$directory")
-
-    new FileServer(directory, noNulls(defaults))

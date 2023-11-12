@@ -20,11 +20,10 @@ package server
 import Values.notNull
 
 private class MountRequestHandler private (path: MountPath, handler: RequestHandler) extends RequestHandler:
+  def this(path: String, handler: RequestHandler) =
+    this(MountPath(path), notNull(handler))
+
   def apply(req: HttpRequest): HttpMessage =
     path.matches(req.path) match
       case true  => handler(req)
       case false => req
-
-private object MountRequestHandler:
-  def apply(path: String, handler: RequestHandler): MountRequestHandler =
-    new MountRequestHandler(MountPath(path), notNull(handler))

@@ -21,11 +21,13 @@ import scala.collection.mutable.ListBuffer
 
 import Values.notNull
 
-private class RouterImpl private (val mountPath: String) extends Router:
+private class RouterImpl(rawMountPath: String) extends Router:
   private val incomings = new ListBuffer[RequestHandler]
   private val outgoings = new ListBuffer[ResponseFilter]
   private val recovers  = new ListBuffer[ErrorHandler]
   private val triggers  = new ListBuffer[LifecycleHook]
+
+  val mountPath = MountPath.normalize(rawMountPath)
 
   def reset(): this.type = synchronized {
     incomings.clear()
@@ -104,7 +106,3 @@ private class RouterImpl private (val mountPath: String) extends Router:
       attributes.flatMap(name => req.getAttribute[Any](name).map(value => name -> value))
         .:+("scamper.http.server.response.request" -> req)
         .toMap
-
-private object RouterImpl:
-  def apply(mountPath: String): RouterImpl =
-    new RouterImpl(MountPath.normalize(mountPath))
