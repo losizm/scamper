@@ -97,25 +97,23 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable:
   private def writeBody(request: HttpRequest): Unit =
     import scala.language.implicitConversions
 
-    request.transferEncodingOption.map { encoding =>
-      val buffer = new Array[Byte](bufferSize)
-      val in = encodeInputStream(request.body.data, encoding)
-      var chunkSize = 0
+    val buffer = new Array[Byte](bufferSize)
 
-      while { chunkSize = in.read(buffer); chunkSize != -1 } do
+    request.transferEncodingOption.map { encoding =>
+      val in        = encodeInputStream(request.body.data, encoding)
+      var chunkSize = in.read(buffer)
+
+      while chunkSize != -1 do
         socket.writeLine(chunkSize.toHexString)
         socket.write(buffer, 0, chunkSize)
         socket.writeLine()
+        chunkSize = in.read(buffer)
 
       socket.writeLine("0")
       socket.writeLine()
       socket.flush()
     }.getOrElse {
-      val buffer = new Array[Byte](bufferSize)
-      val in = request.body.data
-      var length = 0
-      while { length = in.read(buffer); length != -1 } do
-        socket.write(buffer, 0, length)
+      socket.getOutputStream.write(request.body.data, buffer)
       socket.flush()
     }
 

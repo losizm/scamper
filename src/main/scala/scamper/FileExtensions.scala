@@ -15,9 +15,9 @@
  */
 package scamper
 
-import java.io.{ File, FileOutputStream, FileInputStream, InputStream, OutputStream }
+import java.io.*
+import java.nio.file.Files
 
-import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
 private implicit class FileExtensions(file: File) extends AnyVal:
@@ -31,21 +31,9 @@ private implicit class FileExtensions(file: File) extends AnyVal:
     try f(in)
     finally Try(in.close())
 
-  def getBytes(bufferSize: Int = 8192): Array[Byte] =
-    withInputStream { in =>
-      val bytes = ArrayBuffer[Byte]()
-      val buffer = new Array[Byte](bufferSize.max(1024))
-      var len = 0
-
-      while { len = in.read(buffer); len != -1 } do
-        bytes ++= buffer.take(len)
-
-      bytes.toArray
-    }
+  def getBytes(): Array[Byte] =
+    Files.readAllBytes(file.toPath)
 
   def setBytes(bytes: Array[Byte]): File =
-    withOutputStream { out =>
-      out.write(bytes)
-      out.flush()
-      file
-    }
+    Files.write(file.toPath, bytes)
+    file

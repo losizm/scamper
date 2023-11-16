@@ -61,8 +61,8 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(u
    */
   def this(writer: OutputStream => Unit)(using executor: ExecutionContext) = this(8192, writer)
 
-  private val in = PipedInputStream(bufferSize)
-  private val out = PipedOutputStream(in)
+  private val in    = PipedInputStream(bufferSize)
+  private val out   = PipedOutputStream(in)
   private val error = AtomicReference[Throwable]()
 
   Future {
@@ -122,7 +122,7 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(u
    *
    * @throws IOException if I/O error occurs
    */
-  override def read(buffer: Array[Byte]): Int = read(buffer, 0, buffer.length)
+  override def read(buffer: Array[Byte]): Int = read(buffer, 0, buffer.size)
 
   /**
    * Reads bytes from input stream into supplied buffer starting at given
@@ -133,17 +133,17 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(u
    * @throws IOException if I/O error occurs
    */
   override def read(buffer: Array[Byte], offset: Int, length: Int): Int = propose {
-    var eof = false
-    var count = 0
+    var eof   = false
+    var total = 0
 
-    while !eof && count < length do
-      in.read(buffer, offset + count, length - count) match
+    while !eof && total < length do
+      in.read(buffer, offset + total, length - total) match
         case -1 => eof = propose(true)
-        case n  => count += propose(n)
+        case n  => total += propose(n)
 
-    if eof && count == 0 then
-      -1
-    else count
+    eof && total == 0 match
+      case true  => -1
+      case false => total
   }
 
   /** Closes input stream. */

@@ -119,9 +119,9 @@ sealed trait HttpMessage:
    * @throws ReadLimitExceeded if body exceeds `maxLength`
    */
   def drain(maxLength: Long): this.type =
-    val input  = BodyDecoder.decode(this, maxLength)
-    val buffer = new Array[Byte](8192)
-    while input.read(buffer) != -1 do ()
+    val in  = BodyDecoder.decode(this, maxLength)
+    val buf = new Array[Byte](8192)
+    while in.read(buf) != -1 do ()
     this
 
   /**
@@ -135,15 +135,15 @@ sealed trait HttpMessage:
    * @throws ReadLimitExceeded if body exceeds `maxLength`
    */
   def drain(sink: OutputStream, maxLength: Long): Long =
-    val input  = BodyDecoder.decode(this, maxLength)
-    val buffer = new Array[Byte](8192)
-    var length = input.read(buffer)
-    var total  = 0
-    while length != -1 do
-      sink.write(buffer, 0, length)
-      total += length
-      length = input.read(buffer)
-    total
+    val in  = BodyDecoder.decode(this, maxLength)
+    val buf = new Array[Byte](8192)
+    var len = in.read(buf)
+    var tot = 0
+    while len != -1 do
+      sink.write(buf, 0, len)
+      tot += len
+      len = in.read(buf)
+    tot
 
 /**
  * Defines HTTP request.

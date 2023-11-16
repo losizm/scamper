@@ -28,7 +28,7 @@ private object WebSocketDeflate:
     )
 
   def compress(message: Array[Byte]): Array[Byte] =
-    compress(message, 0, message.length)
+    compress(message, 0, message.size)
 
   def compress(message: Array[Byte], offset: Int, length: Int): Array[Byte] =
     val buffer = ByteArrayOutputStream()
@@ -46,7 +46,7 @@ private object WebSocketDeflate:
     InflaterInputStream(message, Inflater(true))
 
   def decompress(message: Array[Byte]): Array[Byte] =
-    decompress(message, 0, message.length)
+    decompress(message, 0, message.size)
 
   def decompress(message: Array[Byte], offset: Int, length: Int): Array[Byte] =
     val buffer = ByteArrayOutputStream()

@@ -151,17 +151,10 @@ class WebSocketConnection(socket: Socket) extends AutoCloseable:
     }
 
     if frame.length > 0 then
-      val buf = new Array[Byte](8192)
-      val in = frame.payload
-      var tot = 0
-      var len = 0
+      val length = out.write(frame.payload, new Array[Byte](8192))
 
-      while { len = in.read(buf); len != -1 } do
-        out.write(buf, 0, len)
-        tot += len
-
-      if tot < frame.length then
-        throw EOFException(s"Truncation dectected: Payload length ($tot) is less than declared length (${frame.length})")
+      if length < frame.length then
+        throw EOFException(s"Truncation dectected: Payload length ($length) is less than declared length (${frame.length})")
 
     out.flush()
   }

@@ -30,7 +30,7 @@ private object HeaderStream:
         case true =>
           if headers.isEmpty then throw HttpException("Cannot parse headers")
           val last = headers.last
-          headers.update(headers.length - 1, Header(last.name, last.value + " " + line.trim()))
+          headers.update(headers.size - 1, Header(last.name, last.value + " " + line.trim()))
         case false =>
           headers += Header(line)
 

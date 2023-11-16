@@ -34,10 +34,10 @@ private class BoundedInputStream(in: InputStream, limit: Long, capacity: Long) e
           byte
 
   override def read(buffer: Array[Byte], offset: Int, length: Int): Int =
-    if      offset < 0                      then throw IndexOutOfBoundsException()
-    else if offset + length > buffer.length then throw IndexOutOfBoundsException()
-    else if position >= capacity            then -1
-    else if position >= limit               then if length == 0 then -1 else throw ReadLimitExceeded(limit)
+    if      offset < 0                    then throw IndexOutOfBoundsException()
+    else if offset + length > buffer.size then throw IndexOutOfBoundsException()
+    else if position >= capacity          then -1
+    else if position >= limit             then if length == 0 then -1 else throw ReadLimitExceeded(limit)
     else
       in.read(buffer, offset, length.min(maxRead)) match
         case -1    => -1

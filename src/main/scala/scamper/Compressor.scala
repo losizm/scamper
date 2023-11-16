@@ -28,10 +28,6 @@ private object Compressor:
     DeflaterInputStream(in)
 
   private def write(in: InputStream, out: GZIPOutputStream, bufferSize: Int): Unit =
-    val buffer = new Array[Byte](bufferSize)
-    var length = 0
-
-    while { length = in.read(buffer); length != -1 } do
-      out.write(buffer, 0, length)
+    out.write(in, new Array[Byte](bufferSize))
     out.finish()
     out.flush()

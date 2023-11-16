@@ -113,13 +113,14 @@ private class ByteArrayBodyParser(val maxLength: Long, bufferSize: Int) extends 
     val in  = decode(message)
     val out = new ArrayBuffer[Byte](bufferSize)
     val buf = new Array[Byte](bufferSize)
-    var len = 0
+    var len = in.read(buf)
     var tot = 0
 
-    while { len = in.read(buf); len != -1 } do
+    while len != -1 do
       tot += len
       if tot > maxLength then throw EntityTooLarge(maxLength)
       out ++= buf.take(len)
+      len = in.read(buf)
 
     out.toArray
 
@@ -146,14 +147,15 @@ private class FileBodyParser(dest: File, val maxLength: Long, bufferSize: Int) e
     val destFile = getDestFile()
 
     destFile.withOutputStream { out =>
-      val buffer = new Array[Byte](bufferSize)
-      var length = 0
-      var total = 0
+      val buf = new Array[Byte](bufferSize)
+      var len = in.read(buf)
+      var tot = 0
 
-      while { length = in.read(buffer); length != -1 } do
-        total += length
-        if total > maxLength then throw EntityTooLarge(maxLength)
-        out.write(buffer, 0, length)
+      while len != -1 do
+        tot += len
+        if tot > maxLength then throw EntityTooLarge(maxLength)
+        out.write(buf, 0, len)
+        len = in.read(buf)
 
       destFile
     }

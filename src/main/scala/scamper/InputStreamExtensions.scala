@@ -20,21 +20,23 @@ import java.io.InputStream
 private implicit class InputStreamExtensions(in: InputStream) extends AnyVal:
   def getToken(delimiters: String, buffer: Array[Byte], offset: Int = 0): String =
     var length = offset
-    var byte = -1
+    var byte   = in.read()
 
-    while { byte = in.read(); !delimiters.contains(byte) && byte != -1 } do
+    while byte != -1 && !delimiters.contains(byte) do
       buffer(length) = byte.toByte
-      length += 1
+      length        += 1
+      byte           = in.read()
 
     String(buffer, 0, length, "UTF-8")
 
   def getLine(buffer: Array[Byte], offset: Int = 0): String =
     var length = offset
-    var byte = -1
+    var byte   = in.read()
 
-    while { byte = in.read(); byte != '\n' && byte != -1} do
+    while byte != -1 && byte != '\n' do
       buffer(length) = byte.toByte
-      length += 1
+      length        += 1
+      byte           = in.read()
 
     if length > 0 && buffer(length - 1) == '\r' then
       length -= 1
@@ -43,8 +45,8 @@ private implicit class InputStreamExtensions(in: InputStream) extends AnyVal:
 
   def readLine(buffer: Array[Byte], offset: Int = 0): Int =
     val bufferSize = buffer.size
-    var length = offset
-    var continue = length < bufferSize
+    var length     = offset
+    var continue   = length < bufferSize
 
     while continue do
       in.read() match
@@ -53,13 +55,13 @@ private implicit class InputStreamExtensions(in: InputStream) extends AnyVal:
 
         case byte =>
           buffer(length) = byte.toByte
-          length += 1
+          length  += 1
           continue = length < bufferSize && byte != '\n'
 
     length
 
   def readMostly(buffer: Array[Byte]): Int =
-    readMostly(buffer, 0, buffer.length)
+    readMostly(buffer, 0, buffer.size)
 
   def readMostly(buffer: Array[Byte], offset: Int, length: Int): Int =
     var total = in.read(buffer, offset, length)
@@ -69,6 +71,6 @@ private implicit class InputStreamExtensions(in: InputStream) extends AnyVal:
 
       while count != -1 && total < length do
         total += count
-        count = in.read(buffer, offset + total, length - total)
+        count  = in.read(buffer, offset + total, length - total)
 
     total

@@ -437,20 +437,19 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
 
       if !res.body.isKnownEmpty then
         val buffer = new Array[Byte](bufferSize)
-        var length = 0
 
         res.transferEncodingOption.map { encoding =>
           val in = encode(res.body.data, encoding)
-          while { length = in.read(buffer); length != -1 } do
-            socket.writeLine(length.toHexString)
-            socket.write(buffer, 0, length)
+          var chunkSize = in.read(buffer)
+          while chunkSize != -1 do
+            socket.writeLine(chunkSize.toHexString)
+            socket.write(buffer, 0, chunkSize)
             socket.writeLine()
+            chunkSize = in.read(buffer)
           socket.writeLine("0")
           socket.writeLine()
         }.getOrElse {
-          val in = res.body.data
-          while { length = in.read(buffer); length != -1 } do
-            socket.write(buffer, 0, length)
+          socket.getOutputStream.write(res.body.data, buffer)
         }
 
       socket.flush()

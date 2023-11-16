@@ -197,7 +197,7 @@ object StatusCode:
    *  used to obtain status code.
    */
   def apply(data: Array[Byte]): StatusCode =
-    data.length match
+    data.size match
       case 2 => apply(BigInt(1, data).toInt)
       case _ => throw IllegalArgumentException()
 

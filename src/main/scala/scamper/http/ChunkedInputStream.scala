@@ -31,7 +31,7 @@ private class ChunkedInputStream(in: InputStream) extends InputStream:
         case byte => position += 1; byte
     case false => -1
 
-  override def read(buffer: Array[Byte]): Int = read(buffer, 0, buffer.length)
+  override def read(buffer: Array[Byte]): Int = read(buffer, 0, buffer.size)
 
   override def read(buffer: Array[Byte], offset: Int, length: Int): Int = isReadable() match
     case true =>
@@ -47,13 +47,13 @@ private class ChunkedInputStream(in: InputStream) extends InputStream:
     case true  => chunkSize - position
     case false => 0
 
-  override def skip(count: Long): Long = isReadable() match
+  override def skip(length: Long): Long = isReadable() match
     case true =>
-      val buffer = new Array[Byte](count.max(0).min(8192).toInt)
-      var skipCount = 0L
-      while skipCount < count && isReadable() do
-        skipCount += read(buffer, 0, (count - skipCount).min(buffer.length).toInt)
-      skipCount
+      val buffer = new Array[Byte](length.max(0).min(8192).toInt)
+      var total  = 0L
+      while total < length && isReadable() do
+        total += read(buffer, 0, (length - total).min(buffer.size).toInt)
+      total
     case false => 0
 
   override def markSupported(): Boolean = false
@@ -71,7 +71,7 @@ private class ChunkedInputStream(in: InputStream) extends InputStream:
     position = 0
 
   private def nextChunkSize: Int =
-    if chunkSize > 0 && readLine().length != 0 then
+    if chunkSize > 0 && readLine().size != 0 then
       throw IOException("Invalid chunk termination")
 
     val regex = "(\\p{XDigit}+)(\\s*;\\s*.+=.+)*".r
@@ -85,8 +85,8 @@ private class ChunkedInputStream(in: InputStream) extends InputStream:
 
   private def readLine(): String =
     val buffer = new Array[Byte](256)
-    var byte = in.read()
     var length = 0
+    var byte   = in.read()
 
     while byte != '\n' && byte != -1 do
       buffer(length) = byte.toByte

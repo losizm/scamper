@@ -116,14 +116,14 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     Future(send(message))
 
   def ping(data: Array[Byte] = Array.empty): Unit =
-    require(data.length <= 125, "data length must not exceed 125 bytes")
+    require(data.size <= 125, "data size must not exceed 125 bytes")
     conn.write(makeFrame(data, Ping))
 
   def pingAsync[T](data: Array[Byte] = Array.empty): Future[Unit] =
     Future(ping(data))
 
   def pong(data: Array[Byte] = Array.empty): Unit =
-    require(data.length <= 125, "data length must not exceed 125 bytes")
+    require(data.size <= 125, "data size must not exceed 125 bytes")
     conn.write(makeFrame(data, Pong))
 
   def pongAsync[T](data: Array[Byte] = Array.empty): Future[Unit] =
@@ -255,7 +255,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
         close(statusCode)
 
   private def sendData(data: Array[Byte], binary: Boolean): Unit =
-    deflate.compressed || data.length > payloadLimit match
+    deflate.compressed || data.size > payloadLimit match
       case true  => sendData(ByteArrayInputStream(data), binary)
       case false => synchronized { conn.write(makeFrame(data, if binary then Binary else Text)) }
 
@@ -267,15 +267,17 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
     deflate(buf, len) match
       case (buf, len) => conn.write(makeFrame(buf, len, if binary then Binary else Text, false, deflate.compressed))
 
-    while { len = in.readMostly(buf); len != -1 } do
+    len = in.readMostly(buf)
+    while len != -1 do
       deflate(buf, len) match
         case (buf, len) => conn.write(makeFrame(buf, len, Continuation, false, deflate.continuation))
+      len = in.readMostly(buf)
 
     conn.write(makeFrame(buf, 0, Continuation, true, false))
   }
 
   private def makeFrame(data: Array[Byte], opcode: Opcode): WebSocketFrame =
-    makeFrame(data, data.length, opcode, true, false)
+    makeFrame(data, data.size, opcode, true, false)
 
   private def makeFrame(data: Array[Byte], length: Int, opcode: Opcode, isFinal: Boolean, isCompressed: Boolean): WebSocketFrame =
     WebSocketFrame(

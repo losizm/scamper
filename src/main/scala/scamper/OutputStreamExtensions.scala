@@ -15,9 +15,18 @@
  */
 package scamper
 
-import java.io.OutputStream
+import java.io.{ InputStream, OutputStream }
 
 private implicit class OutputStreamExtensions(out: OutputStream) extends AnyVal:
+  def write(in: InputStream, buffer: Array[Byte]): Long =
+    var total  = 0
+    var length = in.read(buffer)
+    while length != -1 do
+      out.write(buffer, 0, length)
+      total += length
+      length = in.read(buffer)
+    total
+
   def writeLine(text: String): Unit =
     out.write(text.getBytes("UTF-8"))
     out.write(Array[Byte](13, 10))

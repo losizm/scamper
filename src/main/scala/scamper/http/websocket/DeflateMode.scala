@@ -44,4 +44,4 @@ private[scamper] object DeflateMode:
     def prepare(data: InputStream) = data
     def apply(payload: Array[Byte], length: Int) =
       val deflated = WebSocketDeflate.compress(payload, 0, length)
-      (deflated, deflated.length)
+      (deflated, deflated.size)

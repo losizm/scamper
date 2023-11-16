@@ -74,7 +74,7 @@ private object EmptyEntity extends Entity:
   val data = EmptyInputStream
 
 private case class ByteArrayEntity(bytes: Array[Byte]) extends Entity:
-  val knownSize = Some(bytes.length.toLong)
+  val knownSize = Some(bytes.size.toLong)
   val data = ByteArrayInputStream(bytes)
 
 private case class FileEntity(file: File) extends Entity:

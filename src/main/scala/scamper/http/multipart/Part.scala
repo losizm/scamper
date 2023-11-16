@@ -80,7 +80,7 @@ object Part:
     notNull(name, "name")
     notNull(content, "content")
 
-    ByteArrayPart(getDispositionType(name, None), MediaType.octetStream, Arrays.copyOf(content, content.length))
+    ByteArrayPart(getDispositionType(name, None), MediaType.octetStream, Arrays.copyOf(content, content.size))
 
   /**
    * Creates part using supplied byte content.

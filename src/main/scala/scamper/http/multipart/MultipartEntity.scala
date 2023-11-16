@@ -45,10 +45,7 @@ private case class MultipartEntity(multipart: Multipart, boundary: String) exten
 
         case _: FilePart =>
           part.withInputStream { in =>
-            val buf = new Array[Byte](8192)
-            var len = 0
-            while { len = in.read(buf); len != -1 } do
-              out.write(buf, 0, len)
+            out.write(in, new Array[Byte](8192))
             out.writeLine()
           }
     }

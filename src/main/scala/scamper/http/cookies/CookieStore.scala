@@ -120,7 +120,7 @@ private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentC
   private type Key = Tuple3[String, String, String]
 
   private val ordering: Ordering[PersistentCookie] =
-    Ordering.by(cookie => (-cookie.path.length, cookie.creation))
+    Ordering.by(cookie => (-cookie.path.size, cookie.creation))
 
   def size: Int = synchronized { collection.size }
 

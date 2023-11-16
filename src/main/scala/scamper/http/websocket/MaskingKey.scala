@@ -29,10 +29,10 @@ trait MaskingKey:
    *
    * @return modified data
    *
-   * @note Equivalent to: `apply(data, data.length, 0)`
+   * @note Equivalent to: `apply(data, data.size, 0)`
    */
   def apply(data: Array[Byte]): Array[Byte] =
-    apply(data, data.length, 0)
+    apply(data, data.size, 0)
 
   /**
    * Applies key to `length` bytes of `data`, assuming first byte corresponds to
