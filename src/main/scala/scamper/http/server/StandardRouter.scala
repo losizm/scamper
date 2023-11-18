@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Carlos Conyers
+ * Copyright 2023 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package server
 
 import scala.collection.mutable.ListBuffer
 
-private class RouterImpl(rawMountPath: String) extends Router:
+private class StandardRouter(rawMountPath: String) extends Router:
   private val incomings = new ListBuffer[RequestHandler]
   private val outgoings = new ListBuffer[ResponseFilter]
   private val recovers  = new ListBuffer[ErrorHandler]
@@ -68,39 +68,18 @@ private class RouterImpl(rawMountPath: String) extends Router:
     this
   }
 
-  private[server] def getLifecycleHooks(): Seq[LifecycleHook] =
-    synchronized(triggers.toSeq)
-
-  private[server] def getRequestHandler(): RequestHandler = synchronized {
-    RouterRequestHandler(
-      RequestHandler.coalesce(incomings.toSeq),
-      ResponseFilter.chain(outgoings.toSeq),
-      ErrorHandler.coalesce(recovers.toSeq)
-    )
-  }
-
   private def toLifecycleHook[T](value: T): Option[LifecycleHook] =
     value match
       case hook: LifecycleHook => Some(hook)
       case _                   => None
 
-  private class RouterRequestHandler(in: RequestHandler, out: ResponseFilter, err: ErrorHandler) extends RequestHandler:
-    private val attributes = Seq(
-      "scamper.http.server.message.server",
-      "scamper.http.server.message.socket",
-      "scamper.http.server.message.requestCount",
-      "scamper.http.server.message.correlate"
+  private[server] def getLifecycleHooks(): Seq[LifecycleHook] =
+    synchronized(triggers.toSeq)
+
+  private[server] def getRequestHandler(): RequestHandler = synchronized {
+    AggregateRequestHandler(
+      RequestHandler.coalesce(incomings.toSeq),
+      ResponseFilter.chain(outgoings.toSeq),
+      ErrorHandler.coalesce(recovers.toSeq)
     )
-
-    def apply(req: HttpRequest) =
-      (try in(req) catch err(req)) match
-        case req: HttpRequest  => req
-        case res: HttpResponse => out(addAttributes(res, req))
-
-    private def addAttributes(res: HttpResponse, req: HttpRequest): HttpResponse =
-      res.putAttributes(getAttributes(req))
-
-    private def getAttributes(req: HttpRequest): Map[String, Any] =
-      attributes.flatMap(name => req.getAttribute[Any](name).map(value => name -> value))
-        .:+("scamper.http.server.response.request" -> req)
-        .toMap
+  }

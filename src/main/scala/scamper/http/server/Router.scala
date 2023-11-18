@@ -260,7 +260,7 @@ trait Router:
    * lifecycle hook.
    */
   def route(path: String)(app: RouterApplication): this.type =
-    val router = RouterImpl(mountPath + MountPath.normalize(path))
+    val router = StandardRouter(mountPath + MountPath.normalize(path))
 
     app(router)
 
