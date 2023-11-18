@@ -16,8 +16,6 @@
 package scamper
 package http
 
-import Values.notNull
-
 /**
  * Defines URI builder.
  *

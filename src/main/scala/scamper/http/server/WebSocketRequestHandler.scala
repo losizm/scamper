@@ -22,8 +22,6 @@ import scala.util.Try
 
 import scamper.http.websocket.{ StatusCode, WebSocket, WebSocketApplication }
 
-import Values.notNull
-
 private class WebSocketRequestHandler(app: WebSocketApplication[?]) extends RequestHandler:
   notNull(app)
 

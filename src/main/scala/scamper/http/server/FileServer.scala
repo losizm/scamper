@@ -30,7 +30,6 @@ import scamper.http.types.{ MediaRange, MediaType }
 
 import RequestMethod.Registry.{ Get, Head }
 import ResponseStatus.Registry.*
-import Values.noNulls
 
 private class FileServer private (sourceDirectory: Path, defaults: Seq[String]) extends RouterApplication:
   def this(sourceDirectory: File, defaults: Seq[String]) =

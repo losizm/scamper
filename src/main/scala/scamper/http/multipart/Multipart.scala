@@ -19,8 +19,6 @@ package multipart
 
 import java.io.File
 
-import Values.{ noNulls, notNull }
-
 /**
  * Represents multipart form data.
  *

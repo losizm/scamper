@@ -22,8 +22,6 @@ import java.util.Arrays
 
 import scamper.http.types.{ DispositionType, MediaType }
 
-import Values.notNull
-
 /**
  * Represents part in multipart form data.
  *

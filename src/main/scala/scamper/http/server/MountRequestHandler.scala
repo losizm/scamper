@@ -17,8 +17,6 @@ package scamper
 package http
 package server
 
-import Values.notNull
-
 private class MountRequestHandler private (path: MountPath, handler: RequestHandler) extends RequestHandler:
   def this(path: String, handler: RequestHandler) =
     this(MountPath(path), notNull(handler))

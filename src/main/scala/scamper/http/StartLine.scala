@@ -18,8 +18,6 @@ package http
 
 import scala.util.Try
 
-import Values.notNull
-
 /** Defines HTTP message start line. */
 sealed trait StartLine:
   /** Gets HTTP version. */

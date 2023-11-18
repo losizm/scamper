@@ -18,8 +18,6 @@ package http
 
 import java.net.{ URI, URL }
 
-import Values.{ noNulls, notNull }
-
 /** Defines URI. */
 sealed trait Uri:
   /** Tests whether URI is absolute. */

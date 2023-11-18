@@ -16,8 +16,6 @@
 package scamper
 package http
 
-import Values.{ noNulls, notNull }
-
 private case class HttpResponseImpl(startLine: StatusLine, headers: Seq[Header], body: Entity, attributes: Map[String, Any] = Map.empty) extends HttpResponse:
   notNull(startLine, "startLine")
   noNulls(headers, "headers")

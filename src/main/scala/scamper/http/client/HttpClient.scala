@@ -21,8 +21,6 @@ import scamper.http.cookies.{ CookieStore, PlainCookie }
 import scamper.http.types.{ ContentCodingRange, MediaRange }
 import scamper.http.websocket.WebSocketApplication
 
-import Values.notNull
-
 /**
  * Defines HTTP client.
  *

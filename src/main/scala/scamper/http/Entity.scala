@@ -18,8 +18,6 @@ package http
 
 import java.io.*
 
-import Values.notNull
-
 /** Provides input stream to HTTP entity. */
 trait Entity:
   /** Tests for known emptiness. */

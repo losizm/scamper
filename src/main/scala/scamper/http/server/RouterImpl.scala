@@ -19,8 +19,6 @@ package server
 
 import scala.collection.mutable.ListBuffer
 
-import Values.notNull
-
 private class RouterImpl(rawMountPath: String) extends Router:
   private val incomings = new ListBuffer[RequestHandler]
   private val outgoings = new ListBuffer[ResponseFilter]

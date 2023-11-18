@@ -24,8 +24,6 @@ import javax.net.ssl.TrustManager
 import scamper.http.cookies.CookieStore
 import scamper.http.types.{ ContentCodingRange, MediaRange }
 
-import Values.{ noNulls, notNull }
-
 /**
  * Defines HTTP client settings.
  *
