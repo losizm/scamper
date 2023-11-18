@@ -27,26 +27,23 @@ private class StandardRouter(rawMountPath: String) extends Router:
 
   val mountPath = MountPath.normalize(rawMountPath)
 
-  def reset(): this.type = synchronized {
+  def reset(): this.type =
     incomings.clear()
     outgoings.clear()
     recovers.clear()
     triggers.clear()
     this
-  }
 
-  def trigger(hook: LifecycleHook): this.type = synchronized {
+  def trigger(hook: LifecycleHook): this.type =
     triggers += notNull(hook, "hook")
     this
-  }
 
-  def incoming(handler: RequestHandler): this.type = synchronized {
+  def incoming(handler: RequestHandler): this.type =
     incomings += notNull(handler, "handler")
     toLifecycleHook(handler).foreach(triggers.+=)
     this
-  }
 
-  def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type = synchronized {
+  def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type =
     incomings += TargetRequestHandler(
       toAbsolutePath(notNull(path, "path")),
       notNull(methods, "methods"),
@@ -54,19 +51,16 @@ private class StandardRouter(rawMountPath: String) extends Router:
     )
     toLifecycleHook(handler).foreach(triggers.+=)
     this
-  }
 
-  def outgoing(filter: ResponseFilter): this.type = synchronized {
+  def outgoing(filter: ResponseFilter): this.type =
     outgoings += notNull(filter, "filter")
     toLifecycleHook(filter).foreach(triggers.+=)
     this
-  }
 
-  def recover(handler: ErrorHandler): this.type = synchronized {
+  def recover(handler: ErrorHandler): this.type =
     recovers += notNull(handler, "handler")
     toLifecycleHook(handler).foreach(triggers.+=)
     this
-  }
 
   private def toLifecycleHook[T](value: T): Option[LifecycleHook] =
     value match
@@ -74,12 +68,11 @@ private class StandardRouter(rawMountPath: String) extends Router:
       case _                   => None
 
   private[server] def getLifecycleHooks(): Seq[LifecycleHook] =
-    synchronized(triggers.toSeq)
+    triggers.toSeq
 
-  private[server] def getRequestHandler(): RequestHandler = synchronized {
+  private[server] def getRequestHandler(): RequestHandler =
     AggregateRequestHandler(
       RequestHandler.coalesce(incomings.toSeq),
       ResponseFilter.chain(outgoings.toSeq),
       ErrorHandler.coalesce(recovers.toSeq)
     )
-  }

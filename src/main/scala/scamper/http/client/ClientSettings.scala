@@ -53,17 +53,16 @@ class ClientSettings:
   private var settings = HttpClientImpl.Settings()
 
   /** Resets to default settings. */
-  def reset(): this.type = synchronized {
+  def reset(): this.type =
     settings = HttpClientImpl.Settings()
     this
-  }
 
   /**
    * Sets authority to which relative targets are resolved.
    *
    * @param secure use https and wss schemes
    */
-  def resolveTo(authority: String, secure: Boolean): this.type = synchronized {
+  def resolveTo(authority: String, secure: Boolean): this.type =
     val baseUri = UriBuilder()
       .scheme(if secure then "https" else "http")
       .authority(authority)
@@ -71,14 +70,13 @@ class ClientSettings:
 
     settings = settings.copy(resolveTo = Some(baseUri))
     this
-  }
 
   /**
    * Sets host and port to which relative targets are resolved.
    *
    * @param secure use https and wss schemes
    */
-  def resolveTo(host: String, port: Int, secure: Boolean): this.type = synchronized {
+  def resolveTo(host: String, port: Int, secure: Boolean): this.type =
     val baseUri = UriBuilder()
       .scheme(if secure then "https" else "http")
       .authority(host, port)
@@ -86,14 +84,13 @@ class ClientSettings:
 
     settings = settings.copy(resolveTo = Some(baseUri))
     this
-  }
 
   /**
    * Sets host and port to which relative targets are resolved.
    *
    * @param secure use https and wss schemes
    */
-  def resolveTo(host: String, port: Option[Int], secure: Boolean): this.type = synchronized {
+  def resolveTo(host: String, port: Option[Int], secure: Boolean): this.type =
     val baseUri = UriBuilder()
       .scheme(if secure then "https" else "http")
       .authority(host, port)
@@ -101,17 +98,15 @@ class ClientSettings:
 
     settings = settings.copy(resolveTo = Some(baseUri))
     this
-  }
 
   /**
    * Sets accepted content types.
    *
    * The Accept header for each outgoing request is set accordingly.
    */
-  def accept(ranges: Seq[MediaRange]): this.type = synchronized {
+  def accept(ranges: Seq[MediaRange]): this.type =
     settings = settings.copy(accept = noNulls(ranges, "ranges"))
     this
-  }
 
   /**
    * Sets accepted content types.
@@ -126,10 +121,9 @@ class ClientSettings:
    *
    * The Accept-Encoding header for each outgoing request is set accordingly.
    */
-  def acceptEncoding(ranges: Seq[ContentCodingRange]): this.type = synchronized {
+  def acceptEncoding(ranges: Seq[ContentCodingRange]): this.type =
     settings = settings.copy(acceptEncoding = noNulls(ranges, "ranges"))
     this
-  }
 
   /**
    * Sets accepted content encodings.
@@ -145,10 +139,9 @@ class ClientSettings:
    * The buffer size specifies the size in bytes of client socket's send and
    * receive buffers.
    */
-  def bufferSize(size: Int): this.type = synchronized {
+  def bufferSize(size: Int): this.type =
     settings = settings.copy(bufferSize = size)
     this
-  }
 
   /**
    * Sets read timeout.
@@ -156,10 +149,9 @@ class ClientSettings:
    * The read timeout specifies how many milliseconds a read from client socket
    * blocks before it times out, whereafter `SocketTimeoutException` is thrown.
    */
-  def readTimeout(timeout: Int): this.type = synchronized {
+  def readTimeout(timeout: Int): this.type =
     settings = settings.copy(readTimeout = timeout)
     this
-  }
 
   /**
    * Sets continue timeout.
@@ -170,26 +162,23 @@ class ClientSettings:
    * @note This applies only to requests that include an Except header set to
    * 100-Continue.
    */
-  def continueTimeout(timeout: Int): this.type = synchronized {
+  def continueTimeout(timeout: Int): this.type =
     settings = settings.copy(continueTimeout = timeout)
     this
-  }
 
   /** Enables or disables persistent connections. */
-  def keepAlive(enable: Boolean = true): this.type = synchronized {
+  def keepAlive(enable: Boolean = true): this.type =
     settings = settings.copy(keepAlive = enable)
     this
-  }
 
   /**
    * Sets cookie store.
    *
    * @param cookies cookie store
    */
-  def cookies(cookieStore: CookieStore = CookieStore()): this.type = synchronized {
+  def cookies(cookieStore: CookieStore = CookieStore()): this.type =
     settings = settings.copy(cookies = notNull(cookieStore, "cookieStore"))
     this
-  }
 
   /**
    * Sets truststore.
@@ -198,32 +187,28 @@ class ClientSettings:
    * @param storeType store type (e.g., JKS or PKCS12)
    * @param password store password
    */
-  def trust(truststore: File, storeType: String = "JKS", password: Option[String] = None): this.type = synchronized {
+  def trust(truststore: File, storeType: String = "JKS", password: Option[String] = None): this.type =
     settings = settings.copy(secureSocketFactory = SecureSocketFactory.create(truststore, storeType, password))
     this
-  }
 
   /**
    * Sets trust manager.
    *
    * @param manager trust manager used for HTTPS connections
    */
-  def trust(manager: TrustManager): this.type = synchronized {
+  def trust(manager: TrustManager): this.type =
     settings = settings.copy(secureSocketFactory = SecureSocketFactory.create(manager))
     this
-  }
 
   /** Adds supplied request filter. */
-  def outgoing(filter: RequestFilter): this.type = synchronized {
+  def outgoing(filter: RequestFilter): this.type =
     settings = settings.copy(outgoing = settings.outgoing :+ notNull(filter, "filter"))
     this
-  }
 
   /** Adds supplied response filter. */
-  def incoming(filter: ResponseFilter): this.type = synchronized {
+  def incoming(filter: ResponseFilter): this.type =
     settings = settings.copy(incoming = settings.incoming :+ notNull(filter, "filter"))
     this
-  }
 
   /** Creates client using current settings. */
-  def toHttpClient(): HttpClient = synchronized { HttpClientImpl(settings) }
+  def toHttpClient(): HttpClient = HttpClientImpl(settings)

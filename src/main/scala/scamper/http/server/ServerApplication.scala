@@ -124,20 +124,18 @@ class ServerApplication extends Router:
     "/"
 
   /** @inheritdoc */
-  def reset(): this.type = synchronized {
+  def reset(): this.type =
     app = HttpServerImpl.Application()
     this
-  }
 
   /**
    * Sets logger name.
    *
    * @param name logger name
    */
-  def logger(name: String): this.type = synchronized {
+  def logger(name: String): this.type =
     app = app.copy(loggerName = Option(name))
     this
-  }
 
   /**
    * Sets backlog size.
@@ -150,10 +148,9 @@ class ServerApplication extends Router:
    *
    * @return this application
    */
-  def backlogSize(size: Int): this.type = synchronized {
+  def backlogSize(size: Int): this.type =
     app = app.copy(backlogSize = size)
     this
-  }
 
   /**
    * Sets pool size.
@@ -165,10 +162,9 @@ class ServerApplication extends Router:
    *
    * @return this application
    */
-  def poolSize(size: Int): this.type = synchronized {
+  def poolSize(size: Int): this.type =
     app = app.copy(poolSize = size)
     this
-  }
 
   /**
    * Sets queue size.
@@ -181,10 +177,9 @@ class ServerApplication extends Router:
    *
    * @return this application
    */
-  def queueSize(size: Int): this.type = synchronized {
+  def queueSize(size: Int): this.type =
     app = app.copy(queueSize = size)
     this
-  }
 
   /**
    * Sets buffer size.
@@ -203,10 +198,9 @@ class ServerApplication extends Router:
    * @note `bufferSize` is also used as the optimal chunk size when writing a
    *   response with chunked transfer encoding.
    */
-  def bufferSize(size: Int): this.type = synchronized {
+  def bufferSize(size: Int): this.type =
     app = app.copy(bufferSize = size)
     this
-  }
 
   /**
    * Sets read timeout.
@@ -218,10 +212,9 @@ class ServerApplication extends Router:
    *
    * @return this application
    */
-  def readTimeout(timeout: Int): this.type = synchronized {
+  def readTimeout(timeout: Int): this.type =
     app = app.copy(readTimeout = timeout)
     this
-  }
 
   /**
    * Sets header limit.
@@ -234,10 +227,9 @@ class ServerApplication extends Router:
    *
    * @return this application
    */
-  def headerLimit(limit: Int): this.type = synchronized {
+  def headerLimit(limit: Int): this.type =
     app = app.copy(headerLimit = limit)
     this
-  }
 
   /**
    * Enables persistent connections using specified parameters.
@@ -246,10 +238,9 @@ class ServerApplication extends Router:
    *
    * @return this application
    */
-  def keepAlive(params: KeepAliveParameters): this.type = synchronized {
+  def keepAlive(params: KeepAliveParameters): this.type =
     app = app.copy(keepAlive = Option(params))
     this
-  }
 
   /**
    * Enables persistent connections using specified timeout and max.
@@ -259,10 +250,9 @@ class ServerApplication extends Router:
    *
    * @return this application
    */
-  def keepAlive(timeout: Int, max: Int): this.type = synchronized {
+  def keepAlive(timeout: Int, max: Int): this.type =
     app = app.copy(keepAlive = Some(KeepAliveParameters(timeout, max)))
     this
-  }
 
   /**
    * Sets key store to be used for SSL/TLS.
@@ -273,10 +263,9 @@ class ServerApplication extends Router:
    *
    * @return this application
    */
-  def secure(keyStore: File, password: String, storeType: String): this.type = synchronized {
+  def secure(keyStore: File, password: String, storeType: String): this.type =
     app = app.copy(serverSocketFactory = SecureServerSocketFactory.create(keyStore, password.toCharArray, storeType))
     this
-  }
 
   /**
    * Sets key store to be used for SSL/TLS.
@@ -289,10 +278,9 @@ class ServerApplication extends Router:
    *
    * @note The password can be discarded after invoking this method.
    */
-  def secure(keyStore: File, password: Array[Char], storeType: String): this.type = synchronized {
+  def secure(keyStore: File, password: Array[Char], storeType: String): this.type =
     app = app.copy(serverSocketFactory = SecureServerSocketFactory.create(keyStore, password, storeType))
     this
-  }
 
   /**
    * Sets key and certificate to be used for SSL/TLS.
@@ -302,25 +290,22 @@ class ServerApplication extends Router:
    *
    * @return this application
    */
-  def secure(key: File, certificate: File): this.type = synchronized {
+  def secure(key: File, certificate: File): this.type =
     app = app.copy(serverSocketFactory = SecureServerSocketFactory.create(key, certificate))
     this
-  }
 
   /** @inheritdoc */
-  def trigger(hook: LifecycleHook): this.type = synchronized {
+  def trigger(hook: LifecycleHook): this.type =
     app = app.copy(lifecycleHooks = app.lifecycleHooks :+ notNull(hook))
     this
-  }
 
   /** @inheritdoc */
-  def incoming(handler: RequestHandler): this.type = synchronized {
+  def incoming(handler: RequestHandler): this.type =
     app = app.copy(
       requestHandlers = app.requestHandlers :+ handler,
       lifecycleHooks  = addLifecycleHook(handler)
     )
     this
-  }
 
   /** @inheritdoc */
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type =
@@ -331,22 +316,20 @@ class ServerApplication extends Router:
     this
 
   /** @inheritdoc */
-  def outgoing(filter: ResponseFilter): this.type = synchronized {
+  def outgoing(filter: ResponseFilter): this.type =
     app = app.copy(
       responseFilters = app.responseFilters :+ notNull(filter, "filter"),
       lifecycleHooks  = addLifecycleHook(filter)
     )
     this
-  }
 
   /** @inheritdoc */
-  def recover(handler: ErrorHandler): this.type = synchronized {
+  def recover(handler: ErrorHandler): this.type =
     app = app.copy(
       errorHandlers  = app.errorHandlers :+ notNull(handler, "handler"),
       lifecycleHooks = addLifecycleHook(handler)
     )
     this
-  }
 
   /**
    * Creates server at given port.
@@ -377,9 +360,8 @@ class ServerApplication extends Router:
    *
    * @return new server
    */
-  def toHttpServer(host: InetAddress, port: Int): HttpServer = synchronized {
+  def toHttpServer(host: InetAddress, port: Int): HttpServer =
     HttpServerImpl(host, port, app)
-  }
 
   private def addLifecycleHook[T](value: T): Seq[LifecycleHook] =
     value match
