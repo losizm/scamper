@@ -12,7 +12,7 @@ It includes client and server implementations along with WebSockets.
 To get started, add **Scamper** to your sbt project&dagger;:
 
 ```scala
-libraryDependencies += "com.github.losizm" %% "scamper" % "40.0.3"
+libraryDependencies += "com.github.losizm" %% "scamper" % "40.0.4"
 ```
 
 **Scamper** uses SLF4J logging abstraction under the hood, so you'll need to
