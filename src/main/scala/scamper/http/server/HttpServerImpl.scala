@@ -17,8 +17,8 @@ package scamper
 package http
 package server
 
-import java.io.{ Closeable, EOFException, File, InputStream }
-import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException, URISyntaxException }
+import java.io.EOFException
+import java.net.{ InetAddress, InetSocketAddress, Socket, SocketTimeoutException }
 import java.time.Instant
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.atomic.{ AtomicBoolean, AtomicLong }
@@ -28,7 +28,6 @@ import javax.net.ssl.{ SSLException, SSLServerSocketFactory }
 
 import org.slf4j.LoggerFactory.getLogger
 
-import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.implicitConversions
 import scala.util.{ Failure, Success, Try }
@@ -81,10 +80,10 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
   val host = serverSocket.getInetAddress
   val port = serverSocket.getLocalPort
 
-  private val defaultErrorHandler = new ErrorHandler:
+  private object DefaultErrorHandler extends ErrorHandler:
     def apply(req: HttpRequest): PartialFunction[Throwable, HttpResponse] =
       case err: Throwable =>
-        val correlate = req.getAttributeOrElse("scamper.http.server.message.correlate", "<unknown>")
+        val correlate = req.getAttributeOrElse("scamper.http.server.message.correlate", "unknown")
         logger.error(s"$authority - Error while handling request (correlate=$correlate)", err)
         InternalServerError()
 
@@ -93,7 +92,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
   private val lifecycleHooks    = app.lifecycleHooks
   private val requestHandler    = RequestHandler.coalesce(app.requestHandlers)
   private val responseFilter    = ResponseFilter.chain(app.responseFilters)
-  private val errorHandler      = ErrorHandler.coalesce(app.errorHandlers :+ defaultErrorHandler)
+  private val errorHandler      = ErrorHandler.coalesce(app.errorHandlers :+ DefaultErrorHandler)
   private val chunked           = TransferCoding("chunked")
   private val closed            = AtomicBoolean(false)
   private val threadGroup       = ThreadGroup(s"scamper-server-$id")
@@ -177,11 +176,10 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
     ServiceManager.start()
 
     logger.info(s"$authority - Server is up and running")
-  catch
-    case e: Exception =>
-      Try(logger.error(s"$authority - Failed to start server", e))
-      close()
-      throw e
+  catch case e: Exception =>
+    Try(logger.error(s"$authority - Failed to start server", e))
+    close()
+    throw e
 
   def isClosed: Boolean =
     closed.get()
@@ -204,20 +202,17 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
   private def startLifecycleHooks(): Unit =
     logger.info(s"$authority - Calling start lifecycle hooks")
     lifecycleHooks.foreach { hook =>
-      try
-        hook.process(LifecycleEvent.Start(this))
+      try hook.process(LifecycleEvent.Start(this))
       catch case err: Exception =>
-        if hook.isCriticalService then
-          throw LifecycleException(s"Critical service failure: ${err.getClass.getName}", err)
-        else
-          logger.warn(s"$authority - Start lifecycle hook failure", err)
+        hook.isCriticalService match
+          case true  => throw LifecycleException(s"Critical service failure: ${err.getClass.getName}", err)
+          case false => logger.warn(s"$authority - Start lifecycle hook failure", err)
     }
 
   private def stopLifecycleHooks(): Unit =
     logger.info(s"$authority - Calling stop lifecycle hooks")
     lifecycleHooks.reverse.foreach { hook =>
-      try
-        hook.process(LifecycleEvent.Stop(this))
+      try hook.process(LifecycleEvent.Stop(this))
       catch case err: Exception =>
         logger.warn(s"$authority - Stop lifecycle hook failure", err)
     }
@@ -229,8 +224,8 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
     override def run(): Unit =
       while !isClosed do
         try
-          val socket = serverSocket.accept()
-          service(connectionCount.incrementAndGet, 1)(using socket)
+          implicit val socket = serverSocket.accept()
+          service(connectionCount.incrementAndGet(), 1)
         catch
           case e: Exception if serverSocket.isClosed => close() // Ensure server is closed
           case e: Exception => logger.warn(s"$authority - Error caught in service loop: $e")
@@ -238,11 +233,13 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
     private def createCorrelate(serviceId: Long, connectionId: Long, requestCount: Int): String =
       f"${System.currentTimeMillis}%x-$serviceId%04x-$connectionId%04x-$requestCount%02x"
 
+    private def createTag(socket: Socket, correlate: String): String =
+      socket.getInetAddress.getHostAddress + ":" + socket.getPort + " (correlate=" + correlate + ")"
+
     private def service(connectionId: Long, requestCount: Int)(using socket: Socket): Unit =
-      val serviceId  = serviceCount.incrementAndGet
-      val correlate  = createCorrelate(serviceId, connectionId, requestCount)
-      val connection = socket.getInetAddress.getHostAddress + ":" + socket.getPort
-      val tag        = connection + " (correlate=" + correlate + ")"
+      val serviceId = serviceCount.incrementAndGet()
+      val correlate = createCorrelate(serviceId, connectionId, requestCount)
+      val tag       = createTag(socket, correlate)
 
       def onReadError: PartialFunction[Throwable, HttpResponse] =
         case ReadError(status)              => status()
@@ -255,22 +252,21 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
           logger.error(s"$authority - Error while reading request from $tag", err)
           InternalServerError()
 
-      def onHandleRequest(req: HttpRequest): Try[HttpResponse] =
-        Try(handle(req)).recover {
+      def onHandleRequest(req: HttpRequest): HttpResponse =
+        try handleRequest(req) catch
           case err: SocketTimeoutException => RequestTimeout()
           case err: ResponseAborted        => throw err
           case err: SSLException           => throw err
           case err                         => errorHandler(req)(err)
-        }
 
       def onHandleResponse(res: HttpResponse): ConnectionManagement =
-        Try(filter(res)).recover {
+        Try(filterResponse(res)).recover {
           case err =>
             logger.error(s"$authority - Error while filtering response to $tag", err)
             InternalServerError().setDate().setConnection("close")
         }.map { res =>
           try
-            write(res)
+            socket.writeHttpResponse(res, bufferSize)(using encoderExecutor)
             logger.info(s"$authority - Response sent to $tag")
             connectionManager.evaluate(res)
           finally
@@ -284,20 +280,30 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
             CloseConnection
         }.get
 
-      def onBeginService(firstByte: Byte): ConnectionManagement =
+      def startService: Future[ConnectionManagement] =
+        requestCount == 1 match
+          case true =>
+            logger.info(s"$authority - Connection accepted from $tag")
+            Future(continueService(readByte(false)))(using serviceExecutor)
+
+          case false =>
+            Future(readByte(true))(using keepAliveExecutor)
+              .map(continueService)(using serviceExecutor)
+
+      def continueService(firstByte: Byte): ConnectionManagement =
         try
           logger.info(s"$authority - Servicing request from $tag")
           socket.setSoTimeout(readTimeout)
 
-          var request: HttpRequest = null
+          var origRequest: HttpRequest = null
 
-          Try(read(firstByte))
-            .map(req => addAttributes(req, socket, requestCount, correlate))
-            .map { req => request = req; req }
-            .fold(err => Try(onReadError(err)), req => onHandleRequest(req))
-            .map(res => addAttributes(res, socket, requestCount, correlate))
-            .map(addRequestAttribute(_, request))
-            .map(onHandleResponse)
+          Try(socket.readHttpRequest(firstByte, bufferSize, headerLimit))
+            .map { req => addAttributes(req, socket, requestCount, correlate) }
+            .map { req => origRequest = req; req }
+            .fold( err => Try(onReadError(err)), req => Try(onHandleRequest(req)) )
+            .map { res => addAttributes(res, socket, requestCount, correlate) }
+            .map { res => addRequestAttribute(res, origRequest) }
+            .map { res => onHandleResponse(res) }
             .get
         catch
           case err: ResponseAborted =>
@@ -312,16 +318,7 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
             logger.error(s"$authority - Unhandled error while servicing request from $tag", err)
             CloseConnection
 
-      val result = (requestCount == 1) match
-        case true =>
-          logger.info(s"$authority - Connection accepted from $tag")
-          Future(onBeginService(readByte(false)))(using serviceExecutor)
-
-        case false =>
-          Future(readByte(true))(using keepAliveExecutor)
-            .map(onBeginService)(using serviceExecutor)
-
-      result.onComplete {
+      startService.onComplete {
         case Success(CloseConnection) =>
           logger.info(s"$authority - Closing connection to $tag")
           Try(socket.close())
@@ -335,15 +332,13 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
           Future(upgrade(socket))(using upgradeExecutor)
 
         case Failure(err: ReadAborted) =>
-          (requestCount > 1) match
+          requestCount > 1 match
             case true  => logger.info(s"$authority - Keep-alive aborted with ${err.reason} from $tag")
             case false => logger.info(s"$authority - Service aborted with ${err.reason} from $tag")
           logger.info(s"$authority - Closing connection to $tag")
           Try(socket.close())
 
         case Failure(err: RejectedExecutionException) =>
-          import scala.language.implicitConversions
-
           logger.warn(s"$authority - Request overflow while servicing request from $tag")
           val res = ServiceUnavailable().setRetryAfter(Instant.now.plusSeconds(300))
           Try(addAttributes(res, socket, requestCount, correlate)).map(onHandleResponse)
@@ -364,126 +359,30 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
         socket.read() match
           case -1   => throw EOFException()
           case byte => byte.toByte
-      catch
-        case err: Exception => throw ReadAborted(err.getClass.getName)
+      catch case err: Exception =>
+        throw ReadAborted(err.getClass.getName)
 
-    private def read(firstByte: Byte)(using socket: Socket): HttpRequest =
-      val buffer = new Array[Byte](bufferSize)
-
-      buffer(0) = firstByte
-
-      val method    = readMethod(buffer, 1)
-      val target    = readTarget(buffer)
-      val version   = readVersion(buffer)
-      val startLine = RequestLine(method, target, version)
-      val headers   = readHeaders(buffer)
-
-      HttpRequest(startLine, headers, Entity(socket.getInputStream))
-
-    private def readMethod(buffer: Array[Byte], offset: Int)(using socket: Socket): RequestMethod =
-      try
-        RequestMethod(socket.getToken(" ", buffer, offset))
-      catch
-        case _: IndexOutOfBoundsException => throw ReadError(NotImplemented)
-        case _: IllegalArgumentException  => throw ReadError(BadRequest)
-
-
-    private def readTarget(buffer: Array[Byte])(using socket: Socket): Uri =
-      try
-        Uri(socket.getToken(" ", buffer))
-      catch
-        case _: IndexOutOfBoundsException => throw ReadError(UriTooLong)
-        case _: URISyntaxException        => throw ReadError(BadRequest)
-
-    private def readVersion(buffer: Array[Byte])(using socket: Socket): HttpVersion =
-      try
-        HttpVersion(socket.getLine(buffer))
-      catch
-        case _: IndexOutOfBoundsException => throw ReadError(BadRequest)
-        case _: IllegalArgumentException  => throw ReadError(BadRequest)
-
-    private def readHeaders(buffer: Array[Byte])(using socket: Socket): Seq[Header] =
-      val headers   = new ArrayBuffer[Header]
-      val readLimit = headerLimit * bufferSize
-      var readSize  = 0
-      var line      = ""
-
-      try
-        while { line = socket.getLine(buffer); line != "" } do
-          readSize += line.size
-
-          if readSize <= readLimit then
-            line.matches("[ \t]+.*") match
-              case true =>
-                if headers.isEmpty then throw ReadError(BadRequest)
-                val last = headers.last
-                headers.update(headers.size - 1, Header(last.name, last.value + " " + line.trim()))
-              case false =>
-                if headers.size < headerLimit then
-                  headers += Header(line)
-                else
-                  throw ReadError(RequestHeaderFieldsTooLarge)
-          else
-            throw ReadError(RequestHeaderFieldsTooLarge)
-      catch
-        case _: IndexOutOfBoundsException => throw ReadError(RequestHeaderFieldsTooLarge)
-
-      headers.toSeq
-
-    private def write(res: HttpResponse)(using socket: Socket): Unit =
-      socket.writeLine(res.startLine.toString)
-      res.headers.foreach(header => socket.writeLine(header.toString))
-      socket.writeLine()
-
-      if !res.body.isKnownEmpty then
-        val buffer = new Array[Byte](bufferSize)
-
-        res.transferEncodingOption.map { encoding =>
-          val in = encode(res.body.data, encoding)
-          var chunkSize = in.read(buffer)
-          while chunkSize != -1 do
-            socket.writeLine(chunkSize.toHexString)
-            socket.write(buffer, 0, chunkSize)
-            socket.writeLine()
-            chunkSize = in.read(buffer)
-          socket.writeLine("0")
-          socket.writeLine()
-        }.getOrElse {
-          socket.getOutputStream.write(res.body.data, buffer)
-        }
-
-      socket.flush()
-
-    private def encode(in: InputStream, encoding: Seq[TransferCoding]): InputStream =
-      encoding.foldLeft(in) { (in, enc) =>
-        if      enc.isChunked then in
-        else if enc.isGzip    then Compressor.gzip(in, bufferSize)(using encoderExecutor)
-        else if enc.isDeflate then Compressor.deflate(in, bufferSize)
-        else                  throw HttpException(s"Unsupported transfer encoding: $enc")
-      }
-
-    private def handle(req: HttpRequest): HttpResponse =
+    private def handleRequest(req: HttpRequest): HttpResponse =
       requestHandler(req) match
         case req: HttpRequest  => connectionManager.filter(req, NotFound())
         case res: HttpResponse => connectionManager.filter(req, res)
 
-    private def filter(res: HttpResponse): HttpResponse =
+    private def filterResponse(res: HttpResponse): HttpResponse =
       responseFilter {
         res.hasConnection match
-          case true  => prepare(res).setDate()
-          case false => prepare(res).setDate().setConnection("close")
+          case true  => prepareResponse(res).setDate()
+          case false => prepareResponse(res).setDate().setConnection("close")
       }
 
-    private def prepare(res: HttpResponse): HttpResponse =
+    private def prepareResponse(res: HttpResponse): HttpResponse =
       if res.hasTransferEncoding then
-        res.setTransferEncoding(res.transferEncoding.filterNot(_.isChunked) :+ chunked)
-          .contentLengthRemoved
+        res.setTransferEncoding(res.transferEncoding.filterNot(_.isChunked) :+ chunked).contentLengthRemoved
       else if res.hasContentLength then
         res
       else
-        res.body.knownSize
-          .map(n => if excludeContentLength(res) then res else res.setContentLength(n))
-          .getOrElse(res.setTransferEncoding(chunked))
+        res.body.knownSize match
+          case Some(n) => if excludeContentLength(res) then res else res.setContentLength(n)
+          case None    => res.setTransferEncoding(chunked)
 
     private def excludeContentLength(res: HttpResponse): Boolean =
       res.isInformational || res.status == NoContent || res.request.exists(_.method == Connect)

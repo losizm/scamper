@@ -67,5 +67,6 @@ private class ConnectionManager(keepAlive: Option[KeepAliveParameters]): //
     res.isSuccessful || ((req.isGet || req.isHead) && res.isRedirection)
 
   private def isUpgrade(res: HttpResponse): Boolean =
-    res.status == SwitchingProtocols && res.hasUpgrade &&
-      res.connection.exists("upgrade".equalsIgnoreCase)
+    res.status == SwitchingProtocols &&
+    res.hasUpgrade &&
+    res.connection.exists("upgrade".equalsIgnoreCase)
