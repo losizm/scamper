@@ -15,32 +15,32 @@
  */
 package scamper
 
-inline def notNull[T](value: T): T =
+private inline def notNull[T](value: T): T =
   if value == null then
     throw NullPointerException()
   value
 
-inline def notNull[T](value: T, message: => String): T =
+private inline def notNull[T](value: T, message: => String): T =
   if value == null then
     throw NullPointerException(message)
   value
 
-inline def noNulls[T <: Option[?]](value: T): T =
+private inline def noNulls[T <: Option[?]](value: T): T =
   if value == null || value.contains(null) then
     throw NullPointerException()
   value
 
-inline def noNulls[T <: Option[?]](value: T, message: => String): T =
+private inline def noNulls[T <: Option[?]](value: T, message: => String): T =
   if value == null || value.contains(null) then
     throw NullPointerException(message)
   value
 
-inline def noNulls[T <: Seq[?]](values: T): T =
+private inline def noNulls[T <: Seq[?]](values: T): T =
   if values == null || values.contains(null) then
     throw NullPointerException()
   values
 
-inline def noNulls[T <: Seq[?]](values: T, message: => String): T =
+private inline def noNulls[T <: Seq[?]](values: T, message: => String): T =
   if values == null || values.contains(null) then
     throw NullPointerException(message)
   values
