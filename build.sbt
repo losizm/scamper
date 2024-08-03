@@ -10,6 +10,23 @@ scalacOptions := Seq("-deprecation", "-feature", "-new-syntax", "-Werror", "-Yno
 
 versionScheme := Some("early-semver")
 
+Compile / compile := {
+  import java.nio.file.{ Files, Paths }
+  import java.util.Properties
+
+  val props = new Properties()
+  props.setProperty("product.name", "Scamper")
+  props.setProperty("product.version", version.value)
+
+  val dir = (Compile / classDirectory).value
+  val out = Files.newBufferedWriter(Paths.get(s"$dir/product.properties"))
+
+  try props.store(out, "Product Properties")
+  finally out.close()
+
+  (Compile / compile).value
+}
+
 Compile / doc / scalacOptions := Seq(
   "-project", name.value.capitalize,
   "-project-version", version.value,

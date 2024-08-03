@@ -158,8 +158,8 @@ class HttpClientGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
   private def checkUserAgentHeader(req: HttpRequest): Unit =
     info("check User-Agent header")
     userAgentHeaderCheck.set(
-      req.userAgent.head.name == "Scamper" &&
-      req.userAgent.head.version.exists(_.matches("\\d+(\\.\\d+(\\.\\d+)?)?"))
+      req.userAgent.head.name == Product.name &&
+      req.userAgent.head.version.contains(Product.version)
     )
 
   private def checkContentTypeHeader(req: HttpRequest): Unit =
