@@ -66,4 +66,4 @@ object WebSocketExtension:
 
 private case class WebSocketExtensionImpl(identifier: String, params: Map[String, Option[String]]) extends WebSocketExtension:
   override lazy val toString: String =
-    s"${identifier}${HeaderParams.format(params)}"
+    s"$identifier${HeaderParams.format(params)}"

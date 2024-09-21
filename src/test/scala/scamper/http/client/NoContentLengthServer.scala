@@ -15,7 +15,7 @@ class NoContentLengthServer(data: File):
   private val contentType = MediaType.forFile(data).getOrElse(MediaType.octetStream)
 
   def port: Int =
-    server.getLocalPort()
+    server.getLocalPort
 
   def open(): Unit =
     new Thread() {

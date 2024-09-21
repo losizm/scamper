@@ -92,8 +92,8 @@ class ServerHttpResponse(response: HttpResponse) extends AnyVal:
     val mediaType = MediaType.forFile(file).getOrElse(MediaType.octetStream)
     val disposition = DispositionType(
       typeName,
-      "filename" -> file.getName(),
-      "filename*" -> s"utf-8''${file.getName().toUrlEncoded}"
+      "filename" -> file.getName,
+      "filename*" -> s"utf-8''${file.getName.toUrlEncoded}"
     )
 
     response.setBody(entity)

@@ -53,7 +53,7 @@ class WebSocketChatServer(session: WebSocketSession):
     session.pongAsync(data)
 
   private def doPong(data: Array[Byte]): Unit =
-    if data.toSeq != pingData.toSeq then
+    if data.toSeq != pingData then
       session.close(ProtocolError)
 
   private def doError(err: Throwable): Unit =

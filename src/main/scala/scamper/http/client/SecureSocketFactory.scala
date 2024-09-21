@@ -30,15 +30,15 @@ private object SecureSocketFactory:
     trustManagerFactory.init(keyStore)
 
     val sslContext = SSLContext.getInstance("TLS")
-    sslContext.init(null, trustManagerFactory.getTrustManagers(), null)
-    sslContext.getSocketFactory()
+    sslContext.init(null, trustManagerFactory.getTrustManagers, null)
+    sslContext.getSocketFactory
 
   def create(storeFile: File, storeType: String, password: Option[String]): SSLSocketFactory =
     val storeStream = FileInputStream(storeFile)
 
     try
       val keyStore = KeyStore.getInstance(storeType)
-      keyStore.load(storeStream, password.map(_.toCharArray).getOrElse(null))
+      keyStore.load(storeStream, password.map(_.toCharArray).orNull)
       create(keyStore)
     finally
       Try(storeStream.close())
@@ -46,4 +46,4 @@ private object SecureSocketFactory:
   def create(trustManager: TrustManager): SSLSocketFactory =
     val sslContext = SSLContext.getInstance("TLS")
     sslContext.init(null, Array(trustManager), null)
-    sslContext.getSocketFactory()
+    sslContext.getSocketFactory

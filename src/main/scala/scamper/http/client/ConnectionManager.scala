@@ -87,7 +87,7 @@ private object ConnectionManager:
 
   private def checkSocket(entry: Entry): Boolean =
     val socket  = entry.connection.getSocket()
-    val timeout = socket.getSoTimeout()
+    val timeout = socket.getSoTimeout
 
     socket.setSoTimeout(connectionTestTimeout)
 

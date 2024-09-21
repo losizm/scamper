@@ -32,7 +32,7 @@ class WarningTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(warning.code == 299)
     assert(warning.agent == "-")
     assert(warning.text == "Miscellaneous Persistent Warning")
-    assert(warning.date == None)
+    assert(warning.date.isEmpty)
     assert(warning.toString == "299 - \"Miscellaneous Persistent Warning\"")
   }
 
@@ -48,7 +48,7 @@ class WarningTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(warn2.code == 299)
     assert(warn2.agent == "-")
     assert(warn2.text == "Miscellaneous Persistent Warning")
-    assert(warn2.date == None)
+    assert(warn2.date.isEmpty)
     assert(warn2.toString == "299 - \"Miscellaneous Persistent Warning\"")
 
     assert(WarningType.parseAll(s"$warn1, $warn2") == Seq(warn1, warn2))

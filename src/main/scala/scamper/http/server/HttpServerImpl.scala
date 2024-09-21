@@ -55,7 +55,7 @@ private object HttpServerImpl:
     requestHandlers:     Seq[RequestHandler] = Nil,
     responseFilters:     Seq[ResponseFilter] = Nil,
     errorHandlers:       Seq[ErrorHandler] = Nil,
-    serverSocketFactory: ServerSocketFactory = ServerSocketFactory.getDefault()
+    serverSocketFactory: ServerSocketFactory = ServerSocketFactory.getDefault
   )
 
   def apply(host: InetAddress, port: Int, app: Application) =

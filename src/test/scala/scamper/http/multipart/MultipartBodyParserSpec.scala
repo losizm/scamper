@@ -77,7 +77,7 @@ class MultipartBodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
   private def printSummary(multipart: Multipart): Unit =
     info("Multipart Summary")
-    multipart.parts.map { part =>
+    multipart.parts.foreach { part =>
       info(s"  name=${part.name}, size=${part.size}, contentType=${part.contentType}, contentDisposition=${part.contentDisposition}")
     }
 

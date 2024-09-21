@@ -39,7 +39,7 @@ class HttpResponseSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(res.getAttribute[String]("name").contains("response"))
     assert(res.getAttributeOrElse("success", false))
     assert(res.getAttributeOrElse("answer", 45) == 45)
-    assert(res.setAttributes(Map.empty[String, Any]).attributes.size == 0)
+    assert(res.setAttributes(Map.empty[String, Any]).attributes.isEmpty)
 
     res = res.removeAttributes("name")
     assert(res.attributes.size == 2)

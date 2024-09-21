@@ -48,7 +48,7 @@ private object HttpClientImpl:
     cookies:             CookieStore = CookieStore.Null,
     outgoing:            Seq[RequestFilter] = Nil,
     incoming:            Seq[ResponseFilter] = Nil,
-    secureSocketFactory: SSLSocketFactory = SSLSocketFactory.getDefault().asInstanceOf[SSLSocketFactory]
+    secureSocketFactory: SSLSocketFactory = SSLSocketFactory.getDefault.asInstanceOf[SSLSocketFactory]
   )
 
   def apply(settings: Settings): HttpClientImpl =
@@ -253,7 +253,7 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     }
 
   private def getSocketFactory(secure: Boolean): SocketFactory =
-    if secure then secureSocketFactory else SocketFactory.getDefault()
+    if secure then secureSocketFactory else SocketFactory.getDefault
 
   private def createCorrelate(requestId: Long): String =
     f"${System.currentTimeMillis}%x-$id%04x-$requestId%04x"
@@ -271,12 +271,12 @@ private class HttpClientImpl(id: Long, settings: HttpClientImpl.Settings) extend
     res.putAttributes("scamper.http.client.response.request" -> req)
 
   private def addAccept(req: HttpRequest): HttpRequest =
-    (req.hasAccept || accept.isEmpty) match
+    req.hasAccept || accept.isEmpty match
       case true  => req
       case false => req.setAccept(accept)
 
   private def addAcceptEncoding(req: HttpRequest): HttpRequest =
-    (req.hasAcceptEncoding || acceptEncoding.isEmpty) match
+    req.hasAcceptEncoding || acceptEncoding.isEmpty match
       case true  => req
       case false => req.setAcceptEncoding(acceptEncoding)
 

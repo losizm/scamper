@@ -40,7 +40,7 @@ class ProxyAuthenticationInfo(response: HttpResponse) extends AnyVal:
 
   /** Creates new response with Proxy-Authentication-Info header set to supplied values. */
   def setProxyAuthenticationInfo(values: Map[String, String]): HttpResponse =
-    response.putHeaders(Header("Proxy-Authentication-Info", AuthParams.format(values.toMap).trim))
+    response.putHeaders(Header("Proxy-Authentication-Info", AuthParams.format(values).trim))
 
   /** Creates new response with Proxy-Authentication-Info header set to supplied values. */
   def setProxyAuthenticationInfo(one: (String, String), more: (String, String)*): HttpResponse =

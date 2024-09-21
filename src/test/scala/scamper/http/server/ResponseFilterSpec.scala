@@ -24,7 +24,7 @@ import scamper.http.headers.toContentLength
 import ResponseStatus.Registry.Ok
 
 class ResponseFilterSpec extends org.scalatest.flatspec.AnyFlatSpec:
-  it should "componse response filters" in {
+  it should "compose response filters" in {
     val f1: ResponseFilter = _.setContentLength(10)
     val f2: ResponseFilter = _.setContentLength(20)
     val res = Ok()

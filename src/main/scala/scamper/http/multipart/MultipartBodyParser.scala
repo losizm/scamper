@@ -36,7 +36,7 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
 
     val mediaType = message.contentType
 
-    (mediaType.isMultipart && mediaType.subtypeName == "form-data") match
+    mediaType.isMultipart && mediaType.subtypeName == "form-data" match
       case true =>
         mediaType.params.get("boundary")
           .map(boundary => getMultipart(decode(message), boundary))
@@ -64,7 +64,7 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
             .map(MediaType(_))
             .getOrElse(MediaType.plain)
 
-          contentType.fullName == "text/plain" && contentDisposition.params.get("filename").isEmpty match
+          contentType.fullName == "text/plain" && !contentDisposition.params.contains("filename") match
             case true =>
               val charset = contentType.params.getOrElse("charset", "UTF-8")
               parts += Part(contentDisposition, contentType, getStringContent(in, buffer, charset, status))
@@ -79,7 +79,7 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
       case line => throw HttpException("Invalid start of multipart")
 
   private def getStringContent(in: InputStream, buffer: Array[Byte], charset: String, status: Status): String =
-    var content = new ArrayBuffer[Byte]
+    val content = new ArrayBuffer[Byte]
 
     var length = in.readLine(buffer)
     if length == -1 then

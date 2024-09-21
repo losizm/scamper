@@ -125,4 +125,4 @@ object StatusLine:
       notNull(status, "status"))
 
 private case class StatusLineImpl(version: HttpVersion, status: ResponseStatus) extends StatusLine:
-  override lazy val toString = s"$version ${status.statusCode} ${status.reasonPhrase}"
+  override lazy val toString = s"$version $status"

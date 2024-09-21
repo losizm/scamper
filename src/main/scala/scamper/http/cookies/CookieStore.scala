@@ -117,7 +117,7 @@ object CookieStore:
     DefaultCookieStore(new ArrayBuffer ++= cookies)
 
 private class DefaultCookieStore(private var collection: ArrayBuffer[PersistentCookie]) extends CookieStore:
-  private type Key = Tuple3[String, String, String]
+  private type Key = (String, String, String)
 
   private val ordering: Ordering[PersistentCookie] =
     Ordering.by(cookie => (-cookie.path.size, cookie.creation))

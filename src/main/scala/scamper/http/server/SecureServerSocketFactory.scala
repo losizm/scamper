@@ -31,8 +31,8 @@ private object SecureServerSocketFactory:
     keyManagerFactory.init(keyStore, password)
 
     val sslContext = SSLContext.getInstance("TLS")
-    sslContext.init(keyManagerFactory.getKeyManagers(), null, null)
-    sslContext.getServerSocketFactory()
+    sslContext.init(keyManagerFactory.getKeyManagers, null, null)
+    sslContext.getServerSocketFactory
 
   def create(storeFile: File, password: Array[Char], storeType: String): SSLServerSocketFactory =
     val storeStream = FileInputStream(storeFile)

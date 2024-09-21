@@ -40,7 +40,7 @@ private object WebSocketDeflate:
     compressor.close()
 
     buffer.write(0)
-    buffer.toByteArray()
+    buffer.toByteArray
 
   def decompress(message: InputStream): InputStream =
     InflaterInputStream(message, Inflater(true))
@@ -57,4 +57,4 @@ private object WebSocketDeflate:
     decompressor.flush()
     decompressor.close()
 
-    buffer.toByteArray()
+    buffer.toByteArray

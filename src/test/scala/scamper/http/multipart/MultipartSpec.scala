@@ -34,7 +34,7 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(part1.contentDisposition.params("name") == "id")
     assert(part1.contentType.isText)
     assert(part1.contentType.subtypeName == "plain")
-    assert(part1.contentType.params.get("charset").isEmpty)
+    assert(!part1.contentType.params.contains("charset"))
 
     val part2 = Part(DispositionType("form-data", "name" -> "id"), MediaType.plain("UTF-8"), "root")
     assert(part2.name == "id")
@@ -64,7 +64,7 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(part1.contentDisposition.params("name") == "secret")
     assert(part1.contentType.isApplication)
     assert(part1.contentType.subtypeName == "octet-stream")
-    assert(part1.contentType.params.get("charset").isEmpty)
+    assert(!part1.contentType.params.contains("charset"))
 
     val part2 = Part(DispositionType("form-data", "name" -> "secret"), MediaType("application/password"), secret)
     assert(part2.name == "secret")
@@ -77,7 +77,7 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(part2.contentDisposition.params("name") == "secret")
     assert(part2.contentType.isApplication)
     assert(part2.contentType.subtypeName == "password")
-    assert(part2.contentType.params.get("charset").isEmpty)
+    assert(!part2.contentType.params.contains("charset"))
   }
 
   it should "create part with file content" in {
@@ -118,7 +118,7 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(part3.size == photoFile.length)
     assert(part3.contentDisposition.name == "form-data")
     assert(part3.contentDisposition.params("name") == "photo")
-    assert(part3.contentDisposition.params.get("filename").isEmpty)
+    assert(!part3.contentDisposition.params.contains("filename"))
     assert(part3.contentType.isImage)
     assert(part3.contentType.subtypeName == "svg+xml")
 
@@ -131,7 +131,7 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(part4.size == photoFile.length)
     assert(part4.contentDisposition.name == "form-data")
     assert(part4.contentDisposition.params("name") == "photo")
-    assert(part4.contentDisposition.params.get("filename").isEmpty)
+    assert(!part4.contentDisposition.params.contains("filename"))
     assert(part4.contentType.isImage)
     assert(part4.contentType.subtypeName == "picture")
 
@@ -167,18 +167,18 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
     val reggae = Part("genre", "Reggae")
     val multipart = Multipart(id, photo, rap, rnb, reggae)
 
-    assert(multipart.parts.sameElements(Seq(id, photo, rap, rnb, reggae)))
+    assert(multipart.parts == Seq(id, photo, rap, rnb, reggae))
 
     assert(multipart.getPart("id").contains(id))
-    assert(multipart.getParts("id").sameElements(Seq(id)))
+    assert(multipart.getParts("id") == Seq(id))
     assert(multipart.getString("id").contains("root"))
 
     assert(multipart.getPart("photo").contains(photo))
-    assert(multipart.getParts("photo").sameElements(Seq(photo)))
+    assert(multipart.getParts("photo") == Seq(photo))
     assert(multipart.getFile("photo").contains(File("photo.svg")))
 
     assert(multipart.getPart("genre").contains(rap))
-    assert(multipart.getParts("genre").sameElements(Seq(rap, rnb, reggae)))
+    assert(multipart.getParts("genre") == Seq(rap, rnb, reggae))
     assert(multipart.getString("genre").contains("Rap"))
 
     assert(multipart.getPart("none").isEmpty)
@@ -190,6 +190,6 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(query("id") == "root")
     assert(query.getValues("id") == Seq("root"))
     assert(query("genre") == "Rap")
-    assert(query.getValues("genre").sameElements(Seq("Rap", "R&B", "Reggae")))
+    assert(query.getValues("genre") == Seq("Rap", "R&B", "Reggae"))
     assertThrows[NoSuchElementException] { query("photo") }
   }

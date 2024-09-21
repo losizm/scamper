@@ -61,7 +61,6 @@ extension [T <: HttpMessage & MessageBuilder[T]](message: T)
    * is set to length of bytes.
    *
    * @param bytes message body
-   * @param charset character set
    */
   def setOctetBody(bytes: Array[Byte]): T =
     setBodyContent(Entity(bytes), MediaType.octetStream)

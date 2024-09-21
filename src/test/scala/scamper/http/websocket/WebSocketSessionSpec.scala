@@ -40,7 +40,7 @@ class WebSocketSessionSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
   it should "end sessions with 'Going Away' (deflate)" in withSessions(true)(testGoingAway)
 
-  private val assertDelay    = 250L;
+  private val assertDelay    = 250L
   private val textMessages   = ListBuffer[String]()
   private val binaryMessages = ListBuffer[Array[Byte]]()
   private val pingMessages   = ListBuffer[Array[Byte]]()

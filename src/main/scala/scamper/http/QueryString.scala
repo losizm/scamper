@@ -31,7 +31,7 @@ trait QueryString:
    *
    * @throws java.util.NoSuchElementException if parameter not present
    */
-  def apply(name: String) =
+  def apply(name: String): String =
     getOrElse(name, throw new NoSuchElementException(name))
 
   /**
@@ -312,7 +312,7 @@ trait QueryString:
    *
    * @param pred predicate
    *
-   * @param new query string
+   * @return new query string
    */
   def filter(pred: ((String, String)) => Boolean): QueryString =
     QueryString(toSeq.filter(pred))
@@ -323,7 +323,7 @@ trait QueryString:
    *
    * @param pred predicate
    *
-   * @param new query string
+   * @return new query string
    */
   def filterNot(pred: ((String, String)) => Boolean): QueryString =
     QueryString(toSeq.filterNot(pred))
@@ -452,8 +452,8 @@ object QueryString:
 
   private def parse(query: String): Seq[(String, String)] =
     query.split("&").map(_.split("=")).toIndexedSeq.collect {
-      case Array(name, value) if !name.isEmpty => decode(name, "UTF-8") -> decode(value, "UTF-8")
-      case Array(name)        if !name.isEmpty => decode(name, "UTF-8") -> ""
+      case Array(name, value) if name.nonEmpty => decode(name, "UTF-8") -> decode(value, "UTF-8")
+      case Array(name)        if name.nonEmpty => decode(name, "UTF-8") -> ""
     }
 
   private[scamper] def format(params: Map[String, Seq[String]]): String =
@@ -495,7 +495,7 @@ private case class MapQueryString(toMultiMap: Map[String, Seq[String]]) extends 
   lazy val names = toMultiMap.keys.toSeq
 
   def get(name: String) = toMultiMap.get(name).flatMap(_.headOption)
-  def getValues(name: String) = toMultiMap.get(name).getOrElse(Nil)
+  def getValues(name: String) = toMultiMap.getOrElse(name, Nil)
   def contains(name: String) = toMultiMap.contains(name)
   def isEmpty = toMultiMap.isEmpty
 
@@ -521,7 +521,6 @@ private case class MapQueryString(toMultiMap: Map[String, Seq[String]]) extends 
 
   lazy val toMap =
     toMultiMap.collect { case (name, Seq(value, _*)) => name -> value }
-      .toMap
 
   override lazy val toString = QueryString.format(toMultiMap)
 
@@ -552,11 +551,9 @@ private case class SeqQueryString(toSeq: Seq[(String, String)]) extends QueryStr
   lazy val toMultiMap =
     toSeq.groupBy(_._1)
       .collect { case (name, params) => name -> params.map(_._2) }
-      .toMap
 
   lazy val toMap =
     toSeq.groupBy(_._1)
       .collect { case (name, params) => name -> params.head._2 }
-      .toMap
 
   override lazy val toString = QueryString.format(toSeq)

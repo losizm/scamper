@@ -932,12 +932,12 @@ class HeadersSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(req1.warningOption.isEmpty)
     assert(req1.warningRemoved == req1)
 
-    val req2 = req1.setWarning("110 - \"reqponse is Stale\"", "113 - \"Heuristic Expiration\"")
+    val req2 = req1.setWarning("110 - \"response is Stale\"", "113 - \"Heuristic Expiration\"")
     assert(req2.hasWarning)
-    assert(req2.warning == Seq(WarningType(110, "-", "reqponse is Stale"), WarningType(113, "-", "Heuristic Expiration")))
-    assert(req2.warningOption.contains(Seq(WarningType(110, "-", "reqponse is Stale"), WarningType(113, "-", "Heuristic Expiration"))))
+    assert(req2.warning == Seq(WarningType(110, "-", "response is Stale"), WarningType(113, "-", "Heuristic Expiration")))
+    assert(req2.warningOption.contains(Seq(WarningType(110, "-", "response is Stale"), WarningType(113, "-", "Heuristic Expiration"))))
     assert(req2.warningRemoved == req1)
-    assert(req2.getHeaderValue("Warning").contains("110 - \"reqponse is Stale\", 113 - \"Heuristic Expiration\""))
+    assert(req2.getHeaderValue("Warning").contains("110 - \"response is Stale\", 113 - \"Heuristic Expiration\""))
 
     val res1 = Ok()
     assert(!res1.hasWarning)

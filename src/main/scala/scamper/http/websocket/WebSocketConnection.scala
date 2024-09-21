@@ -40,8 +40,8 @@ class WebSocketConnection(socket: Socket) extends AutoCloseable:
   private val maskBits     = 0x80
   private val lengthBits   = 0x7f
 
-  private val in = DataInputStream(socket.getInputStream())
-  private val out = DataOutputStream(socket.getOutputStream())
+  private val in = DataInputStream(socket.getInputStream)
+  private val out = DataOutputStream(socket.getOutputStream)
 
   /** Tests for secure WebSocket connection. */
   def isSecure: Boolean = socket.isInstanceOf[SSLSocket]
@@ -85,7 +85,7 @@ class WebSocketConnection(socket: Socket) extends AutoCloseable:
     val byte1 = in.readUnsignedByte()
     val isMasked = (byte1 & maskBits) != 0
 
-    val length: Long = (byte1 & lengthBits) match
+    val length: Long = byte1 & lengthBits match
       case 126 => in.readUnsignedShort()
 
       case 127 =>
@@ -154,7 +154,7 @@ class WebSocketConnection(socket: Socket) extends AutoCloseable:
       val length = out.write(frame.payload, new Array[Byte](8192))
 
       if length < frame.length then
-        throw EOFException(s"Truncation dectected: Payload length ($length) is less than declared length (${frame.length})")
+        throw EOFException(s"Truncation detected: Payload length ($length) is less than declared length (${frame.length})")
 
     out.flush()
   }

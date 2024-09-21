@@ -33,7 +33,7 @@ class ProtocolSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
     protocol = Protocol.parse("IRC")
     assert(protocol.name == "IRC")
-    assert(protocol.version == None)
+    assert(protocol.version.isEmpty)
     assert(protocol.toString == "IRC")
     assert(protocol == Protocol("IRC", None))
   }

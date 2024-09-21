@@ -314,7 +314,7 @@ private[scamper] class WebSocketSessionImpl(val id: String, val target: Uri, val
           val count = frame.payload.read(data, position, length - position)
 
           if count == -1 then
-            throw EOFException(s"Truncation dectected: Payload length ($position) is less than declared length ($length)")
+            throw EOFException(s"Truncation detected: Payload length ($position) is less than declared length ($length)")
 
           position += count
 

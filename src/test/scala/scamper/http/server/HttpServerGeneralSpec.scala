@@ -162,7 +162,7 @@ class HttpServerGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
   }
 
   private def test413(secure: Boolean) = withServer(secure) { implicit server =>
-    Post(s"${serverUri}/echo")
+    Post(s"$serverUri/echo")
       .setBody(RandomBytes(16 * 1024))
       .send { res =>
         assert(res.status == PayloadTooLarge)
@@ -172,7 +172,7 @@ class HttpServerGeneralSpec extends org.scalatest.flatspec.AnyFlatSpec with Test
   }
 
   private def test414(secure: Boolean) = withServer(secure) { implicit server =>
-    Get(s"${serverUri}${"/test" * 1024}")
+    Get(s"$serverUri${"/test" * 1024}")
       .send { res =>
         assert(res.status == UriTooLong)
         assert(res.connection == Seq("close"))

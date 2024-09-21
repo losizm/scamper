@@ -71,7 +71,7 @@ private class ChunkedInputStream(in: InputStream) extends InputStream:
     position = 0
 
   private def nextChunkSize: Int =
-    if chunkSize > 0 && readLine().size != 0 then
+    if chunkSize > 0 && readLine().nonEmpty then
       throw IOException("Invalid chunk termination")
 
     val regex = "(\\p{XDigit}+)(?:\\s*;\\s*.+=.+)*".r

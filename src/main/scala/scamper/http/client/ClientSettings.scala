@@ -174,7 +174,7 @@ class ClientSettings:
   /**
    * Sets cookie store.
    *
-   * @param cookies cookie store
+   * @param cookieStore cookie store
    */
   def cookies(cookieStore: CookieStore = CookieStore()): this.type =
     settings = settings.copy(cookies = notNull(cookieStore, "cookieStore"))

@@ -28,7 +28,7 @@ trait ResponseFilter:
   def apply(response: HttpResponse): HttpResponse
 
   /**
-   * Creates composite filter by appying `this` before `other`.
+   * Creates composite filter by applying `this` before `other`.
    *
    * @param other other filter
    */

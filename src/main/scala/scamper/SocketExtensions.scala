@@ -19,37 +19,37 @@ import java.net.Socket
 
 private implicit class SocketExtensions(socket: Socket) extends AnyVal:
   def read(): Int =
-    socket.getInputStream().read()
+    socket.getInputStream.read()
 
   def read(buffer: Array[Byte]): Int =
-    socket.getInputStream().read(buffer)
+    socket.getInputStream.read(buffer)
 
   def read(buffer: Array[Byte], offset: Int, length: Int): Int =
-    socket.getInputStream().read(buffer, offset, length)
+    socket.getInputStream.read(buffer, offset, length)
 
   def readLine(buffer: Array[Byte], offset: Int = 0): Int =
-    socket.getInputStream().readLine(buffer, offset)
+    socket.getInputStream.readLine(buffer, offset)
 
   def getToken(delimiters: String, buffer: Array[Byte], offset: Int = 0): String =
-    socket.getInputStream().getToken(delimiters, buffer, offset)
+    socket.getInputStream.getToken(delimiters, buffer, offset)
 
   def getLine(buffer: Array[Byte], offset: Int = 0): String =
-    socket.getInputStream().getLine(buffer, offset)
+    socket.getInputStream.getLine(buffer, offset)
 
   def write(byte: Int): Unit =
-    socket.getOutputStream().write(byte)
+    socket.getOutputStream.write(byte)
 
   def write(buffer: Array[Byte]): Unit =
-    socket.getOutputStream().write(buffer)
+    socket.getOutputStream.write(buffer)
 
   def write(buffer: Array[Byte], offset: Int, length: Int): Unit =
-    socket.getOutputStream().write(buffer, offset, length)
+    socket.getOutputStream.write(buffer, offset, length)
 
   def writeLine(text: String): Unit =
-    socket.getOutputStream().writeLine(text)
+    socket.getOutputStream.writeLine(text)
 
   def writeLine(): Unit =
-    socket.getOutputStream().writeLine()
+    socket.getOutputStream.writeLine()
 
   def flush(): Unit =
-    socket.getOutputStream().flush()
+    socket.getOutputStream.flush()

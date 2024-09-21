@@ -92,7 +92,7 @@ private class WriterInputStream(bufferSize: Int, writer: OutputStream => Unit)(u
   /**
    * Mark/reset is not supported.
    *
-   * @throws IOException
+   * @throws IOException always
    */
   override def reset(): Unit = throw IOException("mark/reset not supported")
 

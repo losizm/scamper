@@ -27,7 +27,7 @@ class LinkTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
     link = LinkType(Uri("/assets/large-icon.png"), "size" -> Some("64x64"))
     assert(link.ref.toString == "/assets/large-icon.png")
-    assert(link.params("size") == Some("64x64"))
+    assert(link.params("size").contains("64x64"))
     assert(link.toString == "</assets/large-icon.png>; size=64x64")
     assert(link == LinkType(Uri("/assets/large-icon.png"), "size" -> Some("64x64")))
   }

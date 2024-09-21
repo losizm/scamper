@@ -33,7 +33,7 @@ class ProductTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
 
     product = ProductType.parse("libwww")
     assert(product.name == "libwww")
-    assert(product.version == None)
+    assert(product.version.isEmpty)
     assert(product.toString == "libwww")
     assert(product == ProductType("libwww", None))
   }

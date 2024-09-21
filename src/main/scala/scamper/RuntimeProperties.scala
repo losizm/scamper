@@ -22,27 +22,27 @@ import scala.util.Try
 
 private object RuntimeProperties:
   object auxiliary:
-    lazy val executorShowWarning      = getBooleanProperty("scamper.auxiliary.executor.showWarning", false)
-    lazy val executorCorePoolSize     = getIntProperty("scamper.auxiliary.executor.corePoolSize", 0).max(0)
-    lazy val executorMaxPoolSize      = getIntProperty("scamper.auxiliary.executor.maxPoolSize", runtime.availableProcessors * 2).max(1)
-    lazy val executorKeepAliveSeconds = getLongProperty("scamper.auxiliary.executor.keepAliveSeconds", 60L).max(0L)
-    lazy val executorQueueSize        = getIntProperty("scamper.auxiliary.executor.queueSize", 0).max(0)
+    lazy val executorShowWarning: Boolean = getBooleanProperty("scamper.auxiliary.executor.showWarning", false)
+    lazy val executorCorePoolSize: Int = getIntProperty("scamper.auxiliary.executor.corePoolSize", 0).max(0)
+    lazy val executorMaxPoolSize: Int = getIntProperty("scamper.auxiliary.executor.maxPoolSize", runtime.availableProcessors * 2).max(1)
+    lazy val executorKeepAliveSeconds: Long = getLongProperty("scamper.auxiliary.executor.keepAliveSeconds", 60L).max(0L)
+    lazy val executorQueueSize: Int = getIntProperty("scamper.auxiliary.executor.queueSize", 0).max(0)
 
   object cookies:
-    lazy val getRemotePublicSuffixList = getBooleanProperty("scamper.http.cookies.getRemotePublicSuffixList", false)
-    lazy val publicSuffixListUrl       = getProperty("scamper.http.cookies.publicSuffixListUrl", "https://publicsuffix.org/list/public_suffix_list.dat")
+    lazy val getRemotePublicSuffixList: Boolean = getBooleanProperty("scamper.http.cookies.getRemotePublicSuffixList", false)
+    lazy val publicSuffixListUrl: String = getProperty("scamper.http.cookies.publicSuffixListUrl", "https://publicsuffix.org/list/public_suffix_list.dat")
 
   object client:
-    lazy val connectionEvictionInterval = getIntProperty("scamper.http.client.connection.evictionInterval", 5000).max(1000)
-    lazy val connectionIdleTimeout      = getIntProperty("scamper.http.client.connection.idleTimeout", 60000).max(0)
-    lazy val connectionQueueSize        = getIntProperty("scamper.http.client.connection.queueSize", 50).max(1)
-    lazy val connectionTestTimeout      = getIntProperty("scamper.http.client.connection.testTimeout", 20).max(1)
+    lazy val connectionEvictionInterval: Int = getIntProperty("scamper.http.client.connection.evictionInterval", 5000).max(1000)
+    lazy val connectionIdleTimeout: Int = getIntProperty("scamper.http.client.connection.idleTimeout", 60000).max(0)
+    lazy val connectionQueueSize: Int = getIntProperty("scamper.http.client.connection.queueSize", 50).max(1)
+    lazy val connectionTestTimeout: Int = getIntProperty("scamper.http.client.connection.testTimeout", 20).max(1)
 
   object server:
-    lazy val keepAlivePoolSizeFactor = getIntProperty("scamper.http.server.keepAlive.poolSizeFactor", 2).max(1)
-    lazy val upgradePoolSizeFactor   = getIntProperty("scamper.http.server.upgrade.poolSizeFactor", 2).max(1)
-    lazy val encoderPoolSizeFactor   = getIntProperty("scamper.http.server.encoder.poolSizeFactor", 2).max(1)
-    lazy val closerQueueSizeFactor   = getIntProperty("scamper.http.server.closer.queueSizeFactor", 2).max(0)
+    lazy val keepAlivePoolSizeFactor: Int = getIntProperty("scamper.http.server.keepAlive.poolSizeFactor", 2).max(1)
+    lazy val upgradePoolSizeFactor: Int = getIntProperty("scamper.http.server.upgrade.poolSizeFactor", 2).max(1)
+    lazy val encoderPoolSizeFactor: Int = getIntProperty("scamper.http.server.encoder.poolSizeFactor", 2).max(1)
+    lazy val closerQueueSizeFactor: Int = getIntProperty("scamper.http.server.closer.queueSizeFactor", 2).max(0)
 
   private def getBooleanProperty(name: String, default: => Boolean): Boolean =
     Try(sys.props(name).toBoolean)

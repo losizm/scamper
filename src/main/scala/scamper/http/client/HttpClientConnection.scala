@@ -128,12 +128,12 @@ private class HttpClientConnection(socket: Socket) extends AutoCloseable:
   private def getResponse(headOnly: Boolean): HttpResponse =
     val buffer = new Array[Byte](bufferSize)
     val statusLine = StatusLine(socket.getLine(buffer))
-    val headers = HeaderStream.getHeaders(socket.getInputStream(), buffer)
+    val headers = HeaderStream.getHeaders(socket.getInputStream, buffer)
 
     HttpResponse(
       statusLine,
       headers,
       headOnly match
         case true  => Entity.empty
-        case false => Entity(socket.getInputStream())
+        case false => Entity(socket.getInputStream)
     )

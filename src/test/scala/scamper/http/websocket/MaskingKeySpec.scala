@@ -57,7 +57,7 @@ class MaskingKeySpec extends org.scalatest.flatspec.AnyFlatSpec:
       case false =>
         val in  = ByteArrayInputStream(data)
         val out = ByteArrayOutputStream()
-        var buf = new Array[Byte](5) // Use uneven buffer for test
+        val buf = new Array[Byte](5) // Use uneven buffer for test
         var len = 0
         var pos = 0
 

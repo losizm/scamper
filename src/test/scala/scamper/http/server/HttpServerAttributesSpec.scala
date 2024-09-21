@@ -61,7 +61,7 @@ class HttpServerAttributesSpec extends org.scalatest.flatspec.AnyFlatSpec with T
     request.set(null)
     response.set(null)
     info("414 URI Too Long")
-    client.get(s"${serverUri}${"/test" * 512}") { res =>
+    client.get(s"$serverUri${"/test" * 512}") { res =>
       assert(res.status == UriTooLong)
       assert(request.get == null)
 

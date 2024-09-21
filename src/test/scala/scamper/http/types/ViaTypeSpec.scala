@@ -31,7 +31,7 @@ class ViaTypeSpec extends org.scalatest.flatspec.AnyFlatSpec:
     via = ParseVia("SHTTP/1.3 secret-gateway")
     assert(via.protocol == Protocol.parse("SHTTP/1.3"))
     assert(via.by == "secret-gateway")
-    assert(!via.comment.isDefined)
+    assert(via.comment.isEmpty)
     assert(via.toString == "SHTTP/1.3 secret-gateway")
     assert(via == ViaType(Protocol.parse("SHTTP/1.3"), "secret-gateway"))
 

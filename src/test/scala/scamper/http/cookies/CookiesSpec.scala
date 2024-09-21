@@ -67,7 +67,7 @@ class CookiesSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "HttpResponse" should "be created with cookies" in {
     val res = Ok().setCookies(SetCookie("a", "123"), SetCookie("b", "xyz")).putCookies(SetCookie("c", "XYZ"))
     assert(res.getHeaderValue("Set-Cookie").contains("a=123"))
-    assert(res.getHeaderValues("Set-Cookie").sameElements(Seq("a=123", "b=xyz", "c=XYZ")))
+    assert(res.getHeaderValues("Set-Cookie") == Seq("a=123", "b=xyz", "c=XYZ"))
     assert(res.getCookieValue("a").contains("123"))
     assert(res.getCookieValue("b").contains("xyz"))
     assert(res.getCookieValue("c").contains("XYZ"))

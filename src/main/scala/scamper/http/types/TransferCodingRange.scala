@@ -67,7 +67,7 @@ object TransferCodingRange:
     ParseTransferCoding(range) match
       case (name, params) =>
         params.collectFirst {
-          case (QValue.key(key), QValue.value(value)) => (value.toFloat, (params - key))
+          case (QValue.key(key), QValue.value(value)) => (value.toFloat, params - key)
         } map {
           case (weight, params) => TransferCodingRangeImpl(Name(name), QValue(weight), Params(params))
         } getOrElse {

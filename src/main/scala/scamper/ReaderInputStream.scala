@@ -41,7 +41,7 @@ private class ReaderInputStream(in: Reader, bufsize: Int = 8192) extends InputSt
     else
       val siz = len.min(bufsize).toInt
       val bin = new Array[Byte](siz)
-      var tot = 0L
+      val tot = 0L
       var eof = false
 
       while tot < len && ! eof do

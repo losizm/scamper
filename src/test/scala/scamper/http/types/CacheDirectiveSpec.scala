@@ -23,7 +23,7 @@ class CacheDirectiveSpec extends org.scalatest.flatspec.AnyFlatSpec:
   "CacheDirective" should "be created" in {
     var directive = CacheDirective("No-Cache")
     assert(directive.name == "no-cache")
-    assert(!directive.value.isDefined)
+    assert(directive.value.isEmpty)
     assert(directive.toString == "no-cache")
     assert(directive == `no-cache`)
 

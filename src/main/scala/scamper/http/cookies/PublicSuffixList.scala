@@ -17,7 +17,7 @@ package scamper
 package http
 package cookies
 
-import java.net.URL
+import java.net.{ URI, URL }
 
 import scala.io.Source
 import scala.util.Try
@@ -52,7 +52,7 @@ private object PublicSuffixList:
 
   private def getRemoteList(): Seq[String] =
     getRemotePublicSuffixList match
-      case true  => getLines(URL(publicSuffixListUrl))
+      case true  => getLines(URI(publicSuffixListUrl).toURL)
       case false => throw UnsupportedOperationException()
 
   private def getLocalList(): Seq[String] =
@@ -60,11 +60,14 @@ private object PublicSuffixList:
     getLines(url)
 
   private def getLines(url: URL): Seq[String] =
-    Source.fromURL(url)
-      .getLines()
-      .map(line => line.split("\\s+", 2).head)
-      .filterNot(line => line.isEmpty || line.startsWith("//"))
-      .toSeq
+    val source = Source.fromURL(url)
+    try
+      source.getLines()
+        .map(line => line.split("\\s+", 2).head)
+        .filterNot(line => line.isEmpty || line.startsWith("//"))
+        .toSeq
+    finally
+      source.close()
 
   private def toRegex(suffix: String): String =
     "(?i)" + suffix.replaceAll("""\.""", """\\.""")

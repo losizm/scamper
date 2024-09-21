@@ -40,7 +40,7 @@ class AuthenticationInfo(response: HttpResponse) extends AnyVal:
 
   /** Creates new response with Authentication-Info header set to supplied values. */
   def setAuthenticationInfo(values: Map[String, String]): HttpResponse =
-    response.putHeaders(Header("Authentication-Info", AuthParams.format(values.toMap).trim))
+    response.putHeaders(Header("Authentication-Info", AuthParams.format(values).trim))
 
   /** Creates new response with Authentication-Info header set to supplied values. */
   def setAuthenticationInfo(one: (String, String), more: (String, String)*): HttpResponse =

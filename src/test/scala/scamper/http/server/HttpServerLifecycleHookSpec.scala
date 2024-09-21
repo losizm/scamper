@@ -33,7 +33,7 @@ class HttpServerLifecycleHookSpec extends org.scalatest.flatspec.AnyFlatSpec:
     def process(event: LifecycleEvent) =
       event match
         case LifecycleEvent.Start(server) =>
-          error.foreach(throw(_))
+          error.foreach(throw _)
           started = starts.incrementAndGet()
           assert(server.host.getHostName == "localhost")
           assert(!server.isClosed)
@@ -135,7 +135,7 @@ class HttpServerLifecycleHookSpec extends org.scalatest.flatspec.AnyFlatSpec:
     reset()
     assert {
       intercept[LifecycleException](createServer(hook1, hook2, hook3, hook4, hook5))
-        .getCause()
+        .getCause
         .isInstanceOf[UnsupportedOperationException]
     }
 

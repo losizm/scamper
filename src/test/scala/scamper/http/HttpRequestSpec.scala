@@ -75,7 +75,7 @@ class HttpRequestSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(req.getAttribute[String]("name").contains("request"))
     assert(req.getAttributeOrElse("success", false))
     assert(req.getAttributeOrElse("answer", 45) == 45)
-    assert(req.setAttributes(Map.empty[String, Any]).attributes.size == 0)
+    assert(req.setAttributes(Map.empty[String, Any]).attributes.isEmpty)
 
     req = req.removeAttributes("name")
     assert(req.attributes.size == 2)
