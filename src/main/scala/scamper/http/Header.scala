@@ -35,7 +35,7 @@ sealed trait Header:
   def longValue: Long = value.toLong
 
   /**
-   * Gets field value as date (i.e., `Instant`).
+   * Gets field value as `Instant`.
    *
    * @note The field value is assumed formatted per &sect;3.3 of RFC5322.
    */

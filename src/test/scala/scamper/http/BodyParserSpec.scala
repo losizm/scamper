@@ -54,7 +54,7 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
   }
 
   it should "parse request with form body as query string" in {
-    given BodyParser[QueryString] = BodyParser.query()
+    given BodyParser[QueryString] = BodyParser.queryString()
     val body = Entity(QueryString("id" -> "0", "name" -> "root"))
     val request = Post("users").setBody(body).setContentLength(body.knownSize.get)
     val form = request.as[QueryString]
@@ -64,7 +64,7 @@ class BodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
   }
 
   it should "parse response to input stream" in {
-    given BodyParser[InputStream] = BodyParser.stream()
+    given BodyParser[InputStream] = BodyParser.inputStream()
     val body = Entity("Hello, world!")
     val message = Ok(body).setContentType("text/plain").setContentLength(body.knownSize.get)
 
