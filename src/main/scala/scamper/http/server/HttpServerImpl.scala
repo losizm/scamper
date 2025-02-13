@@ -161,9 +161,10 @@ private class HttpServerImpl(id: Long, socketAddress: InetSocketAddress, app: Ht
       }
 
   try
+    logger.info(s"$authority - Starting server")
+
     startLifecycleHooks()
 
-    logger.info(s"$authority - Starting server")
     logger.info(s"$authority - Secure: $isSecure")
     logger.info(s"$authority - Backlog Size: $backlogSize")
     logger.info(s"$authority - Pool Size: $poolSize")
