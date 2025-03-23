@@ -59,7 +59,7 @@ object MessageApplication extends RouterApplication:
 
         Created("Message posted.")
           .setContentType("text/plain")
-          .setLocation(router.toAbsolutePath(s"/$id"))
+          .setLocation(router.getAbsolutePath(s"/$id"))
       }
     }
 

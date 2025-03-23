@@ -45,7 +45,7 @@ private class StandardRouter(rawMountPath: String) extends Router:
 
   def incoming(path: String, methods: RequestMethod*)(handler: RequestHandler): this.type =
     incomings += TargetRequestHandler(
-      toAbsolutePath(notNull(path, "path")),
+      getAbsolutePath(notNull(path, "path")),
       notNull(methods, "methods"),
       notNull(handler, "handler")
     )

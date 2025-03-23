@@ -23,8 +23,10 @@ trait RequestHandler:
   /**
    * Handles incoming request.
    *
-   * If handler satisfies the request, then it returns a response; otherwise, it
+   * If handler satisfies request, then it returns a response; otherwise, it
    * returns a request.
+   *
+   * @param request incoming request
    */
   def apply(request: HttpRequest): HttpMessage
 
@@ -57,11 +59,12 @@ trait RequestHandler:
 /** Provides `RequestHandler` utilities. */
 object RequestHandler:
   /**
-   * Composes request handlers, with tail handlers as fallbacks.
+   * Composes request handlers by applying handlers in order until either
+   * request is satisfied or handlers are exhausted.
    *
    * @param handlers request handlers
    *
-   * @note If `handlers` is empty, a handler is created to return supplied
+   * @note If `handlers` is empty, the returned handler simply returns supplied
    * request.
    */
   def coalesce(handlers: Seq[RequestHandler]): RequestHandler =
@@ -76,7 +79,8 @@ object RequestHandler:
     handle(_, handlers)
 
   /**
-   * Composes `one` handler with `more` handlers, using `more` as fallbacks.
+   * Composes request handlers by applying handlers in order until either
+   * request is satisfied or handlers are exhausted.
    *
    * @param one request handler
    * @param more additional request handlers

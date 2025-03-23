@@ -88,8 +88,8 @@ import scamper.http.types.KeepAliveParameters
  *     case false => NotFound()
  * }
  *
- * // Serve files from file directory
- * app.files("/main", File("/path/to/public"))
+ * // Serve files from filesystem directory
+ * app.fileserver("/main", File("/path/to/public"))
  *
  * // Gzip response body if not empty
  * app.outgoing { res =>

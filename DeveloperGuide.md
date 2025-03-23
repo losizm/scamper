@@ -999,7 +999,7 @@ app.post("/translate/:in/to/:out") { req =>
 You can mount a file server as a specialized request handler.
 
 ```scala
-app.files("/app/main", File("/path/to/public"))
+app.fileserver("/app/main", File("/path/to/public"))
 ```
 
 This adds a handler to serve files from the directory at _/path/to/public_.

@@ -27,20 +27,20 @@ object CookieApplication extends RouterApplication:
   def apply(router: Router): Unit =
     router.get("/foo/bar/baz/*") { implicit req =>
       Ok()
-        .putCookies(getCookies(req, "foo", router.toAbsolutePath("/foo")))
-        .putCookies(getCookies(req, "bar", router.toAbsolutePath("/foo/bar")))
-        .putCookies(getCookies(req, "baz", router.toAbsolutePath("/foo/bar/baz")))
+        .putCookies(getCookies(req, "foo", router.getAbsolutePath("/foo")))
+        .putCookies(getCookies(req, "bar", router.getAbsolutePath("/foo/bar")))
+        .putCookies(getCookies(req, "baz", router.getAbsolutePath("/foo/bar/baz")))
     }
 
     router.get("/foo/bar/*") { implicit req =>
       Ok()
-        .putCookies(getCookies(req, "foo", router.toAbsolutePath("/foo")))
-        .putCookies(getCookies(req, "bar", router.toAbsolutePath("/foo/bar")))
+        .putCookies(getCookies(req, "foo", router.getAbsolutePath("/foo")))
+        .putCookies(getCookies(req, "bar", router.getAbsolutePath("/foo/bar")))
     }
 
     router.get("/foo/*") { implicit req =>
       Ok()
-        .putCookies(getCookies(req, "foo", router.toAbsolutePath("/foo")))
+        .putCookies(getCookies(req, "foo", router.getAbsolutePath("/foo")))
     }
 
   private def getCookies(req: HttpRequest, name: String, path: String): Seq[SetCookie] =

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Carlos Conyers
+ * Copyright 2025 Carlos Conyers
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ trait Router:
   def mountPath: String
 
   /**
-   * Expands supplied router path to its absolute path.
+   * Gets absolute path of supplied router path.
    *
    * @param path router path
    *
@@ -72,7 +72,7 @@ trait Router:
    *
    * @note If `*` is supplied as router path, its absolute path is also `*`.
    */
-  def toAbsolutePath(path: String): String =
+  def getAbsolutePath(path: String): String =
     NormalizePath(path) match
       case ""   => mountPath
       case "/"  => mountPath
@@ -119,8 +119,7 @@ trait Router:
   def incoming(handler: RequestHandler): this.type
 
   /**
-   * Adds supplied handler for requests with given router path and any of
-   * specified request methods.
+   * Adds supplied handler for specified request methods to given router path.
    *
    * The handler is appended to existing request handler chain.
    *
@@ -203,35 +202,9 @@ trait Router:
     incoming(path, Delete)(handler)
 
   /**
-   * Mounts file server at given path.
+   * Adds supplied WebSocket application to given router path.
    *
-   * At request time, the mount path is stripped from the router path, and the
-   * remaining path is used to locate a file in the source directory.
-   *
-   * ### File Mapping Examples
-   *
-   * | Mount Path | Source Directory | Router Path               | Maps to |
-   * | ---------- | ---------------- | ------------------------- | ------- |
-   * | /images    | /tmp             | /images/logo.png          | /tmp/logo.png |
-   * | /images    | /tmp             | /images/icons/warning.png | /tmp/icons/warning.png |
-   *
-   * @param path router path at which directory is mounted
-   * @param source directory from which files are served
-   * @param defaults default file names used when request matches directory
-   *
-   * @return this router
-   *
-   * @note If a request matches a directory, and if a file with one of the
-   * default file names exists in that directory, the server sends 303 (See
-   * Other) with a Location header value set to path of default file.
-   */
-  def files(path: String, source: File, defaults: String*): this.type =
-    route(path)(FileServer(source, defaults))
-
-  /**
-   * Mounts WebSocket application at given path.
-   *
-   * @param path router path at which application is mounted
+   * @param path router path
    * @param app WebSocket application
    *
    * @return this router
@@ -249,9 +222,35 @@ trait Router:
         incoming(path, Get)(WebSocketRequestHandler(app))
 
   /**
-   * Mounts router application at given path.
+   * Mounts file server at given router path.
    *
-   * @param path router path at which application is mounted
+   * At request time, the mount path is stripped from target path, and remaining
+   * path is used to locate a file in source directory.
+   *
+   * ### File Mapping Examples
+   *
+   * | Mount Path  | Source Directory | Target Path               | Maps to |
+   * | ----------- | ---------------- | ------------------------- | ------- |
+   * | /images     | /tmp             | /images/logo.png          | /tmp/logo.png |
+   * | /images     | /tmp             | /images/icons/warning.png | /tmp/icons/warning.png |
+   *
+   * @param path router path at which file server is mounted
+   * @param source directory from which files are served
+   * @param defaults default file names
+   *
+   * @return this router
+   *
+   * @note If request matches a directory, and if a file with one of the default
+   * file names exists in that directory, the server sends 303 (See Other) with
+   * Location header pointing to default file.
+   */
+  def fileserver(path: String, source: File, defaults: String*): this.type =
+    route(path)(FileServer(source, defaults))
+
+  /**
+   * Mounts router application at given router path.
+   *
+   * @param path router path at which router application is mounted
    * @param app router application
    *
    * @return this router
@@ -264,7 +263,7 @@ trait Router:
 
     app(router)
 
-    val hooks = router.getLifecycleHooks()
+    val hooks   = router.getLifecycleHooks()
     val handler = MountRequestHandler(router.mountPath, router.getRequestHandler())
 
     app match

@@ -46,11 +46,11 @@ trait ResponseFilter:
 /** Provides `ResponseFilter` utilities. */
 object ResponseFilter:
   /**
-   * Composes response filters, with filters applied in order.
+   * Chains response filters by applying filters in order.
    *
    * @param filters response filters
    *
-   * @note If `filters` is empty, a filter is created to return supplied
+   * @note If `filters` is empty, the returned filter simply returns supplied
    * response.
    */
   def chain(filters: Seq[ResponseFilter]): ResponseFilter =
@@ -62,7 +62,7 @@ object ResponseFilter:
     filter(_, filters)
 
   /**
-   * Composes response filters, with filters applied in order.
+   * Chains response filters by applying filters in order.
    *
    * @param one response filter
    * @param more additional response filters

@@ -127,7 +127,7 @@ class HttpServerFileServerSpec extends org.scalatest.flatspec.AnyFlatSpec with T
       .backlogSize(8)
       .poolSize(2)
       .queueSize(4)
-      .files("/", Resources.riteshiff, "home.html")
+      .fileserver("/", Resources.riteshiff, "home.html")
       .toHttpServer(0)
 
     try f(server) finally server.close()
