@@ -5,7 +5,7 @@ description  := "The HTTP library for Scala"
 homepage     := Some(url("https://github.com/losizm/scamper"))
 licenses     := List("Apache License, Version 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
-scalaVersion := "3.3.3"
+scalaVersion := "3.3.5"
 scalacOptions := Seq("-deprecation", "-feature", "-new-syntax", "-Werror", "-Yno-experimental")
 
 versionScheme := Some("early-semver")
