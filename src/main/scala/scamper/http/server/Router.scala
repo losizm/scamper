@@ -245,7 +245,7 @@ trait Router:
    * Location header pointing to default file.
    */
   def fileserver(path: String, source: File, defaults: String*): this.type =
-    route(path)(FileServer(source, defaults))
+    mount(FileServer(source, defaults), path, None)
 
   /**
    * Mounts router application at given router path.
@@ -259,22 +259,22 @@ trait Router:
    * lifecycle hook.
    */
   def route(path: String)(app: RouterApplication): this.type =
-    val router = StandardRouter(mountPath + MountPath.normalize(path))
+    mount(app, path, None)
 
-    app(router)
-
-    val hooks   = router.getLifecycleHooks()
-    val handler = MountRequestHandler(router.mountPath, router.getRequestHandler())
-
-    app match
-      case hook: LifecycleHook =>
-        trigger(hook)
-        hooks.foreach(trigger)
-        incoming(handler)
-
-      case _ =>
-        hooks.foreach(trigger)
-        incoming(handler)
+  /**
+   * Mounts conditional router application at given router path.
+   *
+   * @param path router path at which router application is mounted
+   * @param predicate condition under which router is applied
+   * @param app router application
+   *
+   * @return this router
+   *
+   * @note If router app implements [[LifecycleHook]], it is also added as a
+   * lifecycle hook.
+   */
+  def route(path: String, predicate: RequestPredicate)(app: RouterApplication): this.type =
+    mount(app, path, Some(predicate))
 
   /**
    * Adds error handler.
@@ -303,3 +303,25 @@ trait Router:
    * a lifecycle hook.
    */
   def outgoing(filter: ResponseFilter): this.type
+
+  private def mount(app: RouterApplication, path: String, predicate: Option[RequestPredicate]): this.type =
+    val router = StandardRouter(mountPath + MountPath.normalize(path))
+
+    app(router)
+
+    val hooks   = router.getLifecycleHooks()
+    val handler = MountRequestHandler(
+      router.mountPath,
+      predicate.map { ConditionalRequestHandler(_, router.getRequestHandler()) }
+        .getOrElse { router.getRequestHandler() }
+    )
+
+    app match
+      case hook: LifecycleHook =>
+        trigger(hook)
+        hooks.foreach(trigger)
+        incoming(handler)
+
+      case _ =>
+        hooks.foreach(trigger)
+        incoming(handler)
