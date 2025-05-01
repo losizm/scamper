@@ -353,6 +353,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(query.getInt("id").contains(1))
     assert(query.getIntOrElse("id", 0) == 1)
     assert(query.getIntOrElse("xyz", 0) == 0)
+    assert(query.getIntValues("id") == Seq(1, 2, 3))
     assertThrows[NullPointerException](query.getIntOrElse("xyz", throw NullPointerException()))
     assertThrows[NumberFormatException](query.getInt("nan"))
   }
@@ -363,6 +364,7 @@ class QueryStringSpec extends org.scalatest.flatspec.AnyFlatSpec:
     assert(query.getLong("id").contains(1))
     assert(query.getLongOrElse("id", 0) == 1)
     assert(query.getLongOrElse("xyz", 0) == 0)
+    assert(query.getLongValues("id") == Seq(1L, 2L, 3L))
     assertThrows[NullPointerException](query.getLongOrElse("xyz", throw NullPointerException()))
     assertThrows[NumberFormatException](query.getLong("nan"))
   }

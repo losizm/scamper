@@ -109,6 +109,32 @@ trait QueryString:
   def getValues(name: String): Seq[String]
 
   /**
+   * Gets parameter values with given name and parses them to `Int`.
+   *
+   * @param name parameter name
+   *
+   * @throws java.lang.NumberFormatException if parameter values cannot be
+   * parsed to `Int`
+   *
+   * @note If parameter is not present, an empty sequence is returned.
+   */
+  def getIntValues(name: String): Seq[Int] =
+    getValues(name).map(_.toInt)
+
+  /**
+   * Gets parameter values with given name and parses them to `Long`.
+   *
+   * @param name parameter name
+   *
+   * @throws java.lang.NumberFormatException if parameter values cannot be
+   * parsed to `Long`
+   *
+   * @note If parameter is not present, an empty sequence is returned.
+   */
+  def getLongValues(name: String): Seq[Long] =
+    getValues(name).map(_.toLong)
+
+  /**
    * Tests for parameter with given name.
    *
    * @param name parameter name
