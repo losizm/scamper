@@ -17,16 +17,82 @@ package scamper
 package http
 package server
 
+import java.net.Socket
 import java.io.File
 
-import scamper.http.headers.{ toContentDisposition, toContentLength, toContentType }
-import scamper.http.types.{ DispositionType, MediaType }
+import scamper.http.headers.given
+import scamper.http.types.{ DispositionType, MediaRange, MediaType }
 
-/** Adds server extensions to `HttpResponse`. */
-given toServerHttpResponse: Conversion[HttpResponse, ServerHttpResponse] = ServerHttpResponse(_)
+import ResponseStatus.Registry.Continue
 
-/** Adds server extensions to `HttpResponse`. */
-class ServerHttpResponse(response: HttpResponse) extends AnyVal:
+extension (message: HttpMessage) 
+  /**
+   * Gets message correlate.
+   *
+   * Each incoming request is assigned a tag (i.e., correlate), which is later
+   * reassigned to its outgoing response.
+   */
+  def correlate: String =
+    message.getAttribute("scamper.http.server.message.correlate").get
+
+  /** Gets message socket. */
+  def socket: Socket =
+    message.getAttribute("scamper.http.server.message.socket").get
+
+  /**
+   * Gets request count.
+   *
+   * The request count is the number of requests that have been received from
+   * connection.
+   */
+  def requestCount: Int =
+    message.getAttribute("scamper.http.server.message.requestCount").get
+
+  /** Gets server to which this message belongs. */
+  def server: HttpServer =
+    message.getAttribute("scamper.http.server.message.server").get
+
+extension (request: HttpRequest)
+  /** Gets path parameters. */
+  def pathParams: PathParameters =
+    request.getAttributeOrElse("scamper.http.server.request.pathParams", MapPathParameters(Map.empty))
+
+  /**
+   * Sends interim 100 (Continue) response if request includes Expect header
+   * set to 100-Continue.
+   *
+   * @return `true` if response was sent; `false` otherwise
+   */
+  def continue(): Boolean =
+    import scala.language.implicitConversions
+
+    request.expectOption
+      .collect { case value if value.equalsIgnoreCase("100-continue") => request.socket }
+      .map { socket =>
+        socket.writeLine(StatusLine(Continue).toString)
+        socket.writeLine()
+        socket.flush()
+      }.isDefined
+
+  /**
+   * Finds accepted media type among supplied media types.
+   *
+   * The matching media type with the highest weight is returned. If multiple
+   * matches are found with equal weight, the first match is returned.
+   */
+  def findAccepted(types: Seq[MediaType]): Option[MediaType] =
+    import scala.language.implicitConversions
+
+    val ranges = request.accept match
+      case Nil    => Seq(MediaRange("*/*"))
+      case accept => accept.sortBy(_.weight * -1)
+
+    types.flatMap { t => ranges.find(_.matches(t)).map(_.weight -> t) }
+      .sortBy(_._1 * -1)
+      .headOption
+      .map(_._2)
+
+extension (response: HttpResponse)
   /**
    * Optionally gets corresponding request.
    *
