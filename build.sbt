@@ -60,9 +60,8 @@ publishMavenStyle := true
 pomIncludeRepository := { _ => false }
 
 publishTo := {
-  val nexus = "https://oss.sonatype.org"
   isSnapshot.value match {
-    case true  => Some("snaphsots" at s"$nexus/content/repositories/snapshots")
-    case false => Some("releases"  at s"$nexus/service/local/staging/deploy/maven2")
+    case true  => Some("snaphsots" at "https://central.sonatype.com/repository/maven-snapshots/")
+    case false => Some("releases"  at "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2")
   }
 }
