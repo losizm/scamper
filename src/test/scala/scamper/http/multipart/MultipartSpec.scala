@@ -165,7 +165,11 @@ class MultipartSpec extends org.scalatest.flatspec.AnyFlatSpec:
     val rap = Part("genre", "Rap")
     val rnb = Part("genre", "R&B")
     val reggae = Part("genre", "Reggae")
-    val multipart = Multipart(id, photo, rap, rnb, reggae)
+
+    val multipart = MultipartBuilder(Multipart(id, photo, rap))
+      .addPart("genre", "R&B")
+      .addPart("genre", "Reggae")
+      .toMultipart()
 
     assert(multipart.parts == Seq(id, photo, rap, rnb, reggae))
 

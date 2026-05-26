@@ -61,8 +61,7 @@ sealed trait Part:
 
 /** Provides part factory. */
 object Part:
-  /**
-   * Creates part using supplied string content. */
+  /** Creates part using supplied string content. */
   def apply(name: String, content: String): Part =
     notNull(name, "name")
     notNull(content, "content")
