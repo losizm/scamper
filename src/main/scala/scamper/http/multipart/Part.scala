@@ -22,6 +22,9 @@ import java.util.Arrays
 
 import scamper.http.types.{ DispositionType, MediaType }
 
+/** Defines type alias for part content. */
+type PartContent = String | Array[Byte] | File
+
 /**
  * Represents part in multipart form data.
  *
@@ -61,52 +64,66 @@ sealed trait Part:
 
 /** Provides part factory. */
 object Part:
-  /** Creates part using supplied string content. */
-  def apply(name: String, content: String): Part =
-    notNull(name, "name")
-    notNull(content, "content")
-
-    StringPart(getDispositionType(name, None), MediaType.plain, content)
-
   /**
-   * Creates part using supplied byte content.
+   * Creates part using supplied content.
    *
-   * @note Content is copied.
-   */
-  def apply(name: String, content: Array[Byte]): Part =
-    notNull(name, "name")
-    notNull(content, "content")
-
-    ByteArrayPart(getDispositionType(name, None), MediaType.octetStream, Arrays.copyOf(content, content.size))
-
-  /**
-   * Creates part using supplied byte content.
+   * @param name sets name
+   * @param content sets content
+   * @param contentType sets content type, which defaults based on content
+   *   * if content is string, then defaults to `text/plain`
+   *   * if content is byte array, then defaults to `application/octet-stream`
+   *   * if content is file, then defaults based on content file name or
+   *     `fileName` if provided
+   * @param fileName sets file name, which defaults to `None`
+   * @param params sets parameters, which defaults to `Map.empty`
    *
-   * @note Content is copied.
+   * @return part
    */
-  def apply(name: String, content: Array[Byte], offset: Int, length: Int): Part =
+  def apply(
+    name: String,
+    content: PartContent,
+    contentType: Option[MediaType] = None,
+    fileName: Option[String] = None,
+    params: Map[String, String] = Map.empty,
+  ): Part =
     notNull(name, "name")
     notNull(content, "content")
-
-    ByteArrayPart(getDispositionType(name, None), MediaType.octetStream, Arrays.copyOfRange(content, offset, offset + length))
-
-  /** Creates part using supplied file content. */
-  def apply(name: String, content: File): Part =
-    notNull(name, "name")
-    notNull(content, "content")
-
-    FilePart(getDispositionType(name, Some(content.getName)), getMediaType(content.getName), content)
-
-  /** Creates part using supplied file content and optional file name. */
-  def apply(name: String, content: File, fileName: Option[String]): Part =
-    notNull(name, "name")
-    notNull(content, "content")
+    notNull(contentType, "contentType")
     notNull(fileName, "fileName")
+    notNull(params, "params")
 
-    FilePart(getDispositionType(name, fileName), getMediaType(fileName.getOrElse(content.getName)), content)
+    content match
+      case content: String =>
+        StringPart(
+          getContentDisposition(name, fileName, params),
+          contentType.getOrElse(MediaType.plain),
+          content
+        )
 
-  /** Creates part using supplied string content. */
-  def apply(contentDisposition: DispositionType, contentType: MediaType, content: String): Part =
+      case content: Array[Byte] =>
+        ByteArrayPart(
+          getContentDisposition(name, fileName, params),
+          contentType.getOrElse(MediaType.octetStream),
+          content
+        )
+
+      case content: File =>
+        FilePart(
+          getContentDisposition(name, fileName, params),
+          contentType.getOrElse(getContentType(fileName.getOrElse(content.getName))),
+          content
+        )
+
+  /**
+   * Creates part using supplied content.
+   *
+   * @param contentDisposition sets content disposition
+   * @param contentType sets content type
+   * @param content sets content
+   *
+   * @return part
+   */
+  def apply(contentDisposition: DispositionType, contentType: MediaType, content: PartContent): Part =
     notNull(contentDisposition, "contentDisposition")
     notNull(contentType, "contentType")
     notNull(content, "content")
@@ -117,42 +134,28 @@ object Part:
     if !contentDisposition.params.contains("name") then
       throw HttpException("Missing name parameter in content disposition")
 
-    StringPart(contentDisposition, contentType, content)
+    content match
+      case content: String =>
+        StringPart(contentDisposition, contentType, content)
 
-  /** Creates part using supplied byte content. */
-  def apply(contentDisposition: DispositionType, contentType: MediaType, content: Array[Byte]): Part =
-    notNull(contentDisposition, "contentDisposition")
-    notNull(contentType, "contentType")
-    notNull(content, "content")
+      case content: Array[Byte] =>
+        ByteArrayPart(contentDisposition, contentType, Arrays.copyOf(content, content.size))
 
-    if !contentDisposition.isFormData then
-      throw HttpException("Content disposition is not form-data")
+      case content: File =>
+        FilePart(contentDisposition, contentType, content)
 
-    if !contentDisposition.params.contains("name") then
-      throw HttpException("Missing name parameter in content disposition")
-
-    ByteArrayPart(contentDisposition, contentType, content)
-
-  /** Creates part using supplied file content. */
-  def apply(contentDisposition: DispositionType, contentType: MediaType, content: File): Part =
-    notNull(contentDisposition, "contentDisposition")
-    notNull(contentType, "contentType")
-    notNull(content, "content")
-
-    if !contentDisposition.isFormData then
-      throw HttpException("Content disposition is not form-data")
-
-    if !contentDisposition.params.contains("name") then
-      throw HttpException("Missing name parameter in content disposition")
-
-    FilePart(contentDisposition, contentType, content)
-
-  private def getDispositionType(name: String, fileName: Option[String]): DispositionType =
+  private def getContentDisposition(name: String, fileName: Option[String], params: Map[String, String]): DispositionType =
     fileName match
-      case Some(value) => DispositionType("form-data", "name" -> name, "filename" -> value)
-      case None        => DispositionType("form-data", "name" -> name)
+      case Some(fileName) => DispositionType("form-data", Map("name" -> name, "filename" -> fileName) ++ params)
+      case None           => DispositionType("form-data", Map("name" -> name) ++ params)
 
-  private def getMediaType(fileName: String): MediaType =
+  private def getFileName(content: File, fileName: String | Boolean): Option[String] =
+    fileName match
+      case fileName: String => Option(fileName)
+      case true             => Option(content.getName)
+      case false            => None
+
+  private def getContentType(fileName: String): MediaType =
     MediaType.forFileName(fileName).getOrElse(MediaType.octetStream)
 
 private sealed abstract class AbstractPart extends Part:

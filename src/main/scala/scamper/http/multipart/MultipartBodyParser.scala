@@ -19,7 +19,7 @@ package multipart
 
 import java.io.{ File, InputStream }
 
-import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
 import scamper.http.headers.toContentType
@@ -51,7 +51,7 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
 
     in.getLine(buffer) match
       case line if line.startsWith(String(status.start)) =>
-        val parts = new ListBuffer[Part]
+        val parts = MultipartBuilder()
 
         while status.continue do
           val headers = HeaderStream.getHeaders(in, buffer)
@@ -72,7 +72,7 @@ private class MultipartBodyParser(dest: File, val maxLength: Long, bufferSize: I
             case false =>
               parts += Part(contentDisposition, contentType, getFileContent(in, buffer, status))
 
-        Multipart(parts.toSeq)
+        parts.toMultipart()
 
       case line if line.startsWith(String(status.end)) => Multipart(Nil)
 

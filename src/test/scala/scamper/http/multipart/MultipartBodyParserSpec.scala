@@ -33,12 +33,12 @@ class MultipartBodyParserSpec extends org.scalatest.flatspec.AnyFlatSpec:
       .resolveTo("localhost", server.port, false)
       .toHttpClient()
 
-    val song = Multipart(
-      Part("title", "Form Of Intellect"),
-      Part("artist", "Gang Starr"),
-      Part("album", "Step In The Arena"),
-      Part("media", File("./src/test/resources/form_of_intellect.wav"))
-    )
+    val song = MultipartBuilder()
+      .add("title", "Form Of Intellect")
+      .add("artist", "Gang Starr")
+      .add("album", "Step In The Arena")
+      .add("media", File("./src/test/resources/form_of_intellect.wav"))
+      .toMultipart()
 
     val req = Post("/multipart").setMultipartBody(song)
 

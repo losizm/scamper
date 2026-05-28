@@ -19,11 +19,5 @@ package multipart
 
 import java.io.File
 
-/** Converts `Tuple` to `Part` using string content. */
-given tupleToStringPart: Conversion[(String, String), Part] = Part(_, _)
-
-/** Converts `Tuple` to `Part` using byte content. */
-given tupleToByteArrayPart: Conversion[(String, Array[Byte]), Part] = Part(_, _)
-
-/** Converts `Tuple` to `Part` using file content. */
-given tupleToFilePart: Conversion[(String, File), Part] = Part(_, _)
+/** Converts `Tuple` to `Part`. */
+given tupleToPart: Conversion[(String, PartContent), Part] = Part(_, _)

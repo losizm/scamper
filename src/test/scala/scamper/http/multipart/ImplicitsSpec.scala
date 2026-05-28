@@ -42,6 +42,6 @@ class ImplicitsSpec extends org.scalatest.flatspec.AnyFlatSpec:
     val part: Part = "passwd" -> File("test.json")
     assert(part.name == "passwd")
     assert(part.getFile() == File("test.json"))
-    assert(part.fileName.contains("test.json"))
+    assert(part.fileName.isEmpty)
     assert(part.contentType.fullName == "application/json")
   }
